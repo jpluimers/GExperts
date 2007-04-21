@@ -1,0 +1,228 @@
+unit GX_Actions;
+
+interface
+
+uses
+  Classes, ActnList,
+  Menus, ImgList,
+  GX_KbdShortCutBroker;
+
+type
+  { This interface is a rather typical action - except
+    that it takes care of
+      a) freeing + unregistering due to reference-counting
+      b) keyboard shortcut assignment which is special
+         due to the IDE's interference automatically. }
+  IGxAction = interface(IUnknown)
+    ['{4B163781-D710-11D3-A95A-5AE3EA000000}']
+    function GetCaption: string;
+    function GetCategory: string;
+    function GetChecked: Boolean;
+    function GetEnabled: Boolean;
+    function GetHint: string;
+    function GetImageIndex: TImageIndex;
+    function GetOnExecute: TNotifyEvent;
+    function GetOnUpdate: TNotifyEvent;
+    function GetShortCut: TShortCut;
+    function GetVisible: Boolean;
+    procedure SetCaption(const Value: string);
+    procedure SetCategory(const Value: string);
+    procedure SetChecked(const Value: Boolean);
+    procedure SetEnabled(const Value: Boolean);
+    procedure SetHint(const Value: string);
+    procedure SetImageIndex(const Value: TImageIndex);
+    procedure SetOnExecute(Value: TNotifyEvent);
+    procedure SetOnUpdate(Value: TNotifyEvent);
+    procedure SetShortCut(const Value: TShortCut);
+    procedure SetVisible(const Value: Boolean);
+    function GetAction: TCustomAction;
+
+    property Caption: string read GetCaption write SetCaption;
+    property Category: string read GetCategory write SetCategory;
+    property Checked: Boolean read GetChecked write SetChecked;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
+    property Hint: string read GetHint write SetHint;
+    property ImageIndex: TImageIndex read GetImageIndex write SetImageIndex;
+    property OnExecute: TNotifyEvent read GetOnExecute write SetOnExecute;
+    property OnUpdate: TNotifyEvent read GetOnUpdate write SetOnUpdate;
+    property ShortCut: TShortCut read GetShortCut write SetShortCut;
+    property Visible: Boolean read GetVisible write SetVisible;
+  end;
+
+  IGxMenuAction = interface(IGxAction)
+    ['{FD68EC31-D723-11D3-A95A-5AE3EA000000}']
+    function GetAssociatedMenuItem: TMenuItem;
+
+    property AssociatedMenuItem: TMenuItem read GetAssociatedMenuItem;
+  end;
+
+type
+  { Base implementor for all actions implemented and registered
+    by GExperts.
+    Features life-time management through reference-counting. }
+  TGxCustomAction = class(TCustomAction, IGxAction)
+  private
+    FIdeShortCut: IGxKeyboardShortCut;
+  protected
+    property IdeShortCut: IGxKeyboardShortCut read FIdeShortCut write FIdeShortCut;
+  protected
+    // IUnknown overrides
+    FRefCount: Integer;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+  protected
+    // IGxAction
+    function GetCaption: string;
+    function GetCategory: string;
+    function GetChecked: Boolean;
+    function GetEnabled: Boolean;
+    function GetHint: string;
+    function GetImageIndex: TImageIndex;
+    function GetOnExecute: TNotifyEvent;
+    function GetOnUpdate: TNotifyEvent;
+    function GetShortCut: TShortCut;
+    function GetVisible: Boolean;
+    procedure SetCaption(const Value: string);
+    procedure SetCategory(const Value: string);
+    procedure SetChecked(const Value: Boolean);
+    procedure SetEnabled(const Value: Boolean);
+    procedure SetHint(const Value: string);
+    procedure SetImageIndex(const Value: TImageIndex);
+    procedure SetOnExecute(Value: TNotifyEvent); override;
+    procedure SetOnUpdate(Value: TNotifyEvent);
+    procedure SetShortCut(const Value: TShortCut);
+    procedure SetVisible(const Value: Boolean);
+  public
+    property ShortCut: TShortCut read GetShortCut write SetShortCut;
+    function GetAction: TCustomAction;
+  end;
+
+implementation
+
+uses
+  Windows;
+
+{ TGxCustomAction }
+
+function TGxCustomAction.GetAction: TCustomAction;
+begin
+  Result := Self; 
+end;
+
+function TGxCustomAction.GetCaption: string;
+begin
+  Result := inherited Caption;
+end;
+
+function TGxCustomAction.GetCategory: string;
+begin
+  Result := inherited Category;
+end;
+
+function TGxCustomAction.GetChecked: Boolean;
+begin
+  Result := inherited Checked;
+end;
+
+function TGxCustomAction.GetEnabled: Boolean;
+begin
+  Result := inherited Enabled;
+end;
+
+function TGxCustomAction.GetHint: string;
+begin
+  Result := inherited Hint;
+end;
+
+function TGxCustomAction.GetImageIndex: TImageIndex;
+begin
+  Result := inherited ImageIndex;
+end;
+
+function TGxCustomAction.GetOnExecute: TNotifyEvent;
+begin
+  Result := inherited OnExecute;
+end;
+
+function TGxCustomAction.GetOnUpdate: TNotifyEvent;
+begin
+  Result := inherited OnUpdate;
+end;
+
+function TGxCustomAction.GetShortCut: TShortCut;
+begin
+  Result := inherited ShortCut;
+end;
+
+function TGxCustomAction.GetVisible: Boolean;
+begin
+  Result := inherited Visible;
+end;
+
+procedure TGxCustomAction.SetCaption(const Value: string);
+begin
+  inherited Caption := Value;
+
+  if Hint = '' then
+    Hint := StripHotkey(Value);
+end;
+
+procedure TGxCustomAction.SetCategory(const Value: string);
+begin
+  inherited Category := Value;
+end;
+
+procedure TGxCustomAction.SetChecked(const Value: Boolean);
+begin
+  inherited Checked := Value;
+end;
+
+procedure TGxCustomAction.SetEnabled(const Value: Boolean);
+begin
+  inherited Checked := Value;
+end;
+
+procedure TGxCustomAction.SetHint(const Value: string);
+begin
+  inherited Hint := Value;
+end;
+
+procedure TGxCustomAction.SetImageIndex(const Value: TImageIndex);
+begin
+  inherited ImageIndex := Value;
+end;
+
+procedure TGxCustomAction.SetOnExecute(Value: TNotifyEvent);
+begin
+  inherited SetOnExecute(Value);
+end;
+
+procedure TGxCustomAction.SetOnUpdate(Value: TNotifyEvent);
+begin
+  inherited OnUpdate := Value;
+end;
+
+procedure TGxCustomAction.SetShortCut(const Value: TShortCut);
+begin
+  inherited ShortCut := Value;
+end;
+
+procedure TGxCustomAction.SetVisible(const Value: Boolean);
+begin
+  inherited Visible := Value;
+end;
+
+function TGxCustomAction._AddRef: Integer;
+begin
+  Result := InterlockedIncrement(FRefCount);
+end;
+
+function TGxCustomAction._Release: Integer;
+begin
+  Result := InterlockedDecrement(FRefCount);
+  if (Result = 0) { and (Owner = nil) } then
+    Destroy;
+end;
+
+end.
+

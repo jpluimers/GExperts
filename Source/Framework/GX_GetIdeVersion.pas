@@ -1,0 +1,489 @@
+unit GX_GetIdeVersion;
+
+// Original Authors: Stefan Hoffmeister and Erik Berry
+
+interface
+
+type
+  TBorlandIdeVersion =
+    (ideUndetected, ideUnknown,
+     ideD600, ideD601R, ideD601F, ideD602,
+     ideD700, ideD71,
+     ideD800, ideD801, ideD802,
+     ideD900, ideD901, ideD902, ideD903,
+     ideBDS2006,
+     ideDelphi2007,
+     ideBDS2007,
+     ideCSB100,
+     ideBCB600, ideBCB601, ideBCB602, ideBCB604,
+     ideKylix100,
+     ideKylix200,
+     ideKylix300
+     );
+
+// Returns the *exact* version of the product;
+//
+// Note that the IDE executable and hence the IDE's reported
+// version number in the about box may have not been changed.
+//
+// We err on the safe side, i.e. until we do not
+// detect a feature of a higher version, we do
+// not increment the version number to something
+// higher.
+
+function GetBorlandIdeVersion: TBorlandIdeVersion;
+
+implementation
+
+uses
+  SysUtils, Dialogs,
+  GX_GenericUtils, GX_IdeUtils;
+
+var
+  DetectedVersion: TBorlandIdeVersion;
+
+// Result < 0 if V1 < V2
+// Result = 0 if V1 = V2
+// Result > 0 if V1 > V2
+function CompareVersionNumber(const V1, V2: TVersionNumber): Integer;
+begin
+  Result := V1.Major - V2.Major;
+  if Result <> 0 then
+    Exit;
+
+  Result := V1.Minor - V2.Minor;
+  if Result <> 0 then
+    Exit;
+
+  Result := V1.Release - V2.Release;
+  if Result <> 0 then
+    Exit;
+
+  Result := V1.Build - V2.Build;
+end;
+
+{
+  Delphi 6.00:
+
+  File            File Version  Size      Modified Time
+  delphide60.bpl  6.0.6.142     409,600   Thursday, May 17, 2001, 2:46:06 PM (?)
+  vclide60.bpl    6.0.6.142     697,344   Thursday, May 17, 2001, 2:46:22 PM (?)
+  designide60.bpl 6.0.6.142     702,976   Thursday, May 17, 2001, 2:46:06 PM (?)
+  coreide60.bpl   6.0.6.142     3,074,560 Thursday, May 17, 2001, 2:45:56 PM (?)
+  DCC60.DLL       6.0.6.142     867,840   Thursday, May 17, 2001, 2:45:58 PM (?)
+  delphi32.exe    6.0.6.142     473,088   Thursday, May 17, 2001, 2:46:06 PM (?)
+
+  Delphi 6.01 (recalled release):
+
+  File            File Version  Size      Modified Time
+  delphide60.bpl  6.0.6.189     3,065,344 Thursday, September 06, 2001, 6:01:00 AM
+  vclide60.bpl    6.0.6.163     696,832   Tuesday, May 22, 2001, 1:00:00 AM (?)
+  designide60.bpl 6.0.6.163     701,440   Tuesday, May 22, 2001, 1:00:00 AM (?)
+  coreide60.bpl   6.0.6.189     3,065,344 Thursday, September 06, 2001, 6:01:00 AM
+  DCC60.DLL       6.0.6.189     792,064   Thursday, September 06, 2001, 6:01:00 AM
+  delphi32.exe    6.0.6.189     472,064   Thursday, September 06, 2001, 6:01:00 AM
+
+  Delphi 6.01 (final release):
+
+  File            File Version  Size      Modified Time
+  delphide60.bpl  6.0.6.163(!)  409,088   Tuesday, May 22, 2001, 12:00:00 AM
+  vclide60.bpl    6.0.6.163     696,832   Tuesday, May 22, 2001, 12:00:00 AM
+  designide60.bpl 6.0.6.163     701,440   Tuesday, May 22, 2001, 12:00:00 AM
+  coreide60.bpl   6.0.6.190     3,065,344 Thursday, September 27, 2001, 5:01:00 AM
+  DCC60.DLL       6.0.6.190     792,064   Thursday, September 27, 2001, 5:01:00 AM
+  delphi32.exe    6.0.6.190     472,064   Thursday, September 27, 2001, 5:01:00 AM
+
+  Delphi 6.02:
+  File            File Version  Size      Modified Time
+  delphide60.bpl  6.0.6.240     409,600   Friday, February 15, 2002, 2:02:00 PM
+  vclide60.bpl    6.0.6.163     696,832   Tuesday, May 22, 2001, 12:00:00 AM
+  designide60.bpl 6.0.6.163     701,440   Tuesday, May 22, 2001, 12:00:00 AM
+  coreide60.bpl   6.0.6.240     3,065,344 Friday, February 15, 2002, 2:02:00 PM
+  DCC60.DLL       6.0.6.240     707,584   Friday, February 15, 2002, 2:02:00 PM
+  delphi32.exe    6.0.6.240     472,064   Friday, February 15, 2002, 2:02:00 PM
+}
+
+function GetDelphi6IdeVersion: TBorlandIdeVersion;
+const
+  CoreIdeD600: TVersionNumber =
+    (Minor: 0; Major: 6; Build: 142; Release: 6);
+  CoreIdeD601R: TVersionNumber =
+    (Minor: 0; Major: 6; Build: 189; Release: 6);
+  CoreIdeD601F: TVersionNumber =
+    (Minor: 0; Major: 6; Build: 190; Release: 6);
+var
+  ReadFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideD600;
+  ReadFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide60.bpl');
+  VersionNumber := CompareVersionNumber(ReadFileVersion, CoreIdeD600);
+  if VersionNumber > 0 then
+    Result := ideD601R;
+  VersionNumber := CompareVersionNumber(ReadFileVersion, CoreIdeD601R);
+  if VersionNumber > 0 then
+    Result := ideD601F;
+  VersionNumber := CompareVersionNumber(ReadFileVersion, CoreIdeD601F);
+  if VersionNumber > 0 then
+    Result := ideD602;
+end;
+
+{
+  C++Builder 6.00:
+
+  File            File Version  Size      Modified Time
+  designide60.bpl 6.0.10.157    706,560   Saturday, February 02, 2002, 1:00:00 AM
+  coreide60.bpl   6.0.10.157    3,158,016 Saturday, February 02, 2002, 1:00:00 AM
+  bcb.exe         6.0.10.157    732,672   Friday, February 01, 2002, 2:00:00 PM
+  bcc32.exe       5.6.0.0       1,394,688 Saturday, February 02, 2002, 1:00:00 AM
+  dcc60.dll       6.0.10.157    797,696   Saturday, February 02, 2002, 1:00:00 AM
+  bcbide60.bpl    6.0.10.157    974,848   Saturday, February 02, 2002, 12:00:00 AM
+
+  C++Builder 6.01:
+
+  File            File Version  Size      Modified Time
+  designide60.bpl 6.0.10.157   706,560 Saturday, February 02, 2002, 1:00:00 AM
+  dcc60.dll       6.0.10.157   797,696 Saturday, February 02, 2002, 1:00:00 AM
+  bcb.exe         6.0.10.161   732,672 Friday, February 01, 2002, 2:00:00 PM
+  coreide60.bpl   6.0.10.157 3,158,016 Saturday, February 02, 2002, 1:00:00 AM
+  bcc32.exe       5.6.0.0    1,394,688 Saturday, February 02, 2002, 1:00:00 AM
+  bcbide60.bpl    6.0.10.161   974,848 Friday, February 01, 2002, 2:00:00 PM
+
+  C++Builder 6.02:
+
+  File            File Version  Size      Modified Time
+  designide60.bpl 6.0.10.157   706,560 Saturday, February 02, 2002, 1:00:00 AM
+  dcc60.dll       6.0.10.157   797,696 Saturday, February 02, 2002, 1:00:00 AM
+  bcb.exe         6.0.10.165   732,672 Thursday, July 11, 2002, 6:02:00 AM
+  coreide60.bpl   6.0.10.165 3,158,016 Thursday, July 11, 2002, 6:02:00 AM
+  bcc32.exe       5.6.1.0    1,397,760 Thursday, July 11, 2002, 6:02:00 AM
+  bcbide60.bpl    6.0.10.165   974,848 Thursday, July 11, 2002, 6:02:00 AM
+
+  (C++Builder 6.03 was a semi-private beta release)
+
+  C++Builder 6.04:
+
+  File            File Version  Size      Modified Time
+  designide60.bpl 6.0.10.166   706,560 Thursday, January 30, 2003, 6:04:00 AM
+  dcc60.dll       6.0.10.155   797,696 Wednesday, January 30, 2002, 5:38:44 PM
+  bcb.exe         6.0.10.166   732,672 Thursday, January 30, 2003, 6:04:00 AM
+  coreide60.bpl   6.0.10.166 3,158,016 Thursday, January 30, 2003, 6:04:00 AM
+  bcc32.exe       5.6.4.0    1,398,272 Thursday, January 30, 2003, 6:04:00 AM
+  bcbide60.bpl    6.0.10.166   975,872 Thursday, January 30, 2003, 6:04:00 AM
+}
+
+function GetCppBuilder6IdeVersion: TBorlandIdeVersion;
+const
+  BcbExe600: TVersionNumber =
+    (Minor: 0; Major: 6; Build: 157; Release: 10);
+  BcbExe601: TVersionNumber =
+    (Minor: 0; Major: 6; Build: 161; Release: 10);
+  BcbExe602: TVersionNumber =
+    (Minor: 0; Major: 6; Build: 165; Release: 10);
+var
+  ReadFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideBCB600;
+  ReadFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\bcb.exe');
+  VersionNumber := CompareVersionNumber(ReadFileVersion, BcbExe600);
+  if VersionNumber > 0 then
+    Result := ideBCB601;
+  VersionNumber := CompareVersionNumber(ReadFileVersion, BcbExe601);
+  if VersionNumber > 0 then
+    Result := ideBCB602;
+  VersionNumber := CompareVersionNumber(ReadFileVersion, BcbExe602);
+  if VersionNumber > 0 then
+    Result := ideBCB604;
+end;
+
+{
+  Delphi 7.00:
+
+  File            File Version  Size      Modified Time
+  delphide70.bpl  7.0.4.453    473,088    Friday, August 09, 2002, 8:00:00 AM
+  vclide70.bpl    7.0.4.453    708,608    Friday, August 09, 2002, 8:00:00 AM
+  designide70.bpl 7.0.4.453    625,152    Friday, August 09, 2002, 8:00:00 AM
+  coreide70.bpl   7.0.4.453  3,180,544    Friday, August 09, 2002, 8:00:00 AM
+  DCC70.DLL       7.0.4.453    841,216    Friday, August 09, 2002, 8:00:00 AM
+  delphi32.exe    7.0.4.453    545,792    Friday, August 09, 2002, 1:00:00 PM
+
+  Delphi 7.1:
+
+  File            File Version  Size      Modified Time
+  delphide70.bpl  7.0.4.453    473,088    Friday, August 09, 2002, 9:00:00 AM
+  vclide70.bpl    7.0.4.453    708,608    Friday, August 09, 2002, 9:00:00 AM
+  designide70.bpl 7.0.8.1      625,664    Friday, April 23, 2004, 9:01:00 AM
+  coreide70.bpl   7.0.8.1    3,186,688    Friday, April 23, 2004, 9:01:00 AM
+  DCC70.DLL       7.0.8.1      843,264    Friday, April 23, 2004, 9:01:00 AM
+  delphi32.exe    7.0.8.1      545,792    Friday, April 23, 2004, 9:01:00 AM
+}
+function GetDelphi7IdeVersion: TBorlandIdeVersion;
+const
+  CoreIDE700: TVersionNumber =
+    (Minor: 0; Major: 7; Build: 453; Release: 4);
+var
+  ReadFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+  CoreIdeFile: string;
+begin
+  Result := ideD700;
+  CoreIdeFile := GetIdeRootDirectory + 'Bin\coreide70.bpl';
+  if FileExists(CoreIdeFile) then begin
+    ReadFileVersion := GetFileVersionNumber(CoreIdeFile);
+    VersionNumber := CompareVersionNumber(ReadFileVersion, CoreIDE700);
+    if VersionNumber > 0 then
+      Result := ideD71;
+  end;
+end;
+
+function GetCSharpBuilder1Version: TBorlandIdeVersion;
+begin
+  Result := ideCSB100;
+end;
+
+{
+  Delphi 8.00:
+
+  File                 File Version   Size       Modified Time
+  delphicoreide71.bpl 7.1.1446.610   1,228,800  Wednesday, December 17, 2003, 10:00:00 AM
+  vclide71.bpl        7.1.1446.610     921,088  Wednesday, December 17, 2003, 10:00:00 AM
+  designide71.bpl     7.1.1446.610     677,376  Wednesday, December 17, 2003, 10:00:00 AM
+  coreide71.bpl       7.1.1446.610   2,793,984  Wednesday, December 17, 2003, 10:00:00 AM
+  DCC71.DLL           7.1.1446.610     922,112  Wednesday, December 17, 2003, 10:00:00 AM
+  bds.exe             7.1.1446.610   1,092,608  Wednesday, December 17, 2003, 10:00:00 AM
+  Studio.Host.dll     7.1.1446.610     684,032  Wednesday, December 17, 2003, 10:00:00 AM
+  bordbk71.dll        50.4.228.1       718,848  Wednesday, December 17, 2003, 10:00:00 AM
+
+  Delphi 8.01:
+  delphicoreide71.bpl
+  vclide71.bpl
+  designide71.bpl
+  coreide71.bpl
+  DCC71.DLL           7.1.1490.25464
+  bds.exe
+  Studio.Host.dll
+  bordbk71.dll        50.4.228.2
+
+  Delphi 8.02:
+  delphicoreide71.bpl 7.1.1523.17956 1,231,360  Friday, February 27, 2004, 10:02:00 AM
+  vclide71.bpl        7.1.1523.17956   921,600  Friday, February 27, 2004, 10:02:00 AM
+  designide71.bpl     7.1.1523.17956   678,912  Friday, February 27, 2004, 10:02:00 AM
+  coreide71.bpl       7.1.1523.17956 2,797,568  Friday, February 27, 2004, 10:02:00 AM
+  DCC71.DLL           7.1.1523.17956   923,136  Friday, February 27, 2004, 10:02:00 AM
+  bds.exe             7.1.1523.17956 1,092,608  Friday, February 27, 2004, 10:02:00 AM
+  B.Studio.Host.dll   7.1.1523.17956   688,128  Friday, February 27, 2004, 10:02:00 AM
+}
+function GetDelphi8Version: TBorlandIdeVersion;
+const
+  Dcc800: TVersionNumber =
+    (Minor: 1; Major: 7; Build: 610; Release: 1446);
+  BdsExe800: TVersionNumber =
+    (Minor: 1; Major: 7; Build: 610; Release: 1446);
+var
+  DccFileVersion: TVersionNumber;
+  BdsFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideD800;
+  DccFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\DCC71.DLL');
+  VersionNumber := CompareVersionNumber(DccFileVersion, Dcc800);
+  if VersionNumber > 0 then begin
+    Result := ideD801;
+    BdsFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\bds.exe');
+    VersionNumber := CompareVersionNumber(BdsFileVersion, BdsExe800);
+    if VersionNumber > 0 then
+      Result := ideD802;
+  end;
+end;
+
+{
+  Delphi 9.00 (2005):
+
+  File                 File Version   Size       Modified Time
+  delphicoreide9.bpl   9.0.1761.24408 2,891,264  Friday, October 22, 2004, 10:00:00 AM
+  vclide9.bpl          9.0.1761.24408 1,255,936  Friday, October 22, 2004, 10:00:00 AM
+  designide9.bpl       9.0.1761.24408 749,056    Friday, October 22, 2004, 10:00:00 AM
+  coreide9.bpl         9.0.1761.24408 3,367,936  Friday, October 22, 2004, 10:00:00 AM
+  DCC90.DLL            9.0.1761.24408 987,136    Friday, October 22, 2004, 10:00:00 AM
+  bds.exe              9.0.1761.24408 916,992    Friday, October 22, 2004, 10:00:00 AM
+  B.Studio.Host.dll    9.0.1761.24408 688,128    Friday, October 22, 2004, 10:00:00 AM
+  bordbk9.dll          90.1.1.1       779,264    Friday, October 22, 2004, 10:00:00 AM
+
+  Delphi 9.01 (2005 Update 1):
+
+  File                 File Version   Size       Modified Time
+  delphicoreide9.bpl   9.0.1810.11291 2,891,776  Thursday, December 09, 2004, 9:01:00 AM
+  vclide9.bpl          9.0.1761.24408 1,255,936  Friday, October 22, 2004, 10:00:00 AM
+  designide9.bpl       9.0.1810.11291 749,568    Thursday, December 09, 2004, 9:01:00 AM
+  coreide9.bpl         9.0.1810.11291 3,369,472  Thursday, December 09, 2004, 9:01:00 AM
+  DCC90.DLL            9.0.1810.11291 988,672    Thursday, December 09, 2004, 9:01:00 AM
+  bds.exe              9.0.1761.24408 916,992    Thursday, December 09, 2004, 9:01:00 AM
+  B.Studio.Host.dll    9.0.1810.11291 688,128    Thursday, December 09, 2004, 9:01:00 AM
+  bordbk9.dll          90.1.2.1       782,336    Thursday, December 09, 2004, 9:01:00 AM
+
+  Delphi 9.03 (2005 Update 3):
+
+  File                 File Version   Size       Modified Time
+  delphicoreide9.bpl   9.0.1882.30496 2,899,968  Friday, March 04, 2005, 12:02:00 PM
+  vclide9.bpl          9.0.1882.30496 1,255,936  Friday, March 04, 2005, 12:02:00 PM
+  designide9.bpl       9.0.1935.22056 750,080    Tuesday, April 19, 2005, 11:03:00 AM
+  coreide9.bpl         9.0.1935.22056 3,372,544  Tuesday, April 19, 2005, 11:03:00 AM
+  DCC90.DLL            9.0.1882.30496 989,184    Friday, March 04, 2005, 12:02:00 PM
+  bds.exe              9.0.1935.22056 917,504    Tuesday, April 19, 2005, 11:03:00 AM
+  B.Studio.Host.dll    9.0.1882.30496 688,128    Friday, March 04, 2005, 12:02:00 PM
+  bordbk9.dll          90.1.3.1       784,896    Friday, March 04, 2005, 12:02:00 PM
+}
+function GetDelphi9Version: TBorlandIdeVersion;
+const
+  CoreIde900: TVersionNumber =
+    (Minor: 0; Major: 9; Build: 24408; Release: 1761);
+  CoreIde901: TVersionNumber =
+    (Minor: 0; Major: 9; Build: 11291; Release: 1810);
+  CoreIde903: TVersionNumber =
+    (Minor: 0; Major: 9; Build: 22056; Release: 1935);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideD900;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide90.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde900);
+  if VersionNumber > 0 then
+  begin
+    Result := ideD901;
+    VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde901);
+    if VersionNumber > 0 then
+    begin
+      Result := ideD902;
+      VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde903);
+      if VersionNumber >= 0 then
+        Result := ideD903;
+    end;
+  end;
+end;
+
+function GetBDS2006Version: TBorlandIdeVersion;
+const
+  CoreIde1000: TVersionNumber =
+    (Minor: 0; Major: 0; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideBDS2006;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide100.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1000);
+  if VersionNumber > 0 then begin
+    //Result := ideD1001;
+  end;
+end;
+
+function GetDelphi2007Version: TBorlandIdeVersion;
+const
+  CoreIde1000: TVersionNumber =
+    (Minor: 0; Major: 0; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideDelphi2007;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide100.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1000);
+  if VersionNumber > 0 then begin
+    //Result := ideD1001;
+  end;
+end;
+
+function GetBDS2007Version: TBorlandIdeVersion;
+const
+  CoreIde1100: TVersionNumber =
+    (Minor: 0; Major: 0; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideBDS2007;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide110.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1100);
+  if VersionNumber > 0 then begin
+    //Result := ideD1101;
+  end;
+end;
+
+function GetBorlandIdeVersion: TBorlandIdeVersion;
+begin
+  // We only actually detect the version once per session.
+  // The previous result is cached in DetectedVersion.
+  if DetectedVersion <> ideUndetected then
+  begin
+    Result := DetectedVersion;
+    Exit;
+  end;
+
+  {$IFDEF VER140}  // Delphi 6.0 and C++Builder 6.0
+    if RunningCppBuilder then
+    begin
+      Result := GetCppBuilder6IdeVersion;
+      Assert(Result in [ideBCB600, ideBCB601, ideBCB602, ideBCB604]);
+    end
+    else begin
+      if RunningLinux then
+      begin
+        {$IF System.RTLVersion > 14.0 }
+          {$IF System.RTLVersion >= 14.5 }
+            Result := ideKylix300;
+          {$ELSE}
+            Result := ideKylix200;
+          {$IFEND}
+        {$ELSE}
+          Result := ideKylix100;
+        {$IFEND}
+      end else
+      begin
+        Result := GetDelphi6IdeVersion;
+        Assert(Result in [ideD600, ideD601R, ideD601F, ideD602]);
+      end;
+    end;
+  {$ENDIF VER140}
+
+  {$IFDEF VER150}  // Delphi 7.0 and C++Builder 7.0
+    Result := GetDelphi7IdeVersion;
+    Assert(Result in [ideD700, ideD71]);
+  {$ENDIF VER150}
+
+  {$IFDEF VER160}  // Delphi 8 and C#Builder 1.0
+    Result := GetDelphi8Version;
+    Assert(Result in [ideD800, ideD801, ideD802, ideCSB100]);
+  {$ENDIF VER160}
+
+  {$IFDEF VER170}  // Delphi 9 (2005)
+    Result := GetDelphi9Version;
+    Assert(Result in [ideD900, ideD901, ideD902, ideD903]);
+  {$ENDIF VER170}
+
+  {$IFDEF VER180}
+    {$IFNDEF VER185} // BDS 2006
+      Result := GetBDS2006Version;
+      Assert(Result in [ideBDS2006]);
+    {$ELSE} // Delphi 2007
+      Result := GetDelphi2007Version;
+      Assert(Result in [ideDelphi2007]);
+    {$ENDIF}
+  {$ENDIF VER180}
+
+  {$IFDEF VER190}  // BDS 2007
+    Result := GetBDS2007Version;
+    Assert(Result in [ideBDS2007]);
+  {$ENDIF VER190}
+
+  if Result = ideUnknown then
+    MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);
+
+  DetectedVersion := Result;
+end;
+
+initialization
+  DetectedVersion := ideUndetected;
+
+end.

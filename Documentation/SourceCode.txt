@@ -1,0 +1,171 @@
+The GExperts source code is provided under an Open Source license to
+encourage users to contribute bug fixes and new features.  A basic
+introduction to the source code is given below the compilation steps.
+For the rules reguarding the usage of our source code, see License.txt
+and the FAQs on our web site.
+
+Compiling the Source Code
+------------------------------------------------------------------------------
+
+- Open one of the the following projects from the Source directory:
+    GExpertsDelphi2007.dproj  Delphi 2007
+    GExpertsBDS2006.dpr       BDS 2006
+    GExpertsDelphi2005.dpr    Delphi 2005 (Delphi 9)
+    GExpertsD8.dpr            Delphi 8 (See: http://cc.borland.com/ccweb.exe/listing?id=21448)
+    GExpertsD7.dpr            Delphi 7
+    GExpertsD6.dpr            Delphi 6
+
+  Prior IDE versions are not supported.  In most cases, you can build
+  the dll now and install it into the registry, but please continue reading
+  below if you experience problems or want to customize your build.
+
+- Ensure the following directories exist on the projects search path:
+  in the Project Options dialog:
+  - Framework;..\ExternalSource;..\ExternalSource\Abbrevia;
+
+- Open Project | Options
+  - On the Packages page, check the "Build with runtime packages"
+    item
+
+  - Add these packages to the project's runtime package list
+    (required to access various internal IDE units such as ToolsAPI):
+      rtl;vcl;vclx;designide;vclsmp
+
+  - On the Linker page, enter a value of $06000000 for Image Base
+    (this should allow for efficient loading of the GExperts DLL)
+
+  - If you do not want to see Debug Window and other debugging messages,
+    turn off compiler debug information under Project Options.
+    
+  - You should turn off the compiler option for Complete Boolean
+    Evaluation but leave on assertions, range checks, overflow checks,
+    IO checks, etc. 
+
+- If you want to compile GExperts with SynEdit text editor, edit
+  Source\Framework\GX_CondDefine.inc as described there.  Some
+  of the experts require that component.  You may have to edit the
+  global library path for successful compilation.
+
+- Build the project and install the resulting DLL into the IDE using
+  the registry editor "Regedit.exe" as described in the included
+  Readme.txt file (remove any older versions of GExperts first)
+
+- To build the GExperts Debug Window, compile the project
+     Source\StandAlone\DebugWindow\GExpertsDebugWindow.dpr
+  GExperts Debug Window does NOT work under Linux.
+  Do the same for ExpertManager.dpr, GExpertsGrep.dpr, CodeLibrarian.dpr if you would like to
+  have stand-alone versions of these experts.
+
+NOTE: If, while opening forms at runtime or designtime, you get
+errors stating things like "Property XXX does not exist", you need to
+open all of the relevant GExperts forms in your IDE before compiling.
+When you get the same errors at designtime, ignore them, re-save
+the form, and then compile again.  This nuisance is caused by the fact
+that a subsequent version of the IDE you are using did not supply a
+default value for a newly added property, making the form incompatible
+with older IDE versions.
+
+
+Introduction to the Source Code
+------------------------------------------------------------------------------
+
+The units that comprise the core of GExperts are present in the
+Source\Framework directory as follows:
+
+  * GX_GExperts.pas
+      The "main" expert that is installed into the IDE and creates all of
+      the other experts, loads settings, etc.
+
+  * GX_Experts.pas
+      The base class for all of the GExperts experts.
+
+  * GX_EditorExpertManager.pas
+      All editor experts (comment/uncomment expert, for instance)
+      are created and maintained by this manager
+
+  * GX_Configure.pas
+      This is the main GUI configuration dialog.
+
+  * GX_EditorChangeServices.pas
+      Provide notification of IDE events such as edit windows being created,
+      modified, or destroyed and forms being modified.
+
+  * GX_EditorFormServices.pas
+      Allows experts to get direct access to the editor windows and tracks
+      creation/focusing of new editor windows for you.  GExperts uses this
+      to add toolbars to edit windows.
+
+  * GX_ActionBroker.pas
+      Creates and maintains actions that are globally visible to the IDE.
+      If you request an action using this broker, your action can appear on
+      the IDE and GExperts editor toolbars.
+
+  * GX_KbdShortCutBroker.pas
+      Registers keyboard shortcuts with the IDE so they actually work.
+      Allows requesting keyboard shortcuts with/without an associated action.
+
+  * \SampleExperts directory
+      Contains Delphi/C++ example experts and an example editor
+      expert that you can customize when creating new experts.
+
+  * \Utils directory
+     Utility units with functions that are useful to several experts and
+     make GExperts programming easier:
+
+     * GX_OtaUtils.pas - General Open Tools API helper functions to get
+         various interfaces like the current project, editor, etc.  Includes
+         functions to get/set the selected text, insert text into the editor,
+         see is a file is open, and tons of other stuff.
+     * GX_GenericUtils.pas - Generic utilities such as string manipulation,
+         file/path manipulation, form/component functions, and error handling.
+     * GX_GxUtils.pas - GExperts-specific functions not related to the OTA.
+         Includes package functions, bitmap functions, etc.
+     * GX_IdeUtils.pas - Provides direct access to the IDE without using the
+         Open Tools API.  Access the Component Palette, Object Inspector, etc.
+     * GX_GenericClasses.pas - Classes to hold objects, create singletons, etc.
+
+Most of the other units are specific to individual experts.  The expert
+that uses them should be fairly obvious from the file name or the file
+contents.  If you don't know which file contains a specific window, you
+can grep the DFM/source files for the window's caption.
+
+
+Localization
+------------------------------------------------------------------------------
+
+If you wish to localize the GExperts source code for different
+international environments, refer to the IDE documentation under
+
+ Programming with Delphi: Creating international applications
+ Programming with C++Builder: Creating international applications
+
+as well as the relevant Borland.com newsgroups at
+
+  nntp://forums.borland.com/
+
+and their archives at
+
+  http://groups.google.com/
+
+Specific to the localization of GExperts are the following items:
+
+- Load the GExperts project into your IDE
+
+- Make sure that your project has been built with a detailed MAP file
+  (Project | Options --> Linker page)
+
+- Choose File | New.  In the dialog, select the item: Resource DLL Wizard
+  Note: Some versions of Delphi and C++Builder do not ship with this wizard
+
+- Follow the steps in the wizard
+
+- Translate all items of the localization project
+
+------------------------------------------------------------------------------
+
+Please tell me what your experiences are (positive or negative), and
+if you make any interesting changes, please pass them on to us.
+
+Thanks,
+Erik
+eberry@gexperts.org

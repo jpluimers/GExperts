@@ -1,0 +1,28 @@
+1 VERSIONINFO
+FILEVERSION 1,3,2,0
+FILEFLAGSMASK 0x3FL
+FILEFLAGS 0x00L
+FILEOS 0x40004L
+FILETYPE 0x0L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+         BLOCK "040904E4"
+         BEGIN
+            VALUE "Comments", "Open Source\0"
+            VALUE "CompanyName", "GExperts Development Team\0"
+            VALUE "CompileDate", "Thursday, April 19, 2007 11:52 PM\0"
+            VALUE "FileDescription", "GExperts IDE Addin\0"
+            VALUE "FileVersion", "\0"
+            VALUE "InternalName", "GExperts for Delphi 8\0"
+            VALUE "OriginalFilename", "GExpertsD8.dll\0"
+            VALUE "ProductName", "GExperts IDE Addin\0"
+            VALUE "ProductVersion", "1.32\0"
+         END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+         VALUE "Translation", 0x0409, 1252
+    END
+END
