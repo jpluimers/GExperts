@@ -117,7 +117,7 @@ uses
   GX_ProjDependProp in 'ProjectDependencies\GX_ProjDependProp.pas' {fmProjDependProp},
   GX_ProjOptionSets in 'ProjectOptionSets\GX_ProjOptionSets.pas' {fmProjOptionSets},
   GX_ProjOptMap in 'ProjectOptionSets\GX_ProjOptMap.pas',
-  GX_ProofreaderAutoCorrectEntry in 'Proofreader\GX_ProofreaderAutoCorrectEntry.pas' {fmProofreaderAutoCorrectEntry},
+  GX_ProofreaderAutoCorrectEntry in 'CodeProofreader\GX_ProofreaderAutoCorrectEntry.pas' {fmProofreaderAutoCorrectEntry},
   GX_ProofreaderConfig in 'CodeProofreader\GX_ProofreaderConfig.pas' {fmProofreaderConfig},
   GX_ProofreaderCorrection in 'CodeProofreader\GX_ProofreaderCorrection.pas',
   GX_ProofreaderData in 'CodeProofreader\GX_ProofreaderData.pas',
