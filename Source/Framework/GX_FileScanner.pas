@@ -379,6 +379,7 @@ begin
                   ProcedureItem.EndIndex := FParser.TokenPos;
               end;
           end;
+
           if (ProcScanning in [stInProcedure]) then
           begin
             // These have ends with no begins - account for them.
@@ -409,13 +410,13 @@ begin
                   ProcedureItem := ProcedureStack.Pop;
                   ProcScanning := ProcedureItem.ScanningStatus;
                   BeginCount := 0;
-                end;
-              end;
-            end;
-          end
-        end;
-      end;
-    end;
+                end; // ProcedureStack.Count > 0
+              end; // ProcScanning = stScanned
+            end; // FParser.TokenID = tkEnd
+          end; // ProcScanning in [stInProcedure]
+        end; // FParser.TokenID = tkSemiColon
+      end; // Procedure body collection
+    end; // FParser.TokenID <> tkNull
 
     // Store the last procedure
     if Assigned(ProcedureItem) then
