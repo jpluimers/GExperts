@@ -179,7 +179,6 @@ end;
 
 procedure TfmExpertManager.actExpertAddExecute(Sender: TObject);
 var
-  ExpertList: TStringList;
   CurrentIdeFolder: string;
 begin
   CurrentIdeFolder := GetCurrentDir;
@@ -190,13 +189,7 @@ begin
     SetCurrentDir(CurrentIdeFolder);
   end;
 
-  ExpertList := TStringList.Create;
-  try
-    ExpertList.Add(dlgAddExpert.FileName);
-    AddExperts(ExpertList);
-  finally
-    FreeAndNil(ExpertList);
-  end;
+  Self.AddExperts(dlgAddExpert.Files);
 end;
 
 procedure TfmExpertManager.actExpertRemoveExecute(Sender: TObject);

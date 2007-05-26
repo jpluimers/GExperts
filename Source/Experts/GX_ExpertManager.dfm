@@ -115,7 +115,7 @@ object fmExpertManager: TfmExpertManager
   object dlgAddExpert: TOpenDialog
     DefaultExt = '.dll'
     Filter = 'IDE Experts (*.dll)|*.dll|All Files (*.*)|*.*'
-    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist]
+    Options = [ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
     Title = 'Select expert DLL'
     Left = 96
     Top = 48
