@@ -11,6 +11,8 @@
    Version           : 2.02a
 </pre>*)(*
    History:
+     2006-09-26
+       - Discontinued, class moved to GpStreams unit.
      2.02a: 2002-11-23
        - Fixed read/write bug that allowed caller to read/write one byte over
          the buffer boundary.
@@ -23,7 +25,7 @@
        - Class TMyMemoryStream renamed to TGpFixedMemoryStream and made
          descendant of TStream.
 *)
-                                  
+
 unit GpMemStr;
 
 interface

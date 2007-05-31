@@ -4,7 +4,7 @@
 
 This software is distributed under the BSD license.
 
-Copyright (c) 2006, Primoz Gabrijelcic
+Copyright (c) 2007, Primoz Gabrijelcic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -30,13 +30,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author            : Primoz Gabrijelcic
    Creation date     : 2002-07-04
-   Last modification : 2007-01-19
-   Version           : 1.23a
+   Last modification : 2007-04-17
+   Version           : 1.26
 </pre>*)(*
    History:
+     1.26: 2007-04-17
+       - Added TGpReal class.
+     1.25: 2007-03-19
+       - Added TGpCountedIntegerList class.
+       - Added TGpCountedInt64List class.
+       - Added CustomSort method to the TGpIntegerList and TGpInt64List classes.
+     1.24: 2007-02-20
+       - Added EqualTo method to the TGpIntegerList class.
      1.23a: 2007-01-19
-       - Compiles with Delphi 6 again. Big thanks to Tao Lin and 
-         Erik Berry for reporting, diagnosing and fixing the problem.
+       - Compiles with Delphi 6 again. Big thanks to Tao Lin and Erik Berry for reporting,
+         diagnosing and fixing the problem.
      1.23: 2006-12-06
        - Added ValuesIdx to the TGpObjectMap class.
      1.22a: 2006-09-29
@@ -122,8 +130,7 @@ uses
   Windows;
 
 type
-  {:Class holding one int64 field. Usable for inserting int64 numbers into the
-    TObjectList or similar classes.
+  {:Boxed int64. Usable for inserting int64 numbers into the TObjectList or similar classes.
     @since   2003-08-02
   }
   TGpInt64 = class
@@ -134,8 +141,7 @@ type
     property Value: int64 read i64Value write i64Value;
   end; { TGpInt64 }
 
-  {:Class holding one TDateTime field. Usable for inserting TDateTime numbers
-    into the TObjectList or similar classes.
+  {:Boxed TDateTime. Usable for inserting TDateTime values into the TObjectList or similar classes.
     @since   2003-08-23
   }
   TGpDateTime = class
@@ -146,7 +152,7 @@ type
     property Value: TDateTime read dtValue write dtValue;
   end; { TGpDateTime }
 
-  {:Class holding one string field.
+  {:Boxed string.
     @since   2005-10-27
   }
   TGpString = class
@@ -156,6 +162,17 @@ type
     constructor Create(aValue: string = '');
     property Value: string read sValue write sValue;
   end; { TGpString }
+
+  {:Boxed real.
+    @since   2007-04-17
+  }
+  TGpReal = class
+  private
+    rValue: real;
+  public
+    constructor Create(aValue: real = 0);
+    property Value: real read rValue write rValue;
+  end; { TGpReal }
 
   TGpIntegerList = class;
 
@@ -195,9 +212,8 @@ type
     procedure SetCapacity(const value: integer); virtual;
     procedure SetCount(const value: integer); virtual;
     procedure SetItems(idx: integer; const value: integer); virtual;
-    procedure SetSorted(const value: Boolean); virtual;
-    procedure SetText(const Value: string); virtual;
-    procedure Sort; virtual;
+    procedure SetSorted(const value: boolean); virtual;
+    procedure SetText(const value: string); virtual;
   public
     constructor Create; overload;
     constructor Create(elements: array of integer); overload;
@@ -210,9 +226,11 @@ type
     procedure Assign(elements: array of integer); overload;
     procedure Assign(list: TGpIntegerList); overload; virtual;
     procedure Clear; virtual;
+    procedure CustomSort(sortMethod: TGpIntegerListSortCompare);
     procedure Delete(idx: integer); virtual;
     function  Dump(baseAddr: pointer): pointer; virtual;
     function  Ensure(item: integer): integer; virtual;
+    function  EqualTo(list: TGpIntegerList): boolean;
     procedure Exchange(idx1, idx2: integer); virtual;
     function  Find(avalue: integer; var idx: integer): boolean; virtual;
     function  First: integer; virtual;
@@ -261,6 +279,7 @@ type
     ilList      : TList;
     ilSorted    : Boolean;
   protected
+    procedure CustomSort(sortMethod: TGpInt64ListSortCompare); virtual;
     function  GetAsDelimitedText(const delimiter: string;
       appendLastDelimiter: boolean): string;
     function  GetCapacity: integer; virtual;
@@ -271,9 +290,8 @@ type
     procedure SetCapacity(const value: integer); virtual;
     procedure SetCount(const value: integer); virtual;
     procedure SetItems(idx: integer; value: int64); virtual;
-    procedure SetSorted(const value: Boolean); virtual;
+    procedure SetSorted(const value: boolean); virtual;
     procedure SetText(const value: string); virtual;
-    procedure Sort; virtual;
   public
     constructor Create; overload;
     constructor Create(elements: array of int64); overload;
@@ -343,6 +361,21 @@ type
     property Objects[idxObject: integer]: TObject read GetObject write SetObject;
   end; { TGpIntegerObjectList }
 
+  {:A thin layer over TGpIntegerObject list where each item has associated counter (stored
+    in the Objects property).
+  }
+  TGpCountedIntegerList = class(TGpIntegerObjectList)
+  protected
+    function  GetItemCount(idx: integer): integer; virtual;
+    procedure SetItemCount(idx: integer; const value: integer); virtual;
+  public
+    constructor Create; reintroduce;
+    function  Add(item, count: integer): integer; reintroduce;
+    function  Ensure(item, count: integer): integer; reintroduce;
+    procedure SortByCounter(descending: boolean = true);
+    property  Counter[idx: integer]: integer read GetItemCount write SetItemCount;
+  end; { TGpCountedIntegerList }
+
   {:Int64 list where each integer is accompanied with an object.
     @since   2006-09-20
   }
@@ -372,13 +405,27 @@ type
     property Objects[idxObject: integer]: TObject read GetObject write SetObject;
   end; { TGpInt64ObjectList }
 
-  {:String list where each item has associated counter (stored in the Objects)
-    property.
+  {:A thin layer over TGpInt64Object list where each item has associated counter (stored
+    in the Objects property).
+  }
+  TGpCountedInt64List = class(TGpInt64ObjectList)
+  protected
+    function  GetItemCount(idx: integer): integer; virtual;
+    procedure SetItemCount(idx: integer; const value: integer); virtual;
+  public
+    constructor Create; reintroduce;
+    function  Add(item: int64; count: integer): integer; reintroduce;
+    function  Ensure(item: int64; count: integer): integer; reintroduce;
+    procedure SortByCounter(descending: boolean = true);
+    property  Counter[idx: integer]: integer read GetItemCount write SetItemCount;
+  end; { TGpCountedInt64List }
+
+  {:String list where each item has associated counter (stored in the Objects property).
   }
   TGpCountedStringList = class(TStringList)
   protected
     function  GetItemCount(idx: integer): integer; virtual;
-    procedure SetItemCount(idx: integer; const Value: integer); virtual;
+    procedure SetItemCount(idx: integer; const value: integer); virtual;
   public
     function  Add(const s: string; count: integer): integer; reintroduce;
     function  Ensure(const s: string; count: integer): integer; 
@@ -659,6 +706,14 @@ begin
   sValue := aValue;
 end; { TGpString.Create }
 
+{ TGpReal }
+
+constructor TGpReal.Create(aValue: real);
+begin
+  inherited Create;
+  rValue := aValue;
+end; { TGpReal.Create }
+
 { TGpIntegerListEnumerator }
 
 constructor TGpIntegerListEnumerator.Create(aList: TGpIntegerList);
@@ -769,6 +824,12 @@ begin
   ilList.Clear;
 end; { TGpIntegerList.Clear }
 
+procedure TGpIntegerList.CustomSort(sortMethod: TGpIntegerListSortCompare);
+begin
+  if not Sorted and (Count > 1) then
+    QuickSort(0, Count - 1, sortMethod);
+end; { TGpIntegerList.CustomSort }
+
 procedure TGpIntegerList.Delete(idx: integer);
 begin
   ilList.Delete(idx);
@@ -799,6 +860,23 @@ begin
   if Result < 0 then
     Result := Add(item);
 end; { TGpIntegerList.Ensure }
+
+///<summary>Checks whether two lists contain equal elements.</summary>
+///<returns>True if elements in all positions do match.</returns>
+///<since>2007-02-18</since>
+function TGpIntegerList.EqualTo(list: TGpIntegerList): boolean;
+var
+  iList: integer;
+begin
+  Result := Count = list.Count;
+  if Result then begin
+    for iList := 0 to Count - 1 do
+      if Items[iList] <> list.GetItems(iList) then begin
+        Result := false;
+        break; //for iList
+      end;
+  end;
+end; { TGpIntegerList.EqualTo }
 
 procedure TGpIntegerList.Exchange(idx1, idx2: integer);
 begin
@@ -1037,19 +1115,19 @@ procedure TGpIntegerList.SetSorted(const value: boolean);
 begin
   if (ilSorted <> value) then begin
     if value then
-      Sort;
+      CustomSort(IntegerListCompare);
     ilSorted := value;
   end;
 end; { TGpIntegerList.SetSorted }
 
-procedure TGpIntegerList.SetText(const Value: string);
+procedure TGpIntegerList.SetText(const value: string);
 var
   p    : PChar;
   s    : string;
   start: PChar;
 begin
   Clear;
-  p := pointer(Value);
+  p := pointer(value);
   if P <> nil then
     while p^ <> #0 do begin
       start := p;
@@ -1061,12 +1139,6 @@ begin
       if p^ = #10 then Inc(p);
     end;
 end; { TGpIntegerList.SetText }
-
-procedure TGpIntegerList.Sort;
-begin
-  if not Sorted and (Count > 1) then
-    QuickSort(0, Count - 1, IntegerListCompare);
-end; { TGpIntegerList.Sort }
 
 { TGpInt64ListEnumerator }
 
@@ -1214,6 +1286,12 @@ begin
   ilList.Clear;
 end; { TGpInt64List.Clear }
 
+procedure TGpInt64List.CustomSort(sortMethod: TGpInt64ListSortCompare);
+begin
+  if not Sorted and (Count > 1) then
+    QuickSort(0, Count - 1, sortMethod);
+end; { TGpInt64List.CustomSort }
+
 procedure TGpInt64List.Delete(idx: integer);
 begin
   ilList.Delete(2*idx);
@@ -1356,7 +1434,7 @@ end; { TGpInt64List.GetText }
 
 function TGpInt64List.IndexOf(item: int64): integer;
 begin
-  if Sorted then begin
+  if Sorted then begin         
     if not Find(item, Result) then
       Result := -1
   end
@@ -1447,14 +1525,13 @@ begin
     Delete(idxItem);
 end; { TGpInt64List.Remove }
 
+type
+  PInteger64 = ^Int64; // Workaround for Delphi 6 "Internal error: URW699" below
+
 {:Restores the list dumped by the Dump method.
   @returns Pointer to the byte immediately after the end of dumped data.
   @since   2006-09-20
 }
-
-type
-  PInteger64 = ^Int64; // Workaround for Delphi 6/8 "Internal error: URW699" below
-
 function TGpInt64List.Restore(baseAddr: pointer): pointer;
 var
   iList   : integer;
@@ -1503,7 +1580,7 @@ procedure TGpInt64List.SetSorted(const value: boolean);
 begin
   if (ilSorted <> value) then begin
     if value then
-      Sort;
+      CustomSort(Int64ListCompare);
     ilSorted := value;
   end;
 end; { TGpInt64List.SetSorted }
@@ -1528,11 +1605,7 @@ begin
     end;
 end; { TGpInt64List.SetText }
 
-procedure TGpInt64List.Sort;
-begin
-  if not Sorted and (Count > 1) then
-    QuickSort(0, Count - 1, Int64ListCompare);
-end; { TGpInt64List.Sort }
+{ TGpIntegerObjectList }
 
 constructor TGpIntegerObjectList.Create(ownsObjects: boolean);
 begin
@@ -1545,8 +1618,6 @@ begin
   FreeAndNil(iolObjects);
   inherited;
 end; { TGpIntegerObjectList.Destroy }
-
-{ TGpIntegerObjectList }
 
 function TGpIntegerObjectList.Add(item: integer): integer;
 begin
@@ -1703,6 +1774,77 @@ begin
   iolObjects[idxObject] := value;
 end; { TGpIntegerObjectList.SetObject }
 
+{ TGpCountedIntegerList }
+
+function CompareAscending_CIL(list: TGpIntegerList; index1, index2: integer): integer;
+var
+  item1: integer;
+  item2: integer;
+begin
+  item1 := TGpCountedIntegerList(list).Counter[index1];
+  item2 := TGpCountedIntegerList(list).Counter[index2];
+  if item1 < item2 then
+    Result := -1
+  else if item1 > item2 then
+    Result := 1
+  else
+    Result := 0;
+end; { CompareAscending_CIL }
+
+function CompareDescending_CIL(list: TGpIntegerList; index1, index2: integer): integer;
+var
+  item1: integer;
+  item2: integer;
+begin
+  item1 := TGpCountedIntegerList(list).Counter[index1];
+  item2 := TGpCountedIntegerList(list).Counter[index2];
+  if item1 > item2 then
+    Result := -1
+  else if item1 < item2 then
+    Result := 1
+  else
+    Result := 0;
+end; { CompareDescending_CIL }
+
+constructor TGpCountedIntegerList.Create;
+begin
+  inherited Create(false);
+end; { TGpCountedIntegerList.Create }
+
+function TGpCountedIntegerList.Add(item, count: integer): integer;
+begin
+  Result := inherited AddObject(item, TObject(count));
+end; { TGpCountedIntegerList.Add }
+
+function TGpCountedIntegerList.Ensure(item, count: integer): integer;
+begin
+  Result := IndexOf(item);
+  if Result < 0 then
+    Result := Add(item, count)
+  else
+    Counter[Result] := count;
+end; { TGpCountedIntegerList.Ensure }
+
+function TGpCountedIntegerList.GetItemCount(idx: integer): integer;
+begin
+  Result := integer(Objects[idx]);
+end; { TGpCountedIntegerList.GetItemCount }
+
+procedure TGpCountedIntegerList.SetItemCount(idx: integer; const value: integer);
+begin
+  Objects[idx] := TObject(value);
+end; { TGpCountedIntegerList.SetItemCount }
+
+procedure TGpCountedIntegerList.SortByCounter(descending: boolean);
+begin
+  Sorted := false;
+  if descending then
+    CustomSort(CompareDescending_CIL)
+  else
+    CustomSort(CompareAscending_CIL);
+  Sorted := false;
+end; { TGpCountedIntegerList.SortByCounter }
+
 { TGpInt64ObjectList }
 
 constructor TGpInt64ObjectList.Create(ownsObjects: boolean);
@@ -1729,7 +1871,7 @@ begin
     iolObjects.Insert(Result, obj)
   else
     Objects[Result] := obj;
-end; { TGpInt64ObjectList.AddObject }                    
+end; { TGpInt64ObjectList.AddObject }
 
 procedure TGpInt64ObjectList.Clear;
 begin
@@ -1875,9 +2017,80 @@ begin
   iolObjects[idxObject] := value;
 end; { TGpInt64ObjectList.SetObject }
 
+{ TGpCountedInt64List }
+
+function CompareAscending_CI64L(list: TGpInt64List; index1, index2: integer): integer;
+var
+  item1: integer;
+  item2: integer;
+begin
+  item1 := TGpCountedInt64List(list).Counter[index1];
+  item2 := TGpCountedInt64List(list).Counter[index2];
+  if item1 < item2 then
+    Result := -1
+  else if item1 > item2 then
+    Result := 1
+  else
+    Result := 0;
+end; { CompareAscending_CI64L }
+
+function CompareDescending_CI64L(list: TGpInt64List; index1, index2: integer): integer;
+var
+  item1: integer;
+  item2: integer;
+begin
+  item1 := TGpCountedInt64List(list).Counter[index1];
+  item2 := TGpCountedInt64List(list).Counter[index2];
+  if item1 > item2 then
+    Result := -1
+  else if item1 < item2 then
+    Result := 1
+  else
+    Result := 0;
+end; { CompareDescending_CI64L }
+
+constructor TGpCountedInt64List.Create;
+begin
+  inherited Create(false);
+end; { TGpCountedInt64List.Create }
+
+function TGpCountedInt64List.Add(item: int64; count: integer): integer;
+begin
+  Result := inherited AddObject(item, TObject(count));
+end; { TGpCountedInt64List.Add }
+
+function TGpCountedInt64List.Ensure(item: int64; count: integer): integer;
+begin
+  Result := IndexOf(item);
+  if Result < 0 then
+    Result := Add(item, count)
+  else
+    Counter[Result] := count;
+end; { TGpCountedInt64List.Ensure }
+
+function TGpCountedInt64List.GetItemCount(idx: integer): integer;
+begin
+  Result := integer(Objects[idx]);
+end; { TGpCountedInt64List.GetItemCount }
+
+procedure TGpCountedInt64List.SetItemCount(idx: integer; const value: integer);
+begin
+  Objects[idx] := TObject(value);
+end; { TGpCountedInt64List.SetItemCount }
+
+procedure TGpCountedInt64List.SortByCounter(descending: boolean);
+begin
+  Sorted := false;
+  if descending then
+    CustomSort(CompareDescending_CI64L)
+  else
+    CustomSort(CompareAscending_CI64L);
+  Sorted := false;
+end; { TGpCountedInt64List.SortByCounter }
+
 { TGpCountedStringList }
 
-function CompareAscending(list: TStringList; index1, index2: integer): integer;
+function CompareAscending_CSL(list: TStringList; index1, index2: integer): integer;
 var
   item1: integer;
   item2: integer;
@@ -1890,9 +2103,9 @@ begin
     Result := 1
   else
     Result := 0;
-end; { CompareAscending }
+end; { CompareAscending_CSL }
 
-function CompareDescending(list: TStringList; index1, index2: integer): integer;
+function CompareDescending_CSL(list: TStringList; index1, index2: integer): integer;
 var
   item1: integer;
   item2: integer;
@@ -1905,7 +2118,7 @@ begin
     Result := 1
   else
     Result := 0;
-end; { CompareDescending }
+end; { CompareDescending_CSL }
 
 function TGpCountedStringList.Add(const s: string; count: integer): integer;
 begin
@@ -1927,18 +2140,18 @@ begin
   Result := integer(Objects[idx]);
 end; { TGpCountedStringList.GetItemCount }
 
-procedure TGpCountedStringList.SetItemCount(idx: integer; const Value: integer);
+procedure TGpCountedStringList.SetItemCount(idx: integer; const value: integer);
 begin
-  Objects[idx] := pointer(Value);
+  Objects[idx] := pointer(value);
 end; { TGpCountedStringList.SetItemCount }
 
 procedure TGpCountedStringList.SortByCounter(descending: boolean);
 begin
   Sorted := false;
   if descending then
-    CustomSort(CompareDescending)
+    CustomSort(CompareDescending_CSL)
   else
-    CustomSort(CompareAscending);
+    CustomSort(CompareAscending_CSL);
   Sorted := false;
 end; { TGpCountedStringList.SortByCounter }
 
@@ -2617,8 +2830,4 @@ begin
 end; { TGpDoublyLinkedList.Unlock }
 
 end.
-
-
-
-
 

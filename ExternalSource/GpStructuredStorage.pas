@@ -1,5 +1,6 @@
 (*:Strucured storage (compound file; file system inside a file) implementation.
-   Inspired by the Compound File implementation by the Julian M Bucknall.
+   Inspired by the Compound File implementation written by Julian M Bucknall
+   (http://www.boyet.com/).
    Not threadsafe.
    @author Primoz Gabrijelcic
    @desc <pre>
@@ -32,13 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author            : Primoz Gabrijelcic
    Creation date     : 2003-11-10
-   Last modification : 2006-09-17
-   Version           : 1.10c
+   Last modification : 2006-11-23
+   Version           : 1.12a
 </pre>*)(*
    History:
+     1.12a: 2006-12-06
+       - Fixed potential accvio in TGpStructuredStorage destructor.
+     1.12: 2006-11-23
+       - Big speed optimizations in directory access.
+     1.11: 2006-10-20
+       - Added test to raise exception if programmer tries to delete a folder containing
+         open files.
      1.10c: 2006-09-17
-       - FileInfo['/'] was not working. Fixed. (FileInfo['/'] is equivalent to FileInfo[''].)
-       - Backslashes were not converted to slashes in FileInfo. Fixed.
+       - FileInfo['/'] was not working. Fixed.
+         (FileInfo['/'] is equivalent to FileInfo[''].)
+       - Backslashes in parameter were not converted to slashes in FileInfo. Fixed.
      1.10b: 2006-07-20
        - Memory leak fixed: Internal objects representing folders were never freed. 
      1.10a: 2006-01-30
@@ -210,6 +219,7 @@ implementation
 uses
   Contnrs,
   Math,
+//  GpLogger,
   GpMemStr;
 
 const
@@ -352,6 +362,7 @@ type
     function  FAT: TGpStructuredFAT;
     procedure NotifySizeChange;
     procedure ResolvePosition;
+    procedure SetParent(newParentFolder: TGpStructuredFolder);
     procedure SetSize(newSize: longint); override;
     function  Storage: TGpStructuredStream;
     property  Owner: TGpStructuredStorage read sfOwner;
@@ -360,6 +371,7 @@ type
       fileName: string; firstBlock, fileSize: cardinal;
       attributes: TGpStructuredFileAttributes);
     destructor  Destroy; override;
+    function FullPath: string;
     //TStream interface
     function Read(var buffer; count: longint): longint; override;
     function Write(const buffer; count: longint): longint; override;
@@ -426,20 +438,25 @@ type
     property Size: cardinal read GetSize write SetSize;
   end; { TGpStructuredFileInfo }
 
+  TGpStructuredFolderProxy = class;
+
   {:A folder inside the structured storage. Actually a file with a known
     internal structure.
     @since   2003-11-10
   }
   TGpStructuredFolder = class(TGpStructuredFile)
   private
-    sfAccessCount: integer;
-    sfEntries    : TObjectList {of TGpStructuredFolderEntry};
+    sfAccessCount : integer;
+    sfEntries     : TObjectList {of TGpStructuredFolderEntry};
+    sfNumOpenFiles: integer;
+    sfProxy       : TGpStructuredFolderProxy;
   protected
     function  AccessEntry(const entryName: string; mode: word;
       attributes: TGpStructuredFileAttributes; raiseException: boolean = true): integer;
     function  CountEntries: integer;
     function  CreateEntry(const entryName: string;
       attributes: TGpStructuredFileAttributes; length, firstFatEntry: cardinal): integer;
+    procedure FileClosed(strFile: TGpStructuredFile);
     procedure FileSizeChanged(sender: TObject);
     procedure Flush;
     function  GetEntry(idxEntry: integer): TGpStructuredFolderEntry;
@@ -448,6 +465,8 @@ type
       attributes: TGpStructuredFileAttributes): integer;
     procedure ReadEntries;
     property Entry[idxEntry: integer]: TGpStructuredFolderEntry read GetEntry;
+    property NumOpenFiles: integer read sfNumOpenFiles;
+    property Proxy: TGpStructuredFolderProxy read sfProxy write sfProxy;
   public
     constructor Create(owner: TGpStructuredStorage; parentFolder: TGpStructuredFolder;
       const folderName: string; firstBlock, folderSize: cardinal);
@@ -474,6 +493,19 @@ type
   {$ENDIF DebugStructuredStorage}
     property FirstBlock: cardinal read sfFirstBlock;
   end; { TGpStructuredFolder }
+
+  {:Proxy for the TGpStructuredFolder object which can be stored in the doubly-linked
+    MRU folder list.
+    @since   2006-11-23
+  }
+  TGpStructuredFolderProxy = class(TGpDoublyLinkedListObject)
+  private
+    sfpFolder: TGpStructuredFolder;
+  public
+    constructor Create(aFolder: TGpStructuredFolder);
+    destructor  Destroy; override;
+    property Folder: TGpStructuredFolder read sfpFolder;
+  end; { TGpStructuredFolderProxy }
 
   {:One block in the File Allocation Table.
     @since   2003-11-24
@@ -539,16 +571,21 @@ type
   }
   TGpStructuredFolderCache = class
   private
-    gsfcParentFolders: TGpObjectMap;
+    sfcMRUFolders   : TGpDoublyLinkedList;
+    sfcParentFolders: TGpObjectMap;
   protected
+    procedure Flush;
     function  GetSubFolder(parentFolder: TGpStructuredFolder;
       subFolder: string): TGpStructuredFolder;
+    function  Remove(markInactive: boolean; parentFolder: TGpStructuredFolder; subFolder:
+      string): boolean;
     procedure SetSubFolder(parentFolder: TGpStructuredFolder;
       subFolder: string; const value: TGpStructuredFolder);
+    procedure TrimMRUList;
   public
     constructor Create;
     destructor  Destroy; override;
-    function  Remove(parentFolder: TGpStructuredFolder; subFolder: string): boolean;
+    function  MarkInactive(parentFolder: TGpStructuredFolder; subFolder: string): boolean;
     procedure Rename(parentFolder: TGpStructuredFolder; const oldName, newName: string);
     procedure Reparent(parentFolder: TGpStructuredFolder; const folderName: string;
       newParentFolder: TGpStructuredFolder);
@@ -872,12 +909,16 @@ begin
   sfCurrentPos := 0;
   ResolvePosition;
   sfOwner.AccessFolder(sfFolder);
+//GpLog.Log('Create : %s', [FullPath]);
 end; { TGpStructuredFile.Create }
 
 destructor TGpStructuredFile.Destroy;
 begin
-  if assigned(sfOwner) and assigned(sfFolder) then
+//GpLog.Log('Destroy: %s', [FullPath]);
+  if assigned(sfOwner) and assigned(sfFolder) then begin
+    sfFolder.FileClosed(Self);
     sfOwner.ReleaseFolder(sfFolder);
+  end;
   inherited;
 end; { TGpStructuredFile.Destroy }
 
@@ -885,6 +926,14 @@ function TGpStructuredFile.FAT: TGpStructuredFAT;
 begin
   Result := sfOwner.FAT;
 end; { TGpStructuredFile.FAT }
+
+function TGpStructuredFile.FullPath: string;
+begin
+  if not assigned(sfFolder) then
+    Result := FileName
+  else
+    Result := sfFolder.FullPath + '/' + FileName;
+end; { TGpStructuredFile.FullPath }
 
 procedure TGpStructuredFile.NotifySizeChange;
 begin
@@ -950,6 +999,12 @@ end; { TGpStructuredFile.Seek }
 {:Sets new file size and truncates/extends FAT chain when required.
   @since   2004-02-14
 }        
+procedure TGpStructuredFile.SetParent(newParentFolder: TGpStructuredFolder);
+begin
+  sfFolder := newParentFolder;
+  TMethod(sfOnSizeChanged).Data := pointer(sfFolder);
+end; { TGpStructuredFile.SetParent }
+
 procedure TGpStructuredFile.SetSize(newSize: integer);
 var
   currBlocks     : cardinal;
@@ -979,15 +1034,15 @@ begin
   NotifySizeChange;
 end; { TGpStructuredFile.SetSize }
 
-{:Writes 'count' bytes from the 'buffer'. Follows FAT chain and appends new blocks if
-  necessary.
-  @since   2004-02-14
-}
 function TGpStructuredFile.Storage: TGpStructuredStream;
 begin
   Result := sfOwner.Storage;
 end; { TGpStructuredFile.Storage }
 
+{:Writes 'count' bytes from the 'buffer'. Follows FAT chain and appends new blocks if
+  necessary.
+  @since   2004-02-14
+}
 function TGpStructuredFile.Write(const buffer; count: longint): longint;
 var
   bytesToWrite: integer;
@@ -1367,6 +1422,10 @@ begin
       if sfAttrIsFolder in Entry[idxEntry].Attributes then begin
         subFolder := Owner.AccessFolder(self, Entry[idxEntry].FileName);
         try
+          if subFolder.NumOpenFiles > 0 then
+            raise EGpStructuredStorage.CreateFmt('Cannot delete folder %s/%s because ' +
+              'it contains open files.',
+              [FileName, Entry[idxEntry].FileName]);
           subFolder.DeleteAll;
         finally Owner.ReleaseFolder(subFolder); end;
       end;
@@ -1435,6 +1494,11 @@ begin
     end;
 end; { TGpStructuredFolder.Dump }
 {$ENDIF DebugStructuredStorage}
+
+procedure TGpStructuredFolder.FileClosed(strFile: TGpStructuredFile);
+begin
+  Dec(sfNumOpenFiles);
+end; { TGpStructuredFolder.FileClosed }
 
 function TGpStructuredFolder.FileExists(const fileName: string): boolean;
 begin
@@ -1631,6 +1695,7 @@ begin
     Result := TGpStructuredFile.Create(Owner, self, fileName,
       Entry[idxEntry].FirstFatEntry, Entry[idxEntry].FileLength, []);
     Result.OnSizeChanged := FileSizeChanged;
+    Inc(sfNumOpenFiles);
   end;
 end; { TGpStructuredFolder.OpenFile }
 
@@ -1658,16 +1723,22 @@ end; { TGpStructuredFolder.OpenFolder }
 }        
 procedure TGpStructuredFolder.ReadEntries;
 var
-  entry: TGpStructuredFolderEntry;
+  entry    : TGpStructuredFolderEntry;
+  memFolder: TMemoryStream;
 begin
   Position := 0;
-  repeat
-    entry := TGpStructuredFolderEntry.Create;
-    if entry.LoadFrom(self) then
-      sfEntries.Add(entry)
-    else
-      FreeAndNil(entry);
-  until not assigned(entry); 
+  memFolder := TMemoryStream.Create;
+  try
+    memFolder.CopyFrom(Self, 0);
+    memFolder.Position := 0;
+    repeat
+      entry := TGpStructuredFolderEntry.Create;
+      if entry.LoadFrom(memFolder) then
+        sfEntries.Add(entry)
+      else
+        FreeAndNil(entry);
+    until not assigned(entry);
+  finally FreeAndNil(memFolder); end;
 end; { TGpStructuredFolder.ReadEntries }
 
 function TGpStructuredFolder.Release: boolean;
@@ -1679,6 +1750,19 @@ begin
       'TGpStructuredStorage: Trying do decrement access count for folder %s below 0.',
       [FileName]);
 end; { TGpStructuredFolder.Release }
+
+constructor TGpStructuredFolderProxy.Create(aFolder: TGpStructuredFolder);
+begin
+  inherited Create;
+  sfpFolder := aFolder;
+//  GpLog.Log('Created  : PROXY %s', [aFolder.FullPath]);
+end; { TGpStructuredFolderProxy.Create }
+
+destructor TGpStructuredFolderProxy.Destroy;
+begin
+//  GpLog.Log('Destroyed: PROXY %s', [sfpFolder.FullPath]);
+  inherited;
+end; { TGpStructuredFolderProxy.Destroy }
 
 { TGpStructuredFATBlock }
 
@@ -2044,18 +2128,71 @@ end; { TGpStructuredFAT.Truncate }
 constructor TGpStructuredFolderCache.Create;
 begin
   inherited Create;
-  gsfcParentFolders := TGpObjectMap.Create(true);
+  sfcParentFolders := TGpObjectMap.Create(true);
+  sfcMRUFolders := TGpDoublyLinkedList.Create;
 end; { TGpStructuredFolderCache.Create }
 
 destructor TGpStructuredFolderCache.Destroy;
 begin
-  FreeAndNil(gsfcParentFolders);
+  FreeAndNil(sfcMRUFolders);
+  FreeAndNil(sfcParentFolders);
   inherited;
 end; { TGpStructuredFolderCache.Destroy }
 
+procedure TGpStructuredFolderCache.Flush;
+
+  procedure GetChildlessFolderIndex(var idxFolder: integer);
+  var
+    folder   : TGpStructuredFolder;
+    iFolder  : integer;
+    subFolder: TGpStructuredFolder;
+    subIndex : integer;
+  begin
+    idxFolder := 0;
+    repeat
+      folder := TGpStructuredFolder(sfcParentFolders.Items[idxFolder]);
+      subIndex := -1;
+      for iFolder := 0 to sfcParentFolders.Count - 1 do begin
+        if iFolder <> idxFolder then begin
+          subFolder := TGpStructuredFolder(sfcParentFolders.Items[iFolder]);
+          if subFolder.Folder = folder then begin
+            subIndex := iFolder;
+            break; //for iFolder
+          end;
+        end;
+      end; //for iFolder
+      if subIndex < 0 then
+        break; //until
+      idxFolder := subIndex;
+    until false;
+  end; { GetChildlessFolderIndex }
+
+var
+  idxFolder : integer;
+  iSubFolder: integer;
+  parentList: TStringList;
+  subFolder : TGpStructuredFolder;
+
+begin
+  sfcMRUFolders.UnlinkAll;
+  while sfcParentFolders.Count > 0 do begin
+    GetChildlessFolderIndex(idxFolder);
+    parentList := TStringList(sfcParentFolders.ValuesIdx[idxFolder]);
+    for iSubFolder := 0 to parentList.Count - 1 do begin
+      subFolder := TGpStructuredFolder(parentList.Objects[iSubFolder]);
+      subFolder.Proxy.Free;
+      subFolder.Free;
+    end;
+    parentList.Clear;
+    if TGpStructuredFolder(sfcParentFolders.Items[idxFolder]).FileName = '' then // root folder will be destroyed later
+      break; //while
+    sfcParentFolders[sfcParentFolders.Items[idxFolder]] := nil;
+  end;
+end; { TGpStructuredFolderCache.Flush }
+
 {:Tries to find subfolder in the cache.
   @since   2004-02-16
-}        
+}
 function TGpStructuredFolderCache.GetSubFolder(parentFolder: TGpStructuredFolder;
   subFolder: string): TGpStructuredFolder;
 var
@@ -2063,35 +2200,63 @@ var
   parentList  : TStringList;
 begin
   Result := nil;
-  parentList := TStringList(gsfcParentFolders[parentFolder]);
+  parentList := TStringList(sfcParentFolders[parentFolder]);
   if not assigned(parentList) then
     Exit;
   idxSubFolder := parentList.IndexOf(subFolder);
   if idxSubFolder < 0 then
     Exit;
   Result := TGpStructuredFolder(parentList.Objects[idxSubFolder]);
+  if assigned(Result.Proxy) then begin
+    Result.Proxy.Unlink;
+    Result.Proxy.Free;
+    Result.Proxy := nil;
+  end;
 end; { TGpStructuredFolderCache.GetSubFolder }
 
 {:Removes subfolder from the cache.
   @returns False if subfolder is not cached.
   @since   2004-02-16
 }
-function TGpStructuredFolderCache.Remove(parentFolder: TGpStructuredFolder;
+function TGpStructuredFolderCache.MarkInactive(parentFolder: TGpStructuredFolder;
   subFolder: string): boolean;
+begin
+  Result := Remove(true, parentFolder, subFolder);
+end; { TGpStructuredFolderCache.MarkInactive }
+
+function TGpStructuredFolderCache.Remove(markInactive: boolean; parentFolder:
+  TGpStructuredFolder; subFolder: string): boolean;
 var
+  fldSubFolder: TGpStructuredFolder;
   idxSubFolder: integer;
-  parentList  : TStringList;
+  parentList: TStringList;
 begin
   Result := false;
-  parentList := TStringList(gsfcParentFolders[parentFolder]);
+  parentList := TStringList(sfcParentFolders[parentFolder]);
   if not assigned(parentList) then
     Exit;
   idxSubFolder := parentList.IndexOf(subFolder);
   if idxSubFolder < 0 then
     Exit;
-  parentList.Delete(idxSubFolder);
-  if parentList.Count = 0 then
-    gsfcParentFolders[parentFolder] := nil;
+  fldSubFolder := TGpStructuredFolder(parentList.Objects[idxSubFolder]);
+  if markInactive then begin
+    if not assigned(fldSubFolder.Proxy) then begin
+      fldSubFolder.Proxy := TGpStructuredFolderProxy.Create(fldSubFolder);
+      sfcMRUFolders.InsertAtHead(fldSubFolder.Proxy);
+      TrimMRUList;
+    end
+    else begin
+      fldSubFolder.Proxy.Unlink;
+      sfcMRUFolders.InsertAtHead(fldSubFolder.Proxy);
+    end;
+  end
+  else begin
+    fldSubFolder.Proxy.Free;
+    fldSubFolder.Free;
+    parentList.Delete(idxSubFolder);
+    if parentList.Count = 0 then
+      sfcParentFolders[parentFolder] := nil;
+  end;
   Result := true;
 end; { TGpStructuredFolderCache.Remove }
 
@@ -2101,7 +2266,7 @@ var
   idxFolder : integer;
   parentList: TStringList;
 begin
-  parentList := TStringList(gsfcParentFolders[parentFolder]);
+  parentList := TStringList(sfcParentFolders[parentFolder]);
   if not assigned(parentList) then // not in cache, ignore request
     Exit;
   idxFolder := parentList.IndexOf(oldName);
@@ -2118,7 +2283,7 @@ var
   idxFolder : integer;
   parentList: TStringList;
 begin
-  parentList := TStringList(gsfcParentFolders[parentFolder]);
+  parentList := TStringList(sfcParentFolders[parentFolder]);
   if not assigned(parentList) then // not in cache, ignore request
     Exit;
   idxFolder := parentList.IndexOf(folderName);
@@ -2126,6 +2291,7 @@ begin
     Exit;
   folder := TGpStructuredFolder(parentList.Objects[idxFolder]);
   parentList.Delete(idxFolder);
+  folder.SetParent(newParentFolder);
   SubFolder[newParentFolder, folderName] := folder;
 end; { TGpStructuredFolderCache.Reparent }
 
@@ -2141,18 +2307,33 @@ begin
   if not AnsiSameText(subFolder, value.FileName) then
     raise Exception.CreateFmt('TGpStructuredStorage: Folder insertion problem; %s <> %s.',
       [subFolder, value.FileName]);
-  parentList := TStringList(gsfcParentFolders[parentFolder]);
+  if value.Folder <> parentFolder then
+    raise Exception.Create('TGpStructuredStorage: Folder insertion problem; parent <> parent');
+  parentList := TStringList(sfcParentFolders[parentFolder]);
   if not assigned(parentList) then begin
     parentList := TStringList.Create;
-    gsfcParentFolders[parentFolder] := parentList;
+    sfcParentFolders[parentFolder] := parentList;
   end;
   idxSubFolder := parentList.IndexOf(subFolder);
   if idxSubFolder >= 0 then
     raise Exception.CreateFmt(
       'TGpStructuredStorage: Folder %s/%s is already stored in the cache.',
       [parentFolder.FileName, subFolder]);
-  parentList.AddObject(subFolder, value);    
+  parentList.AddObject(subFolder, value);
 end; { TGpStructuredFolderCache.SetSubFolder }
+
+procedure TGpStructuredFolderCache.TrimMRUList;
+const
+  CMaxMRULength = 10; //no hard data behind this number
+var
+  folderProxy: TGpStructuredFolderProxy;
+begin
+  while sfcMRUFolders.Count > CMaxMRULength do begin
+// TODO 1 -oPrimoz Gabrijelcic : Test!
+    folderProxy := TGpStructuredFolderProxy(sfcMRUFolders.RemoveFromTail);
+    Remove(false, folderProxy.Folder.Folder, folderProxy.Folder.FileName);
+  end;
+end; { TGpStructuredFolderCache.TrimMRUList }
 
 { TGpStructuredStorage }
 
@@ -2204,12 +2385,14 @@ end; { TGpStructuredStorage.AddTrailingDelimiter }
 
 procedure TGpStructuredStorage.Close;
 begin
+  UnregisterAllFileInfo;
+  if assigned(gssFolderCache) then
+    gssFolderCache.Flush;
   if assigned(gssFat) and assigned(gssFat.sfBlocks) then
     gssFAT.Truncate;
   {$IFDEF DebugStructuredStorage}
   //Dump('test.dmp');
   {$ENDIF DebugStructuredStorage}
-  UnregisterAllFileInfo;
   FreeAndNil(gssFileInfoList);
   FreeAndNil(gssRootFolder);
   FreeAndNil(gssFolderCache);
@@ -2784,14 +2967,9 @@ begin
   if not assigned(folder) then
     Exit;
   if assigned(folder.Folder) and // Root folder is always cached and is not reference-counted
-     folder.Release then
-  begin
-    if not gssFolderCache.Remove(folder.Folder, folder.FileName) then
-      raise Exception.CreateFmt(
-        'TGpStructuredStorage: Folder %s is not stored in the cache.', [folder.FileName])
-    else
-      FreeAndNil(folder);
-  end;
+     folder.Release
+  then
+    gssFolderCache.MarkInactive(folder.Folder, folder.FileName);
 end; { TGpStructuredStorage.ReleaseFolder }
 
 {:Renames folder in the folder cache.
@@ -2872,5 +3050,8 @@ begin
     Result := gssHeader.LoadHeader and (gssHeader.Version = CVersion);
 end; { TGpStructuredStorage.VerifyHeader }
 
+//initialization
+//  GpLog.FileName := 'GpStructuredStorage.log';
+//  GpLog.LoggingType := ltFastFile;
 end.
 
