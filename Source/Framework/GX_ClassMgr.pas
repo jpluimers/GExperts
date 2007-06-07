@@ -452,6 +452,7 @@ begin
   EditorStream := TMemoryStream.Create;
   try
     LocalEditReader.SaveToStream(EditorStream);
+    LocalEditReader.FreeFileData;
     EditorStream.Position := EditorStream.Size;
     FillChar(Buf, 23, 0);
     EditorStream.WriteBuffer(Buf, 23);
@@ -1020,6 +1021,7 @@ begin
   EditorStream := TMemoryStream.Create;
   try
     LocalEditReader.SaveToStream(EditorStream);
+    LocalEditReader.FreeFileData;
     Parser := TmPasParser.Create;
     Parser.Origin := EditorStream.Memory;
     if Collection.SetParser(Parser) then
@@ -1063,6 +1065,7 @@ begin
   EditorStream := TMemoryStream.Create;
   try
     LocalEditReader.SaveToStream(EditorStream);
+    LocalEditReader.FreeFileData;
     Parser := TmPasParser.Create;
     try
       Parser.Origin := EditorStream.Memory;
