@@ -129,8 +129,11 @@ end;
 
 procedure CallWinHelp(const Command, ContextID: Integer; const HelpOwner: TWinControl);
 begin
-  // The 0 allows the help to drop behind the IDE
-  HtmlHelp(0, PChar(ConfigInfo.HelpFile), Command, ContextID);
+  if FileExists(ConfigInfo.HelpFile) then
+    // The 0 allows the help to drop behind the IDE
+    HtmlHelp(0, PChar(ConfigInfo.HelpFile), Command, ContextID)
+  else
+    raise Exception.Create('The configured help file is missing: ' + ConfigInfo.HelpFile);
 end;
 
 procedure GxContextHelpContents(const HelpOwner: TWinControl);

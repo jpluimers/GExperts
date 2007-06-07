@@ -46,7 +46,7 @@ function HtmlHelp(hWndCaller: HWND; pszFile: LPCTSTR; uCommand: UINT; dwData: DW
 begin
   Result := HtmlHelpA(hWndCaller, pszFile, uCommand, dwData);
   if Result = 0 then
-    raise Exception.Create('Microsoft HTML Help not installed.  Please update to Internet Explorer 5 or later.');
+    raise Exception.Create('Microsoft HTML Help is not functioning.  Please update to Internet Explorer 5 or later.');
 end;
 
 function HtmlHelpA(hWndCaller: HWND; pszFile: PAnsiChar; uCommand: UINT; dwData:DWORD): HWND;
