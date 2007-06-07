@@ -1764,7 +1764,7 @@ Action.BuildVersion = BuildVersion
                 </Object>
               <Object Class="TDelphiCompilerOptions" XMLID="{7955C9BC-A185-415E-8C49-D5BF1D863779}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
-                <Property name="AlwaysUseDOFSearchPath" type="WordBool">True</Property>
+                <Property name="AlwaysUseDOFSearchPath" type="WordBool">False</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
@@ -1808,7 +1808,7 @@ Action.BuildVersion = BuildVersion
                 <Property name="RecordFieldAlign" type="TFieldAlign">fa8</Property>
                 <Property name="ReferenceInfo" type="WordBool">False</Property>
                 <Property name="SafeDivide" type="WordBool">False</Property>
-                <Property MultiValue="0" name="SearchPath" type="WideString">Src;Comps</Property>
+                <Property MultiValue="0" name="SearchPath" type="WideString">Framework;..\ExternalSource;..\ExternalSource\Abbrevia</Property>
                 <Property name="ShowHints" type="WordBool">True</Property>
                 <Property name="ShowWarnings" type="WordBool">True</Property>
                 <Property name="StackFrames" type="WordBool">False</Property>
