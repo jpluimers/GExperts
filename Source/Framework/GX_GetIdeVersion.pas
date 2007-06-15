@@ -13,7 +13,6 @@ type
      ideD900, ideD901, ideD902, ideD903,
      ideBDS2006,
      ideDelphi2007,
-     ideBDS2007,
      ideCSB100,
      ideBCB600, ideBCB601, ideBCB602, ideBCB604,
      ideKylix100,
@@ -363,6 +362,19 @@ begin
   end;
 end;
 
+{
+  BDS 2006:
+
+  File                 File Version   Size       Modified Time
+  delphicoreide100.bpl 
+  vclide100.bpl
+  designide100.bpl
+  coreide100.bpl
+  DCC100.DLL
+  bds.exe
+  B.Studio.Host.dll
+  bordbk10.dll
+}
 function GetBDS2006Version: TBorlandIdeVersion;
 const
   CoreIde1000: TVersionNumber =
@@ -379,6 +391,19 @@ begin
   end;
 end;
 
+{
+  Delphi 2007:
+
+  File                 File Version   Size       Modified Time
+  delphicoreide110.bpl 
+  vclide110.bpl
+  designide110.bpl
+  coreide110.bpl
+  DCC110.DLL
+  bds.exe
+  B.Studio.Host.dll
+  bordbk11.dll
+}
 function GetDelphi2007Version: TBorlandIdeVersion;
 const
   CoreIde1000: TVersionNumber =
@@ -392,22 +417,6 @@ begin
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1000);
   if VersionNumber > 0 then begin
     //Result := ideD1001;
-  end;
-end;
-
-function GetBDS2007Version: TBorlandIdeVersion;
-const
-  CoreIde1100: TVersionNumber =
-    (Minor: 0; Major: 0; Build: 0; Release: 0);
-var
-  CoreIdeFileVersion: TVersionNumber;
-  VersionNumber: Integer;
-begin
-  Result := ideBDS2007;
-  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide110.bpl');
-  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1100);
-  if VersionNumber > 0 then begin
-    //Result := ideD1101;
   end;
 end;
 
@@ -471,11 +480,6 @@ begin
       Assert(Result in [ideDelphi2007]);
     {$ENDIF}
   {$ENDIF VER180}
-
-  {$IFDEF VER190}  // BDS 2007
-    Result := GetBDS2007Version;
-    Assert(Result in [ideBDS2007]);
-  {$ENDIF VER190}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);
