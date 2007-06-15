@@ -9,13 +9,13 @@ interface
 uses
   Windows, Classes, Graphics, Controls,
   {$IFDEF SYNEDIT} // Edit GX_CondDefine.inc to compile without requiring SynEdit support
-  SynEdit, SynMemo, SynEditTypes, SynEditTextBuffer,
+  SynEdit, SynMemo, SynEditTypes, SynEditTextBuffer, GX_SynMemoUtils,
   {$ENDIF SYNEDIT}
 
   {$IFNDEF GX_ENHANCED_EDITOR}
   ComCtrls, StdCtrls, Printers, Messages, // TRichEdit support
   {$ENDIF GX_ENHANCED_EDITOR}
-  GX_GenericUtils, GX_SynMemoUtils;
+  GX_GenericUtils;
 
 type
   TGxEnhancedEditor = class(TWinControl)

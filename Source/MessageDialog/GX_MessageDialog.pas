@@ -5,8 +5,7 @@ unit GX_MessageDialog;
 interface
 
 uses
-  Classes, Graphics, Controls, Forms,
-  StdCtrls, ExtCtrls, ComCtrls;
+  Classes, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls;
 
 type
   TSourceType = (stPascal, stCpp);

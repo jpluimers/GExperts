@@ -7,7 +7,7 @@ unit GXHotKey;
 interface
 
 uses
-  SysUtils, Classes, Controls, ComCtrls, StdCtrls, Messages;
+  SysUtils, Classes, Controls, ComCtrls, StdCtrls;
 
 type
 {$IFDEF COMBOSTYLE}

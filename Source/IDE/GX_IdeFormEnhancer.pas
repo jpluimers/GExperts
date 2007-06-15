@@ -13,10 +13,9 @@ type
 
 implementation
 
-uses Classes, Forms, Windows, Dialogs, SysUtils, ToolsAPI, ExtCtrls,
-  Controls, IniFiles, ActnList, ActnMan, Menus, ExtDlgs, StdCtrls,
-  GX_GenericUtils, TypInfo, ComCtrls, GX_ConfigurationInfo, Contnrs,
-  GX_IdeUtils;
+uses Classes, Forms, Windows, Dialogs, SysUtils, ExtCtrls, Controls,
+ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
+GX_GenericUtils,, GX_ConfigurationInfo, GX_IdeUtils;
 
 type
   THackForm = class(TCustomForm);
