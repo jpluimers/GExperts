@@ -15,7 +15,7 @@ implementation
 
 uses Classes, Forms, Windows, Dialogs, SysUtils, ExtCtrls, Controls,
 ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
-GX_GenericUtils,, GX_ConfigurationInfo, GX_IdeUtils;
+GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils;
 
 type
   THackForm = class(TCustomForm);
