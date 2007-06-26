@@ -240,15 +240,17 @@ var
   i: Integer;
   AnExpert: TGX_Expert;
   ShortCutEdit: TEdit;
+  RowWidth: Integer;
 const
   RowHeight = 40;
 begin
   FThumbSize := RowHeight;
+  RowWidth := sbxExperts.Width;
   for i := 0 to GExpertsInst.ExpertCount - 1 do
   begin
     Panel := TPanel.Create(Self);
     Panel.Parent := sbxExperts;
-    Panel.SetBounds(0, i * RowHeight, sbxExperts.Width, RowHeight);
+    Panel.SetBounds(0, i * RowHeight, RowWidth, RowHeight);
     Panel.Tag := i;
 
     AnExpert := GExpertsInst.ExpertList[i];
