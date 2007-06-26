@@ -254,6 +254,8 @@ procedure SetListBoxChecked(CheckList: TCheckListBox; Action: TListboxCheckActio
 procedure ListBoxDeleteSelected(ListBox: TListBox);
 procedure ListViewDeleteSelected(ListView: TListView);
 procedure ListViewSelectAll(ListView: TListView);
+procedure ListViewResizeColumn(ListView: TListView; ColumnIndex: Integer);
+
 
 function FindTreeNode(Tree: TTreeView; const NodeText: string): TTreeNode;
 
@@ -416,6 +418,7 @@ function RunningLinux: Boolean;
 
 // Get a string representing the OS and version
 function GetOSString: string;
+function IsWindowsVistaOrLater: Boolean;
 
 // Get the currently logged-in username, or '' if it is not vailable
 function GetCurrentUser: string;
@@ -428,8 +431,9 @@ function ExtractUpperFileExt(const FileName: string): string;
 // and without a file extension.
 function ExtractPureFileName(const FileName: string): string;
 
-// Determine whether a file or directory is read-only
 function FileIsReadOnly(const FileName: string): Boolean;
+function CanWriteToDirectory(const Dir: string): Boolean;
+function CanCreateFile(const FileName: string): Boolean;
 
 // Displays a directory selection box.
 // Returns True if the user selected a directory; Dir then
@@ -1395,7 +1399,7 @@ begin
     if not Result then
       Exit;
   end;
-  Result := not FileIsReadOnly(Dir);
+  Result := CanWriteToDirectory(Dir);
 end;
 
 function IsPathAbsolute(const FileName: string): Boolean;
@@ -1784,6 +1788,21 @@ var
 begin
   for i := 0 to ListView.Items.Count - 1 do
     ListView.Items[i].Selected := True;
+end;
+
+procedure ListViewResizeColumn(ListView: TListView; ColumnIndex: Integer);
+var
+  TotalWidth: Integer;
+  i: Integer;
+  RemainingWidth: Integer;
+begin
+  Assert(Assigned(ListView));
+  Assert(ColumnIndex < ListView.Columns.Count);
+  TotalWidth := 0;
+  for i := 0 to ListView.Columns.Count - 1 do
+    Inc(TotalWidth, ListView.Column[i].Width);
+  RemainingWidth := ListView.ClientWidth - TotalWidth;// - GetScrollbarWidth;
+  ListView.Column[ColumnIndex].Width := Max(ListView.Column[ColumnIndex].Width + RemainingWidth, 10);
 end;
 
 function FindTreeNode(Tree: TTreeView; const NodeText: string): TTreeNode;
@@ -2849,6 +2868,11 @@ begin
 end;
 {$ENDIF MSWINDOWS}
 
+function IsWindowsVistaOrLater: Boolean;
+begin
+  Result := RunningWindows and (Win32MajorVersion >= 6);
+end;
+
 {$IFDEF MSWINDOWS}
 function GetCurrentUser: string;
 var
@@ -2897,6 +2921,28 @@ begin
   Result := False;
   if FileExists(FileName) then
     Result := SysUtils.FileIsReadOnly(FileName);
+end;
+
+function CanWriteToDirectory(const Dir: string): Boolean;
+begin
+  Result := False;
+  if DirectoryExists(Dir) then
+    Result := CanCreateFile(AddSlash(Dir) + 'GExpertsDirectoryWritePermissionsTest.xyzz');
+end;
+
+function CanCreateFile(const FileName: string): Boolean;
+var
+  Handle: Integer;
+begin
+  Result := False;
+  if DirectoryExists(ExtractFileDir(FileName)) then begin
+    Handle := FileCreate(FileName);
+    Result := Handle > 0;
+    if Result then begin
+      FileClose(Handle);
+      SysUtils.DeleteFile(FileName);
+    end;
+  end;
 end;
 
 {$IFDEF LINUX}
