@@ -143,6 +143,7 @@ type
     FPlaceGxMainMenuInToolsMenu: Boolean;
     FEnableKeyboardShortcuts: Boolean;
     procedure LoadSettings;
+    function DefaultConfigPath: string;
   protected
     // IConfigInfo
     procedure SaveSettings;
@@ -394,7 +395,7 @@ begin
   else // Windows
   begin
     FGExpertsPath := AddSlash(ExtractFilePath(ThisDllName));
-    FConfigPath := AddSlash(GetUserApplicationDataFolder) + AddSlash('GExperts') + IDEEnglishName;
+    FConfigPath := DefaultConfigPath;
   end;
 
   EditorEnhancements.Enabled := False;
@@ -403,6 +404,11 @@ begin
   if not IsStandAlone then
     IdeEnhancements.Initialize;
   ShowGxMessageBox(TShowBadDirectoryMessage, FConfigPath);
+end;
+
+function TConfigInfo.DefaultConfigPath: string;
+begin
+  Result := AddSlash(GetUserApplicationDataFolder) + AddSlash('GExperts') + IDEEnglishName;
 end;
 
 destructor TConfigInfo.Destroy;
@@ -572,12 +578,16 @@ end;
 function TShowBadDirectoryMessage.GetMessage: string;
 resourcestring
   SBadConfigPath =
-    'The storage directory defined in the GExperts configuration dialog ' +
-    'does not exist or is read-only.  Please correct the problem or you may ' +
-    'find that some GExperts data is not being saved.' + sLineBreak +
-    'Directory: %s';
+    'The storage directory defined in the GExperts configuration dialog does ' +
+    'not exist or is read-only. Under Windows Vista or later, this may be due ' +
+    'to being a limited user and not having write access to this directory. ' +
+    'Please correct the problem or you may find that some GExperts data files ' +
+    'are not being saved.' + sLineBreak +
+    'Current Directory: %s' + sLineBreak +
+    'Suggested Directory: %s';
 begin
-  Result := Format(SBadConfigPath, [FData]);
+  Assert(Assigned(FPrivateConfigurationInfo));
+  Result := Format(SBadConfigPath, [FData, FPrivateConfigurationInfo.DefaultConfigPath]);
 end;
 
 var
