@@ -137,6 +137,7 @@ type
     procedure actFavAddToFavoritesExecute(Sender: TObject);
     procedure actFavDeleteFromFavoritesExecute(Sender: TObject);
     procedure actClearRecentListExecute(Sender: TObject);
+    procedure pcUnitsResize(Sender: TObject);
   private
     FAvailableFiles: TAvailableFiles;
     FInitialFileType: string;
@@ -160,6 +161,11 @@ type
     function FileType(Index: Integer): TFileType;
     procedure InitializeFromSettings;
     procedure InitializeFileTypes(const SelectType: string);
+    procedure LoadSettings;
+    procedure SaveSettings;
+    function ConfigurationKey: string;
+    procedure CopyColumns(Source: TListView);
+    procedure ResizeListViewColumns;
   public
     property ActivePageIndex: Integer read GetActivePageIndex write SetActivePageIndex;
     property AvailableFiles: TAvailableFiles read FAvailableFiles write FAvailableFiles;
@@ -220,7 +226,7 @@ type
   end;
 
 var
- OpenFileExpert: TOpenFileExpert;
+  OpenFileExpert: TOpenFileExpert;
 
 { TOpenFileExpert }
 
@@ -232,6 +238,7 @@ begin
   try
     Form.ActivePageIndex := Settings.LastTabIndex;
     Form.Caption := StripHotkey(GetActionCaption);
+    Form.LoadSettings;
 
     case OpenFileType of
       otOpenMenu: Form.InitialFileType := Settings.DefaultFileType;
@@ -240,8 +247,10 @@ begin
       otViewForm: Form.InitialFileType := Settings.IDEOverride.OpenFormDefaultType;
     end;
     SetFormIcon(Form);
-    if (Form.ShowModal = mrOk) or (Form.chkDefault.Checked) then
+    if (Form.ShowModal = mrOk) or (Form.chkDefault.Checked) then begin
       SaveSettings;
+      Form.SaveSettings;
+    end;
   finally
     FreeAndNil(Form);
   end;
@@ -534,7 +543,7 @@ begin
     try
       FileExtensions := TStringList.Create;
       // This will allow semi-colon separated lists at the user GUI level
-      // D5 has no way to separate ; into tstrings.
+      // D5 has no way to separate ; into TStrings.
       FileExtensions.CommaText := StringReplace(FFileExtensions, ';', ',', [rfReplaceAll]);
       GxOtaGetProjectFileNames(Project, CurrentProjectFiles);
       for i := 0 to CurrentProjectFiles.Count - 1 do
@@ -624,10 +633,7 @@ begin
   lvCommon.Enabled := False;
   FAvailableFiles := TAvailableFiles.Create;
   AvailableFiles.OnFindComplete := SearchPathReady;
-  lvFavorite.Columns.Assign(lvSearchPath.Columns);
-  lvCommon.Columns.Assign(lvSearchPath.Columns);
-  lvProjects.Columns.Assign(lvSearchPath.Columns);
-  lvRecent.Columns.Assign(lvSearchPath.Columns);
+  CopyColumns(lvSearchPath);
 end;
 
 procedure TfmOpenFile.SearchPathReady;
@@ -681,6 +687,7 @@ begin
   finally
     FCurrentListView.Items.EndUpdate;
   end;
+  ResizeListViewColumns;
 end;
 
 procedure TfmOpenFile.SelectMatchingItemInList;
@@ -810,6 +817,7 @@ end;
 
 procedure TfmOpenFile.FormShow(Sender: TObject);
 begin
+  ResizeListViewColumns;
   tabSearchPathShow(tabSearchPath);
   InitializeFileTypes(FInitialFileType);
   PostMessage(Handle, UM_REFRESHLIST, 0, 0);
@@ -826,6 +834,19 @@ begin
   FilterVisibleUnits;
   PostMessage(Handle, UM_REFRESHLIST, 0, 0);
   FCurrentListView.Invalidate;
+end;
+
+procedure TfmOpenFile.pcUnitsResize(Sender: TObject);
+begin
+  ResizeListViewColumns;
+end;
+
+procedure TfmOpenFile.ResizeListViewColumns;
+begin
+  if Assigned(FCurrentListView) then begin
+    ListViewResizeColumn(FCurrentListView, 1);
+    CopyColumns(FCurrentListView);
+  end;
 end;
 
 procedure TfmOpenFile.cbxTypeChange(Sender: TObject);
@@ -908,6 +929,25 @@ begin
   Self.Hide;
   GxOtaOpenFileOrForm(FileName);
   ModalResult := mrOK;
+end;
+
+function TfmOpenFile.ConfigurationKey: string;
+begin
+  Result := 'OpenFile';
+end;
+
+procedure TfmOpenFile.CopyColumns(Source: TListView);
+begin
+  if Source <> lvSearchPath then
+    lvSearchPath.Columns.Assign(Source.Columns);
+  if Source <> lvFavorite then
+    lvFavorite.Columns.Assign(Source.Columns);
+  if Source <> lvCommon then
+    lvCommon.Columns.Assign(Source.Columns);
+  if Source <> lvProjects then
+    lvProjects.Columns.Assign(Source.Columns);
+  if Source <> lvRecent then
+    lvRecent.Columns.Assign(Source.Columns);
 end;
 
 function TfmOpenFile.CurrentFileType: TFileType;
@@ -993,6 +1033,31 @@ begin
     SelectedFileType := cbxType.Items[cbxType.ItemIndex];
   InitializeFileTypes(SelectedFileType);
   MatchAnywhere := Settings.MatchAnywhere;
+end;
+
+procedure TfmOpenFile.LoadSettings;
+var
+  Settings: TGExpertsSettings;
+begin
+  Settings := TGExpertsSettings.Create;
+  try
+    Settings.LoadForm(Self, ConfigurationKey + '\OpenFileForm');
+  finally
+    FreeAndNil(Settings);
+  end;
+  EnsureFormVisible(Self);
+end;
+
+procedure TfmOpenFile.SaveSettings;
+var
+  Settings: TGExpertsSettings;
+begin
+  Settings := TGExpertsSettings.Create;
+  try
+    Settings.SaveForm(Self, ConfigurationKey + '\OpenFileForm');
+  finally
+    FreeAndNil(Settings);
+  end;
 end;
 
 procedure TfmOpenFile.InitializeFileTypes(const SelectType: string);

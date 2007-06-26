@@ -1,10 +1,10 @@
 object fmOpenFile: TfmOpenFile
   Left = 297
   Top = 241
-  Width = 563
-  Height = 475
   ActiveControl = edtFilter
   Caption = 'Open Unit'
+  ClientHeight = 447
+  ClientWidth = 555
   Color = clBtnFace
   Constraints.MinHeight = 325
   Constraints.MinWidth = 350
@@ -24,7 +24,7 @@ object fmOpenFile: TfmOpenFile
     Left = 0
     Top = 27
     Width = 555
-    Height = 381
+    Height = 382
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 2
@@ -34,19 +34,19 @@ object fmOpenFile: TfmOpenFile
       Left = 2
       Top = 35
       Width = 551
-      Height = 344
+      Height = 345
       ActivePage = tabSearchPath
       Align = alClient
-      TabIndex = 0
       TabOrder = 1
       OnChange = pcUnitsChange
+      OnResize = pcUnitsResize
       object tabSearchPath: TTabSheet
         Caption = '&Search Path'
         ImageIndex = 3
         OnShow = tabSearchPathShow
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 283
+          Top = 284
           Width = 543
           Height = 33
           Align = alBottom
@@ -65,7 +65,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 283
+          Height = 284
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -75,7 +75,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 277
+            Height = 278
             Align = alClient
             Columns = <
               item
@@ -109,7 +109,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 283
+          Height = 284
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -119,7 +119,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 277
+            Height = 278
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -134,7 +134,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 283
+          Top = 284
           Width = 543
           Height = 33
           Align = alBottom
@@ -158,7 +158,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 283
+          Height = 284
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -168,7 +168,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 277
+            Height = 278
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -183,7 +183,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 283
+          Top = 284
           Width = 543
           Height = 33
           Align = alBottom
@@ -207,7 +207,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 283
+          Height = 284
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -217,7 +217,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 277
+            Height = 278
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -232,7 +232,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 283
+          Top = 284
           Width = 543
           Height = 33
           Align = alBottom
@@ -262,7 +262,7 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabRecentShow
         object pnlRecentFooter: TPanel
           Left = 0
-          Top = 283
+          Top = 284
           Width = 543
           Height = 33
           Align = alBottom
@@ -289,7 +289,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 283
+          Height = 284
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -298,7 +298,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 277
+            Height = 278
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -369,7 +369,7 @@ object fmOpenFile: TfmOpenFile
   end
   object pnlOKCancel: TPanel
     Left = 0
-    Top = 408
+    Top = 409
     Width = 555
     Height = 38
     Align = alBottom
