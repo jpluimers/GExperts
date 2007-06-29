@@ -130,7 +130,6 @@ Name: {group}\Grep Search; Filename: {app}\GExpertsGrep.exe
 [Registry]
 Root: HKCU; Subkey: Software\Borland\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue; Check: IDEExecuted
 Root: HKLM; Subkey: Software\Borland\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue uninsdeletekeyifempty
-Root: HKCU; Subkey: Software\Borland\{#IDERegName}\{#IDERegVer}.0\GExperts-{#VerRegKey}\Misc; ValueType: STRING; ValueName: HelpFile; ValueData: {app}\GExperts.chm; Check: IDEExecuted
 Root: HKCU; Subkey: Software\GExperts\Debug; ValueType: STRING; ValueName: FilePath; ValueData: {app}\GExpertsDebugWindow.exe
 
 [Code]
@@ -146,7 +145,7 @@ begin
     Deltree(Dir + '*.gex',      False, True, False);
     Deltree(Dir + 'Classes.{#DLLSuffix}', True, True, True); // Classes.D6, etc.
     // Delete this settings directory itself only if it is now empty
-    Deltree(Dir,                 True, False, False);
+    Deltree(Dir,                True, False, False);
   end;
 end;
 
