@@ -2148,6 +2148,7 @@ begin
   end;
 end;
 
+// This should only be used for a display that does not care about the format, it can change regularly
 function GxOtaGetIDEProductIdentifier: string;
 begin
   if IsStandAlone then
@@ -2704,7 +2705,7 @@ var
   CompHandle: TOTAHandle;
 begin
   Result := nil;
-  if (AComponent = nil) or (not GxOtaActiveDesignerIsVCL) then
+  if (AComponent = nil) or ((GxOtaCurrentlyEditingForm) and (not GxOtaActiveDesignerIsVCL)) then
     Exit;
   CompHandle := AComponent.GetComponentHandle;
   if Assigned(CompHandle) then
