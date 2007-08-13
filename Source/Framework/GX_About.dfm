@@ -40,7 +40,7 @@ object fmAbout: TfmAbout
   object lblWebPage: TLabel
     Left = 350
     Top = 79
-    Width = 127
+    Width = 121
     Height = 13
     Cursor = crHandPoint
     Alignment = taCenter
@@ -48,17 +48,17 @@ object fmAbout: TfmAbout
     OnClick = lblWebPageClick
   end
   object lblProjectLeader: TLabel
-    Left = 266
+    Left = 268
     Top = 99
-    Width = 74
+    Width = 72
     Height = 13
     Alignment = taRightJustify
     Caption = 'Project Leader:'
   end
   object lblContributors: TLabel
-    Left = 246
+    Left = 252
     Top = 121
-    Width = 94
+    Width = 88
     Height = 13
     Alignment = taRightJustify
     Caption = 'Major Contributors:'
@@ -66,7 +66,7 @@ object fmAbout: TfmAbout
   object lblErik: TLabel
     Left = 350
     Top = 99
-    Width = 170
+    Width = 158
     Height = 13
     Cursor = crHandPoint
     Caption = 'Erik Berry <eberry@gexperts.org>'
@@ -100,11 +100,28 @@ object fmAbout: TfmAbout
     Caption = 'Pre-Release'
     Visible = False
   end
+  object mmoBuildDetails: TMemo
+    Left = 216
+    Top = 230
+    Width = 233
+    Height = 39
+    Alignment = taCenter
+    BorderStyle = bsNone
+    Color = clBtnFace
+    Ctl3D = False
+    Lines.Strings = (
+      'Experimental build from http://www.domain.com.  '
+      'Please report all bugs to email@domain.com.')
+    ParentCtl3D = False
+    ReadOnly = True
+    TabOrder = 4
+    Visible = False
+  end
   object pnlContributors: TPanel
     Left = 350
     Top = 121
     Width = 213
-    Height = 114
+    Height = 110
     BevelOuter = bvNone
     Enabled = False
     TabOrder = 3
@@ -112,7 +129,7 @@ object fmAbout: TfmAbout
       Left = 0
       Top = 0
       Width = 213
-      Height = 114
+      Height = 110
       TabStop = False
       Align = alClient
       BorderStyle = bsNone

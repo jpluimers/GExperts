@@ -22,12 +22,14 @@ type
     lbxContributors: TListBox;
     lblPreRelease1: TLabel;
     lblPreRelease2: TLabel;
+    mmoBuildDetails: TMemo;
     procedure btnEmailClick(Sender: TObject);
     procedure lblWebPageClick(Sender: TObject);
   private
     procedure InitVersionInfoControls;
   public
     constructor Create(AOwner: TComponent); override;
+    class procedure SetCustomBuildDetails(const Details: string);
   end;
 
 implementation
@@ -38,6 +40,9 @@ implementation
 uses
   SysUtils, Graphics,
   GX_GenericUtils, GX_FeedbackWizard;
+
+var
+  BuildDetails: string = '';
 
 procedure TfmAbout.btnEmailClick(Sender: TObject);
 begin
@@ -68,10 +73,22 @@ begin
   SetFontUnderline(lblWebPage);
   SetFontColor(lblErik, clBlue);
   SetFontColor(lblWebPage, clBlue);
-
+  SetFontColor(mmoBuildDetails, clRed);
 
   imgLogo.Picture.Bitmap.LoadFromResourceName(HInstance, 'ABOUT_WIZ');
   InitVersionInfoControls;
+
+  if NotEmpty(BuildDetails)then
+  begin
+    btnEmail.Visible := False;
+    mmoBuildDetails.Visible := True;
+    mmoBuildDetails.Lines.Text := BuildDetails;
+  end
+  else
+  begin
+    btnEmail.Visible := True;
+    mmoBuildDetails.Visible := False;
+  end;
 end;
 
 procedure TfmAbout.InitVersionInfoControls;
@@ -89,6 +106,11 @@ begin
   end;
   if Version.Build <> 0 then
     lblVersion.Caption := lblVersion.Caption + '.' + IntToStr(Version.Build);
+end;
+
+class procedure TfmAbout.SetCustomBuildDetails(const Details: string);
+begin
+  BuildDetails := Details;
 end;
 
 end.
