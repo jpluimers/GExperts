@@ -2843,7 +2843,7 @@ begin
         begin
           OSPlatform := 'Windows Vista';
           if (VerInfoEx.dwOSVersionInfoSize > 0) and (VerInfoEx.wProductType <> VER_NT_WORKSTATION) then
-            OSPlatform := 'Windows Server Longhorn';
+            OSPlatform := 'Windows Server 2008';
         end;
         BuildNumber := Win32BuildNumber;
       end;
