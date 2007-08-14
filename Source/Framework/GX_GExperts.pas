@@ -90,7 +90,7 @@ end;
 
 procedure ShowGXAboutForm;
 begin
-  with TfmAbout.Create(nil) do
+  with gblAboutFormClass.Create(nil) do
   try
     ShowModal;
   finally

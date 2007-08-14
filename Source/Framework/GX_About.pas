@@ -32,6 +32,12 @@ type
     class procedure SetCustomBuildDetails(const Details: string);
   end;
 
+type
+  TAboutFormClass = class of TfmAbout;
+
+var
+  gblAboutFormClass: TAboutFormClass;
+
 implementation
 
 {$R *.dfm}
@@ -78,7 +84,7 @@ begin
   imgLogo.Picture.Bitmap.LoadFromResourceName(HInstance, 'ABOUT_WIZ');
   InitVersionInfoControls;
 
-  if NotEmpty(BuildDetails)then
+  if NotEmpty(BuildDetails) then
   begin
     btnEmail.Visible := False;
     mmoBuildDetails.Visible := True;
@@ -86,7 +92,8 @@ begin
   end
   else
   begin
-    btnEmail.Visible := True;
+    if gblAboutFormClass = TfmAbout then
+      btnEmail.Visible := True;
     mmoBuildDetails.Visible := False;
   end;
 end;
@@ -113,5 +120,7 @@ begin
   BuildDetails := Details;
 end;
 
+initialization
+  gblAboutFormClass := TfmAbout;
 end.
 
