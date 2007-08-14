@@ -131,7 +131,7 @@
 		</Directories>
 		<Parameters>
 			<Parameters Name="RunParams" Type="String">-np -ns</Parameters>
-			<Parameters Name="HostApplication" Type="String">D:\Borland\Delphi10\Bin\bds.exe</Parameters>
+			<Parameters Name="HostApplication" Type="String">D:\Borland\BDS2006\Bin\bds.exe</Parameters>
 			<Parameters Name="Launcher" Type="String"></Parameters>
 			<Parameters Name="UseLauncher" Type="Boolean">False</Parameters>
 			<Parameters Name="DebugCWD" Type="String"></Parameters>
@@ -173,7 +173,7 @@
 			<VersionInfoKeys Name="ProductVersion" Type="String">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
 			<VersionInfoKeys Name="Compile Date">Saturday, October 06, 2001 3:07 PM</VersionInfoKeys>
-			<VersionInfoKeys Name="CompileDate">Monday, April 09, 2007 1:11 AM</VersionInfoKeys>
+			<VersionInfoKeys Name="CompileDate">Wednesday, June 20, 2007 2:54 PM</VersionInfoKeys>
 		</VersionInfoKeys>
 		<Language>
 			<Language Name="ActiveLang" Type="String"></Language>
