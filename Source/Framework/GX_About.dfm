@@ -24,7 +24,6 @@ object fmAbout: TfmAbout
     Top = 19
     Width = 140
     Height = 20
-    Margins.Bottom = 0
     Alignment = taCenter
     AutoSize = False
     Caption = 'GExperts'
@@ -34,7 +33,6 @@ object fmAbout: TfmAbout
     Top = 38
     Width = 140
     Height = 20
-    Margins.Bottom = 0
     Alignment = taCenter
     AutoSize = False
     Caption = 'Version ?.??'
@@ -45,7 +43,6 @@ object fmAbout: TfmAbout
     Width = 121
     Height = 13
     Cursor = crHandPoint
-    Margins.Bottom = 0
     Alignment = taCenter
     Caption = 'http://www.gexperts.org/'
     OnClick = lblWebPageClick
@@ -55,7 +52,6 @@ object fmAbout: TfmAbout
     Top = 99
     Width = 72
     Height = 13
-    Margins.Bottom = 0
     Alignment = taRightJustify
     Caption = 'Project Leader:'
   end
@@ -64,7 +60,6 @@ object fmAbout: TfmAbout
     Top = 121
     Width = 88
     Height = 13
-    Margins.Bottom = 0
     Alignment = taRightJustify
     Caption = 'Major Contributors:'
   end
@@ -74,7 +69,6 @@ object fmAbout: TfmAbout
     Width = 158
     Height = 13
     Cursor = crHandPoint
-    Margins.Bottom = 0
     Caption = 'Erik Berry <eberry@gexperts.org>'
     OnClick = btnEmailClick
   end
@@ -83,7 +77,6 @@ object fmAbout: TfmAbout
     Top = 79
     Width = 47
     Height = 13
-    Margins.Bottom = 0
     Alignment = taRightJustify
     Caption = 'Web Site:'
   end
@@ -92,7 +85,6 @@ object fmAbout: TfmAbout
     Top = 30
     Width = 101
     Height = 19
-    Margins.Bottom = 0
     Alignment = taCenter
     AutoSize = False
     Caption = 'Pre-Release'
@@ -103,7 +95,6 @@ object fmAbout: TfmAbout
     Top = 30
     Width = 101
     Height = 19
-    Margins.Bottom = 0
     Alignment = taCenter
     AutoSize = False
     Caption = 'Pre-Release'
