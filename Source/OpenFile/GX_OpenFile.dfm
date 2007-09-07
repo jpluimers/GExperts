@@ -1,10 +1,10 @@
 object fmOpenFile: TfmOpenFile
   Left = 297
   Top = 241
+  Width = 563
+  Height = 475
   ActiveControl = edtFilter
   Caption = 'Open Unit'
-  ClientHeight = 447
-  ClientWidth = 555
   Color = clBtnFace
   Constraints.MinHeight = 325
   Constraints.MinWidth = 350
@@ -37,6 +37,7 @@ object fmOpenFile: TfmOpenFile
       Height = 345
       ActivePage = tabSearchPath
       Align = alClient
+      TabIndex = 0
       TabOrder = 1
       OnChange = pcUnitsChange
       OnResize = pcUnitsResize
@@ -80,11 +81,11 @@ object fmOpenFile: TfmOpenFile
             Columns = <
               item
                 Caption = 'File'
-                Width = 150
+                Width = 170
               end
               item
+                AutoSize = True
                 Caption = 'Path'
-                Width = 275
               end
               item
                 Caption = 'Extension'

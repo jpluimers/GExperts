@@ -633,6 +633,11 @@ begin
   lvCommon.Enabled := False;
   FAvailableFiles := TAvailableFiles.Create;
   AvailableFiles.OnFindComplete := SearchPathReady;
+  lvSearchPath.DoubleBuffered := True;
+  lvFavorite.DoubleBuffered := True;
+  lvCommon.DoubleBuffered := True;
+  lvProjects.DoubleBuffered := True;
+  lvRecent.DoubleBuffered := True;
   CopyColumns(lvSearchPath);
 end;
 
@@ -833,7 +838,6 @@ begin
   Settings.LastTabIndex := pcUnits.ActivePageIndex;
   FilterVisibleUnits;
   PostMessage(Handle, UM_REFRESHLIST, 0, 0);
-  FCurrentListView.Invalidate;
 end;
 
 procedure TfmOpenFile.pcUnitsResize(Sender: TObject);
@@ -843,10 +847,9 @@ end;
 
 procedure TfmOpenFile.ResizeListViewColumns;
 begin
-  if Assigned(FCurrentListView) then begin
+  Exit; // This is done using Column.AutoSize for now
+  if Assigned(FCurrentListView) then
     ListViewResizeColumn(FCurrentListView, 1);
-    CopyColumns(FCurrentListView);
-  end;
 end;
 
 procedure TfmOpenFile.cbxTypeChange(Sender: TObject);
@@ -938,6 +941,7 @@ end;
 
 procedure TfmOpenFile.CopyColumns(Source: TListView);
 begin
+  Assert(Assigned(Source));
   if Source <> lvSearchPath then
     lvSearchPath.Columns.Assign(Source.Columns);
   if Source <> lvFavorite then
@@ -957,11 +961,11 @@ begin
     Result := FileType(cbxType.ItemIndex);
 end;
 
-// This is just a hack to force the headers on hidden tabs to repaint
+// This is a hack to force the column 0 headers on hidden tabs to repaint
 procedure TfmOpenFile.UMRefreshList(var Msg: TMessage);
 begin
   if Assigned(FCurrentListView) then
-    FCurrentListView.Width := FCurrentListView.Width + 1;
+    FCurrentListView.Width := FCurrentListView.Width - 1;
 end;
 
 procedure TfmOpenFile.AddFavoriteFile(FileName: string);
