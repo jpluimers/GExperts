@@ -549,7 +549,7 @@ begin
   StatusBar.Repaint;
 
   {$IFOPT D+}SendDebug('Loading: ' + FileName); {$ENDIF}
-  if not (IsKnownSourceFile(FileName) or IsToDo(FileName)) then
+  if not (IsKnownSourceFile(FileName) or IsToDo(FileName) or IsInc(FileName)) then
     Exit;
   IsCPPModule := IsCppSourceModule(FileName);
 
