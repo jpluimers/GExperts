@@ -120,8 +120,8 @@ type
     procedure edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure edtFilterChange(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
-    procedure tbnMatchAnywhereClick(Sender: TObject);
-    procedure tbnMatchFromStartClick(Sender: TObject);
+    procedure actMatchAnywhereExecute(Sender: TObject);
+    procedure actMatchPrefixExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FileListDoubleClick(Sender: TObject);
     procedure pcUnitsChange(Sender: TObject);
@@ -782,7 +782,7 @@ begin
   FreeAndNil(FAvailableFiles);
 end;
 
-procedure TfmOpenFile.tbnMatchAnywhereClick(Sender: TObject);
+procedure TfmOpenFile.actMatchAnywhereExecute(Sender: TObject);
 begin
   FilterVisibleUnits;
 end;
@@ -793,7 +793,7 @@ begin
   FCommonThread.Terminate;
 end;
 
-procedure TfmOpenFile.tbnMatchFromStartClick(Sender: TObject);
+procedure TfmOpenFile.actMatchPrefixExecute(Sender: TObject);
 begin
   FilterVisibleUnits;
 end;

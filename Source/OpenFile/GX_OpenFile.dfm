@@ -1,10 +1,10 @@
 object fmOpenFile: TfmOpenFile
   Left = 297
   Top = 241
-  Width = 563
-  Height = 475
   ActiveControl = edtFilter
   Caption = 'Open Unit'
+  ClientHeight = 448
+  ClientWidth = 555
   Color = clBtnFace
   Constraints.MinHeight = 325
   Constraints.MinWidth = 350
@@ -24,7 +24,7 @@ object fmOpenFile: TfmOpenFile
     Left = 0
     Top = 27
     Width = 555
-    Height = 382
+    Height = 383
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 2
@@ -34,10 +34,9 @@ object fmOpenFile: TfmOpenFile
       Left = 2
       Top = 35
       Width = 551
-      Height = 345
+      Height = 346
       ActivePage = tabSearchPath
       Align = alClient
-      TabIndex = 0
       TabOrder = 1
       OnChange = pcUnitsChange
       OnResize = pcUnitsResize
@@ -47,7 +46,7 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabSearchPathShow
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 284
+          Top = 285
           Width = 543
           Height = 33
           Align = alBottom
@@ -66,7 +65,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 284
+          Height = 285
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -76,7 +75,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 278
+            Height = 279
             Align = alClient
             Columns = <
               item
@@ -106,6 +105,10 @@ object fmOpenFile: TfmOpenFile
       object tabProject: TTabSheet
         Caption = '&Project'
         OnShow = tabProjectShow
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object pnlProject: TPanel
           Left = 0
           Top = 0
@@ -155,6 +158,10 @@ object fmOpenFile: TfmOpenFile
         Caption = '&VCL/RTL'
         ImageIndex = 1
         OnShow = tabCommonShow
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object pnlCommon: TPanel
           Left = 0
           Top = 0
@@ -204,11 +211,15 @@ object fmOpenFile: TfmOpenFile
         Caption = 'Fav&orite'
         ImageIndex = 2
         OnShow = tabFavoriteShow
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
           Width = 543
-          Height = 284
+          Height = 285
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -218,7 +229,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 278
+            Height = 279
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -233,7 +244,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 284
+          Top = 285
           Width = 543
           Height = 33
           Align = alBottom
@@ -261,9 +272,13 @@ object fmOpenFile: TfmOpenFile
         Caption = '&Recent'
         ImageIndex = 4
         OnShow = tabRecentShow
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object pnlRecentFooter: TPanel
           Left = 0
-          Top = 284
+          Top = 285
           Width = 543
           Height = 33
           Align = alBottom
@@ -290,7 +305,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 543
-          Height = 284
+          Height = 285
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -299,7 +314,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 537
-            Height = 278
+            Height = 279
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -331,6 +346,7 @@ object fmOpenFile: TfmOpenFile
         Top = 10
         Width = 22
         Height = 13
+        Margins.Bottom = 0
         Alignment = taRightJustify
         Caption = '&Filter'
         FocusControl = edtFilter
@@ -340,6 +356,7 @@ object fmOpenFile: TfmOpenFile
         Top = 10
         Width = 24
         Height = 13
+        Margins.Bottom = 0
         Alignment = taRightJustify
         Anchors = [akTop, akRight]
         Caption = '&Type'
@@ -370,7 +387,7 @@ object fmOpenFile: TfmOpenFile
   end
   object pnlOKCancel: TPanel
     Left = 0
-    Top = 409
+    Top = 410
     Width = 555
     Height = 38
     Align = alBottom
@@ -420,7 +437,6 @@ object fmOpenFile: TfmOpenFile
     ButtonHeight = 23
     DisabledImages = dmSharedImages.DisabledImages
     EdgeBorders = [ebTop, ebBottom]
-    Flat = True
     Images = dmSharedImages.Images
     ParentShowHint = False
     ShowHint = True
@@ -428,23 +444,20 @@ object fmOpenFile: TfmOpenFile
     object tbnMatchFromStart: TToolButton
       Left = 0
       Top = 0
+      Action = actMatchPrefix
       Grouped = True
-      ImageIndex = 24
       ParentShowHint = False
       ShowHint = True
       Style = tbsCheck
-      OnClick = tbnMatchFromStartClick
     end
     object tbnMatchAnywhere: TToolButton
       Left = 23
       Top = 0
-      Down = True
+      Action = actMatchAnywhere
       Grouped = True
-      ImageIndex = 25
       ParentShowHint = False
       ShowHint = True
       Style = tbsCheck
-      OnClick = tbnMatchAnywhereClick
     end
     object tbnSep1: TToolButton
       Left = 46
@@ -501,11 +514,13 @@ object fmOpenFile: TfmOpenFile
       Caption = 'Match Prefix'
       Hint = 'Match filter only from the start'
       ImageIndex = 24
+      OnExecute = actMatchPrefixExecute
     end
     object actMatchAnywhere: TAction
       Caption = 'Match Anywhere'
       Hint = 'Match filter anywhere'
       ImageIndex = 25
+      OnExecute = actMatchAnywhereExecute
     end
     object actConfig: TAction
       Caption = 'Configuration...'
