@@ -346,7 +346,6 @@ object fmOpenFile: TfmOpenFile
         Top = 10
         Width = 22
         Height = 13
-        Margins.Bottom = 0
         Alignment = taRightJustify
         Caption = '&Filter'
         FocusControl = edtFilter
@@ -356,7 +355,6 @@ object fmOpenFile: TfmOpenFile
         Top = 10
         Width = 24
         Height = 13
-        Margins.Bottom = 0
         Alignment = taRightJustify
         Anchors = [akTop, akRight]
         Caption = '&Type'
@@ -512,12 +510,15 @@ object fmOpenFile: TfmOpenFile
     end
     object actMatchPrefix: TAction
       Caption = 'Match Prefix'
+      GroupIndex = 1
       Hint = 'Match filter only from the start'
       ImageIndex = 24
       OnExecute = actMatchPrefixExecute
     end
     object actMatchAnywhere: TAction
       Caption = 'Match Anywhere'
+      Checked = True
+      GroupIndex = 1
       Hint = 'Match filter anywhere'
       ImageIndex = 25
       OnExecute = actMatchAnywhereExecute
