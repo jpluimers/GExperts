@@ -28,21 +28,22 @@ THE EXPERTS
 
 KNOWN LIMITATIONS/BUGS
 -----------------------------------------------
-- The following features are not supported under Delphi 8, 2005 and 2006:
-  UNICODE format text files, inner classes and class helpers in the Class
-  Browser, and some of the old editor tab enhancements.  Note that the IDE
-  converts some high ANSI and MBCS characters to UTF-8 UNICODE when loaded
-  in the code editor, so you may experience problems searching for or viewing
-  those characters.  Those IDEs also no longer have a tabbed component
-  palette, so those options are no longer supported, as well.
+- The following features are not supported under Delphi 8/2005/2006/2007:
+  UNICODE format text files, inner classes, class helpers, and generics in
+  the Class Browser, and some of the old editor tab enhancements, such as
+  multiline editor tabs.  Note that the IDE converts some high ANSI and MBCS
+  characters to UTF-8 UNICODE when loaded in the code editor, so you may
+  experience problems searching for or viewing those characters.  Those IDEs
+  also no longer have a tabbed component palette, so those options are no
+  longer supported, as well.
 - The compiler replacement option of the Code Proofreader is only partially
   working under Delphi 7-2005.  It does not correct when a symbol is
   terminated by a '.' character (IDE limitation).  It does not work at all
-  in BDS 2006 (IDE bug).
+  in BDS 2006 or later (IDE bug).
 - You should turn off the "Ignore Comments" Grep Search option to perform a
   search and replace on the results (GExperts limitation).
 - Due to either native Open Tools API limitations or bugs, the following
-  items can not be supported under Delphi 8, 2005, or 2006:
+  items can not be supported under Delphi 8/2005/2006/2007:
   Delphi 8 Only:
    - Rename Components (IDE bug setting the Name property)
    - Jumping to a form search match from Grep Results when the source is open
@@ -50,15 +51,15 @@ KNOWN LIMITATIONS/BUGS
   Delphi 2005 Only:
    - The Project Option Sets environment options (IDE bug)
    - Set Tab Order: Selecting components in the desired tab order (IDE bug)
-  Delphi 8, 2005, and 2006:
+  Delphi 8, 2005, 2006, and 2007:
    - Any interaction at all with the WinForms/.NET form designer/components
      (no WinForms support for IOTAFormEditor/IOTAComponent)
    - Replace Components for VCL.NET (No direct access to components)
    - Components to Code for VCL.NET (No direct access to components)
-   - It is no longer possible for addins to override some built-in IDE shortcuts.
-     You may need to configure your GExperts shortcuts (Prev/Next Identifier,
-     etc.) to not conflict with your selected keymapping.  Also, the Macro
-     Library can not always intercept the Shift+Ctrl+R keystroke to
+   - It is no longer possible for addins to override some built-in IDE
+     shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
+     Identifier, etc.) to not conflict with your selected keymapping.  Also,
+     the Macro Library can not always intercept the Shift+Ctrl+R keystroke to
      automatically grab keyboard macros, so you will need to create macros
      using the record functionality on the toolbar.
 
@@ -66,21 +67,21 @@ KNOWN LIMITATIONS/BUGS
 INSTALLATION
 ----------------------
   GExperts is distributed as a self-installing executable that should
-automatically install itself into the IDE.  Before executing this file,
-you should uninstall any older versions of GExperts for the same IDE
-version.  You can run concurrent versions of GExperts for different IDE
-releases if you install the copies of GExperts into different directories.
-If the GExperts menu does not appear the next time you start your IDE, you
-can install GExperts manually by setting up a new key using the registry
-editor (RegEdit.exe).  Create the following key:
+automatically install itself into the IDE.  If you are installing under
+Vista as a non-administrator, you may need to manually register the GExperts
+DLL with the IDE after installation.  This is most easily done using the
+Expert Manager tool in the GExperts start menu group.  If you prefer, you
+can also manually register the DLL with the IDE using the Windows registry
+editor (RegEdit.exe).  Create the following key (the value for X is IDE
+dependent - Delphi 2007 uses 5.0, for example):
 HKEY_CURRENT_USER\Software\Borland\BDS\X.0\Experts\ or
-HKEY_CURRENT_USER\Software\Borland\Delphi\X.0\Experts\ or
-HKEY_CURRENT_USER\Software\Borland\C++Builder\X.0\Experts\
+HKEY_CURRENT_USER\Software\Borland\Delphi\X.0\Experts\
 
-Then add a new string value that points to the GExperts DLL:
-GExperts=C:\Program Files\GExperts\GExpertsDX.dll or
-GExperts=C:\Program Files\GExperts\GExpertsBCBX.dll or
+Then add a new string value that points to your GExperts DLL (X is the IDE
+version such as 6, 7, 8, 2005, 2006, 2007, etc.):
 GExperts=C:\Program Files\GExperts\GExpertsDelphiX.dll
+GExperts=C:\Program Files\GExperts\GExpertsBDSX.dll or
+GExperts=C:\Program Files\GExperts\GExpertsDX.dll or
 
   Before installing GExperts, it is strongly recommended that you install
 the latest updates and patches for your IDE available from:
@@ -89,19 +90,20 @@ the latest updates and patches for your IDE available from:
 
 UNINSTALLATION
 ----------------------
-  You should undock all GExperts windows before uninstallation,
-or the IDE might temporarily leave a blank area where the docked expert
-used to be on the next IDE restart.
   Uninstallation of GExperts can be done from the Control Panel's
 Add/Remove Programs or Programs [and Features] tool under Vista.
 
 
 CHANGE LOG
 ----------------------
-VERSION 1.32 (April ??, 2007)
-- Save GExperts data files under the user's Application Data\GExperts directory
-  by default for new installs, to better support Windows Vista user restrictions.
-  To change this location manually, go to GExperts Configuration, File Locations.
+VERSION 1.32 (September 11, 2007)
+- General: Added support for RAD Studio 2007
+  GExperts data files are saved under the user's Application Data\GExperts
+  directory by default for new installs, to better support Windows Vista user
+  restrictions.  To change this location manually, go to GExperts,
+  Configuration, File Locations.
+- Grep: Allow searching of the active form's text while the editor is active
+- To Do List: Allow scanning .inc files in searched directories for to do items
 
 
 VERSION 1.31 (April 7, 2007)

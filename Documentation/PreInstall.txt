@@ -1,3 +1,3 @@
-  Please backup and uninstall any earlier versions of GExperts before installing this version (you will not lose your saved preferences from any compatible version).  You can uninstall GExperts from the Control Panel's "Add/Remove Programs" applet.
+  Please backup and uninstall any earlier versions of GExperts before installing this version (you will not lose your saved preferences from any compatible version).  You can uninstall GExperts from the Control Panel's "Add/Remove Programs" or "Programs and Features" applet.
 
-  NOTE: GExperts runs best and is tested only with the latest patch versions of Delphi and C++Builder.  For best results, please install the latest patches from CodeGear at: http://www.codegear.com/.  At the time of release, the latest tested versions were Delphi 6.02/7.1/8.02/2005/2007, BDS 2006, and C++Builder 6.03.
+  NOTE: GExperts runs best and is tested only with the latest patch versions of Delphi and C++Builder.  For best results, please install the latest IDE patches from CodeGear at: http://www.codegear.com/.
