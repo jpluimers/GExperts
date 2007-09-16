@@ -187,7 +187,8 @@ implementation
 uses
   ActiveX,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
-  GX_SharedImages, GX_XmlUtils;
+  GX_SharedImages, GX_XmlUtils,
+  GX_MacroLibraryNamePrompt;
 
 const
   MacroLibraryStorageFileName = 'MacroLibrary.xml';
@@ -201,7 +202,6 @@ const
 
 resourcestring
   SMacroLibCaption = 'Macro &Library';
-  SMacroLibCaptionNoShortcut = 'Macro Library';
   SMacroName = 'Macro name';
 
 const
@@ -824,15 +824,20 @@ procedure TfmMacroLibrary.AddToMacroLibrary(CR: IOTARecord);
 var
   Stream: IStream;
   Info: TMacroInfo;
-  s: string;
+  MacroName: string;
+  MacroDesc: string;
 begin
-  s := UnknownName + Format('%2.2d', [FDataList.Count]);
-  if FPromptForName and not InputQuery(SMacroLibCaptionNoShortcut, SMacroName, s) then
-    exit;
+  MacroName := UnknownName + Format('%2.2d', [FDataList.Count]);
+  MacroDesc := '';
+  if FPromptForName then begin
+    if not TfmMacroLibraryNamePrompt.Execute(Self, MacroName, MacroDesc, FPromptForName) then
+      exit;
+  end;
 
   Info := TMacroInfo.Create;
   FDataList.Insert(0, Info);
-  Info.Name := s;
+  Info.Name := MacroName;
+  Info.Description := MacroDesc;
   Info.TimeStamp := Now;
 
   Stream := TStreamAdapter.Create(Info.Stream);
