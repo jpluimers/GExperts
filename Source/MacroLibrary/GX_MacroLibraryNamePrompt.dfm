@@ -1,6 +1,6 @@
 object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
-  Left = 0
-  Top = 0
+  Left = 235
+  Top = 272
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Macro Library'
@@ -21,7 +21,6 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 8
     Width = 59
     Height = 13
-    Margins.Bottom = 0
     Caption = 'Macro Name'
   end
   object lblMacroDesc: TLabel
@@ -29,7 +28,6 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 56
     Width = 85
     Height = 13
-    Margins.Bottom = 0
     Caption = 'Macro Description'
   end
   object edtMacroName: TEdit
