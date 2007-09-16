@@ -166,8 +166,11 @@
     <DCCReference Include="Experts\GX_IdeShortCuts.pas">
       <Form>fmIdeShortCuts</Form>
     </DCCReference>
-    <DCCReference Include="Experts\GX_MacroLibrary.pas">
+    <DCCReference Include="MacroLibrary\GX_MacroLibrary.pas">
       <Form>fmMacroLibrary</Form>
+    </DCCReference>
+    <DCCReference Include="MacroLibrary\GX_MacroLibraryNamePrompt.pas">
+      <Form>fmMacroLibraryNamePrompt</Form>
     </DCCReference>
     <DCCReference Include="Experts\GX_PeInfo.pas" />
     <DCCReference Include="Experts\GX_PeInformation.pas">
