@@ -314,6 +314,12 @@ object fmMacroLibrary: TfmMacroLibrary
       ShortCut = 113
       OnExecute = actEditRenameExecute
     end
+    object actPromptForName: TAction
+      Category = 'View'
+      Caption = 'Prompt for Name'
+      Hint = 'Automatically prompt for a name when stopping recording'
+      OnExecute = actPromptForNameExecute
+    end
   end
   object mnuMacroPop: TPopupMenu
     Left = 112
@@ -381,6 +387,12 @@ object fmMacroLibrary: TfmMacroLibrary
     end
     object mitShowDescription: TMenuItem
       Action = actViewDescription
+    end
+    object mitSep5: TMenuItem
+      Caption = '-'
+    end
+    object mitPromptforName: TMenuItem
+      Action = actPromptForName
     end
   end
   object ilLarge: TImageList

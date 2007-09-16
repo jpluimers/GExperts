@@ -96,6 +96,9 @@ type
     mmoMacroDescription: TMemo;
     lblMacroDesc: TLabel;
     Splitter: TSplitter;
+    actPromptForName: TAction;
+    mitPromptforName: TMenuItem;
+    mitSep5: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvMacrosDblClick(Sender: TObject);
     procedure actEditCopyExecute(Sender: TObject);
@@ -120,11 +123,13 @@ type
     procedure FormCreate(Sender: TObject);
     procedure actHelpExecute(Sender: TObject);
     procedure lvMacrosInfoTip(Sender: TObject; Item: TListItem; var InfoTip: String);
+    procedure actPromptForNameExecute(Sender: TObject);
   private
     FDataList: TList;
     FSBWidth: Integer;
     FSuspended: Boolean;
     FShortCut: IGxKeyboardShortCut;
+    FPromptForName: boolean;
     procedure InsertMacro(Index: Integer; Info: TMacroInfo);
     procedure ClearDataList;
     procedure LoadMacros;
@@ -196,6 +201,8 @@ const
 
 resourcestring
   SMacroLibCaption = 'Macro &Library';
+  SMacroLibCaptionNoShortcut = 'Macro Library';
+  SMacroName = 'Macro name';
 
 const
   UnknownName = 'Unknown';
@@ -384,6 +391,7 @@ begin
     RegIni.WriteBool(RegistrySection, 'ViewToolbar', Toolbar.Visible);
     RegIni.WriteBool(RegistrySection, 'ViewDescription', DescriptionVisible);
     RegIni.WriteInteger(RegistrySection, 'DescriptionSize', pnlDescription.Height);
+    RegIni.WriteBool(RegistrySection, 'PromptForName', FPromptForName);
   finally
     FreeAndNil(RegIni);
   end;
@@ -405,6 +413,7 @@ begin
     Toolbar.Visible := RegIni.ReadBool(RegistrySection, 'ViewToolbar', True);
     DescriptionVisible := RegIni.ReadBool(RegistrySection, 'ViewDescription', True);
     pnlDescription.Height := RegIni.ReadInteger(RegistrySection, 'DescriptionSize', pnlDescription.Height);
+    FPromptForName := RegIni.ReadBool(RegistrySection, 'PromptForName', False);
   finally
     FreeAndNil(RegIni);
   end;
@@ -552,6 +561,7 @@ begin
   actViewStyleSmallIcon.Checked := lvMacros.ViewStyle = vsSmallIcon;
   actViewStyleList.Checked      := lvMacros.ViewStyle = vsList;
   actViewStyleDetails.Checked   := lvMacros.ViewStyle = vsReport;
+  actPromptForName.Checked := FPromptForName;
 end;
 
 procedure TfmMacroLibrary.actViewToolbarExecute(Sender: TObject);
@@ -805,14 +815,24 @@ begin
   GxOtaGetKeyboardServices.ResumePlayback;
 end;
 
+procedure TfmMacroLibrary.actPromptForNameExecute(Sender: TObject);
+begin
+  FPromptForName := not FPromptForName;
+end;
+
 procedure TfmMacroLibrary.AddToMacroLibrary(CR: IOTARecord);
 var
   Stream: IStream;
   Info: TMacroInfo;
+  s: string;
 begin
+  s := UnknownName + Format('%2.2d', [FDataList.Count]);
+  if FPromptForName and not InputQuery(SMacroLibCaptionNoShortcut, SMacroName, s) then
+    exit;
+
   Info := TMacroInfo.Create;
   FDataList.Insert(0, Info);
-  Info.Name := UnknownName + Format('%2.2d', [FDataList.Count]);
+  Info.Name := s;
   Info.TimeStamp := Now;
 
   Stream := TStreamAdapter.Create(Info.Stream);
@@ -820,6 +840,8 @@ begin
 
   InsertMacro(0, Info);
   SelectFirstMacro;
+
+  SaveMacros;
 end;
 
 procedure TfmMacroLibrary.FormCreate(Sender: TObject);
