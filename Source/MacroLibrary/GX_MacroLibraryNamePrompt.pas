@@ -3,30 +3,21 @@ unit GX_MacroLibraryNamePrompt;
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Variants,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls;
 
 type
   TfmMacroLibraryNamePrompt = class(TForm)
     lblMacroName: TLabel;
     edtMacroName: TEdit;
     chkDoNotShowAgain: TCheckBox;
-    b_OK: TButton;
-    b_Cancel: TButton;
+    btnOK: TButton;
+    btnCancel: TButton;
     lblMacroDesc: TLabel;
     mmoMacroDescription: TMemo;
-  private
   public
-    class function Execute(_Owner: TComponent; var _MacroName, _MacroDesc: string;
-      var _PromptForName: boolean): boolean;
+    class function Execute(AOwner: TComponent; var AMacroName, AMacroDesc: string;
+      var APromptForName: Boolean): Boolean;
   end;
 
 implementation
@@ -35,25 +26,25 @@ implementation
 
 { TTfmMacroLibraryNamePrompt }
 
-class function TfmMacroLibraryNamePrompt.Execute(_Owner: TComponent;
-  var _MacroName, _MacroDesc: string; var _PromptForName: boolean): boolean;
+class function TfmMacroLibraryNamePrompt.Execute(AOwner: TComponent;
+  var AMacroName, AMacroDesc: string; var APromptForName: Boolean): Boolean;
 var
-  frm: TfmMacroLibraryNamePrompt;
+  Form: TfmMacroLibraryNamePrompt;
 begin
-  frm := TfmMacroLibraryNamePrompt.Create(_Owner);
+  Form := TfmMacroLibraryNamePrompt.Create(AOwner);
   try
-    frm.edtMacroName.Text := _MacroName;
-    frm.mmoMacroDescription.Lines.Text := _MacroDesc;
-    frm.chkDoNotShowAgain.Checked := False;
-    Result := frm.ShowModal = mrOk;
+    Form.edtMacroName.Text := AMacroName;
+    Form.mmoMacroDescription.Lines.Text := AMacroDesc;
+    Form.chkDoNotShowAgain.Checked := False;
+    Result := (Form.ShowModal = mrOk);
     if Result then begin
-      _MacroName := frm.edtMacroName.Text;
-      _MacroDesc := frm.mmoMacroDescription.Lines.Text;
+      AMacroName := Form.edtMacroName.Text;
+      AMacroDesc := Form.mmoMacroDescription.Lines.Text;
     end;
-    // the checkbox is always evaluated
-    _PromptForName := not frm.chkDoNotShowAgain.Checked;
+    // The checkbox is always evaluated
+    APromptForName := not Form.chkDoNotShowAgain.Checked;
   finally
-    frm.Free;
+    FreeAndNil(Form);
   end;
 end;
 

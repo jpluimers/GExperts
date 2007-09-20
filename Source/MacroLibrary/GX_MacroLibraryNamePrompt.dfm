@@ -44,9 +44,9 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Width = 169
     Height = 17
     Caption = 'Do not show this dialog again'
-    TabOrder = 4
+    TabOrder = 2
   end
-  object b_OK: TButton
+  object btnOK: TButton
     Left = 184
     Top = 144
     Width = 75
@@ -54,9 +54,9 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 2
+    TabOrder = 3
   end
-  object b_Cancel: TButton
+  object btnCancel: TButton
     Left = 264
     Top = 144
     Width = 75
@@ -64,7 +64,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 3
+    TabOrder = 4
   end
   object mmoMacroDescription: TMemo
     Left = 8

@@ -316,7 +316,7 @@ object fmMacroLibrary: TfmMacroLibrary
     end
     object actPromptForName: TAction
       Category = 'View'
-      Caption = 'Prompt for Name'
+      Caption = 'Auto-Prompt for Name'
       Hint = 'Automatically prompt for a name when stopping recording'
       OnExecute = actPromptForNameExecute
     end

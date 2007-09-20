@@ -129,7 +129,7 @@ type
     FSBWidth: Integer;
     FSuspended: Boolean;
     FShortCut: IGxKeyboardShortCut;
-    FPromptForName: boolean;
+    FPromptForName: Boolean;
     procedure InsertMacro(Index: Integer; Info: TMacroInfo);
     procedure ClearDataList;
     procedure LoadMacros;
@@ -831,7 +831,7 @@ begin
   MacroDesc := '';
   if FPromptForName then begin
     if not TfmMacroLibraryNamePrompt.Execute(Self, MacroName, MacroDesc, FPromptForName) then
-      exit;
+      Exit;
   end;
 
   Info := TMacroInfo.Create;
