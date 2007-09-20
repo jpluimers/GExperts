@@ -1,10 +1,10 @@
 object fmOpenFile: TfmOpenFile
   Left = 297
   Top = 241
+  Width = 563
+  Height = 476
   ActiveControl = edtFilter
   Caption = 'Open Unit'
-  ClientHeight = 448
-  ClientWidth = 555
   Color = clBtnFace
   Constraints.MinHeight = 325
   Constraints.MinWidth = 350
@@ -37,6 +37,7 @@ object fmOpenFile: TfmOpenFile
       Height = 346
       ActivePage = tabSearchPath
       Align = alClient
+      TabIndex = 0
       TabOrder = 1
       OnChange = pcUnitsChange
       OnResize = pcUnitsResize
@@ -105,10 +106,6 @@ object fmOpenFile: TfmOpenFile
       object tabProject: TTabSheet
         Caption = '&Project'
         OnShow = tabProjectShow
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object pnlProject: TPanel
           Left = 0
           Top = 0
@@ -138,7 +135,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 284
+          Top = 285
           Width = 543
           Height = 33
           Align = alBottom
@@ -158,10 +155,6 @@ object fmOpenFile: TfmOpenFile
         Caption = '&VCL/RTL'
         ImageIndex = 1
         OnShow = tabCommonShow
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object pnlCommon: TPanel
           Left = 0
           Top = 0
@@ -191,7 +184,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 284
+          Top = 285
           Width = 543
           Height = 33
           Align = alBottom
@@ -211,10 +204,6 @@ object fmOpenFile: TfmOpenFile
         Caption = 'Fav&orite'
         ImageIndex = 2
         OnShow = tabFavoriteShow
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
@@ -272,10 +261,6 @@ object fmOpenFile: TfmOpenFile
         Caption = '&Recent'
         ImageIndex = 4
         OnShow = tabRecentShow
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object pnlRecentFooter: TPanel
           Left = 0
           Top = 285
@@ -435,6 +420,7 @@ object fmOpenFile: TfmOpenFile
     ButtonHeight = 23
     DisabledImages = dmSharedImages.DisabledImages
     EdgeBorders = [ebTop, ebBottom]
+    Flat = True
     Images = dmSharedImages.Images
     ParentShowHint = False
     ShowHint = True
