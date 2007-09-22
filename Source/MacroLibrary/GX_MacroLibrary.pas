@@ -172,6 +172,7 @@ type
     class function GetName: string; override;
     function BitmapFileName: string; override;
     procedure Click(Sender: TObject); override;
+    procedure Configure; override;
     function HasConfigOptions: Boolean; override;
     property StorageFile: string read GetStorageFile;
   end;
@@ -188,7 +189,7 @@ uses
   ActiveX,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
-  GX_MacroLibraryNamePrompt;
+  GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig;
 
 const
   MacroLibraryStorageFileName = 'MacroLibrary.xml';
@@ -956,7 +957,13 @@ end;
 
 function TMacroLibExpert.HasConfigOptions: Boolean;
 begin
-  Result := False;
+  Result := True;
+end;
+
+procedure TMacroLibExpert.Configure;
+begin
+  if TfmGxMacroLibraryConfig.Execute(fmMacroLibrary.FPromptForName) then
+    fmMacroLibrary.SaveSettings;
 end;
 
 initialization
