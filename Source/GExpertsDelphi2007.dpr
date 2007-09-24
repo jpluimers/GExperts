@@ -90,7 +90,9 @@ uses
   GX_LibrarySource in 'Framework\GX_LibrarySource.pas',
   GX_MacroExpandNotifier in 'MacroTemplates\GX_MacroExpandNotifier.pas',
   GX_MacroFile in 'MacroTemplates\GX_MacroFile.pas',
+  GX_MacroLibrary in 'MacroLibrary\GX_MacroLibrary.pas' {fmMacroLibrary},
   GX_MacroLibraryNamePrompt in 'MacroLibrary\GX_MacroLibraryNamePrompt.pas' {fmMacroLibraryNamePrompt},
+  GX_MacroLibraryConfig in 'MacroLibrary\GX_MacroLibraryConfig.pas' {fmGxMacroLibraryConfig},
   GX_MacroParser in 'Framework\GX_MacroParser.pas',
   GX_MacroSelect in 'MacroTemplates\GX_MacroSelect.pas' {fmMacroSelect},
   GX_MacroTemplateEdit in 'MacroTemplates\GX_MacroTemplateEdit.pas' {fmMacroTemplateEdit},
@@ -151,9 +153,7 @@ uses
   GX_UsesManager in 'Framework\GX_UsesManager.pas',
   GX_VerDepConst in 'Framework\GX_VerDepConst.pas',
   GX_XmlUtils in 'Utils\GX_XmlUtils.pas',
-  GX_Zipper in 'BackupProject\GX_Zipper.pas',
-  GX_MacroLibrary in 'MacroLibrary\GX_MacroLibrary.pas' {fmMacroLibrary},
-  GX_MacroLibraryConfig in 'MacroLibrary\GX_MacroLibraryConfig.pas' {fmGxMacroLibraryConfig};
+  GX_Zipper in 'BackupProject\GX_Zipper.pas';
 
 begin
 end.
