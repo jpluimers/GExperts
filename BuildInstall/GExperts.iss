@@ -1,19 +1,22 @@
-; This install script requires the Inno Setup Quick Start Pack version 5.1
-; or greater with the included ISPP, from: http://www.jrsoftware.org/isdl.php
+; This install script requires the Inno Setup Quick Start Pack version 5.20
+; or greater with the included ISPP, available from: http://www.jrsoftware.org/
+
+// TODO: Use ExecAsOriginalUser to register the DLL with the IDE for better Vista elevation support
 
 #ifdef ISPPCC_INVOKED
 ; Command line compiler
   #ifndef Version
-    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.20"
+    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.4"
   #endif
 #else
 ; IDE compiler
   #define Delphi2007
-  #define Version "1.32"
+  #define Version "1.4"
 #endif
 
 #define Product "GExperts"
-#define VerRegKey "1.3"
+#define VerRegKey "1.4"
+#define RegCompany   "Borland"
 
 #ifdef Delphi6
   #define IDEShortName "Delphi"
@@ -63,13 +66,14 @@
   #define IDERegName   "BDS"
   #define IDERegVer    "5"
 #endif
-#ifdef BDS2007
-  #define IDEShortName "BDS"
-  #define IDELongName  "BDS"
-  #define IDEVer       "2007"
-  #define DLLSuffix    "BDS2007"
+#ifdef RS2008
+  #define IDEShortName "RadStudio"
+  #define IDELongName  "RadStudio"
+  #define IDEVer       "2008"
+  #define DLLSuffix    "RadStudio2008"
   #define IDERegName   "BDS"
   #define IDERegVer    "6"
+  #define RegCompany   "CodeGear"
 #endif
 #ifdef BCB6
   #define BCB
@@ -82,7 +86,7 @@
 #endif
 
 #ifndef IDEShortName
-  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.32"
+  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.4"
 #endif
 
 #define FullName    Product +" for "+ IDELongName +" "+ IDEVer
@@ -128,8 +132,8 @@ Name: {group}\GExperts Readme; Filename: {app}\Readme.txt
 Name: {group}\Grep Search; Filename: {app}\GExpertsGrep.exe
 
 [Registry]
-Root: HKCU; Subkey: Software\Borland\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue; Check: IDEExecuted
-Root: HKLM; Subkey: Software\Borland\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue uninsdeletekeyifempty
+Root: HKCU; Subkey: Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue; Check: IDEExecuted
+Root: HKLM; Subkey: Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue uninsdeletekeyifempty
 Root: HKCU; Subkey: Software\GExperts\Debug; ValueType: STRING; ValueName: FilePath; ValueData: {app}\GExpertsDebugWindow.exe
 
 [Code]
@@ -157,15 +161,15 @@ begin
   begin
     DataPath := '';
     // Delete the DLL reference even if it was copied from the HKLM tree
-    RegDeleteValue(HKEY_CURRENT_USER, 'Software\Borland\{#IDERegName}\{#IDERegVer}.0\Experts', 'GExperts');
+    RegDeleteValue(HKEY_CURRENT_USER, 'Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0\Experts', 'GExperts');
     case MsgBox('Do you want to delete all of your GExperts preferences and data files?',
                 mbConfirmation, MB_YESNOCANCEL or MB_DEFBUTTON2) of
       IDYES:
         begin
-          RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Borland\{#IDERegName}\{#IDERegVer}.0\GExperts-{#VerRegKey}\Misc', 'ConfigPath', DataPath);
+          RegQueryStringValue(HKEY_CURRENT_USER, 'Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0\GExperts-{#VerRegKey}\Misc', 'ConfigPath', DataPath);
           DeleteDirAndSettings(DataPath);
           DeleteDirAndSettings(ExpandConstant('{app}'));
-          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Borland\{#IDERegName}\{#IDERegVer}.0\GExperts-{#VerRegKey}');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0\GExperts-{#VerRegKey}');
         end;
       IDCANCEL:
         Abort;
@@ -175,5 +179,5 @@ end;
 
 function IDEExecuted: Boolean;
 begin
-  Result := RegKeyExists(HKEY_CURRENT_USER, 'Software\Borland\{#IDERegName}\{#IDERegVer}.0');
+  Result := RegKeyExists(HKEY_CURRENT_USER, 'Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0');
 end;
