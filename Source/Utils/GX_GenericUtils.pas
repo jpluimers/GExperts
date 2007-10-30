@@ -1965,9 +1965,7 @@ var
   i: Integer;
   AComponent: TComponent;
 begin
-
   Assert(StartComponent <> nil);
-
 
   if Owned then begin
     {$IFOPT D+} SendDebugFmt('Writing owned component list for "%s"...', [StartComponent.Name]); {$ENDIF}
@@ -2634,7 +2632,7 @@ begin
     else
       ReadFullStreamAsASCIIANSI;
   finally
-    FileStream.Free;
+    FreeAndNil(FileStream);
   end;
 end;
 
