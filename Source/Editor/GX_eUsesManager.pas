@@ -216,7 +216,7 @@ resourcestring
     '  This expert is designed to help you manage the uses clauses of your Delphi files.  ' +
     'You can delete and move units between the interface and implementation sections of ' +
     'the file you are editing using the buttons or drag and drop.  You can also add units from:'#13 +
-    '  - The effective search path (this list is populated in the background)'#13 +
+    '  - The effective search path (project root, project search paths, IDE library paths)'#13 +
     '  - The current project'#13 +
     '  - Delphi''s common VCL/RTL units'#13 +
     '  - A user-defined favorite units list'#13 +
