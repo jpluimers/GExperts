@@ -33,57 +33,6 @@
     <Borland.ProjectType>VCLApplication</Borland.ProjectType>
     <BorlandProject>
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters><Parameters Name="RunParams">-ns -np</Parameters><Parameters Name="HostApplication">D:\Borland\Delphi2007\bin\bds.exe</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">3</VersionInfo><VersionInfo Name="Release">2</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">True</VersionInfo><VersionInfo Name="Locale">1033</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">Erik Berry and the GExperts Development Team</VersionInfoKeys><VersionInfoKeys Name="FileDescription">GExperts for Delphi 2007</VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.3.2.0</VersionInfoKeys><VersionInfoKeys Name="InternalName">GExperts for Delphi 2007</VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename">GExpertsDelphi2007.dll</VersionInfoKeys><VersionInfoKeys Name="ProductName">GExperts for Delphi 2007</VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.32</VersionInfoKeys><VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys><VersionInfoKeys Name="Compile Date">Saturday, October 06, 2001 3:07 PM</VersionInfoKeys><VersionInfoKeys Name="CompileDate">Saturday, April 21, 2007 5:42 AM</VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">GExpertsDelphi2007.dpr</Source></Source><Excluded_Packages>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dclmid100.bpl">CodeGear MyBase DataAccess Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcldb100.bpl">CodeGear Database Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\applet100.bpl">CodeGear Control Panel Applet Package</Excluded_Packages>
@@ -282,8 +231,8 @@
       <Form>fmProgress</Form>
     </DCCReference>
     <DCCReference Include="Framework\GX_SharedImages.pas">
-      <Form>dmSharedImages</Form>
       <DesignClass>TDataModule</DesignClass>
+      <Form>dmSharedImages</Form>
     </DCCReference>
     <DCCReference Include="Framework\GX_SynMemoUtils.pas" />
     <DCCReference Include="Framework\GX_UnitPositions.pas" />
