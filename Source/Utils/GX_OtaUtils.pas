@@ -5,7 +5,7 @@ unit GX_OtaUtils;
 interface
 
 uses
-  SysUtils, Classes, Forms, ActnList, ImgList, Menus, ToolsAPI,
+  SysUtils, Classes, Controls, Forms, ActnList, ImgList, Menus, ToolsAPI,
   GX_GenericUtils;
 
 // Returns the TObject represented by an IOTAComponent, if possible
@@ -283,8 +283,12 @@ function GxOtaCurrentlyEditingForm: Boolean;
 // See if the user is editing a source file
 function GxOtaCurrentlyEditingSource: Boolean;
 
+// Obtain and focus the IDE's internal edit control wrapper
+function GxOtaGetCurrentIDEEditControl: TWinControl;
+function GxOtaFocusCurrentIDEEditControl: Boolean;
+
 // Returns reference to currently active project;
-// returns Nil if there is no (active) project.
+// returns nil if there is no (active) project.
 function GxOtaGetCurrentProject: IOTAProject;
 
 // See if there is an active project
@@ -333,6 +337,8 @@ function GxOtaGetVersionInfoKeysString: string;
 // Get the selected text in the top edit view, if any
 function GxOtaGetCurrentSelection(IncludeTrailingCRLF: Boolean = True): string;
 
+function GxOtaMoveEditCursorColumn(EditView: IOTAEditView; RelativePos: Integer): Boolean;
+
 // Returns -1, 0, 1 depending on the position relationship between two edit positions
 function GxOtaCompareEditPos(AEditPos1, AEditPos2: TOTAEditPos): Integer;
 
@@ -341,6 +347,10 @@ procedure GxOtaSelectBlock(const Editor: IOTASourceEditor; const Start, After: T
 procedure GxOtaSelectBlock(const Editor: IOTASourceEditor; Start, After: TOTAEditPos); overload;
 function GxOtaGetSelection(const EditView: IOTAEditView;
   var BlockStart, BlockEnd: TOTAEditPos; var SelStart, SelLength: Integer): Boolean;
+
+// Un-fold all regions or the nearest region in a file
+procedure GxOtaUnfoldAllRegions(const View: IOTAEditView);
+procedure GxOtaUnfoldNearestRegion(const View: IOTAEditView);
 
 // Delete the selected text in the editor
 function GxOtaDeleteSelection(const EditView: IOTAEditView = nil): Boolean;
@@ -369,6 +379,7 @@ function GxOtaFileOrModuleExists(const AFileName: string; UseBase: Boolean = Fal
 function GxOtaMakeSourceVisible(const FileName: string): Boolean;
 function GxOtaModuleIsShowingFormSource(Module: IOTAModule): Boolean;
 procedure GxOtaGoToFileLine(const FileName: string; Line: Integer);
+procedure GxOtaGoToFileLineColumn(const FileName: string; Line: Integer; StartColumn: Integer = 0; StopColumn: Integer = 0; ShowInMiddle: Boolean = True);
 
 // Transform dfm, hpp, etc. references to the base .pas/cpp file name
 function GxOtaGetBaseModuleFileName(const FileName: string): string;
@@ -1055,6 +1066,42 @@ begin
   Result := IsIdeEditorForm(Screen.ActiveCustomForm) or IsEditControl(Screen.ActiveControl);
 end;
 
+function GxOtaGetCurrentIDEEditControl: TWinControl;
+var
+  EditView: IOTAEditView;
+  EditWindow: INTAEditWindow;
+  EditForm: TCustomForm;
+begin
+  Result := nil;
+  EditView := GxOtaGetTopMostEditView;
+  if Assigned(EditView) then
+  begin
+    EditWindow := EditView.GetEditWindow;
+    if Assigned(EditWindow) then
+    begin
+      EditForm := EditWindow.Form;
+      if Assigned(EditForm) then
+        Result := GetIDEEditControl(EditForm);
+    end;
+  end;
+end;
+
+function GxOtaFocusCurrentIDEEditControl: Boolean;
+var
+  EditControl: TWinControl;
+begin
+  Result := False;
+  EditControl := GxOtaGetCurrentIDEEditControl;
+  if EditControl.CanFocus then begin
+    try
+      EditControl.SetFocus;
+      Result := True;
+    except
+      // Ignore exceptions and return False
+    end;
+  end;
+end;
+
 function GxOtaGetProjectFileName(Project: IOTAProject; NormalizeBdsProj: Boolean = False): string;
 begin
   Result := '';
@@ -1292,6 +1339,21 @@ begin
     Result := IDEEditorStringToString(EditBlock.Text);
     if not IncludeTrailingCRLF and (EditBlock.Style in [btNonInclusive]) then
       RemoveLastEOL(Result);
+  end;
+end;
+
+function GxOtaMoveEditCursorColumn(EditView: IOTAEditView; RelativePos: Integer): Boolean;
+var
+  CursorPos: TOTAEditPos;
+begin
+  Assert(Assigned(EditView));
+  Result := False;
+  CursorPos := EditView.CursorPos;
+  if CursorPos.Col + RelativePos > 0 then
+  begin
+    CursorPos.Col := CursorPos.Col + RelativePos;
+    EditView.CursorPos := CursorPos;
+    Result := True;
   end;
 end;
 
@@ -1566,11 +1628,39 @@ begin
 
       SelStart := UseView.CharPosToPos(CharPos);
       SelLength := Block.Size;
-      
+
       Result := True;
     end;
   end;
 end;
+
+procedure GxOtaUnfoldAllRegions(const View: IOTAEditView);
+{$IFDEF GX_VER160_up}
+var
+  ElideActions: IOTAElideActions;
+begin
+  Assert(Assigned(View));
+  if Supports(View, IOTAElideActions, ElideActions) then
+    ElideActions.UnElideAllBlocks;
+end;
+{$ELSE}
+begin
+end;
+{$ENDIF}
+
+procedure GxOtaUnfoldNearestRegion(const View: IOTAEditView);
+{$IFDEF GX_VER160_up}
+var
+  ElideActions: IOTAElideActions;
+begin
+  Assert(Assigned(View));
+  if Supports(View, IOTAElideActions, ElideActions) then
+    ElideActions.UnElideNearestBlock;
+end;
+{$ELSE}
+begin
+end;
+{$ENDIF}
 
 function GxOtaDeleteSelection(const EditView: IOTAEditView): Boolean;
 var
@@ -1788,6 +1878,68 @@ begin
   finally
     FreeAndNil(EditRead);
   end;
+end;
+
+procedure GxOtaGoToFileLineColumn(const FileName: string; Line: Integer; StartColumn: Integer = 0; StopColumn: Integer = 0; ShowInMiddle: Boolean = True);
+var
+  EditView: IOTAEditView;
+  Module: IOTAModule;
+  SourceEditor: IOTASourceEditor;
+  CurPos: TOTAEditPos;
+  CharPos: TOTACharPos;
+  EditPos: TOTAEditPos;
+  MatchLength: Integer;
+resourcestring
+  SCouldNotOpenFile = 'Could not open file %s';
+begin
+  // Force the source editor to show the right file (cpp, pas, dfm, xfm, etc.)
+  if not GxOtaMakeSourceVisible(FileName) then
+    raise Exception.CreateFmt(SCouldNotOpenFile, [FileName]);
+
+  Module := GxOtaGetModule(FileName);
+  if not Assigned(Module) then
+    Exit;
+
+  SourceEditor := GxOtaGetSourceEditorFromModule(Module, FileName);
+  if not Assigned(SourceEditor) then
+    Exit;
+
+  EditView := GxOtaGetTopMostEditView(SourceEditor);
+  if not Assigned(EditView) then
+    Exit;
+
+  SourceEditor.Show;
+  EditView.GetEditWindow.Form.Update;
+  EditView.Block.SetVisible(False);
+
+  // Set the top line of the edit view
+  CurPos.Col := 1;
+  CurPos.Line := Line;
+  if ShowInMiddle then
+    CurPos.Line := CurPos.Line - (EditView.ViewSize.cy div 2);
+  if CurPos.Line < 1 then
+   CurPos.Line := 1;
+  EditView.TopPos := CurPos;
+
+  Application.ProcessMessages;
+
+  GxOtaFocusCurrentIDEEditControl;
+
+  // Position the cursor to the line and column of the match
+  CharPos.CharIndex := StartColumn - 1;
+  CharPos.Line := Line;
+  EditView.ConvertPos(False, EditPos, CharPos);
+  EditView.CursorPos := EditPos;
+  GxOtaUnfoldNearestRegion(EditView);
+  EditView.CursorPos := EditPos;
+  EditView.Block.BeginBlock;
+  MatchLength := StopColumn - StartColumn + 1;
+  // This calculation doesn't work when there are tabs inside the match text (rare)
+  EditPos.Col := EditPos.Col + MatchLength;
+  EditView.CursorPos := EditPos;
+  EditView.Block.EndBlock;
+  EditView.Block.SetVisible(True);
+  EditView.Paint;
 end;
 
 function GxOtaGetBaseModuleFileName(const FileName: string): string;

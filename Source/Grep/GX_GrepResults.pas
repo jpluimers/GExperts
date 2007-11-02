@@ -181,68 +181,15 @@ resourcestring
 procedure GoToMatchLine(MatchLine: TLineResult; SourceEditorInMiddle: Boolean);
 var
   MatchFileName: string;
-  EditView: IOTAEditView;
-  Module: IOTAModule;
-  SourceEditor: IOTASourceEditor;
-  CurPos: TOTAEditPos;
-  CharPos: TOTACharPos;
-  EditPos: TOTAEditPos;
-  MatchLength: Integer;
 resourcestring
   SCouldNotOpenFile = 'Could not open file %s';
 begin
   MatchFileName := TFileResult(MatchLine.Collection).FileName;
 
   if IsStandAlone then
-  begin
-    GXShellExecute(MatchFileName, '', True);
-    Exit;
-  end;
-
-  // Force the source editor to show the right file (cpp, pas, dfm, xfm, etc.)
-  if not GxOtaMakeSourceVisible(MatchFileName) then
-    raise Exception.CreateFmt(SCouldNotOpenFile, [MatchFileName]);
-
-  Module := GxOtaGetModule(MatchFileName);
-  if not Assigned(Module) then
-    Exit;
-
-  SourceEditor := GxOtaGetSourceEditorFromModule(Module, MatchFileName);
-  if not Assigned(SourceEditor) then
-    Exit;
-
-  EditView := GxOtaGetTopMostEditView(SourceEditor);
-  if not Assigned(EditView) then
-    Exit;
-
-  SourceEditor.Show;
-  EditView.GetEditWindow.Form.Update;
-  EditView.Block.SetVisible(False);
-
-  // Set the top line of the edit view
-  CurPos.Col := 1;
-  CurPos.Line := MatchLine.LineNo;
-  if SourceEditorInMiddle then
-    CurPos.Line := CurPos.Line - (EditView.ViewSize.cy div 2);
-  if CurPos.Line < 1 then
-   CurPos.Line := 1;
-  EditView.TopPos := CurPos;
-
-  Application.ProcessMessages;
-
-  // Position the cursor to the line and column of the match
-  CharPos.CharIndex := MatchLine.Matches[0].SPos - 1;
-  CharPos.Line := MatchLine.LineNo;
-  EditView.ConvertPos(False, EditPos, CharPos);
-  EditView.CursorPos := EditPos;
-  EditView.Block.BeginBlock;
-  MatchLength := MatchLine.Matches[0].EPos - MatchLine.Matches[0].SPos + 1;
-  // This calculation doesn't work when there are tabs inside the match text (rare)
-  EditPos.Col := EditPos.Col + MatchLength;
-  EditView.CursorPos := EditPos;
-  EditView.Block.EndBlock;
-  EditView.Block.SetVisible(True);
-  EditView.Paint;
+    GXShellExecute(MatchFileName, '', True)
+  else
+    GxOtaGoToFileLineColumn(MatchFileName, MatchLine.LineNo, MatchLine.Matches[0].SPos, MatchLine.Matches[0].EPos, SourceEditorInMiddle);
 end;
 
 { TfmGrepResults }
