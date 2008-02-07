@@ -2597,14 +2597,14 @@ begin
         end;
       end
       // UTF-8 (3 byte BOM, 1 byte chars)
-      else if (BytesRead >= 3) and (Word1 = $EFBB) and (Lo(Word2) = $BF) then // UTF-8
+      else if (BytesRead >= 3) and (Word1 = $BBEF) and (Lo(Word2) = $BF) then // UTF-8
       begin
         BOMSize := 3;
         StringBytes := FileStream.Size - BOMSize;
         if FileStream.Size > BOMSize then
         begin
           RewindStreamPastByte(BOMSize);
-          SetLength(Str, StringBytes);
+          SetLength(Result, StringBytes);
           FileStream.Read(Result[1], StringBytes);
         end;
       end
