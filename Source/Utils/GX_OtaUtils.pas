@@ -1640,8 +1640,10 @@ var
   ElideActions: IOTAElideActions;
 begin
   Assert(Assigned(View));
-  if Supports(View, IOTAElideActions, ElideActions) then
-    ElideActions.UnElideAllBlocks;
+  Assert(Assigned(View.Buffer));
+  if IsBdsSourceFile(View.Buffer.FileName) then // SQL files, for example, can raise an exception below
+    if Supports(View, IOTAElideActions, ElideActions) then
+      ElideActions.UnElideAllBlocks;
 end;
 {$ELSE}
 begin
@@ -1654,8 +1656,10 @@ var
   ElideActions: IOTAElideActions;
 begin
   Assert(Assigned(View));
-  if Supports(View, IOTAElideActions, ElideActions) then
-    ElideActions.UnElideNearestBlock;
+  Assert(Assigned(View.Buffer));
+  if IsBdsSourceFile(View.Buffer.FileName) then // SQL files, for example, can raise an exception below
+    if Supports(View, IOTAElideActions, ElideActions) then
+      ElideActions.UnElideNearestBlock;
 end;
 {$ELSE}
 begin
