@@ -22,7 +22,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Classes, ToolsAPI,
   GX_OtaUtils, GX_GenericUtils, GX_ProofreaderUtils,
-  GX_EditorFormServices, GX_KibitzComp, GX_IdeUtils;
+  GX_EditorFormServices, GX_KibitzComp, GX_IdeUtils, StrUtils;
 
 type
   IEditorPositionInformation = interface(IUnknown)
@@ -109,7 +109,7 @@ type
     function PerformKibitzReplacement(const SourceEditor: IOTASourceEditor;
       const EditorPositionInformation: IEditorPositionInformation;
       const ReplacementSourceTable: TReplacementSource;
-      const TrailingCharacters, SourceString: string): Boolean;
+      const TrailingCharacters, SourceString, OriginalSourceString: string): Boolean;
 
     function PerformReplacementAtEnd(const SourceEditor: IOTASourceEditor;
       const EditorPositionInformation: IEditorPositionInformation;
@@ -378,12 +378,13 @@ end;
 function TAutoTypeWriterNotifier.PerformKibitzReplacement(const SourceEditor: IOTASourceEditor;
   const EditorPositionInformation: IEditorPositionInformation;
   const ReplacementSourceTable: TReplacementSource;
-  const TrailingCharacters, SourceString: string): Boolean;
+  const TrailingCharacters, SourceString, OriginalSourceString: string): Boolean;
 var
   GxEditFormProxy: IGxEditFormProxy;
   CharPos: TOTACharPos;
   ReplacementString: string;
   slKibitz: TStrings;
+  //OriginalPos: TOTAEditPos;
 begin
   Result := False;
 
@@ -392,19 +393,44 @@ begin
   if not GxEditFormProxy.IsSourceEditor then
     Exit;
 
+  // When using Kibitz OTA support, it only works well when the cursor position
+  // matches the position you want to gather code completion for.  So we have to
+  // either backup the cursor one character to the end of the previous identifier
+  // (which breaks parameter hints), or limit the corrections to only happen
+  // after whitespace is typed, when the IDE seems to correct better, so we only
+  // support correcting in Delphi files after whitespace.
+  if KibitzOta and (GxOtaGetCurrentSyntaxHighlighter(SourceEditor) = gxpPAS) and NotEmpty(OriginalSourceString) and (not IsCharWhiteSpace(RightStr(OriginalSourceString, 1)[1])) then
+    Exit;
+
   Assert(Assigned(EditorPositionInformation));
   CharPos := EditorPositionInformation.CharPos;
 
-  slKibitz := TStringList.Create;
-  try
-    GetKibitzSymbols(SourceEditor, GxEditFormProxy.EditControl,
-      EditorPositionInformation.EditView,
-      CharPos.CharIndex - Length(TrailingCharacters), CharPos.Line, SourceString, TrailingCharacters, slKibitz);
+  {
+  // Moving of the cursor allows the more accurate IDE Kibitz info to be obtained,
+  // but disables parameter insight, for example
+  OriginalPos := EditorPositionInformation.EditView.CursorPos;
+  if KibitzOta then // We need to back the cursor up one character, so it gets the code completion for the previous identifier
+    GxOtaMoveEditCursorColumn(EditorPositionInformation.EditView, -1);
 
-    ReplacementString := FProofreaderData.FindInStrings(slKibitz, False, SourceString);
-  finally
-    FreeAndNil(slKibitz);
+  try
+  }
+    slKibitz := TStringList.Create;
+    try
+      GetKibitzSymbols(SourceEditor, GxEditFormProxy.EditControl,
+        EditorPositionInformation.EditView,
+        CharPos.CharIndex - Length(TrailingCharacters), CharPos.Line, SourceString, TrailingCharacters, slKibitz);
+
+      ReplacementString := FProofreaderData.FindInStrings(slKibitz, False, SourceString);
+    finally
+      FreeAndNil(slKibitz);
+    end;
+  {
+  except
+    if KibitzOta then
+      EditorPositionInformation.EditView.CursorPos := OriginalPos;
+    raise;
   end;
+  }
 
   if ReplacementString <> '' then
   begin
@@ -418,7 +444,11 @@ begin
     AppendKibitzHistory(ReplacementSourceTable, SourceString, ReplacementString);
 
     Result := True;
-  end;
+  end
+  {
+  else if KibitzOta then
+    EditorPositionInformation.EditView.CursorPos := OriginalPos;
+  }
 end;
 
 // Return the offset of the caret locator from left, top in string
@@ -605,17 +635,18 @@ begin
   // Read the part of the text in the current source line
   // that is located in front of the current cursor position.
   SourceString := GxOtaGetPreceedingCharactersInLine(EditView);
-  if Trim(SourceString) = '' then
+  if IsEmpty(SourceString) then
     Exit;
 
   EditView.GetAttributeAtPos(CursorPos, False, Element, LineFlag);
 
   if Element = atWhiteSpace then
+  begin
     if GxOtaIsWhiteSpaceInComment(EditView, EditorPositionInformation.CursorPos) then
       Element := atComment
-    else
-    if GxOtaIsWhiteSpaceInString(EditView, EditorPositionInformation.CursorPos) then
+    else if GxOtaIsWhiteSpaceInString(EditView, EditorPositionInformation.CursorPos) then
       Element := atString;
+  end;
 
   SyntaxHighlighter := GxOtaGetCurrentSyntaxHighlighter(SourceEditor);
   if not DetermineReplacementSource(Element, SyntaxHighlighter, ReplacementSourceTable) then
@@ -628,6 +659,7 @@ procedure TAutoTypeWriterNotifier.SourceEditorModified(const SourceEditor: IOTAS
 var
   TrailingChars: string;
   SourceString: string;
+  OriginalSourceString: string;
   EditorPositionInformation: IEditorPositionInformation;
   ReplacementSourceTable: TReplacementSource;
   n: Integer;
@@ -642,7 +674,7 @@ begin
 
     // Only correct when the active form is an IDE TEditWindow.
     // This prevents some unwanted corrections when other experts,
-    // the form designer, or the IDE make changes.
+    // the form designer, or the IDE features make changes.
     if not GxOtaCurrentlyEditingSource then
       Exit;
 
@@ -661,6 +693,7 @@ begin
       begin
         Exit;
       end;
+      OriginalSourceString := SourceString;
 
       // No point in continuing checking for a correction of an empty string
       if Length(SourceString) = 0 then
@@ -679,7 +712,7 @@ begin
 
       // The rest of the replacement tests replace whole words only
       // and cannot possibly match if the last char is alphanumeric
-      n := Length(SourceString); // We know from the Exit above that always Length(SourceString) > 0.
+      n := Length(SourceString); // We know from the Exit above that Length(SourceString) > 0.
 
       // Check the last character in the buffer that we copied.
       //
@@ -747,7 +780,7 @@ begin
          (ReplacementSourceTable in [rtPasSrc, rtCPPSrc]) then
       begin
         if PerformKibitzReplacement(SourceEditor, EditorPositionInformation,
-          ReplacementSourceTable, TrailingChars, SourceString) then
+          ReplacementSourceTable, TrailingChars, SourceString, OriginalSourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
           Exit;

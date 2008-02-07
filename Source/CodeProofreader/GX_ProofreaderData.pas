@@ -708,7 +708,7 @@ begin
     LocateInDict := Word;
   Assert(Length(LocateInDict) > 0);
 
-  MaxErrs := Length(Word) + 10;
+  MaxErrs := Length(Word) + 12;
   ResultIsAmbiguous := False;
 
   // Do a linear scan through the dictionary entries looking for matches
@@ -727,7 +727,7 @@ begin
       // Possibly save the errorcount as the max error count
       if Err <= MaxErrs then
       begin
-        if (Err = MaxErrs) and (Result <> StringInDict) then
+        if (Err = MaxErrs) and (Result <> StringInDict) and (NotEmpty(Result)) then
           ResultIsAmbiguous := True
         else
         begin

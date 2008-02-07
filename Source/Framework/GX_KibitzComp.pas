@@ -2,7 +2,7 @@ unit GX_KibitzComp;
 
 {$I GX_CondDefine.inc}
 
-{$IFDEF GX_VER150_up}
+{$IFDEF GX_VER150_up} // Delphi 7+
   {$DEFINE GX_KIBITZ_OTA}
 {$ENDIF GX_VER150_up}
 
@@ -17,18 +17,19 @@ procedure GetKibitzSymbols(const SourceEditor: IOTASourceEditor;
   const SourceString, TrailingCharacters: string; Strings: TStrings);
 
 function KibitzEnabled: Boolean;
+function KibitzOta: Boolean;
 
 implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Windows, SysUtils, GX_OtaUtils, GX_IdeUtils;
+  Windows, SysUtils, GX_OtaUtils, GX_IdeUtils, GX_GenericUtils;
 
 type
   PObject = ^TObject;
-  TSymbols = packed array[0..(MaxInt div SizeOf(Integer))-1] of Integer;
+  TSymbols = packed array[0..(MaxInt div SizeOf(Integer)) - 1] of Integer;
   PSymbols = ^TSymbols;
-  TUnknowns = packed array [0..(MaxInt div SizeOf(Byte))-1] of Byte;
+  TUnknowns = packed array [0..(MaxInt div SizeOf(Byte)) - 1] of Byte;
   PUnknowns = ^TUnknowns;
 
   // Verified for D6, should work for D7 now as well
@@ -203,8 +204,16 @@ end;
 function KibitzEnabled: Boolean;
 begin
   Initialize;
-  Result := PrivateKibitzEnabled
-    and (not RunningBDS2006); // Else we crash due to SetQueryContext (?) every time in BDS 2006
+  Result := PrivateKibitzEnabled;
+end;
+
+function KibitzOta: Boolean;
+begin
+  {$IFDEF GX_KIBITZ_OTA}
+  Result := True;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
 end;
 
 procedure Finalize;
@@ -237,6 +246,14 @@ procedure GetKibitzSymbols(const SourceEditor: IOTASourceEditor;
   const SourceString, TrailingCharacters: string; Strings: TStrings);
 
 {$IFDEF GX_KIBITZ_OTA}
+var
+  NewCharPos: TOTACharPos;
+  NewCursorPos: TOTAEditPos;
+  OldCursorPos: TOTAEditPos;
+  ManagerIndex: Integer;
+  CodeInsightServices: IOTACodeInsightServices;
+  CodeInsightManager: IOTACodeInsightManager;
+
   procedure AddManagerSymbolsToList(CurrentCodeInsightManager: IOTACodeInsightManager);
   var
     Allow: Boolean;
@@ -256,26 +273,29 @@ procedure GetKibitzSymbols(const SourceEditor: IOTASourceEditor;
       Exit;
     if not CurrentCodeInsightManager.HandlesFile(SourceEditor.FileName) then
       Exit;
-    Allow := True;
-    CurrentCodeInsightManager.AllowCodeInsight(Allow, #0);
-    if not Allow then
-      Exit; // otherwise you will get an AV in 'InvokeCodeCompletion'
 
-    EditView.GetAttributeAtPos(EditView.CursorPos, False, ElementAttribute, LineFlag);
+    CodeInsightServices.SetQueryContext(EditView, CodeInsightManager);
+    try
+      Allow := True;
+      CurrentCodeInsightManager.AllowCodeInsight(Allow, #0);
+      if not Allow then
+        Exit; // otherwise you will get an AV in 'InvokeCodeCompletion'
 
-    {$IFNDEF GX_VER150_up}
-    if TrailingCharacters = '' then
-      FirstChar := #0
-    else
-      FirstChar := TrailingCharacters[1];
-    {$ELSE}
-    // Without this, Delphi 7 and 2005 pop up a dialog stating "Unable to invoke
-    // Code Completion due to errors in source code" with unknown identifiers
-    FirstChar := CodeInsightKeySymbolHint;
-    {$ENDIF GX_VER150_up}
+      EditView.GetAttributeAtPos(EditView.CursorPos, False, ElementAttribute, LineFlag);
 
-    CurrentCodeInsightManager.GetCodeInsightType(FirstChar, ElementAttribute,
-      CodeInsightType, InvokeType);
+      {$IFNDEF GX_VER150_up}
+      if TrailingCharacters = '' then
+        FirstChar := #0
+      else
+        FirstChar := TrailingCharacters[1];
+      {$ELSE}
+      // Without this, Delphi 7 and 2005 pop up a dialog stating "Unable to invoke
+      // Code Completion due to errors in source code" with unknown identifiers
+      FirstChar := CodeInsightKeySymbolHint;
+      {$ENDIF GX_VER150_up}
+
+      CurrentCodeInsightManager.GetCodeInsightType(FirstChar, ElementAttribute,
+        CodeInsightType, InvokeType);
 
 (*
 There is a bug here that you can reproduce as follows:
@@ -306,49 +326,37 @@ One solution might be to (temporarily) replace the '.' in the code editor
 with a ' ', and at the end restore the '.', but this adds to the undo stack.
 *)
 
-    // Not used, but the IDE calls it in this order, and the calling order might be important.
-    ValidChars := CurrentCodeInsightManager.EditorTokenValidChars(False);
+      // Not used, but the IDE calls it in this order, and the calling order might be important.
+      ValidChars := CurrentCodeInsightManager.EditorTokenValidChars(False);
 
-    try
-      Symbol := SourceString;
-      if not CurrentCodeInsightManager.InvokeCodeCompletion(InvokeType, Symbol) then
-        Exit;
       try
-        CurrentCodeInsightManager.GetSymbolList(CodeInsightSymbolList);
-        if (CodeInsightSymbolList = nil) then
+        Symbol := SourceString;
+        if not CurrentCodeInsightManager.InvokeCodeCompletion(InvokeType, Symbol) then
           Exit;
+        try
+          CurrentCodeInsightManager.GetSymbolList(CodeInsightSymbolList);
+          if (CodeInsightSymbolList = nil) then
+            Exit;
 
-        SymbolCount := CodeInsightSymbolList.Count;
-        // Expand string list to the needed capacity so that it does not
-        // have to be resized while adding symbols in the loop below.
-        Strings.Capacity := (Strings.Capacity - Strings.Count) + SymbolCount;
-        for SymbolIndex := 0 to SymbolCount-1 do
-          Strings.Add(CodeInsightSymbolList.GetSymbolText(SymbolIndex));
-      finally
-        DisplayParams := False;
-        CurrentCodeInsightManager.Done(False, DisplayParams);
+          SymbolCount := CodeInsightSymbolList.Count;
+          // Expand string list to the needed capacity so that it does not
+          // have to be resized while adding symbols in the loop below.
+          Strings.Capacity := (Strings.Capacity - Strings.Count) + SymbolCount;
+          for SymbolIndex := 0 to SymbolCount - 1 do
+            Strings.Add(CodeInsightSymbolList.GetSymbolText(SymbolIndex));
+        finally
+          DisplayParams := False;
+          CurrentCodeInsightManager.Done(False, DisplayParams);
+        end;
+      except
+        on E: Exception do
+          {$IFOPT D+}SendDebugError('Exception: ' + E.Message);{$ENDIF}
       end;
-    except
-      on E: Exception do
-        {$IFOPT D+}SendDebugError('Exception: ' + E.Message);{$ENDIF}
-    end;
-  end;
-
-var
-  NewCharPos: TOTACharPos;
-  NewCursorPos: TOTAEditPos;
-  OldCursorPos: TOTAEditPos;
-  CodeInsightServices: IOTACodeInsightServices;
-  CodeInsightManager: IOTACodeInsightManager;
-  ManagerIndex: Integer;
-
-  procedure AddManagerSymbolsToListInContext(CurrentCodeInsightManager: IOTACodeInsightManager);
-  begin
-    CodeInsightServices.SetQueryContext(EditView, CodeInsightManager);
-    try
-      AddManagerSymbolsToList(CodeInsightManager);
     finally
-      CodeInsightServices.SetQueryContext(nil, nil);
+      if RunningBDS2006OrGreater {and (StrContains('pascal', CodeInsightManager.Name))} then
+        CodeInsightServices.SetQueryContext(nil, CodeInsightManager)
+      else
+        CodeInsightServices.SetQueryContext(nil, nil);  // This crashes BDS 2006 for some reason?
     end;
   end;
 
@@ -373,14 +381,14 @@ begin
     if (CodeInsightManager = nil) then
     begin
       // So we ask all the managers to provide their list of symbols
-      for ManagerIndex := 0 to CodeInsightServices.CodeInsightManagerCount-1 do
+      for ManagerIndex := 0 to CodeInsightServices.CodeInsightManagerCount - 1 do
       begin
         CodeInsightManager := CodeInsightServices.CodeInsightManager[ManagerIndex];
-        AddManagerSymbolsToListInContext(CodeInsightManager);
+        AddManagerSymbolsToList(CodeInsightManager);
       end;
     end
     else
-      AddManagerSymbolsToListInContext(CodeInsightManager);
+      AddManagerSymbolsToList(CodeInsightManager);
   finally
     EditView.CursorPos := OldCursorPos;
   end;
@@ -432,7 +440,7 @@ begin
 
           Strings.BeginUpdate;
           try
-            for i := 0 to SymbolCount-1 do
+            for i := 0 to SymbolCount - 1 do
             begin
               // Get the name of the symbol.
               CompGetSymbolText(Symbols^[i], S, 2);
