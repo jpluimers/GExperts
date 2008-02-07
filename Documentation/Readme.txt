@@ -1,4 +1,4 @@
-GExperts 1.32
+GExperts 1.33
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -12,7 +12,7 @@ related queries to the project leader at:
 
 INTRODUCTION
 ----------------------
-  GExperts is a set of tools built to increase the productivity of
+GExperts is a set of tools built to increase the productivity of
 Delphi and C++Builder programmers by adding several features to the
 IDE.  GExperts is developed as Open Source software and is contributed
 as freeware to the development community.  Users are encouraged to
@@ -22,7 +22,7 @@ new features for inclusion in the GExperts distribution.
 
 THE EXPERTS
 ----------------------
-  GExperts contains numerous experts.  See the online help
+GExperts contains numerous experts.  See the online help
 (GExperts.chm) for information on the usage of the experts.
 
 
@@ -37,9 +37,9 @@ KNOWN LIMITATIONS/BUGS
   also no longer have a tabbed component palette, so those options are no
   longer supported, as well.
 - The compiler replacement option of the Code Proofreader is only partially
-  working under Delphi 7-2005.  It does not correct when a symbol is
-  terminated by a '.' character (IDE limitation).  It does not work at all
-  in BDS 2006 or later (IDE bug).
+  working under Delphi 7-2005.  It does not correct when an identifier is
+  terminated by pressing a symbol key such as a period or open parenthesis,
+  but works fine when the symbol is terminated by a space (IDE limitation).
 - You should turn off the "Ignore Comments" Grep Search option to perform a
   search and replace on the results (GExperts limitation).
 - Due to either native Open Tools API limitations or bugs, the following
@@ -60,8 +60,8 @@ KNOWN LIMITATIONS/BUGS
      shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
      Identifier, etc.) to not conflict with your selected keymapping.  Also,
      the Macro Library can not always intercept the Shift+Ctrl+R keystroke to
-     automatically grab keyboard macros, so you will need to create macros
-     using the record functionality on the toolbar.
+     automatically grab keyboard macros, so you may need to create macros
+     using the recording functions in the toolbar.
 
 
 INSTALLATION
@@ -90,7 +90,7 @@ the latest updates and patches for your IDE available from:
 
 UNINSTALLATION
 ----------------------
-  Uninstallation of GExperts can be done from the Control Panel's
+Uninstallation of GExperts can be done from the Control Panel's
 Add/Remove Programs or Programs [and Features] tool under Vista.
 
 
@@ -158,7 +158,7 @@ VERSION 1.30 (October 26, 2006)
    tab options can not be supported in the newer IDEs.
  - Procedure List: Option to view the selected procedure's source code
    (Paul Gardner, Erik).  Optionally search in the class name. (Primoz)
-   Support for scanning Delphi .inc files and upgraded C++ support. 
+   Support for scanning Delphi .inc files and upgraded C++ support.
  - Code Proofreader: Added basic C# support (Erik)
  - Component Grid: Allow editing the Hint property for components (Erik)
  - IDE Enhancements: Changing the multiline component tabs setting in
@@ -472,7 +472,7 @@ http://www.helpandmanual.com/
 GEXPERTS LICENSE
 ----------------------
 
-GExperts is copyright 1996-2007 by GExperts, Inc, Erik Berry, and several
+GExperts is copyright 1996-2008 by GExperts, Inc, Erik Berry, and several
 other authors who have submitted their code for inclusion. This license
 agreement only covers code written by GExperts, Inc. and Erik Berry. You
 should contact the other authors concerning their respective copyrights
