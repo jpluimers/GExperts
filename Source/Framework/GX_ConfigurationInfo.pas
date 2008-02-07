@@ -35,11 +35,11 @@ type
 
     // Return the IDE's base registry key without a
     // trailing backslash, e.g.
-    //    SOFTWARE\Borland\Delphi\5.0
+    //    SOFTWARE\Borland\Delphi\6.0
     property IdeRootRegistryKey: string read GetIdeRootRegistryKey;
     // Return the GExperts base registry key within
     // the IDE without a trailing backslash, e.g.
-    //    SOFTWARE\Borland\Delphi\5.0\GExperts
+    //    SOFTWARE\Borland\Delphi\6.0\GExperts
     property GExpertsIdeRootRegistryKey: string read GetGExpertsIdeRootRegistryKey;
     // Return the location of the GExperts help file.
     property HelpFile: string read GetHelpFileLocation write SetHelpFileLocation;
@@ -127,7 +127,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils,
-  GX_IdeEnhance, GX_EditorEnhancements, GX_MessageBox,
+  GX_EditorEnhancements, GX_MessageBox,
   GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils, GX_VerDepConst;
 
 type
@@ -377,6 +377,7 @@ end;
 
 constructor TConfigInfo.Create;
 begin
+  // Don't do anything significant here, because this gets recreated many times
   {$IFOPT D+} SendDebug('Creating configuration info'); {$ENDIF D+}
   inherited Create;
   FPrivateConfigurationInfo := Self;
@@ -401,8 +402,6 @@ begin
   EditorEnhancements.Enabled := False;
 
   LoadSettings;
-  if not IsStandAlone then
-    IdeEnhancements.Initialize;
   ShowGxMessageBox(TShowBadDirectoryMessage, FConfigPath);
 end;
 
@@ -416,7 +415,6 @@ begin
   {$IFOPT D+} SendDebug('TConfigInfo.Destroy'); {$ENDIF D+}
   SaveSettings;
   FreeEditorEnhancements;
-  FreeIdeEnhancements;
 
   inherited Destroy;
 end;

@@ -55,7 +55,7 @@ uses
   SysUtils, Dialogs, ExtCtrls,
   GX_GenericUtils, GX_GetIdeVersion, GX_About, GX_MenuActions, GX_MessageBox,
   GX_ConfigurationInfo, GX_Configure, GX_KbdShortCutBroker, GX_SharedImages,
-  GX_IdeUtils;
+  GX_IdeUtils, GX_IdeEnhance;
 
 var
   FPrivateGExpertsInst: TGExperts = nil;
@@ -202,6 +202,7 @@ begin
         // Release the editor expert manager and the editor experts
         {$IFOPT D+} SendDebug('Releasing editor expert manager'); {$ENDIF}
         FreeEditorExperts;
+        FreeIdeEnhancements;
 
         // Free the action manager and remove any registered keybindings
         {$IFOPT D+} SendDebug('Freeing Action manager'); {$ENDIF}
@@ -297,6 +298,7 @@ begin
     if ConfigInfo.EditorExpertsEnabled then
       LoadEditorExperts;
 
+    IdeEnhancements.Initialize;
   finally
     GxKeyboardShortCutBroker.EndUpdate;
   end;
