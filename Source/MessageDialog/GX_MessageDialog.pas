@@ -1035,6 +1035,7 @@ function TCppMessageDialogBuilder.GetCode: string;
     Column: Integer;
     Indent: string;
     StartOffset, LineNo: Integer;
+    SwitchValue: string;
   begin
     GxOtaGetCurrentLineData(StartOffset, Column, LineNo);
 
@@ -1043,8 +1044,14 @@ function TCppMessageDialogBuilder.GetCode: string;
       Indent := Indent + ' ';
 
     for i := 0 to FunctionResults.Count - 1 do
-      Result := Result + Format('%s   case %s : ;' + sLineBreak + '%s      break;' +
-        sLineBreak, [Indent, AnsiUpperCase(FunctionResults[i]), Indent]);
+    begin
+      SwitchValue := FunctionResults[i];
+      if FMessageType is TMessageBoxType then
+        SwitchValue := UpperCase(SwitchValue);
+
+      Result := Result + Format('%s   case %s:' + sLineBreak + '%s      break;' +
+        sLineBreak, [Indent, SwitchValue, Indent]);
+    end;
     Result := Result + Indent + '}';
   end;
 
