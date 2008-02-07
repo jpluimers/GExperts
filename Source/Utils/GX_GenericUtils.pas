@@ -50,19 +50,22 @@ type
               );
     end;
 
-  TOSVersionInfoExA = packed record
+  {$ALIGN ON}
+  _OSVERSIONINFOEXA = record
     dwOSVersionInfoSize: DWORD;
     dwMajorVersion: DWORD;
     dwMinorVersion: DWORD;
     dwBuildNumber: DWORD;
     dwPlatformId: DWORD;
-    szCSDVersion: array[0..127] of AnsiChar;
-    wServicePackMajor: WORD;
-    wServicePackMinor: WORD;
-    wSuiteMask: WORD;
+    szCSDVersion: array [0..127] of AnsiChar;
+    wServicePackMajor: Word;
+    wServicePackMinor: Word;
+    wSuiteMask: Word;
     wProductType: Byte;
     wReserved: Byte;
   end;
+  TOSVersionInfoExA = _OSVERSIONINFOEXA;
+  TOSVersionInfoEx = TOSVersionInfoExA;
 
   EVersionInfoNotFound = class(Exception);
 
@@ -2780,12 +2783,12 @@ function GetVersionExA(lpVersionInformation: Pointer): BOOL; stdcall;
 
 function GetOSString: string;
 const
-  VER_NT_WORKSTATION = $01;
+  VER_NT_WORKSTATION = $00000001;
 var
   OSPlatform: string;
   BuildNumber: Integer;
   SysInfo: TSystemInfo;
-  VerInfoEx: TOSVersionInfoExA;
+  VerInfoEx: TOSVersionInfoEx;
 begin
   Result := 'Unknown Windows Version';
   OSPlatform := 'Windows';
@@ -2794,7 +2797,7 @@ begin
   GetSystemInfo(SysInfo);
 
   ZeroMemory(@VerInfoEx, SizeOf(VerInfoEx));
-  VerInfoEx.dwOSVersionInfoSize := SizeOf(TOSVersionInfoA);
+  VerInfoEx.dwOSVersionInfoSize := SizeOf(TOSVersionInfoEx);
   if not GetVersionExA(@VerInfoEx) then
     VerInfoEx.dwOSVersionInfoSize := 0;
 
@@ -2837,7 +2840,7 @@ begin
                end;
           end;
         end
-        else if Win32MajorVersion = 6 then
+        else if (Win32MajorVersion = 6) and (Win32MinorVersion = 0) then
         begin
           OSPlatform := 'Windows Vista';
           if (VerInfoEx.dwOSVersionInfoSize > 0) and (VerInfoEx.wProductType <> VER_NT_WORKSTATION) then
