@@ -25,8 +25,8 @@ object fmConfiguration: TfmConfiguration
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 511
-    Height = 457
+    Width = 503
+    Height = 450
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 7
@@ -48,8 +48,8 @@ object fmConfiguration: TfmConfiguration
         object sbxExperts: TScrollBox
           Left = 0
           Top = 0
-          Width = 489
-          Height = 415
+          Width = 481
+          Height = 408
           VertScrollBar.Increment = 40
           VertScrollBar.Range = 920
           VertScrollBar.Tracking = True
@@ -687,7 +687,7 @@ object fmConfiguration: TfmConfiguration
   object dlgHelpFile: TOpenDialog
     DefaultExt = '.chm'
     Filter = 'Help Files (*.chm)|*.chm'
-    Options = [ofPathMustExist, ofFileMustExist]
+    Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
     Title = 'Select Help File'
     Left = 358
     Top = 332
