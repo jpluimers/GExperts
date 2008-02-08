@@ -123,9 +123,9 @@ const
 
   LastPatternChar = opEndPat;
 
-  GrepPatternSize = 512;
-  SearchLineSize = 1024;
-  DefaultBufferSize = 2048;
+  GrepPatternSize = 1024;
+  SearchLineSize = 31 * 1024; // Max editor line length: D6: 1K, BDS 2006: 4K
+  DefaultBufferSize = 31 * 1024;
 
 { Generic routines }
 
@@ -257,7 +257,7 @@ begin
             except
               on E: Exception do
               begin
-                GxLogAndShowException(E, Format('Error during text conversion of form %s:%s', [FFileName, sLineBreak]));
+                GxLogAndShowException(E, Format('Error during text conversion of form %s:%s', [FFileName, sLineBreak + E.Message]));
                 Exit;
               end;
             end;
@@ -429,7 +429,7 @@ begin
     FBufferDataCount := FSearchStream.Read(FSearchBuffer^, AmountOfBytesToRead)
   else
   begin
-    Assert(Assigned(FEditReader), 'No FEditReader in TSearcher.ReadIntoBuffer');
+    Assert(Assigned(FEditReader), 'No FEditReader in TSearcher.ReadIntoBuffer for: ' + FileName);
     FBufferDataCount := FEditReader.GetText(FEditReaderPos, FSearchBuffer, AmountOfBytesToRead);
   end;
 end;
@@ -579,7 +579,8 @@ begin
         end;
       end;
     end;
-    if FEof then Exit;
+    if FEof then
+      Exit;
     i := FBufferSearchPos;
     while i < FBufferDataCount do
     begin
@@ -747,12 +748,15 @@ begin
       end;
       Inc(i);
     end;
-    if FSearchBuffer[i] <> #0 then Inc(FLineNo);
+    if FSearchBuffer[i] <> #0 then
+      Inc(FLineNo);
     BLine[LPos] := #0;
     OrgLine[LPos] := #0;
-    if BLine[0] <> #0 then PatternMatch;
+    if BLine[0] <> #0 then
+      PatternMatch;
     LPos := 0;
-    if FBufferSearchPos < i then FBufferSearchPos := i;
+    if FBufferSearchPos < i then
+      FBufferSearchPos := i;
   end;
 end;
 

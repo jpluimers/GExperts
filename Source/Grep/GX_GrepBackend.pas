@@ -473,7 +473,6 @@ begin
 
   FSearcher := TSearcher.Create('');
   try
-    FSearcher.BufSize := 30000;
     FSearcher.OnFound := FoundIt;
     //FSearcher.OnFound := WideFoundIt;
     FSearcher.OnStartSearch := StartFileSearch;
