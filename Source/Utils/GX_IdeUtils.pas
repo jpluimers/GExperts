@@ -74,6 +74,7 @@ function RunningBDS2006OrGreater: Boolean;
 function RunningBDS2006: Boolean;
 function RunningCPPBuilder: Boolean;
 function IDEHasWelcomePage: Boolean;
+function IDEEditorEncodingIsUTF8: Boolean;
 
 implementation
 
@@ -465,6 +466,11 @@ begin
 end;
 
 function IDEHasWelcomePage: Boolean;
+begin
+  Result := RunningDelphi8OrGreater;
+end;
+
+function IDEEditorEncodingIsUTF8: Boolean;
 begin
   Result := RunningDelphi8OrGreater;
 end;
