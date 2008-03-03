@@ -1,8 +1,8 @@
 object fmExpertManager: TfmExpertManager
   Left = 277
   Top = 202
-  Width = 467
-  Height = 267
+  Width = 594
+  Height = 319
   ActiveControl = lvExperts
   BorderIcons = [biSystemMenu]
   Caption = 'Expert Manager'
@@ -24,17 +24,17 @@ object fmExpertManager: TfmExpertManager
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 199
-    Width = 459
+    Top = 244
+    Width = 578
     Height = 19
     Panels = <>
     SimplePanel = False
   end
   object lvExperts: TListView
     Left = 0
-    Top = 22
-    Width = 459
-    Height = 177
+    Top = 24
+    Width = 578
+    Height = 220
     Align = alClient
     Columns = <
       item
@@ -61,11 +61,10 @@ object fmExpertManager: TfmExpertManager
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 459
-    Height = 22
+    Width = 578
+    Height = 24
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
-    EdgeBorders = []
     Flat = True
     Images = dmSharedImages.Images
     ParentShowHint = False
