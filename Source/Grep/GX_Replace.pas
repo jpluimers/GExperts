@@ -130,11 +130,12 @@ var
     FormFile: TFileStream;
     FormSource: TStringStream;
   begin
-    if (InMemory) then
+    if InMemory then
     begin
       EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
       EditWriter.DeleteTo(MaxInt);
-      EditWriter.Insert(PChar(ConvertToIDEEditorString(TempFile.Text)));
+      // RemoveLastEOL is necessary because TStringList.Text adds an extra CRLF on the end
+      EditWriter.Insert(PChar(ConvertToIDEEditorString(RemoveTrailingCRLF(TempFile.Text))));
       EditWriter := nil;
       Module := nil;
       SourceEditor := nil;
