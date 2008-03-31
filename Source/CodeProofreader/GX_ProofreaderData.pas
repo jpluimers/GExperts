@@ -649,8 +649,8 @@ var
 
     // If other letters are allowed and the chars are near on the keyboard.
     if OneCharIncorrect and
-      ((not MustBeNearbyLetter) or
-      (CharsAreNearOnKeyboard(Typed[DifferCharIndex], InDict[DifferCharIndex]))) then
+      ((not MustBeNearbyLetter) or (((DifferCharIndex <= Length(Typed)) and (DifferCharIndex <= Length(InDict))) and
+      (CharsAreNearOnKeyboard(Typed[DifferCharIndex], InDict[DifferCharIndex])))) then
     begin
       // The Result is the errorcount +14 found in the resulting string.
       ResultCandidate := ErrCount(CurErrLevel + 14,
