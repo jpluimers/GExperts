@@ -663,6 +663,7 @@ var
   EditorPositionInformation: IEditorPositionInformation;
   ReplacementSourceTable: TReplacementSource;
   n: Integer;
+  DoCompiler: Boolean;
 begin
   if FModifyingSelf then
     Exit;
@@ -779,7 +780,14 @@ begin
       if FProofreaderData.CompilerActive and
          (ReplacementSourceTable in [rtPasSrc, rtCPPSrc]) then
       begin
-        if PerformKibitzReplacement(SourceEditor, EditorPositionInformation,
+        DoCompiler := True;
+        // If the dictionary contains the typed word, don't bother with compiler
+        // replacement, since the dictionary serves as an override to not
+        // correct things the compiler might be bad at, like keywords (then, etc.)
+        // We could also ignore certain element types, such as atReservedWord, atNumber, etc.
+        if FProofreaderData.DictionaryActive then
+          DoCompiler := not FProofreaderData.FindExactDictionary(ReplacementSourceTable, SourceString);
+        if DoCompiler and PerformKibitzReplacement(SourceEditor, EditorPositionInformation,
           ReplacementSourceTable, TrailingChars, SourceString, OriginalSourceString) then
         begin
           EditorPositionInformation.EditView.Paint;

@@ -53,6 +53,7 @@ type
     procedure SaveData;
     procedure ReloadData;
 
+    function FindExactDictionary(const Zone: TReplacementSource; const AWord: string): Boolean;
     function FindDictionary(const Zone: TReplacementSource; const AWord: string): string;
     function FindInStrings(Strings: TStrings; const ListIsSorted: Boolean; const Word: string): string;
     function FindReplacementIndex(const Zone: TReplacementSource; const TypedString: string): Integer;
@@ -708,7 +709,7 @@ begin
     LocateInDict := Word;
   Assert(Length(LocateInDict) > 0);
 
-  MaxErrs := Length(Word) + 12;
+  MaxErrs := Length(Word) + 12; // Warning: Subjective magic number
   ResultIsAmbiguous := False;
 
   // Do a linear scan through the dictionary entries looking for matches
@@ -896,6 +897,16 @@ procedure TProofreaderData.ValidateReplacementIndex(ReplacementList: TReplacemen
 begin
   if (Index < 0) or (Index >= ReplacementList.Count) then
     raise Exception.Create('Invalid replacement index requested');
+end;
+
+function TProofreaderData.FindExactDictionary(const Zone: TReplacementSource; const AWord: string): Boolean;
+var
+  Index: Integer;
+begin
+  Result := False;
+  Index := FDictionaryLists[Zone].IndexOf(AWord);
+  if (Index >= 0) and (FDictionaryLists[Zone][Index] = AWord) then
+    Result := True;
 end;
 
 end.
