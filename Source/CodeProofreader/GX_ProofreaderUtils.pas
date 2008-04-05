@@ -5,7 +5,7 @@ unit GX_ProofreaderUtils;
 interface
 
 uses
-  Classes, GX_GenericClasses;
+  Classes, Contnrs, GX_GenericClasses;
 
 type
   TGXWhereReplace = (wrAnywhere, wrWordBegin, wrWordEnd, wrWholeWord);
@@ -30,7 +30,7 @@ type
 
   TCorrectionHistory = class(TObject)
   private
-    FItems: TGxObjectList;
+    FItems: TObjectList;
     FMaxHistory: Integer;
     function GetCount: Integer;
     function GetItem(Index: Integer): TCorrectionItem;
@@ -157,7 +157,7 @@ const
 begin
   inherited Create;
 
-  FItems := TGxObjectList.Create(not OwnsObject);
+  FItems := TObjectList.Create(not OwnsObject);
   FMaxHistory := 25;
 end;
 
