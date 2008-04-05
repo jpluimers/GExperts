@@ -97,8 +97,6 @@ var
   SpaceBefore: string;
   SpaceAfter: string;
   LeadingSpace: string;
-const
-  Whitespace = [#9, ' '];
 begin
   if IsCPPSourceModule(GxOtaGetCurrentSourceEditor.FileName) then
     AssignOp := '='
@@ -134,7 +132,7 @@ begin
           Exit;
     end;
     i := 1;
-    while S[i] in Whitespace do
+    while IsCharWhitespace(S[i]) do
     begin
       LeadingSpace := LeadingSpace + S[i];
       Inc(i);
@@ -143,7 +141,7 @@ begin
     i := AssignPos - 1;
     if StringBefore <> '' then
     begin
-      while S[i] in Whitespace do
+      while IsCharWhitespace(S[i]) do
       begin
         SpaceBefore := S[i] + SpaceBefore;
         SetLength(StringBefore, Length(StringBefore) - 1);
@@ -151,7 +149,7 @@ begin
       end;
     end;
     i := AssignPos + Length(AssignOp);
-    while S[i] in Whitespace do
+    while IsCharWhitespace(S[i]) do
     begin
       SpaceAfter := SpaceAfter + S[i];
       Inc(i);
