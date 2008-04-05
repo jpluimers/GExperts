@@ -1326,7 +1326,7 @@ begin
   Result := False;
   if CompareText(PI.Target, 'xml') = 0 then begin
     // 2004-02-06 (mr): modified to recognize valid delimiter characters
-    EncodingStartPos := Pos('encoding=', PI.Data) + 9;
+    EncodingStartPos := Pos(WideString('encoding='), PI.Data) + 9;
 
     if EncodingStartPos > 9 then begin
       DelimiterChar := PI.Data[EncodingStartPos];
@@ -3183,7 +3183,7 @@ end;
 
 procedure TXMLCDATASection.CheckValue(const Value: WideString);
 begin
-  if Pos(']]>', Value) > 0 then
+  if Pos(WideString(']]>'), Value) > 0 then
     raise EXMLException.CreateParseError(INVALID_CHARACTER_ERR, MSG_E_INVALID_CDATACLOSINGTAG, []);
 end;
 
@@ -3694,6 +3694,7 @@ var
     if (PI <> nil) and FindEncoding(PI, CodePage) then
       Result := CodePage;
   end;
+
 begin
   US := TXMLTextStream.Create(OutputStream, smWrite, InternalFindEncoding);
   try
