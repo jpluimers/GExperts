@@ -194,10 +194,10 @@ type
   TUnitInfo = class(TObject)
   private
     FFormName: string;
-    FUnitName: string;
+    FSourceName: string;
     FFileName: string;
   public
-    property UnitName: string read FUnitName write FUnitName;
+    property SourceName: string read FSourceName write FSourceName;
     property FormName: string read FFormName write FFormName;
     property FileName: string read FFileName write FFileName;
   end;
@@ -642,7 +642,7 @@ begin
 
       UnitInfo.FileName := ModuleInfo.FileName;
       UnitInfo.FormName := ModuleInfo.FormName;
-      UnitInfo.UnitName := ModuleInfo.Name;
+      UnitInfo.SourceName := ModuleInfo.Name;
     end;
   end;
 end;
@@ -1426,7 +1426,7 @@ procedure GxOtaGetCurrentIdentEx(var Ident: string; var IdentOffset: Integer;
 
   function IsEndOfWordChar(Char: Char): Boolean;
   begin
-    if Char in GxIdentChars then
+    if IsCharIdentifier(Char) then
       Result := False
     else
       Result := True;
@@ -1555,7 +1555,7 @@ begin
   if not Assigned(Writer) then
     raise Exception.Create('No edit writer');
   Writer.DeleteTo(MaxLongint);
-  Writer.Insert(PChar(Text));
+  Writer.Insert(PAnsiChar(ConvertToIDEEditorString(Text)));
   Writer := nil;
 end;
 
@@ -1934,7 +1934,9 @@ begin
   CharPos.Line := Line;
   EditView.ConvertPos(False, EditPos, CharPos);
   EditView.CursorPos := EditPos;
-  GxOtaUnfoldNearestRegion(EditView);
+  // This is disabled since it causes crashes in D2007 jumping to matches in data modules with no opened project
+  // inside EdScript.TOTAEditView.unElideNearestBlock
+  //GxOtaUnfoldNearestRegion(EditView);
   EditView.CursorPos := EditPos;
   EditView.Block.BeginBlock;
   MatchLength := StopColumn - StartColumn + 1;
@@ -2647,7 +2649,7 @@ type
       1: (SString: ShortString);
       2: (Int: Integer);
       3: (Int64: Int64);
-      4: (LString: PChar);
+      4: (LString: PAnsiChar);
       5: (WString: PWChar);
       6: (VChar: Char);
       7: (VWChar: WideChar);
@@ -2751,10 +2753,10 @@ var
   VInteger         : Integer;
   VInt64           : Int64;
   VVariant         : Variant;
-  VString          : string;
+  VAString         : AnsiString;
   VShortString     : string;
   VFloat           : Extended;
-  VChar            : Char;
+  VAChar           : AnsiChar;
   VWChar           : WChar;
   VBoolean         : Boolean;
 
@@ -2777,8 +2779,8 @@ begin
     tkWString: Result := AComponent.SetPropByName(PropertyName, Value);
 
     tkLString: begin
-        VString := Value;
-        Result := AComponent.SetPropByName(PropertyName, VString);
+        VAString := Value;
+        Result := AComponent.SetPropByName(PropertyName, VAString);
       end;
 
     tkString: begin
@@ -2808,8 +2810,8 @@ begin
 
     tkChar: begin
         if Length(Value) > 0 then begin
-          VChar := Char(Value[1]);
-          Result := AComponent.SetPropByName(PropertyName, VChar);
+          VAChar := AnsiChar(Value[1]);
+          Result := AComponent.SetPropByName(PropertyName, VAChar);
         end;
       end;
 
@@ -2913,9 +2915,17 @@ begin
 end;
 
 function GxOtaGetComponentName(const AComponent: IOTAComponent): WideString;
+var
+  Component: TComponent;
 begin
   Assert(Assigned(AComponent));
   Result := GxOtaGetComponentPropertyAsString(AComponent, NamePropertyName);
+  if IsEmpty(Result) then
+  begin
+    Component := GxOtaGetNativeComponent(AComponent);
+    if Assigned(Component) then
+      Result := Component.Name;
+  end;
 end;
 
 function GxOtaSetComponentName(const AComponent: IOTAComponent; const Name: WideString): Boolean;
@@ -3223,7 +3233,7 @@ const
   BufSize = 16384;
 var
   CurSize, BytesRead: Longint;
-  Buf: array[0..BufSize] of Char;
+  Buf: array[0..BufSize] of AnsiChar;
 begin
   Assert(FEditReader <> nil, 'fReader is nil in TEditReaderStream.GetSize');
 
@@ -3265,32 +3275,27 @@ end;
 procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream);
 const
   // Leave typed constant as is - needed for streaming code.
-  TerminatingNulChar: Char = #0;
+  TerminatingNullChar: AnsiChar = #0;
   BufferSize = 1024 * 24;
 var
-  Buffer: PChar;
   EditReaderPos: Integer;
   ReadDataSize: Integer;
+  Buffer: array[0..BufferSize] of AnsiChar;
 begin
   Assert(EditReader <> nil);
   Assert(Stream <> nil);
 
-  GetMem(Buffer, BufferSize);
-  try
-    EditReaderPos := 0;
+  EditReaderPos := 0;
+  ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, BufferSize);
+  Inc(EditReaderPos, ReadDataSize);
+  while ReadDataSize = BufferSize do
+  begin
+    Stream.Write(Buffer, ReadDataSize);
     ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, BufferSize);
     Inc(EditReaderPos, ReadDataSize);
-    while ReadDataSize = BufferSize do
-    begin
-      Stream.Write(Buffer^, ReadDataSize);
-      ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, BufferSize);
-      Inc(EditReaderPos, ReadDataSize);
-    end;
-    Stream.Write(Buffer^, ReadDataSize);
-    Stream.Write(TerminatingNulChar, SizeOf(TerminatingNulChar));
-  finally
-    FreeMem(Buffer);
   end;
+  Stream.Write(Buffer, ReadDataSize);
+  Stream.Write(TerminatingNullChar, SizeOf(TerminatingNullChar));
 end;
 
 function GxOtaGetActiveEditorText(Stream: TStream; UseSelection: Boolean): Boolean;
@@ -3316,7 +3321,7 @@ begin
     if (IEditView.Block.Size > 0) and UseSelection then
     begin
       BlockSelText := IDEEditorStringToString(IEditView.Block.Text);
-      Stream.WriteBuffer(PChar(BlockSelText)^, Length(BlockSelText) + SizeOf(#0));
+      Stream.WriteBuffer(PAnsiChar(ConvertToIDEEditorString(BlockSelText))^, Length(BlockSelText) + SizeOf(Byte(0)));
       Result := True;
     end
     else
@@ -3339,6 +3344,15 @@ begin
   finally
     FreeAndNil(StringStream);
   end;
+end;
+
+function ReadEditorTextToString(EditReader: IOTAEditReader; LineStartPos: Integer; LineLength: Integer): string;
+var
+  AString: AnsiString;
+begin
+  SetLength(AString, LineLength);
+  EditReader.GetText(Max(LineStartPos, 0), PAnsiChar(AString), LineLength);
+  Result := AString;
 end;
 
 function GxOtaGetPreceedingCharactersInLine(View: IOTAEditView): string;
@@ -3371,8 +3385,7 @@ begin
   Assert(LineLength >= 0);
   if LineLength = 0 then
     Exit;
-  SetLength(Result, LineLength);
-  EditReader.GetText(Max(LineStartPos, 0), PChar(Result), LineLength);
+  Result := ReadEditorTextToString(EditReader, LineStartPos, LineLength);
   Result := LastLineOf(Result);
 end;
 
@@ -3467,7 +3480,7 @@ begin
     Exit;
   EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
   EditWriter.CopyTo(Position);
-  EditWriter.Insert(PChar(ConvertToIDEEditorString(Text)));
+  EditWriter.Insert(PAnsiChar(ConvertToIDEEditorString(Text)));
 end;
 
 procedure GxOtaGotoPosition(Position: Longint; EditView: IOTAEditView; Middle: Boolean);
@@ -3560,74 +3573,9 @@ var
   View: IOTAEditView;
   Start, After: TOTACharPos;
 
-  // Replace a columnar selection with a single string.
-  // Delete a portion of each line within the block, and insert
-  // the replacement text on the first line. The Start position
-  // is the upper left corner. The After position is the lower
-  // right corner.
   procedure ReplaceColumns(Start, After: TOTAEditPos; RplText: string);
-  var
-    EditPos: TOTAEditPos;
-    StartCharPos: TOTACharPos;
-    AfterCharPos: TOTACharPos;
-    Line: Integer;
-    TmpText: string;
-    Strings: TEditorStrings;
-    ReplaceStrings: TStringList;
-    ReplaceLine: Integer;
   begin
-    ReplaceLine := 0;
-    ReplaceStrings := nil;
-    Strings := TEditorStrings.Create(Editor);
-    try
-      ReplaceStrings := TStringList.Create;
-      ReplaceStrings.Text := RplText;
-      // For each line in the block...
-      for Line := Start.Line to After.Line do
-      begin
-        // Determine the starting and ending character indices for the current line
-        EditPos.Line := Line;
-        EditPos.Col := Start.Col;
-        View.ConvertPos(True, EditPos, StartCharPos);
-        EditPos.Col := After.Col;
-        View.ConvertPos(True, EditPos, AfterCharPos);
-
-        if ReplaceStrings.Count = (After.Line - Start.Line + 1) then
-        begin
-          // Replace each line individually
-          RplText := ReplaceStrings[ReplaceLine];
-          RemoveLastEOL(RplText);
-          TmpText := Strings[Line-1];
-          Delete(TmpText, StartCharPos.CharIndex+1,
-            AfterCharPos.CharIndex-StartCharPos.CharIndex+1);
-          Insert(RplText, TmpText, StartCharPos.CharIndex+1);
-          Strings[Line-1] := TmpText;
-          Inc(ReplaceLine);
-        end
-        else
-        begin // Replacement text goes only in the first line
-          // Delete the selected portion of the line and insert the
-          // replacement text so it starts at the same position.
-          // Lines numbers are 1-based, and the string list
-          // is 0-based, so subtract 1 for the line index. Strings
-          // indices are 1-based, but character position indices
-          // are 0-based, or add 1 for the character index. The After
-          // column is inclusive.
-          TmpText := Strings[Line-1];
-          Delete(TmpText, StartCharPos.CharIndex+1,
-            AfterCharPos.CharIndex-StartCharPos.CharIndex+1);
-          Insert(RplText, TmpText, StartCharPos.CharIndex+1);
-          Strings[Line-1] := TmpText;
-
-          // Clear RplText so the replacement occurs only on the first line.
-          RplText := '';
-        end;
-      end;
-      Strings.SaveToEditor(Editor);
-    finally
-      FreeAndNil(Strings);
-      FreeAndNil(ReplaceStrings);
-    end;
+    raise Exception.Create('Replacing of columnar selections is no longer supported');
   end;
 
   // Replace the text between Start and After, inclusive, with Text.
@@ -3671,7 +3619,7 @@ var
 
       if (After.CharIndex = 0) and (After.Line - Start.Line = 1) then
       begin
-        Dec(DeleteToPos, Length(#13#10)); // TODO 4 -oAnyone -cKylix: Fix CRLF dependencies for Kylix
+        Dec(DeleteToPos, Length(#13#10));
         {$IFDEF GX_WorkAroundFirstCharInLineSelectionBug}
         if FirstCharInLineDeleted then
         begin
@@ -3695,7 +3643,7 @@ var
       if DeleteToPos > StartPos then
         Writer.DeleteTo(DeleteToPos);
       // Insert the replacement text
-      Writer.Insert(PChar(ConvertToIDEEditorString(Text)));
+      Writer.Insert(PAnsiChar(ConvertToIDEEditorString(Text)));
       // Copy the rest of the file
       Writer.CopyTo(High(Longint));
     finally
@@ -3746,6 +3694,8 @@ var
   SourceEditor: IOTASourceEditor;
   Component: TComponent;
   EditStream: TGxEditorReadStream;
+  //i: Integer;
+  //IsUTF8: Boolean;
 begin
   WasBinary := False;
   Assert(Assigned(Lines));
@@ -3828,11 +3778,18 @@ begin
         FileReader := TEditReader.Create(FileName);
         try
           FileReader.SaveToStream(MemStream);
+          //IsUTF8 := FileReader.IsUTF8;
           MemStream.Position := 0;
         finally
           FreeAndNil(FileReader);
         end;
         Lines.LoadFromStream(MemStream);
+        //if IsUTF8 then
+        //begin
+        //  for i := 0 to Lines.Count - 1 do
+        //    // We only support chracters representable in the user's ANSI encoding (not full UNICODE)
+        //    Lines[i] := Utf8ToAnsi(Lines[i]);
+        //end;
       end;
     end;
   finally
