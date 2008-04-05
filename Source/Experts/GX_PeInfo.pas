@@ -62,7 +62,7 @@ type
 
   Import_Function = record
     Ordinal: SmallInt;
-    Name: array[0..255] of Char;
+    Name: array[0..255] of AnsiChar;
   end;
 
   PEOptionalHeader = record
@@ -100,7 +100,7 @@ type
   end;
 
   ImageSectionHeader = record
-    Name: array[0..7] of Char;
+    Name: array[0..7] of AnsiChar;
     VirtualSize: Integer;
     VirtualAddress: Integer;
     SizeOfRawData: Integer;
@@ -302,7 +302,7 @@ resourcestring
   SInvalidPeFile = 'Invalid PE file format';
   SExecutableFormat = 'Executable format';
 var
-  PE: array[0..3] of Char;
+  PE: array[0..3] of AnsiChar;
   BytesRead: Integer;
 begin
   FStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
@@ -371,7 +371,7 @@ procedure TPEFileInfo.ReadImportList;
   function GetName(L: Integer): string;
   var
     SPos: Integer;
-    Buf: array[0..1024] of Char;
+    Buf: array[0..1024] of AnsiChar;
   begin
     SPos := FStream.Position;
     FStream.Position := L;
@@ -478,7 +478,7 @@ var
   SectionHeader: ImageSectionHeader;
   ExportAddress: Integer;
   NameAddress: Integer;
-  Buffer: array[0..255] of Char;
+  Buffer: array[0..255] of AnsiChar;
   j: Integer;
   MaxExports: Longint;
   Ordinal: Word;
