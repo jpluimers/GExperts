@@ -999,7 +999,7 @@ begin
 
   for i := Length(Value) downto 1 do
   begin
-    if Result[i] in ['"', '\'] then
+    if CharInSet(Result[i], ['"', '\']) then
       Insert('\', Result, i);
   end;
 end;
