@@ -36,7 +36,6 @@ uses
 // and have the problem solved elsewhere, but this is hard...
 // We don't remove the CRLF if the block ends in the first column,
 // because then we delete a necessary CRLF.
-// TODO 4 -cKylix -oAnyone: Test LF detection under Kylix
 function TSelectionEditorExpert.BlockSelectionToLineEndType(SouceEditor: IOTASourceEditor;
   const Selection: string): Integer;
 var
