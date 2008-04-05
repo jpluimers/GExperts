@@ -63,7 +63,7 @@ type
 
   TLanguage = class(TObject)
   private
-    FOrigin: PChar;
+    FOrigin: PAnsiChar;
     FFileStream: TMemoryStream;
   protected
     FProcedures: TProcedures;
@@ -72,7 +72,7 @@ type
     constructor Create(const FileName: string);
     procedure Execute; virtual; abstract;
     property Procedures: TProcedures read FProcedures write FProcedures;
-    property Origin: PChar read fOrigin write FOrigin;
+    property Origin: PAnsiChar read fOrigin write FOrigin;
     property FileStream: TMemoryStream read FFileStream write FFileStream;
     property FileName: string read FFileName write FFileName;
   end;
@@ -142,7 +142,7 @@ end;
 
 function TProcedure.GetBody: string;
 begin
-  Result := Copy(PChar(TProcedures(Collection).MemStream.Memory), FBeginIndex +
+  Result := Copy(PAnsiChar(TProcedures(Collection).MemStream.Memory), FBeginIndex +
     1, (FEndIndex - FBeginIndex));
 end;
 
