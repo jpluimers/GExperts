@@ -286,10 +286,10 @@ begin
   if s = '' then
     Result := ''
   else begin
-    l := MultiByteToWideChar(codePage, MB_PRECOMPOSED, PChar(@s[1]), -1, nil, 0);
+    l := MultiByteToWideChar(codePage, MB_PRECOMPOSED, PAnsiChar(@s[1]), -1, nil, 0);
     SetLength(Result, l-1);
     if l > 1 then
-      MultiByteToWideChar(CodePage, MB_PRECOMPOSED, PChar(@s[1]), -1, PWideChar(@Result[1]), l-1);
+      MultiByteToWideChar(CodePage, MB_PRECOMPOSED, PAnsiChar(@s[1]), -1, PWideChar(@Result[1]), l-1);
   end;
 end; { StringToWideString }
 
@@ -333,13 +333,13 @@ function WideCharBufToUTF8Buf(const unicodeBuf; uniByteCount: integer;
   var utf8Buf): integer;
 var
   iwc: integer;
-  pch: PChar;
+  pch: PAnsiChar;
   pwc: PWideChar;
   wc : word;
 
   procedure AddByte(b: byte);
   begin
-    pch^ := char(b);
+    pch^ := AnsiChar(b);
     Inc(pch);
   end; { AddByte }
 
@@ -751,7 +751,7 @@ begin
       try
         bytesRead := WrappedStream.Read(tmpBuf^,numChar);
         numChar := MultiByteToWideChar(tsCodePage, MB_PRECOMPOSED,
-          PChar(tmpBuf), bytesRead, PWideChar(@buffer), numChar);
+          PAnsiChar(tmpBuf), bytesRead, PWideChar(@buffer), numChar);
         Result := numChar * SizeOf(WideChar);
       finally FreeBuffer(tmpBuf); end;
     end;
