@@ -7,7 +7,7 @@ interface
 function CharsAreNearOnKeyboard(const a, b: Char): Boolean;
 
 var
-  KeysWithDistance1: array[1..50] of set of Char;
+  KeysWithDistance1: array[1..50] of set of AnsiChar;
   KeyboardChars, ShiftKeyboardChars, AltGrKeyboardChars: ShortString;
 
 implementation
@@ -36,7 +36,7 @@ begin
 end;
 
 var
-  BarrierChars: set of Char;
+  BarrierChars: set of AnsiChar;
   Barriers, NextChars: string[6]; // FS: added
 
 (*
@@ -77,7 +77,7 @@ the array spot isn't already filled.
 {$WARNINGS OFF}
 procedure InitKeySets;
 
-  procedure IncludeInSet(iKeySet: Integer; Key: Char);
+  procedure IncludeInSet(iKeySet: Integer; Key: AnsiChar);
   begin
     if Key <> #32 then
       KeysWithDistance1[iKeySet] := KeysWithDistance1[iKeySet] + [Key];
@@ -156,7 +156,7 @@ begin
             end;
         end;
         if (Row > 0) and (KeyBoardLayout[aKeyState][Row][Column] = #32) then
-          KeyBoardLayout[aKeyState][Row][Column] := Char(i);
+          KeyBoardLayout[aKeyState][Row][Column] := AnsiChar(i);
       end;
     end;
   end;
