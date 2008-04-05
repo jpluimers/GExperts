@@ -1001,10 +1001,8 @@ begin
 
   while Idx >= 1 do
   begin
-
-    if AText[Idx] in [#13, #10] then
+    if IsCharLineEnding(AText[Idx]) then
       Break;
-
     Inc(Result);
     Dec(Idx);
   end;
