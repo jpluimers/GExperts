@@ -314,13 +314,13 @@ end;
 type
   IGxGrepSearchAdapter = interface
   ['{2A8DD529-D06F-4CA7-83E5-E4880477BE31}']
-    function GetText(Position: Longint; Buffer: PChar; Count: Longint): Longint;
+    function GetText(Position: Longint; Buffer: PAnsiChar; Count: Longint): Longint;
   end;
 
 type
   TGrepStreamAdapter = class(TInterfacedObject, IGxGrepSearchAdapter)
   private
-    function GetText(Position: Longint; Buffer: PChar; Count: Longint): Longint;
+    function GetText(Position: Longint; Buffer: PAnsiChar; Count: Longint): Longint;
   private
     FOwned: Boolean;
     FStream: TStream;
@@ -332,7 +332,7 @@ type
 type
   TGrepOtaAdapter = class(TInterfacedObject, IGxGrepSearchAdapter)
   private
-    function GetText(Position: Longint; Buffer: PChar; Count: Longint): Longint;
+    function GetText(Position: Longint; Buffer: PAnsiChar; Count: Longint): Longint;
   private
     FEditReader: IOTAEditReader;
   public
@@ -401,7 +401,7 @@ begin
   Masks := TStringList.Create;
   try
     for i := 1 to Length(Mask) do
-      if Mask[i] in [';', ','] then
+      if CharInSet(Mask[i], [';', ',']) then
         Mask[i] := #13;
 
     Masks.Text := Mask;
@@ -609,7 +609,7 @@ begin
   inherited Destroy;
 end;
 
-function TGrepStreamAdapter.GetText(Position: Integer; Buffer: PChar;
+function TGrepStreamAdapter.GetText(Position: Integer; Buffer: PAnsiChar;
   Count: Integer): Longint;
 begin
   FStream.Position := Position;
@@ -626,7 +626,7 @@ begin
   FEditReader := EditReader;
 end;
 
-function TGrepOtaAdapter.GetText(Position: Integer; Buffer: PChar;
+function TGrepOtaAdapter.GetText(Position: Integer; Buffer: PAnsiChar;
   Count: Integer): Longint;
 begin
   Result := FEditReader.GetText(Position, Buffer, Count);
