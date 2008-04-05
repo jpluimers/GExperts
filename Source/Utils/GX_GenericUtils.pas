@@ -19,7 +19,6 @@ const
   {$ENDIF LINUX}
   EmptyString = '';
   // Note these don't handle german/polish/etc. extrnded ASCII alpha chars that are valid in Delphi 8+
-  GxIdentChars       = ['A'..'Z', 'a'..'z', '0'..'9', '_'];
   GxIdentStartChars  = ['A'..'Z', 'a'..'z', '0'..'9'];
   GxAlphaChars       = ['A'..'Z', 'a'..'z'];
   GxUpperAlphaChars  = ['A'..'Z'];
@@ -110,6 +109,23 @@ procedure FindMinIndent(ALines: TStrings; var LineIndex, SpaceCount: Integer);
 
 // Determine if a character represents white space
 function IsCharWhiteSpace(C: Char): Boolean;
+function IsCharWhiteSpaceOrNull(C: Char): Boolean;
+function IsCharLineEnding(C: Char): Boolean;
+function IsCharLineEndingOrNull(C: Char): Boolean; overload;
+function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload;
+function IsCharAlphaNumeric(C: Char): Boolean; overload;
+function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
+function IsCharNumeric(C: Char): Boolean; overload;
+function IsCharNumeric(C: AnsiChar): Boolean; overload;
+function IsCharTab(C: Char): Boolean;
+function IsCharSymbol(C: Char): Boolean; overload;
+function IsCharSymbol(C: AnsiChar): Boolean; overload;
+// See if a character is a valid locale identifier character, _, or 0..9
+function IsCharIdentifier(C: Char): Boolean; overload;
+function IsCharIdentifier(C: AnsiChar): Boolean; overload;
+{$IFNDEF UNICODE}
+function CharInSet(C: Char; Set: TSysCharSet);
+{$ENDIF UNICODE}
 
 // Transforms all consecutive sequences of #10, #13, #32, and #9 in Str
 // into a single space, and strips off whitespace at the beginning and
@@ -504,8 +520,6 @@ function TempHourGlassCursor: IInterface;
 
 procedure GetEnvironmentVariables(Strings: TStrings);
 
-// See if a character is a valid locale identifier character, _, or 0..9
-function IsCharIdent(C: Char): Boolean;
 function FindTextIdent(Id: string; const Source: string;
   LastPos: Integer; Prev: Boolean; var Pos: Integer): Boolean;
 
@@ -543,15 +557,13 @@ type
     procedure ReleaseResults;
   end;
 
-var
-  LocaleIdentifierChars: set of Char;
-
 implementation
 
 uses
   Windows, Messages,
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   {$IFDEF GX_DEBUGLOG} GX_Debug, {$ENDIF}
+  {$IFDEF UNICODE} Character, {$ENDIF}
   ShellAPI, ShlObj, ActiveX, StrUtils;
 
 type
@@ -565,6 +577,7 @@ type
 
 var
   ASCIICharTable: array [#0..#255] of Byte;
+  LocaleIdentifierChars: set of AnsiChar;
 
 function SelectDirCB(Wnd: HWND; uMsg: UINT; lParam, lpData: LPARAM): Integer stdcall;
 begin
@@ -635,7 +648,7 @@ begin
 end;
 
 // FastCode PosIEx PosIEx_JOH_IA32_1_c from fastcode.org
-function PosIEx(const SubStr, S: string; Offset: Integer = 1): Integer;
+function PosIEx(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
 const
   LocalsSize = 32;
   _ebx =  0;
@@ -885,8 +898,11 @@ end; {PosIEx}
 
 function CaseInsensitivePos(const Pat, Text: string): Integer;
 begin
-  //Result := Pos(UpperCase(Pat), UpperCase(Text));
+  {$IFDEF UNICODE}
+  Result := Pos(UpperCase(Pat), UpperCase(Text));
+  {$ELSE}
   Result := PosIEx(Pat, Text);
+  {$ENDIF}
 end;
 
 function CaseInsensitivePosFrom(const Pat, Text: string; StartIndex: Integer): Integer;
@@ -1023,9 +1039,87 @@ begin
   end; // for i
 end;
 
+{$IFNDEF UNICODE}
+function CharInSet(C: Char; Set: TSysCharSet);
+begin
+  Result := C in Set;
+end;
+{$ENDIF UNICODE}
+
 function IsCharWhiteSpace(C: Char): Boolean;
 begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsWhiteSpace(C);
+  {$ELSE not UNICODE}
   Result := C in [#9, #10, #13, #32];
+  {$ENDIF}
+end;
+
+function IsCharWhiteSpaceOrNull(C: Char): Boolean;
+begin
+  Result := (C = #0) or IsCharWhiteSpace(C);
+end;
+
+function IsCharLineEnding(C: Char): Boolean;
+begin
+  Result := CharInSet(C, [#10, #13]);
+end;
+
+function IsCharLineEndingOrNull(C: Char): Boolean;
+begin
+  Result := CharInSet(C, [#0, #10, #13]);
+end;
+
+function IsCharLineEndingOrNull(C: AnsiChar): Boolean;
+begin
+  Result := C in [#0, #10, #13];
+end;
+
+function IsCharAlphaNumeric(C: Char): Boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsLetterOrDigit(C);
+  {$ELSE not UNICODE}
+  Result := Windows.IsCharAlphaNumeric(C);
+  {$ENDIF}
+end;
+
+function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
+begin
+  Result := Windows.IsCharAlphaNumericA(C);
+end;
+
+function IsCharNumeric(C: Char): Boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsDigit(C);
+  {$ELSE not UNICODE}
+  Result := CharInSet(C, '0'..'9']);
+  {$ENDIF}
+end;
+
+function IsCharNumeric(C: AnsiChar): Boolean;
+begin
+  Result := C in ['0'..'9'];
+end;
+
+function IsCharTab(C: Char): Boolean;
+begin
+  Result := C = #8;
+end;
+
+function IsCharSymbol(C: Char): Boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
+  {$ELSE not UNICODE}
+  Result := CharInSet(['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
+  {$ENDIF}
+end;
+
+function IsCharSymbol(C: AnsiChar): Boolean;
+begin
+  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
 end;
 
 // This function is impossible to read, but it is very fast
@@ -1050,7 +1144,7 @@ begin
     case CheckChar of
       #9, #10, #13, #32:
         begin
-          if (NextChar in [#0, #9, #10, #13, #32]) or (NextResultChar = 1) then
+          if IsCharWhiteSpaceOrNull(NextChar) or (NextResultChar = 1) then
             Continue
           else
           begin
@@ -1073,7 +1167,7 @@ end;
 function LeftTrimChars(var Value: string; const TrimChars: TSysCharSet = [#9, #32]): Integer;
 begin
   Result := 0;
-  while (Length(Value) > Result) and (Value[Result+1] in TrimChars) do
+  while (Length(Value) > Result) and CharInSet(Value[Result+1], TrimChars) do
     Inc(Result);
 
   Delete(Value, 1, Result);
@@ -1084,7 +1178,7 @@ var
   CharCnt: Integer;
 begin
   CharCnt := 0;
-  while (Length(AValue) > CharCnt) and (AValue[CharCnt+1] in TrimChars) and
+  while (Length(AValue) > CharCnt) and CharInSet(AValue[CharCnt+1], TrimChars) and
         ((CharCnt < AMaxCount) or (AMaxCount = 0)) do
     Inc(CharCnt);
 
@@ -1234,7 +1328,7 @@ function SentenceCase(const S: string): string;
     Result := False;
     while (i > 0) and (IsCharWhiteSpace(S[i])) do
       Dec(i);
-    if (i > 0) and (S[i] in GxSentenceEndChars) then
+    if (i > 0) and CharInSet(S[i], GxSentenceEndChars) then
       Result := True;
   end;
 
@@ -1498,13 +1592,11 @@ end;
 //   #13    (Macintosh, Amiga)
 // Note: Pos must be at the beginning of the EOL characters
 function EOLSizeAtPos(const S: string; Pos: Integer): Integer;
-const
-  EolChars = [#10, #13];
 begin
-  if (StrCharAt(S, Pos) in EolChars) then
+  if IsCharLineEnding(StrCharAt(S, Pos)) then
   begin
     Result := 1;
-    if ((StrCharAt(S, Pos + 1) in EolChars) and
+    if (IsCharLineEnding(StrCharAt(S, Pos + 1)) and
         (StrCharAt(S, Pos) <> StrCharAt(S, Pos + 1))) then
       Inc(Result);
   end
@@ -3225,10 +3317,10 @@ end;
 
 procedure Initialize;
 var
-  i: Char;
+  i: AnsiChar;
 begin
-  for i := Low(Char) to High(Char) do
-    if Windows.IsCharAlphaNumeric(i) then
+  for i := Low(AnsiChar) to High(AnsiChar) do
+    if Windows.IsCharAlphaNumericA(i) then
       Include(LocaleIdentifierChars, i);
   Include(LocaleIdentifierChars, '_');
   MakeASCIICharTable;
@@ -3248,11 +3340,6 @@ begin
   else
     Exit;
   Result := True;
-end;
-
-function IsCharIdent(C: Char): Boolean;
-begin
-  Result := IsCharAlpha(C) or (C in GxIdentChars);
 end;
 
 function FindTextIdent(Id: string; const Source: string;
@@ -3293,7 +3380,7 @@ begin
         else
           NextChar := Source[StartPos + Length(Id)];
 
-        if (not (PrevChar in LocaleIdentifierChars)) and (not (NextChar in LocaleIdentifierChars)) then
+        if (not IsCharIdentifier(PrevChar)) and (not IsCharIdentifier(NextChar)) then
         begin
           Pos := StartPos;
           Result := True;
