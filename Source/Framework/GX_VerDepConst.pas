@@ -63,7 +63,7 @@ const
   {$ENDIF VER180}
 
   {$IFDEF VER190}
-    GExpertsDll = 'GExpertsBDS2007.dll';
+    GExpertsDll = 'GExpertsRS2008.dll';
     {$DEFINE GExpertsDllNameDefined}
   {$ENDIF VER190}
 
@@ -127,7 +127,7 @@ const
   {$ENDIF VER180}
 
   {$IFDEF VER190}
-    TTabDockHostFormClassContainer = 'designide110.bpl';
+    TTabDockHostFormClassContainer = 'designide120.bpl';
     {$DEFINE TTabDockHostFormClassContainerDefined}
   {$ENDIF VER190}
 
@@ -204,7 +204,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER180}
 
   {$IFDEF VER190}
-    MajorVersionNumberChar = '12';  // BDS 2007
+    MajorVersionNumberChar = '12';  // RS 2008
     {$DEFINE MajorVersionNumber}
   {$ENDIF VER190}
 
@@ -272,7 +272,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER180}
 
   {$IFDEF VER190}
-    IDEEnglishName = 'RAD Studio 2007';
+    IDEEnglishName = 'RAD Studio 2008';
     {$DEFINE IDEEnglishNameDefined}
   {$ENDIF VER190}
 
@@ -399,7 +399,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER180}
 
   {$IFDEF VER190}
-    ClassBrowserStorageFolder = 'Classes.BDS2007';
+    ClassBrowserStorageFolder = 'Classes.RS2008';
     {$DEFINE ClassBrowserStorageDefined}
   {$ENDIF VER190}
 
