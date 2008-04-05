@@ -79,7 +79,7 @@ uses
 {$IFDEF LINUX}
   WinUtils,
 {$ENDIF LINUX}
-  Windows, SysUtils, Classes,
+  Windows, SysUtils, Classes, Contnrs,
   GX_GenericUtils, GX_IdeUtils, GX_GenericClasses;
 
 type
@@ -118,7 +118,7 @@ type
   TGxEditorFormServices = class(TComponent, IGxEditorFormServices)
   private
     FCurrentProxyHost: Integer;
-    FHostComponents: TGxObjectList;
+    FHostComponents: TObjectList;
     FListeners: TList;
     procedure ClearListeners;
     procedure ClearHostComponents;
@@ -210,11 +210,11 @@ var
 
 function CBTHookProc(nCode: Integer; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
 const
-  ClassNameBufferSize = 120;
+  ClassNameBufferSize = 200;
 var
   ClassNameBuffer: array[0..ClassNameBufferSize-1] of Char;
+  ClassName: string;
   ApiResult: Integer;
-  ComparisonResult: Integer;
 begin
   if nCode < 0 then
   begin
@@ -230,17 +230,17 @@ begin
           ApiResult := GetClassName(wParam, ClassNameBuffer, SizeOf(ClassNameBuffer));
           Win32Check(ApiResult <> 0);
           Assert(ApiResult < ClassNameBufferSize, 'Found class name larger than fixed buffer size');
+          ClassName := ClassNameBuffer;
 
-          {$IFOPT D+} SendDebug('SetFocus hook found: ' + StrPas(ClassNameBuffer)); {$ENDIF}
-          ComparisonResult := StrLIComp(ClassNameBuffer, EditorControlClassName, ClassNameBufferSize);
-          if ComparisonResult = 0 then
+          {$IFOPT D+} SendDebug('SetFocus hook found: ' + ClassName); {$ENDIF}
+          if SameText(ClassName, EditorControlClassName) then
           begin
             {$IFOPT D+} SendDebug('SetFocus hook found an editor control'); {$ENDIF}
             Assert(Assigned(PrivateGxEditorFormServices));
             PrivateGxEditorFormServices.BeforeSetFocusEditorForm(wParam);
           end;
         end;
-      (*  This may be useful later to replace the Screen.OnActiveFormChanged hook 
+      (*  This may be useful later to replace the Screen.OnActiveFormChanged hook
       HCBT_ACTIVATE: // A top-level window was focused
         if wParam > 0 then  // wParam is 0 if an Exception happens in HCBT_ACTIVATE?
         begin
@@ -452,7 +452,7 @@ begin
   inherited Create(AOwner);
 
   FListeners := TList.Create;
-  FHostComponents := TGxObjectList.Create(not OwnsObjects);
+  FHostComponents := TObjectList.Create(not OwnsObjects);
   InvalidateCurrentProxyHost;
 
   CBTHook := SetWindowsHookEx(WH_CBT, CBTHookProc, 0, GetCurrentThreadID);
