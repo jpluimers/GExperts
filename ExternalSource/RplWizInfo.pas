@@ -1162,7 +1162,8 @@ begin
 
     FOldName := GetName;
 
-    Assert(Assigned(Parent.LatestComponentInterface));
+    Assert(Assigned(Parent), 'Parent not assigned');
+    Assert(Assigned(Parent.LatestComponentInterface), 'Parent.LatestComponentInterface not assigned');
     with Properties do
     try
       {$IFOPT D+} SendDebug(Format('Creating with pos: (Left=%d, Top=%d', [GetLeft, GetTop])); {$ENDIF}
