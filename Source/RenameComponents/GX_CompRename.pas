@@ -467,7 +467,7 @@ begin
   end;
 
   Pipe2Pos := -1;
-  Pipe1Pos := Pos('|', RenameRule);
+  Pipe1Pos := Pos(WideString('|'), RenameRule);
   if Pipe1Pos > 0 then begin
     Delete(RenameRule, Pipe1Pos, 1);
     Pipe2Pos := LastCharPos(RenameRule, '|');
@@ -475,7 +475,7 @@ begin
       Delete(RenameRule, Pipe2Pos, 1);
   end;
 
-  PlaceHolderPos := Pos('%d', RenameRule);
+  PlaceHolderPos := Pos(WideString('%d'), RenameRule);
   if PlaceHolderPos > 0 then
     Delete(RenameRule, PlaceHolderPos, 2);
 
