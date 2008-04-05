@@ -545,10 +545,8 @@ end;
 procedure TfmGrepResults.lbResultsKeyPress(Sender: TObject; var Key: Char);
 begin
   case Key of
-
     '+', '-':
       ToggleFileResultExpanded(lbResults.ItemIndex);
-
     #13:
       GotoHighlightedListEntry;
   end;
@@ -858,6 +856,9 @@ procedure TfmGrepResults.GotoHighlightedListEntry;
 var
   CurrentLine: TLineResult;
   ResultIndex: Integer;
+  //S: string;
+  //rS: string;
+  //uS: WideString;
 begin
   ResultIndex := lbResults.ItemIndex;
   if ResultIndex < 0 then
@@ -873,6 +874,11 @@ begin
   if CurrentLine = nil then
     Exit;
 
+  //S := lbResults.Items[ResultIndex];
+  //rS := Copy(S, CurrentLine.Matches[0].SPos, CurrentLine.Matches[0].Length);
+  //uS := AnsiToUtf8(S);
+  //CurrentLine.Matches[0].SPos := Pos(AnsiToUtf8(rS), uS);
+  //CurrentLine.Matches[0].EPos := CurrentLine.Matches[0].SPos + Length(AnsiToUtf8(rS)) - 1;
   GoToMatchLine(CurrentLine, GrepExpert.GrepMiddle);
 end;
 
