@@ -66,13 +66,13 @@ begin
   Result := False;
 
   while CurPos >= 1 do
-    if IsCharIdent(Source[CurPos]) then
+    if IsCharIdentifier(Source[CurPos]) then
     begin
       Dec(CurPos);
       Result := True;
     end
     else if (not Result) and (CurPos >= 2) then
-      if IsCharIdent(Source[CurPos - 1]) then
+      if IsCharIdentifier(Source[CurPos - 1]) then
       begin
         Dec(CurPos, 2);
         Result := True;
@@ -87,7 +87,7 @@ begin
     Pos := CurPos + 1;
     Inc(CurPos, 2);
     while (CurPos >= 1) and (CurPos <= Length(Source)) do
-      if IsCharIdent(Source[CurPos]) then
+      if IsCharIdentifier(Source[CurPos]) then
         Inc(CurPos)
       else
         Break;
@@ -141,7 +141,7 @@ begin
     finally
       FreeAndNil(EditRead);
     end;
-    SetString(FSource, PChar(MemStream.Memory), MemStream.Size);
+    SetString(FSource, PAnsiChar(MemStream.Memory), MemStream.Size);
   finally
     FreeAndNil(MemStream);
   end;
