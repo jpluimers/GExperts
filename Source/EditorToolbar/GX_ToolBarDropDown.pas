@@ -338,8 +338,8 @@ begin
   Assert(Assigned(UnitInfo));
   Assert(Assigned(AList));
   if IsBdsSourceFile(UnitInfo.FileName) then
-    if AList.IndexOf(UnitInfo.UnitName) = -1 then
-      AList.AddObject(UnitInfo.UnitName, Data);
+    if AList.IndexOf(UnitInfo.SourceName) = -1 then
+      AList.AddObject(UnitInfo.SourceName, Data);
 end;
 
 { TFormPopupListing }
@@ -409,7 +409,7 @@ begin
         UsesItem := UsesManager.InterfaceUses.Items[i];
         UnitInfo.FileName := ApplyAlias(UsesItem.Name) + '.pas';
         UnitInfo.FormName := '';
-        UnitInfo.UnitName := UsesItem.Name;
+        UnitInfo.SourceName := UsesItem.Name;
       end;
       {$IFOPT D+}SendDebug('Iterating through implementation uses.  Count = ' + IntToStr(UsesManager.ImplementationUses.Count));{$ENDIF}
       for i := 0 to UsesManager.ImplementationUses.Count - 1 do
@@ -419,7 +419,7 @@ begin
         UsesItem := UsesManager.ImplementationUses.Items[i];
         UnitInfo.FileName := ApplyAlias(UsesItem.Name) + '.pas';
         UnitInfo.FormName := '';
-        UnitInfo.UnitName := UsesItem.Name;
+        UnitInfo.SourceName := UsesItem.Name;
       end;
     finally
       FreeAndNil(UsesManager);
@@ -437,7 +437,7 @@ begin
   Assert(Assigned(UnitInfo));
   Assert(Assigned(AList));
 
-  TrimmedUsesName := Trim(UnitInfo.UnitName);
+  TrimmedUsesName := Trim(UnitInfo.SourceName);
   if TrimmedUsesName <> '' then
     if AList.IndexOf(TrimmedUsesName) = -1 then
       AList.AddObject(TrimmedUsesName, Data);
