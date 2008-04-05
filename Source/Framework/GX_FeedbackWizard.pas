@@ -567,7 +567,7 @@ end;
 
 procedure TfmFeedbackWizard.edtPercentKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['0'..'9', #8]) then
+  if not CharInSet(Key, ['0'..'9', #8]) then
     Key := #0;
 end;
 
