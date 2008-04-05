@@ -56,7 +56,7 @@
               {$DEFINE GX_VER185_up}  // Delphi 2007
             {$ENDIF}
             {$IF CompilerVersion >= 19}
-              {$DEFINE GX_VER190_up}  // BDS 2007
+              {$DEFINE GX_VER190_up}  // Rad Studio 2008?
             {$IFEND}
           {$IFEND}
         {$IFEND}
