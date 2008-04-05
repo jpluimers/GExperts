@@ -251,7 +251,7 @@ begin
     Index := ImageIndexWindow;
 
   UInfo := TUnitInfo.Create;
-  UInfo.UnitName := UnitName;
+  UInfo.SourceName := UnitName;
   UInfo.FileName := FileName;
   FFileList.AddObject(UnitName, UInfo);
 
