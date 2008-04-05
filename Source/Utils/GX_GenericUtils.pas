@@ -123,8 +123,11 @@ function IsCharSymbol(C: AnsiChar): Boolean; overload;
 // See if a character is a valid locale identifier character, _, or 0..9
 function IsCharIdentifier(C: Char): Boolean; overload;
 function IsCharIdentifier(C: AnsiChar): Boolean; overload;
+function IsCharIdentifierStart(C: Char): Boolean; overload;
+function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
 {$IFNDEF UNICODE}
-function CharInSet(C: Char; Set: TSysCharSet);
+function CharInSet(C: Char; Set: TSysCharSet): Boolean;
+function IsLeadChar(C: Char): Boolean;
 {$ENDIF UNICODE}
 
 // Transforms all consecutive sequences of #10, #13, #32, and #9 in Str
@@ -1040,9 +1043,14 @@ begin
 end;
 
 {$IFNDEF UNICODE}
-function CharInSet(C: Char; Set: TSysCharSet);
+function CharInSet(C: Char; Set: TSysCharSet): Boolean;
 begin
   Result := C in Set;
+end;
+
+function IsLeadChar(C: AnsiChar): Boolean;
+begin
+  Result := C in LeadBytes;
 end;
 {$ENDIF UNICODE}
 
@@ -1120,6 +1128,34 @@ end;
 function IsCharSymbol(C: AnsiChar): Boolean;
 begin
   Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
+end;
+
+function IsCharIdentifierStart(C: Char): Boolean; overload;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsLetter(C) or (C = '_');
+  {$ELSE not UNICODE}
+  Result := (C in LocaleIdentifierChars) and not (C in [0..9]);
+  {$ENDIF}
+end;
+
+function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
+begin
+  Result := (C in LocaleIdentifierChars) and not (C in [0..9]);
+end;
+
+function IsCharIdentifier(C: Char): Boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
+  {$ELSE not UNICODE}
+  Result := C in LocaleIdentifierChars;
+  {$ENDIF}
+end;
+
+function IsCharIdentifier(C: AnsiChar): Boolean; overload;
+begin
+  Result := C in LocaleIdentifierChars;
 end;
 
 // This function is impossible to read, but it is very fast
