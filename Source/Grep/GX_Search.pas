@@ -35,11 +35,11 @@ type
     procedure SignalStartSearch; virtual;
     procedure SignalFoundMatch(LineNo: Integer; const Line: string; SPos, FEditReaderPos: Integer); virtual;
   protected
-    BLine: PChar; // The current search line, case-converted if requested
-    OrgLine: PChar; // The current search line, without case-conversion
+    BLine: PAnsiChar; // The current search line, case-converted if requested
+    OrgLine: PAnsiChar; // The current search line, without case-conversion
     FLineNo: Integer;
     FEof: Boolean;
-    FSearchBuffer: PChar;
+    FSearchBuffer: PAnsiChar;
     FBufSize: Integer;
     FBufferSearchPos: Integer;
     FBufferDataCount: Integer;
@@ -50,23 +50,24 @@ type
     FSlashCommentActive: Boolean;
     FQuoteActive : Boolean;
     FDoubleQuoteActive: Boolean;
-    FPattern: PChar;
+    FPattern: PAnsiChar;
     FFileName: string;
-    LoCase: function(const Ch: Char): Char;
+    LoCase: function(const Ch: AnsiChar): AnsiChar;
     procedure DoSearch(FileComment: TFileComment);
     procedure FillBuffer;
     procedure PatternMatch;
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); virtual; abstract;
     procedure Seek(Offset: Longint; Direction: Integer); virtual; abstract;
     procedure AfterFill; virtual; abstract;
+    procedure BufferUtf8ToAnsi; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure SetPattern(const Source: string);
+    procedure SetPattern(const Source: AnsiString);
     property ANSICompatible: Boolean write SetANSICompatible;
     property BufSize: Integer read FBufSize write SetBufSize;
     property NoComments: Boolean read FNoComments write FNoComments;
-    property Pattern: PChar read FPattern;
+    property Pattern: PAnsiChar read FPattern;
     property SearchOptions: TSearchOptions read FSearchOptions write FSearchOptions;
     property OnFound: TFoundEvent read FOnFound write FOnFound;
     property OnStartSearch: TNotifyEvent read FOnStartSearch write FOnStartSearch;
@@ -90,6 +91,7 @@ type
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); override;
     procedure Seek(Offset: Longint; Direction: Integer); override;
     procedure AfterFill; override;
+    procedure BufferUtf8ToAnsi; override;
   public
     constructor Create(const SearchFileName: string);
     destructor Destroy; override;
@@ -129,19 +131,19 @@ const
 
 { Generic routines }
 
-function ANSILoCase(const Ch: Char): Char;
+function ANSILoCase(const Ch: AnsiChar): AnsiChar;
 var
   w: Word;
 begin
   w := MakeWord(Ord(Ch), 0);
   CharLower(PChar(@w));
-  Result := Char(Lo(w));
+  Result := AnsiChar(Lo(w));
 end;
 
-function ASCIILoCase(const Ch: Char): Char;
+function ASCIILoCase(const Ch: AnsiChar): AnsiChar;
 begin
   if Ch in GxUpperAlphaChars then
-    Result := Char(Ord(Ch) + 32)
+    Result := AnsiChar(Ord(Ch) + 32)
   else
     Result := Ch;
 end;
@@ -299,6 +301,9 @@ procedure TSearcher.SetFileName(const Value: string);
   function GetModuleInterface: Boolean;
   var
     UpperFileExt: string;
+    //ReaderStream: TGxEditorReadStream;
+    //Lst: TStringList;
+    //i: Integer;
   begin
     Result := False;
 
@@ -325,6 +330,23 @@ procedure TSearcher.SetFileName(const Value: string);
       FEditReader := FEditorIntf.CreateReader;
       if FEditReader = nil then
         Exit;
+      (*
+      // Get Reader interface
+      ReaderStream := TGxEditorReadStream.Create(FEditorIntf);
+      Lst := TStringList.Create;
+      try
+        Lst.LoadFromStream(ReaderStream);
+        ReaderStream.Free;
+        for i := 0 to Lst.Count - 1 do
+          Lst[i] := Utf8ToAnsi(Lst[i]);
+
+        FSearchStream := TMemoryStream.Create;
+        Lst.SaveToStream(FSearchStream);
+      finally
+        FreeAndNil(Lst);
+      end;
+      FMode := mmFile;
+      *)
       Result := True;
     end;
   end;
@@ -448,6 +470,33 @@ begin
   Inc(FEditReaderPos, FBufferDataCount);
 end;
 
+procedure TSearcher.BufferUtf8ToAnsi;
+var
+  UTF: Integer;
+  Lst: TStringList;
+  i: Integer;
+begin
+  if Mode = mmFile then
+  begin
+    FSearchStream.Read(UTF, 3);
+    if (UTF and $00FFFFFF) = $00BFBBEF then
+    begin
+      Lst := TStringList.Create;
+      try
+        Lst.LoadFromStream(FSearchStream);
+        for i := 0 to Lst.Count - 1 do
+          Lst[i] :=  Utf8ToAnsi(Lst[i]);
+        FSearchStream.Free;
+        FSearchStream := TMemoryStream.Create;
+        Lst.SaveToStream(FSearchStream);
+      finally
+        FreeAndNil(Lst);
+      end;
+    end;
+    FSearchStream.Seek(0, soFromBeginning);
+  end;
+end;
+
 { TBaseSearcher }
 
 constructor TBaseSearcher.Create;
@@ -455,9 +504,9 @@ begin
   inherited Create;
 
   FBufSize := DefaultBufferSize;
-  BLine := StrAlloc(SearchLineSize);
-  OrgLine := StrAlloc(SearchLineSize);
-  FPattern := StrAlloc(GrepPatternSize);
+  BLine := AnsiStrAlloc(SearchLineSize);
+  OrgLine := AnsiStrAlloc(SearchLineSize);
+  FPattern := AnsiStrAlloc(GrepPatternSize);
   LoCase := ASCIILoCase;
 end;
 
@@ -494,10 +543,10 @@ resourcestring
 var
   AmountOfBytesToRead: Integer;
   SkippedCharactersCount: Integer;
-  LineEndScanner: PChar;
+  LineEndScanner: PAnsiChar;
 begin
   if FSearchBuffer = nil then
-    FSearchBuffer := StrAlloc(FBufSize);
+    FSearchBuffer := AnsiStrAlloc(FBufSize);
   FSearchBuffer[0] := #0;
 
   // Read at most (FBufSize - 1) bytes
@@ -563,6 +612,7 @@ var
   UseChar: Boolean;
 begin
   SignalStartSearch;
+  //BufferUtf8ToAnsi;
 
   LPos := 0;
   while not FEof do
@@ -766,14 +816,14 @@ begin
     FBufSize := New;
 end;
 
-procedure TBaseSearcher.SetPattern(const Source: string);
+procedure TBaseSearcher.SetPattern(const Source: AnsiString);
 resourcestring
   SClassNotTerminated = 'Class at %d did not terminate properly';
 var
   PatternCharIndex: Integer;
   SourceCharIndex: Integer;
 
-  procedure Store(Ch: Char);
+  procedure Store(Ch: AnsiChar);
   begin
     Assert(PatternCharIndex < GrepPatternSize, 'Buffer overrun!');
     if not (soCaseSensitive in SearchOptions) then
@@ -915,14 +965,14 @@ end;
 procedure TBaseSearcher.PatternMatch;
 var
   l, p: Integer; // Line and pattern pointers
-  op: Char; // Pattern operation
+  op: AnsiChar; // Pattern operation
   LinePos: Integer;
 
   procedure IsFound;
   var
     S: Integer;
     E: Integer;
-    TestChar: Char;
+    TestChar: AnsiChar;
   begin
     if soWholeWord in SearchOptions then
     begin
@@ -931,13 +981,13 @@ var
       if (S >= 0) then
       begin
         TestChar := BLine[S];
-        if IsCharAlphaNumeric(TestChar) or (TestChar = '_') then
+        if IsCharIdentifier(TestChar) then
           Exit;
       end;
       TestChar := BLine[E];
       if TestChar <> #0 then
       begin
-        if IsCharAlphaNumeric(TestChar) or (TestChar = '_') then
+        if IsCharIdentifier(TestChar) then
           Exit;
       end;
     end;
@@ -1020,7 +1070,7 @@ begin
 
         opAlpha:
           begin
-            if not IsCharAlpha(BLine[l]) then
+            if not IsCharAlphaA(BLine[l]) then
               Break;
             Inc(p);
           end;
