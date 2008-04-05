@@ -330,7 +330,7 @@ end;
 destructor TEditorChangeServices.Destroy;
 begin
   RemoveInternalIdeNotifier;
-  //TODO: Unhook all editor windows
+  //TODO 3 -oAnyone -cFeature: Unhook all editor windows
 
   ClearNotifiers;
   FreeAndNil(FNotifiers);
