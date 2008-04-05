@@ -67,7 +67,7 @@ type
     FClassList: TClassList;
     // The complete list of object/interface ancestors
     FDerivedFrom: string;
-    FUnitName: string;
+    FSourceName: string;
     FLineNo: Integer;
     FFileName: string;
     FIsLoaded: Boolean;
@@ -89,7 +89,7 @@ type
     property DerivedFrom: string read FDerivedFrom;
     property ObjectDerivedFrom: string read GetObjectDerivedFrom;
     property FileName: string read FFileName;
-    property UnitName: string read FUnitName;
+    property SourceName: string read FSourceName;
     property LineNo: Integer read FLineNo;
     property IsLoaded: Boolean read FIsLoaded;
     property Name: string read FName;
@@ -488,9 +488,9 @@ begin
               // ObjectInfo.LineNo:=Parser.Info.LineNumber;
               ObjectInfo.FFileName := LocalEditReader.FileName;
               if Parser.Info.AI <> nil then
-                ObjectInfo.FUnitName := Parser.Info.AI.aiUnit
+                ObjectInfo.FSourceName := Parser.Info.AI.aiUnit
               else
-                ObjectInfo.FUnitName := ExtractPureFileName(ObjectInfo.FileName);
+                ObjectInfo.FSourceName := ExtractPureFileName(ObjectInfo.FileName);
             end;
         end; // case
       end;
@@ -578,7 +578,7 @@ end;
 function TBrowseClassInfoCollection.GetText: string;
 begin
   Result := #34 + Name + #34 + ',' + #34 + DerivedFrom + #34 + ',' +
-    #34 + UnitName + #34 + ',' + #34 + IntToStr(LineNo) + #34 + ',' + #34 + FileName + #34;
+    #34 + SourceName + #34 + ',' + #34 + IntToStr(LineNo) + #34 + ',' + #34 + FileName + #34;
 end;
 
 procedure TBrowseClassInfoCollection.SetText(const New: string);
@@ -608,7 +608,7 @@ begin
           case TypeCounter of
             0: FName        := ExtractSubString;
             1: FDerivedFrom := ExtractSubString;
-            2: FUnitName    := ExtractSubString;
+            2: FSourceName  := ExtractSubString;
             3: FLineNo      := StrToInt(ExtractSubString);
             4: FFileName    := ExtractSubString;
           else
