@@ -74,10 +74,10 @@ var
 
 var
   DosHeader: PImageDosHeader;
-  PCodeBegin: PChar;
-  PCodeEnd: PChar;
-  PCodeScanner: PChar;
-  P: PChar;
+  PCodeBegin: PAnsiChar;
+  PCodeEnd: PAnsiChar;
+  PCodeScanner: PAnsiChar;
+  P: PAnsiChar;
 
   FoundClassName: PShortString;
 
@@ -125,7 +125,7 @@ begin
     Exit;
 
   // Compute beginning and end of the code section
-  PCodeBegin := PChar(ScannedModule + SectionHeader.VirtualAddress);
+  PCodeBegin := PAnsiChar(ScannedModule + SectionHeader.VirtualAddress);
   PCodeEnd := PCodeBegin + (SectionHeader.SizeOfRawData - 3);
   PCodeScanner := PCodeBegin;
   while PCodeScanner < PCodeEnd do
