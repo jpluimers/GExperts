@@ -5,7 +5,7 @@ unit GX_Experts;
 interface
 
 uses
-  Classes, Graphics, Forms, ActnList, GX_Actions, GX_ConfigurationInfo;
+  Classes, Graphics, Forms, ActnList, GX_Actions, GX_ConfigurationInfo, Menus;
 
 type
   TGX_Expert = class(TObject)
@@ -23,6 +23,7 @@ type
     procedure SetFormIcon(Form: TForm);
     procedure SetActive(New: Boolean); virtual;
     procedure UpdateAction(Action: TCustomAction); virtual;
+    function HasSubmenuItems: Boolean; virtual; // Default = False
     // See LoadSettings
     procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
     // See SaveSettings
@@ -53,6 +54,8 @@ type
     function HasConfigOptions: Boolean; virtual; // Default = True
     function HasMenuItem: Boolean; virtual; // Default = True
     function HasDesignerMenuItem: Boolean; virtual; // Default = False
+    procedure DoCreateSubMenuItems(MenuItem: TMenuItem);
+    procedure CreateSubMenuItems(MenuItem: TMenuItem); virtual;
     function IsDefaultActive: Boolean; virtual; // Default = True
     // "Executes" the expert
     procedure Click(Sender: TObject); virtual; abstract;
@@ -97,7 +100,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Dialogs, Menus,
+  SysUtils, Dialogs,
   GX_MenuActions, GX_MessageBox, GX_IconMessageBox,
   GX_GxUtils, GX_OtaUtils, GX_GenericUtils;
 
@@ -124,6 +127,11 @@ begin
   // Don't set Active to True.
   // Instead override IsDefaultActive and let LoadSettings do it
   FShortCut := 0;
+end;
+
+procedure TGX_Expert.CreateSubMenuItems(MenuItem: TMenuItem);
+begin
+  // Override to create any submenu items in the main menu
 end;
 
 destructor TGX_Expert.Destroy;
@@ -186,6 +194,11 @@ end;
 function TGX_Expert.HasMenuItem: Boolean;
 begin
   Result := True;
+end;
+
+function TGX_Expert.HasSubmenuItems: Boolean;
+begin
+  Result := False;
 end;
 
 function TGX_Expert.BitmapFileName: string;
@@ -365,6 +378,13 @@ end;
 function TGX_Expert.GetActionEnabled: Boolean;
 begin
   Result := FAction.GetEnabled;
+end;
+
+procedure TGX_Expert.DoCreateSubMenuItems(MenuItem: TMenuItem);
+begin
+  if HasSubMenuItems then
+    if Assigned(MenuItem) and (MenuItem.Count = 0) then
+      CreateSubMenuItems(MenuItem);
 end;
 
 procedure TGX_Expert.DoUpdateAction;

@@ -98,7 +98,7 @@ type
 type
   TGxActionBroker = class(TSingletonInterfacedObject, IGxActionBroker)
   private
-    FGxActionList: TGxObjectList;
+    FGxActionList: TObjectList;
     procedure ClearGxActionList;
     function GetIdeActionList: TCustomActionList;
     function GetActionOwner: TCustomForm;
@@ -152,7 +152,7 @@ constructor TGxActionBroker.Create;
 begin
   inherited Create;
 
-  FGxActionList := TGxObjectList.Create(False);
+  FGxActionList := TObjectList.Create(False);
 end;
 
 destructor TGxActionBroker.Destroy;

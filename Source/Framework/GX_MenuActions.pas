@@ -92,8 +92,8 @@ const
   SepItemTag = NonExpertItemTagStart + 1;
   ConfigItemTag = NonExpertItemTagStart + 2;
   AboutItemTag = NonExpertItemTagStart + 3;
+  SubMenuItemTag = NonExpertItemTagStart + 4;
   MoreMenuItemName = 'GExpertsMoreMenuItem';
-
 
 function GXMenuActionManager: IGxMenuActionManager;
 begin
@@ -306,6 +306,22 @@ var
   Item: TMenuItem;
   CurrentIndex: Integer;
   MenuItems: TMenuItemArray;
+
+  function GetMenuItem(Caption: string): TMenuItem;
+  var
+    j: Integer;
+  begin
+    Result := nil;
+    for j := 0 to Length(MenuItems) - 1 do
+    begin
+      if MenuItems[j].Caption = Caption then
+      begin
+        Result := MenuItems[j];
+        Break;
+      end;
+    end;
+  end;
+
 begin
   {$IFOPT D+} SendDebug('Arranging menu items'); {$ENDIF}
   NormalizeMenuItems;
@@ -342,6 +358,16 @@ begin
     Item.MenuIndex := CurrentIndex;
     Inc(CurrentIndex);
   end;
+
+  for i := 0 to GExpertsInst.ExpertCount - 1 do
+  begin
+    ParentItem := GetMenuItem(GExpertsInst.ExpertList[i].GetActionCaption);
+    if Assigned(ParentItem) then
+    begin
+      ParentItem.Tag := SubMenuItemTag;
+      GExpertsInst.ExpertList[i].DoCreateSubMenuItems(ParentItem);
+    end;
+  end;
 end;
 
 procedure TGXMenuActionManager.MoreActionExecute(Sender: TObject);
@@ -371,7 +397,7 @@ procedure TGXMenuActionManager.GetMenuItems(out MenuItems: TMenuItemArray; SkipM
     for i := 0 to Parent.Count - 1 do
     begin
       Item := Parent.Items[i];
-      if Item.Count > 0 then
+      if (Item.Count > 0) and (Item.Tag <> SubMenuItemTag) then
         AddMenuItemsForParent(Item);
     end;
   end;

@@ -16,6 +16,8 @@ type
     class function GetName: string; override;
     function GetDisplayName: string; override;
     function HasConfigOptions: Boolean; override;
+    function HasSubmenuItems: Boolean; override;
+    procedure CreateSubMenuItems(MenuItem: TMenuItem); override;
     procedure Click(Sender: TObject); override;
   end;
 
@@ -50,16 +52,42 @@ end;
 { TGxMenusForEditorExperts }
 
 procedure TGxMenusForEditorExperts.Click(Sender: TObject);
-var
-  MousePosition: TPoint;
-  APopupMenu: TPopupMenu;
 begin
-  MousePosition := Mouse.CursorPos;
+  // The submenu items perform all actions
+end;
 
-  APopupMenu := GetInternalPopupMenu;
-  Assert(Assigned(APopupMenu));
-  PopulatePopupMenu(APopupMenu);
-  APopupMenu.Popup(MousePosition.x, MousePosition.y);
+procedure TGxMenusForEditorExperts.CreateSubMenuItems(MenuItem: TMenuItem);
+var
+  i: Integer;
+  AGExpertsInstance: TGExperts;
+  AEditorExpertManager: TGxEditorExpertManager;
+  AEditorExpert: TEditorExpert;
+
+  ExpertMenuEntry: TMenuItem;
+begin
+  inherited;
+  Assert(Assigned(MenuItem));
+  MenuItem.Clear;
+
+  AGExpertsInstance := GExpertsInst;
+  Assert(Assigned(AGExpertsInstance));
+
+  AEditorExpertManager := AGExpertsInstance.EditorExpertManager;
+  // If editor experts are not enabled, then the editor
+  // expert manager is not present; exit if this is the case.
+  if not Assigned(AEditorExpertManager) then
+    Exit;
+
+  for i := 0 to AEditorExpertManager.EditorExpertCount-1 do
+  begin
+    AEditorExpert := AEditorExpertManager.EditorExpertList[i];
+    Assert(Assigned(AEditorExpert));
+
+    ExpertMenuEntry := TMenuItem.Create(MenuItem);
+    ExpertMenuEntry.Action := GxActionBroker.FindAction(AEditorExpert.GetActionName);
+
+    MenuItem.Add(ExpertMenuEntry);
+  end;
 end;
 
 function TGxMenusForEditorExperts.GetActionCaption: string;
@@ -84,6 +112,11 @@ end;
 function TGxMenusForEditorExperts.HasConfigOptions: Boolean;
 begin
   Result := False;
+end;
+
+function TGxMenusForEditorExperts.HasSubmenuItems: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TGxMenusForEditorExperts.PopulatePopupMenu(const PopupMenu: TPopupMenu);
