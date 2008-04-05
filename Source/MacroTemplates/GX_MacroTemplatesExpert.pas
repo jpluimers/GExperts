@@ -639,7 +639,7 @@ begin
   end
   else
     CodeForced := False;
-  // TODO: Fix when pressing Shift+Alt+T or the template's shortcut with a non-template identifier under the cursor, but choosing another template to insert inserts the text before the identifier
+  // TODO 3 -oAnyone -cBug: Fix when pressing Shift+Alt+T or the template's shortcut with a non-template identifier under the cursor, but choosing another template to insert inserts the text before the identifier
 
   // Locate the named template, or prompt for one if it does not exist
   TemplateIdx := GetTemplate(TemplateName, not CodeForced);
@@ -858,7 +858,7 @@ begin
       end;
     tipLineEnd:
       begin
-        // TODO: Complete this....
+        // TODO 4 -oAnyone -cFeature: Complete line end template support
       end;
     // Otherwise, use the existing/current insert position
   end;
