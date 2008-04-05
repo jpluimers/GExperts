@@ -56,7 +56,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   ToolsAPI,
-  GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo;
+  Contnrs, GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo;
 
 // First of all we have shared code; in
 // particular, we share a large chunk
@@ -66,7 +66,7 @@ uses
 type
   TGxBaseKeyboardShortCutBroker = class(TSingletonInterfacedObject, IGxKeyboardShortCutBroker)
   private
-    FShortCutList: TGxObjectList;
+    FShortCutList: TObjectList;
     FKeyboardName: string;
   private
     procedure NotifyDestruction(AGxKeyboardShortCut: TObject);
@@ -125,7 +125,7 @@ type
 
 // ****************************************************************************
 
-function LocateKeyboardShortCut(ShortCutList: TGxObjectList; KeyCode: TShortCut): TGxKeyboardShortCut;
+function LocateKeyboardShortCut(ShortCutList: TObjectList; KeyCode: TShortCut): TGxKeyboardShortCut;
 var
   i: Integer;
   AShortCutItem: TGxKeyboardShortCut;
@@ -191,7 +191,7 @@ const
 begin
   inherited Create;
 
-  FShortCutList := TGxObjectList.Create(not DoOwnObjects);
+  FShortCutList := TObjectList.Create(not DoOwnObjects);
 end;
 
 destructor TGxBaseKeyboardShortCutBroker.Destroy;
