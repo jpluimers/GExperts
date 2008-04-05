@@ -28,7 +28,7 @@ implementation
 uses
   Classes;
 
-procedure ResampleLine(SourcePtr: PChar; SourceWidth: Integer; DestPtr: PChar; DestWidth, ChannelCount: Integer);
+procedure ResampleLine(SourcePtr: PAnsiChar; SourceWidth: Integer; DestPtr: PAnsiChar; DestWidth, ChannelCount: Integer);
 var
   Scale: Extended;
   Insfac: Extended;
@@ -40,7 +40,7 @@ var
   ix, ox: Integer;
   OldIX: Integer;
   Channel: Integer;
-  P: PChar;
+  P: PAnsiChar;
 begin
   Scale := DestWidth / SourceWidth;
   Insfac := 1 / Scale;
@@ -77,7 +77,7 @@ begin
       for Channel := 0 to ChannelCount - 1 do
       begin
         Accumulator[Channel] := Accumulator[Channel] + (Intensity[Channel] * Outseg);
-        P[Channel] := Char(Trunc(Accumulator[Channel] * Scale));
+        P[Channel] := AnsiChar(Trunc(Accumulator[Channel] * Scale));
         Accumulator[Channel] := 0.0;
       end; // for Channel
       Inseg := Inseg - Outseg;
@@ -93,7 +93,7 @@ function Resample(Source, Destination: TBitmap): Boolean;
   var
     y: Integer;
     ChannelCount: Integer;
-    Line: PChar;
+    Line: PAnsiChar;
   begin
     ChannelCount := 3 + Ord(Source.PixelFormat = pf32bit);
     GetMem(Line, (Source.Width + 1) * ChannelCount);
@@ -116,9 +116,9 @@ function Resample(Source, Destination: TBitmap): Boolean;
 
   function ResampleHeight(Source, Destination: TBitmap): Boolean;
   var
-    SourceLine: PChar;
-    DestinationLine: PChar;
-    P: PChar;
+    SourceLine: PAnsiChar;
+    DestinationLine: PAnsiChar;
+    P: PAnsiChar;
     x, y, yy: Integer;
     ChannelCount: Integer;
   begin
@@ -136,7 +136,7 @@ function Resample(Source, Destination: TBitmap): Boolean;
         // Duplicate last line
         if (y < Source.Height) then
           yy := y;
-        Move((PChar(Source.ScanLine[yy]) + x * ChannelCount)^, P^, ChannelCount);
+        Move((PAnsiChar(Source.ScanLine[yy]) + x * ChannelCount)^, P^, ChannelCount);
         Inc(P, ChannelCount);
       end; // for y
 
@@ -146,7 +146,7 @@ function Resample(Source, Destination: TBitmap): Boolean;
       P := DestinationLine;
       for y := 0 to Destination.Height - 1 do
       begin
-        Move(P^, (PChar(Destination.ScanLine[y]) + x * ChannelCount)^, ChannelCount);
+        Move(P^, (PAnsiChar(Destination.ScanLine[y]) + x * ChannelCount)^, ChannelCount);
         Inc(P, ChannelCount);
       end; // for y
     end; // for x
