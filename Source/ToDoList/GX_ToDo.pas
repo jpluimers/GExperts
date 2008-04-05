@@ -432,7 +432,7 @@ begin
       j := 0;
       while j < Length(ParsingString) do
       begin
-        if not (ParsingString[j + 1] in ['0'..'9']) then
+        if not IsCharNumeric(ParsingString[j + 1]) then
           Break;
         Inc(j);
       end;
@@ -1023,7 +1023,7 @@ begin
     FileMask := FileMask + ';*.cpp;*.hpp;*.h';
 
   for i := 1 to Length(FileMask) do
-    if FileMask[i] in [';', ','] then
+    if CharInSet(FileMask[i], [';', ',']) then
       FileMask[i] := #13;
 
   FileMaskList := TStringList.Create;
