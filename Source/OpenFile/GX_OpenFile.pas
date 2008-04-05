@@ -765,7 +765,7 @@ begin
       begin
         FileName := MakeFileName(Src.Items[i]);
         DoOpenFile(FileName);
-        // TODO: Add support for focusing the editor to the last file
+        // TODO 4 -oAnyone -cFeature: Add support for focusing the editor to the last file
         //if i = Src.Items.Count - 1 then
         // Focus last editor/form
       end;
