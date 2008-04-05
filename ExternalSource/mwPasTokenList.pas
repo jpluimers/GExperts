@@ -51,7 +51,7 @@ type
   TmSearcher = class(TObject)
   private
     FPasTokenList: TPasTokenList;
-    FSearchOrigin: PChar;
+    FSearchOrigin: PAnsiChar;
     Pat: string;
     fPos: Integer;
     HalfLen: Integer;
@@ -95,7 +95,7 @@ type
   TPasTokenList = class(TObject)
   private
     FTokenPositionsList: TLongintList;
-    fOrigin: PChar;
+    fOrigin: PAnsiChar;
     fPCharSize: Longint;
     fPCharCapacity: Longint;
     FComment: TCommentState;
@@ -131,7 +131,7 @@ type
     Searcher: TmSearcher;
     constructor Create;
     destructor Destroy; override;
-    procedure SetOrigin(NewOrigin: PChar; NewSize: Longint);
+    procedure SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
     procedure Clear;
     procedure Delete(Index: Integer);
     procedure Exchange(Index1, Index2: Integer);
@@ -145,7 +145,7 @@ type
     property Count: Integer read GetCount write SetCount;
     property Token[Index: Integer]: string read GetToken write SetToken; default;
     property TokenPositionsList: TLongintList read FTokenPositionsList;
-    property Origin: PChar read fOrigin;
+    property Origin: PAnsiChar read fOrigin;
     property PCharSize: Longint read fPCharSize;
     property PCharCapacity: Longint read fPCharCapacity;
     function GetSubString(StartPos, EndPos: Longint): string;
@@ -166,7 +166,7 @@ type
     function IndexAtLine(anIndex: Longint): Longint;
     function PositionToIndex(aPosition: Longint): Longint;
     procedure DeleteGroup(StartIndex: Longint; GroupCount: Longint);
-    function InsertString(StartIndex: Longint; ToInsert: string): Longint;
+    function InsertString(StartIndex: Longint; ToInsert: AnsiString): Longint;
     function MoveGroup(OldStartIndex: Longint; NewStartIndex: Longint; GroupCount: Longint): Boolean;
     property Comments: TCommentState read FComment write FComment;
     property EndCount: Integer read FEndCount write FEndCount;
@@ -202,7 +202,7 @@ Const
 implementation
 
 uses
-  SysUtils;
+  SysUtils, GX_GenericUtils;
 
 constructor TmSearcher.Create(Value: TPasTokenList);
 begin
@@ -591,7 +591,7 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TPasTokenList.SetOrigin(NewOrigin: PChar; NewSize: Longint);
+procedure TPasTokenList.SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
 begin
   FOrigin := NewOrigin;
   Run := 0;
@@ -607,7 +607,7 @@ procedure TPasTokenList.WriteTo(InsPos, DelPos: Longint;
   const Item: string);
 var
   StringCount, NewSize: Longint;
-  aString: string;
+  aString: AnsiString;
 begin
   aString := Item + (FOrigin + DelPos);
   StringCount := Length(aString);
@@ -625,7 +625,7 @@ begin
           raise exception.Create('unable to reallocate PChar');
         end;
       end;
-      StrECopy((FOrigin + InsPos), PChar(aString));
+      StrECopy((FOrigin + InsPos), PAnsiChar(aString));
       FPCharSize := NewSize;
       FOrigin[FPCharSize] := #0;
       aString := '';
@@ -772,14 +772,14 @@ begin
   FTokenPositionsList.Insert(Index + 1, EndPos);
 end; { Insert }
 
-function TPasTokenList.InsertString(StartIndex: Longint; ToInsert: string): Longint;
+function TPasTokenList.InsertString(StartIndex: Longint; ToInsert: AnsiString): Longint;
 var
   I, StartPos, EndPos, ItemLen: Longint;
   TempHelper: TPasTokenList;
 begin
   TempHelper := TPasTokenList.Create;
   ItemLen := Length(ToInsert);
-  TempHelper.SetOrigin(PChar(ToInsert), ItemLen);
+  TempHelper.SetOrigin(PAnsiChar(ToInsert), ItemLen);
   Result := TempHelper.Count;
   StartPos := FTokenPositionsList[StartIndex];
   ResetLines(StartIndex, ItemLen);
@@ -1130,7 +1130,7 @@ begin
       #1..#9, #11, #12, #14..#32:
         begin
           Inc(Walker);
-          while FOrigin[Walker] in [#1..#9, #11, #12, #14..#32] do Inc(Walker);
+          while CharInSet(FOrigin[Walker], [#1..#9, #11, #12, #14..#32]) do Inc(Walker);
           FTokenPositionsList.Add(Walker);
         end;
 
@@ -1151,14 +1151,14 @@ begin
       'A'..'Z', 'a'..'z', '_':
         begin
           Inc(Walker);
-          while FOrigin[Walker] in ['A'..'Z', 'a'..'z', '0'..'9', '_'] do Inc(Walker);
+          while CharInSet(FOrigin[Walker], ['A'..'Z', 'a'..'z', '0'..'9', '_']) do Inc(Walker);
           FTokenPositionsList.Add(Walker);
         end;
 
       '0'..'9':
         begin
           Inc(Walker);
-          while FOrigin[Walker] in ['0'..'9', '.', 'e', 'E'] do
+          while CharInSet(FOrigin[Walker], ['0'..'9', '.', 'e', 'E']) do
           begin
             case FOrigin[Walker] of
               '.':
@@ -1228,7 +1228,7 @@ begin
                 Break;
               end;
             end
-            else if (FOrigin[Walker] in [#0, #10, #13]) then
+            else if IsCharLineEndingOrNull(FOrigin[Walker]) then
               Break;
             Inc(Walker);
           end;
@@ -1238,14 +1238,14 @@ begin
       '#':
         begin
           Inc(Walker);
-          while FOrigin[Walker] in ['0'..'9'] do Inc(Walker);
+          while CharInSet(FOrigin[Walker], ['0'..'9']) do Inc(Walker);
           FTokenPositionsList.Add(Walker);
         end;
 
       '$':
         begin
           Inc(Walker);
-          while FOrigin[Walker] in ['0'..'9', 'A'..'F', 'a'..'f'] do Inc(Walker);
+          while CharInSet(FOrigin[Walker], ['0'..'9', 'A'..'F', 'a'..'f']) do Inc(Walker);
           FTokenPositionsList.Add(Walker);
         end;
 
@@ -1279,7 +1279,7 @@ begin
       begin
         Inc(Running);
         Result := tkNumber;
-        while FOrigin[Running] in ['0'..'9', '.'] do
+        while CharInSet(FOrigin[Running], ['0'..'9', '.']) do
         begin
           case FOrigin[Running] of
             '.':

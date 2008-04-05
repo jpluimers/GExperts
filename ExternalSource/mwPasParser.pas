@@ -52,7 +52,7 @@ type
     LinePos: Integer;
     Position: Integer;
     Length: Integer;
-    Origin: PChar;
+    Origin: PAnsiChar;
     constructor Create;
     property Data: string read GetData;
   end;
@@ -66,14 +66,14 @@ type
     FLastComment: Longint;
     FLastIdentPos: Longint;
     FLastSemiColon: Longint;
-    fOrigin: PChar;
+    fOrigin: PAnsiChar;
     Run: Longint;
     FRoundCount: ShortInt;
     FSquareCount: ShortInt;
     FVisibility: TTokenKind;
     function GetIsJunk: Boolean;
     function IdentKind: TTokenKind;
-    procedure SetOrigin(Value: PChar);
+    procedure SetOrigin(Value: PAnsiChar);
     procedure SetRunPos(NewPos: Longint);
     procedure HandleComments;
   public
@@ -96,7 +96,7 @@ type
     property LastComment: Longint read FLastComment;
     property LastIdentPos: Longint read FLastIdentPos;
     property LastSemiColon: Longint read FLastSemiColon;
-    property Origin: PChar read fOrigin write SetOrigin;
+    property Origin: PAnsiChar read fOrigin write SetOrigin;
     property RunPos: Longint read Run write SetRunPos;
     property RoundCount: ShortInt read FRoundCount write FRoundCount;
     property SquareCount: ShortInt read FSquareCount write FSquareCount;
@@ -123,7 +123,7 @@ Const
 implementation
 
 uses
-  SysUtils;
+  SysUtils, GX_GenericUtils;
 
 constructor TmPasToken.Create;
 begin
@@ -166,7 +166,7 @@ begin
   SetString(Result, (FOrigin + StartPos), SubLen);
 end; { GetSubString }
 
-procedure TmPasParser.SetOrigin(Value: PChar);
+procedure TmPasParser.SetOrigin(Value: PAnsiChar);
 begin
   FOrigin := Value;
   Run := 0;
@@ -504,7 +504,7 @@ begin
       #1..#9, #11, #12, #14..#32:
         begin
           FToken.Position := Run;
-          while FOrigin[Run] in [#1..#9, #11, #12, #14..#32] do Inc(Run);
+          while CharInSet(FOrigin[Run], [#1..#9, #11, #12, #14..#32]) do Inc(Run);
           FToken.ID := tkSpace;
           FToken.Length := Run - FToken.Position;
         end;
@@ -553,7 +553,7 @@ begin
         begin
           FToken.Position := Run;
           Inc(Run);
-          while FOrigin[Run] in ['A'..'Z', 'a'..'z', '0'..'9', '_'] do Inc(Run);
+          while CharInSet(FOrigin[Run], ['A'..'Z', 'a'..'z', '0'..'9', '_']) do Inc(Run);
           FToken.Length := Run - FToken.Position;
           FToken.ID := IdentKind;
         end;
@@ -563,7 +563,7 @@ begin
           FToken.Position := Run;
           Inc(Run);
           FToken.ID := tkNumber;
-          while FOrigin[Run] in ['0'..'9', '.', 'e', 'E'] do
+          while CharInSet(FOrigin[Run], ['0'..'9', '.', 'e', 'E']) do
           begin
             Case FOrigin[Run] of
               '.': if FOrigin[Run + 1] <> '.' then FToken.ID := tkFloat else Break;
@@ -682,7 +682,7 @@ begin
                 Break;
               end;
             end
-            else if (fOrigin[Run] in [#0, #10, #13]) then
+            else if IsCharLineEndingOrNull(fOrigin[Run]) then
             begin
               FToken.ID := tkBadString;
               Break;
@@ -697,7 +697,7 @@ begin
           FToken.Position := Run;
           FToken.ID := tkAsciiChar;
           Inc(Run);
-          while FOrigin[Run] in ['0'..'9'] do Inc(Run);
+          while CharInSet(FOrigin[Run], ['0'..'9']) do Inc(Run);
           FToken.Length := Run - FToken.Position;
         end;
 
@@ -706,7 +706,7 @@ begin
           FToken.Position := Run;
           FToken.ID := tkInteger;
           Inc(Run);
-          while FOrigin[Run] in ['0'..'9', 'A'..'F', 'a'..'f'] do Inc(Run);
+          while CharInSet(FOrigin[Run], ['0'..'9', 'A'..'F', 'a'..'f']) do Inc(Run);
           FToken.Length := Run - FToken.Position;
         end;
 
