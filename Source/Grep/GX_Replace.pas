@@ -135,7 +135,7 @@ var
       EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
       EditWriter.DeleteTo(MaxInt);
       // RemoveLastEOL is necessary because TStringList.Text adds an extra CRLF on the end
-      EditWriter.Insert(PChar(ConvertToIDEEditorString(RemoveTrailingEOL(TempFile.Text))));
+      EditWriter.Insert(PAnsiChar(ConvertToIDEEditorString(RemoveTrailingEOL(TempFile.Text))));
       EditWriter := nil;
       Module := nil;
       SourceEditor := nil;
