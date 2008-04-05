@@ -112,14 +112,14 @@ type
   TmwPasLex = class(TObject)
   private
     fComment: TCommentState;
-    fOrigin: PChar;
+    fOrigin: PAnsiChar;
     fProcTable: array[#0..#255] of procedure of object;
     Run: Longint;
-    Temp: PChar;
+    Temp: PAnsiChar;
     FRoundCount: Integer;
     FSquareCount: Integer;
     fStringLen: Integer;
-    fToIdent: PChar;
+    fToIdent: PAnsiChar;
     fIdentFuncTable: array[0..191] of function: TTokenKind of object;
     fTokenPos: Integer;
     fLineNumber: Integer;
@@ -130,7 +130,7 @@ type
     fLinePos: Integer;
     fIsInterface: Boolean;
     fIsClass: Boolean;
-    function KeyHash(ToHash: PChar): Integer;
+    function KeyHash(ToHash: PAnsiChar): Integer;
     function KeyComp(const aKey: string): Boolean;
     function Func15: TTokenKind;
     function Func19: TTokenKind;
@@ -204,8 +204,8 @@ type
     function Func191: TTokenKind;
     function AltFunc: TTokenKind;
     procedure InitIdent;
-    function IdentKind(MayBe: PChar): TTokenKind;
-    procedure SetOrigin(NewValue: PChar);
+    function IdentKind(MayBe: PAnsiChar): TTokenKind;
+    procedure SetOrigin(NewValue: PAnsiChar);
     procedure SetRunPos(Value: Integer);
     procedure MakeMethodTables;
     procedure AddressOpProc;
@@ -241,12 +241,12 @@ type
     procedure SymbolProc;
     procedure UnknownProc;
     function GetToken: string;
-    function InSymbols(aChar: Char): Boolean;
+    function InSymbols(aChar: AnsiChar): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
-    function CharAhead(Count: Integer): Char;
-    function NextChar: Char;
+    function CharAhead(Count: Integer): AnsiChar;
+    function NextChar: AnsiChar;
     procedure Next;
     procedure NextID(ID: TTokenKind);
     procedure NextNoJunk;
@@ -258,7 +258,7 @@ type
     property LastNoSpacePos: Integer read fLastNoSpacePos;
     property LineNumber: Integer read fLineNumber;
     property LinePos: Integer read fLinePos;
-    property Origin: PChar read fOrigin write SetOrigin;
+    property Origin: PAnsiChar read fOrigin write SetOrigin;
     property RunPos: Integer read Run write SetRunPos;
     property TokenPos: Integer read fTokenPos;
     property Token: string read GetToken;
@@ -299,11 +299,10 @@ var // May include tkOperator after initialization
 implementation
 
 uses
-  SysUtils;
+  SysUtils, GX_GenericUtils;
 
 const
   SpaceChars = [#1..#9, #11, #12, #14..#32];
-  IdentStartChars = ['a'..'z', 'A'..'Z', '_'];
 
 procedure MakeIdentTable;
 var
@@ -403,15 +402,15 @@ begin
     end;
 end;
 
-function TmwPasLex.KeyHash(ToHash: PChar): Integer;
+function TmwPasLex.KeyHash(ToHash: PAnsiChar): Integer;
 begin
   Result := 0;
-  while ToHash^ in ['a'..'z', 'A'..'Z']do
+  while CharInSet(ToHash^, ['a'..'z', 'A'..'Z']) do
   begin
     Inc(Result, mHashTable[ToHash^]);
     Inc(ToHash);
   end;
-  if ToHash^ in ['_', '0'..'9'] then Inc(ToHash);
+  if CharInSet(ToHash^, ['_', '0'..'9']) then Inc(ToHash);
   fStringLen := ToHash - fToIdent;
 end; { KeyHash }
 
@@ -885,7 +884,7 @@ begin
   Result := tkIdentifier
 end;
 
-function TmwPasLex.IdentKind(MayBe: PChar): TTokenKind;
+function TmwPasLex.IdentKind(MayBe: PAnsiChar): TTokenKind;
 var
   HashKey: Integer;
 begin
@@ -952,7 +951,7 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TmwPasLex.SetOrigin(NewValue: PChar);
+procedure TmwPasLex.SetOrigin(NewValue: PAnsiChar);
 begin
   fOrigin := NewValue;
   fComment := csNo;
@@ -988,7 +987,7 @@ procedure TmwPasLex.AsciiCharProc;
 begin
   fTokenID := tkAsciiChar;
   Inc(Run);
-  while FOrigin[Run] in ['0'..'9'] do Inc(Run);
+  while IsCharNumeric(FOrigin[Run]) do Inc(Run);
 end;
 
 procedure TmwPasLex.BraceCloseProc;
@@ -1121,23 +1120,23 @@ begin
   end;
 end;
 
-function TmwPasLex.InSymbols(aChar: Char): Boolean;
+function TmwPasLex.InSymbols(aChar: AnsiChar): Boolean;
 begin
-  if aChar in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'] then
+  if IsCharSymbol(aChar) then
     Result := True
   else
     Result := False;
 end;
 
-function TmwPasLex.CharAhead(Count: Integer): Char;
+function TmwPasLex.CharAhead(Count: Integer): AnsiChar;
 begin
   Temp := fOrigin + Run + Count;
-  while Temp^ in [#1..#9, #11, #12, #14..#32] do
+  while CharInSet(Temp^, [#1..#9, #11, #12, #14..#32]) do
     Inc(Temp);
   Result := Temp^;
 end;
 
-function TmwPasLex.NextChar: Char;
+function TmwPasLex.NextChar: AnsiChar;
 begin
   Temp := fOrigin + Run;
   Result := Temp^;
@@ -1155,7 +1154,7 @@ procedure TmwPasLex.IntegerProc;
 begin
   Inc(Run);
   fTokenID := tkInteger;
-  while FOrigin[Run] in ['0'..'9', 'A'..'F', 'a'..'f'] do
+  while CharInSet(FOrigin[Run], ['0'..'9', 'A'..'F', 'a'..'f']) do
     Inc(Run);
 end;
 
@@ -1208,7 +1207,7 @@ procedure TmwPasLex.NumberProc;
 begin
   Inc(Run);
   fTokenID := tkNumber;
-  while FOrigin[Run]in ['0'..'9', '.', 'e', 'E'] do
+  while CharInSet(FOrigin[Run], ['0'..'9', '.', 'e', 'E']) do
   begin
     case FOrigin[Run] of
       '.':
@@ -1368,7 +1367,7 @@ procedure TmwPasLex.SpaceProc;
 begin
   Inc(Run);
   fTokenID := tkSpace;
-  while FOrigin[Run] in SpaceChars do Inc(Run);
+  while CharInSet(FOrigin[Run], SpaceChars) do Inc(Run);
 end;
 
 procedure TmwPasLex.SquareCloseProc;
@@ -1404,7 +1403,7 @@ begin
         Break;
       end;
     end
-    else if (fOrigin[Run] in [#0, #10, #13]) then
+    else if CharInSet(fOrigin[Run], [#0, #10, #13]) then
     begin
       FTokenID := tkBadString;
       Break;
@@ -1498,7 +1497,7 @@ begin
     if TokenID = tkNull then
       Exit;
     Result := Result + Token;
-    if StayAtIdentEnd and ((NextChar <> '.') and (not (NextChar in IdentStartChars))) then
+    if StayAtIdentEnd and ((NextChar <> '.') and (not (IsCharIdentifierStart(NextChar)))) then
       Exit;
     Next;
   end;
