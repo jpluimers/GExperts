@@ -436,7 +436,7 @@ var
         if FViewUnitNames then
         begin
           with AClassItem do
-            NodeText := UnitName + '.' + Name;
+            NodeText := SourceName + '.' + Name;
         end
         else
           NodeText := AClassItem.Name;
@@ -479,7 +479,7 @@ begin
         if FViewUnitNames then
         begin
           with ClassInfoCollItem do
-            NodeText := UnitName + '.' + Name;
+            NodeText := SourceName + '.' + Name;
         end
         else
           NodeText := ClassInfoCollItem.Name;
@@ -515,7 +515,7 @@ begin
     if FViewUnitNames then
     begin
       with Item.ClassItem[i] do
-        NodeText := UnitName + '.' + Name;
+        NodeText := SourceName + '.' + Name;
     end
     else
       NodeText := Item.ClassItem[i].Name;
@@ -637,7 +637,7 @@ begin
         if pcMain.ActivePage = tshInherit then DrawInheritance;
         TimeSpent := GetTickCount - TimeSpent;
         LoadList(OInfo);
-        StatusBar.SimpleText := Format(SSourceModule, [OInfo.UnitName, TimeSpent]);
+        StatusBar.SimpleText := Format(SSourceModule, [OInfo.SourceName, TimeSpent]);
       end
       else
       begin
@@ -1189,7 +1189,7 @@ begin
     BitmapSize := FontHeight - 1;
     TextOut(PR_OffsetX, Row, SAncestor + OInfo.DerivedFrom);
     Row := Row + FontHeight + 5;
-    TextOut(PR_OffsetX, Row, SUnit + OInfo.UnitName);
+    TextOut(PR_OffsetX, Row, SUnit + OInfo.SourceName);
     Row := Row + FontHeight + 10;
     PrintHeader;
     Font.Style := [];
@@ -1469,7 +1469,7 @@ begin
     Exit;
   while Assigned(Node) do
   begin
-    if (Node.Level > 0) and (CaseInsensitivePos(PChar(Text), PChar(TBrowseClassInfoCollection(Node.Data).Name)) > 0) then
+    if (Node.Level > 0) and (CaseInsensitivePos(Text, TBrowseClassInfoCollection(Node.Data).Name) > 0) then
     begin
       tvBrowse.Selected := Node;
       Break;
@@ -1665,7 +1665,7 @@ begin
   try
     OInfo := TBrowseClassInfoCollection(tvBrowse.Selected.Data);
     LoadList(OInfo);
-    StatusBar.SimpleText := OInfo.UnitName + ': ' + IntToStr(OInfo.LineNo);
+    StatusBar.SimpleText := OInfo.SourceName + ': ' + IntToStr(OInfo.LineNo);
   finally
     Self.Cursor := crDefault;
   end;
@@ -1699,7 +1699,7 @@ begin
     edtDerivedFrom.Text := OInfo.DerivedFrom;
     mmoFileName.Text := OInfo.FileName;
     edtLineNo.Text := IntToStr(OInfo.LineNo);
-    edtUnit.Text := OInfo.UnitName;
+    edtUnit.Text := OInfo.SourceName;
     ShowModal;
   finally
     Free;
