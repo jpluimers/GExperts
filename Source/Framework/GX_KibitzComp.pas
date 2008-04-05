@@ -411,7 +411,7 @@ begin
     Exit;
 
   // Save the old edit control (I don't know if it is necessary but it won't do harm).
-  MagicEditControlHolder := PObject(PChar(CodeCompletionManager^) + 4);
+  MagicEditControlHolder := PObject(PAnsiChar(CodeCompletionManager^) + 4);
 
   OldEditControl := MagicEditControlHolder^;
   Assert((OldEditControl = nil) or (OldEditControl.ClassName = 'TEditControl'));
