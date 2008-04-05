@@ -20,9 +20,10 @@ type
     FModIntf: IOTAModule;
     FNotifierIndex: Integer;
 
-    Buf: PChar;
+    Buf: PAnsiChar;
     FBufSize: Integer;
     FFileName: string;
+    //FIsUTF8: Boolean;
     FMode: TModuleMode;
     SFile: TStream;
     procedure AllocateFileData;
@@ -49,6 +50,7 @@ type
     property FileName: string read FFileName write SetFileName;
     property LineCount: Integer read GetLineCount;
     property Mode: TModuleMode read FMode;
+    //property IsUTF8: Boolean read FIsUTF8;
   end;
 
 implementation
@@ -148,12 +150,22 @@ resourcestring
   SNoModuleNotifier = 'TEditReader: Could not get module notifier';
 
   procedure AllocateFromDisk;
+  //var
+  //  UnicodeBOM: Integer;
+  //  Bytes: Integer;
   begin
     if not FileExists(FFileName) then
       raise Exception.CreateFmt(SFileDoesNotExist, [FFileName]);
 
+    //FileToWideString(FFileName);
+
     FMode := mmFile;
     SFile := TFileStream.Create(FFileName, fmOpenRead or fmShareDenyWrite);
+    //Bytes := SFile.Read(UnicodeBOM, 3);
+    // This does not support other encodings such as UCS-2, UCS-4, etc.
+    //FIsUTF8 := (Bytes = 3) and ((UnicodeBOM and $00FFFFFF) = $00BFBBEF);
+    //if not FIsUTF8 then
+    //  SFile.Seek(0, soFromBeginning);
   end;
 
 begin
@@ -178,6 +190,7 @@ begin
   begin
     FMode := mmModule;
     {$IFOPT D+} SendDebug('EditReader: Got module for ' + FFileName); {$ENDIF}
+    //FIsUTF8 := RunningDelphi8OrGreater; // Delphi 8+ convert all edit buffers to UTF-8
 
     // Allocate notifier for module
     Assert(FModuleNotifier = nil);
@@ -378,7 +391,7 @@ begin
   begin
     Pos := 0;
     if Buf = nil then
-      Buf := StrAlloc(BufSize + 1);
+      Buf := AnsiStrAlloc(BufSize + 1);
     if FEditRead = nil then
       raise Exception.Create(SNoEditReader);
     // Delphi 5+ sometimes returns -1 here, for an unknown reason
@@ -445,7 +458,7 @@ begin
   begin
     Pos := GetCurrentBufferPos;
     if Buf = nil then
-      Buf := StrAlloc(BufSize);
+      Buf := AnsiStrAlloc(BufSize);
     if FEditRead = nil then
       raise Exception.Create(SNoEditReader);
     Size := FEditRead.GetText(Pos, Buf, BufSize);
@@ -485,7 +498,7 @@ begin
     AfterPos := GetCurrentBufferPos;
     Pos := 0;
     if Buf = nil then
-      Buf := StrAlloc(BufSize);
+      Buf := AnsiStrAlloc(BufSize);
     if FEditRead = nil then
       raise Exception.Create(SNoEditReader);
 
