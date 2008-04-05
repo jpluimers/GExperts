@@ -672,7 +672,7 @@ begin
         Clipboard.AsText := MissingEntries;
         // Do not localize; this is just test code
         MessageDlg('There are missing project options in GX_ProjOptMap.pas:' +#13#10+ MissingEntries, mtWarning, [mbOK], 0);
-    end;
+      end;
     {$ENDIF CheckProjectOptionMap}
   finally
     FPrjOptions := nil;
