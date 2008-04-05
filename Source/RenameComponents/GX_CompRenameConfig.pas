@@ -207,9 +207,9 @@ begin
     OrgValueList := FValueList;
     OrgValuelist.Sorted := True;
     FValueList := TStringList.Create;
-    for i := Grid.FixedRows to Grid.RowCount-1 do
+    for i := Grid.FixedRows to Grid.RowCount - 1 do
       if Trim(Grid.Cells[0, i]) <> '' then
-        FValueList.Add(Grid.Cells[0, i]+'='+Grid.Cells[1, i]);
+        FValueList.Add(Grid.Cells[0, i] + '=' + Grid.Cells[1, i]);
     for i := 0 to FValueList.Count - 1 do
     begin
       Index := OrgValuelist.IndexOfName(FValueList.Names[i]);
@@ -227,21 +227,23 @@ end;
 
 procedure TfmCompRenameConfig.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
 begin
-  acAdd.Enabled := IsValidRule(Grid.Row) and not IsEmptyRow(Grid, Grid.RowCount-1);
+  acAdd.Enabled := IsValidRule(Grid.Row) and not IsEmptyRow(Grid, Grid.RowCount - 1);
   acDelete.Enabled := ((Grid.Row >= Grid.FixedRows) and (Grid.Row < Grid.RowCount));
   acOtherProperties.Enabled := RowHasComponent(Grid, Grid.Row);
 end;
 
 procedure TfmCompRenameConfig.acAddExecute(Sender: TObject);
 begin
-  if Grid.CanFocus then Grid.SetFocus;
+  if Grid.CanFocus then
+    Grid.SetFocus;
   GridAddRow;
   FormResize(Self);
 end;
 
 procedure TfmCompRenameConfig.acDeleteExecute(Sender: TObject);
 begin
-  if Grid.CanFocus then Grid.SetFocus;
+  if Grid.CanFocus then
+    Grid.SetFocus;
   GridDeleteRow(Grid.Row);
   if Grid.RowCount <= Grid.FixedRows then
     GridAddRow;
@@ -290,7 +292,7 @@ begin
       VK_DOWN:
         begin
           // If we are at bottom of grid, add a new empty row
-          if (Grid.Row = Grid.RowCount-1) and not IsEmptyRow(Grid, Grid.Row) then
+          if (Grid.Row = Grid.RowCount - 1) and not IsEmptyRow(Grid, Grid.Row) then
             Grid.RowCount := Grid.RowCount + 1;
         end;
 
@@ -322,9 +324,9 @@ end;
 
 function TfmCompRenameConfig.RemoveEmptyBottomRow: Boolean;
 begin
-  if IsEmptyRow(Grid, Grid.RowCount-1) and (Grid.RowCount > Grid.FixedRows)
-  then begin
-    Grid.RowCount := Grid.RowCount-1;
+  if IsEmptyRow(Grid, Grid.RowCount - 1) and (Grid.RowCount > Grid.FixedRows) then
+  begin
+    Grid.RowCount := Grid.RowCount - 1;
     Result := True;
   end
   else
@@ -336,26 +338,26 @@ begin
   Grid.RowCount := Grid.RowCount + 1;
   Application.ProcessMessages;
   Grid.Col := Grid.FixedCols;
-  Grid.Row := Grid.RowCount-1;
+  Grid.Row := Grid.RowCount - 1;
 end;
 
 procedure TfmCompRenameConfig.GridDeleteRow(ARow: Integer);
 var
   i, j: Integer;
 begin
-  if ARow > Grid.FixedRows-1 then
+  if ARow > Grid.FixedRows - 1 then
   begin
-    if ARow < Grid.RowCount-1 then
+    if ARow < Grid.RowCount - 1 then
     begin
       // Move all cells one row up
-      for i := ARow to Grid.RowCount-2 do
-        for j := 0 to Grid.ColCount-1 do
-          Grid.Cells[j, i] := Grid.Cells[j, i+1];
+      for i := ARow to Grid.RowCount - 2 do
+        for j := 0 to Grid.ColCount - 1 do
+          Grid.Cells[j, i] := Grid.Cells[j, i + 1];
     end;
     // Delete the last row
-    Grid.Rows[Grid.RowCount-1].Clear;
-    if Grid.RowCount > Grid.FixedRows+1 then
-      Grid.RowCount := Grid.RowCount-1;
+    Grid.Rows[Grid.RowCount - 1].Clear;
+    if Grid.RowCount > Grid.FixedRows + 1 then
+      Grid.RowCount := Grid.RowCount - 1;
   end;
 end;
 
@@ -390,19 +392,19 @@ var
   FoundCol: Integer;
   FindMsg: string;
 begin
-  Index := Grid.Row+1;
+  Index := Grid.Row + 1;
   FoundRow := -1;
   FoundCol := 0;
   while (FoundRow < 0) and (Index < Grid.RowCount) do
   begin
-    if CaseInsensitivePos(PChar(FindDialog.FindText), PChar(Grid.Cells[1, Index])) > 0
-    then begin
+    if CaseInsensitivePos(FindDialog.FindText, Grid.Cells[1, Index]) > 0 then
+    begin
       FoundCol := 1;
       FoundRow := Index;
     end;
 
-    if CaseInsensitivePos(PChar(FindDialog.FindText), PChar(Grid.Cells[0, Index])) > 0
-    then begin
+    if CaseInsensitivePos(FindDialog.FindText, Grid.Cells[0, Index]) > 0 then
+    begin
       FoundCol := 0;
       FoundRow := Index;
     end;
