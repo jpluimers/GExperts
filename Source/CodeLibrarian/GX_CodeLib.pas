@@ -2,7 +2,7 @@ unit GX_CodeLib;
 
 {$I GX_CondDefine.inc}
 
-//TODO 3 -cIssue -oAnyone: Handle invalid filenames with \/, or use Topic attribute as the disply text?
+//TODO 3 -cIssue -oAnyone: Handle invalid filenames with \/, or use Topic attribute as the display text?
 
 interface
 
