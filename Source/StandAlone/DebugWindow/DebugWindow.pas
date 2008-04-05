@@ -273,7 +273,7 @@ procedure TfmDebug.WMEndSession(var Message: TMessage);
 begin
   FAllowClose := True;
   Close;
-  
+
   inherited;
 end;
 
@@ -282,7 +282,7 @@ begin
   FTaskIcon.Active := False;
   FAllowClose := True;
   Close;
-  
+
   inherited;
 end;
 
@@ -299,7 +299,6 @@ end;
 procedure TfmDebug.actEditCopySelectedLinesExecute(Sender: TObject);
 var
   CopyStrings: TStrings;
-  CopyText: PChar;
   i: Integer;
   ListItem: TListItem;
   NewLine: string;
@@ -307,6 +306,7 @@ begin
   CopyStrings := TStringList.Create;
   try
     for i := 0 to lvMessages.Items.Count - 1 do
+    begin
       if lvMessages.Items[i].Selected then
       begin
         ListItem := lvMessages.Items[i];
@@ -314,13 +314,8 @@ begin
                                              ListItem.SubItems[0]]);
         CopyStrings.Add(NewLine);
       end;
-
-    CopyText := CopyStrings.GetText;
-    try
-      Clipboard.SetTextBuf(CopyText);
-    finally
-      StrDispose(CopyText);
     end;
+    Clipboard.AsText := CopyStrings.Text;
   finally
     FreeAndNil(CopyStrings);
   end;
