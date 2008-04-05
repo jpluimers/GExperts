@@ -7,8 +7,6 @@ uses
 
 type
   TGxMenusForEditorExperts = class(TGX_Expert)
-  private
-    procedure PopulatePopupMenu(const PopupMenu: TPopupMenu);
   protected
     procedure UpdateAction(Action: TCustomAction); override;
   public
@@ -117,46 +115,6 @@ end;
 function TGxMenusForEditorExperts.HasSubmenuItems: Boolean;
 begin
   Result := True;
-end;
-
-procedure TGxMenusForEditorExperts.PopulatePopupMenu(const PopupMenu: TPopupMenu);
-
-  procedure ClearMenuItems(AMenu: TMenu);
-  begin
-    Assert(Assigned(AMenu));
-    AMenu.Items.Clear;
-  end;
-
-var
-  i: Integer;
-  AGExpertsInstance: TGExperts;
-  AEditorExpertManager: TGxEditorExpertManager;
-  AEditorExpert: TEditorExpert;
-
-  ExpertMenuEntry: TMenuItem;
-begin
-  Assert(Assigned(PopupMenu));
-  ClearMenuItems(PopupMenu);
-
-  AGExpertsInstance := GExpertsInst;
-  Assert(Assigned(AGExpertsInstance));
-
-  AEditorExpertManager := AGExpertsInstance.EditorExpertManager;
-  // If editor experts are not enabled, then the editor
-  // expert manager is not present; exit if this is the case.
-  if not Assigned(AEditorExpertManager) then
-    Exit;
-
-  for i := 0 to AEditorExpertManager.EditorExpertCount-1 do
-  begin
-    AEditorExpert := AEditorExpertManager.EditorExpertList[i];
-    Assert(Assigned(AEditorExpert));
-
-    ExpertMenuEntry := TMenuItem.Create(PopupMenu);
-    ExpertMenuEntry.Action := GxActionBroker.FindAction(AEditorExpert.GetActionName);
-
-    PopupMenu.Items.Add(ExpertMenuEntry);
-  end;
 end;
 
 procedure TGxMenusForEditorExperts.UpdateAction(Action: TCustomAction);

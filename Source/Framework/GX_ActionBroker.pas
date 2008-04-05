@@ -77,7 +77,7 @@ uses
   Windows, SysUtils, Forms, Menus, Rescaler,
   ToolsAPI,
   GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_KbdShortCutBroker,
-  GX_GenericClasses, GX_GenericUtils;
+  GX_GenericClasses, GX_GenericUtils, Contnrs;
 
 type
   // Special action that implements menu actions.

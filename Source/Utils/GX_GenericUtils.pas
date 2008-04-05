@@ -112,23 +112,27 @@ function IsCharWhiteSpace(C: Char): Boolean;
 function IsCharWhiteSpaceOrNull(C: Char): Boolean;
 function IsCharLineEnding(C: Char): Boolean;
 function IsCharLineEndingOrNull(C: Char): Boolean; overload;
-function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload;
 function IsCharAlphaNumeric(C: Char): Boolean; overload;
-function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
 function IsCharNumeric(C: Char): Boolean; overload;
-function IsCharNumeric(C: AnsiChar): Boolean; overload;
 function IsCharTab(C: Char): Boolean;
 function IsCharSymbol(C: Char): Boolean; overload;
-function IsCharSymbol(C: AnsiChar): Boolean; overload;
 // See if a character is a valid locale identifier character, _, or 0..9
 function IsCharIdentifier(C: Char): Boolean; overload;
-function IsCharIdentifier(C: AnsiChar): Boolean; overload;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
+{$IFDEF UNICODE}
 function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
-{$IFNDEF UNICODE}
-function CharInSet(C: Char; Set: TSysCharSet): Boolean;
+function IsCharIdentifier(C: AnsiChar): Boolean; overload;
+function IsCharSymbol(C: AnsiChar): Boolean; overload;
+function IsCharNumeric(C: AnsiChar): Boolean; overload;
+function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
+function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload;
+function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
 function IsLeadChar(C: Char): Boolean;
-{$ENDIF UNICODE}
+{$ELSE not UNICODE}
+function CharInSet(C: Char; CSet: TSysCharSet): Boolean;
+function AnsiStrAlloc(Size: Cardinal): PChar;
+function IsLeadChar(C: Char): Boolean;
+{$ENDIF not UNICODE}
 
 // Transforms all consecutive sequences of #10, #13, #32, and #9 in Str
 // into a single space, and strips off whitespace at the beginning and
@@ -1042,17 +1046,58 @@ begin
   end; // for i
 end;
 
-{$IFNDEF UNICODE}
-function CharInSet(C: Char; Set: TSysCharSet): Boolean;
-begin
-  Result := C in Set;
-end;
-
+{$IFDEF UNICODE}
 function IsLeadChar(C: AnsiChar): Boolean;
 begin
   Result := C in LeadBytes;
 end;
-{$ENDIF UNICODE}
+
+function IsCharLineEndingOrNull(C: AnsiChar): Boolean;
+begin
+  Result := C in [#0, #10, #13];
+end;
+
+function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
+begin
+  Result := Windows.IsCharAlphaNumericA(C);
+end;
+
+function IsCharNumeric(C: AnsiChar): Boolean;
+begin
+  Result := C in ['0'..'9'];
+end;
+
+function IsCharSymbol(C: AnsiChar): Boolean;
+begin
+  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
+end;
+
+function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
+begin
+  Result := (C in LocaleIdentifierChars) and not (C in ['0'..'9']);
+end;
+
+function IsCharIdentifier(C: AnsiChar): Boolean; overload;
+begin
+  Result := C in LocaleIdentifierChars;
+end;
+
+{$ELSE not UNICODE}
+function CharInSet(C: Char; CSet: TSysCharSet): Boolean;
+begin
+  Result := C in CSet;
+end;
+
+function AnsiStrAlloc(Size: Cardinal): PChar;
+begin
+  Result := StrAlloc(Size);
+end;
+
+function IsLeadChar(C: Char): Boolean;
+begin
+  Result := C in LeadBytes;
+end;
+{$ENDIF not UNICODE}
 
 function IsCharWhiteSpace(C: Char): Boolean;
 begin
@@ -1078,11 +1123,6 @@ begin
   Result := CharInSet(C, [#0, #10, #13]);
 end;
 
-function IsCharLineEndingOrNull(C: AnsiChar): Boolean;
-begin
-  Result := C in [#0, #10, #13];
-end;
-
 function IsCharAlphaNumeric(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
@@ -1092,23 +1132,13 @@ begin
   {$ENDIF}
 end;
 
-function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
-begin
-  Result := Windows.IsCharAlphaNumericA(C);
-end;
-
 function IsCharNumeric(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
   Result := TCharacter.IsDigit(C);
   {$ELSE not UNICODE}
-  Result := CharInSet(C, '0'..'9']);
+  Result := CharInSet(C, ['0'..'9']);
   {$ENDIF}
-end;
-
-function IsCharNumeric(C: AnsiChar): Boolean;
-begin
-  Result := C in ['0'..'9'];
 end;
 
 function IsCharTab(C: Char): Boolean;
@@ -1121,13 +1151,8 @@ begin
   {$IFDEF UNICODE}
   Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
   {$ELSE not UNICODE}
-  Result := CharInSet(['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
+  Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
   {$ENDIF}
-end;
-
-function IsCharSymbol(C: AnsiChar): Boolean;
-begin
-  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
 end;
 
 function IsCharIdentifierStart(C: Char): Boolean; overload;
@@ -1135,13 +1160,8 @@ begin
   {$IFDEF UNICODE}
   Result := TCharacter.IsLetter(C) or (C = '_');
   {$ELSE not UNICODE}
-  Result := (C in LocaleIdentifierChars) and not (C in [0..9]);
+  Result := (C in LocaleIdentifierChars) and not (C in ['0'..'9']);
   {$ENDIF}
-end;
-
-function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
-begin
-  Result := (C in LocaleIdentifierChars) and not (C in [0..9]);
 end;
 
 function IsCharIdentifier(C: Char): Boolean;
@@ -1151,11 +1171,6 @@ begin
   {$ELSE not UNICODE}
   Result := C in LocaleIdentifierChars;
   {$ENDIF}
-end;
-
-function IsCharIdentifier(C: AnsiChar): Boolean; overload;
-begin
-  Result := C in LocaleIdentifierChars;
 end;
 
 // This function is impossible to read, but it is very fast

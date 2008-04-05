@@ -52,7 +52,7 @@ implementation
 
 uses
   SysUtils, Windows, Dialogs,
-  mwPasTokenList, mwBCBTokenList, EditorStrings,
+  mwPasTokenList, mwBCBTokenList,
   GX_EditReader, GX_GenericUtils, GX_OtaUtils;
 
 resourcestring

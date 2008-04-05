@@ -602,7 +602,7 @@ uses
   {$IFDEF LINUX} WinUtils, {$ENDIF}
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, DesignIntf, TypInfo, 
-  EditorStrings, GX_EditReader, GX_IdeUtils, GX_VerDepConst, SetString;
+  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SetString;
 
 procedure ClearUnitInfoList(const List: TList);
 var
