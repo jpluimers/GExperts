@@ -140,7 +140,7 @@ begin
   if DebugWin <> 0 then
   begin
     MessageString := MsgPrefix + Msg;
-    CDS.cbData := Length(MessageString) + 4;
+    CDS.cbData := (Length(MessageString) + 4) * SizeOf(Char);
     CDS.dwData := 0;
     if Msg = chrClearCommand then
       CDS.lpData := PChar(chrClearCommand+Char(Ord(MType) + 1)+ MessageString +#0)
