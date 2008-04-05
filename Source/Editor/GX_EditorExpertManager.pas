@@ -5,13 +5,12 @@ unit GX_EditorExpertManager;
 interface
 
 uses
-  GX_GenericClasses,
-  GX_EditorExpert;
+  Contnrs, GX_GenericClasses, GX_EditorExpert;
 
 type
   TGxEditorExpertManager = class(TObject)
   private
-    FEditorExpertList: TGxObjectList;
+    FEditorExpertList: TObjectList;
     function GetEditorExpert(const Index: Integer): TEditorExpert;
     function GetEditorExpertCount: Integer;
     procedure LoadEditorExperts;
@@ -36,7 +35,7 @@ constructor TGxEditorExpertManager.Create;
 begin
   inherited Create;
 
-  FEditorExpertList := TGxObjectList.Create(False);
+  FEditorExpertList := TObjectList.Create(False);
   LoadEditorExperts;
 end;
 
