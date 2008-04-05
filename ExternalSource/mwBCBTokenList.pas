@@ -70,7 +70,7 @@ type
   TmsSearcher = class(TObject)
   private
     FBCBTokenList: TBCBTokenList;
-    FSearchOrigin: PChar;
+    FSearchOrigin: PAnsiChar;
     Pat: string;
     fPos: Integer;
     HalfLen: Integer;
@@ -112,7 +112,7 @@ type
   TBCBTokenList = class(TObject)
   private
     FTokenPositionsList: TLongintList;
-    fOrigin: PChar;
+    fOrigin: PAnsiChar;
     fPCharSize: Longint;
     fPCharCapacity: Longint;
     FComment: TCommentState;
@@ -146,7 +146,7 @@ type
     Searcher: TmsSearcher;
     constructor Create;
     destructor Destroy; override;
-    procedure SetOrigin(NewOrigin: PChar; NewSize: Longint);
+    procedure SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
     function Add(const Item: string): Integer;
     procedure Clear;
     procedure Delete(Index: Integer);
@@ -161,7 +161,7 @@ type
     property Count: Integer read GetCount write SetCount;
     property Token[Index: Integer]: string read GetToken write SetToken; default;
     property TokenPositionsList: TLongintList read FTokenPositionsList;
-    property Origin: PChar read fOrigin;
+    property Origin: PAnsiChar read fOrigin;
     property PCharSize: Longint read fPCharSize;
     property PCharCapacity: Longint read fPCharCapacity;
     function GetSubString(StartPos, EndPos: Longint): string;
@@ -203,7 +203,7 @@ const
 
 implementation
 
-uses SysUtils;
+uses SysUtils, GX_GenericUtils;
 
 constructor TmsSearcher.Create(Value: TBCBTokenList);
 begin
@@ -384,7 +384,7 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TBCBTokenList.SetOrigin(NewOrigin: PChar; NewSize: Longint);
+procedure TBCBTokenList.SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
 begin
   FOrigin := NewOrigin;
   Run := 0;
@@ -416,10 +416,10 @@ begin
           FPCharCapacity := FPCharCapacity + 16384;
           ReAllocMem(FOrigin, PCharCapacity);
         except
-          raise exception.Create('unable to reallocate PChar');
+          raise Exception.Create('unable to reallocate PAnsiChar');
         end;
       end;
-      StrECopy((FOrigin + InsPos), PChar(aString));
+      StrECopy((FOrigin + InsPos), PAnsiChar(aString));
       FPCharSize := NewSize;
       FOrigin[FPCharSize] := #0;
       aString := '';
@@ -849,21 +849,21 @@ begin
       #1..#9, #11, #12, #14..#32:
         begin
           Inc(Run);
-          while FOrigin[Run] in [#1..#9, #11, #12, #14..#32] do Inc(Run);
+          while CharInSet(FOrigin[Run], [#1..#9, #11, #12, #14..#32]) do Inc(Run);
           FTokenPositionsList.Add(Run);
         end;
 
       'A'..'Z', 'a'..'z', '_', '~':
         begin
           Inc(Run);
-          while FOrigin[Run] in ['A'..'Z', 'a'..'z', '0'..'9', '_'] do Inc(Run);
+          while CharInSet(FOrigin[Run], ['A'..'Z', 'a'..'z', '0'..'9', '_']) do Inc(Run);
           FTokenPositionsList.Add(Run);
         end;
 
       '0'..'9':
         begin
           Inc(Run);
-          while FOrigin[Run] in ['0'..'9', '.', 'e', 'E'] do
+          while CharInSet(FOrigin[Run], ['0'..'9', '.', 'e', 'E']) do
           begin
             case FOrigin[Run] of
               '.':
@@ -908,17 +908,17 @@ begin
                       Inc(Run);
                       if (FOrigin[Run] = '\') then
                       begin
-                        while not (FOrigin[Run + 1] in [#10, #13, #0]) do
+                        while not IsCharLineEndingOrNull(FOrigin[Run + 1]) do
                           Inc(Run);
                         Run := Run + 2;
                       end;
-                    until (FOrigin[Run + 1] in [#10, #13, #0]);
+                    until IsCharLineEndingOrNull(FOrigin[Run + 1]);
                     Run := Run + 2;
                   end
                   else
                   begin
                     Inc(Run);
-                    while FOrigin[Run] in ['A'..'Z', 'a'..'z'] do Inc(Run);
+                    while CharInSet(FOrigin[Run], ['A'..'Z', 'a'..'z']) do Inc(Run);
                     Dec(Run)
                   end;
               end;
@@ -1102,7 +1102,7 @@ begin
       begin
         Inc(Running);
         Result := tknumber;
-        while FOrigin[Running] in ['0'..'9', '.'] do
+        while CharInSet(FOrigin[Running], ['0'..'9', '.']) do
         begin
           case FOrigin[Running] of
             '.':
@@ -1149,7 +1149,7 @@ begin
                   begin
                     Inc(Running);
                     TempRun := Running;
-                    while FOrigin[Running] in ['A'..'Z', 'a'..'z'] do Inc(Running);
+                    while CharInSet(FOrigin[Running], ['A'..'Z', 'a'..'z']) do Inc(Running);
                     Result := DirKind(TempRun, Running);
                   end;
                 end;
