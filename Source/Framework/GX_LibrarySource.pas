@@ -9,7 +9,7 @@ unit GX_LibrarySource;
 interface
 
 uses
-  ToolsAPI; // Errors here indicate that you didn't link to the designide/dsnidexx package
+  ToolsAPI; // Errors here indicate that you didn't link to the DesignIde package
 
 // This function needs to be interface-visible, otherwise
 // C++Builder 5 complains about a missing EXTDEF symbol
