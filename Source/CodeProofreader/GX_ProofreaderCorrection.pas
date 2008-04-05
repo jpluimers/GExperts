@@ -271,7 +271,7 @@ begin
 
   CharIndex := Length(ReplaceString) - Length(ReplaceItem.Typed);
   Assert(CharIndex >= 0);
-  PrevCharIsIdent := (CharIndex > 0) and (ReplaceString[CharIndex] in LocaleIdentifierChars);
+  PrevCharIsIdent := (CharIndex > 0) and IsCharIdentifier(ReplaceString[CharIndex]);
 
   if Beginning then
     Result := Result and ((ReplaceItem.Where = wrAnywhere) or
@@ -340,7 +340,7 @@ begin
   EditWriter.CopyTo(EditorCharIndex - Length(TextToReplace) - Length(TrailingCharacters));
   EditWriter.DeleteTo(EditorCharIndex);
   // Note: Insert doesn't preserve trailing spaces
-  EditWriter.Insert(PChar(ConvertToIDEEditorString(Replacement + TrailingCharacters)));
+  EditWriter.Insert(PAnsiChar(ConvertToIDEEditorString(Replacement + TrailingCharacters)));
 
   EditWriter := nil; // Explicitly release interface here and now
 end;
@@ -495,7 +495,7 @@ begin
                Inc(Source);
              end;
       else
-        if Source^ in LeadBytes then
+        if IsLeadChar(Source^) then
         begin
           MultiByteSequenceLen := StrNextChar(Source) - Source;
 
@@ -723,7 +723,7 @@ begin
       // If that last character is in the set of alpha-numeric characters,
       // the user is not done typing the word, identifier, or statement.
       // Do not make an attempt to correct anything in that case.
-      if SourceString[n] in LocaleIdentifierChars then
+      if IsCharIdentifier(SourceString[n]) then
         Exit;
 
       // We now split the buffer we retrieved into two halves:
@@ -741,7 +741,7 @@ begin
       TrailingChars := Copy(SourceString, n, n);
       Delete(SourceString, n, n);
       if (Length(SourceString) = 0) or
-         not (SourceString[Length(SourceString)] in LocaleIdentifierChars) then
+         not (IsCharIdentifier(SourceString[Length(SourceString)])) then
       begin
         Exit;
       end;
@@ -759,7 +759,7 @@ begin
       // Make sure that we only have alphanumeric characters left in s by
       // stripping out all leading non-alphanumeric characters.
       n := Length(SourceString);
-      while (n > 0) and (SourceString[n] in LocaleIdentifierChars) do
+      while (n > 0) and IsCharIdentifier(SourceString[n]) do
         Dec(n);
 
       Delete(SourceString, 1, n);
