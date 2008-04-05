@@ -1,21 +1,21 @@
-; This install script requires the Inno Setup Quick Start Pack version 5.20
-; or greater with the included ISPP, available from: http://www.jrsoftware.org/
+; This install script requires the Inno Setup Quick Start Pack version 5.2.2 or
+; greater with the included ISPP, available from: http://www.jrsoftware.org/
 
 // TODO: Use ExecAsOriginalUser to register the DLL with the IDE for better Vista elevation support
 
 #ifdef ISPPCC_INVOKED
 ; Command line compiler
   #ifndef Version
-    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.4"
+    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.3"
   #endif
 #else
 ; IDE compiler
   #define Delphi2007
-  #define Version "1.4"
+  #define Version "1.3"
 #endif
 
 #define Product "GExperts"
-#define VerRegKey "1.4"
+#define VerRegKey "1.3"
 #define RegCompany   "Borland"
 
 #ifdef Delphi6
@@ -86,7 +86,7 @@
 #endif
 
 #ifndef IDEShortName
-  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.4"
+  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.3"
 #endif
 
 #define FullName    Product +" for "+ IDELongName +" "+ IDEVer
