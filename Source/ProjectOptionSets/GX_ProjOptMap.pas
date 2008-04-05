@@ -43,7 +43,7 @@ type
     ocObjectPascal, ocATL,
     // Directories / Folders
     ocFolders,
-    // not yet known
+    // Not yet known
     ocUnknown
   );
 
@@ -84,31 +84,37 @@ type
 // TODO 4 -oAnyone -cFeature : Add similar maps for the environment options?
 
 const
-  GxOptionsMap: array[0..299] of TGxOptionsMap = (
+  {$IFDEF GX_VER190_up}
+  StringType = tkUString;
+  {$ELSE} // Delphi 2007 or older
+  StringType = tkLString;
+  {$ENDIF}
+
+  GxOptionsMap: array[0..304] of TGxOptionsMap = (
     ( // 0
       Name: 'HostApplication';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Debugger host application';
       Categories: [ocDelphi, ocBCB, ocDebugger];
       Translator: GxStringOptionTranslator;
     ),
     ( // 1
       Name: 'RunParams';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Debugger command line parameters';
       Categories: [ocDelphi, ocBCB, ocDebugger];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'RemoteHost';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Debugger remote host';
       Categories: [ocDelphi, ocBCB, ocDebugger];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'RemotePath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Debugger remote path';
       Categories: [ocDelphi, ocBCB, ocDebugger, ocFolders];
       Translator: GxStringOptionTranslator;
@@ -138,7 +144,7 @@ const
       Name: 'OutputObj';
       AssumedTypeKind: tkSet;
       Description: '';
-      Categories: [ocUnknown];
+      Categories: [ocCompiler];
       Translator: nil;
     ),
     (
@@ -206,84 +212,84 @@ const
     ),
     (
       Name: 'CompileName';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
-      Categories: [ocUnknown];
+      Categories: [ocCompiler];
       Translator: nil;
     ),
     (
       Name: 'Defines';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Conditional defines';
       Categories: [ocBCB, ocDelphi, ocCompiler];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'SysDefines';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'System defines (defined by IDE)';
       Categories: [ocBCB, ocCompiler];
       Translator: GxStringOptionTranslator;
     ),
     ( // 20
       Name: 'OutputDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Output directory for compiled binaries';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'UnitOutputDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Output directory for DCU files';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'UnitDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Unit search path';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'ObjDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Search path?'; // ????? search path in D5
       Categories: [ocFolders];
       Translator: nil;
     ),
     (
       Name: 'SrcDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Search path?'; // ????? search path in D5
       Categories: [ocFolders];
       Translator: nil;
     ),
     (
       Name: 'ResDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Search path?'; // ???? Search path in D5
       Categories: [ocFolders];
       Translator: nil;
     ),
     (
       Name: 'PkgDllDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'BPL output directory';
       Categories: [ocBCB, ocDelphi, ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'OptionsString';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocUnknown];
       Translator: nil;
     ),
     (
       Name: 'PkgDcpDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'DCP/BPI output directory';
       Categories: [ocBCB, ocDelphi, ocFolders];
       Translator: GxStringOptionTranslator;
@@ -297,21 +303,21 @@ const
     ),
     ( // 30
       Name: 'Packages';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Runtime packages list';
       Categories: [ocBCB, ocDelphi, ocLinker];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'UnitAliases';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Aliases for units that have changed names';
       Categories: [ocCompiler, ocDelphi, ocBCB];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'ExeDescription';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'EXE Description (inserted in binary)';
       Categories: [ocLinker];
       Translator: GxStringOptionTranslator;
@@ -339,7 +345,7 @@ const
     ),
     (
       Name: 'DebugSourcePath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Search path for the debugger to find source units';
       Categories: [ocBCB, ocDelphi, ocIde, ocDebugger, ocFolders];
       Translator: GxStringOptionTranslator;
@@ -348,7 +354,7 @@ const
       Name: 'ImageDebugInfo';
       AssumedTypeKind: tkEnumeration;
       Description: '';
-      Categories: [ocUnknown];
+      Categories: [ocLinker];
       Translator: GxBoolOptionTranslator;
     ),
     (
@@ -495,7 +501,7 @@ const
       Name: 'GenPackage';
       AssumedTypeKind: tkEnumeration;
       Description: 'Generate package';
-      Categories: [ocUnknown];
+      Categories: [ocCompiler];
       Translator: GxBoolOptionTranslator;
     ),
     (
@@ -723,14 +729,14 @@ const
     ),
     ( // 90
       Name: 'PchPath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Precompiled header path';
       Categories: [ocBCB, ocIde, ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'PchStopAfter';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Stop compiling pre-compiled headers after file';
       Categories: [ocBCB, ocIde];
       Translator: GxStringOptionTranslator;
@@ -810,42 +816,42 @@ const
     ),
     (
       Name: 'IncludePath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'LibPath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'DebugPath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'ReleasePath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'LibraryList';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'TasmViaCppOpts';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: '';
       Categories: [ocTasm];
       Translator: GxStringOptionTranslator;
@@ -1007,7 +1013,7 @@ const
     ),
     ( // 130
       Name: 'TasmDirective';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Directives to be passed to TASM';
       Categories: [ocTasm];
       Translator: GxStringOptionTranslator;
@@ -1248,14 +1254,14 @@ const
     ),
     (
       Name: 'AppFileExt';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AppFileExt';
       Categories: [ocBCB, ocUnknown];
       Translator: nil;
     ),
     (
       Name: 'LibDir';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'The location of the C++Builder Lib directory (read only)';
       Categories: [ocBCB, ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -1353,14 +1359,14 @@ const
     ),
     (
       Name: 'LinkImageComment';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Image comment';
       Categories: [ocBCB, ocLinker];
       Translator: GxStringOptionTranslator;
     ),
     ( // 180
       Name: 'LinkDelayLoad';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Delay-loaded DLLs';
       Categories: [ocBCB, ocLinker];
       Translator: GxStringOptionTranslator;
@@ -1374,7 +1380,7 @@ const
     ),
     ( // 182
       Name: 'ListFile';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'ListFile';
       Categories: [ocTASM, ocUnknown];
       Translator: nil;
@@ -1395,7 +1401,7 @@ const
     ),
     (
       Name: 'Launcher';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Launcher application to run (console) process (Kylix)';
       Categories: [ocDebugger];
       Translator: nil;
@@ -1409,21 +1415,21 @@ const
     ),
     (
       Name: 'DebugCWD';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Current working directory for debugged process';
       Categories: [ocDebugger];
       Translator: nil;
     ),
     (
       Name: 'RemoteLauncher';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Remote launcher (Kylix)';
       Categories: [ocDebugger];
       Translator: nil;
     ),
     (
       Name: 'RemoteCWD';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Current working directory on remote host for debugged process (Kylix)';
       Categories: [ocDebugger];
       Translator: nil;
@@ -1437,14 +1443,14 @@ const
     ),
     (
       Name: 'SOName';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Shared object name';
       Categories: [ocLinker];
       Translator: nil;
     ),
     (
       Name: 'SOPrefix';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Shared object prefix';
       Categories: [ocLinker];
       Translator: nil;
@@ -1458,21 +1464,21 @@ const
     ),
     (
       Name: 'SOSuffix';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Shared object suffix';
       Categories: [ocLinker];
       Translator: nil;
     ),
     (
       Name: 'SOVersion';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Shared object version';
       Categories: [ocLinker];
       Translator: nil;
     ),
     (
       Name: 'DynamicLoader';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Dynamic loader';
       Categories: [ocLinker];
       Translator: nil;
@@ -1493,7 +1499,7 @@ const
     ),
     (
       Name: 'NamespacePrefix';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Namespace prefix';
       Categories: [ocCompiler];
       Translator: nil;
@@ -1857,7 +1863,7 @@ const
     ),
     ( // 251
       Name: 'DefaultNamespace';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Default namespace';
       Categories: [ocCompiler];
       Translator: GxStringOptionTranslator;
@@ -1892,35 +1898,35 @@ const
     ),
     (
       Name: 'AspNetStartPage';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AspNetStartPage';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'AspNetHostServer';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AspNetHostServer';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'AspNetIISVirtualDirectory';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AspNetIISVirtualDirectory';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'AspNetHTTPAddress';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AspNetHTTPAddress';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'AspNetCassiniVirtualDirectory';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AspNetCassiniVirtualDirectory';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -1955,7 +1961,7 @@ const
     ),
     (
       Name: 'TargetName';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'TargetName';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -1969,7 +1975,7 @@ const
     ),
     (
       Name: 'Main';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'Main';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -1990,7 +1996,7 @@ const
     ),
     (
       Name: 'AppIcon';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'AppIcon';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -1999,7 +2005,7 @@ const
       Name: 'Warning';
       AssumedTypeKind: tkInteger;
       Description: 'Warning';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
@@ -2011,7 +2017,7 @@ const
     ),
     ( // 273
       Name: 'DocFile';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'DocFile';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -2025,7 +2031,7 @@ const
     ),
     (
       Name: 'RemoteParams';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'RemoteParams';
       Categories: [ocDebugger];
       Translator: GxStringOptionTranslator;
@@ -2046,14 +2052,14 @@ const
     ),
     (
       Name: 'SymbolSearchPath';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'SymbolSearchPath';
       Categories: [ocFolders];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'PasCodepage';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'PasCodepage';
       Categories: [ocIDE];
       Translator: GxStringOptionTranslator;
@@ -2095,14 +2101,14 @@ const
     ),
     (
       Name: 'KeyFile';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'KeyFile';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'KeyContainer';
-      AssumedTypeKind: tkLString;
+      AssumedTypeKind: StringType;
       Description: 'KeyContainer';
       Categories: [ocUnknown];
       Translator: GxStringOptionTranslator;
@@ -2111,91 +2117,126 @@ const
       Name: 'WarnOptionTruncated';
       AssumedTypeKind: tkInteger;
       Description: 'WarnOptionTruncated';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnWideCharReduced';
       AssumedTypeKind: tkInteger;
       Description: 'WarnWideCharReduced';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnDuplicatesIgnored';
       AssumedTypeKind: tkInteger;
       Description: 'WarnDuplicatesIgnored';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnInitSeq';
       AssumedTypeKind: tkInteger;
       Description: 'WarnInitSeq';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnLocalPInvoke';
       AssumedTypeKind: tkInteger;
       Description: 'WarnLocalPInvoke';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLWhitespaceNotAllowed';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLWhitespaceNotAllowed';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLUnknownEntity';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLUnknownEntity';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLInvalidNameStart';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLInvalidNameStart';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLInvalidName';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLInvalidName';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLExpectedCharacter';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLExpectedCharacter';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLCREFNoResolve';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLCREFNoResolve';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
       Name: 'WarnXMLNoParm';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLNoParm';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     ( // 299
       Name: 'WarnXMLNoMatchingParm';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLNoMatchingParm';
-      Categories: [ocUnknown];
+      Categories: [ocWarnings];
+      Translator: GxStringOptionTranslator;
+    ),
+    (
+      Name: 'WarnTypeInfoImplicitlyAdded';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnTypeInfoImplicitlyAdded';
+      Categories: [ocWarnings];
+      Translator: GxStringOptionTranslator;
+    ),
+    (
+      Name: 'WarnImplicitStringCast';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnImplicitStringCast';
+      Categories: [ocWarnings];
+      Translator: GxStringOptionTranslator;
+    ),
+    (
+      Name: 'WarnImplicitStringCastLoss';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnImplicitStringCastLoss';
+      Categories: [ocWarnings];
+      Translator: GxStringOptionTranslator;
+    ),
+    (
+      Name: 'WarnExplicitStringCast';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnExplicitStringCast';
+      Categories: [ocWarnings];
+      Translator: GxStringOptionTranslator;
+    ),
+    ( // 304
+      Name: 'WarnExplicitStringCastLoss';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnExplicitStringCastLoss';
+      Categories: [ocWarnings];
       Translator: GxStringOptionTranslator;
     )
   );
