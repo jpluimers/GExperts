@@ -232,7 +232,7 @@ begin
       Exit;
 
     Index := Length(LineText) - 1;
-    while (Index > 0) and (LineText[Index] in LocaleIdentifierChars) do
+    while (Index > 0) and IsCharIdentifier(LineText[Index]) do
       Dec(Index);
 
     TemplateName := Copy(LineText, Index + 1, Length(LineText) - Index - 1);
