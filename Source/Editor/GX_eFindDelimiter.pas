@@ -121,7 +121,6 @@ var
   EChar: TOTACharPos;
   Module: IOTAModule;
   SourceEditor: IOTASourceEditor;
-  EList: TEditorStrings;
 
   TextToken: string;
   EditorLine: string;
@@ -623,14 +622,9 @@ begin
     end;
 
     // A matching delimiter was found
-    EList := TEditorStrings.Create(SourceEditor);
-    try
-      SChar := EList.PosToCharPos(SPos);
-      EChar := EList.PosToCharPos(EPos);
-      DoDelimiterAction(SourceEditor, Offset, SChar, EChar);
-    finally
-      FreeAndNil(EList);
-    end;
+    SChar := GxOtaGetCharPosFromPos(SPos, GxOtaGetTopMostEditView(SourceEditor));
+    EChar := GxOtaGetCharPosFromPos(EPos, GxOtaGetTopMostEditView(SourceEditor));
+    DoDelimiterAction(SourceEditor, Offset, SChar, EChar);
 
   finally
     FreeAndNil(MemStream);
