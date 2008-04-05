@@ -802,7 +802,7 @@ begin
     if ProcInfo.Body <> '' then
       FCodeText.Lines.Text := ProcInfo.Body
     else
-      FCodeText.Lines.Text := Copy(PChar(FMemStream.Memory),
+      FCodeText.Lines.Text := Copy(PAnsiChar(FMemStream.Memory),
         ProcInfo.BeginIndex + 1, (ProcInfo.EndIndex - ProcInfo.BeginIndex));
     FLastProcLineNo := ProcInfo.LineNo;
   finally
