@@ -62,7 +62,7 @@ end;
 
 procedure TfmCodeOptions.eNumericKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (Key in ['0'..'9', #8]) then
+  if not IsCharNumeric(Key) or IsCharTab(Key) then
     Key := #0;
 end;
 
