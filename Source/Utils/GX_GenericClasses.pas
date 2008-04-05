@@ -12,17 +12,6 @@ type
   // reference-counting.  Only use this if you have a very good reason.
   NoRefCount = Pointer;
 
-  // TODO: Remove this and use just TObjectList in D6+
-  TGxObjectList = class(TObjectList)
-  private
-    function GetOwnsObjects: Boolean;
-    procedure SetOwnsObjects(const Value: Boolean);
-  public
-    constructor Create; overload;
-    constructor Create(AOwnsObjects: Boolean); overload;
-    property OwnsObjects: Boolean read GetOwnsObjects write SetOwnsObjects;
-  end;
-
   TSingletonInterfacedObject = class(TInterfacedObject)
   protected
     // IUnknown overrides for private life-time management.
@@ -75,31 +64,6 @@ uses
   SysUtils;
   
 { TGxObjectList }
-
-constructor TGxObjectList.Create;
-begin
-  inherited Create;
-  OwnsObjects := False;
-end;
-
-constructor TGxObjectList.Create(AOwnsObjects: Boolean);
-begin
-  inherited Create;
-  SetOwnsObjects(AOwnsObjects);
-end;
-
-function TGxObjectList.GetOwnsObjects: Boolean;
-begin
-  Result := inherited OwnsObjects;
-end;
-
-procedure TGxObjectList.SetOwnsObjects(const Value: Boolean);
-begin
-  Assert(Value = False);
-
-  inherited OwnsObjects := Value;
-end;
-
 { TSingletonInterfacedObject }
 
 function TSingletonInterfacedObject._AddRef: Integer;
