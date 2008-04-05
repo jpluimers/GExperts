@@ -7,7 +7,7 @@ interface
 uses
   SysUtils, Classes, Forms, Controls,
   MenuBar, Menus, Messages,
-  // You must link to the DesignIde/DsnIdeXX package to compile this unit
+  // You must link to the DesignIde package to compile this unit
   DockForm;
 
 type

@@ -19,7 +19,7 @@ uses
 
 // Returns True if the binary this function is called from
 // has been linked against various packages; at this time,
-// these packages are VCL, VCLX, DSNIDE/DESIGNIDE, etc.
+// these packages are VCL, VCLX, DESIGNIDE, etc.
 function BuiltWithPackages: Boolean;
 // Show a message box notifying the user that an application
 // has not been built with packages.
