@@ -1,5 +1,7 @@
 unit GX_MessageBox;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
@@ -58,11 +60,11 @@ uses
 const
   MsgDlgResults: array[TMsgDlgBtn] of Integer = (
     mrYes, mrNo, mrOk, mrCancel, mrAbort, mrRetry, mrIgnore, mrAll, mrNoToAll,
-    mrYesToAll, 0);
+    mrYesToAll, 0 {$IFDEF GX_VER190_up}, 0{$ENDIF});
 
   MsgDlgButtonCaptions: array[TMsgDlgBtn] of string = (
    SMsgDlgYes, SNoButton, SMsgDlgOK, SMsgDlgCancel, SMsgDlgAbort, SMsgDlgRetry,
-   SMsgDlgIgnore, SMsgDlgAll, SMsgDlgNoToAll, SMsgDlgYesToAll, SMsgDlgHelp);
+   SMsgDlgIgnore, SMsgDlgAll, SMsgDlgNoToAll, SMsgDlgYesToAll, SMsgDlgHelp {$IFDEF GX_VER190_up}, ''{$ENDIF});
 
 function ShowGxMessageBox(AdaptorClass: TGxMsgBoxAdaptorClass; const Data: string): TModalResult;
 var
