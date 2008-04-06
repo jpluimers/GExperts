@@ -434,7 +434,7 @@ begin
     FHelpFileLocation := Settings.ReadString(ConfigurationKey, 'HelpFile', FGExpertsPath + 'GExperts.chm');
     if SameText(ExtractFileExt(FHelpFileLocation), '.hlp') then
       FHelpFileLocation := ChangeFileExt(FHelpFileLocation, '.chm');
-    FAlphabetizeMenu := Settings.ReadBool(ConfigurationKey, 'AlphabetizeMenu', False);
+    FAlphabetizeMenu := Settings.ReadBool(ConfigurationKey, 'AlphabetizeMenu', True);
     FEditorExpertsEnabled := Settings.ReadBool(ConfigurationKey, 'EditorExpertsEnabled', True);
     FPlaceGxMainMenuInToolsMenu := Settings.ReadBool(ConfigurationKey, 'PlaceGxMainMenuInToolsMenu', False);
     FEnableKeyboardShortcuts := Settings.ReadBool(ConfigurationKey, 'EnableKeyboardShortcuts', True);

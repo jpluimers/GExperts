@@ -71,7 +71,7 @@ type
   private
     FBCBTokenList: TBCBTokenList;
     FSearchOrigin: PAnsiChar;
-    Pat: string;
+    Pat: AnsiString;
     fPos: Integer;
     HalfLen: Integer;
     PatLenPlus: Integer;
@@ -203,7 +203,7 @@ const
 
 implementation
 
-uses SysUtils, GX_GenericUtils;
+uses SysUtils, GX_GenericUtils, GX_OtaUtils; //TODO: Remove dependency
 
 constructor TmsSearcher.Create(Value: TBCBTokenList);
 begin
@@ -419,7 +419,7 @@ begin
           raise Exception.Create('unable to reallocate PAnsiChar');
         end;
       end;
-      StrECopy((FOrigin + InsPos), PAnsiChar(aString));
+      StrECopy((FOrigin + InsPos), PAnsiChar(ConvertToIDEEditorString(AString))); // ?? Safe? It can change the size of the editor buffer
       FPCharSize := NewSize;
       FOrigin[FPCharSize] := #0;
       aString := '';

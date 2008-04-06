@@ -454,7 +454,7 @@ begin
     LocalEditReader.SaveToStream(EditorStream);
     LocalEditReader.FreeFileData;
     EditorStream.Position := EditorStream.Size;
-    FillChar(Buf, 23, 0);
+    FillChar(Buf, 23, 0); // 23?
     EditorStream.WriteBuffer(Buf, 23);
     EditorStream.Position := 0;
     Parser := TmEPTokenList.Create;

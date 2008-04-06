@@ -324,7 +324,7 @@ end;
 
 procedure InitExpertIndexLookup;
 const
-  OldExpertOrder: array [0..26] of string = (
+  OldExpertOrder: array [0..29] of string = (
   'TProcedureExpert',
   'TExpertManagerExpert',
   'TGrepDlgExpert',
@@ -351,7 +351,10 @@ const
   'TCompsToCodeExpert',
   'TCompRenameExpert',
   'TCopyComponentNamesExpert',
-  'TGxMenusForEditorExperts'
+  'TGxMenusForEditorExperts',
+  'TMacroLibExpert',
+  'TOpenFileExpert',
+  'TFindCompRefWizard'
   );
 var
   i: Integer;

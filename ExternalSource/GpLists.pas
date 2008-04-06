@@ -641,7 +641,7 @@ implementation
 uses
   SysUtils,
   Consts,
-  Math;
+  Math, GX_GenericUtils;
 
 { publics }
 
@@ -1131,7 +1131,7 @@ begin
   if P <> nil then
     while p^ <> #0 do begin
       start := p;
-      while not (p^ in [#0, #10, #13]) do
+      while not IsCharLineEndingOrNull(p^) do
         Inc(p);
       SetString(s, start, p - start);
       Add(StrToInt(s));
@@ -1596,7 +1596,7 @@ begin
   if P <> nil then
     while p^ <> #0 do begin
       start := p;
-      while not (p^ in [#0, #10, #13]) do
+      while not IsCharLineEndingOrNull(p^) do
         Inc(p);
       SetString(s, start, p - start);
       Add(StrToInt64(s));

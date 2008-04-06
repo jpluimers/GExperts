@@ -110,12 +110,15 @@ procedure FindMinIndent(ALines: TStrings; var LineIndex, SpaceCount: Integer);
 // Determine if a character represents white space
 function IsCharWhiteSpace(C: Char): Boolean;
 function IsCharWhiteSpaceOrNull(C: Char): Boolean;
+function IsCharWhiteSpaceOrControl(C: Char): Boolean;
 function IsCharLineEnding(C: Char): Boolean;
 function IsCharLineEndingOrNull(C: Char): Boolean; overload;
 function IsCharAlphaNumeric(C: Char): Boolean; overload;
 function IsCharNumeric(C: Char): Boolean; overload;
+function IsCharHexDigit(C: Char): Boolean;
 function IsCharTab(C: Char): Boolean;
 function IsCharSymbol(C: Char): Boolean; overload;
+function IsCharControl(C: Char): Boolean;
 // See if a character is a valid locale identifier character, _, or 0..9
 function IsCharIdentifier(C: Char): Boolean; overload;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
@@ -126,8 +129,6 @@ function IsCharSymbol(C: AnsiChar): Boolean; overload;
 function IsCharNumeric(C: AnsiChar): Boolean; overload;
 function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
 function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload;
-function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
-function IsLeadChar(C: Char): Boolean;
 {$ELSE not UNICODE}
 function CharInSet(C: Char; CSet: TSysCharSet): Boolean;
 function AnsiStrAlloc(Size: Cardinal): PChar;
@@ -1104,13 +1105,18 @@ begin
   {$IFDEF UNICODE}
   Result := TCharacter.IsWhiteSpace(C);
   {$ELSE not UNICODE}
-  Result := C in [#9, #10, #13, #32];
+  Result := C in [#9, #10, #11, #12, #13, #32];
   {$ENDIF}
 end;
 
 function IsCharWhiteSpaceOrNull(C: Char): Boolean;
 begin
   Result := (C = #0) or IsCharWhiteSpace(C);
+end;
+
+function IsCharWhiteSpaceOrControl(C: Char): Boolean;
+begin
+  Result := IsCharWhiteSpace(C) or IsCharControl(C);
 end;
 
 function IsCharLineEnding(C: Char): Boolean;
@@ -1141,6 +1147,11 @@ begin
   {$ENDIF}
 end;
 
+function IsCharHexDigit(C: Char): Boolean;
+begin
+  Result := IsCharNumeric(C) or CharInSet(C, ['A'..'F', 'a'..'f']);
+end;
+
 function IsCharTab(C: Char): Boolean;
 begin
   Result := C = #8;
@@ -1152,6 +1163,15 @@ begin
   Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
   {$ELSE not UNICODE}
   Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
+  {$ENDIF}
+end;
+
+function IsCharControl(C: Char): Boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsControl(C);
+  {$ELSE not UNICODE}
+  Result := C in [#0..#8, #14..#31];
   {$ENDIF}
 end;
 
@@ -1169,7 +1189,7 @@ begin
   {$IFDEF UNICODE}
   Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
   {$ELSE not UNICODE}
-  Result := C in LocaleIdentifierChars;
+  Result := C in LocaleIdentifierChars; // Includes '_'
   {$ENDIF}
 end;
 

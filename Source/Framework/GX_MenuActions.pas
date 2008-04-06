@@ -92,7 +92,6 @@ const
   SepItemTag = NonExpertItemTagStart + 1;
   ConfigItemTag = NonExpertItemTagStart + 2;
   AboutItemTag = NonExpertItemTagStart + 3;
-  SubMenuItemTag = NonExpertItemTagStart + 4;
   MoreMenuItemName = 'GExpertsMoreMenuItem';
 
 function GXMenuActionManager: IGxMenuActionManager;
@@ -363,10 +362,7 @@ begin
   begin
     ParentItem := GetMenuItem(GExpertsInst.ExpertList[i].GetActionCaption);
     if Assigned(ParentItem) then
-    begin
-      ParentItem.Tag := SubMenuItemTag;
       GExpertsInst.ExpertList[i].DoCreateSubMenuItems(ParentItem);
-    end;
   end;
 end;
 
@@ -397,7 +393,7 @@ procedure TGXMenuActionManager.GetMenuItems(out MenuItems: TMenuItemArray; SkipM
     for i := 0 to Parent.Count - 1 do
     begin
       Item := Parent.Items[i];
-      if (Item.Count > 0) and (Item.Tag <> SubMenuItemTag) then
+      if (Item.Count > 0) and (Item.Tag = MoreItemTag) then
         AddMenuItemsForParent(Item);
     end;
   end;
@@ -419,7 +415,7 @@ begin
     for j := i to Length(MenuItems) - 1 do
     begin
       if Alphabetical then
-        Condition :=  (MenuItems[j].Tag < NonExpertItemTagStart) and
+        Condition := (MenuItems[j].Tag < NonExpertItemTagStart) and
           (AnsiCompareText(StripHotkey(MenuItems[i].Caption), StripHotkey(MenuItems[j].Caption)) > 0)
       else
         Condition := MenuItems[i].Tag > MenuItems[j].Tag;

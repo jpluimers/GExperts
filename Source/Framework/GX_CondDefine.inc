@@ -74,7 +74,7 @@
 // Turn on IDE docking support
 {$DEFINE EnableIdeDockingSupport}
 
-// All IDEs support this feature to some degree (though Delphi 8+ does not support multiline editor tabs)
+// All IDEs support this feature to some degree (though Delphi 8+ do not support multiline editor tabs)
 {$DEFINE GX_EditorEnhancements}
 
 // JCL stack tracing and SynEdit only work under Windows
