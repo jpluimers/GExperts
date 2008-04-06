@@ -2,7 +2,7 @@ unit SetString;
 
 interface
 
-uses SysUtils, TypInfo;
+uses SysUtils, TypInfo, GX_GenericUtils;
 
 // Convert a set to a string, e.g.,
 // var
@@ -163,11 +163,6 @@ end;
 { StringToSet }
 
 const
-  WhiteSpace = [#0..' '];
-  Alphabetic = ['a'..'z', 'A'..'Z', '_'];
-  Digits = ['0'..'9'];
-  AlphaNumeric = Alphabetic + Digits;
-  HexDigits = ['a'..'f', 'A'..'F'] + Digits;
   CharBegin = ['#', ''''];
   AsciiChars = [' '..'~']; // printable ASCII characters
 
@@ -177,7 +172,7 @@ resourcestring
 
 procedure SkipWhiteSpace(const Str: string; var I: Integer);
 begin
-  while (I <= Length(Str)) and (Str[I] in WhiteSpace) do
+  while (I <= Length(Str)) and IsCharWhiteSpaceOrControl(Str[I]) do
     Inc(I);
 end;
 
@@ -196,13 +191,13 @@ begin
   begin
     SkipWhiteSpace(Str, I);
     // Skip the prefix, separator, or suffix.
-    if (I <= Length(Str)) and not (Str[I] in AlphaNumeric) then
+    if (I <= Length(Str)) and (not IsCharIdentifier(Str[I])) then
       Inc(I);
     SkipWhiteSpace(Str, I);
 
     // Remember the start of the set element, and collect the entire element name.
     Start := I;
-    while (I <= Length(Str)) and (Str[I] in AlphaNumeric) do
+    while (I <= Length(Str)) and IsCharIdentifier(Str[I]) do
       Inc(I);
 
     // No name, so skip to the next element.
@@ -240,7 +235,7 @@ begin
     SkipWhiteSpace(Str, I);
     // Skip over one character, which might be the prefix,
     // a separator, or suffix.
-    if (I <= Length(Str)) and not (Str[I] in CharBegin) then
+    if (I <= Length(Str)) and not CharInSet(Str[I], CharBegin) then
       Inc(I);
     SkipWhiteSpace(Str, I);
 
@@ -257,12 +252,12 @@ begin
         if (I < Length(Str)) and (Str[I] = '$') then
         begin
           Inc(I);
-          while (I <= Length(Str)) and (Str[I] in HexDigits) do
+          while (I <= Length(Str)) and IsCharHexDigit(Str[I]) do
             Inc(I);
         end
         else
         begin
-          while (I <= Length(Str)) and (Str[I] in Digits) do
+          while (I <= Length(Str)) and IsCharNumeric(Str[I]) do
             Inc(I);
         end;
         ElementName := Copy(Str, Start, I-Start);
