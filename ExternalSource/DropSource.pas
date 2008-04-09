@@ -902,7 +902,7 @@ var
   pFile: PChar;
   pFileW: PWideChar;
   DropEffect: ^DWORD;
-  strlength: Integer;
+  StrBytes: Integer;
   tmpFilenames: TStringList;
 begin
   Medium.tymed := 0;
@@ -915,11 +915,10 @@ begin
     (FormatEtcIn.dwAspect = DVASPECT_CONTENT) and
     (FormatEtcIn.tymed and TYMED_HGLOBAL <> 0) then
   begin
-    strlength := 0;
-    for i := 0 to fFiles.Count-1 do
-      Inc(strlength, Length(fFiles[i])+1);
-    Medium.hGlobal :=
-      GlobalAlloc(GMEM_SHARE or GMEM_ZEROINIT, SizeOf(TDropFiles)+strlength+1);
+    StrBytes := 0;
+    for i := 0 to fFiles.Count - 1 do
+      Inc(StrBytes, (Length(fFiles[i]) * SizeOf(Char)) + SizeOf(Char));
+    Medium.hGlobal := GlobalAlloc(GMEM_SHARE or GMEM_ZEROINIT, SizeOf(TDropFiles) + StrBytes + SizeOf(Char));
     if (Medium.hGlobal = 0) then
       Result:=E_OUTOFMEMORY
     else
@@ -928,12 +927,15 @@ begin
       dropfiles := GlobalLock(Medium.hGlobal);
       try
         dropfiles^.pfiles := SizeOf(TDropFiles);
-        dropfiles^.fwide := False;
-        Longint(pFile) := Longint(dropfiles)+SizeOf(TDropFiles);
-        for i := 0 to fFiles.Count-1 do
+        if SizeOf(Char) = 2 then
+          dropfiles^.fwide := True
+        else
+          dropfiles^.fwide := False;
+        Longint(pFile) := Longint(dropfiles) + SizeOf(TDropFiles);
+        for i := 0 to fFiles.Count - 1 do
         begin
           StrPCopy(pFile, fFiles[i]);
-          Inc(pFile, Length(fFiles[i])+1);
+          Inc(pFile, Length(fFiles[i]) + 1);
         end;
         pFile^ := #0;
       finally
@@ -949,23 +951,22 @@ begin
     //make sure there is a Mapped Name for each filename...
     (fMappedNames.Count = fFiles.Count) then
   begin
-    strlength := 0;
-    for i := 0 to fMappedNames.Count-1 do
-      Inc(strlength, Length(fMappedNames[i])+1);
+    StrBytes := 0;
+    for i := 0 to fMappedNames.Count - 1 do
+      Inc(StrBytes, (Length(fMappedNames[i]) * SizeOf(Char)) + SizeOf(Char));
 
-    Medium.hGlobal :=
-      GlobalAlloc(GMEM_SHARE or GMEM_ZEROINIT, strlength+1);
+    Medium.hGlobal := GlobalAlloc(GMEM_SHARE or GMEM_ZEROINIT, StrBytes + SizeOf(Char));
     if (Medium.hGlobal = 0) then
-      Result:=E_OUTOFMEMORY
+      Result := E_OUTOFMEMORY
     else
     begin
       Medium.tymed := TYMED_HGLOBAL;
       pFile := GlobalLock(Medium.hGlobal);
       try
-        for i := 0 to fMappedNames.Count-1 do
+        for i := 0 to fMappedNames.Count - 1 do
         begin
           StrPCopy(pFile, fMappedNames[i]);
-          Inc(pFile, Length(fMappedNames[i])+1);
+          Inc(pFile, Length(fMappedNames[i]) + 1);
         end;
         pFile^ := #0;
       finally
@@ -981,11 +982,11 @@ begin
     //make sure there is a Mapped Name for each filename...
     (fMappedNames.Count = fFiles.Count) then
   begin
-    strlength := 2;
+    StrBytes := 2;
     for i := 0 to fMappedNames.Count-1 do
-      Inc(strlength, (Length(fMappedNames[i])+1)*2);
+      Inc(StrBytes, (Length(fMappedNames[i])+1)*2);
 
-    Medium.hGlobal := GlobalAlloc(GMEM_SHARE or GMEM_ZEROINIT, strlength);
+    Medium.hGlobal := GlobalAlloc(GMEM_SHARE or GMEM_ZEROINIT, StrBytes);
     if (Medium.hGlobal = 0) then
       Result:=E_OUTOFMEMORY
     else
@@ -997,7 +998,7 @@ begin
         begin
           StringToWideChar(fMappedNames[i], pFileW,
             (Length(fMappedNames[i])+1)*2);
-          Inc(pFileW, Length(fMappedNames[i])+1);
+          Inc(pFileW, Length(fMappedNames[i]) + 1);
         end;
         pFileW^ := #0;
       finally

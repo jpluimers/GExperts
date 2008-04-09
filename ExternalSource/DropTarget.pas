@@ -181,13 +181,13 @@ var
 begin
   DropFiles := PDropFiles(GlobalLock(HGlob));
   try
-    FileName := PChar(DropFiles) + DropFiles^.pFiles;
+    PAnsiChar(FileName) := PAnsiChar(DropFiles) + DropFiles^.pFiles; // PAnsiChar to move by SizeOf(DropFiles) bytes
     while (FileName^ <> #0) do
     begin
       if (DropFiles^.fWide) then // -> NT4 compatibility
       begin
         s := PWideChar(FileName);
-        Inc(FileName, (Length(s) + 1) * 2);
+        Inc(PByte(FileName), (Length(s) + 1) * 2);
       end else
       begin
         s := FileName;
@@ -199,7 +199,8 @@ begin
     GlobalUnlock(HGlob);
   end;
   if Files.Count > 0 then
-    Result := True else
+    Result := True
+  else
     Result := False;
 end;
 
