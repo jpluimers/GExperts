@@ -84,7 +84,7 @@ type
 // TODO 4 -oAnyone -cFeature : Add similar maps for the environment options?
 
 const
-  {$IFDEF GX_VER190_up}
+  {$IFDEF GX_VER200_up}
   StringType = tkUString;
   {$ELSE} // Delphi 2007 or older
   StringType = tkLString;

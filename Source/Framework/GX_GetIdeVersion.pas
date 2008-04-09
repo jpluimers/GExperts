@@ -498,10 +498,12 @@ begin
     {$ENDIF}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  // VER190 is Delphi.NET 2007  
+
+  {$IFDEF VER200}
     Result := GetRS2008Version;
     Assert(Result in [ideRS2008]);
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);

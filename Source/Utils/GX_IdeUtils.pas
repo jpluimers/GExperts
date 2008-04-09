@@ -440,7 +440,7 @@ end;
 
 function RunningRS2008OrGreater: Boolean;
 begin
-  {$IFDEF GX_VER190_up}
+  {$IFDEF GX_VER200_up}
   Result := True;
   {$ELSE}
   Result := False;

@@ -62,10 +62,10 @@ const
     {$DEFINE GExpertsDllNameDefined}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  {$IFDEF VER200}
     GExpertsDll = 'GExpertsRS2008.dll';
     {$DEFINE GExpertsDllNameDefined}
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   {$IFNDEF GExpertsDllNameDefined}
     GExpertsDllNameDefined not defined
@@ -126,10 +126,10 @@ const
     {$DEFINE TTabDockHostFormClassContainerDefined}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  {$IFDEF VER200}
     TTabDockHostFormClassContainer = 'designide120.bpl';
     {$DEFINE TTabDockHostFormClassContainerDefined}
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   {$IFNDEF TTabDockHostFormClassContainerDefined}
     TTabDockHostFormClassContainer not defined
@@ -203,10 +203,10 @@ TTabDockHostFormName = 'TTabDockHostForm';
     {$DEFINE MajorVersionNumber}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  {$IFDEF VER200}
     MajorVersionNumberChar = '12';  // RS 2008
     {$DEFINE MajorVersionNumber}
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   {$IFNDEF MajorVersionNumber}
     MajorVersionNumberChar has not been defined
@@ -271,10 +271,10 @@ TTabDockHostFormName = 'TTabDockHostForm';
     {$ENDIF}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  {$IFDEF VER200}
     IDEEnglishName = 'RAD Studio 2008';
     {$DEFINE IDEEnglishNameDefined}
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   {$IFNDEF IDEEnglishNameDefined}
     IDEEnglishName has not been defined
@@ -342,11 +342,11 @@ TTabDockHostFormName = 'TTabDockHostForm';
     {$DEFINE IdeBaseKey}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  {$IFDEF VER200}
     // BDS 2007
     CompilerDefinedProductRegistryKey = 'BDS\6.0';
     {$DEFINE IdeBaseKey}
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   {$IFNDEF IdeBaseKey}
     CompilerDefinedProductRegistryKey not defined
@@ -398,10 +398,10 @@ TTabDockHostFormName = 'TTabDockHostForm';
     {$DEFINE ClassBrowserStorageDefined}
   {$ENDIF VER180}
 
-  {$IFDEF VER190}
+  {$IFDEF VER200}
     ClassBrowserStorageFolder = 'Classes.RS2008';
     {$DEFINE ClassBrowserStorageDefined}
-  {$ENDIF VER190}
+  {$ENDIF VER200}
 
   {$IFNDEF ClassBrowserStorageDefined}
     Storage folder for class browser not defined

@@ -56,7 +56,10 @@
               {$DEFINE GX_VER185_up}  // Delphi 2007
             {$ENDIF}
             {$IF CompilerVersion >= 19}
-              {$DEFINE GX_VER190_up}  // Rad Studio 2008?
+              {$DEFINE GX_VER190_up}  // Delphi .NET 2007
+              {$IF CompilerVersion >= 20}
+                {$DEFINE GX_VER200_up}  // RAD Studio 2008?
+              {$IFEND}
             {$IFEND}
           {$IFEND}
         {$IFEND}

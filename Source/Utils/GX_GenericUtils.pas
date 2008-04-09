@@ -18,8 +18,7 @@ const
   AllFilesWildCard = '*.*';
   {$ENDIF LINUX}
   EmptyString = '';
-  // Note these don't handle german/polish/etc. extrnded ASCII alpha chars that are valid in Delphi 8+
-  GxIdentStartChars  = ['A'..'Z', 'a'..'z', '0'..'9'];
+  // Note these don't handle german/polish/etc. extended ASCII alpha chars that are valid in Delphi 8+
   GxAlphaChars       = ['A'..'Z', 'a'..'z'];
   GxUpperAlphaChars  = ['A'..'Z'];
   GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];

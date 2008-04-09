@@ -60,11 +60,11 @@ uses
 const
   MsgDlgResults: array[TMsgDlgBtn] of Integer = (
     mrYes, mrNo, mrOk, mrCancel, mrAbort, mrRetry, mrIgnore, mrAll, mrNoToAll,
-    mrYesToAll, 0 {$IFDEF GX_VER190_up}, mrClose{$ENDIF});
+    mrYesToAll, 0 {$IFDEF GX_VER200_up}, mrClose{$ENDIF});
 
   MsgDlgButtonCaptions: array[TMsgDlgBtn] of string = (
    SMsgDlgYes, SNoButton, SMsgDlgOK, SMsgDlgCancel, SMsgDlgAbort, SMsgDlgRetry,
-   SMsgDlgIgnore, SMsgDlgAll, SMsgDlgNoToAll, SMsgDlgYesToAll, SMsgDlgHelp {$IFDEF GX_VER190_up}, SMsgDlgClose{$ENDIF});
+   SMsgDlgIgnore, SMsgDlgAll, SMsgDlgNoToAll, SMsgDlgYesToAll, SMsgDlgHelp {$IFDEF GX_VER200_up}, SMsgDlgClose{$ENDIF});
 
 function ShowGxMessageBox(AdaptorClass: TGxMsgBoxAdaptorClass; const Data: string): TModalResult;
 var
