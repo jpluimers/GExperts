@@ -164,7 +164,6 @@ end;
 
 const
   CharBegin = ['#', ''''];
-  AsciiChars = [' '..'~']; // printable ASCII characters
 
 resourcestring
   sInvalidSetString = 'StringToSet: %s is not a valid literal for the set type';
