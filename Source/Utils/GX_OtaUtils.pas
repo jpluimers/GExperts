@@ -2758,7 +2758,9 @@ var
   VInt64           : Int64;
   VVariant         : Variant;
   VAString         : AnsiString;
+  {$IFDEF GX_VER200_up}
   VUString         : string;
+  {$ENDIF}
   VShortString     : string;
   VFloat           : Extended;
   VAChar           : AnsiChar;
