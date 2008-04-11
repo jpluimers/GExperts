@@ -2238,7 +2238,7 @@ begin
   begin
     PropName := PropList[i].Name;
     case PropList[i].PropType^.Kind of
-      tkLString, tkWString, tkVariant:
+      tkLString, tkWString, tkVariant {$IFDEF GX_VER200_up}, tkUString {$ENDIF}:
         SetPropValue(Dest, PropName, GetPropValue(Source, PropName));
       tkInteger, tkChar, tkWChar, tkClass:
         SetOrdProp(Dest, PropName, GetOrdProp(Source, PropName));

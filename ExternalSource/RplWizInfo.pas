@@ -117,7 +117,7 @@ type
       tkInt64: (Int64Value: Int64;);
       tkFloat:  (FloatValue: Extended;);
       tkMethod: (MethodValue: TMethod;);
-      tkClass, tkString, tkLString, tkWString: (PtrValue: Pointer;);
+      tkClass, tkString, tkLString, tkWString {$IFDEF GX_VER200_up}, tkUString {$ENDIF}: (PtrValue: Pointer;);
       tkVariant: (VariantValue: array[1..SizeOf(Variant)] of Byte);
   end;
 
@@ -367,9 +367,12 @@ function TPropInfo.GetStrValue(const Default: string): string;
 begin
   if PropType in [tkString, tkLString] then
     Result := AnsiString(PropValue.PtrValue)
-  else
-  if PropType in [tkWString] then
+  else if PropType in [tkWString] then
     Result := WideString(PropValue.PtrValue)
+  {$IFDEF GX_VER200_up}  
+  else if PropType in [tkUString] then
+    Result := string(PropValue.PtrValue)
+  {$ENDIF}
   else
     Result := Default
 end;
@@ -719,7 +722,7 @@ begin
     if (DestParentObject = nil) or (DestParentInfo = nil) then
       Exit;
 
-    if not (SourceInfo.PropType^.Kind in [tkString, tkLString]) then
+    if not (SourceInfo.PropType^.Kind in [tkString, tkLString {$IFDEF GX_VER200_up}, tkUString{$ENDIF}]) then
       Exit;
 
     if ClassLevel(GetObjectPropClass(DestParentObject, DestParentInfo.Name), TComponent) < 0 then

@@ -2654,6 +2654,7 @@ type
       6: (VChar: Char);
       7: (VWChar: WideChar);
       8: (VFloat: Extended);
+      9: (UString: PChar);
     end;
 
 function GxOtaGetComponentPropertyAsString(const AComponent: IOTAComponent;
@@ -2678,6 +2679,9 @@ begin
 
   case PropertyType of
     tkLString: Result := Buffer.LString;
+    {$IFDEF GX_VER200_up}
+    tkUString: Result := Buffer.UString;
+    {$ENDIF}
     tkString:  Result := Buffer.SString;
     tkInteger: Result := IntToStr(Buffer.Int);
     tkInt64:   Result := IntToStr(Buffer.Int64);
@@ -2754,6 +2758,7 @@ var
   VInt64           : Int64;
   VVariant         : Variant;
   VAString         : AnsiString;
+  VUString         : string;
   VShortString     : string;
   VFloat           : Extended;
   VAChar           : AnsiChar;
@@ -2782,6 +2787,13 @@ begin
         VAString := Value;
         Result := AComponent.SetPropByName(PropertyName, VAString);
       end;
+
+    {$IFDEF GX_VER200_up}
+    tkUString: begin
+        VUString := Value;
+        Result := AComponent.SetPropByName(PropertyName, VUString);
+      end;
+    {$ENDIF}
 
     tkString: begin
         VShortString := Value;

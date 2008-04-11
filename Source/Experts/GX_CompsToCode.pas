@@ -514,10 +514,10 @@ var
       propName2: string;
     begin
       // Get string properties
-      Count := GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray], nil);
+      Count := GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray {$IFDEF GX_VER200_up}, tkUString {$ENDIF}], nil);
       Size := Count * SizeOf(Pointer);
       GetMem(PropList, Size);
-      GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray], PropList);
+      GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray {$IFDEF GX_VER200_up}, tkUString {$ENDIF}], PropList);
 
       p := Pos('.', propName);
       if p <> 0 then

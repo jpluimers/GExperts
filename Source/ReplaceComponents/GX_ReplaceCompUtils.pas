@@ -256,7 +256,7 @@ begin
       Result := IsDefaultOrdProp;
     tkFloat:
       Result := IsDefaultFloatProp;
-    tkString, tkLString, tkWString:
+    tkString, tkLString, tkWString {$IFDEF GX_VER200_up}, tkUString {$ENDIF}:
       Result := IsDefaultStrProp;
     tkVariant:
       Result := IsDefaultVariantProp;

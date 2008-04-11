@@ -1054,7 +1054,7 @@ begin
   case AKind of
     tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString,
     tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant,
-    tkArray, tkRecord, tkInterface, tkInt64, tkDynArray:
+    tkArray, tkRecord, tkInterface, tkInt64, tkDynArray {$IFDEF GX_VER200_up}, tkUString {$ENDIF}:
       Result := VarAsType(AValue, varString);
   else
     {$IFOPT D+} SendDebug('Unknown value passed to GetValueAsString');  {$ENDIF}
