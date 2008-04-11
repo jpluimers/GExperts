@@ -81,14 +81,17 @@ object fmOpenFile: TfmOpenFile
             Columns = <
               item
                 Caption = 'File'
+                MinWidth = 55
                 Width = 170
               end
               item
                 AutoSize = True
                 Caption = 'Path'
+                MinWidth = 55
               end
               item
                 Caption = 'Extension'
+                MinWidth = 55
                 Width = 63
               end>
             DragMode = dmAutomatic

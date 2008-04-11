@@ -143,6 +143,7 @@ type
     FInitialFileType: string;
     FCurrentListView: TListView;
     FCurrentFilePaths: TStringList;
+    FFileColumnWidth: Integer;
     procedure SearchPathReady;
     procedure FilterVisibleUnits;
     procedure SelectMatchingItemInList;
@@ -166,6 +167,8 @@ type
     function ConfigurationKey: string;
     procedure CopyColumns(Source: TListView);
     procedure ResizeListViewColumns;
+    procedure SetCurrentListView(const Value: TListView);
+    property CurrentListView: TListView read FCurrentListView write SetCurrentListView;
   public
     property ActivePageIndex: Integer read GetActivePageIndex write SetActivePageIndex;
     property AvailableFiles: TAvailableFiles read FAvailableFiles write FAvailableFiles;
@@ -450,7 +453,7 @@ begin
 
   FreeAndNil(FCommonThread);
   FCommonThread := TFileFindThread.Create;
-  FCOmmonThread.RecursiveSearchDirs.Add(ExtractFilePath(GetIdeRootDirectory) + AddSlash('Source'));
+  FCommonThread.RecursiveSearchDirs.Add(ExtractFilePath(GetIdeRootDirectory) + AddSlash('Source'));
   FCommonThread.FileMasks.CommaText := '*.pas,*.cpp,*.cs,*.inc,*.dfm';
   FCommonThread.OnFindComplete := CommonSearchComplete;
   FCommonThread.StartFind;
@@ -638,14 +641,15 @@ begin
   lvCommon.DoubleBuffered := True;
   lvProjects.DoubleBuffered := True;
   lvRecent.DoubleBuffered := True;
-  CopyColumns(lvSearchPath);
 end;
 
 procedure TfmOpenFile.SearchPathReady;
 begin
   FilterVisibleUnits;
+  lvSearchPath.HandleNeeded;
   lvSearchPath.Color := clWindow;
   lvSearchPath.Enabled := True;
+  lvCommon.HandleNeeded;
   lvCommon.Color := clWindow;
   lvCommon.Enabled := True;
 end;
@@ -667,42 +671,40 @@ var
   i: Integer;
 begin
   pcUnits.ActivePage.OnShow(pcUnits.ActivePage);
-  FCurrentListView.Items.BeginUpdate;
+  CurrentListView.Items.BeginUpdate;
   try
-    FCurrentListView.Items.Clear;
-    FCurrentListView.SortType := stNone;
+    CurrentListView.Items.Clear;
+    CurrentListView.SortType := stNone;
     for i := 0 to FCurrentFilePaths.Count - 1 do
     begin
       SearchValue := ExtractPureFileName(FCurrentFilePaths[i]);
 
       if Length(edtFilter.Text) = 0 then
-        AddListItem(FCurrentListView, FCurrentFilePaths[i])
+        AddListItem(CurrentListView, FCurrentFilePaths[i])
       else
         if tbnMatchAnywhere.Down then
         begin
           if StrContains(edtFilter.Text, SearchValue, False) then
-            AddListItem(FCurrentListView, FCurrentFilePaths[i]);
+            AddListItem(CurrentListView, FCurrentFilePaths[i]);
         end
         else
           if StrBeginsWith(edtFilter.Text, SearchValue, False) then
-            AddListItem(FCurrentListView, FCurrentFilePaths[i]);
+            AddListItem(CurrentListView, FCurrentFilePaths[i]);
     end;
-    FCurrentListView.SortType := stText;
+    CurrentListView.SortType := stText;
     SelectMatchingItemInList;
   finally
-    FCurrentListView.Items.EndUpdate;
+    CurrentListView.Items.EndUpdate;
   end;
   ResizeListViewColumns;
 end;
 
 procedure TfmOpenFile.SelectMatchingItemInList;
 var
-  CurrentListView: TListView;
   i, SelIndex: Integer;
   FilterText: string;
   ListItem: TListItem;
 begin
-  CurrentListView := FCurrentListView;
   if CurrentListView.Items.Count > 0 then
   begin
     SelIndex := 0;
@@ -729,7 +731,7 @@ var
 begin
   if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
   begin
-    ListBox := FCurrentListView;
+    ListBox := CurrentListView;
     if ListBox.Items.Count > 1 then
       ListBox.Perform(WM_KEYDOWN, Key, 0)
     else
@@ -758,7 +760,7 @@ var
   FileName: string;
 begin
   FAvailableFiles.Terminate;
-  Src := FCurrentListView;
+  Src := CurrentListView;
   if Src.SelCount > 0 then
     for i := 0 to Src.Items.Count - 1 do
       if Src.Items[i].Selected then
@@ -820,8 +822,17 @@ begin
     pcUnits.ActivePageIndex := Value;
 end;
 
+procedure TfmOpenFile.SetCurrentListView(const Value: TListView);
+begin
+  FCurrentListView := Value;
+  if Assigned(CurrentListView) then
+    CurrentListView.HandleNeeded;
+end;
+
 procedure TfmOpenFile.FormShow(Sender: TObject);
 begin
+  lvSearchPath.Columns[0].Width := FFileColumnWidth;
+  CopyColumns(lvSearchPath);
   ResizeListViewColumns;
   tabSearchPathShow(tabSearchPath);
   InitializeFileTypes(FInitialFileType);
@@ -847,9 +858,8 @@ end;
 
 procedure TfmOpenFile.ResizeListViewColumns;
 begin
-  Exit; // This is done using Column.AutoSize for now
-  if Assigned(FCurrentListView) then
-    ListViewResizeColumn(FCurrentListView, 1);
+  if Assigned(CurrentListView) then
+    ListViewResizeColumn(CurrentListView, 1);
 end;
 
 procedure TfmOpenFile.cbxTypeChange(Sender: TObject);
@@ -871,25 +881,25 @@ end;
 
 procedure TfmOpenFile.tabSearchPathShow(Sender: TObject);
 begin
-  FCurrentListView := lvSearchPath;
+  CurrentListView := lvSearchPath;
   FCurrentFilePaths := AvailableFiles.SearchPathFiles;
 end;
 
 procedure TfmOpenFile.tabProjectShow(Sender: TObject);
 begin
-  FCurrentListView := lvProjects;
+  CurrentListView := lvProjects;
   FCurrentFilePaths := AvailableFiles.ProjectFiles;
 end;
 
 procedure TfmOpenFile.tabCommonShow(Sender: TObject);
 begin
-  FCurrentListView := lvCommon;
+  CurrentListView := lvCommon;
   FCurrentFilePaths := AvailableFiles.CommonFiles;
 end;
 
 procedure TfmOpenFile.tabFavoriteShow(Sender: TObject);
 begin
-  FCurrentListView := lvFavorite;
+  CurrentListView := lvFavorite;
   if cbxType.ItemIndex = -1 then
     FCurrentFilePaths := nil
   else
@@ -898,7 +908,7 @@ end;
 
 procedure TfmOpenFile.tabRecentShow(Sender: TObject);
 begin
-  FCurrentListView := lvRecent;
+  CurrentListView := lvRecent;
   if cbxType.ItemIndex = -1 then
     FCurrentFilePaths := nil
   else
@@ -964,8 +974,8 @@ end;
 // This is a hack to force the column 0 headers on hidden tabs to repaint
 procedure TfmOpenFile.UMRefreshList(var Msg: TMessage);
 begin
-  if Assigned(FCurrentListView) then
-    FCurrentListView.Width := FCurrentListView.Width - 1;
+  if Assigned(CurrentListView) then
+    CurrentListView.Width := CurrentListView.Width - 1;
 end;
 
 procedure TfmOpenFile.AddFavoriteFile(FileName: string);
@@ -989,9 +999,9 @@ procedure TfmOpenFile.actAddToFavoritesExecute(Sender: TObject);
 var
   i: Integer;
 begin
-  for i := 0 to FCurrentListView.Items.Count - 1 do
-    if FCurrentListView.Items[i].Selected then
-      AddFavoriteFile(MakeFileName(FCurrentListView.Items[i]));
+  for i := 0 to CurrentListView.Items.Count - 1 do
+    if CurrentListView.Items[i].Selected then
+      AddFavoriteFile(MakeFileName(CurrentListView.Items[i]));
 end;
 
 procedure TfmOpenFile.actFavAddToFavoritesExecute(Sender: TObject);
@@ -1046,6 +1056,7 @@ begin
   Settings := TGExpertsSettings.Create;
   try
     Settings.LoadForm(Self, ConfigurationKey + '\OpenFileForm');
+    FFileColumnWidth := Settings.ReadInteger(ConfigurationKey, 'FileColumnWidth', lvSearchPath.Columns[0].Width);
   finally
     FreeAndNil(Settings);
   end;
@@ -1059,6 +1070,8 @@ begin
   Settings := TGExpertsSettings.Create;
   try
     Settings.SaveForm(Self, ConfigurationKey + '\OpenFileForm');
+    if Assigned(CurrentListView) then
+      Settings.WriteInteger(ConfigurationKey, 'FileColumnWidth', CurrentListView.Columns[0].Width);
   finally
     FreeAndNil(Settings);
   end;
