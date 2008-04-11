@@ -208,7 +208,7 @@ end;
 procedure TfmGrepResults.Execute(DoRefresh: Boolean);
 resourcestring
   SGrepActive = 'A Grep search is currently active; either abort it or wait until it is finished.';
-  SGrepSearchStats = 'Searched %d files in %.2f seconds';
+  SGrepSearchStats = 'Searched %d files in %.2f seconds for "%s"';
   SMatches = '%d matches';
 var
   TimeStart: TDateTime;
@@ -246,7 +246,7 @@ begin
     FSearchInProgress := False;
   end;
 
-  SetStatusString(Format(SGrepSearchStats, [FilesSearched, (Now - TimeStart) * 24*60*60]));
+  SetStatusString(Format(SGrepSearchStats, [FilesSearched, (Now - TimeStart) * 24*60*60, FGrepSettings.Pattern]));
 
   lbResults.Sorted := True;  // There is no Sort method
   lbResults.Sorted := False;
