@@ -426,21 +426,14 @@ begin
     SearchForm
   else
   begin
-    if (UpperFileExt = '.PAS') or (UpperFileExt = '.INC') or (UpperFileExt = '.DPR') then
+    if StringInArray(UpperFileExt, ['.PAS', '.INC', '.DPR']) then
       DoSearch(fcPas)
-    else if (UpperFileExt = '.CPP') then
-    begin
-      DoSearch(fcCPP);
-      FileName := ChangeFileExt(FileName, '.h');
-      Reset;
-      DoSearch(fcCPP);
-    end
-    else if (UpperFileExt = '.H') or (UpperFileExt = '.HPP') then
+    else if StringInArray(UpperFileExt, ['.CPP', '.C', '.HPP', '.H']) then
       DoSearch(fcCPP)
     else
       DoSearch(fcNone);
 
-    if FIncludeForms and ((UpperFileExt = '.PAS') or (UpperFileExt = '.CPP')) then
+    if FIncludeForms and StringInArray(UpperFileExt, ['.PAS', '.CPP']) then
       SearchForm;
   end;
 end;

@@ -1106,6 +1106,7 @@ begin
     FGrepSettings.CanRefresh := True;
     SetMatchString('');
     Dlg.RetrieveSettings(FGrepSettings);
+    Dlg.GrepExpert.SaveSettings;
     Result := True;
   finally
     FreeAndNil(Dlg);

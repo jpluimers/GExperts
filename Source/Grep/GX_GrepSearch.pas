@@ -47,7 +47,6 @@ type
     procedure SaveFormSettings;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure RetrieveSettings(var Value: TGrepSettings);
     property GrepExpert: TGrepExpert read FGrepExpert;
   end;
@@ -58,7 +57,7 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Click(Sender: TObject); override;
-    procedure Configure; override;    
+    procedure Configure; override;
   end;
 
 implementation
@@ -215,21 +214,14 @@ begin
     end;
   end;
 
+  SaveFormSettings;
   ModalResult := mrOk;
 end;
 
 constructor TfmGrepSearch.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-
+  inherited;
   LoadFormSettings;
-end;
-
-destructor TfmGrepSearch.Destroy;
-begin
-  SaveFormSettings;
-
-  inherited Destroy;
 end;
 
 procedure TfmGrepSearch.SaveFormSettings;

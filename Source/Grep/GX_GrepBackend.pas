@@ -120,8 +120,6 @@ type
     FSearchRoot: string;
     procedure FoundIt(Sender: TObject; LineNo: Integer; const Line: string;
       SPos, EPos: Integer);
-    //procedure WideFoundIt(Sender: TObject; LineNo: Integer; const Line: WideString;
-    //  SPos, EPos: Integer);
     procedure StartFileSearch(Sender: TObject);
   private
     FGrepSettings: TGrepSettings;
@@ -474,7 +472,6 @@ begin
   FSearcher := TSearcher.Create('');
   try
     FSearcher.OnFound := FoundIt;
-    //FSearcher.OnFound := WideFoundIt;
     FSearcher.OnStartSearch := StartFileSearch;
 
     FSearcher.NoComments := FGrepSettings.NoComments;
@@ -525,14 +522,6 @@ begin
 end;
 
 procedure TGrepSearchRunner.FoundIt(Sender: TObject; LineNo: Integer; const Line: string; SPos, EPos: Integer);
-(*
-begin
-  WideFoundIt(Sender, LineNo, Line, SPos, EPos);
-end;
-
-procedure TGrepSearchRunner.WideFoundIt(Sender: TObject; LineNo: Integer;
-  const Line: WideString; SPos, EPos: Integer);
-*)
 var
   ALineResult: TLineResult;
   AMatchResult: TMatchResult;
