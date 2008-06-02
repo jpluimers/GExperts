@@ -50,8 +50,11 @@
       <Excluded_Packages Name="$(BDS)\bin\dcltee7100.bpl">TeeChart Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclado100.bpl">CodeGear ADO DB Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclie100.bpl">Internet Explorer Components</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\bcbie100.bpl">CodeGear C++Builder Internet Explorer 5 Components Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclwebsnap100.bpl">CodeGear WebSnap Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclsoap100.bpl">CodeGear SOAP Components</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\dbx100.bpl">CodeGear SQL Explorer UI Package</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\designdgm100.bpl">CodeGear Module Diagram Editview</Excluded_Packages>
     </Excluded_Packages></Delphi.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
