@@ -382,6 +382,7 @@
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
               <Property name="IncludeCompileDate" type="WordBool">True</Property>
+              <Property name="IncludeManifest" type="Boolean">False</Property>
               <Property name="IncludeVerInfo" type="WordBool">True</Property>
               <Property name="IsAction" type="Boolean">True</Property>
               <Property name="IsBreakPoint" type="WordBool">False</Property>
@@ -395,13 +396,14 @@
               <Property name="Locale" type="Integer">1033</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MajorVersion" type="Integer">1</Property>
+              <Property MultiValue="0" name="ManifestFile" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="MinorVersion" type="Integer">3</Property>
               <Property name="NodeCollapsed" type="Boolean">False</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsD6.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">2</Property>
+              <Property name="ReleaseVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -416,7 +418,7 @@
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
               <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 6
-FileVersion=1.3.2.0
+FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 6
 OriginalFilename=GExpertsD6.dll
 ProductName=GExperts for Delphi 6
@@ -467,7 +469,7 @@ Action.BuildVersion = BuildVersion
                 <Property name="IncludeRemoteSymbols" type="WordBool">False</Property>
                 <Property name="IncludeTD32" type="WordBool">False</Property>
                 <Property name="IOChecking" type="WordBool">True</Property>
-                <Property MultiValue="0" name="LibraryPath" type="WideString">$(DELPHI)\Lib;$(DELPHI)\Bin;$(DELPHI)\Imports;%BorlandDir%\SynEdit\Source;%BorlandDir%\VCLZip;%BorlandDir%\ACE\D6</Property>
+                <Property MultiValue="0" name="LibraryPath" type="WideString">$(DELPHI)\Lib;$(DELPHI)\Bin;$(DELPHI)\Imports;%BorlandDir%\SynEdit\Source</Property>
                 <Property name="LinkerOutput" type="Integer">0</Property>
                 <Property name="LocalSymbols" type="WordBool">False</Property>
                 <Property name="Mapfile" type="Integer">0</Property>
@@ -632,6 +634,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
               <Property name="IncludeCompileDate" type="WordBool">True</Property>
+              <Property name="IncludeManifest" type="Boolean">False</Property>
               <Property name="IncludeVerInfo" type="WordBool">True</Property>
               <Property name="IsAction" type="Boolean">True</Property>
               <Property name="IsBreakPoint" type="WordBool">False</Property>
@@ -645,13 +648,14 @@ Action.BuildVersion = BuildVersion
               <Property name="Locale" type="Integer">1033</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MajorVersion" type="Integer">1</Property>
+              <Property MultiValue="0" name="ManifestFile" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="MinorVersion" type="Integer">3</Property>
               <Property name="NodeCollapsed" type="Boolean">False</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsD7.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">2</Property>
+              <Property name="ReleaseVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -666,7 +670,7 @@ Action.BuildVersion = BuildVersion
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
               <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 7
-FileVersion=1.3.2.0
+FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 7
 OriginalFilename=GExpertsD7.dll
 ProductName=GExperts for Delphi 7
@@ -717,7 +721,7 @@ Action.BuildVersion = BuildVersion
                 <Property name="IncludeRemoteSymbols" type="WordBool">False</Property>
                 <Property name="IncludeTD32" type="WordBool">False</Property>
                 <Property name="IOChecking" type="WordBool">True</Property>
-                <Property MultiValue="0" name="LibraryPath" type="WideString">$(DELPHI)\Lib;$(DELPHI)\Bin;$(DELPHI)\Imports;%BorlandDir%\Ace\D6;%BorlandDir%\SynEdit\Source;%BorlandDir%\VCLZip</Property>
+                <Property MultiValue="0" name="LibraryPath" type="WideString">$(DELPHI)\Lib;$(DELPHI)\Bin;$(DELPHI)\Imports;$(DELPHI)\Projects\Bpl;%BorlandDir%\SynEdit\Source</Property>
                 <Property name="LinkerOutput" type="Integer">0</Property>
                 <Property name="LocalSymbols" type="WordBool">False</Property>
                 <Property name="Mapfile" type="Integer">0</Property>
@@ -871,7 +875,7 @@ Action.BuildVersion = BuildVersion
                 <Property name="PrivateBuild" type="Boolean">False</Property>
                 <Property MultiValue="1" name="ProductName" type="string"><![CDATA[GExperts IDE Addin]]>
                   </Property>
-                <Property MultiValue="0" name="ProductVersion" type="string">1.32</Property>
+                <Property MultiValue="0" name="ProductVersion" type="string">1.33</Property>
                 <Property name="ReleaseVersion" type="Integer">2</Property>
                 <Property name="SpecialBuild" type="Boolean">False</Property>
                 </Object>
@@ -1206,6 +1210,7 @@ DLL=-1
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
               <Property name="IncludeCompileDate" type="WordBool">True</Property>
+              <Property name="IncludeManifest" type="Boolean">False</Property>
               <Property name="IncludeVerInfo" type="WordBool">True</Property>
               <Property name="IsAction" type="Boolean">True</Property>
               <Property name="IsBreakPoint" type="WordBool">False</Property>
@@ -1219,13 +1224,14 @@ DLL=-1
               <Property name="Locale" type="Integer">1033</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MajorVersion" type="Integer">1</Property>
+              <Property MultiValue="0" name="ManifestFile" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="MinorVersion" type="Integer">3</Property>
               <Property name="NodeCollapsed" type="Boolean">False</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsDelphi2005.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">2</Property>
+              <Property name="ReleaseVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -1240,7 +1246,7 @@ DLL=-1
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
               <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 9
-FileVersion=1.3.2.0
+FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 9
 OriginalFilename=GExpertsD9.dll
 ProductName=GExperts for Delphi 9
@@ -1456,6 +1462,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
               <Property name="IncludeCompileDate" type="WordBool">True</Property>
+              <Property name="IncludeManifest" type="Boolean">False</Property>
               <Property name="IncludeVerInfo" type="WordBool">True</Property>
               <Property name="IsAction" type="Boolean">True</Property>
               <Property name="IsBreakPoint" type="WordBool">False</Property>
@@ -1469,13 +1476,14 @@ Action.BuildVersion = BuildVersion
               <Property name="Locale" type="Integer">1033</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MajorVersion" type="Integer">1</Property>
+              <Property MultiValue="0" name="ManifestFile" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="MinorVersion" type="Integer">3</Property>
               <Property name="NodeCollapsed" type="Boolean">False</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsBDS2006.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">2</Property>
+              <Property name="ReleaseVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -1490,7 +1498,7 @@ Action.BuildVersion = BuildVersion
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
               <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for BDS 2006
-FileVersion=1.3.2.0
+FileVersion=1.3.3.0
 InternalName=GExperts for BDS 2006
 OriginalFilename=GExpertsBDS2006.dll
 ProductName=GExperts for BDS 2006
@@ -1707,6 +1715,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
               <Property name="IncludeCompileDate" type="WordBool">True</Property>
+              <Property name="IncludeManifest" type="Boolean">False</Property>
               <Property name="IncludeVerInfo" type="WordBool">True</Property>
               <Property name="IsAction" type="Boolean">True</Property>
               <Property name="IsBreakPoint" type="WordBool">False</Property>
@@ -1720,13 +1729,14 @@ Action.BuildVersion = BuildVersion
               <Property name="Locale" type="Integer">1033</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MajorVersion" type="Integer">1</Property>
+              <Property MultiValue="0" name="ManifestFile" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="MinorVersion" type="Integer">3</Property>
               <Property name="NodeCollapsed" type="Boolean">False</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsDelphi2007.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">2</Property>
+              <Property name="ReleaseVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -1741,7 +1751,7 @@ Action.BuildVersion = BuildVersion
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
               <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 2007
-FileVersion=1.3.2.0
+FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 2007
 OriginalFilename=GExpertsDelphi2007.dll
 ProductName=GExperts for Delphi 2007
@@ -1996,7 +2006,7 @@ Action.BuildVersion = BuildVersion
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
         </Object>
       <Object Class="TFBVariable" XMLID="{EE033A11-3573-4496-96E5-B25A22952A74}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="1" name="DefaultValue" type="string"><![CDATA[C:\Program Files (x86)\Dev\Inno Setup\iscc.exe]]>
+        <Property MultiValue="1" name="DefaultValue" type="string"><![CDATA[C:\Program Files (x86)\Development\Inno Setup\iscc.exe]]>
           </Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
@@ -2005,7 +2015,7 @@ Action.BuildVersion = BuildVersion
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
         </Object>
       <Object Class="TFBVariable" XMLID="{55F09ED1-BE0B-4ED6-B681-1ACC70B14C75}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">1.32</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">1.33</Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
         <Property name="MakeEnv" type="Boolean">False</Property>
@@ -2013,7 +2023,7 @@ Action.BuildVersion = BuildVersion
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
         </Object>
       <Object Class="TFBVariable" XMLID="{EDF763E4-AAAB-4116-951F-AB12B1241BA6}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">132</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">133</Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
         <Property name="MakeEnv" type="Boolean">False</Property>
@@ -2021,7 +2031,7 @@ Action.BuildVersion = BuildVersion
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
         </Object>
       <Object Class="TFBVariable" XMLID="{D33A8AB7-CD8E-4021-A772-EB17D1DFCE27}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">2</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">3</Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
         <Property name="MakeEnv" type="Boolean">False</Property>
