@@ -69,8 +69,10 @@ function RunningDelphi7OrLess: Boolean;
 function RunningDelphi7OrGreater: Boolean;
 function RunningDelphi2005: Boolean;
 function RunningDelphi2007: Boolean;
+function RunningDelphi2007OrLess: Boolean;
 function RunningDelphi2007OrGreater: Boolean;
 function RunningRS2008OrGreater: Boolean;
+function RunningBDS2006OrLess: Boolean;
 function RunningBDS2006OrGreater: Boolean;
 function RunningBDS2006: Boolean;
 function RunningCPPBuilder: Boolean;
@@ -429,6 +431,15 @@ begin
   {$ENDIF}
 end;
 
+function RunningDelphi2007OrLess: Boolean;
+begin
+  {$IFDEF GX_VER200_up}
+  Result := False;
+  {$ELSE}
+  Result := True;
+  {$ENDIF}
+end;
+
 function RunningDelphi2007OrGreater: Boolean;
 begin
   {$IFDEF GX_VER185_up}
@@ -454,6 +465,11 @@ begin
   {$ELSE}
   Result := False;
   {$ENDIF}
+end;
+
+function RunningBDS2006OrLess: Boolean;
+begin
+  Result := not RunningDelphi2007OrGreater;
 end;
 
 function RunningBDS2006: Boolean;
