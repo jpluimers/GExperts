@@ -24,7 +24,7 @@ unit GpTextStream;
 
 This software is distributed under the BSD license.
 
-Copyright (c) 2006, Primoz Gabrijelcic
+Copyright (c) 2008, Primoz Gabrijelcic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -50,11 +50,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author           : Primoz Gabrijelcic
    Creation date    : 2001-07-17
-   Last modification: 2006-08-30
-   Version          : 1.04a
+   Last modification: 2008-05-26
+   Version          : 1.06
    </pre>
 *)(*
    History:
+     1.06: 2008-05-26
+       - Changed Char -> AnsiChar in preparation for the Unicode Delphi. 
+     1.05: 2008-05-05
+       - Exported StringToWideString, WideStringToString, and GetDefaultAnsiCodepage.
      1.04a: 2006-08-30
        - Bug fixed: When cfUseLF was set, /CR/ was used as line delimiter in Writeln (/LF/
          should be used).
@@ -228,7 +232,11 @@ type
     }
     property  WindowsError: DWORD read GetWindowsError;
   end; { TGpTextStream }
-               
+
+function StringToWideString(const s: AnsiString; codePage: word): WideString;
+function WideStringToString (const ws: WideString; codePage: Word): AnsiString;
+function GetDefaultAnsiCodepage(LangID: LCID; defCP: integer): word;
+
 implementation
 
 uses
@@ -257,7 +265,7 @@ const
 
   {:Third byte of UTF-8 BOM.
   }
-  CUTF8BOM3: Char = Char($BF);
+  CUTF8BOM3: AnsiChar = AnsiChar($BF);
 
   {:Size of preallocated buffer used for 8 to 16 to 8 bit conversions in
     TGpTextStream.
@@ -304,7 +312,7 @@ var
 begin
   if ws = '' then
     Result := ''
-  else begin
+  else begin 
     l := WideCharToMultiByte(codePage,
            WC_COMPOSITECHECK or WC_DISCARDNS or WC_SEPCHARS or WC_DEFAULTCHAR,
            @ws[1], -1, nil, 0, nil, nil);
@@ -386,7 +394,7 @@ var
   c1 : byte;
   c2 : byte;
   ch : byte;
-  pch: PChar;
+  pch: PAnsiChar;
   pwc: PWideChar;
 begin
   pch := @utf8Buf;
@@ -434,11 +442,11 @@ end; { UTF8BufToWideCharBuf }
                   a valid language ID.
   @returns Default Ansi codepage for LangID or 'defCP' in case of error.
 }
-function GetDefaultAnsiCodepage (LangID: LCID; defCP: integer): word;
+function GetDefaultAnsiCodepage(LangID: LCID; defCP: integer): word;
 var
   p: array [0..255] of char;
 begin
-  if GetLocaleInfo (LangID, 4100, p, High (p)) > 0 then
+  if GetLocaleInfo(LangID, 4100, p, High (p)) > 0 then
     Result := StrToIntDef(p,defCP)
   else
     Result := defCP;
@@ -552,7 +560,7 @@ end; { TGpTextStream.IsUnicodeCodepage }
 procedure TGpTextStream.PrepareStream;
 var
   marker : WideChar;
-  marker3: Char;
+  marker3: AnsiChar;
   marker4: UCS4Char;
 begin
   case tsAccess of
@@ -583,7 +591,7 @@ begin
             Codepage := CP_UNICODE;
           end
           else if (marker = CUTF8BOM12) and (WrappedStream.Size >= 3) then begin
-            WrappedStream.Read(marker3, SizeOf(Char));
+            WrappedStream.Read(marker3, SizeOf(AnsiChar));
             if marker3 = CUTF8BOM3 then begin
               tsCreateFlags := tsCreateFlags + [tscfUnicode];
               Codepage := CP_UTF8;
@@ -609,7 +617,7 @@ begin
             WrappedStream.Write(CUnicodeNormal,SizeOf(WideChar))
           else if tscfWriteUTF8BOM in tsCreateFlags then begin
             WrappedStream.Write(CUTF8BOM12,SizeOf(WideChar));
-            WrappedStream.Write(CUTF8BOM3,SizeOf(Char));
+            WrappedStream.Write(CUTF8BOM3,SizeOf(AnsiChar));
           end;
         end;
       end; //tsaccWrite
@@ -626,7 +634,7 @@ begin
             WrappedStream.Write(CUnicodeNormal,SizeOf(WideChar))
           else if tscfWriteUTF8BOM in tsCreateFlags then begin
             WrappedStream.Write(CUTF8BOM12,SizeOf(WideChar));
-            WrappedStream.Write(CUTF8BOM3,SizeOf(Char));
+            WrappedStream.Write(CUTF8BOM3,SizeOf(AnsiChar));
           end;
         end;
       end; //tsaccReadWrite
@@ -657,7 +665,7 @@ begin
             Codepage := CP_UNICODE;
           end
           else if (marker = CUTF8BOM12) and (WrappedStream.Size >= 3) then begin
-            WrappedStream.Read(marker3,SizeOf(Char));
+            WrappedStream.Read(marker3,SizeOf(AnsiChar));
             if marker3 = CUTF8BOM3 then begin
               tsCreateFlags := tsCreateFlags + [tscfUnicode];
               Codepage := CP_UTF8;
@@ -669,7 +677,7 @@ begin
             WrappedStream.Write(CUnicodeNormal,SizeOf(WideChar))
           else if tscfWriteUTF8BOM in tsCreateFlags then begin
             WrappedStream.Write(CUTF8BOM12,SizeOf(WideChar));
-            WrappedStream.Write(CUTF8BOM3,SizeOf(Char));
+            WrappedStream.Write(CUTF8BOM3,SizeOf(AnsiChar));
           end;
         end;
         WrappedStream.Position := WrappedStream.Size;
@@ -1006,15 +1014,15 @@ begin
   end
   else begin
     if tscfUseLF in tsCreateFlags then begin
-      ch := Char($0A);
-      Result := (WrappedStream.Write(ch,SizeOf(Char)) = SizeOf(Char));
+      ch := AnsiChar($0A);
+      Result := (WrappedStream.Write(ch,SizeOf(AnsiChar)) = SizeOf(AnsiChar));
     end
     else begin
-      ch := Char($0D);
-      Result := (WrappedStream.Write(ch,SizeOf(Char)) = SizeOf(Char));
+      ch := AnsiChar($0D);
+      Result := (WrappedStream.Write(ch,SizeOf(AnsiChar)) = SizeOf(AnsiChar));
       if Result then begin
-        ch := Char($0A);
-        Result := (WrappedStream.Write(ch,SizeOf(Char)) = SizeOf(Char));
+        ch := AnsiChar($0A);
+        Result := (WrappedStream.Write(ch,SizeOf(AnsiChar)) = SizeOf(AnsiChar));
       end;
     end;
   end;
