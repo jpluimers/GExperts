@@ -7,7 +7,7 @@
 
 This software is distributed under the BSD license.
 
-Copyright (c) 2006, Primoz Gabrijelcic
+Copyright (c) 2008, Primoz Gabrijelcic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -34,9 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Author            : Primoz Gabrijelcic
    Creation date     : 2003-11-10
    Last modification : 2006-11-23
-   Version           : 1.12a
+   Version           : 2.0
 </pre>*)(*
    History:
+     2.0: 2008-05-31
+       - Added Unicode support to the underlying storage. File and folder names are stored
+         in UTF-16, as are attribute names and values. API is still based on Delphi's
+         'string' type - meaning that values are converted to Unicode and back on the fly
+         using the current locale.
+       - Existing structured storage files will be upgraded automatically if they are not
+         open for readonly access. Applications, compiled with GpStructuredStorage 1.x
+         will not be able to read new/upgraded files. Version is incremented to 2.0.0.0
+         when 1.x file is opened unless it is opened in readonly mode. Newly created
+         storages have version 2.0.0.0.
      1.12a: 2006-12-06
        - Fixed potential accvio in TGpStructuredStorage destructor.
      1.12: 2006-11-23
@@ -104,8 +114,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
        - Free list is reordered in ascending order on Destroy.
      1.01: 2004-02-16
        - Added DeleteFile.
-     1.0: 2004-02-16
-       - Created.
 *)
 
 unit GpStructuredStorage;
@@ -135,14 +143,14 @@ type
   //accessors
     function  GetAttribute(const attributeName: string): string;
     function  GetSize: cardinal;
-    procedure SetAttribute(const attributeName, value: string);
+    procedure SetAttribute(const attributeName: string; const value: string);
     procedure SetSize(value: cardinal);
   //public
     //:Fills the list with all defined attribute names.
     procedure AttributeNames({out} attributes: TStrings);
     //:File attributes.
-    property Attribute[const attributeName: string]: string
-      read GetAttribute write SetAttribute;
+    property Attribute[const attributeName: string]: string read GetAttribute write
+      SetAttribute;
     //:File size.
     property Size: cardinal read GetSize write SetSize;
   end; { IGpStructuredFileInfo }
@@ -173,7 +181,8 @@ type
        storage is open read-only.
        @param   fileName Absolute path of the file to be created/open. Must start with a
                          folder delimiter (\ or /) and can contain any ascii character
-                         except #0, \ and /.
+                         except #0, \ and /. In Unicode Delphis, all Unicode characters
+                         except mentioned three are allowed.
        @returns Nil if file does not exist and mode is not fmCreate; an object
                 representing the file otherwise. Caller is responsible for destroying this
                 object. *)
@@ -191,7 +200,7 @@ type
     function  FolderExists(const folderName: string): boolean;
     //:Returns list of files in folder 'folderName'.
     procedure FileNames(const folderName: string; {out} files: TStrings);
-    //:Returns list of folders in folder 'folderName'. 
+    //:Returns list of folders in folder 'folderName'.
     procedure FolderNames(const folderName: string; {out} folders: TStrings);
     //:Fast way to check if folder is empty.
     function  IsFolderEmpty(const folderName: string): boolean;
@@ -223,12 +232,13 @@ uses
   GpMemStr;
 
 const
-  CVersion: cardinal = $01000200; // 1.0.2.0
+  CLowestSupported: cardinal = $01000200; // 1.0.2.0
+  CVersion:         cardinal = $02000000; // 2.0.0.0
 
   CBlockSize          = 1024 {bytes};
   CFATEntriesPerBlock = CBlockSize div 4;
 
-  CSignature   = 'GpStructuredStorage file'#13#10#26#0;
+  CSignature: AnsiString   = 'GpStructuredStorage file'#13#10#26#0;
 
   //Numerical attribute representation. When changing, modify methods NumToAttributes and AttributesToNum.
   CAttrIsFolder        = $00000001;
@@ -246,7 +256,7 @@ const
   <=256 x [block:FOLDER/FILE:1024]
 
   HEADER:
-  [signature:32]                     // PChar
+  [signature:32]                     // AnsiChar
   [unused:964]
   [storage attribute file:4]
   [storage attribute file size:4]
@@ -267,8 +277,9 @@ const
   [0:2]
 
   FILE_INFO:
-  [file name length:2]
-  [file name:1..65535]
+  [file name length:2]               // highest bit is used to separate Ansi file name (0)
+                                     // from Unicode UTF-16 (1)
+  [file name:1..32767]               // UTF-16
   [file attributes:ATTRIBUTES:4]
   [file length:4]                    // 4 GB per file
   [first file block:4]
@@ -282,6 +293,12 @@ const
 *)
 
 type
+  {$IFDEF Unicode}
+  TUnicodeString = string;
+  {$ELSE}
+  TUnicodeString = WideString;
+  {$ENDIF Unicode}
+
   {:Stream wrapper, used for all accesses to structured storage.
     @since   2004-01-06
   }
@@ -321,13 +338,13 @@ type
     constructor Create(storage: TGpStructuredStream);
     function  CreateHeader: boolean;
     function  LoadHeader: boolean;
+    property FirstEmptyBlock: cardinal index -3 read GetCardinal write SetCardinal;
+    property FirstFATBlock: cardinal index -4 read GetCardinal write SetCardinal;
+    property FirstRootFolderBlock: cardinal index -2 read GetCardinal write SetCardinal;
+    property RootFolderSize: cardinal index -1 read GetCardinal write SetCardinal;
     //following properties are ordered by the offset from the end of block 0
     property StorageAttributeFile: cardinal index -6 read GetCardinal write SetCardinal;
     property StorageAttributeFileSize: cardinal index -5 read GetCardinal write SetCardinal;
-    property FirstFATBlock: cardinal index -4 read GetCardinal write SetCardinal;
-    property FirstEmptyBlock: cardinal index -3 read GetCardinal write SetCardinal;
-    property FirstRootFolderBlock: cardinal index -2 read GetCardinal write SetCardinal;
-    property RootFolderSize: cardinal index -1 read GetCardinal write SetCardinal;
     property Version: cardinal index 0 read GetCardinal write SetCardinal;
   end; { TGpStructuredHeader }
 
@@ -420,7 +437,7 @@ type
     procedure ListAttributes(attrStream: TStream; {out} attributes: TStrings);
     function  RetrieveAttribute(attrStream: TStream;
       const attributeName: string): string;
-    procedure SetAttribute(const attributeName, value: string);
+    procedure SetAttribute(const attributeName: string; const value: string);
     procedure SetSize(value: cardinal);
     procedure UpdateAttribute(attrStream: TStream; const attributeName,
       attributeValue: string);
@@ -432,8 +449,8 @@ type
     //:Fills the list with all defined attribute names.
     procedure AttributeNames({out} attributes: TStrings);
     //:File attributes.
-    property Attribute[const attributeName: string]: string
-      read GetAttribute write SetAttribute;
+    property Attribute[const attributeName: string]: string read GetAttribute write
+      SetAttribute;
     //:File size.
     property Size: cardinal read GetSize write SetSize;
   end; { TGpStructuredFileInfo }
@@ -601,6 +618,7 @@ type
   }
   TGpStructuredStorage = class(TInterfacedObject, IGpStructuredStorage, IGpDebugStructuredStorage)
   private
+    gsmStorageMode : word;
     gssFAT         : TGpStructuredFAT;
     gssFileInfoList: TList;
     gssFileName    : string;
@@ -672,37 +690,116 @@ begin
   Result := TGpStructuredStorage.Create;
 end; { CreateStructuredStorage }
 
+function GetLocaleString(locale, lcType: DWORD): string;
+var
+  p: array [0..255] of char;
+begin
+  if GetLocaleInfo(locale, lcType, p, High(p)) > 0 then
+    Result := p
+  else
+    Result := '';
+end; { GetLocaleString }
+
+function StringToWideString(const s: AnsiString): TUnicodeString;
+var
+  codePage: DWORD;
+  l       : integer;
+begin
+  if s = '' then
+    Result := ''
+  else begin
+    codePage := StrToIntDef(GetLocaleString(GetUserDefaultLCID, LOCALE_IDEFAULTANSICODEPAGE), 0);
+    if codePage = 0 then
+      codePage := StrToIntDef(GetLocaleString(GetSystemDefaultLCID, LOCALE_IDEFAULTANSICODEPAGE), 1252);
+    l := MultiByteToWideChar(codePage, MB_PRECOMPOSED, PAnsiChar(@s[1]), -1, nil, 0);
+    SetLength(Result, l-1);
+    if l > 1 then
+      MultiByteToWideChar(CodePage, MB_PRECOMPOSED, PAnsiChar(@s[1]), -1, PWideChar(@Result[1]), l-1);
+  end;
+end; { StringToWideString }
+
+function WideStringToString (const ws: TUnicodeString): AnsiString;
+var
+  codePage: DWORD;
+  l       : integer;
+begin
+  if ws = '' then
+    Result := ''
+  else begin
+    codePage := StrToIntDef(GetLocaleString(GetUserDefaultLCID, LOCALE_IDEFAULTANSICODEPAGE), 0);
+    if codePage = 0 then
+      codePage := StrToIntDef(GetLocaleString(GetSystemDefaultLCID, LOCALE_IDEFAULTANSICODEPAGE), 1252);
+    l := WideCharToMultiByte(codePage,
+           WC_COMPOSITECHECK or WC_DISCARDNS or WC_SEPCHARS or WC_DEFAULTCHAR,
+           @ws[1], -1, nil, 0, nil, nil);
+    SetLength(Result, l-1);
+    if l > 1 then
+      WideCharToMultiByte(codePage,
+        WC_COMPOSITECHECK or WC_DISCARDNS or WC_SEPCHARS or WC_DEFAULTCHAR,
+        @ws[1], -1, @Result[1], l-1, nil, nil);
+  end;
+end; { WideStringToString }
+
 function ReadString(str: TStream): string;
 var
-  len: integer;
+  len       : integer;
+  sAnsiValue: AnsiString;
+  sWideValue: TUnicodeString;
 begin
-  if str.Read(len, SizeOf(integer)) = SizeOf(integer) then begin
-    SetLength(Result, len);
-    if (len = 0) or (str.Read(Result[1], len) = len) then
-      Exit;
-  end;
   Result := '';
+  if (str.Read(len, SizeOf(cardinal)) <> SizeOf(cardinal)) or
+     ((len AND $7FFFFFFF) = 0)
+  then
+    Exit;
+  if (len AND $80000000) <> 0 then begin //v2 Unicode format
+    len := len AND $7FFFFFFF;
+    SetLength(sWideValue, len);
+    str.Read(sWideValue[1], len * 2);
+    {$IFDEF Unicode}
+    Result := sWideValue;
+    {$ELSE}
+    Result := WideStringToString(sWideValue);
+    {$ENDIF Unicode}
+  end
+  else begin //v1 Ansi format
+    SetLength(sAnsiValue, len);
+    str.Read(sAnsiValue[1], len);
+    {$IFDEF Unicode}
+    Result := StringToWideString(sAnsiValue);
+    {$ELSE}
+    Result := sAnsiValue;
+    {$ENDIF Unicode}
+  end;
 end; { ReadString }
 
 procedure WriteString(str: TStream; value: string);
 var
-  len: integer;
+  len       : cardinal;
+  sWideValue: TUnicodeString;
 begin
-  len := Length(value);
-  str.Write(len, SizeOf(integer));
+  {$IFDEF Unicode}
+  sWideValue := value;
+  {$ELSE}
+  sWideValue := StringToWideString(value);
+  {$ENDIF Unicode}
+  len := cardinal(Length(sWideValue)) OR $80000000; //v2 Unicode format
+  str.Write(len, SizeOf(cardinal));
+  len := len AND $7FFFFFFF;
   if len > 0 then
-    str.Write(value[1], len);    
+    str.Write(sWideValue[1], len * 2);
 end; { WriteString }
 
 function GetTempPath: string;
 var
   tempPath: PChar;
+  bufSize: DWORD;
 begin
-  GetMem(tempPath, MAX_PATH);
+  bufSize := Windows.GetTempPath(0, nil);
+  GetMem(tempPath, bufSize*SizeOf(char));
   try
-    Windows.GetTempPath(MAX_PATH, tempPath);
+    Windows.GetTempPath(bufSize, tempPath);
     Result := StrPas(tempPath);
-  finally FreeMem(tempPath, MAX_PATH); end;
+  finally FreeMem(tempPath); end;
 end; { GetTempPath }
 
 function GetTempFileName(const prefix: string): string;
@@ -710,11 +807,13 @@ var
   tempFileName: PChar;
 begin
   Result := '';
-  GetMem(tempFileName, MAX_PATH);
+  GetMem(tempFileName, MAX_PATH * SizeOf(char));
   try
-    Windows.GetTempFileName(PChar(GetTempPath), PChar(prefix), 0, tempFileName);
-    Result := StrPas(tempFileName);
-  finally FreeMem(tempFileName, MAX_PATH); end;
+    if Windows.GetTempFileName(PChar(GetTempPath), PChar(prefix), 0, tempFileName) <> 0 then
+      Result := StrPas(tempFileName)
+    else
+      Result := '';
+  finally FreeMem(tempFileName); end;
 end; { GetTempFileName }
 
 { TGpStructuredStream }
@@ -1097,15 +1196,34 @@ end; { TGpStructuredFolderEntry.Create }
 
 function TGpStructuredFolderEntry.LoadFrom(stream: TStream): boolean;
 var
-  nameLen: word;
-  numAttr: cardinal;
+  nameLen  : word;
+  numAttr  : cardinal;
+  sAnsiName: AnsiString;
+  sWideName: TUnicodeString;
 begin
   Result := false;
   stream.Read(nameLen, 2);
   if nameLen = 0 then
     Exit;
-  SetLength(sfeFileName, nameLen);
-  stream.Read(sfeFileName[1], nameLen);
+  if (nameLen AND $8000) <> 0 then begin //v2 Unicode format
+    nameLen := nameLen AND $7FFF;
+    SetLength(sWideName, nameLen);
+    stream.Read(sWideName[1], nameLen * 2);
+    {$IFDEF Unicode}
+    sfeFileName := sWideName;
+    {$ELSE}
+    sfeFileName := WideStringToString(sWideName);
+    {$ENDIF Unicode}
+  end
+  else begin //v1 Ansi format
+    SetLength(sAnsiName, nameLen);
+    stream.Read(sAnsiName[1], nameLen);
+    {$IFDEF Unicode}
+    sfeFileName := StringToWideString(sAnsiName);
+    {$ELSE}
+    sfeFileName := sAnsiName;
+    {$ENDIF Unicode}
+  end;
   stream.Read(numAttr, 4);
   stream.Read(sfeFirstFatEntry, 4);
   stream.Read(sfeLength, 4);
@@ -1125,13 +1243,20 @@ end; { TGpStructuredFolderEntry.NumToAttributes }
 
 procedure TGpStructuredFolderEntry.SaveTo(stream: TStream);
 var
-  nameLen: word;
-  numAttr: cardinal;
+  nameLen  : word;
+  numAttr  : cardinal;
+  sWideName: TUnicodeString;
 begin
   numAttr := AttributesToNum(sfeAttributes);
-  nameLen := Length(sfeFileName);
+  {$IFDEF Unicode}
+  sWideName := sfeFileName;
+  {$ELSE}
+  sWideName := StringToWideString(sfeFileName);
+  {$ENDIF Unicode}
+  nameLen := Length(sWideName) OR $8000; //v2 Unicode format
   stream.Write(nameLen, 2);
-  stream.Write(sfeFileName[1], nameLen);
+  nameLen := nameLen AND $7FFF;
+  stream.Write(sWideName[1], nameLen * 2);
   stream.Write(numAttr, 4);
   stream.Write(sfeFirstFatEntry, 4);
   stream.Write(sfeLength, 4);
@@ -1258,7 +1383,8 @@ end; { TGpStructuredFileInfo.RetrieveAttribute }
 {:Updates attribute in the attribute file.
   @since   2004-02-18
 }        
-procedure TGpStructuredFileInfo.SetAttribute(const attributeName, value: string);
+procedure TGpStructuredFileInfo.SetAttribute(const attributeName: string; const value:
+  string);
 var
   strAttr: TGpStructuredFile;
 begin
@@ -2753,6 +2879,7 @@ begin
     raise EGpStructuredStorage.Create('Already initialized');
   if mode = fmOpenWrite then
     mode := fmOpenReadWrite;
+  gsmStorageMode := mode;
   gssFileName := storageDataFile;
   gssStorage := TFileStream.Create(storageDataFile, mode);
   gssOwnsStream := true;
@@ -2768,6 +2895,7 @@ begin
   if assigned(gssStorage) then
     raise EGpStructuredStorage.Create('Already initialized');
   gssFileName := '';
+  gsmStorageMode := fmOpenReadWrite;
   gssStorage := storageDataStream;
   gssOwnsStream := false;
   InitializeStorage;
@@ -2834,9 +2962,13 @@ procedure TGpStructuredStorage.LoadStorageMetadata;
 begin
   if not gssHeader.LoadHeader then
     raise EGpStructuredStorage.CreateFmt('Failed to load header.', [DataFile]);
-  if gssHeader.Version <> CVersion then
-    raise EGpStructuredStorage.CreateFmt('Invalid version (%x, expected %x).',
-      [gssHeader.Version, CVersion]);
+  if (gssHeader.Version > CVersion) or
+     (gssHeader.Version < CLowestSupported)
+  then
+    raise EGpStructuredStorage.CreateFmt('Invalid version (%.8x, expected from %.8x to %.8x).',
+      [gssHeader.Version, CLowestSupported, CVersion]);
+  if (gssHeader.Version <> CVersion) and (gsmStorageMode <> fmOpenRead) then
+    gssHeader.Version := CVersion;
   gssFAT.Load;
   gssRootFolder := TGpStructuredFolder.Create(self, nil, '',
     gssHeader.FirstRootFolderBlock, gssHeader.RootFolderSize);
@@ -3047,7 +3179,9 @@ begin
   if gssStream.Size = 0 then
     Result := false
   else
-    Result := gssHeader.LoadHeader and (gssHeader.Version = CVersion);
+    Result := gssHeader.LoadHeader and
+              (gssHeader.Version <= CVersion) and
+              (gssHeader.Version >= CLowestSupported);
 end; { TGpStructuredStorage.VerifyHeader }
 
 //initialization
