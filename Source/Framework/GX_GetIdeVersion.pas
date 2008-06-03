@@ -2,6 +2,8 @@ unit GX_GetIdeVersion;
 
 // Original Authors: Stefan Hoffmeister and Erik Berry
 
+{$I GX_CondDefine.inc}
+
 interface
 
 type
