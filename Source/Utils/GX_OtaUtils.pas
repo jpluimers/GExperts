@@ -2688,7 +2688,15 @@ begin
     tkChar:    Result := Buffer.VChar;
     tkWChar:   Result := Buffer.VWChar;
     tkFloat:   Result := FloatToStr(Buffer.VFloat);
-    tkWString: Result := Buffer.WString;
+    // Delphi 2007 and earlier have a bug that returns a WideString as AnsiString data.
+    // This will fail for characters outside of the current ANSI codepage.
+    tkWString:
+      begin
+        if RunningDelphi2007OrLess then
+          Result := Buffer.LString
+        else
+          Result := Buffer.WString;
+      end;
     tkSet:
       begin
         if PreferStrings and GxOtaActiveDesignerIsVCL then
@@ -2783,7 +2791,15 @@ begin
   PropertyType := AComponent.GetPropTypeByName(PropertyName);
   PropertyTypeName := GetEnumName(TypeInfo(TTypeKind), Ord(PropertyType));
   case PropertyType of
-    tkWString: Result := AComponent.SetPropByName(PropertyName, Value);
+    tkWString: begin
+        VAString := Value;
+        // Delphi 2007 and earlier have a bug that requires AnsiString data to set a WideString.
+        // This will fail for characters outside of the current ANSI codepage.
+        if RunningDelphi2007OrLess then
+          Result := AComponent.SetPropByName(PropertyName, VAString)
+        else
+          Result := AComponent.SetPropByName(PropertyName, Value);
+      end;
 
     tkLString: begin
         VAString := Value;
