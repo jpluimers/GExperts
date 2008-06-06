@@ -38,7 +38,7 @@ uses
   Forms; // We need "Forms" for the Application object
 
 threadvar
-  MsgPrefix: AnsiString;
+  MsgPrefix: string;
 
 const
   chrClearCommand = #3;
