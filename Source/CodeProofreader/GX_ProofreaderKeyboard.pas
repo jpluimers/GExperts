@@ -82,7 +82,8 @@ procedure InitKeySets;
     if Key <> #32 then
       KeysWithDistance1[iKeySet] := KeysWithDistance1[iKeySet] + [Key];
   end;
-
+const
+  ASCIIAlphaChars = ['A'..'Z', 'a'..'z'];
 type
   TKeyState = (ksNormal, ksShift, ksAltGr);
 var
@@ -243,7 +244,7 @@ begin
     for aKeyState := ksNormal to ksShift do
     begin
       Column := Length(KeyBoardLayout[aKeyState][Row]);
-      while (Column > 0) and not (KeyBoardLayout[aKeyState][Row][Column] in GxAlphaChars) do
+      while (Column > 0) and not (KeyBoardLayout[aKeyState][Row][Column] in ASCIIAlphaChars) do
         Dec(Column);
       if (Column > 0) and (Column < Length(KeyBoardLayout[aKeyState][Row])) then
       begin
