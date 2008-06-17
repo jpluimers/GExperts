@@ -486,6 +486,9 @@ function GxOtaFormEditorHasSelectedComponent: Boolean;
 function GxOtaGetFormEditorFromModule(const Module: IOTAModule): IOTAFormEditor;
 // Shows the form editor for a module.  Returns True if successful.
 function GxOtaShowFormForModule(const Module: IOTAModule): Boolean;
+// Get an open form's text representation into a stream or as a string
+procedure GxOtaGetFormAsText(Form: IOTAFormEditor; OutStream: TStream); overload;
+function GxOtaGetFormAsText(Form: IOTAFormEditor): string; overload;
 
 // Returns the IOTASourceEditor interface for a module
 // if there is a file that supports one; returns nil
@@ -601,8 +604,8 @@ implementation
 uses
   {$IFDEF LINUX} WinUtils, {$ENDIF}
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Variants, Windows, DesignIntf, TypInfo, 
-  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SetString;
+  Variants, Windows, ActiveX, DesignIntf, TypInfo,
+  GX_EditReader, GX_IdeUtils, GX_VerDepConst;
 
 procedure ClearUnitInfoList(const List: TList);
 var
@@ -769,6 +772,46 @@ begin
   begin
     FormEditor.Show;
     Result := True;
+  end;
+end;
+
+procedure GxOtaGetFormAsText(Form: IOTAFormEditor; OutStream: TStream); overload;
+var
+  MemoryStream: TMemoryStream;
+  Stream: IStream;
+  StreamFormat: TStreamOriginalFormat;
+begin
+  Assert(Assigned(OutStream));
+  Assert(Assigned(Form));
+
+  Stream := TStreamAdapter.Create(OutStream);
+  Form.GetFormResource(Stream);
+  StreamFormat := TestStreamFormat(OutStream);
+  if StreamFormat = sofBinary then begin
+    MemoryStream := TMemoryStream.Create;
+    try
+      MemoryStream.CopyFrom(OutStream, OutStream.Size);
+      MemoryStream.Position := 0;
+      OutStream.Position := 0;
+      ObjectResourceToText(MemoryStream, OutStream);
+    finally
+      MemoryStream.Free;
+    end;
+  end;
+  OutStream.Position := 0;
+end;
+
+function GxOtaGetFormAsText(Form: IOTAFormEditor): string;
+var
+  StringStream: TStringStream;
+begin
+  Assert(Assigned(Form));
+  StringStream := TStringStream.Create('');
+  try
+    GxOtaGetFormAsText(Form, StringStream);
+    Result := StringStream.DataString;
+  finally
+    StringStream.Free;
   end;
 end;
 
@@ -2703,7 +2746,7 @@ begin
         begin
           NativeObject := GxOtaGetNativeObject(AComponent);
           Assert(Assigned(NativeObject), 'No native object for property ' + PropertyName);
-          Result := SetToString(FindTypeInfo(NativeObject, PropertyName), Buffer.Int);
+          Result := SetToString(GetPropInfo(NativeObject, PropertyName), Buffer.Int, True);
         end
         else
           Result := IntToStr(Buffer.Int);
