@@ -19,8 +19,6 @@ const
   {$ENDIF LINUX}
   EmptyString = '';
   // Note these don't handle german/polish/etc. extended ASCII alpha chars that are valid in Delphi 8+
-  GxAlphaChars       = ['A'..'Z', 'a'..'z'];
-  GxUpperAlphaChars  = ['A'..'Z'];
   GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
 
   {$IFNDEF GX_VER160_up}
@@ -1102,7 +1100,7 @@ end;
 function IsCharWhiteSpace(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsWhiteSpace(C);
+  Result := TCharacter.IsWhiteSpace(C) or (CharInSet(C, [#10, #11, #12])); // TODO: See QC 62158
   {$ELSE not UNICODE}
   Result := C in [#9, #10, #11, #12, #13, #32];
   {$ENDIF}
