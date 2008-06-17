@@ -141,8 +141,10 @@ begin
 end;
 
 function ASCIILoCase(const Ch: AnsiChar): AnsiChar;
+const
+  ASCIIUpperAlphaChars  = ['A'..'Z'];
 begin
-  if Ch in GxUpperAlphaChars then
+  if Ch in ASCIIUpperAlphaChars then
     Result := AnsiChar(Ord(Ch) + 32)
   else
     Result := Ch;
