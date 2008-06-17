@@ -245,7 +245,8 @@ begin
       if Assigned(Panel) then
         Panel.Width := Settings.ReadInteger(Section, SplitPosIdent, Panel.Width);
     end;
-    if RememberWidth and (not RememberSize) then begin
+    if RememberWidth and (not RememberSize) then
+    begin
       Form.Width := Settings.ReadInteger(Section, WidthIdent, Form.Width);
       if not RememberPosition then
         CenterForm(Form);
@@ -270,7 +271,8 @@ var
   i: Integer;
   PictureDialog: TOpenPictureDialog;
 begin
-  if ResizePictureDialogs then begin
+  if ResizePictureDialogs then
+  begin
     for i := 0 to Form.ComponentCount - 1 do
     begin
       if Form.Components[i] is TOpenPictureDialog then
@@ -310,9 +312,8 @@ begin
       else
         Settings.DeleteKey(Section, SplitPosIdent);
     end;
-    if RememberWidth and (not RememberSize) then begin
-      Settings.WriteInteger(Section, WidthIdent, Form.Width)
-    end;
+    if RememberWidth and (not RememberSize) then
+      Settings.WriteInteger(Section, WidthIdent, Form.Width);
   finally
     FreeAndNil(Settings);
   end;
@@ -412,7 +413,8 @@ var
   ManagedForm: TManagedForm;
 begin
   Assert(Assigned(Form));
-  if ShouldManageForm(Form, Changes) then begin
+  if ShouldManageForm(Form, Changes) then
+  begin
     ManagedForm := TManagedForm.Create;
     ManagedForm.FormClassName := Form.ClassName;
     ManagedForm.Handle := Form.Handle;
@@ -466,7 +468,8 @@ begin
   begin
     if StrContains(Form.ClassName + ';', FormsToChange[i].FormClassNames + ';') then
     begin
-      if not IsManagingForm(Form) then begin
+      if not IsManagingForm(Form) then
+      begin
         Result := True;
         Changes := FormsToChange[i];
         Break;
