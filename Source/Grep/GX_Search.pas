@@ -85,7 +85,7 @@ type
     procedure Reset;
   protected
     procedure SetFileName(const Value: string);
-    procedure SearchForm;
+    procedure SearchForm(ExactFileName: Boolean);
     procedure FreeObjects;
   protected
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); override;
@@ -176,13 +176,11 @@ begin
   inherited Destroy;
 end;
 
-procedure TSearcher.SearchForm;
+procedure TSearcher.SearchForm(ExactFileName: Boolean);
 var
-  CompIntf: IOTAComponent;
   FormIntf: IOTAFormEditor;
   Editor: IOTASourceEditor;
   FormStream: TStream;
-  Form: TComponent;
   Buf: array[0..2] of Byte;
   KeepStream: Boolean;
   Bytes: Integer;
@@ -196,28 +194,11 @@ begin
     if FormIntf <> nil then
     begin
       FreeObjects;
-      CompIntf := FormIntf.GetRootComponent;
-      if CompIntf <> nil then
-      begin
-        Form := GxOtaGetNativeComponent(CompIntf);
-        if Form <> nil then
-        begin
-          FormStream := TMemoryStream.Create;
-          try
-            FormStream.WriteComponent(Form);
-            FormStream.Position := 0;
-
-            Assert(not Assigned(FSearchStream));
-            FSearchStream := TMemoryStream.Create;
-            ObjectBinaryToText(FormStream, FSearchStream);
-          finally
-            FreeAndNil(FormStream);
-          end;
-          FSearchStream.Position := 0;
-          FMode := mmFile;
-          FFileName := FormIntf.FileName;
-        end;
-      end;
+      FSearchStream := TMemoryStream.Create;
+      GxOtaGetFormAsText(FormIntf, FSearchStream);
+      FSearchStream.Position := 0;
+      FMode := mmFile;
+      FFileName := FormIntf.FileName;
     end
     else // Is the form opened as text already and doesn't have a form interface?
     begin
@@ -237,11 +218,14 @@ begin
   begin
     FreeObjects;
     // Prefer DFMs here?  What if both exist?
-    FFileName := ChangeFileExt(FFileName, '.dfm');
-    if not FileExists(FileName) then
-      FFileName := ChangeFileExt(FFileName, '.nfm');
-    if not FileExists(FileName) then
-      FFileName := ChangeFileExt(FFileName, '.xfm');
+    if not ExactFileName then
+    begin
+      FFileName := ChangeFileExt(FFileName, '.dfm');
+      if not FileExists(FileName) then
+        FFileName := ChangeFileExt(FFileName, '.nfm');
+      if not FileExists(FileName) then
+        FFileName := ChangeFileExt(FFileName, '.xfm');
+    end;
     if FileExists(FFileName) then
     begin
       KeepStream := False;
@@ -425,7 +409,7 @@ begin
   {$IFOPT D+} SendDebug('Grep: Searching file ' + FFileName); {$ENDIF}
 
   if IsForm(FFileName) then
-    SearchForm
+    SearchForm(True)
   else
   begin
     if StringInArray(UpperFileExt, ['.PAS', '.INC', '.DPR']) then
@@ -436,7 +420,7 @@ begin
       DoSearch(fcNone);
 
     if FIncludeForms and StringInArray(UpperFileExt, ['.PAS', '.CPP']) then
-      SearchForm;
+      SearchForm(False);
   end;
 end;
 
@@ -481,7 +465,7 @@ begin
         Lst.LoadFromStream(FSearchStream);
         for i := 0 to Lst.Count - 1 do
           Lst[i] :=  Utf8ToAnsi(Lst[i]);
-        FSearchStream.Free;
+        FreeAndNil(FSearchStream);
         FSearchStream := TMemoryStream.Create;
         Lst.SaveToStream(FSearchStream);
       finally
