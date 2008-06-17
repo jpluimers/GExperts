@@ -30,10 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author            : Primoz Gabrijelcic
    Creation date     : 2002-07-04
-   Last modification : 2008-06-03
-   Version           : 1.41
+   Last modification : 2008-06-17
+   Version           : 1.42
 </pre>*)(*
    History:
+     1.42: 2008-06-17
+       - Work around Int64 pointer compiler bug using Delphi 8 native/IDE compiler
+         and various internal compiler errors in Delphi 2005
      1.41: 2008-06-03
        - Unicode-ready (hope, hope).
      1.40: 2008-05-11
@@ -186,12 +189,19 @@ interface
 {$IFDEF CONDITIONALEXPRESSIONS}
   {$WARN SYMBOL_PLATFORM OFF}
   {$IF (RTLVersion < 15)} // Delphi 6 or older
-    {$DEFINE GpLists_RequiresD6CompilerHack}
+    {$DEFINE GpLists_RequiresInt64CompilerHack}
+  {$IFEND}
+  {$IF (CompilerVersion >= 16) and (CompilerVersion < 17)} // Delphi 8 IDE Integration compiler
+    {$DEFINE GpLists_RequiresInt64CompilerHack}
   {$IFEND}
   {$IF (CompilerVersion >= 17)} //Delphi 2005 or newer
-    {$DEFINE GpLists_Inline}
     {$DEFINE GpLists_TStringListHelper}
-    {$DEFINE GpLists_Enumerators}
+    {$IF (CompilerVersion >= 18)} //Delphi 2006 or newer
+      {$DEFINE GpLists_Inline}
+      {$DEFINE GpLists_Enumerators}
+    {$ELSE} // Delphi 2005 only
+      {$DEFINE GpLists_DoNotDescendFromTStringList}
+    {$IFEND}
   {$IFEND}
 {$ENDIF}
 
@@ -700,6 +710,7 @@ type
   end; { TGpStringListHelper }
   {$ENDIF GpLists_TStringListHelper}
 
+{$IFNDEF GpLists_DoNotDescendFromTStringList}
   {:String list where each item has associated counter (stored in the Objects property).
   }
   TGpCountedStringList = class(TStringList)
@@ -713,6 +724,7 @@ type
     procedure SortByCounter(descending: boolean = true);
     property  Counter[idx: integer]: integer read GetItemCount write SetItemCount;
   end; { TGpCountedStringList }
+{$ENDIF}
 
   {$IFDEF GpLists_Enumerators}
   {:TGpTMethodList enumerator.
@@ -1843,7 +1855,7 @@ end; { TGpInt64ListWalkEnumeratorFactory.GetEnumerator }
 { TGpInt64List }
 
 type
-  PInteger64 = ^Int64; // Workaround for Delphi 6 "Internal error: URW699" below
+  PInteger64 = ^Int64; // Workaround for Delphi 6/8 "Internal error: URW699" (or URW778) below
 
 constructor TGpInt64List.Create;
 begin
@@ -1979,7 +1991,7 @@ end; { TGpInt64List.Delete }
 function TGpInt64List.Dump(baseAddr: pointer): pointer;
 var
   iList: integer;
-  pList: PLargeInteger;
+  pList: {$IFDEF GpLists_RequiresInt64CompilerHack} PInteger64 {$ELSE} PLargeInteger {$ENDIF};
 begin
   pList := baseAddr;
   pList^ := Count;
@@ -2235,7 +2247,7 @@ function TGpInt64List.Restore(baseAddr: pointer): pointer;
 var
   iList   : integer;
   numItems: integer;
-  pList   : {$IFDEF GpLists_RequiresD6CompilerHack} PInteger64 {$ELSE} PLargeInteger {$ENDIF};
+  pList   : {$IFDEF GpLists_RequiresInt64CompilerHack} PInteger64 {$ELSE} PLargeInteger {$ENDIF};
 begin
   pList := baseAddr;
   numItems := integer(pList^);
@@ -3039,6 +3051,8 @@ end; { TGpStringListHelper.Sort }
 
 {$ENDIF GpLists_TStringListHelper}
 
+{$IFNDEF GpLists_DoNotDescendFromTStringList}
+
 { TGpCountedStringList }
 
 function CompareAscending_CSL(list: TStringList; index1, index2: integer): integer;
@@ -3110,6 +3124,8 @@ begin
     CustomSort(CompareAscending_CSL);
   Sorted := false;
 end; { TGpCountedStringList.SortByCounter }
+
+{$ENDIF GpLists_DoNotDescendFromTStringList}
 
 { TGpTMethodListEnumerator }
 
