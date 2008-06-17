@@ -876,7 +876,7 @@ Action.BuildVersion = BuildVersion
                 <Property MultiValue="1" name="ProductName" type="string"><![CDATA[GExperts IDE Addin]]>
                   </Property>
                 <Property MultiValue="0" name="ProductVersion" type="string">1.33</Property>
-                <Property name="ReleaseVersion" type="Integer">2</Property>
+                <Property name="ReleaseVersion" type="Integer">3</Property>
                 <Property name="SpecialBuild" type="Boolean">False</Property>
                 </Object>
               </Object>
