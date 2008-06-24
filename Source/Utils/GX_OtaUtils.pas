@@ -2177,46 +2177,31 @@ procedure GxOtaGetAllPossiblePaths(Paths: TStrings);
   procedure AddVCLPaths;
   var
     BasePath: string;
+    DirFinder: TFileFindThread;
+    i: Integer;
   begin
     BasePath := AddSlash(GetIdeRootDirectory) + 'Source' + PathDelim;
-    AddAPath(BasePath + 'RTL\Common');
-    AddAPath(BasePath + 'RTL\Corba');
-    AddAPath(BasePath + 'RTL\Sys');
-    AddAPath(BasePath + 'RTL\Win');
-    AddAPath(BasePath + 'VCL');
-    AddAPath(BasePath + 'CLX');
-    AddAPath(BasePath + 'Decision Cube');
-    AddAPath(BasePath + 'Indy');
-    AddAPath(BasePath + 'Internet');
-    AddAPath(BasePath + 'IntraWeb');
-    AddAPath(BasePath + 'Property Editors');
-    AddAPath(BasePath + 'Samples');
-    AddAPath(BasePath + 'Soap');
-    AddAPath(BasePath + 'ToolsAPI');
-    AddAPath(BasePath + 'WebMidas');
-    AddAPath(BasePath + 'WebSnap');
-    AddAPath(BasePath + 'Xml');
-    AddAPath(BasePath + 'db');
-    AddAPath(BasePath + 'dbwebcontrols');
-    AddAPath(BasePath + 'IBX');
-    AddAPath(BasePath + 'IndyNet');
-    AddAPath(BasePath + 'rtl');
-    AddAPath(BasePath + 'Win32\vcl');
-    AddAPath(BasePath + 'Win32\rtl\common');
-    AddAPath(BasePath + 'Win32\rtl\sys');
-    AddAPath(BasePath + 'Win32\rtl\win');
-    AddAPath(BasePath + 'Win32\Internet');
-    AddAPath(BasePath + 'Win32\soap');
-    AddAPath(BasePath + 'Win32\WebSnap');
-    AddAPath(BasePath + 'Win32\xml');
-    AddAPath(BasePath + 'dotNet\rtl');
-    AddAPath(BasePath + 'dotNet\vcl');
-    AddAPath(BasePath + 'dotNet\db');
-    AddAPath(BasePath + 'dotNet\dbwebcontrols');
-    AddAPath(BasePath + 'dotNet\IBX');
-    AddAPath(BasePath + 'dotNet\IndyNet');
-    AddAPath(BasePath + 'dotNet\IndyNet\Core');
-    AddAPath(BasePath + 'dotNet\xml');
+    DirFinder := TFileFindThread.Create;
+    try
+      DirFinder.FileMasks.Add('*.*');
+      DirFinder.RecursiveSearchDirs.Add(BasePath);
+      DirFinder.DirectoriesOnly := True;
+      // TODO: Cache the IDE source dir list between calls
+      DirFinder.StartFind;
+      Sleep(1);
+      while not DirFinder.Complete do
+        Sleep(1);
+      DirFinder.LockResults;
+      try
+        for i := 0 to DirFinder.Results.Count - 1 do
+          AddAPath(DirFinder.Results[i])
+      finally
+        DirFinder.Terminate;
+        DirFinder.ReleaseResults;
+      end;
+    finally
+      FreeAndNil(DirFinder);
+    end;
   end;
 
 var
@@ -2225,16 +2210,10 @@ var
   i: Integer;
 begin
   Assert(Assigned(Paths));
-  // Add library search paths
-  GxOtaGetEffectiveLibraryPath(Paths);
-  // Add current file path
-  AddAPath(GetPath(GxOtaGetFileNameOfCurrentModule));
-  // Add path of the project group
-  AddAPath(GetPath(GxOtaGetProjectGroupFileName));
   // Add path of the current project
   AddAPath(GetPath(GxOtaGetCurrentProjectFileName));
-  // Add path of the current source file (probably same as first one)
-  AddAPath(GetPath(GxOtaGetCurrentSourceFile));
+  // Add library search paths
+  GxOtaGetEffectiveLibraryPath(Paths);
   // Add paths of all files included in the project
   UnitList := TList.Create;
   try
@@ -2247,6 +2226,12 @@ begin
   finally
     FreeAndNil(UnitList);
   end;
+  // Add current file path
+  AddAPath(GetPath(GxOtaGetFileNameOfCurrentModule));
+  // Add path of the current source file (probably same as first one)
+  AddAPath(GetPath(GxOtaGetCurrentSourceFile));
+  // Add path of the project group
+  AddAPath(GetPath(GxOtaGetProjectGroupFileName));
   // Add paths to VCL source (since we are smart)
   AddVCLPaths;
 end;

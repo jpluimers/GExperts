@@ -545,13 +545,17 @@ type
     FRecursiveSearchDirs: TStringList;
     FFindComplete: TThreadMethod;
     FResultsLock: TCriticalSection;
+    FDirectoriesOnly: Boolean;
+    FComplete: Boolean;
   protected
     procedure Execute; override;
     procedure FindFilesInDir(const Dir: string; Recursive: Boolean);
     procedure AddResult(const FileName: string); virtual;
   public
+    property Complete: Boolean read FComplete;
     property FileMasks: TStringList read FFileMasks;
     property SearchDirs: TStringList read FSearchDirs;
+    property DirectoriesOnly: Boolean read FDirectoriesOnly write FDirectoriesOnly;
     property RecursiveSearchDirs: TStringList read FRecursiveSearchDirs;
     property OnFindComplete: TThreadMethod read FFindComplete write FFindComplete;
     property Results: TStringList read FResults;
@@ -3754,6 +3758,7 @@ procedure TFileFindThread.Execute;
 var
   i: Integer;
 begin
+  FComplete := False;
   try
     LockResults;
     try
@@ -3781,6 +3786,7 @@ begin
       Exit;
     if Assigned(FFindComplete) then
       Synchronize(FFindComplete);
+    FComplete := True;
   except
     on E: Exception do
       MessageBox(0, PChar(E.Message), 'File Search Thread', MB_OK + MB_ICONERROR + MB_APPLMODAL);
@@ -3817,7 +3823,13 @@ begin
     if FindFirst(Dir + FileMasks[i], faAnyFile, SearchRec) = 0 then
     try
       repeat
-        AddResult(BuildFileName(Dir, SearchRec.Name));
+        if DirectoriesOnly then
+        begin
+          if ((SearchRec.Attr and faDirectory) <> 0) and (not StringInArray(SearchRec.Name, ['..', '.'])) then
+            AddResult(BuildFileName(Dir, SearchRec.Name));
+        end
+        else
+          AddResult(BuildFileName(Dir, SearchRec.Name));
       until (FindNext(SearchRec) <> 0) or Terminated;
     finally
       SysUtils.FindClose(SearchRec);
