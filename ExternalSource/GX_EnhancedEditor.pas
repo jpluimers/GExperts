@@ -53,6 +53,8 @@ type
     procedure SetWantTabs(const Value: Boolean);
     function  GetWantTabs: Boolean;
     function  GetNormalizedText: string;
+    function GetTabWidth: Integer;
+    procedure SetTabWidth(const Value: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -77,6 +79,7 @@ type
     property TopLine: Integer read GetTopLine write SetTopLine;
     property WantTabs: Boolean read GetWantTabs write SetWantTabs;
     property NormalizedText: string read GetNormalizedText;
+    property TabWidth: Integer read GetTabWidth write SetTabWidth;
   published
     property Align;
     property Anchors;
@@ -113,7 +116,7 @@ begin
     {$IFDEF SYNEDIT}
     FEditor := TSynMemo.Create(nil);
     FEditor.Gutter.Width := 0;
-    FEditor.Options := FEditor.Options - [eoScrollPastEof, eoScrollPastEol];
+    FEditor.Options := FEditor.Options - [eoScrollPastEof, eoScrollPastEol, eoTabsToSpaces];
     (Lines as TSynEditStringList).AppendNewLineAtEOF := False;
     {$ENDIF SYNEDIT}
 
@@ -382,6 +385,34 @@ begin
   {$IFDEF SYNEDIT}
   // Workaround the string list always appending an extra CRLF
   RemoveLastEOL(Result);
+  {$ENDIF SYNEDIT}
+end;
+
+function TGxEnhancedEditor.GetTabWidth: Integer;
+begin
+  {$IFDEF SYNEDIT}
+  Result := FEditor.TabWidth;
+  {$ELSE}
+  Result := 0;
+  {$ENDIF SYNEDIT}
+end;
+
+procedure TGxEnhancedEditor.SetTabWidth(const Value: Integer);
+{$IFNDEF SYNEDIT}
+var
+  AvgWidth: Integer;
+  DialogUnitsX: Longint;
+  Units: Integer;
+{$ENDIF}
+begin
+  {$IFDEF SYNEDIT}
+  FEditor.TabWidth := Value;
+  {$ELSE}
+  DialogUnitsX := LoWord(GetDialogBaseUnits);
+  AvgWidth := GetAverageCharWidth(FEditor);
+  Units := Value * (AvgWidth * 4) div DialogUnitsX;
+  SendMessage(FEditor.Handle, EM_SETTABSTOPS, WPARAM(1), LPARAM(@Units));
+  FEditor.Refresh;
   {$ENDIF SYNEDIT}
 end;
 
