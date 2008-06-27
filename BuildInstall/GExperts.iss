@@ -6,12 +6,12 @@
 #ifdef ISPPCC_INVOKED
 ; Command line compiler
   #ifndef Version
-    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.3"
+    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.33"
   #endif
 #else
 ; IDE compiler
-  #define Delphi2007
-  #define Version "1.3"
+  #define RS2008
+  #define Version "1.33"
 #endif
 
 #define Product "GExperts"
@@ -67,10 +67,10 @@
   #define IDERegVer    "5"
 #endif
 #ifdef RS2008
-  #define IDEShortName "RadStudio"
-  #define IDELongName  "RadStudio"
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
   #define IDEVer       "2008"
-  #define DLLSuffix    "RadStudio2008"
+  #define DLLSuffix    "RS2008"
   #define IDERegName   "BDS"
   #define IDERegVer    "6"
   #define RegCompany   "CodeGear"
@@ -86,7 +86,7 @@
 #endif
 
 #ifndef IDEShortName
-  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.3"
+  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.33"
 #endif
 
 #define FullName    Product +" for "+ IDELongName +" "+ IDEVer
