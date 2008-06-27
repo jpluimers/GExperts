@@ -299,6 +299,8 @@ procedure SetFontUnderline(Control: TControl);
 procedure SetFontSize(Control: TControl; SizeChange: Integer);
 // Change a font size relative to the current size
 procedure SetFontColor(Control: TControl; Color: TColor);
+// Get the average low-ASCII chracter witdh for the control's current font
+function GetAverageCharWidth(Control: TControl): Integer;
 
 // Sets the ParentBackground property, if supported by the current VCL version
 // This needs to be false for colored TPanels that can appear in a themed app
@@ -2054,6 +2056,23 @@ end;
 procedure SetFontColor(Control: TControl; Color: TColor);
 begin
   TControlCracker(Control).Font.Color := Color;
+end;
+
+function GetAverageCharWidth(Control: TControl): Integer;
+var
+  Width: Integer;
+  Bitmap: Graphics.TBitmap;
+begin
+  Assert(Assigned(Control));
+
+  Bitmap := Graphics.TBitmap.Create;
+  try
+    Bitmap.Canvas.Font.Assign(TControlCracker(Control).Font);
+    Width := Bitmap.Canvas.TextWidth(SAllAlphaNumericChars);
+    Result := Round(Width / Length(SAllAlphaNumericChars));
+  finally
+    FreeAndNil(Bitmap);
+  end;
 end;
 
 procedure SetParentBackgroundValue(Panel: TCustomPanel; Value: Boolean);
