@@ -85,6 +85,7 @@ type
     chkAutoSave: TCheckBox;
     edtMinutes: TEdit;
     udMinutes: TUpDown;
+    btnEditView: TButton;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -120,6 +121,7 @@ type
     procedure btnEumerateActionsClick(Sender: TObject);
     procedure btnGetFontsClick(Sender: TObject);
     procedure btnAppBuilderClick(Sender: TObject);
+    procedure btnEditViewClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -950,6 +952,11 @@ end;
 procedure TfmConfiguration.btnAppBuilderClick(Sender: TObject);
 begin
   OutputComponentList(GetIdeMainForm, False);
+end;
+
+procedure TfmConfiguration.btnEditViewClick(Sender: TObject);
+begin
+  GxOtaShowEditViewDetails;
 end;
 
 end.

@@ -515,38 +515,38 @@ object fmConfiguration: TfmConfiguration
         end
         object btnEumerateActions: TButton
           Left = 16
-          Top = 71
+          Top = 103
           Width = 137
           Height = 25
           Caption = 'Enumerate Actions'
-          TabOrder = 2
+          TabOrder = 3
           OnClick = btnEumerateActionsClick
         end
         object btnGetFonts: TButton
           Left = 16
-          Top = 103
+          Top = 135
           Width = 137
           Height = 25
           Caption = 'IDE Fonts'
-          TabOrder = 3
+          TabOrder = 4
           OnClick = btnGetFontsClick
         end
         object btnAppBuilder: TButton
           Left = 16
-          Top = 135
+          Top = 167
           Width = 137
           Height = 25
           Caption = 'Application Window'
-          TabOrder = 4
+          TabOrder = 5
           OnClick = btnAppBuilderClick
         end
         object gbxFonts: TGroupBox
           Left = 16
-          Top = 175
+          Top = 207
           Width = 321
           Height = 81
           Caption = 'Custom &Fonts'
-          TabOrder = 5
+          TabOrder = 6
           object btnOIFont: TButton
             Left = 24
             Top = 22
@@ -586,11 +586,11 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxFileSaving: TGroupBox
           Left = 18
-          Top = 269
+          Top = 301
           Width = 175
           Height = 70
           Caption = 'File &Saving'
-          TabOrder = 6
+          TabOrder = 7
           Visible = False
           object lblEvery: TLabel
             Left = 31
@@ -636,6 +636,15 @@ object fmConfiguration: TfmConfiguration
             TabOrder = 2
             Wrap = False
           end
+        end
+        object btnEditView: TButton
+          Left = 16
+          Top = 71
+          Width = 137
+          Height = 25
+          Caption = 'Edit View'
+          TabOrder = 2
+          OnClick = btnEditViewClick
         end
       end
     end
