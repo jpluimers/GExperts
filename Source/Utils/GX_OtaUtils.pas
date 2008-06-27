@@ -552,6 +552,7 @@ procedure GxOtaShowProjectModuleInformation;
 
 // Show a dialog enumerating all of the IDE's actions with details
 procedure GxOtaShowIDEActions;
+procedure GxOtaShowEditViewDetails;
 
 {$IFDEF GX_VER160_up}
 function ConvertToIDEEditorString(const S: string): UTF8String;
@@ -4062,6 +4063,10 @@ begin
     Result := StrToIntDef(TabStops, DefTabSize) - 1
   else
     Result := DefTabSize;
+  if Result > 16 then
+    Result := 16;
+  if Result < 1 then
+    Result := 1;
 end;
 
 procedure GxOtaExpandTabsInList(ALines: TStrings);
@@ -4208,6 +4213,143 @@ begin
       Msg := Msg + sLineBreak + ActionMsg;
   end;
   MessageBox(0, PChar(Msg), 'IDE Actions', MB_ICONINFORMATION or MB_OK)
+end;
+
+procedure GxOtaShowEditViewDetails;
+var
+  View: IOTAEditView;
+  Buffer: IOTAEditBuffer;
+  Msg: TStringList;
+  Options: IOTABufferOptions;
+  Window: INTAEditWindow;
+  Form: TCustomForm;
+  Block: IOTAEditBlock;
+  Position: IOTAEditPosition;
+
+  procedure Add(const Str: string);
+  begin
+    Msg.Add(Str);
+  end;
+
+  procedure AddFmt(const Str: string; const Args: array of const);
+  begin
+    Msg.Add(Format(Str, Args));
+  end;
+  
+begin
+  View := GxOtaGetTopMostEditView;
+  if not Assigned(View) then
+    raise Exception.Create('No active edit view');
+
+  Msg := TStringList.Create;
+  try
+    Buffer := View.Buffer;
+    if Assigned(Buffer) then
+    begin
+      AddFmt('FileName: %s', [Buffer.FileName]);
+      AddFmt('Initial Date: %s', [DateTimeToStr(Buffer.GetInitialDate)]);
+      AddFmt('Current Date: %s', [DateTimeToStr(Buffer.GetCurrentDate)]);
+
+      Position := Buffer.EditPosition;
+      if Assigned(Position) then
+      begin
+        AddFmt('Position.Character: %s', [Position.Character]);
+        AddFmt('Position.Column: %d', [Position.Column]);
+        AddFmt('Position.IsSpecialCharacter: %s', [BooleanText(Position.IsSpecialCharacter)]);
+        AddFmt('Position.IsWhiteSpace: %s', [BooleanText(Position.IsWhiteSpace)]);
+        AddFmt('Position.IsWordCharacter: %s', [BooleanText(Position.IsWordCharacter)]);
+        AddFmt('Position.LastRow: %d', [Position.LastRow]);
+        AddFmt('Position.Row: %d', [Position.Row]);
+      end
+      else
+        Add('No IOTAEditView.Position');
+
+      AddFmt('Buffer.IsModified: %s', [BooleanText(Buffer.IsModified)]);
+      AddFmt('Buffer.IsReadOnly: %s', [BooleanText(Buffer.IsReadOnly)]);
+      AddFmt('Buffer.BlockVisible: %s', [BooleanText(Buffer.BlockVisible)]);
+      AddFmt('Buffer.Modified: %s', [BooleanText(Buffer.Modified)]);
+      AddFmt('Buffer.GetLinesInBuffer: %d', [Buffer.GetLinesInBuffer]);
+      AddFmt('Buffer.EditViewCount: %d', [Buffer.EditViewCount]);
+      AddFmt('Buffer.BlockStart.CharIndex: %d', [Buffer.BlockStart.CharIndex]);
+      AddFmt('Buffer.BlockStart.Line: %d', [Buffer.BlockStart.Line]);
+      AddFmt('Buffer.BlockAfter.CharIndex: %d', [Buffer.BlockAfter.CharIndex]);
+      AddFmt('Buffer.BlockAfter.Line: %d', [Buffer.BlockAfter.Line]);
+      Options := Buffer.BufferOptions;
+      if Assigned(Options) then
+      begin
+        AddFmt('AutoIndent: %s', [BooleanText(Options.AutoIndent)]);
+        AddFmt('BackspaceUnindents: %s', [BooleanText(Options.BackspaceUnindents)]);
+        AddFmt('CreateBackupFile: %s', [BooleanText(Options.CreateBackupFile)]);
+        AddFmt('CursorThroughTabs: %s', [BooleanText(Options.CursorThroughTabs)]);
+        AddFmt('GroupUndo: %s', [BooleanText(Options.GroupUndo)]);
+        AddFmt('InsertMode: %s', [BooleanText(Options.InsertMode)]);
+        AddFmt('KeepTrailingBlanks: %s', [BooleanText(Options.KeepTrailingBlanks)]);
+        AddFmt('LeftGutterWidth: %d', [Options.LeftGutterWidth]);
+        AddFmt('OverwriteBlocks: %s', [BooleanText(Options.OverwriteBlocks)]);
+        AddFmt('PersistentBlocks: %s', [BooleanText(Options.PersistentBlocks)]);
+        AddFmt('PreserveLineEnds: %s', [BooleanText(Options.PreserveLineEnds)]);
+        AddFmt('RightMargin: %d', [Options.RightMargin]);
+        AddFmt('SmartTab: %s', [BooleanText(Options.SmartTab)]);
+        AddFmt('SyntaxHighlight: %s', [BooleanText(Options.SyntaxHighlight)]);
+        AddFmt('TabStops: %s', [Options.TabStops]);
+        AddFmt('UndoAfterSave: %s', [BooleanText(Options.UndoAfterSave)]);
+        AddFmt('UndoLimit: %d', [Options.UndoLimit]);
+        AddFmt('UseTabCharacter: %s', [BooleanText(Options.UseTabCharacter)]);
+      end
+      else
+        Add('No buffer options');
+    end
+    else
+      Add('No edit buffer filename');
+
+    Block := View.Block;
+    if Assigned(Block) then
+    begin
+      AddFmt('Block.IsValid: %s', [BooleanText(Block.IsValid)]);
+      AddFmt('Block.Visible: %s', [BooleanText(Block.Visible)]);
+      AddFmt('Block.EndingColumn: %d', [Block.EndingColumn]);
+      AddFmt('Block.EndingRow: %d', [Block.EndingRow]);
+      AddFmt('Block.StartingColumn: %d', [Block.StartingColumn]);
+      AddFmt('Block.StartingRow: %d', [Block.StartingRow]);
+      AddFmt('Block.Style: %s', [GetEnumName(TypeInfo(TOTABlockType), Ord(Block.Style))]);
+      AddFmt('Block.Text: %s', [Block.Text]);
+    end
+    else
+      Add('No IOTAEditView.Block');
+
+    AddFmt('View.BottomRow: %d', [View.BottomRow]);
+    AddFmt('View.LastEditColumn: %d', [View.LastEditColumn]);
+    AddFmt('View.LastEditRow: %d', [View.LastEditRow]);
+    AddFmt('View.LeftColumn: %d', [View.LeftColumn]);
+    AddFmt('View.RightColumn: %d', [View.RightColumn]);
+    AddFmt('View.TopRow: %d', [View.TopRow]);
+    AddFmt('View.CursorPos.Line: %d', [View.CursorPos.Line]);
+    AddFmt('View.CursorPos.Col: %d', [View.CursorPos.Col]);
+    AddFmt('View.TopPos.Line: %d', [View.TopPos.Line]);
+    AddFmt('View.TopPos.Col: %d', [View.TopPos.Col]);
+    AddFmt('View.ViewSize.cx: %d', [View.ViewSize.cx]);
+    AddFmt('View.ViewSize.cy: %d', [View.ViewSize.cy]);
+
+    if Supports(View, INTAEditWindow, Window) then
+    begin
+      Add('Supports INTAEditWindow');
+      Form := Window.Form;
+      if Assigned(Form) then
+      begin
+        AddFmt('Form Class: %s', [Form.ClassName]);
+        AddFmt('Form Caption: %s', [Form.Caption]);
+        AddFmt('Form Top: %d  Left: %d  Height: %d  Width: %d', [Form.Top, Form.Left, Form.Height, Form.Width]);
+        if Assigned(Form.ActiveControl) then
+          AddFmt('Form.ActiveControl ClassName: %s  TextLen: %d', [Form.ActiveControl.ClassName, Form.ActiveControl.GetTextLen]);
+      end
+      else
+        Add('No INTAEditWindow.Form');
+    end
+    else
+      Add('No support for INTAEditWindow');
+  finally
+    MessageBox(Application.Handle, PChar(Msg.Text), 'Edit View Details', 0);
+  end;
 end;
 
 {$IFDEF GX_VER160_up}
