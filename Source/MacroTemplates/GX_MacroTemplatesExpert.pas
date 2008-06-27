@@ -48,7 +48,7 @@ type
     function PrefixLines(Lines, Prefix: string; AStartLine: Integer = 1): string;
     function PrepareWhitePrefix(AInsertCol: Integer): string;
     procedure PrepareNewCursorPos(var VTemplateText: string;
-      AInsertPos: TOTAEditPos; var VNewPos: TOTAEditPos);
+      AInsertPos: TOTAEditPos; var VNewPos: TOTAEditPos; ConsiderPipe: Boolean);
     procedure ClearTemplShortCuts;
     procedure AddTemplShortCut(AName: string; AShortCut: TShortCut);
     procedure TemplateActionExecute(Sender: TObject; ACode: string);
@@ -621,6 +621,7 @@ var
   InsertWhiteCnt: Integer;
   CodeForced, CodeInEditor: Boolean;
   CursorPos: TOTAEditPos;
+  TemplateContainsPipe: Boolean;
 begin
   // Retrieve the template from the editor window
   GxOtaGetCurrentIdentEx(TemplateName, CodeOffset, InsertPos, CurrentPos, AfterLen);
@@ -653,6 +654,7 @@ begin
 
     TemplateObject := FMacroFile.MacroItems[TemplateIdx];
     TemplateText := TemplateObject.Text;
+    TemplateContainsPipe := StrContains('|', TemplateText);
     // Convert to CRLF on Windows
     if sLineBreak = #13#10 then
       TemplateText := AdjustLineBreaks(TemplateText);
@@ -660,7 +662,7 @@ begin
     // Insert the macro into the editor
     if TemplateText <> '' then
     begin
-      CodeInEditor := (CurrentPos.Col+1<>InsertPos.Col) and (not CodeForced);
+      CodeInEditor := (CurrentPos.Col + 1 <> InsertPos.Col) and (not CodeForced);
 
       if CodeForced and (TemplateObject.InsertPos = tipCursorPos) then
       begin
@@ -694,7 +696,7 @@ begin
         end;
       end;
 
-      PrepareNewCursorPos(TemplateText, InsertPos, NewCursorPos);
+      PrepareNewCursorPos(TemplateText, InsertPos, NewCursorPos, TemplateContainsPipe);
 
       if CodeForced or (not SameText(TemplateName, TemplateObject.Name)) then
         InsertTemplateIntoEditor('', TemplateText, CodeOffset, InsertOffset)
@@ -780,14 +782,14 @@ end;
 // Prepare the new cursor position after insertion of a template
 // Fix the template's text if a cursor indicator was found
 procedure TMacroTemplatesExpert.PrepareNewCursorPos(var VTemplateText: string;
-  AInsertPos: TOTAEditPos; var VNewPos: TOTAEditPos);
+  AInsertPos: TOTAEditPos; var VNewPos: TOTAEditPos; ConsiderPipe: Boolean);
 var
   CursorMarkIndex: Integer;
 begin
   // Calculate new cursor offset if it is assumed in macro code
   CursorMarkIndex := Pos('|', VTemplateText);
-  if CursorMarkIndex > 0 then
-  begin
+  if (CursorMarkIndex > 0) and ConsiderPipe then
+  begin // This does not account for any embedded pipes in a %SELECTION%
     VNewPos := CalculateNewCursorPos(VTemplateText, AInsertPos);
     Delete(VTemplateText, CursorMarkIndex, 1);
   end
