@@ -1176,6 +1176,8 @@ begin
   FCodeText.OnChange := CodeTextChange;
   FCodeText.Parent := pnlView;
   FCodeText.ReadOnly := True;
+  FCodeText.WantTabs := True;
+  FCodeText.TabWidth := GxOtaGetTabWidth;
 end;
 
 constructor TfmCodeLib.Create(AOwner: TComponent);
