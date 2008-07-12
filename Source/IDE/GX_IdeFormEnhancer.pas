@@ -251,8 +251,6 @@ begin
       if not RememberPosition then
         CenterForm(Form);
     end;
-    //if Self.CenterForm then
-    //  GX_GenericUtils.CenterForm(Form);
   finally
     FreeAndNil(Settings);
   end;
