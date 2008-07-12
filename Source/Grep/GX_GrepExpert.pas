@@ -265,18 +265,18 @@ begin
   begin
     MaskList.Add('*.pas;*.dpr;*.inc');
     MaskList.Add('*.txt;*.html;*.htm;.rc;*.xml;*.todo;*.me');
-    if GxOtaHaveCPPSupport then
+    if IsStandAlone or GxOtaHaveCPPSupport then
       MaskList.Add('*.cpp;*.hpp;*.h;*.pas;*.dpr');
-    if GxOtaHaveCSharpSupport then
+    if IsStandAlone or GxOtaHaveCSharpSupport then
       MaskList.Add('*.cs');
   end;
   if DirList.Count = 0 then
   begin
     TempPath := RemoveSlash(ConfigInfo.VCLPath);
-    if TempPath <> '' then
+    if NotEmpty(TempPath) and DirectoryExists(TempPath) then
       DirList.Add(TempPath);
     TempPath := RtlPath(ConfigInfo.VCLPath);
-    if TempPath <> '' then
+    if NotEmpty(TempPath) and DirectoryExists(TempPath) then
       DirList.Add(RemoveSlash(TempPath));
   end;
 end;
