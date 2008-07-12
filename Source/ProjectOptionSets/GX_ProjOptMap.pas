@@ -90,7 +90,7 @@ const
   StringType = tkLString;
   {$ENDIF}
 
-  GxOptionsMap: array[0..304] of TGxOptionsMap = (
+  GxOptionsMap: array[0..309] of TGxOptionsMap = (
     ( // 0
       Name: 'HostApplication';
       AssumedTypeKind: StringType;
@@ -158,7 +158,7 @@ const
       Name: 'WarnFlag';
       AssumedTypeKind: tkEnumeration;
       Description: 'Show compiler warnings';
-      Categories: [ocCompiler, ocDelphi];
+      Categories: [ocCompiler, ocDelphi, ocWarnings];
       Translator: GxBoolOptionTranslator;
     ),
     ( // 10
@@ -459,7 +459,7 @@ const
       Name: 'ShowWarnings';
       AssumedTypeKind: tkEnumeration;
       Description: 'Show BCB compiler warnings'; //????
-      Categories: [ocCompiler, ocBCB];
+      Categories: [ocCompiler, ocBCB, ocWarnings];
       Translator: GxBoolOptionTranslator;
     ),
     (
@@ -515,7 +515,7 @@ const
       Name: 'ShowLinkerWarnings';
       AssumedTypeKind: tkEnumeration;
       Description: 'Show linker warnings';
-      Categories: [ocBCB, ocLinker];
+      Categories: [ocBCB, ocLinker, ocWarnings];
       Translator: GxBoolOptionTranslator;
     ),
     (
@@ -980,14 +980,14 @@ const
       Name: 'TasmWarningsOn'; 
       AssumedTypeKind: tkEnumeration;
       Description: 'Generate warnings';
-      Categories: [ocTasm];
+      Categories: [ocTasm, ocWarnings];
       Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'TasmWarningsLevel1'; 
       AssumedTypeKind: tkEnumeration;
       Description: 'Use warnings Level 1';
-      Categories: [ocTasm];
+      Categories: [ocTasm, ocWarnings];
       Translator: GxBoolOptionTranslator;
     ),
     (
@@ -1956,7 +1956,7 @@ const
       Name: 'WarningAsError';
       AssumedTypeKind: tkEnumeration;
       Description: 'WarningAsError';
-      Categories: [ocUnknown];
+      Categories: [ocCompiler, ocWarnings];
       Translator: GxStringOptionTranslator;
     ),
     (
@@ -2118,126 +2118,161 @@ const
       AssumedTypeKind: tkInteger;
       Description: 'WarnOptionTruncated';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnWideCharReduced';
       AssumedTypeKind: tkInteger;
       Description: 'WarnWideCharReduced';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnDuplicatesIgnored';
       AssumedTypeKind: tkInteger;
       Description: 'WarnDuplicatesIgnored';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnInitSeq';
       AssumedTypeKind: tkInteger;
       Description: 'WarnInitSeq';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnLocalPInvoke';
       AssumedTypeKind: tkInteger;
       Description: 'WarnLocalPInvoke';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLWhitespaceNotAllowed';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLWhitespaceNotAllowed';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLUnknownEntity';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLUnknownEntity';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLInvalidNameStart';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLInvalidNameStart';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLInvalidName';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLInvalidName';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLExpectedCharacter';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLExpectedCharacter';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLCREFNoResolve';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLCREFNoResolve';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnXMLNoParm';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLNoParm';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     ( // 299
       Name: 'WarnXMLNoMatchingParm';
       AssumedTypeKind: tkInteger;
       Description: 'WarnXMLNoMatchingParm';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnTypeInfoImplicitlyAdded';
       AssumedTypeKind: tkInteger;
       Description: 'WarnTypeInfoImplicitlyAdded';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnImplicitStringCast';
       AssumedTypeKind: tkInteger;
       Description: 'WarnImplicitStringCast';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnImplicitStringCastLoss';
       AssumedTypeKind: tkInteger;
       Description: 'WarnImplicitStringCastLoss';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     (
       Name: 'WarnExplicitStringCast';
       AssumedTypeKind: tkInteger;
       Description: 'WarnExplicitStringCast';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
     ),
     ( // 304
       Name: 'WarnExplicitStringCastLoss';
       AssumedTypeKind: tkInteger;
       Description: 'WarnExplicitStringCastLoss';
       Categories: [ocWarnings];
-      Translator: GxStringOptionTranslator;
+      Translator: GxBoolOptionTranslator;
+    ),
+    (
+      Name: 'WarnRLinkWarning';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnRLinkWarning';
+      Categories: [ocWarnings];
+      Translator: GxBoolOptionTranslator;
+    ),
+    (
+      Name: 'WarnCvtWCharToAChar';
+      AssumedTypeKind: tkInteger;
+      Description: 'Warn on conversions from WideChar to AnsiChar';
+      Categories: [ocWarnings];
+      Translator: GxBoolOptionTranslator;
+    ),
+    (
+      Name: 'WarnCvtNarrowingStringLost';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnCvtNarrowingStringLost';
+      Categories: [ocWarnings];
+      Translator: GxBoolOptionTranslator;
+    ),
+    (
+      Name: 'WarnCvtACharToWChar';
+      AssumedTypeKind: tkInteger;
+      Description: 'Warn on conversions from AnsiChar to WideChar';
+      Categories: [ocWarnings];
+      Translator: GxBoolOptionTranslator;
+    ),
+    ( // 309
+      Name: 'WarnCvtWideningStringLost';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnCvtWideningStringLost';
+      Categories: [ocWarnings];
+      Translator: GxBoolOptionTranslator;
     )
   );
 
