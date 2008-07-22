@@ -173,7 +173,15 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF D+}
   SysUtils, Messages, ToolsAPI,
   GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_GrepPrinting, GX_GrepSearch,
-  GX_GExperts, GX_ConfigurationInfo, GX_SharedImages, GX_Replace, GX_GrepReplace;
+  GX_GExperts, GX_ConfigurationInfo, GX_SharedImages, GX_Replace, GX_GrepReplace,
+  GX_MessageBox, GX_IdeUtils;
+
+type
+  TShowUnicodeReplaceMessage = class(TGxMsgBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+    function ShouldShow: Boolean; override;
+  end;
 
 resourcestring
   SGrepReplaceStats = 'Replaced %d occurrence(s) in %.2f seconds';
@@ -1117,6 +1125,8 @@ function TfmGrepResults.QueryUserForReplaceOptions(const ReplaceInString: string
 var
   Dlg: TfmGrepReplace;
 begin
+  ShowGxMessageBox(TShowUnicodeReplaceMessage);
+  
   Result := False;
   Dlg := TfmGrepReplace.Create(nil);
   try
@@ -1135,6 +1145,21 @@ end;
 function TfmGrepResults.ConfigurationKey: string;
 begin
   Result := TGrepExpert.ConfigurationKey;
+end;
+
+{ TShowUnicodeReplaceMessage }
+
+function TShowUnicodeReplaceMessage.GetMessage: string;
+begin
+  Result := 'Using GExperts grep replace can corrupt your source code if the file ' +
+    'being replaced is in a UNICODE format on disk or if the file is loaded into the IDE ' +
+    'editor and contains characters other than low ASCII.  Canceling the replace ' +
+    'is recommended if any of your files fall into one of these categories.';
+end;
+
+function TShowUnicodeReplaceMessage.ShouldShow: Boolean;
+begin
+  Result := RunningDelphi8OrGreater;
 end;
 
 end.
