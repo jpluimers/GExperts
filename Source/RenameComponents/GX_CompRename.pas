@@ -130,6 +130,7 @@ var
 function TfmCompRename.Execute: TModalResult;
 begin
   ActiveControl := edtNewName;
+  lblReason.Top := btnOK.Top + Round((btnOK.Height / 2) - (lblReason.Height / 2));
   Result := ShowModal;
 end;
 
@@ -828,7 +829,6 @@ begin
   SetModalFormPopupMode(Self);
   SetDefaultFont(Self);
   lblReason.Font.Color := clRed;
-  lblReason.Top := btnOK.Top + Round((btnOK.Height / 2) - (lblReason.Height / 2));
 end;
 
 procedure TfmCompRename.btnSettingsClick(Sender: TObject);
