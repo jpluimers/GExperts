@@ -464,7 +464,7 @@ begin
       try
         Lst.LoadFromStream(FSearchStream);
         for i := 0 to Lst.Count - 1 do
-          Lst[i] :=  Utf8ToAnsi(Lst[i]);
+          Lst[i] := Utf8ToAnsi(Lst[i]);
         FreeAndNil(FSearchStream);
         FSearchStream := TMemoryStream.Create;
         Lst.SaveToStream(FSearchStream);

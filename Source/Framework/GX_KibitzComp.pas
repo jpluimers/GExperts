@@ -39,7 +39,7 @@ type
   {$ELSE}
     KibitzDataArray: array [0..81] of Integer;
   {$ENDIF}
-    KibitzDataStr: string;
+    KibitzDataStr: AnsiString;
     KibitzReserveArray: array[0..255] of Integer;
   end;
 

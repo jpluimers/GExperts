@@ -14,7 +14,7 @@ type
   TGrepAction = (gaProjGrep, gaCurrentOnlyGrep, gaOpenFilesGrep, gaDirGrep, gaProjGroupGrep);
 
   // Saved grep settings (used for refresh)
-  TGrepSettings = packed record
+  TGrepSettings = record
     NoComments: Boolean;
     NoCase: Boolean;
     WholeWord: Boolean;

@@ -19,14 +19,14 @@ uses
   GX_ProofreaderUtils;
 
 type
-  TGxDefReplacementItem = packed record // We use "packed" to conserve space.
+  TGxDefReplacementItem = record
     Typed: string;
     Replace: string;
     WhereReplace: TGXWhereReplace;
     Language: TReplacementSource;
   end;
 
-  TGxDefDictionaryItem = packed record // We use "packed" to conserve space.
+  TGxDefDictionaryItem = record
     Language: TReplacementSource;
     Word: string;
   end;
