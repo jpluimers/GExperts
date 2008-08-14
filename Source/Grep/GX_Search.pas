@@ -59,7 +59,7 @@ type
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); virtual; abstract;
     procedure Seek(Offset: Longint; Direction: Integer); virtual; abstract;
     procedure AfterFill; virtual; abstract;
-    procedure BufferUtf8ToAnsi; virtual; abstract;
+    //procedure BufferUtf8ToAnsi; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
@@ -91,7 +91,7 @@ type
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); override;
     procedure Seek(Offset: Longint; Direction: Integer); override;
     procedure AfterFill; override;
-    procedure BufferUtf8ToAnsi; override;
+    //procedure BufferUtf8ToAnsi; override;
   public
     constructor Create(const SearchFileName: string);
     destructor Destroy; override;
@@ -449,6 +449,7 @@ begin
   Inc(FEditReaderPos, FBufferDataCount);
 end;
 
+(*
 procedure TSearcher.BufferUtf8ToAnsi;
 var
   UTF: Integer;
@@ -475,6 +476,7 @@ begin
     FSearchStream.Seek(0, soFromBeginning);
   end;
 end;
+*)
 
 { TBaseSearcher }
 

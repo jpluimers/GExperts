@@ -2672,7 +2672,7 @@ end;
 
 type
   // TODO 3 -cCleanup -oAnyone: Remove this type, since it is confusing and is not .NET compatible
-  TPropertyValBuffer = packed record
+  TPropertyValBuffer = record
     case Integer of
       0: (RawBuffer: array[0..255] of Byte);
       1: (SString: ShortString);
