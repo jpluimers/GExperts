@@ -4054,7 +4054,8 @@ var
   TabStops: string;
   SpacePos: Integer;
 begin
-  TabStops := GxOtaGetTabStops;
+  if not IsStandAlone then
+    TabStops := GxOtaGetTabStops;
   SpacePos := LastCharPos(TabStops, ' ');
   if SpacePos > 0 then
     Result := StrToIntDef(Copy(TabStops, SpacePos + 1, 3), DefTabSize) - 1
