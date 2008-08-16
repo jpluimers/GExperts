@@ -71,7 +71,7 @@ function RunningDelphi2005: Boolean;
 function RunningDelphi2007: Boolean;
 function RunningDelphi2007OrLess: Boolean;
 function RunningDelphi2007OrGreater: Boolean;
-function RunningRS2008OrGreater: Boolean;
+function RunningRS2009OrGreater: Boolean;
 function RunningBDS2006OrLess: Boolean;
 function RunningBDS2006OrGreater: Boolean;
 function RunningBDS2006: Boolean;
@@ -449,7 +449,7 @@ begin
   {$ENDIF}
 end;
 
-function RunningRS2008OrGreater: Boolean;
+function RunningRS2009OrGreater: Boolean;
 begin
   {$IFDEF GX_VER200_up}
   Result := True;

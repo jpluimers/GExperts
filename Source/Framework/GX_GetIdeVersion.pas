@@ -15,7 +15,7 @@ type
      ideD900, ideD901, ideD902, ideD903,
      ideBDS2006,
      ideDelphi2007,
-     ideRS2008,
+     ideRS2009,
      ideCSB100,
      ideBCB600, ideBCB601, ideBCB602, ideBCB604,
      ideKylix100,
@@ -423,7 +423,7 @@ begin
   end;
 end;
 
-function GetRS2008Version: TBorlandIdeVersion;
+function GetRS2009Version: TBorlandIdeVersion;
 const
   CoreIde1200: TVersionNumber =
     (Minor: 0; Major: 0; Build: 0; Release: 0);
@@ -431,11 +431,11 @@ var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
 begin
-  Result := ideRS2008;
+  Result := ideRS2009;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide120.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1200);
   if VersionNumber > 0 then begin
-    //Result := ideRS2008Update1;
+    //Result := ideRS2009Update1;
   end;
 end;
 
@@ -503,8 +503,8 @@ begin
   // VER190 is Delphi.NET 2007  
 
   {$IFDEF VER200}
-    Result := GetRS2008Version;
-    Assert(Result in [ideRS2008]);
+    Result := GetRS2009Version;
+    Assert(Result in [ideRS2009]);
   {$ENDIF VER200}
 
   if Result = ideUnknown then

@@ -63,7 +63,7 @@ const
   {$ENDIF VER180}
 
   {$IFDEF VER200}
-    GExpertsDll = 'GExpertsRS2008.dll';
+    GExpertsDll = 'GExpertsRS2009.dll';
     {$DEFINE GExpertsDllNameDefined}
   {$ENDIF VER200}
 
@@ -190,7 +190,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER160}
 
   {$IFDEF VER170}
-    MajorVersionNumberChar = '9';  // Delphi 9
+    MajorVersionNumberChar = '9';  // Delphi 9/2005
     {$DEFINE MajorVersionNumber}
   {$ENDIF VER170}
 
@@ -204,7 +204,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER180}
 
   {$IFDEF VER200}
-    MajorVersionNumberChar = '12';  // RS 2008
+    MajorVersionNumberChar = '12';  // RS 2009
     {$DEFINE MajorVersionNumber}
   {$ENDIF VER200}
 
@@ -272,7 +272,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER180}
 
   {$IFDEF VER200}
-    IDEEnglishName = 'RAD Studio 2008';
+    IDEEnglishName = 'RAD Studio 2009';
     {$DEFINE IDEEnglishNameDefined}
   {$ENDIF VER200}
 
@@ -399,7 +399,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER180}
 
   {$IFDEF VER200}
-    ClassBrowserStorageFolder = 'Classes.RS2008';
+    ClassBrowserStorageFolder = 'Classes.RadStudio2009';
     {$DEFINE ClassBrowserStorageDefined}
   {$ENDIF VER200}
 
