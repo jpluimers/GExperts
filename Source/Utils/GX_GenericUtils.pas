@@ -2257,7 +2257,7 @@ begin
   PropCount := GetPropList(Source.ClassInfo, tkAny, @PropList);
   for i := 0 to PropCount - 1 do
   begin
-    PropName := PropList[i].Name;
+    PropName := string(PropList[i].Name);
     case PropList[i].PropType^.Kind of
       tkLString, tkWString, tkVariant {$IFDEF GX_VER200_up}, tkUString {$ENDIF}:
         SetPropValue(Dest, PropName, GetPropValue(Source, PropName));
@@ -2297,8 +2297,8 @@ begin
   if (TypeInfo^.Kind = tkClass) then
   begin
     TypeData := GetTypeData(TypeInfo);
-    ParentName := TypeData^.ParentInfo^.Name;
-    if (ParentName <> TypeInfo^.Name) and (GetClass(ParentName) <> nil) then
+    ParentName := string(TypeData^.ParentInfo^.Name);
+    if (ParentName <> string(TypeInfo^.Name)) and (GetClass(ParentName) <> nil) then
       GetPropertyNames(GetClass(ParentName), PropertyNames, PropertyTypeNames, PropertyTypesToLookFor);
     if (TypeData^.PropCount > 0) then
     begin
@@ -2306,10 +2306,10 @@ begin
       GetPropInfos(TypeInfo, PropList);
       for IndexProperties := 0 to Pred(TypeData^.PropCount) do
       begin
-        PropertyTypeName := PropList^[IndexProperties]^.PropType^.Name;
+        PropertyTypeName := string(PropList^[IndexProperties]^.PropType^.Name);
         if (PropertyTypesToLookFor = nil) or (PropertyTypesToLookFor.IndexOf(PropertyTypeName) > -1) then
         begin
-          PropertyName := PropList^[IndexProperties]^.Name;
+          PropertyName := string(PropList^[IndexProperties]^.Name);
           if (PropertyNames.IndexOf(PropertyName) < 0) then
           begin
             PropertyNames.Add(PropertyName);
