@@ -51,20 +51,20 @@ type
 
   TAbSpanStream = class(TStream)
   private
-    function GetSpace: LongInt;
+    function GetSpace: Int64;
     function FixSpanNumber(ImageNumber: Integer): Integer;
   protected {private}
     FSpanMode     : TAbSpanMode;  {Reading or Writing                }
     FMediaType    : TAbMediaType; {Local or Removeable               }
-    FThreshold    : Longint;      {Max size that can be written      }
+    FThreshold    : Int64;      {Max size that can be written      }
     FSpanNumber   : Integer;      {Contains sequence of curr. span   }
     FImageName    : string;       {Contains name of curr. image      }
     FCancelled    : Boolean;      {Determines whether to abort       }
-    FBytesWritten : LongInt;      {Contains the no. of bytes
+    FBytesWritten : Int64;      {Contains the no. of bytes
                                    written to the surrent span       }
-    FBytesRead    : LongInt;
+    FBytesRead    : Int64;
 
-    FBytesAvail   : LongInt;      {Contains the no. of available
+    FBytesAvail   : Int64;      {Contains the no. of available
                                    bytes on the current media        }
     FStr          : TFileStream;  {Internal file stream              }
     FFileMode     : Word;         {File open mode for internal stream}
@@ -74,40 +74,39 @@ type
     {fired when new media required   }
     FOnRequestImage     : TAbRequestImageEvent;
     FOnArchiveProgress  : TAbProgressEvent;                            {!!.04}
-    FArchiveTotalWritten : Longint;                                    {!!.04}
-    FArchiveTotalSize : Longint;                                       {!!.04}
+    FArchiveTotalWritten : Int64;                                    {!!.04}
+    FArchiveTotalSize : Int64;                                       {!!.04}
 
 
     function MediaIsValid(const FName : string) : Boolean;
     function DoRequestNewMedia{(const Prompt: string)}: Boolean;         {!!.01}
     function NextDefaultImageName : string;
     function ValidateImageName(const NewName : string) : Boolean;
-    procedure SetSize(NewSize: Longint); override;
+    procedure SetSize(const NewSize: Int64); override;
   public
     constructor Create(const FileName: string; Mode: Word;
-                       MediaType : TAbMediaType; Threshold : LongInt);
+                       MediaType : TAbMediaType; Threshold : Int64);
     destructor Destroy; override;
     function Read(var Buffer; Count: Longint): Longint; override;
     function Write(const Buffer; Count: Longint): Longint; override;
-    function Seek(Offset: Longint; Origin: Word): Longint; override;
+    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
 
     procedure GotoNext;
 
     property SpanMode : TAbSpanMode read FSpanMode;
     property MediaType : TAbMediaType read FMediaType write FMediaType;
     property SpanNumber : Integer read FSpanNumber write FSpanNumber;   {!!.01}
-    property Threshold : Longint
+    property Threshold : Int64
       read  FThreshold write FThreshold
       default 0;
     property OnRequestImage : TAbRequestImageEvent
       read FOnRequestImage write FOnRequestImage;
     property OnArchiveProgress  : TAbProgressEvent                     {!!.04}
       read FOnArchiveProgress write FOnArchiveProgress;                {!!.04}
-    property ArchiveTotalSize : Longint                                {!!.04}
+    property ArchiveTotalSize : Int64                                {!!.04}
       read FArchiveTotalSize write FArchiveTotalSize;                  {!!.04}
 
-    property FreeSpace : LongInt read
-      GetSpace;
+    property FreeSpace : Int64 read  GetSpace;
 
     property IgnoreSpanning : boolean                                    {!!.01}
       read FIgnoreSpanning write FIgnoreSpanning;                        {!!.01}
@@ -139,7 +138,7 @@ begin
   end                                                                    {!!.01}
   else begin
     if (Count > 0) and (FStr.Position = FStr.Size) then begin { need next span }
-      if not Assigned(FOnRequestImage) then Exit;
+      if not Assigned(FOnRequestImage) then exit;
       FStr.Free;
       FStr := nil;
       Inc(FSpanNumber);
@@ -269,10 +268,10 @@ end;
 {!!.01 -- end re-written}
 
 {------------------------------------------------------------------------------}
-function TAbSpanStream.Seek(Offset: Longint; Origin: Word): Longint;
+function TAbSpanStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 var
   Valid : Boolean;
-  NewPos : LongInt;
+  NewPos : Int64;
 begin
   { can only seek when reading }
   if FSpanMode = smWriting then
@@ -282,12 +281,12 @@ begin
     Result := NewPos;
 
     case Origin of
-      soFromBeginning : NewPos := Offset;
-      soFromEnd : begin
+      soBeginning : NewPos := Offset;
+      soEnd : begin
         { calc size }
         NewPos := FStr.Size + Offset;
       end;
-      soFromCurrent : begin
+      soCurrent : begin
         NewPos := FStr.Position + Offset;
       end;
     end;
@@ -304,7 +303,7 @@ begin
     if (NewPos < 0) then begin  { past beginning of current stream }
 
       { request previous media }
-      if not Assigned(FOnRequestImage) then Exit;
+      if not Assigned(FOnRequestImage) then exit;
       Dec(FSpanNumber);
       FOnRequestImage(Self,FixSpanNumber(FSpanNumber), FImageName, FCancelled);             {!!.01}
       if FCancelled then                                               {!!.05}
@@ -322,12 +321,12 @@ begin
       end;
 
       { seek rest of way in new stream}
-      Result := Result + FStr.Seek(NewPos, soFromEnd);
+      Result := Result + FStr.Seek(NewPos, soEnd);
     end
     else
     if (NewPos > FStr.Size) then begin { past end of current stream }
       { request next media }
-      if not Assigned(FOnRequestImage) then Exit;
+      if not Assigned(FOnRequestImage) then exit;
       Dec(FSpanNumber);
       FOnRequestImage(Self, FixSpanNumber(FSpanNumber), FImageName, FCancelled);             {!!.01}
       if FCancelled then
@@ -344,17 +343,17 @@ begin
       end;
 
       { seek rest of way in new stream}
-      Result := Result + FStr.Seek(NewPos - FStr.Size, soFromBeginning);
+      Result := Result + FStr.Seek(NewPos - FStr.Size, soBeginning);
     end
     else { offset is within current stream } begin
-      Result := FStr.Seek(NewPos, soFromBeginning);
+      Result := FStr.Seek(NewPos, soBeginning);
     end;
   end;
 end;
 
 {------------------------------------------------------------------------------}
 constructor TAbSpanStream.Create(const FileName: string; Mode: Word;
-                                 MediaType : TAbMediaType; Threshold : LongInt);
+                                 MediaType : TAbMediaType; Threshold : Int64);
 begin
   inherited Create;
 
@@ -464,7 +463,7 @@ begin
       else {!!.05 [ 783614 ]}
        begin
           result := false;
-          Exit;
+          exit;
        end;
     end; { While }
    end { if Assigned(FOnRequestImage) then begin }
@@ -491,10 +490,10 @@ begin
 end;
 {------------------------------------------------------------------------------}
 {!!.01 -- Rewritten}
-function TAbSpanStream.GetSpace: LongInt;
+function TAbSpanStream.GetSpace: Int64;
 { Return space remaining in current span}
 var
-  EffectiveThreshold : LongInt;
+  EffectiveThreshold : Int64;
 begin
   if FMediaType = mtRemoveable then begin
     EffectiveThreshold := FThreshold;
@@ -512,9 +511,9 @@ end;
 {!!.01 -- End Rewritten}
 {------------------------------------------------------------------------------}
 {!!.01 -- Rewritten}
-procedure TAbSpanStream.SetSize(NewSize: Integer);
+procedure TAbSpanStream.SetSize(const NewSize: Int64);
 var
-  CurSize, Remaining : LongInt;
+  CurSize, Remaining : Int64;
 begin
   if Assigned(FStr) then begin
     if NewSize = 0 then

@@ -325,7 +325,7 @@ begin
 
   {if it isn't valid, reposition the stream, ready for the next try}
   if not Result then begin
-    FStream.Seek(-sizeof(Header), soFromCurrent);
+    FStream.Seek(-sizeof(Header), soCurrent);
     FReady := false;
   end
 

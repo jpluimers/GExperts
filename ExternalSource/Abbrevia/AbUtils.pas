@@ -86,7 +86,7 @@ var
 
 type
   TAbArchiveType = (atUnknown, atZip, atSpannedZip {!!.01}, atSelfExtZip,
-                    atTar, atGzip, atGzippedTar, atCab);
+                    atTar, atGzip, atGzippedTar, atCab, atBZip, atBzippedTar);
 
 
 {$IFDEF LINUX}
@@ -205,7 +205,7 @@ type
     {Returns true if Path is an existing directory
      returns False on blank strings, filenames...}
 
-  function AbDrive(const ArchiveName : string) : AnsiChar;
+  function AbDrive(const ArchiveName : string) : Char;
 
   function AbDriveIsRemovable(const ArchiveName : string) : Boolean;
 
@@ -223,7 +223,7 @@ type
   function AbFindNthSlash( const Path : string; n : Integer ) : Integer;
     {return the position of the character just before the nth backslash}
 
-  function AbGetDriveFreeSpace(const ArchiveName : string) : LongInt;
+  function AbGetDriveFreeSpace(const ArchiveName : string) : int64;
     {return the available space on the specified drive }
 
   function AbGetPathType( const Value : string ) : TAbPathType;
@@ -262,7 +262,11 @@ type
   procedure AbFixName( var FName : string );
     {-changes backslashes to forward slashes}
 
-  procedure AbUnfixName( var FName : string );
+  procedure AbUnfixName( var FName : string ); overload;
+{$IFDEF UNICODE}
+  procedure AbUnfixName( var FName : AnsiString ); overload;
+  // D6 Error: [Error] AbUtils.pas(269): Identifier redeclared: 'AbUnfixName'
+{$ENDIF}
     {-changes forward slashes to backslashes}
 
   procedure AbUpdateCRC( var CRC : LongInt; var Buffer; Len : Word );
@@ -270,17 +274,19 @@ type
   function AbUpdateCRC32(CurByte : Byte; CurCrc : LongInt) : LongInt;
     {-Returns an updated crc32}
 
-
+  {$IFNDEF UNICODE}
+  function AnsiStrAlloc(Size: Cardinal): PAnsiChar;
+  {$ENDIF}
 
   function AbWriteVolumeLabel(const VolName : string;
-                                  Drive : AnsiChar) : Cardinal;
+                                  Drive : Char) : Cardinal;
 {!!.04 - Added }
 const
   AB_SPAN_VOL_LABEL = 'PKBACK# %3.3d';
 
-  function AbGetVolumeLabel(Drive : AnsiChar) : AnsiString;
-  procedure AbSetSpanVolumeLabel(Drive: AnsiChar; VolNo : Integer);
-  function AbTestSpanVolumeLabel(Drive: AnsiChar; VolNo : Integer): Boolean;
+  function AbGetVolumeLabel(Drive : Char) : String;
+  procedure AbSetSpanVolumeLabel(Drive: Char; VolNo : Integer);
+  function AbTestSpanVolumeLabel(Drive: Char; VolNo : Integer): Boolean;
 {!!.04 - Added End }
 
   function AbFileGetAttr(const aFileName : string) : integer;
@@ -506,7 +512,7 @@ var
 begin
 {$IFDEF MSWINDOWS}
   if not AbDirectoryExists(Dir) then
-    GetTempPath(sizeof(TempPathZ), TempPathZ)
+    GetTempPath(sizeof(TempPathZ) div SizeOf(Char), TempPathZ)
   else
     StrPCopy(TempPathZ, Dir);
   GetTempFileName(TempPathZ, 'VMS', Word(not CreateIt), FileNameZ);
@@ -537,7 +543,7 @@ begin
     Result := Var1;
 end;
 { -------------------------------------------------------------------------- }
-function AbDrive(const ArchiveName : string) : AnsiChar;
+function AbDrive(const ArchiveName : string) : Char;
 var
   iPos: Integer;
   Path : string;
@@ -550,7 +556,7 @@ begin
     Result := Path[1];
 end;
 { -------------------------------------------------------------------------- }
-function AbDriveIsRemovable(const ArchiveName : string) : Boolean;       
+function AbDriveIsRemovable(const ArchiveName : string) : Boolean;
 var
 {$IFDEF MSWINDOWS}
   DType : Integer;
@@ -582,37 +588,16 @@ begin
 end;
 { -------------------------------------------------------------------------- }
 {!!.01 -- Rewritten}
-function AbGetDriveFreeSpace(const ArchiveName : string) : LongInt;
+function AbGetDriveFreeSpace(const ArchiveName : string) : Int64;
 { attempt to find free space (in bytes) on drive/volume,
   returns MaxLongInt on drives with greater space,
   returns -1 if fails for some reason }
 
 {$IFDEF MSWINDOWS }
-function GetLocalDiskFree(const Path : string) : {$IFDEF VERSION4} Int64 {$ELSE} LongInt {$ENDIF};
-var
-  SectorsPerCluster, BytesPerSector,
-  NumberOfFreeClusters, TotalNumberOfClusters : {$IFDEF VERSION4} Cardinal {$ELSE} LongInt {$ENDIF};
-  Succeeded : BOOL;
-  DrvBuf : array[0..255] of char;
-begin
-  Result := -1;
-  StrPCopy(DrvBuf, ExtractFileDrive(Path) + AbDosPathDelim);
-  Succeeded := GetDiskFreeSpace(DrvBuf,
-    SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters);
-  if Succeeded then
-{!!.03 -- Rewritten}
-    try
-      Result := BytesPerSector * SectorsPerCluster * NumberOfFreeClusters;
-    except
-      on EIntOverflow do
-        Result := High(Result);
-    end;
-{!!.03 -- End Rewritten}
-end;
 
-function GetRemoteDiskFree(const Path : string) : {$IFDEF VERSION4} Int64 {$ELSE} LongInt {$ENDIF};
+function GetDiskFree(const Path : string) : Int64;
 var
-  FreeAvailable, TotalSpace, TotalFree: {$IFDEF VERSION4} TLargeInteger {$ELSE} LongInt {$ENDIF};
+  FreeAvailable, TotalSpace, TotalFree: Int64;
   Succeeded : BOOL;
   PathBuf : array[0..255] of char;
 begin
@@ -623,7 +608,7 @@ begin
     Result := FreeAvailable;
 end;
 
-function GetRemoveableDiskFree(const Path : string) : LongInt;
+function GetRemoveableDiskFree(const Path : string) : Int64;
 begin
   Result := DiskFree(Ord(AbDrive(Path)) - Ord('A') + 1);
 end;
@@ -670,18 +655,11 @@ end;
 {$ENDIF LINUX}
 
 var
-{$IFDEF MSWINDOWS}
-{$IFDEF VERSION4}
   Size : Int64;
-{$ELSE}
-  Size : Integer;
-{$ENDIF VERSION4}
+{$IFDEF MSWINDOWS}
   DrvTyp : Integer;
   DrvStr : string;                                                       {!!.02}
 {$ENDIF MSWINDOWS}
-{$IFDEF LINUX}
-  Size : Int64;
-{$ENDIF}
 begin
 {$IFDEF MSWINDOWS }
   Size := -1;
@@ -698,18 +676,18 @@ begin
       if Pos('\\', ArchiveName) = 1 then begin  {path is UNC; must refer to network }
         { check OS version }
         if OSOK then begin
-          Size := GetRemoteDiskFree(DrvStr);                             {!!.02}
+          Size := GetDiskFree(DrvStr);                             {!!.02}
         end
         else begin {OS < Win95b }
           {GetDiskFreeSpaceEx isn't available and
            GetDiskFreeSpace and DiskFree fail on UNC paths,
            about all we can do is hope the server isn't full}
-            Size := MaxLongInt;
+            Size := High(Int64);
         end; {if}
       end
       else begin { path is not UNC}
         { determine drive type }
-        DrvTyp := GetDriveType(PAnsiChar(DrvStr));                       {!!.02}
+        DrvTyp := GetDriveType(PChar(DrvStr));                       {!!.02}
         {DrvTyp := GetDriveType(PAnsiChar(ExtractFilePath(ArchiveName))); }{!!.02}
         case DrvTyp of
           0 {type undeterminable} : Size := -1; { fail }
@@ -718,10 +696,10 @@ begin
 
 //        DRIVE_CDROM           : Size := -1; { fail }                 {!!.04}
 //        DRIVE_CDROM           : Size := 0; { Read-Only }             {!!.04}
-          DRIVE_CDROM             : Size := GetLocalDiskFree(DrvStr);  {!!.04}
+          DRIVE_CDROM             : Size := GetDiskFree(DrvStr);  {!!.04}
           DRIVE_REMOVABLE         : Size := GetRemoveableDiskFree(DrvStr); {!!.02}
-          DRIVE_FIXED             : Size := GetLocalDiskFree(DrvStr);      {!!.02}
-          DRIVE_REMOTE            : Size := GetRemoteDiskFree(DrvStr);     {!!.02}
+          DRIVE_FIXED             : Size := GetDiskFree(DrvStr);      {!!.02}
+          DRIVE_REMOTE            : Size := GetDiskFree(DrvStr);     {!!.02}
         end; {case}
       end; {if}
     end; {ptAbsolute}
@@ -745,7 +723,7 @@ function AbDirectoryExists( const Path : string ) : Boolean;
 {$IFDEF MSWINDOWS}
 var
   Attr : DWORD;
-  PathZ: array [0..255] of AnsiChar;
+  PathZ: array [0..255] of Char;
 {$ENDIF}
 {$IFDEF LINUX}
 var
@@ -764,7 +742,7 @@ begin
 {$ENDIF}
 {$IFDEF LINUX}
   if FileExists(Path) then begin
-    stat(PAnsiChar(Path), SB);
+    stat(PChar(Path), SB);
     Result := (SB.st_mode and AB_FMODE_DIR) = AB_FMODE_DIR;
   end;
 {$ENDIF}
@@ -796,14 +774,18 @@ var
   Found : Integer;
   NameMask: string;
 begin
+
   Found := FindFirst( FileMask, SearchAttr, SR );
+	//raise EWin32Error.Create(SysErrorMessage(Found));	
   if Found = 0 then begin
     try
       NameMask := UpperCase(ExtractFileName(FileMask));
       while Found = 0 do begin
         NewFile := ExtractFilePath( FileMask ) + SR.Name;
-        if AbPatternMatch(UpperCase(SR.Name), 1, NameMask, 1) then
-        FileList.Add( NewFile );
+	   if ((sr.Name <> AbThisDir) and (sr.Name <> AbParentDir)) then begin
+	        if AbPatternMatch(UpperCase(SR.Name), 1, NameMask, 1) then
+    	    FileList.Add( NewFile );
+        end;
         Found := FindNext( SR );
       end;
     finally
@@ -855,7 +837,7 @@ end;
 function AbAddBackSlash(const DirName : string) : string;
 { Add a default slash to a directory name }
 const
-  AbDelimSet : set of Char = [AbPathDelim, ':', #0];
+  AbDelimSet : set of AnsiChar = [AbPathDelim, ':', #0];
 begin
   Result := DirName;
   if Length(DirName) = 0 then
@@ -955,7 +937,7 @@ end;
 procedure AbIncFilename( var Filename : string; Value : Word );
 { place value at the end of filename, e.g. Files.C04 }
 var
-  Ext : string[4];
+  Ext : string;
   I : Word;
 begin
   I := (Value +1) mod 100;
@@ -1136,7 +1118,7 @@ begin
       FName[i] := AB_ZIPPATHDELIM;
 end;
 { -------------------------------------------------------------------------- }
-procedure AbUnfixName( var FName : string );
+procedure AbUnfixName( var FName : string ); overload;
 { changes forward slashes to backslashes }
 var
   i : Integer;
@@ -1145,6 +1127,19 @@ begin
     if FName[i] = AB_ZIPPATHDELIM then
       FName[i] := AbPathDelim;
 end;
+
+{$IFDEF UNICODE}
+procedure AbUnfixName( var FName : Ansistring ); overload;
+{ changes forward slashes to backslashes }
+var
+  i : Integer;
+begin
+  for i := 1 to Length( FName ) do
+    if FName[i] = AB_ZIPPATHDELIM then
+      FName[i] := AbPathDelim;
+end;
+{$ENDIF}
+
 { -------------------------------------------------------------------------- }
 procedure AbUpdateCRC( var CRC : LongInt; var Buffer; Len : Word );
 type
@@ -1169,13 +1164,21 @@ begin
   Result := DWORD(AbCrc32Table[ Byte(CurCrc xor LongInt( CurByte ) ) ] xor
             ((CurCrc shr 8) and DWORD($00FFFFFF)));
 end;
+
+{$IFNDEF UNICODE}
+function AnsiStrAlloc(Size: Cardinal): PAnsiChar;
+begin
+  Result := StrAlloc(Size);
+end;
+{$ENDIF}
+
 { -------------------------------------------------------------------------- }
 function AbWriteVolumeLabel(const VolName : string;
-                                Drive : AnsiChar) : Cardinal;
+                                Drive : Char) : Cardinal;
 var
   Temp : string;
-  Vol : array[0..11] of AnsiChar;
-  Root : array[0..3] of AnsiChar;
+  Vol : array[0..11] of Char;
+  Root : array[0..3] of Char;
 begin
   Temp := VolName;
   StrCopy(Root, '%:' + AbPathDelim);
@@ -1424,7 +1427,7 @@ begin
 
   {$IFDEF LINUX}
   {$WARN SYMBOL_PLATFORM OFF}
-  stat(PAnsiChar(aFileName), SB);
+  stat(PChar(aFileName), SB);
   Result := AbUnix2DosFileAttributes(SB.st_mode);                        {!!.01}
   {$WARN SYMBOL_PLATFORM ON}
   {$ENDIF}
@@ -1488,10 +1491,10 @@ end;
 const
   MAX_VOL_LABEL = 16;
 
-function AbGetVolumeLabel(Drive : AnsiChar) : AnsiString;
+function AbGetVolumeLabel(Drive : Char) : String;
 {-Get the volume label for the specified drive.}
 var
-  Root : AnsiString;
+  Root : String;
   Flags, MaxLength : DWORD;
   NameSize : Integer;
   VolName : string;
@@ -1505,20 +1508,20 @@ begin
 
   Result := '';
 
-  if GetVolumeInformation(PAnsiChar(Root), PChar(VolName), Length(VolName),
+  if GetVolumeInformation(PChar(Root), PChar(VolName), Length(VolName),
     nil, MaxLength, Flags, nil, NameSize)
   then
     Result := VolName;
 {$ENDIF}
 end;
 
-procedure AbSetSpanVolumeLabel(Drive: AnsiChar; VolNo : Integer);
+procedure AbSetSpanVolumeLabel(Drive: Char; VolNo : Integer);
 begin
   AbWriteVolumeLabel(Format(AB_SPAN_VOL_LABEL,
     [VolNo]), Drive);
 end;
 
-function AbTestSpanVolumeLabel(Drive: AnsiChar; VolNo : Integer): Boolean;
+function AbTestSpanVolumeLabel(Drive: Char; VolNo : Integer): Boolean;
 var
   VolLabel, TestLabel : string;
 begin

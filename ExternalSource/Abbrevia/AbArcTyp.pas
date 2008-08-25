@@ -49,10 +49,10 @@ type
   private
     function GetLastModTimeAsDateTime: TDateTime;                        {!!.01}
     procedure SetLastModTimeAsDateTime(const Value: TDateTime);          {!!.01}
-  protected {private}
+  private
     NextItem          : TAbArchiveItem;
     FAction           : TAbArchiveAction;
-    FCompressedSize   : LongInt;
+    FCompressedSize   : Int64;
     FCRC32            : Longint;
     FDiskFileName     : string;
     FExternalFileAttributes : Longint;
@@ -61,10 +61,14 @@ type
     FLastModFileTime  : Word;
     FLastModFileDate  : Word;
     FTagged           : Boolean;
-    FUncompressedSize : LongInt;
-
+    FUncompressedSize : Int64;
+    FIsDirectory      : Boolean;
+  protected
+    function GetIsDirectory(): Boolean;
+    procedure SetIsDirectory(const Value: Boolean); 
+    class function GetMaxFileSize(): Int64; virtual;
   protected {property methods}
-    function GetCompressedSize : LongInt; virtual;
+    function GetCompressedSize : Int64; virtual;
     function GetCRC32 : Longint; virtual;
     function GetDiskPath : string;
     function GetExternalFileAttributes : LongInt; virtual;
@@ -73,29 +77,29 @@ type
     function GetLastModFileDate : Word; virtual;
     function GetLastModFileTime : Word; virtual;
     function GetStoredPath : string;
-    function GetUncompressedSize : LongInt; virtual;
-    procedure SetCompressedSize(const Value : LongInt); virtual;
+    function GetUncompressedSize : Int64; virtual;
+    procedure SetCompressedSize(const Value : Int64); virtual;
     procedure SetCRC32(const Value : Longint); virtual;
     procedure SetExternalFileAttributes( Value : LongInt ); virtual;
     procedure SetFileName(const Value : string); virtual;
     procedure SetIsEncrypted(Value : Boolean); virtual;
     procedure SetLastModFileDate(const Value : Word); virtual;
     procedure SetLastModFileTime(const Value : Word); virtual;
-    procedure SetUncompressedSize(const Value : LongInt); virtual;
+    procedure SetUncompressedSize(const Value : Int64); virtual;
 
   public {methods}
     constructor Create;
     destructor Destroy; override;
     function MatchesDiskName(const FileMask : string) : Boolean;
     function MatchesStoredName(const FileMask : string) : Boolean;
-    function MatchesStoredNameEx(const FileMask : string) : Boolean;     
+    function MatchesStoredNameEx(const FileMask : string) : Boolean;
 
 
   public {properties}
     property Action : TAbArchiveAction
       read FAction
       write FAction;
-    property CompressedSize : LongInt
+    property CompressedSize : Int64
       read GetCompressedSize
       write SetCompressedSize;
     property CRC32 : Longint
@@ -126,9 +130,13 @@ type
     property Tagged : Boolean
       read FTagged
       write FTagged;
-    property UncompressedSize : LongInt
+    property UncompressedSize : Int64
       read GetUncompressedSize
       write SetUncompressedSize;
+
+    property IsDiskFileADirectory: Boolean
+        read GetIsDirectory
+        write SetIsDirectory;
 
     property LastModTimeAsDateTime : TDateTime                           {!!.01}
       read GetLastModTimeAsDateTime                                      {!!.01}
@@ -252,7 +260,7 @@ type
     FStream         : TStream;
     FStatus         : TAbArchiveStatus;
 
-  protected {property variables}
+  protected {property variables}    //These break Encapsulation
     FArchiveName    : string;
     FAutoSave       : Boolean;
     FBaseDirectory  : string;
@@ -262,7 +270,7 @@ type
     FImageNumber    : Word;
     FInStream       : TStream;
     FIsDirty        : Boolean;
-    FSpanningThreshold      : Longint;
+    FSpanningThreshold      : Int64;
     FItemList       : TAbArchiveList;
     FLogFile        : string;
     FLogging        : Boolean;
@@ -302,6 +310,9 @@ type
     procedure SetLogFile(const Value : string);
     procedure SetLogging(Value : Boolean);
     procedure Unlock;
+    class function GetMaxFileSize: Int64; virtual;
+   	class Function SupportsEmptyFolder: Boolean; virtual;
+
 
   protected {abstract methods}
     function CreateItem(const FileSpec : string): TAbArchiveItem;
@@ -343,9 +354,9 @@ type
       virtual;
     function FixName(const Value : string) : string;
       virtual;
-    function GetSpanningThreshold : Longint;
+    function GetSpanningThreshold : Int64;
       virtual;
-    procedure SetSpanningThreshold( Value : Longint );
+    procedure SetSpanningThreshold( Value : Int64 );
       virtual;
 
   protected {properties and events}
@@ -433,7 +444,7 @@ type
       read FMode;
     property Spanned : Boolean
       read FSpanned;
-    property SpanningThreshold : Longint
+    property SpanningThreshold : Int64
       read  GetSpanningThreshold
       write SetSpanningThreshold;
     property Status : TAbArchiveStatus
@@ -564,7 +575,13 @@ begin
   inherited Destroy;
 end;
 { -------------------------------------------------------------------------- }
-function TAbArchiveItem.GetCompressedSize : LongInt;
+
+class function TAbArchiveItem.GetMaxFileSize: Int64;
+begin
+    Result := $FFFFFFFF;  //Make same as old
+end;
+{ -------------------------------------------------------------------------- }
+function TAbArchiveItem.GetCompressedSize : Int64;
 begin
   Result := FCompressedSize;
 end;
@@ -589,6 +606,11 @@ begin
   Result := FFileName;
 end;
 { -------------------------------------------------------------------------- }
+function TAbArchiveItem.GetIsDirectory: Boolean;
+begin
+    Result := FIsDirectory;
+end;
+
 function TAbArchiveItem.GetIsEncrypted : Boolean;
 begin
   Result := FIsEncrypted;
@@ -609,7 +631,7 @@ begin
   Result := ExtractFilePath(DiskFileName);
 end;
 { -------------------------------------------------------------------------- }
-function TAbArchiveItem.GetUnCompressedSize : LongInt;
+function TAbArchiveItem.GetUnCompressedSize : Int64;
 begin
   Result := FUnCompressedSize;
 end;
@@ -657,7 +679,7 @@ begin
   Result := False;
 end;
 { -------------------------------------------------------------------------- }
-procedure TAbArchiveItem.SetCompressedSize(const Value : LongInt);
+procedure TAbArchiveItem.SetCompressedSize(const Value : Int64);
 begin
   FCompressedSize := Value;
 end;
@@ -677,6 +699,11 @@ begin
   FFileName := Value;
 end;
 { -------------------------------------------------------------------------- }
+procedure TAbArchiveItem.SetIsDirectory(const Value: Boolean);
+begin
+    FIsDirectory := Value;
+end;
+
 procedure TAbArchiveItem.SetIsEncrypted(Value : Boolean);
 begin
   FIsEncrypted := Value;
@@ -692,9 +719,10 @@ begin
   FLastModFileTime := Value;
 end;
 { -------------------------------------------------------------------------- }
-procedure TAbArchiveItem.SetUnCompressedSize(const Value : LongInt);
+procedure TAbArchiveItem.SetUnCompressedSize(const Value : Int64);
 begin
   FUnCompressedSize := Value;
+  if Value > GetMaxFileSize() then raise EAbFileTooLarge.Create();
 end;
 { -------------------------------------------------------------------------- }
 {!!.01 -- Added }
@@ -715,6 +743,7 @@ end;
 {!!.01 -- End Added }
 
 { TAbArchiveList implementation ============================================ }
+
 { TAbArchiveList }
 constructor TAbArchiveList.Create;
 begin
@@ -992,13 +1021,13 @@ var
     FilterList := TStringList.Create;
     try
       if (MaskF <> '') then
-        AbFindFilesEx(MaskF, SearchAttr and not faDirectory, FilterList, Recursing);
+        AbFindFilesEx(MaskF, SearchAttr, FilterList, Recursing);
 
         Files := TStringList.Create;
         try
 
-          AbFindFilesEx(Mask, SearchAttr and not faDirectory, Files, Recursing);
-          if (Files.Count > 0) then
+          AbFindFilesEx(Mask, SearchAttr, Files, Recursing);
+          if (Files.Count > 0) then begin
             for i := 0 to pred(Files.Count) do
               if FilterList.IndexOf(Files[i]) < 0 then               
                 if not Wild then begin                               
@@ -1006,13 +1035,15 @@ var
                     Item := CreateItem(Files[i]);
                     Add(Item);
                   end;
-                end else begin                                       
+                end else begin
                   if (AbAddBackSlash(FBaseDirectory) + Files[i]) <> FArchiveName
                     then begin
                       Item := CreateItem(Files[i]);
                       Add(Item);
                     end;
                 end;
+            FIsDirty := true;
+          end;
         finally
           Files.Free;
         end;
@@ -1023,6 +1054,10 @@ var
   end;
 
 begin
+   if (not SupportsEmptyFolder()) then begin
+    SearchAttr := SearchAttr and not faDirectory;
+   end;
+
   CheckValid;
   IsWild := (Pos('*', FileMask) > 0) or (Pos('?', FileMask) > 0);
   PathType := AbGetPathType(FileMask);
@@ -1033,19 +1068,7 @@ begin
   AbUnfixName(MaskF);
 
   case PathType of
-    ptNone :
-      begin
-        GetDir(0, SaveDir);
-        if BaseDirectory <> '' then
-          ChDir(BaseDirectory);
-        try
-          CreateItems(IsWild, soRecurse in StoreOptions);
-        finally
-          if BaseDirectory <> '' then
-            ChDir(SaveDir);
-        end;
-      end;
-    ptRelative :
+    ptNone, ptRelative :
       begin
         GetDir(0, SaveDir);
         if BaseDirectory <> '' then
@@ -1302,8 +1325,16 @@ begin
     if not Confirm then
       Exit;
     TempNewName := NewName;
-    if (TempNewName = '') then
+    if (TempNewName = '') then begin
       TempNewName := TAbArchiveItem(FItemList[Index]).FileName;
+      AbUnfixName(TempNewName);
+
+      if (not (eoRestorePath in ExtractOptions)) then
+      	TempNewName := ExtractFileName(TempNewName);
+
+      TempNewName := AbAddBackSlash(BaseDirectory) + TempNewName;
+	end;
+
     try
       FCurrentItem := FItemList[Index];
       ExtractItemAt(Index, TempNewName);
@@ -1425,6 +1456,7 @@ begin
   end;
 end;
 { -------------------------------------------------------------------------- }
+
 procedure TAbArchive.TestTaggedItems;
   {test all tagged items in the archive}
 var
@@ -1638,7 +1670,7 @@ var
   SaveDir : string;
   DName : string;
 begin
-  PathType := AbGetPathType(Item.FileName);
+  PathType := AbGetPathType(Item.DiskFileName);
   if (soRecurse in StoreOptions) and (PathType = ptNone) then begin
     GetDir(0, SaveDir);
     if BaseDirectory <> '' then
@@ -1646,6 +1678,9 @@ begin
     try
       Files := TStringList.Create;
       try
+        // even if archive supports empty folder we don't have to
+        // freshen it because there is no data, although, the timestamp
+        // can be update since the folder was added
         AbFindFiles(Item.FileName, faAnyFile and not faDirectory, Files,
                      True);
         if Files.Count > 0 then begin
@@ -1676,7 +1711,7 @@ begin
   end;
 end;
 { -------------------------------------------------------------------------- }
-function TAbArchive.GetSpanningThreshold : Longint;
+function TAbArchive.GetSpanningThreshold : Int64;
 begin
   Result := FSpanningThreshold;
 end;
@@ -1742,7 +1777,7 @@ begin
       ltFoundUnhandled : StrPCopy(Buf, FN + AbStrRes(AbUnhandledEntity) +
         DateTimeToStr(Now) + CRLF);
     end;
-    FLogStream.Write(Buf, StrLen(Buf));
+    FLogStream.Write(Buf, StrLen(Buf) * SizeOf(Char));
   end;
 end;
 { -------------------------------------------------------------------------- }
@@ -1793,11 +1828,18 @@ procedure TAbArchive.Replace(aItem : TAbArchiveItem);
   {replace the item}
 var
   Index : Integer;
+  existingItem: TAbArchiveItem;
 begin
   CheckValid;
   Index := FindItem(aItem);
-  if Index <> -1 then
+  if Index <> -1 then begin
+  	{HACK: find a better way of doing this}
+  	// why are we searching for the file more than once?
+    //for mask like ..\*.* with soStripPath it looses disk information
+    existingItem := FItemList.Items[index];
+    existingItem.FDiskFileName := aItem.FDiskFileName;
     ReplaceAt(Index);
+  end;
 end;
 { -------------------------------------------------------------------------- }
 procedure TAbArchive.ReplaceAt(Index : Integer);
@@ -1864,7 +1906,7 @@ begin
     raise EAbNoSuchDirectory.Create;
 end;
 { -------------------------------------------------------------------------- }
-procedure TAbArchive.SetSpanningThreshold( Value : Longint );
+procedure TAbArchive.SetSpanningThreshold( Value : Int64 );
 begin
   FSpanningThreshold := Value;
 end;
@@ -1911,6 +1953,12 @@ begin
   FPadLock.Locked := False;
 end;
 { -------------------------------------------------------------------------- }
+//TODO: Remove
+class function TAbArchive.GetMaxFileSize: Int64;
+begin
+    Result := High(LongWord);
+end;
+{ -------------------------------------------------------------------------- }
 procedure TAbArchive.UnTagItems(const FileMask : string);
   {clear tags for all items that match the mask}
 var
@@ -1929,6 +1977,11 @@ procedure TAbArchive.DoSpanningMediaRequest(Sender: TObject;
   ImageNumber: Integer; var ImageName: string; var Abort: Boolean);
 begin
   raise EAbSpanningNotSupported.Create;
+end;
+
+class function TAbArchive.SupportsEmptyFolder: Boolean;
+begin
+	Result := false;
 end;
 
 { TAbArchiveStreamHelper }

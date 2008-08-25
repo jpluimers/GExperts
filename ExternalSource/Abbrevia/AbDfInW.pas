@@ -104,7 +104,7 @@ type
       function GetNextKeyLength : integer;
       function Position : longint;
       procedure ReadBuffer(var aBuffer; aCount  : longint;
-                                        aOffset : longint);
+                                        aOffset : Int64);
 
       property ChainLen : integer read FChainLen write FChainLen;
       property Checksum : longint read iwGetChecksum;
@@ -744,14 +744,14 @@ begin
 end;
 {--------}
 procedure TAbDfInputWindow.ReadBuffer(var aBuffer; aCount  : longint;
-                                                   aOffset : longint);
+                                                   aOffset : Int64);
 var
-  CurPos : longint;
+  CurPos : Int64;              
 begin
-  CurPos := FStream.Seek(0, soFromCurrent);
-  FStream.Seek(aOffSet, soFromBeginning);
+  CurPos := FStream.Seek(0, soCurrent);
+  FStream.Seek(aOffSet, soBeginning);
   FStream.ReadBuffer(aBuffer, aCount);
-  FStream.Seek(CurPos, soFromBeginning);
+  FStream.Seek(CurPos, soBeginning);
 end;
 {====================================================================}
 

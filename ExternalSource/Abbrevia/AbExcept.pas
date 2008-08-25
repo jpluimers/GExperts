@@ -102,7 +102,14 @@ type
   EAbZipException = class( EAbException ); {Zip exception}
   EAbCabException = class( EAbException ); {Cab exception}
   EAbTarException = class( EAbException ); {Tar Exception}
-  EAbGzipException = class( EAbException); {GZip exception }
+  EAbGzipException = class( EAbException); {GZip exception}
+  EAbBzipException = class( EAbException); {BZip exception}
+
+
+  EAbInvalidHeaderException = class(EAbException)
+  public 
+    constructor Create;
+  end;
 
   EAbZipBadSpanStream = class( EAbZipException )
   public
@@ -205,6 +212,21 @@ type
   end;
 
   EAbGzipInvalid = class( EAbGZipException )
+  public
+    constructor Create;
+  end;
+
+  EAbBzipBadCRC = class( EAbBZipException )
+  public
+    constructor Create;
+  end;
+
+  EAbBzipBadFileSize = class( EAbBZipException )
+  public
+    constructor Create;
+  end;
+
+  EAbBzipInvalid = class( EAbBZipException )
   public
     constructor Create;
   end;
@@ -362,6 +384,11 @@ type
   EAbInvalidCabFile = class( EAbCabException )
   public
     constructor Create;
+  end;
+
+  EAbFileTooLarge = class(EAbException)  
+    constructor Create;
+
   end;
 
   procedure AbConvertException( const E : Exception;
@@ -784,6 +811,32 @@ begin
 
 end;
 
+
+{ EAbBzipBadCRC }
+
+constructor EAbBzipBadCRC.Create;
+begin
+  inherited Create(AbStrRes(AbBzipBadCRC));
+  ErrorCode := AbBzipBadCRC;
+end;
+
+{ EAbBzipBadFileSize }
+
+constructor EAbBzipBadFileSize.Create;
+begin
+  inherited Create(AbStrRes(AbBzipBadFileSize));
+  ErrorCode := AbBzipBadFileSize;
+end;
+
+{ EAbBzipInvalid }
+
+constructor EAbBzipInvalid.Create;
+begin
+  inherited Create(AbStrRes(AbSpanningNotSupported));
+  ErrorCode := AbSpanningNotSupported;
+
+end;
+
 { EAbSpanningNotSupported }
 
 constructor EAbSpanningNotSupported.Create;
@@ -792,5 +845,21 @@ begin
   ErrorCode := AbSpanningNotSupported;
 end;
 
+
+{ EAbInvalidHeader }
+
+constructor EAbInvalidHeaderException.Create;
+begin
+	inherited Create('Invalid Header');
+    ErrorCode := AbInvaliHeader;
+end;
+
+{ EAbFileTooLarge }
+
+constructor EAbFileTooLarge.Create;
+begin
+    {TODO Create const and fix wording}
+    inherited Create('File size is too big for archive type'); 
+end;
 
 end.

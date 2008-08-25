@@ -56,13 +56,13 @@ type
     FCRC : LongInt;                                                      
     FCheckByte : Boolean;
     FOnNeedPassword : TAbNeedPasswordEvent;
-    FPassword : string;
+    FPassword : AnsiString;
     FRetries : Byte;
     FStream : TStream;
 
     function DecryptByte : Byte;
       {get the decryption byte}
-    procedure DoOnNeedPassword( var NewPassword : string );
+    procedure DoOnNeedPassword( var NewPassword : AnsiString );
               virtual;
     procedure InitKeys;
       {-Initialize Keys}
@@ -87,7 +87,7 @@ type
     property OnNeedPassword : TAbNeedPasswordEvent
              read FOnNeedPassword
              write FOnNeedPassword;
-    property Password : string
+    property Password : AnsiString
              write FPassword;
     property Retries : Byte
              read FRetries
@@ -172,7 +172,7 @@ begin
   Result := ( Temp * ( Temp xor 1 ) ) shr 8;
 end;
 { -------------------------------------------------------------------------- }
-procedure TAbZDecoder.DoOnNeedPassword( var NewPassword : string );
+procedure TAbZDecoder.DoOnNeedPassword( var NewPassword : AnsiString );
 begin
   if Assigned( FOnNeedPassword ) then
     FOnNeedPassword( Self, NewPassword )
