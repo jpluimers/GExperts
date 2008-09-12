@@ -3146,7 +3146,7 @@ end;
 
 function GetDirectory(var Dir: string; Owner: TCustomForm): Boolean;
 resourcestring
-  SSelDir = 'Select a directory';
+  SSelDir = 'Select a Directory';
 var
   OldErrorMode: UINT;
   BrowseRoot: WideString;
