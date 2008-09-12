@@ -77,6 +77,7 @@ function RunningBDS2006OrGreater: Boolean;
 function RunningBDS2006: Boolean;
 function RunningCPPBuilder: Boolean;
 function IDEHasWelcomePage: Boolean;
+function FileIsWelcomePage(const FileName: string): Boolean;
 function IDEEditorEncodingIsUTF8: Boolean;
 
 implementation
@@ -494,6 +495,11 @@ end;
 function IDEHasWelcomePage: Boolean;
 begin
   Result := RunningDelphi8OrGreater;
+end;
+
+function FileIsWelcomePage(const FileName: string): Boolean;
+begin
+  Result := IDEHasWelcomePage and StringInArray(FileName, ['default.htm', 'bds:/default.htm']);
 end;
 
 function IDEEditorEncodingIsUTF8: Boolean;
