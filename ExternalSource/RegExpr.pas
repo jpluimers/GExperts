@@ -5,7 +5,8 @@ unit RegExpr;
      Delphi Regular Expressions
 
  Copyright (c) 1999-2004 Andrey V. Sorokin, St.Petersburg, Russia
- Adapted to Tiburon by Sebastian Zierer
+ Delphi 2009 Adaption by Sebastian Zierer
+ Minor fixes and error message changes by Erik Berry
 
  You may use this software in any kind of development,
  including comercial, redistribute, and modify it freely,
@@ -29,8 +30,8 @@ unit RegExpr;
     not be charged seperatly.
  4. Altered versions must be plainly marked as such, and must
     not be misrepresented as being the original software.
- 5. RegExp Studio application and all the visual components as 
-    well as documentation is not part of the TRegExpr library 
+ 5. RegExp Studio application and all the visual components as
+    well as documentation is not part of the TRegExpr library
     and is not free for usage.
 
                                     mailto:anso@mail.ru
@@ -137,7 +138,7 @@ type
 const
   EscChar = '\'; // 'Escape'-char ('\' in common r.e.) used for escaping metachars (\w, \d etc).
   RegExprModifierI : boolean = False;    // default value for ModifierI
-  RegExprModifierR : boolean = True;     // default value for ModifierR
+  RegExprModifierR : boolean = False;    // default value for ModifierR
   RegExprModifierS : boolean = True;     // default value for ModifierS
   RegExprModifierG : boolean = True;     // default value for ModifierG
   RegExprModifierM : boolean = False;    // default value for ModifierM
@@ -1054,7 +1055,7 @@ const
  reeNoExpression = 1003;
  reeCorruptedProgram = 1004;
  reeNoInpitStringSpecified = 1005;
- reeOffsetMustBeGreaterThen0 = 1006;
+ reeOffsetMustBeGreaterThan0 = 1006;
  reeExecNextWithoutExec = 1007;
  reeGetInputStringWithoutInputString = 1008;
  reeDumpCorruptedOpcode = 1011;
@@ -1067,47 +1068,48 @@ function TRegExpr.ErrorMsg (AErrorID : integer) : RegExprString;
  begin
   case AErrorID of
     reeOk: Result := 'No errors';
-    reeCompNullArgument: Result := 'TRegExpr(comp): Null Argument';
-    reeCompRegexpTooBig: Result := 'TRegExpr(comp): Regexp Too Big';
-    reeCompParseRegTooManyBrackets: Result := 'TRegExpr(comp): ParseReg Too Many ()';
-    reeCompParseRegUnmatchedBrackets: Result := 'TRegExpr(comp): ParseReg Unmatched ()';
-    reeCompParseRegUnmatchedBrackets2: Result := 'TRegExpr(comp): ParseReg Unmatched ()';
-    reeCompParseRegJunkOnEnd: Result := 'TRegExpr(comp): ParseReg Junk On End';
-    reePlusStarOperandCouldBeEmpty: Result := 'TRegExpr(comp): *+ Operand Could Be Empty';
-    reeNestedSQP: Result := 'TRegExpr(comp): Nested *?+';
-    reeBadHexDigit: Result := 'TRegExpr(comp): Bad Hex Digit';
-    reeInvalidRange: Result := 'TRegExpr(comp): Invalid [] Range';
-    reeParseAtomTrailingBackSlash: Result := 'TRegExpr(comp): Parse Atom Trailing \';
-    reeNoHexCodeAfterBSlashX: Result := 'TRegExpr(comp): No Hex Code After \x';
-    reeHexCodeAfterBSlashXTooBig: Result := 'TRegExpr(comp): Hex Code After \x Is Too Big';
-    reeUnmatchedSqBrackets: Result := 'TRegExpr(comp): Unmatched []';
-    reeInternalUrp: Result := 'TRegExpr(comp): Internal Urp';
-    reeQPSBFollowsNothing: Result := 'TRegExpr(comp): ?+*{ Follows Nothing';
-    reeTrailingBackSlash: Result := 'TRegExpr(comp): Trailing \';
-    reeRarseAtomInternalDisaster: Result := 'TRegExpr(comp): RarseAtom Internal Disaster';
-    reeBRACESArgTooBig: Result := 'TRegExpr(comp): BRACES Argument Too Big';
-    reeBracesMinParamGreaterMax: Result := 'TRegExpr(comp): BRACE Min Param Greater then Max';
-    reeUnclosedComment: Result := 'TRegExpr(comp): Unclosed (?#Comment)';
-    reeComplexBracesNotImplemented: Result := 'TRegExpr(comp): If you want take part in beta-testing BRACES ''{min,max}'' and non-greedy ops ''*?'', ''+?'', ''??'' for complex cases - remove ''.'' from {.$DEFINE ComplexBraces}';
-    reeUrecognizedModifier: Result := 'TRegExpr(comp): Urecognized Modifier';
-    reeBadLinePairedSeparator: Result := 'TRegExpr(comp): LinePairedSeparator must countain two different chars or no chars at all';
+    reeCompNullArgument: Result := 'Null argument';
+    reeCompRegexpTooBig: Result := 'Regular expression too long';
+    reeCompParseRegTooManyBrackets: Result := 'Too many parenthsis';
+    reeCompParseRegUnmatchedBrackets: Result := 'Unmatched parenthesis';
+    reeCompParseRegUnmatchedBrackets2: Result := 'Unmatched parenthesis';
+    reeCompParseRegJunkOnEnd: Result := 'Junk on end of expression';
+    reePlusStarOperandCouldBeEmpty: Result := '*+ Operand could be empty';
+    reeNestedSQP: Result := 'Nested *?+ operator';
+    reeBadHexDigit: Result := 'Invalid hex digit';
+    reeInvalidRange: Result := 'Invalid [] range';
+    reeParseAtomTrailingBackSlash: Result := 'Trailing \ found';
+    reeNoHexCodeAfterBSlashX: Result := 'No hex code found after \x';
+    reeHexCodeAfterBSlashXTooBig: Result := 'Hex code after \x is too big';
+    reeUnmatchedSqBrackets: Result := 'Unmatched brackets';
+    reeInternalUrp: Result := 'Internal error: Invalid character found';
+    reeQPSBFollowsNothing: Result := '?+*{ should follow something';
+    reeTrailingBackSlash: Result := 'Trailing \';
+    reeRarseAtomInternalDisaster: Result := 'Internal disaster!';
+    reeBRACESArgTooBig: Result := 'Numer inside braces ({n,m}) is too large';
+    reeBracesMinParamGreaterMax: Result := 'Brace min value is greater than max value';
+    reeUnclosedComment: Result := 'Unclosed (?#Comment)';
+    reeComplexBracesNotImplemented: Result := 'If you want take part in beta-testing BRACES ''{min,max}'' and non-greedy ops ''*?'', ''+?'', ''??'' for complex cases - remove ''.'' from {.$DEFINE ComplexBraces}';
+    reeUrecognizedModifier: Result := 'Urecognized modifier';
+    reeBadLinePairedSeparator: Result := 'LinePairedSeparator must countain two different chars or no chars at all';
 
-    reeRegRepeatCalledInappropriately: Result := 'TRegExpr(exec): RegRepeat Called Inappropriately';
-    reeMatchPrimMemoryCorruption: Result := 'TRegExpr(exec): MatchPrim Memory Corruption';
-    reeMatchPrimCorruptedPointers: Result := 'TRegExpr(exec): MatchPrim Corrupted Pointers';
-    reeNoExpression: Result := 'TRegExpr(exec): Not Assigned Expression Property';
-    reeCorruptedProgram: Result := 'TRegExpr(exec): Corrupted Program';
-    reeNoInpitStringSpecified: Result := 'TRegExpr(exec): No Input String Specified';
-    reeOffsetMustBeGreaterThen0: Result := 'TRegExpr(exec): Offset Must Be Greater Then 0';
-    reeExecNextWithoutExec: Result := 'TRegExpr(exec): ExecNext Without Exec[Pos]';
-    reeGetInputStringWithoutInputString: Result := 'TRegExpr(exec): GetInputString Without InputString';
-    reeDumpCorruptedOpcode: Result := 'TRegExpr(dump): Corrupted Opcode';
-    reeLoopStackExceeded: Result := 'TRegExpr(exec): Loop Stack Exceeded';
-    reeLoopWithoutEntry: Result := 'TRegExpr(exec): Loop Without LoopEntry !';
+    reeRegRepeatCalledInappropriately: Result := 'RegRepeat called inappropriately';
+    reeMatchPrimMemoryCorruption: Result := 'Memory corruption in MatchPrim';
+    reeMatchPrimCorruptedPointers: Result := 'Corrupted pointers in MatchPrim';
+    reeNoExpression: Result := 'Blank regular expression';
+    reeCorruptedProgram: Result := 'Corrupted program';
+    reeNoInpitStringSpecified: Result := 'No data to search';
+    reeOffsetMustBeGreaterThan0: Result := 'Search start offset must be greater than 0';
+    reeExecNextWithoutExec: Result := 'ExecNext called without first calling Exec[Pos]';
+    reeGetInputStringWithoutInputString: Result := 'GetInputString called without first calling InputString';
+    reeDumpCorruptedOpcode: Result := 'Corrupted opcode';
+    reeLoopStackExceeded: Result := 'Loop stack exceeded';
+    reeLoopWithoutEntry: Result := 'Loop wihtout a loop entry';
 
-    reeBadPCodeImported: Result := 'TRegExpr(misc): Bad p-code imported';
+    reeBadPCodeImported: Result := 'Bad p-code imported';
     else Result := 'Unknown error';
    end;
+   Result := 'Regular Expression Error: ' + Result;
  end; { of procedure TRegExpr.Error
 --------------------------------------------------------------}
 
@@ -3221,7 +3223,7 @@ function TRegExpr.MatchPrim (prog : PRegExprChar) : boolean;
         scan := next;
     end; { of while scan <> nil}
 
-  // We get here only if there's trouble -- normally "case EEND" is the
+  // We get here only if there's trouble -- normally "case END" is the
   // terminating point.
   Error (reeMatchPrimCorruptedPointers);
  end; { of function TRegExpr.MatchPrim
@@ -3441,7 +3443,7 @@ function TRegExpr.ExecPrim (AOffset: integer) : boolean;
 
   //Check that the start position is not negative
   if AOffset < 1 then begin
-    Error (reeOffsetMustBeGreaterThen0);
+    Error (reeOffsetMustBeGreaterThan0);
     EXIT;
    end;
   // Check that the start position is not longer than the line
@@ -4017,7 +4019,7 @@ procedure TRegExpr.Error (AErrorID : integer);
   fLastError := AErrorID; // dummy stub - useless because will raise exception
   if AErrorID < 1000 // compilation error ?
    then e := ERegExpr.Create (ErrorMsg (AErrorID) // yes - show error pos
-             + ' (pos ' + IntToStr (CompilerErrorPos) + ')')
+             + ' (Character #' + IntToStr (CompilerErrorPos) + ')')
    else e := ERegExpr.Create (ErrorMsg (AErrorID));
   e.ErrorCode := AErrorID;
   e.CompilerErrorPos := CompilerErrorPos;
