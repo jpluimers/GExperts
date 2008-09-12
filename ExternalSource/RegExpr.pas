@@ -5,6 +5,7 @@ unit RegExpr;
      Delphi Regular Expressions
 
  Copyright (c) 1999-2004 Andrey V. Sorokin, St.Petersburg, Russia
+ Adapted to Tiburon by Sebastian Zierer
 
  You may use this software in any kind of development,
  including comercial, redistribute, and modify it freely,
@@ -49,6 +50,7 @@ interface
 {$IFDEF VER130} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D5
 {$IFDEF VER140} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D6
 {$IFDEF VER150} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D7
+{$IF CompilerVersion > 15} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$IFEND} // D7
 
 // ======== Define base compiler options
 {$BOOLEVAL OFF}
@@ -69,6 +71,9 @@ interface
 
 // ======== Define options for TRegExpr engine
 {.$DEFINE UniCode} // Unicode support
+{$IF CompilerVersion >= 20}
+  {$DEFINE UniCode}
+{$IFEND}
 {$DEFINE RegExpPCodeDump} // p-code dumping (see Dump method)
 {$IFNDEF FPC} // the option is not supported in FreePascal
  {$DEFINE reRealExceptionAddr} // exceptions will point to appropriate source line, not to Error procedure
@@ -102,7 +107,11 @@ uses
 type
  {$IFDEF UniCode}
  PRegExprChar = PWideChar;
+ {$IF CompilerVersion >= 20}
+ RegExprString = UnicodeString;
+ {$ELSE}
  RegExprString = WideString;
+ {$IFEND}
  REChar = WideChar;
  {$ELSE}
  PRegExprChar = PChar;
@@ -1164,11 +1173,11 @@ destructor TRegExpr.Destroy;
 
 class function TRegExpr.InvertCaseFunction (const Ch : REChar) : REChar;
  begin
-  {$IFDEF UniCode}
+  {$IF Defined(UniCode) and (CompilerVersion < 19)}
   if Ch >= #128
    then Result := Ch
   else
-  {$ENDIF}
+  {$IFEND}
    begin
     Result := {$IFDEF FPC}AnsiUpperCase (Ch) [1]{$ELSE} REChar (CharUpper (PChar (Ch))){$ENDIF};
     if Result = Ch
