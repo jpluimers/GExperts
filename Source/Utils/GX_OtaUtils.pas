@@ -2821,7 +2821,7 @@ begin
   PropertyTypeName := GetEnumName(TypeInfo(TTypeKind), Ord(PropertyType));
   case PropertyType of
     tkWString: begin
-        VAString := Value;
+        VAString := AnsiString(Value);
         // Delphi 2007 and earlier have a bug that requires AnsiString data to set a WideString.
         // This will fail for characters outside of the current ANSI codepage.
         if RunningDelphi2007OrLess then
@@ -2831,7 +2831,7 @@ begin
       end;
 
     tkLString: begin
-        VAString := Value;
+        VAString := AnsiString(Value);
         Result := AComponent.SetPropByName(PropertyName, VAString);
       end;
 
