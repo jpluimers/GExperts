@@ -642,12 +642,7 @@ end;
 
 function TGxIdeNotifier.ValidModuleFileName(const FileName: string): Boolean;
 begin
-  Result := False;
-  // Ignore the default.htm module (the Welcome Page) in Delphi 8+
-  if IDEHasWelcomePage then
-    if SameFileName(FileName, 'default.htm') or SameFileName(FileName, ('bds:/default.htm')) then
-      Exit;
-  Result := True;
+  Result := not FileIsWelcomePage(FileName);
 end;
 
 { TGxModuleNotifier }
