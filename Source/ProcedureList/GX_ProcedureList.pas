@@ -515,7 +515,7 @@ begin
     if Trim(FCodeText.SelText) <> '' then
       Clipboard.AsText := FCodeText.SelText
     else
-      Clipboard.AsText := FCodeText.Lines.Text;
+      Clipboard.AsText := FCodeText.AsString;
   end
   else
   begin
@@ -792,21 +792,21 @@ procedure TfmProcedureList.UpdateCodeView(ProcInfo: TProcedure);
 begin
   if not Assigned(FCodeText) then
     Exit;
-  FCodeText.Lines.BeginUpdate;
+  FCodeText.BeginUpdate;
   try
     if Assigned(ProcInfo) and (FLastProcLineNo = ProcInfo.LineNo) then
       Exit;
-    FCodeText.Lines.Clear;
+    FCodeText.Clear;
     if (not Assigned(ProcInfo)) or (not FOptions.CodeViewVisible) then
       Exit;
     if ProcInfo.Body <> '' then
-      FCodeText.Lines.Text := ProcInfo.Body
+      FCodeText.AsString := ProcInfo.Body
     else
-      FCodeText.Lines.Text := Copy(PAnsiChar(FMemStream.Memory),
+      FCodeText.AsString := Copy(PAnsiChar(FMemStream.Memory),
         ProcInfo.BeginIndex + 1, (ProcInfo.EndIndex - ProcInfo.BeginIndex));
     FLastProcLineNo := ProcInfo.LineNo;
   finally
-    FCodeText.Lines.EndUpdate;
+    FCodeText.EndUpdate;
   end;
 end;
 

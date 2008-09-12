@@ -9,6 +9,8 @@
 // used in several others.
 // Download from: http://synedit.sourceforge.net/
 // or via CVS here: http://sourceforge.net/cvs/?group_id=3221
+// For Delphi 2009 or later, UniSynEdit (March 13, 2008 or later) is required:
+// http://mh-nexus.de/en/unisynedit.php
 
 // Define GX_DEBUGLOG below to enable exception and SendDebug logging
 // to <ModuleName>.debuglog. This requires the JCL 1.99+ available at:
@@ -32,7 +34,7 @@
   {$ELSE}
     {$DEFINE GX_Delphi}
   {$ENDIF}
-  
+
   {$IF CompilerVersion >= 14}
     {$DEFINE GX_VER140_up} // Delphi 6
     {$IFDEF LINUX}
@@ -89,6 +91,9 @@
 // Define GX_ENHANCED_EDITOR if SynEdit is available
 {$IFDEF SYNEDIT}
   {$DEFINE GX_ENHANCED_EDITOR}
+  {$IFDEF GX_VER200_up}
+    {$DEFINE UniSynEdit}
+  {$ENDIF}
 {$ENDIF SYNEDIT}
 
 {$IFOPT B+}

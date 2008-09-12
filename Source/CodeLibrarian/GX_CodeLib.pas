@@ -495,7 +495,7 @@ begin
   end
   else
   begin
-    CodeDB.FileText :=  FCodeText.Lines.Text;
+    CodeDB.FileText :=  FCodeText.AsWideString;
 
     if mitPascal.Checked then
       LangType := 'P'
@@ -535,7 +535,7 @@ begin
     if (Node <> nil) and (IsCodeSnippet(Node)) then
     begin
       CodeDB.OpenFile(GetNodePath(Node));
-      FCodeText.Lines.BeginUpdate;
+      FCodeText.BeginUpdate;
       try
         LangType := CodeDB.AttributeAsString(AttrLanguage, 'P');
         if LangType = 'N' then  // Do not localize.
@@ -571,14 +571,14 @@ begin
           mitPascal.Checked := True;
           FCodeText.Highlighter := gxpPAS;
         end;
-        FCodeText.Lines.Text := CodeDB.FileText;
+        FCodeText.AsWideString := CodeDB.FileText;
       finally
-        FCodeText.Lines.EndUpdate;
+        FCodeText.EndUpdate;
       end;
       FCodeText.ReadOnly := False;
     end
     else
-      FCodeText.Lines.Clear;
+      FCodeText.Clear;
 
     Modified := False;
   except

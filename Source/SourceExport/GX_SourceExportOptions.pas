@@ -118,7 +118,7 @@ var
 begin
   if NoChangeEvents then
     Exit;
-  Attr := TSynHighlighterAttributes.Create(cbxAttributes.Items[cbxAttributes.ItemIndex]);
+  Attr := TSynHighlighterAttributes.Create(cbxAttributes.Items[cbxAttributes.ItemIndex]{$IFDEF UniSynEdit}, cbxAttributes.Items[cbxAttributes.ItemIndex]{$ENDIF});
   try
     AttrStyle := [];
     Attr.Foreground := ColorGrid.ForegroundColor;
@@ -143,7 +143,7 @@ procedure TfmSourceExportOptions.cbxAttributesChange(Sender: TObject);
 var
   Attr: TSynHighlighterAttributes;
 begin
-  Attr := TSynHighlighterAttributes.Create('');
+  Attr := TSynHighlighterAttributes.Create(''{$IFDEF UniSynEdit}, ''{$ENDIF});
   try
     Attr.Assign(FSampleEditor.Highlighter.Attribute[cbxAttributes.ItemIndex]);
     NoChangeEvents := True;
@@ -216,7 +216,7 @@ end;
 
 procedure TfmSourceExportOptions.SynEditSelectionChange(Sender: TObject; Changes: TSynStatusChanges);
 var
-  Token: string;
+  Token: {$IFDEF UniSynEdit}WideString{$ELSE}string{$ENDIF};
   Attributes: TSynHighlighterAttributes;
   i: Integer;
 begin

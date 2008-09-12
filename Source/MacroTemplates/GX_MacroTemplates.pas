@@ -566,7 +566,7 @@ begin
   MacroObject := TMacroObject(lvTemplates.Items[AMacroIndex].Data);
   if MacroObject <> nil then
   begin
-    FTemplateText.Lines.Text := MacroObject.Text;
+    FTemplateText.AsString := MacroObject.Text;
     AddUses(MacroObject.PubUnits, lvGlobalUses);
     AddUses(MacroObject.PrivUnits, lvLocalUses);
     SetEditing(True);
@@ -665,7 +665,7 @@ end;
 procedure TfmMacroTemplates.ClearMacro;
 begin
   lvTemplates.Selected := nil;
-  FTemplateText.Lines.Clear;
+  FTemplateText.Clear;
   FTemplateShortCut := EmptyShortCut;
   lvGlobalUses.Items.Clear;
   lvLocalUses.Items.Clear;
@@ -681,7 +681,7 @@ begin
   lvTemplates.Items.Clear;
   if Idx > 0 then
     lvTemplates.Selected := nil;
-  FTemplateText.Lines.Clear;
+  FTemplateText.Clear;
   SetEditing(False);
 end;
 

@@ -573,7 +573,7 @@ begin
   try
     lvInfo.Items.Clear;
 
-    FMethodText.Lines.Clear;
+    FMethodText.Clear;
     for i := 0 to OInfo.Count-1 do
     begin
       AMethod := OInfo.Items[i];
@@ -645,8 +645,8 @@ begin
         lvInfo.Items.BeginUpdate;
         lvInfo.Items.Clear;
         lvInfo.Items.EndUpdate;
-        FMethodText.Lines.Clear;
-        FCodeText.Lines.Clear;
+        FMethodText.Clear;
+        FCodeText.Clear;
         FCurrentCodePaneFile := '';
         while scInherit.ControlCount > 0 do
           scInherit.Controls[0].Free;
@@ -753,20 +753,20 @@ procedure TfmClassBrowser.LoadCode;
   begin
     if FCurrentCodePaneFile = F then
     begin
-      if FCodeText.Lines.Count > 2 then
+      if FCodeText.LineCount > 2 then
         Exit;
     end
     else
       FCurrentCodePaneFile := F;
 
-    FCodeText.Lines.Clear;
+    FCodeText.Clear;
     EditRead := TEditReader.Create(F);
     try
       AMemoryStream := TMemoryStream.Create;
       try
         EditRead.SaveToStream(AMemoryStream);
         AMemoryStream.Position := 0;
-        FCodeText.Lines.LoadFromStream(AMemoryStream);
+        FCodeText.LoadFromStream(AMemoryStream);
       finally
         FreeAndNil(AMemoryStream);
       end;
@@ -781,7 +781,7 @@ var
   MInfo: TBrowseMethodInfoItem;
 begin
   Screen.Cursor := crHourglass;
-  FCodeText.Lines.BeginUpdate;
+  FCodeText.BeginUpdate;
   try
     if tvBrowse.Selected = nil then Exit;
     if tvBrowse.Selected.Level = 0 then Exit;
@@ -815,7 +815,7 @@ begin
       FCodeText.CaretXY := Point(1, LineNumber);
     end;
   finally
-    FCodeText.Lines.EndUpdate;
+    FCodeText.EndUpdate;
     Screen.Cursor := crDefault;
   end;
 end;
