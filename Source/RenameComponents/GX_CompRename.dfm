@@ -44,7 +44,6 @@ object fmCompRename: TfmCompRename
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Invalid identifier'
-    Color = clBtnFace
     Visible = False
   end
   object edtOldName: TEdit
@@ -54,7 +53,6 @@ object fmCompRename: TfmCompRename
     Height = 21
     TabStop = False
     Anchors = [akLeft, akTop, akRight]
-    Color = clBtnFace
     ReadOnly = True
     TabOrder = 0
   end
