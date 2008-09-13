@@ -116,7 +116,7 @@ constructor TAbZDecoder.Create(const aPassword : string;
                                     aCRC : LongInt; aCheckByte : Boolean );
 begin
   inherited Create;
-  FPassword := aPassword;
+  FPassword := AnsiString(aPassword);
   FStream := aStream;
   FCRC := aCRC;
   FCheckByte := aCheckByte;

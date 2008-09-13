@@ -387,7 +387,7 @@ end;begin
   try {SaveDir}
     if (ZipArchive.BaseDirectory <> '') then
       ChDir(ZipArchive.BaseDirectory);
-    StrPCopy(Buff, Item.DiskFileName);
+    StrPCopy(Buff, AnsiString(Item.DiskFileName));
 {!!OEM - Added }
 {$IFDEF Linux}
  { do nothing to Buff }

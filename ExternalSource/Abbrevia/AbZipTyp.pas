@@ -1583,7 +1583,7 @@ begin
     if Length( FileName ) > 0 then begin
       Temp := AnsiStrAlloc( succ( Length( FileName ) ) );
       try
-        StrPCopy( Temp, FileName );
+        StrPCopy( Temp, AnsiString(FileName) );
         LFH.FileName := Temp;
       finally
         StrDispose( Temp );
@@ -1592,7 +1592,7 @@ begin
     if Length( ExtraField ) > 0 then begin
       Temp := AnsiStrAlloc( succ( Length( ExtraField ) ) );
       try
-        StrPCopy( Temp, ExtraField );
+        StrPCopy( Temp, AnsiString(ExtraField) );
         LFH.ExtraField := Temp;
       finally
         StrDispose( Temp );
@@ -1658,7 +1658,7 @@ begin
   FItemInfo.FExtraField := nil;
   if Length( Value ) > 0 then begin
     FItemInfo.FExtraField := AnsiStrAlloc( succ( FItemInfo.FExtraFieldLength ) );
-    StrPCopy( FItemInfo.FExtraField, Value );
+    StrPCopy( FItemInfo.FExtraField, AnsiString(Value) );
   end;
 end;
 { -------------------------------------------------------------------------- }
@@ -1671,7 +1671,7 @@ begin
 
   if Length( Value ) > 0 then begin
     FItemInfo.FFileComment := AnsiStrAlloc( succ( FItemInfo.FFileCommentLength ) );
-    StrPCopy( FItemInfo.FFileComment, Value );
+    StrPCopy( FItemInfo.FFileComment, AnsiString(Value) );
   end;
 end;
 { -------------------------------------------------------------------------- }
@@ -1684,7 +1684,7 @@ begin
   FItemInfo.FFileName := nil;
   if Length( Value ) > 0 then begin
     FItemInfo.FFileName := AnsiStrAlloc( succ( FItemInfo.FFileNameLength ) );
-    StrPCopy( FItemInfo.FFileName, Value );
+    StrPCopy( FItemInfo.FFileName, AnsiString(Value) );
   end;
 end;
 { -------------------------------------------------------------------------- }
@@ -1779,7 +1779,7 @@ begin
         FileSpec := IncludeTrailingPathDelimiter(FileSpec);
     end;
 
-    StrPCopy(Buff, ExpandFileName(FileSpec));
+    StrPCopy(Buff, AnsiString(ExpandFileName(FileSpec)));
 
     
 {!!.03 - Added }
@@ -3083,7 +3083,7 @@ begin
   FInfo.FZipFileComment := nil;
   if Length( Value ) > 0 then begin
     FInfo.FZipFileComment := AnsiStrAlloc( succ( FInfo.FZipFileCommentLength ) );
-    StrPCopy( FInfo.FZipFileComment, Value );
+    StrPCopy( FInfo.FZipFileComment, AnsiString(Value) );
     FIsDirty := True;
   end                                                                    {!!.02}
   else begin  { if Value = '' then clear the ZIP Comment }               {!!.02}
