@@ -9,6 +9,7 @@ interface
 uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
   {$IFDEF LINUX} DialogsToQDialogs, libc, {$ENDIF LINUX}
+  {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
   Types, CheckLst, TypInfo, ExtCtrls, ComCtrls;
 
 const
@@ -32,6 +33,16 @@ resourcestring
   SAllAlphaNumericChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
 type
+  {$IFDEF UNICODE}
+  TGXUnicodeChar = Char;
+  TGXUnicodeString = string;
+  TGXUnicodeStringList = TStringList;
+  {$ELSE}
+  TGXUnicodeChar = WideChar;
+  TGXUnicodeString = WideString;
+  TGXUnicodeStringList = TWideStringList; // This should link to either the JCL or SynEdit TWideStringList in D2006 and lower
+  {$ENDIF}
+
   TGXSyntaxHighlighter = (gxpPlaceHolder, gxpNone, gxpPAS, gxpCPP, gxpHTML, gxpSQL, gxpCS, gxpXML);
 
   TVersionNumber = packed record
