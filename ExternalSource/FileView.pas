@@ -118,20 +118,29 @@ procedure TFileViewer.LoadFromFile(const FileName: string);
   {$IFDEF SYNEDIT}
   procedure AssignParser(Parser: TGXSyntaxHighlighter);
   var
+    Strings: TStrings;
     WasBinary: Boolean;
   begin
+    FRichEdit.Visible := False;
+    FImage.Visible := False;
+    if IsForm(FileName) then
+    begin
+      Strings := TStringList.Create;
+      try
+        LoadFormFileToStrings(FileName, Strings, WasBinary);
+        FEditor.Lines.Text := Strings.Text;
+      finally
+        FreeAndNil(Strings);
+      end;
+    end
+    else
+      FEditor.Lines.LoadFromFile(FileName); // Slow for large .sql files (4K lines), for example!
     if (FGXSyntaxParser <> Parser) then
     begin
       SetSynEditHighlighter(FEditor, Parser);
       FGXSyntaxParser := Parser;
     end;
-    FRichEdit.Visible := False;
-    FImage.Visible := False;
     FEditor.Visible := True;
-    if IsForm(FileName) then
-      LoadFormFileToStrings(FileName, FEditor.Lines, WasBinary)
-    else
-      FEditor.Lines.LoadFromFile(FileName);
   end;
   {$ENDIF SYNEDIT}
 
