@@ -14,7 +14,7 @@ uses
 
 type
   TSearchRecord = record
-    Text: WideString;
+    Text: TGXUnicodeString;
     CaseSensitive: Boolean;
     WholeWord: Boolean;
   end;
@@ -25,39 +25,39 @@ type
   private
     FStorage: IGpStructuredStorage;
     FFile: TStream;
-    FFileName: WideString;
-    function GetFileText: WideString;
-    procedure SetFileText(const Value: WideString);
+    FFileName: TGXUnicodeString;
+    function GetFileText: TGXUnicodeString;
+    procedure SetFileText(const Value: TGXUnicodeString);
     procedure AssertFileIsOpen;
-    procedure AssertValidFolderName(FolderName: WideString);
-    procedure AssertValidFileName(FileName: WideString);
-    procedure AssertExistingObjectName(const ObjectName: WideString);
+    procedure AssertValidFolderName(FolderName: TGXUnicodeString);
+    procedure AssertValidFileName(FileName: TGXUnicodeString);
+    procedure AssertExistingObjectName(const ObjectName: TGXUnicodeString);
     function GetFileInfo: IGpStructuredFileInfo;
   public
-    constructor Create(const FileName: WideString);
+    constructor Create(const FileName: TGXUnicodeString);
     procedure CompactStorage;
     procedure CloseStorage;
     procedure SaveStorage;
 
-    procedure OpenFile(const FullPath: WideString); overload;
-    procedure OpenFile(const FolderName, FileName: WideString); overload;
-    procedure Delete(const ObjectName: WideString);
-    procedure Move(const OldName, NewName: WideString);
+    procedure OpenFile(const FullPath: TGXUnicodeString); overload;
+    procedure OpenFile(const FolderName, FileName: TGXUnicodeString); overload;
+    procedure Delete(const ObjectName: TGXUnicodeString);
+    procedure Move(const OldName, NewName: TGXUnicodeString);
     procedure CloseFile;
-    procedure CreateFolder(const FolderName: WideString);
-    function FolderExists(const FolderName: WideString): Boolean;
-    function FileExists(const FileName: WideString): Boolean;
-    function ObjectExists(const ObjectName: WideString): Boolean;
+    procedure CreateFolder(const FolderName: TGXUnicodeString);
+    function FolderExists(const FolderName: TGXUnicodeString): Boolean;
+    function FileExists(const FileName: TGXUnicodeString): Boolean;
+    function ObjectExists(const ObjectName: TGXUnicodeString): Boolean;
 
-    procedure ListFiles(const FolderName: WideString; Files: TStrings);
-    procedure ListFolders(const FolderName: WideString; Files: TStrings);
+    procedure ListFiles(const FolderName: TGXUnicodeString; Files: TStrings);
+    procedure ListFolders(const FolderName: TGXUnicodeString; Files: TStrings);
 
-    property FileText: WideString read GetFileText write SetFileText;
-    function AttributeAsString(const AttrName: WideString; const Default: WideString = ''): WideString;
-    procedure SetAttribute(const AttrName: WideString; const Value: WideString); overload;
-    procedure SetAttribute(const AttrName: WideString; const Value: Integer); overload;
-    procedure SetObjectAttribute(const ObjectName, AttrName, AttrValue: WideString);
-    function GetObjectAttribute(const ObjectName, AttrName: WideString): WideString;
+    property FileText: TGXUnicodeString read GetFileText write SetFileText;
+    function AttributeAsString(const AttrName: TGXUnicodeString; const Default: TGXUnicodeString = ''): TGXUnicodeString;
+    procedure SetAttribute(const AttrName: TGXUnicodeString; const Value: TGXUnicodeString); overload;
+    procedure SetAttribute(const AttrName: TGXUnicodeString; const Value: Integer); overload;
+    procedure SetObjectAttribute(const ObjectName, AttrName, AttrValue: TGXUnicodeString);
+    function GetObjectAttribute(const ObjectName, AttrName: TGXUnicodeString): TGXUnicodeString;
   end;
 
   TfmCodeLib = class(TForm)
@@ -211,16 +211,16 @@ type
     procedure tvTopicsCompare(Sender: TObject; Node1, Node2: TTreeNode;
       Data: Integer; var Compare: Integer);
     procedure actCompactStorageExecute(Sender: TObject);
-    function GetUniqueTopicName(ParentNode: TTreeNode; Folder: Boolean): WideString;
+    function GetUniqueTopicName(ParentNode: TTreeNode; Folder: Boolean): TGXUnicodeString;
   private
     FModified: Boolean;
     FSearch: TSearchRecord;
     FLayout: TCodeLayout;
-    FStoragePath: WideString;
+    FStoragePath: TGXUnicodeString;
     FCodeText: TGxEnhancedEditor;
     FCurrentSyntaxMode: TGXSyntaxHighlighter;
     CodeDB: TGXStorageFile;
-    function OpenStorage(const StorageFile: WideString): TGXStorageFile;
+    function OpenStorage(const StorageFile: TGXUnicodeString): TGXStorageFile;
     procedure CloseDB(ClearFileName: Boolean = False);
     procedure InitializeTreeView;
     procedure SaveRecord;
@@ -235,19 +235,19 @@ type
     function IsFolder(Node: TTreeNode): Boolean;
     function ConfigurationKey: string;
     procedure AddNewNode(Folder: Boolean);
-    function GetNodePath(Node: TTreeNode): WideString;
-    function GetNodeParentPath(Node: TTreeNode): WideString;
-    procedure AssertValidFileName(const FileName: WideString);
+    function GetNodePath(Node: TTreeNode): TGXUnicodeString;
+    function GetNodeParentPath(Node: TTreeNode): TGXUnicodeString;
+    procedure AssertValidFileName(const FileName: TGXUnicodeString);
     function HaveSelectedNode: Boolean;
-    function SelectedNodeFullName: WideString;
-    function SelectedCaption: WideString;
+    function SelectedNodeFullName: TGXUnicodeString;
+    function SelectedCaption: TGXUnicodeString;
     procedure AssertSelectedNode;
     function FolderSelected: Boolean;
     procedure AddFolder(ParentNode: TTreeNode);
     procedure AddCode;
     property Modified: Boolean read FModified write SetModified;
-    property StoragePath: WideString read FStoragePath write FStoragePath;
-    procedure SetNodeAttribute(Node: TTreeNode; const AttrName, AttrValue: WideString);
+    property StoragePath: TGXUnicodeString read FStoragePath write FStoragePath;
+    procedure SetNodeAttribute(Node: TTreeNode; const AttrName, AttrValue: TGXUnicodeString);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -301,7 +301,7 @@ type
     function GetMessage: string; override;
   end;
 
-function MakeFileName(const FolderName, FileName: WideString): WideString;
+function MakeFileName(const FolderName, FileName: TGXUnicodeString): TGXUnicodeString;
 begin
   Result := FolderName;
   if Result = '' then
@@ -317,7 +317,7 @@ begin
   end;
 end;
 
-function TfmCodeLib.OpenStorage(const StorageFile: WideString): TGXStorageFile;
+function TfmCodeLib.OpenStorage(const StorageFile: TGXUnicodeString): TGXStorageFile;
 begin
   Result := TGXStorageFile.Create(StorageFile);
   {$IFOPT D+}SendDebug('Created new CodeLib storage file: ' + StorageFile);{$ENDIF}
@@ -331,7 +331,7 @@ procedure TfmCodeLib.InitializeTreeView;
     Folders: TStringList;
     Files: TStringList;
     i: Integer;
-    RootPath: WideString;
+    RootPath: TGXUnicodeString;
   begin
     Folders := TStringList.Create;
     Files := TStringList.Create;
@@ -405,8 +405,8 @@ end;
 procedure TfmCodeLib.AddFolder(ParentNode: TTreeNode);
 var
   NewNode: TTreeNode;
-  NewFolder: WideString;
-  NewTopic: WideString;
+  NewFolder: TGXUnicodeString;
+  NewTopic: TGXUnicodeString;
 begin
   NewTopic := GetUniqueTopicName(ParentNode, True);
   NewFolder := AddSlash(GetNodePath(ParentNode)) + NewTopic;
@@ -436,8 +436,8 @@ end;
 procedure TfmCodeLib.AddCode;
 var
   Node: TTreeNode;
-  NewFileName: WideString;
-  TopicName: WideString;
+  NewFileName: TGXUnicodeString;
+  TopicName: TGXUnicodeString;
 begin
   if not HaveSelectedNode then
     Exit;
@@ -476,7 +476,7 @@ end;
 
 procedure TfmCodeLib.SaveRecord;
 var
-  LangType: WideString;
+  LangType: TGXUnicodeString;
 begin
   // This is called from the destructor where
   // we may be in a forced clean-up state due
@@ -495,7 +495,7 @@ begin
   end
   else
   begin
-    CodeDB.FileText :=  FCodeText.AsWideString;
+    CodeDB.FileText :=  FCodeText.AsUnicodeString;
 
     if mitPascal.Checked then
       LangType := 'P'
@@ -515,7 +515,7 @@ end;
 
 procedure TfmCodeLib.tvTopicsEdited(Sender: TObject; Node: TTreeNode; var S: string);
 var
-  NewFileName: WideString;
+  NewFileName: TGXUnicodeString;
 begin
   Modified := True;
   AssertValidFileName(S);
@@ -529,7 +529,7 @@ end;
 
 procedure TfmCodeLib.tvTopicsChange(Sender: TObject; Node: TTreeNode);
 var
-  LangType: WideString;
+  LangType: TGXUnicodeString;
 begin
   try
     if (Node <> nil) and (IsCodeSnippet(Node)) then
@@ -571,7 +571,7 @@ begin
           mitPascal.Checked := True;
           FCodeText.Highlighter := gxpPAS;
         end;
-        FCodeText.AsWideString := CodeDB.FileText;
+        FCodeText.AsUnicodeString := CodeDB.FileText;
       finally
         FCodeText.EndUpdate;
       end;
@@ -593,7 +593,7 @@ resourcestring
   SFolder = 'folder';
   SConfirmDelete = 'Delete this %s?';
 var
-  NodeType: WideString;
+  NodeType: TGXUnicodeString;
 begin
   if not HaveSelectedNode then
     Exit;
@@ -654,7 +654,7 @@ resourcestring
 
 procedure TfmCodeLib.CopyFromIdeExecute(Sender: TObject);
 var
-  FileName: WideString;
+  FileName: TGXUnicodeString;
 begin
   FileName := GxOtaGetCurrentSourceFile;
   if IsForm(FileName) then
@@ -665,7 +665,7 @@ end;
 
 procedure TfmCodeLib.PasteToIdeExecute(Sender: TObject);
 var
-  FileName: WideString;
+  FileName: TGXUnicodeString;
 begin
   FileName := GxOtaGetCurrentSourceFile;
   if IsForm(FileName) then
@@ -698,7 +698,7 @@ end;
 
 procedure TfmCodeLib.DoSearch(First: Boolean);
 
-  function DoMatch(const Text: WideString): Integer;
+  function DoMatch(const Text: TGXUnicodeString): Integer;
   var
     MatchPos: Integer;
   begin
@@ -728,7 +728,7 @@ var
   Match: Integer;
   InTopic: Boolean;
   FirstLoop: Boolean;
-  NodePath: WideString;
+  NodePath: TGXUnicodeString;
   IsSnippet: Boolean;
 begin
   try
@@ -1284,7 +1284,7 @@ begin
     Compare := -1;
 end;
 
-function TfmCodeLib.GetNodeParentPath(Node: TTreeNode): WideString;
+function TfmCodeLib.GetNodeParentPath(Node: TTreeNode): TGXUnicodeString;
 begin
   Assert(Assigned(Node));
   Result := CodeLibPathSep;
@@ -1309,7 +1309,7 @@ begin
   Result := TCodeLibExpert.ConfigurationKey;
 end;
 
-procedure TfmCodeLib.AssertValidFileName(const FileName: WideString);
+procedure TfmCodeLib.AssertValidFileName(const FileName: TGXUnicodeString);
 resourcestring
   SlashError = 'The slash characters are not allowed in topic names';
   EmptyError = 'Blank names are not allowed';
@@ -1320,9 +1320,9 @@ begin
     raise Exception.Create(EmptyError);
 end;
 
-function TfmCodeLib.GetNodePath(Node: TTreeNode): WideString;
+function TfmCodeLib.GetNodePath(Node: TTreeNode): TGXUnicodeString;
 
-  function GetPath(const Prefix: WideString; Node: TTreeNode): WideString;
+  function GetPath(const Prefix: TGXUnicodeString; Node: TTreeNode): TGXUnicodeString;
   begin
     if not Assigned(Node) then
       Result := Prefix
@@ -1342,13 +1342,13 @@ begin
   Result := Assigned(tvTopics.Selected);
 end;
 
-function TfmCodeLib.SelectedNodeFullName: WideString;
+function TfmCodeLib.SelectedNodeFullName: TGXUnicodeString;
 begin
   AssertSelectedNode;
   Result := GetNodePath(tvTopics.Selected);
 end;
 
-function TfmCodeLib.SelectedCaption: WideString;
+function TfmCodeLib.SelectedCaption: TGXUnicodeString;
 begin
   AssertSelectedNode;
   Result := tvTopics.Selected.Text;
@@ -1372,9 +1372,9 @@ begin
   Result := Node.ImageIndex = ImageIndexClosedFolder;
 end;
 
-procedure TfmCodeLib.SetNodeAttribute(Node: TTreeNode; const AttrName, AttrValue: WideString);
+procedure TfmCodeLib.SetNodeAttribute(Node: TTreeNode; const AttrName, AttrValue: TGXUnicodeString);
 var
-  ObjectName: WideString;
+  ObjectName: TGXUnicodeString;
 begin
   Assert(Assigned(Node));
   ObjectName := GetNodePath(Node);
@@ -1493,7 +1493,7 @@ begin
     raise Exception.Create('The file name is blank');
 end;
 
-procedure TGXStorageFile.AssertValidFileName(FileName: WideString);
+procedure TGXStorageFile.AssertValidFileName(FileName: TGXUnicodeString);
 begin
   if FileName = '' then
     raise Exception.Create('The file name can not be blank');
@@ -1501,7 +1501,7 @@ begin
     raise Exception.Create('The file name can not start with a slash: ' + FileName);
 end;
 
-procedure TGXStorageFile.AssertValidFolderName(FolderName: WideString);
+procedure TGXStorageFile.AssertValidFolderName(FolderName: TGXUnicodeString);
 begin
   if FolderName = '' then
     raise Exception.Create('FolderName can not be blank');
@@ -1509,7 +1509,7 @@ begin
     raise Exception.Create('FolderName must start with a slash');
 end;
 
-function TGXStorageFile.AttributeAsString(const AttrName, Default: WideString): WideString;
+function TGXStorageFile.AttributeAsString(const AttrName, Default: TGXUnicodeString): TGXUnicodeString;
 var
   FileInfo: IGpStructuredFileInfo;
 begin
@@ -1528,7 +1528,7 @@ begin
   //FreeAndNil(FStorage);?
 end;
 
-constructor TGXStorageFile.Create(const FileName: WideString);
+constructor TGXStorageFile.Create(const FileName: TGXUnicodeString);
 begin
   inherited Create;
   FStorage := CreateStructuredStorage;
@@ -1538,24 +1538,24 @@ begin
     FStorage.Initialize(FileName, fmCreate or fmOpenReadWrite);
 end;
 
-procedure TGXStorageFile.CreateFolder(const FolderName: WideString);
+procedure TGXStorageFile.CreateFolder(const FolderName: TGXUnicodeString);
 begin
   FStorage.CreateFolder(FolderName);
 end;
 
-procedure TGXStorageFile.Delete(const ObjectName: WideString);
+procedure TGXStorageFile.Delete(const ObjectName: TGXUnicodeString);
 begin
   Assert(Length(ObjectName) > 0);
   CloseFile;
   FStorage.Delete(ObjectName);
 end;
 
-function TGXStorageFile.FileExists(const FileName: WideString): Boolean;
+function TGXStorageFile.FileExists(const FileName: TGXUnicodeString): Boolean;
 begin
   Result := FStorage.FileExists(FileName);
 end;
 
-function TGXStorageFile.FolderExists(const FolderName: WideString): Boolean;
+function TGXStorageFile.FolderExists(const FolderName: TGXUnicodeString): Boolean;
 begin
   Result := FStorage.FolderExists(FolderName);
 end;
@@ -1568,7 +1568,7 @@ begin
     raise Exception.CreateFmt('The file %s does not exist to get the file info', [FFileName]);
 end;
 
-function TGXStorageFile.GetFileText: WideString;
+function TGXStorageFile.GetFileText: TGXUnicodeString;
 var
   StringStream: TStringStream;
 begin
@@ -1582,19 +1582,19 @@ begin
   end;
 end;
 
-procedure TGXStorageFile.ListFiles(const FolderName: WideString; Files: TStrings);
+procedure TGXStorageFile.ListFiles(const FolderName: TGXUnicodeString; Files: TStrings);
 begin
   AssertValidFolderName(FolderName);
   FStorage.FileNames(FolderName, Files);
 end;
 
-procedure TGXStorageFile.ListFolders(const FolderName: WideString; Files: TStrings);
+procedure TGXStorageFile.ListFolders(const FolderName: TGXUnicodeString; Files: TStrings);
 begin
   AssertValidFolderName(FolderName);
   FStorage.FolderNames(FolderName, Files);
 end;
 
-procedure TGXStorageFile.Move(const OldName, NewName: WideString);
+procedure TGXStorageFile.Move(const OldName, NewName: TGXUnicodeString);
 begin
   if OldName = NewName then
     Exit;
@@ -1603,14 +1603,14 @@ begin
     OpenFile(NewName);
 end;
 
-procedure TGXStorageFile.OpenFile(const FolderName, FileName: WideString);
+procedure TGXStorageFile.OpenFile(const FolderName, FileName: TGXUnicodeString);
 begin
   AssertValidFolderName(FolderName);
   AssertValidFileName(FileName);
   OpenFile(MakeFileName(FolderName, FileName));
 end;
 
-procedure TGXStorageFile.OpenFile(const FullPath: WideString);
+procedure TGXStorageFile.OpenFile(const FullPath: TGXUnicodeString);
 begin
   FreeAndNil(FFile);
   AssertValidFolderName(FullPath);
@@ -1630,12 +1630,12 @@ begin
   //FStorage.Save;
 end;
 
-procedure TGXStorageFile.SetAttribute(const AttrName: WideString; const Value: Integer);
+procedure TGXStorageFile.SetAttribute(const AttrName: TGXUnicodeString; const Value: Integer);
 begin
   SetAttribute(AttrName, IntToStr(Value));
 end;
 
-procedure TGXStorageFile.SetAttribute(const AttrName: WideString; const Value: WideString);
+procedure TGXStorageFile.SetAttribute(const AttrName: TGXUnicodeString; const Value: TGXUnicodeString);
 var
   FileInfo: IGpStructuredFileInfo;
 begin
@@ -1644,7 +1644,7 @@ begin
   FileInfo.Attribute[AttrName] := Value;
 end;
 
-procedure TGXStorageFile.SetFileText(const Value: WideString);
+procedure TGXStorageFile.SetFileText(const Value: TGXUnicodeString);
 var
   StringStream: TStringStream;
 begin
@@ -1659,7 +1659,7 @@ begin
   end;
 end;
 
-procedure TGXStorageFile.SetObjectAttribute(const ObjectName, AttrName, AttrValue: WideString);
+procedure TGXStorageFile.SetObjectAttribute(const ObjectName, AttrName, AttrValue: TGXUnicodeString);
 var
   FileInfo: IGpStructuredFileInfo;
 begin
@@ -1668,7 +1668,7 @@ begin
   FileInfo.Attribute[AttrName] := AttrValue;
 end;
 
-function TGXStorageFile.GetObjectAttribute(const ObjectName, AttrName: WideString): WideString;
+function TGXStorageFile.GetObjectAttribute(const ObjectName, AttrName: TGXUnicodeString): TGXUnicodeString;
 var
   FileInfo: IGpStructuredFileInfo;
 begin
@@ -1678,20 +1678,20 @@ begin
   Result := FileInfo.Attribute[AttrName];
 end;
 
-procedure TGXStorageFile.AssertExistingObjectName(const ObjectName: WideString);
+procedure TGXStorageFile.AssertExistingObjectName(const ObjectName: TGXUnicodeString);
 begin
   Assert(ObjectExists(ObjectName), ObjectName + ' does not exist');
 end;
 
-function TfmCodeLib.GetUniqueTopicName(ParentNode: TTreeNode; Folder: Boolean): WideString;
+function TfmCodeLib.GetUniqueTopicName(ParentNode: TTreeNode; Folder: Boolean): TGXUnicodeString;
 resourcestring
   FolderPrefix = 'Folder ';
   SnippetPrefix = 'Snippet ';
 var
   i: Integer;
-  TopicName: WideString;
-  ParentPath: WideString;
-  TestName: WideString;
+  TopicName: TGXUnicodeString;
+  ParentPath: TGXUnicodeString;
+  TestName: TGXUnicodeString;
 begin
   if Folder then
     TopicName := FolderPrefix
@@ -1711,7 +1711,7 @@ begin
   raise Exception.Create('Unable to find a unique folder name under ' + ParentPath);
 end;
 
-function TGXStorageFile.ObjectExists(const ObjectName: WideString): Boolean;
+function TGXStorageFile.ObjectExists(const ObjectName: TGXUnicodeString): Boolean;
 begin
   Result := FileExists(ObjectName) or FolderExists(ObjectName);
 end;
