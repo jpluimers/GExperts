@@ -28,8 +28,6 @@ type
     {$ENDIF GX_ENHANCED_EDITOR}
     FHighlighter: TGXSyntaxHighlighter;
     FOnChange: TNotifyEvent;
-    function  GetLines: TStrings;
-    procedure SetLines(const Value: TStrings);
     function  GetReadOnly: Boolean;
     procedure SetReadOnly(const Value: Boolean);
     function  GetModified: Boolean;
@@ -55,6 +53,13 @@ type
     function  GetNormalizedText: string;
     function GetTabWidth: Integer;
     procedure SetTabWidth(const Value: Integer);
+    function GetLineCount: Integer;
+    procedure SetAsAnsiString(const Value: AnsiString);
+    procedure SetAsString(const Value: string);
+    function GetAsAnsiString: AnsiString;
+    function GetAsString: string;
+    function GetAsUnicodeString: TGXUnicodeString;
+    procedure SetAsUnicodeString(const Value: TGXUnicodeString);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -66,10 +71,12 @@ type
     procedure SetFocus; override;
     procedure Print(const ATitle: string);
     function Focused: Boolean; override;
+    procedure LoadFromStream(Stream: TStream);
+    procedure BeginUpdate;
+    procedure EndUpdate;
     property Highlighter: TGXSyntaxHighlighter read GetHighlighter write SetHighlighter;
     property Text: string read GetText write SetText;
     property Color: TColor  read GetColor write SetColor;
-    property Lines: TStrings read GetLines write SetLines;
     property CaretXY: TPoint  read GetCaretXY write SetCaretXY;
     property ReadOnly: Boolean read GetReadOnly write SetReadOnly;
     property Modified: Boolean read GetModified write SetModified;
@@ -80,6 +87,10 @@ type
     property WantTabs: Boolean read GetWantTabs write SetWantTabs;
     property NormalizedText: string read GetNormalizedText;
     property TabWidth: Integer read GetTabWidth write SetTabWidth;
+    property LineCount: Integer read GetLineCount;
+    property AsString: string read GetAsString write SetAsString;
+    property AsAnsiString: AnsiString read GetAsAnsiString write SetAsAnsiString;
+    property AsUnicodeString: TGXUnicodeString read GetAsUnicodeString write SetAsUnicodeString;
   published
     property Align;
     property Anchors;
@@ -117,7 +128,7 @@ begin
     FEditor := TSynMemo.Create(nil);
     FEditor.Gutter.Width := 0;
     FEditor.Options := FEditor.Options - [eoScrollPastEof, eoScrollPastEol, eoTabsToSpaces];
-    (Lines as TSynEditStringList).AppendNewLineAtEOF := False;
+    (FEditor.Lines as TSynEditStringList).AppendNewLineAtEOF := False;
     {$ENDIF SYNEDIT}
 
     {$IFNDEF GX_ENHANCED_EDITOR}
@@ -150,6 +161,16 @@ begin
     FreeAndNil(FEditor);
   end;
   inherited Destroy;
+end;
+
+procedure TGxEnhancedEditor.BeginUpdate;
+begin
+  FEditor.Lines.BeginUpdate;
+end;
+
+procedure TGxEnhancedEditor.EndUpdate;
+begin
+  FEditor.Lines.EndUpdate;
 end;
 
 procedure TGxEnhancedEditor.Clear;
@@ -218,10 +239,40 @@ begin
   {$ENDIF GX_ENHANCED_EDITOR}
 end;
 
+function TGxEnhancedEditor.GetAsAnsiString: AnsiString;
+begin
+  Result := AnsiString(FEditor.Lines.Text);
+end;
+
+function TGxEnhancedEditor.GetAsString: string;
+begin
+  Result := FEditor.Lines.Text;
+end;
+
+function TGxEnhancedEditor.GetAsUnicodeString: TGXUnicodeString;
+begin
+  Result := FEditor.Lines.Text;
+end;
+
 function TGxEnhancedEditor.GetCaretXY: TPoint;
 begin
   Assert(False, 'Not implemented');
   Result := Point(0, 0);
+end;
+
+procedure TGxEnhancedEditor.SetAsAnsiString(const Value: AnsiString);
+begin
+  FEditor.Lines.Text := Value;
+end;
+
+procedure TGxEnhancedEditor.SetAsString(const Value: string);
+begin
+  FEditor.Lines.Text := Value;
+end;
+
+procedure TGxEnhancedEditor.SetAsUnicodeString(const Value: TGXUnicodeString);
+begin
+  FEditor.Lines.Text := Value;
 end;
 
 procedure TGxEnhancedEditor.SetCaretXY(const Value: TPoint);
@@ -271,17 +322,9 @@ begin
   FEditor.Modified := Value;
 end;
 
-procedure TGxEnhancedEditor.SetLines(const Value: TStrings);
+function TGxEnhancedEditor.GetLineCount: Integer;
 begin
-  FEditor.Lines := Value;
-end;
-
-function TGxEnhancedEditor.GetLines: TStrings;
-begin
-  if Assigned(FEditor) then
-    Result := FEditor.Lines
-  else
-    Result := nil;
+  Result := FEditor.Lines.Count;
 end;
 
 function TGxEnhancedEditor.GetReadOnly: Boolean;
@@ -302,6 +345,11 @@ end;
 function TGxEnhancedEditor.GetWantTabs: Boolean;
 begin
   Result := FEditor.WantTabs;
+end;
+
+procedure TGxEnhancedEditor.LoadFromStream(Stream: TStream);
+begin
+  FEditor.Lines.LoadFromStream(Stream);
 end;
 
 function TGxEnhancedEditor.GetColor: TColor;
