@@ -398,7 +398,7 @@ end;begin
 {$ENDIF}
 {!!OEM - End Added }
 
-	FileAtributes := AbFileGetAttr(StrPas(Buff));
+	FileAtributes := AbFileGetAttr(string(StrPas(Buff)));
 	if (0 <> (FileAtributes and faDirectory)) then begin
     	Item.ExternalFileAttributes := FileAtributes;
         AddDirectory(); Exit;
@@ -407,7 +407,7 @@ end;begin
         {  OEMToAnsi(Buff, Buff);  }
 
 		Item.ExternalFileAttributes := FileAtributes;
-        UncompressedStream := TFileStream.Create(StrPas(Buff), fmOpenRead or fmShareDenyWrite );
+        UncompressedStream := TFileStream.Create(string(StrPas(Buff)), fmOpenRead or fmShareDenyWrite );
         {Now get the file's attributes}
 
         Item.UncompressedSize := UncompressedStream.Size;

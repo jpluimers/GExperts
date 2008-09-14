@@ -109,7 +109,7 @@ procedure Register;
 implementation
 
 uses
- SysUtils;
+ SysUtils, SynUnicode;
 
 procedure Register;
 begin
@@ -262,7 +262,11 @@ end;
 
 procedure TGxEnhancedEditor.SetAsAnsiString(const Value: AnsiString);
 begin
-  FEditor.Lines.Text := Value;
+  {$IFDEF SYNEDIT}
+  FEditor.Lines.Text := UnicodeString(Value);
+  {$ELSE}
+  FEditor.Lines.Text := string(Value);
+  {$ENDIF}
 end;
 
 procedure TGxEnhancedEditor.SetAsString(const Value: string);

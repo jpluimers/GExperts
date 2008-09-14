@@ -1468,7 +1468,7 @@ end;
 function TAbZipItem.GetExtraField : string;
 begin
   if Assigned( FItemInfo ) and ( FItemInfo.ExtraField <> nil ) then
-    Result := StrPas( FItemInfo.ExtraField )
+    Result := string(StrPas( FItemInfo.ExtraField ))
   else
     Result := '';
 end;
@@ -1476,7 +1476,7 @@ end;
 function TAbZipItem.GetFileComment : string;
 begin
   if Assigned( FItemInfo ) and ( FItemInfo.FileComment <> nil ) then
-    Result := StrPas( FItemInfo.FileComment )
+    Result := string(StrPas( FItemInfo.FileComment ))
   else
     Result := '';
 end;
@@ -1496,7 +1496,7 @@ begin
     end;
 {$ENDIF}
 {!!.03 - End Added }
-    Result := StrPas(Buff)
+    Result := string(StrPas(Buff))
   end else
     Result := '';
 end;
@@ -1552,7 +1552,7 @@ var
 begin
   FItemInfo.LoadFromStream( Stream );
   if FItemInfo.FileName <> nil then
-    FileName := StrPas( FItemInfo.FileName )
+    FileName := string(StrPas( FItemInfo.FileName ))
   else
     FileName := '';
 
@@ -1803,7 +1803,7 @@ begin
 // DiskFileName and FileName inconsitencies this case may
 // cause a problem.
 
-    DiskFileName :=  StrPas(Buff);
+    DiskFileName := string(StrPas(Buff));
     FileName := FixName(FileSpec);
     RelativeOffset := 0;
   end;
@@ -2216,7 +2216,7 @@ end;
 { -------------------------------------------------------------------------- }
 function TAbZipArchive.GetZipFileComment : string;
 begin
-  Result := StrPas( FInfo.ZipFileComment );
+  Result := string(StrPas( FInfo.ZipFileComment ));
 end;
 { -------------------------------------------------------------------------- }
 procedure TAbZipArchive.LoadArchive;

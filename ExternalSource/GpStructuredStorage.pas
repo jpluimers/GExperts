@@ -941,7 +941,7 @@ var
   iPointer: integer;
 begin
   header := TStringStream.Create(CSignature +
-    StringOfChar(' ', CBlockSize - Length(CSignature) - Length(shPointers)*4));
+    AnsiString(StringOfChar(' ', CBlockSize - Length(CSignature) - Length(shPointers)*4)));
   try
     header.Position := header.Size;
     for iPointer := Low(shPointers) to High(shPointers) do begin
@@ -972,7 +972,7 @@ begin
   try
     shStorage.Position := 0;
     if (shStorage.ReadStream(header, Length(CSignature)) <> Length(CSignature)) or
-       (header.DataString <> CSignature)
+       (header.DataString <> string(CSignature))
     then
       Exit;
   finally FreeAndNil(header); end;

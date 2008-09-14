@@ -1045,6 +1045,18 @@ uses
   Consts,
   Math;
 
+{$IFNDEF UNICODE}
+function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload;
+begin
+  Result := C in CharSet;
+end;
+
+function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload;
+begin
+  Result := (C < #$0100) and (AnsiChar(C) in CharSet);
+end;
+{$ENDIF}
+
 { publics }
 
 function IntegerCompare(avalue1, avalue2: integer): integer;
@@ -1705,7 +1717,7 @@ begin
   if P <> nil then
     while p^ <> #0 do begin
       start := p;
-      while not (p^ in [#0, #10, #13]) do
+      while not CharInSet(p^, [#0, #10, #13]) do
         Inc(p);
       SetString(s, start, p - start);
       Add(StrToInt(s));
@@ -2307,7 +2319,7 @@ begin
   if P <> nil then
     while p^ <> #0 do begin
       start := p;
-      while not (p^ in [#0, #10, #13]) do
+      while not CharInSet(p^, [#0, #10, #13]) do
         Inc(p);
       SetString(s, start, p - start);
       Add(StrToInt64(s));

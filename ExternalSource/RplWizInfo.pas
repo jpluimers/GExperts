@@ -366,7 +366,7 @@ end;
 function TPropInfo.GetStrValue(const Default: string): string;
 begin
   if PropType in [tkString, tkLString] then
-    Result := AnsiString(PropValue.PtrValue)
+    Result := string(AnsiString(PropValue.PtrValue))
   else if PropType in [tkWString] then
     Result := WideString(PropValue.PtrValue)
   {$IFDEF GX_VER200_up}  
@@ -570,7 +570,7 @@ function TPropList.CanWrite(Instance: TObject; APropInfo: PPropInfo): Boolean;
 begin
   Result := Assigned(APropInfo.SetProc);
   if (not Result) and (APropInfo^.PropType^.Kind in [tkClass]) then
-    Result := (ClassLevel(TStrings, GetObjectPropClass(Instance, APropInfo.Name)) >= 0);
+    Result := (ClassLevel(TStrings, GetObjectPropClass(Instance, string(APropInfo.Name))) >= 0);
 end;
 
 procedure TPropList.ExecutePropAssign(OldCompIntf: IOTAComponent; NewCompIntf: IOTAComponent;
@@ -655,7 +655,7 @@ begin
           PropValue := '[ changed ]'
         else
           PropValue := '';
-        PropValue := VarToStr(GetPropValue(ValueObj, ValuePropInfo.Name)) + ' '+
+        PropValue := VarToStr(GetPropValue(ValueObj, string(ValuePropInfo.Name))) + ' '+
           PropValue;
       end;
       FController.LogMsg(Format(SPropValue,
@@ -725,7 +725,7 @@ begin
     if not (SourceInfo.PropType^.Kind in [tkString, tkLString {$IFDEF GX_VER200_up}, tkUString{$ENDIF}]) then
       Exit;
 
-    if ClassLevel(GetObjectPropClass(DestParentObject, DestParentInfo.Name), TComponent) < 0 then
+    if ClassLevel(GetObjectPropClass(DestParentObject, string(DestParentInfo.Name)), TComponent) < 0 then
       Exit;
 
     PropTail := ReverseString(DestExpression);
@@ -733,11 +733,11 @@ begin
     ParentPropName := ReverseString(ExtractToken(PropTail, '.'));
 
     if (not SameText(PropName, 'Name')) or
-       (not SameText(ParentPropName, DestParentInfo.Name))
+       (not SameText(ParentPropName, string(DestParentInfo.Name)))
     then
       Exit;
 
-    CompName := GetStrProp(SourceObject, SourceInfo.Name);
+    CompName := GetStrProp(SourceObject, string(SourceInfo.Name));
 
     if Trim(CompName)<>'' then
     begin
@@ -748,7 +748,7 @@ begin
     else
       NewDestComponent := nil;
 
-    SetObjectProp(DestParentObject, DestParentInfo.Name, NewDestComponent);
+    SetObjectProp(DestParentObject, string(DestParentInfo.Name), NewDestComponent);
     Result := True;
 
   except
@@ -758,7 +758,7 @@ begin
       if Assigned(DestObject) then
         DestClass := DestObject.ClassName;
       if Assigned(DestInfo) then
-        DestName := DestInfo.Name;
+        DestName := string(DestInfo.Name);
 
       FController.HandleException(E, Format(SCompNameAssignCtx, [DestClass, DestName]));
     end;
@@ -794,8 +794,8 @@ begin
     case SourceType of
       tkClass:
       begin
-        SourceObj := GetObjectProp(SourceObject, SourceInfo.Name);
-        DestObj := GetObjectProp(DestObject, DestInfo.Name);
+        SourceObj := GetObjectProp(SourceObject, string(SourceInfo.Name));
+        DestObj := GetObjectProp(DestObject, string(DestInfo.Name));
 
         if DestInfo.SetProc = nil then
         begin // Setter is nil - only TStrings is handled here
@@ -813,42 +813,42 @@ begin
             (DestObj as TStrings).Text := (SourceObj as TWideStrings).Text
           else
           {$ENDIF GX_VER170_up}
-            SetObjectProp(DestObject, DestInfo.Name, GetObjectProp(SourceObject, SourceInfo.Name));
+            SetObjectProp(DestObject, string(DestInfo.Name), GetObjectProp(SourceObject, string(SourceInfo.Name)));
         end;
       end; // tkClass
       tkMethod:
-        SetMethodProp(DestObject, DestInfo.Name, GetMethodProp(SourceObject, SourceInfo.Name));
+        SetMethodProp(DestObject, string(DestInfo.Name), GetMethodProp(SourceObject, string(SourceInfo.Name)));
       else
-        SetPropValue(DestObject, DestInfo.Name, GetPropValue(SourceObject, SourceInfo.Name));
+        SetPropValue(DestObject, string(DestInfo.Name), GetPropValue(SourceObject, string(SourceInfo.Name)));
     end // case
   end // Same type
   else // Different property types
   begin
     // Different types but both can be a variant
     if (SourceType <> tkClass) and (DestType <> tkClass) then
-      SetPropValue(DestObject, DestInfo.Name, GetPropValue(SourceObject, SourceInfo.Name))
+      SetPropValue(DestObject, string(DestInfo.Name), GetPropValue(SourceObject, string(SourceInfo.Name)))
     else // Class on one side only
     begin
       // Test for TStrings on source side
       if (SourceType = tkClass) then
       begin
-        SourceObj := GetObjectProp(SourceObject, SourceInfo.Name);
+        SourceObj := GetObjectProp(SourceObject, string(SourceInfo.Name));
         if SourceObj is TStrings then
-          SetPropValue(DestObject, DestInfo.Name, (SourceObj as TStrings).Text)
+          SetPropValue(DestObject, string(DestInfo.Name), (SourceObj as TStrings).Text)
         {$IFDEF GX_VER170_up}
         else if SourceObj is TWideStrings then
-          SetPropValue(DestObject, DestInfo.Name, (SourceObj as TWideStrings).Text)
+          SetPropValue(DestObject, string(DestInfo.Name), (SourceObj as TWideStrings).Text)
         {$ENDIF GX_VER170_up}
       end
       // Test for T[Wide]Strings on dest side
       else if DestType = tkClass then
       begin
-        DestObj := GetObjectProp(DestObject, DestInfo.Name);
+        DestObj := GetObjectProp(DestObject, string(DestInfo.Name));
         if DestObj is TStrings then
-          (DestObj as TStrings).Text := GetPropValue(SourceObject, SourceInfo.Name)
+          (DestObj as TStrings).Text := GetPropValue(SourceObject, string(SourceInfo.Name))
         {$IFDEF GX_VER170_up}
         else if DestObj is TWideStrings then
-          (DestObj as TWideStrings).Text := GetPropValue(SourceObject, SourceInfo.Name)
+          (DestObj as TWideStrings).Text := GetPropValue(SourceObject, string(SourceInfo.Name))
         {$ENDIF GX_VER170_up}
       end;
     end;
@@ -864,15 +864,15 @@ var
 begin
   if not (DestInfo.PropType^.Kind in [tkClass])
   then
-    SetPropValue(DestObject, DestInfo.Name, ConstExpression)
+    SetPropValue(DestObject, string(DestInfo.Name), ConstExpression)
   else // Class on dest side
   begin
     // Test for TStrings on dest side
     if (DestInfo.PropType^.Kind in [tkClass]) and
-       (ClassLevel(TStrings, GetObjectPropClass(DestObject, DestInfo.Name)) >= 0)
+       (ClassLevel(TStrings, GetObjectPropClass(DestObject, string(DestInfo.Name))) >= 0)
     then
     begin
-      SList := GetObjectProp(DestObject, DestInfo.Name) as TStrings;
+      SList := GetObjectProp(DestObject, string(DestInfo.Name)) as TStrings;
       if Assigned(SList) then
         SList.Text := ConstExpression;
     end
@@ -934,7 +934,7 @@ begin
     // assign new output values
     PropName := ExtractToken(PropTail, '.');
     VPropInfo := TypInfo.GetPropInfo(
-      GetObjectPropClass(PersObject, VPropInfo.Name), PropName);
+      GetObjectPropClass(PersObject, string(VPropInfo.Name)), PropName);
     PersObject := RawObject as TPersistent;
   end;
 

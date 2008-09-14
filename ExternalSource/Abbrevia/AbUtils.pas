@@ -276,6 +276,8 @@ type
 
   {$IFNDEF UNICODE}
   function AnsiStrAlloc(Size: Cardinal): PAnsiChar;
+  function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload;
+  function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload;
   {$ENDIF}
 
   function AbWriteVolumeLabel(const VolName : string;
@@ -842,7 +844,7 @@ begin
   Result := DirName;
   if Length(DirName) = 0 then
     Exit;
-  if not (DirName[Length(DirName)] in AbDelimSet) then
+  if not CharInSet(DirName[Length(DirName)], AbDelimSet) then
     Result := DirName + AbPathDelim;
 end;
 { -------------------------------------------------------------------------- }
@@ -1169,6 +1171,16 @@ end;
 function AnsiStrAlloc(Size: Cardinal): PAnsiChar;
 begin
   Result := StrAlloc(Size);
+end;
+
+function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean;
+begin
+  Result := C in CharSet;
+end;
+
+function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean;
+begin
+  Result := (C < #$0100) and (AnsiChar(C) in CharSet);
 end;
 {$ENDIF}
 
