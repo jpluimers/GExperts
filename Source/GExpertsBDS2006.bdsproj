@@ -123,7 +123,7 @@
 			<Directories Name="UnitOutputDir" Type="String"></Directories>
 			<Directories Name="PackageDLLOutputDir" Type="String"></Directories>
 			<Directories Name="PackageDCPOutputDir" Type="String"></Directories>
-			<Directories Name="SearchPath" Type="String">Framework;..\ExternalSource;..\ExternalSource\Abbrevia</Directories>
+			<Directories Name="SearchPath" Type="String">Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</Directories>
 			<Directories Name="Packages" Type="String">vcl;rtl;vclx;designide</Directories>
 			<Directories Name="Conditionals" Type="String"></Directories>
 			<Directories Name="DebugSourceDirs" Type="String"></Directories>
@@ -151,7 +151,7 @@
 			<VersionInfo Name="AutoIncBuild" Type="Boolean">False</VersionInfo>
 			<VersionInfo Name="MajorVer" Type="Integer">1</VersionInfo>
 			<VersionInfo Name="MinorVer" Type="Integer">3</VersionInfo>
-			<VersionInfo Name="Release" Type="Integer">2</VersionInfo>
+			<VersionInfo Name="Release" Type="Integer">3</VersionInfo>
 			<VersionInfo Name="Build" Type="Integer">0</VersionInfo>
 			<VersionInfo Name="Debug" Type="Boolean">False</VersionInfo>
 			<VersionInfo Name="PreRelease" Type="Boolean">False</VersionInfo>
@@ -162,7 +162,7 @@
 			<VersionInfo Name="CodePage" Type="Integer">1252</VersionInfo>
 		</VersionInfo>
 		<VersionInfoKeys>
-			<VersionInfoKeys Name="FileVersion" Type="String">1.3.2.0</VersionInfoKeys>
+			<VersionInfoKeys Name="FileVersion" Type="String">1.3.3.0</VersionInfoKeys>
 			<VersionInfoKeys Name="CompanyName" Type="String">Erik Berry and the GExperts Development Team</VersionInfoKeys>
 			<VersionInfoKeys Name="FileDescription" Type="String">GExperts for BDS 2006</VersionInfoKeys>
 			<VersionInfoKeys Name="InternalName" Type="String">GExperts for BDS 2006</VersionInfoKeys>
@@ -172,7 +172,6 @@
 			<VersionInfoKeys Name="ProductName" Type="String">GExperts for BDS 2006</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion" Type="String">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
-			<VersionInfoKeys Name="Compile Date">Saturday, October 06, 2001 3:07 PM</VersionInfoKeys>
 			<VersionInfoKeys Name="CompileDate">Wednesday, June 20, 2007 2:54 PM</VersionInfoKeys>
 		</VersionInfoKeys>
 		<Language>

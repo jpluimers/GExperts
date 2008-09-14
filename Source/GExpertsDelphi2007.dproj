@@ -20,10 +20,10 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Version>7.0</Version>
     <DCC_Define>DEBUG</DCC_Define>
-    <DCC_UnitSearchPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia</DCC_UnitSearchPath>
-    <DCC_ResourcePath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia</DCC_ResourcePath>
-    <DCC_ObjPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia</DCC_ObjPath>
-    <DCC_IncludePath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia</DCC_IncludePath>
+    <DCC_UnitSearchPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</DCC_UnitSearchPath>
+    <DCC_ResourcePath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</DCC_ResourcePath>
+    <DCC_ObjPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</DCC_ObjPath>
+    <DCC_IncludePath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</DCC_IncludePath>
     <DCC_Optimize>False</DCC_Optimize>
     <DCC_IntegerOverflowCheck>True</DCC_IntegerOverflowCheck>
     <DCC_RangeChecking>True</DCC_RangeChecking>

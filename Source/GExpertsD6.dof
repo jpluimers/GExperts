@@ -34,7 +34,7 @@ UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=
 MapFile=0
 OutputObjs=0
 ConsoleApp=1
-DebugInfo=0
+DebugInfo=1
 RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
@@ -45,7 +45,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=Framework;..\ExternalSource;..\ExternalSource\Abbrevia
+SearchPath=Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit
 Packages=rtl;vcl;vclx;vclsmp;designide
 Conditionals=
 DebugSourceDirs=
@@ -61,7 +61,7 @@ IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=1
 MinorVer=3
-Release=2
+Release=3
 Build=0
 Debug=0
 PreRelease=0
@@ -73,13 +73,13 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=GExperts Development Team
 FileDescription=GExperts for Delphi 6
-FileVersion=1.3.2.0
+FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 6
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=GExpertsD6.dll
 ProductName=GExperts for Delphi 6
-ProductVersion=1.0.0.0
+ProductVersion=1.33
 Comments=Open Source
 CompileDate=Monday, April 09, 2007 1:11 AM
 [Excluded Packages]
@@ -107,10 +107,10 @@ D:\Borland\ReportBuilderD6\Lib\dclRBU66.bpl=ReportBuilder Sample Components
 D:\Borland\ReportBuilderD6\Lib\dclRBC66.bpl=ReportBuilder TeeChart 4.04 Components
 D:\Borland\ReportBuilderD6\Lib\dclDAD66.bpl=ReportBuilder Data Access Environment
 D:\Borland\RemObjects\Dcu\D6\RemObjects_IDE_D6.bpl=RemObjects - IDE
-d:\borland\delphi6\Bin\dclcds60.bpl=Borland Base Cached ClientDataset Component
-D:\Borland\Delphi6\Bin\dclmid60.bpl=Borland MyBase DataAccess Components
 d:\borland\delphi6\Bin\dclbde60.bpl=Borland BDE DB Components
 d:\borland\delphi6\Bin\DCLIB60.bpl=InterBase Data Access Components
+d:\borland\delphi6\Bin\dclcds60.bpl=Borland Base Cached ClientDataset Component
+D:\Borland\Delphi6\Bin\dclmid60.bpl=Borland MyBase DataAccess Components
 d:\borland\delphi6\Bin\dclbdecds60.bpl=Borland Local BDE ClientDataset Components
 d:\borland\delphi6\Bin\dclqrt60.bpl=QuickReport Components
 d:\borland\delphi6\Bin\dcltee60.bpl=TeeChart Components
@@ -136,9 +136,6 @@ C:\WINDOWS\system32\ibevnt60.bpl=Borland Interbase Event Alerter Component
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=1
-Item0=Framework;..\ExternalSource;..\ExternalSource\Abbrevia
 [Warnings]
 SymbolDeprecated=1
 SymbolLibrary=1
