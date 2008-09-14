@@ -23,10 +23,9 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
 			<DCC_StringChecks>off</DCC_StringChecks>
 			<DCC_UnitSearchPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-			<DCC_WIDECHAR_REDUCED>false</DCC_WIDECHAR_REDUCED>
-			<DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
 			<DCC_DependencyCheckOutputName>GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
 			<UsePackages>true</UsePackages>
 			<GenDll>true</GenDll>
