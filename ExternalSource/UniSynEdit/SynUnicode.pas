@@ -319,8 +319,8 @@ function SynWideLowerCase(const S: UnicodeString): UnicodeString;
 function SynIsCharAlpha(const C: WideChar): Boolean;
 function SynIsCharAlphaNumeric(const C: WideChar): Boolean;
 {$IFNDEF UNICODE}
-function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload; {$MESSAGE 'add inline; for Delphi versions that support it'}
-function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload; {$MESSAGE 'add inline; for Delphi versions that support it'}
+function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload; {$IFDEF SYN_INLINE} inline; {$ENDIF}
+function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload; {$IFDEF SYN_INLINE} inline; {$ENDIF}
 {$ENDIF}
 
 function WideLastDelimiter(const Delimiters, S: UnicodeString): Integer;
@@ -428,7 +428,9 @@ uses
   QSynEditTextBuffer,
   {$ELSE}
   SynEditTextBuffer,
-  SynUsp10,
+    {$IFDEF SynUniscribe}
+    SynUsp10,
+    {$ENDIF}
   {$ENDIF}
   Math,
   {$IFDEF SYN_LINUX}
@@ -836,36 +838,12 @@ begin
 end;
 
 procedure TUnicodeStrings.LoadFromStream(Stream: TStream);
-// usual loader routine, but enhanced to handle byte order marks in stream
 var
-  Size,
-  BytesRead: Integer;
-  Order: WideChar;
-  SW: UnicodeString;
-  SA: AnsiString;
+  Dummy: Boolean;
 begin
   BeginUpdate;
   try
-    Size := Stream.Size - Stream.Position;
-    BytesRead := Stream.Read(Order, 2);
-    if (Order = BOM_LSB_FIRST) or (Order = BOM_MSB_FIRST) then
-    begin
-      FSaveUnicode := True;
-      SetLength(SW, (Size - 2) div 2);
-      Stream.Read(PWideChar(SW)^, Size - 2);
-      if Order = BOM_MSB_FIRST then
-        StrSwapByteOrder(PWideChar(SW));
-      SetTextStr(SW);
-    end
-    else
-    begin
-      // without byte order mark it is assumed that we are loading ANSI text
-      FSaveUnicode := False;
-      Stream.Seek(-BytesRead, soFromCurrent);
-      SetLength(SA, Size);
-      Stream.Read(PAnsiChar(SA)^, Size);
-      SetTextStr(SA);
-    end;
+    SynUnicode.LoadFromStream(Self, Stream, Dummy); // Supports ANSI, UTF-8, UTF-16 BE/LE
   finally
     EndUpdate;
   end;
@@ -958,8 +936,7 @@ begin
     else
     begin
       SA := AnsiString(PWideChar(SW));
-      if Allowed then
-        Stream.WriteBuffer(PAnsiChar(SA)^, Length(SA));
+      Stream.WriteBuffer(PAnsiChar(SA)^, Length(SA));
     end;
     FSaved := True;
   end;
@@ -2310,17 +2287,22 @@ end;
 {$ENDIF}
 
 function GetTextSize(DC: HDC; Str: PWideChar; Count: Integer): TSize;
+{$IFDEF SynUniscribe}
 const
   SSAnalyseFlags = SSA_GLYPHS or SSA_FALLBACK or SSA_LINK;
+{$ENDIF}
 var
   tm: TTextMetricA;
+  {$IFDEF SynUniscribe}
   GlyphBufferSize: Integer;
-  saa: TScriptStringAnalysis;
   lpSize: PSize;
+  saa: TScriptStringAnalysis;
+  {$ENDIF}
 begin
   Result.cx := 0;
   Result.cy := 0;
 
+  {$IFDEF SynUniscribe}
   if Usp10IsInstalled then
   begin
     if Count <= 0 then Exit;
@@ -2347,6 +2329,7 @@ begin
     end;
   end
   else
+  {$ENDIF}
   begin
     GetTextExtentPoint32W(DC, Str, Count, Result);
     if not Win32PlatformIsUnicode then
@@ -2479,7 +2462,7 @@ begin
       raise EFCreateError.CreateResFmt(PResStringRec(@SFCreateErrorEx),
         [ExpandFileName(FileName), SysErrorMessage(GetLastError)]);
   {$ELSE}
-      raise EFCreateError.CreateResFmt(@SFCreateError, [FileName]);
+      raise EFCreateError.CreateResFmt(PResStringRec(@SFCreateError), [FileName]);
   {$ENDIF}
 {$ENDIF}
     end
@@ -2502,7 +2485,7 @@ begin
       raise EFOpenError.CreateResFmt(PResStringRec(@SFOpenErrorEx),
         [ExpandFileName(FileName), SysErrorMessage(GetLastError)]);
   {$ELSE}
-      raise EFOpenError.CreateResFmt(@SFOpenError, [FileName]);
+      raise EFOpenError.CreateResFmt(PResStringRec(@SFOpenError), [FileName]);
   {$ENDIF}
 {$ENDIF}
     end;

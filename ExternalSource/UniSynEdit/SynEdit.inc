@@ -453,6 +453,8 @@
   {$ENDIF}
 {$ENDIF}
 
+{.$DEFINE SynUniscribe} // Turn this off if you don't need complex script support, since it is slower
+
 {------------------------------------------------------------------------------}
 { Please change this to suit your needs (to activate an option remove the dot) }
 {------------------------------------------------------------------------------}

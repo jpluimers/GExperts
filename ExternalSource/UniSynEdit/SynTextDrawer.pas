@@ -253,8 +253,10 @@ function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
 
 implementation
 
+{$IFDEF SynUniscribe}
 uses
   SynUsp10;
+{$ENDIF}
 
 var
   gFontsInfoManager: TheFontsInfoManager;
@@ -280,13 +282,17 @@ end;
 // See here for details: http://groups.google.com/group/microsoft.public.win32.programmer.international/browse_thread/thread/77cd596f2b96dc76/146300208098285c?lnk=st&q=font+substitution+problem#146300208098285c
 function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
   Rect: TRect; Str: PWideChar; Count: Integer; ETODist: PIntegerArray): Boolean;
+{$IFDEF SynUniscribe}
 const
   SSAnalyseFlags = SSA_GLYPHS or SSA_FALLBACK or SSA_LINK;
   SpaceString: UnicodeString = ' ';
+{$ENDIF}
 var
   TextOutFlags: DWORD;
+{$IFDEF SynUniscribe}
   GlyphBufferSize: Integer;
   saa: TScriptStringAnalysis;
+{$ENDIF}
 begin
   TextOutFlags := 0;
   if tooOpaque in Options then
@@ -294,6 +300,7 @@ begin
   if tooClipped in Options then
     TextOutFlags := TextOutFlags or ETO_CLIPPED;
 
+{$IFDEF SynUniscribe}
   if Usp10IsInstalled then
   begin
     // UniScribe requires that the string contains at least one character.
@@ -318,7 +325,7 @@ begin
     // value for GlyphBufferSize (see documentation of cGlyphs parameter of
     // ScriptStringAnalyse function)
     GlyphBufferSize := (3 * Count) div 2 + 16;
-    
+
     Result := Succeeded(ScriptStringAnalyse(DC, Str, Count, GlyphBufferSize, -1,
       SSAnalyseFlags, 0, nil, nil, Pointer(ETODist), nil, nil, @saa));
     Result := Result and Succeeded(ScriptStringOut(saa, X, Y, TextOutFlags,
@@ -326,6 +333,7 @@ begin
     Result := Result and Succeeded(ScriptStringFree(@saa));
   end
   else
+{$ENDIF}
   begin
     Result := ExtTextOutW(DC, X, Y, TextOutFlags, @Rect, Str, Count,
       Pointer(ETODist));
@@ -876,7 +884,7 @@ procedure TheTextDrawer.ExtTextOut(X, Y: Integer; Options: TTextOutOptions;
     ReallocMem(FETODist, Length * SizeOf(Integer));
     for i := 0 to Length - 1 do
     begin
-      Size := TextExtent(@Text[i], 1);
+      Size := TextExtent(PWideChar(@Text[i]), 1);
       FETODist[i] := Ceil(Size.cx / CharWidth) * CharWidth;
     end;
   end;

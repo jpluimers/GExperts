@@ -486,9 +486,12 @@ begin
       while not Highlighter.GetEOL do
       begin
         Attri := Highlighter.GetTokenAttribute;
-        Token := ReplaceReservedChars(Highlighter.GetToken);
-        SetTokenAttribute(Attri);
-        FormatToken(Token);
+        if Assigned(Attri) then // The .pas highlighter, for example, can return a nil Attri above for a trailing EOF/null that was loaded from a stream
+        begin
+          Token := ReplaceReservedChars(Highlighter.GetToken);
+          SetTokenAttribute(Attri);
+          FormatToken(Token);
+        end;
         Highlighter.Next;
       end;
       FormatNewLine;

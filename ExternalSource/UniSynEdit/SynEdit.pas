@@ -11092,7 +11092,7 @@ initialization
   begin
     // Hooking GetMessage/PeekMessage-calls is necessary as the use of
     // PeekMessageA in TApplication.ProcessMessage mutilates Unicode-messages.
-    GetMsgHook := SetWindowsHookExW(WH_GETMESSAGE, @GetMsgProc, 0,
+    GetMsgHook := SetWindowsHookExW(WH_GETMESSAGE, TFNHookProc(@GetMsgProc), 0,
       GetCurrentThreadId);
   end
   else

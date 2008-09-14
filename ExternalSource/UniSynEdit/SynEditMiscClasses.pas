@@ -1527,7 +1527,7 @@ begin
 
   if not Relative then Delete(S, 1, 1);
   TempKey := 0;
-  Result := RegOpenKeyExA(GetBaseKey(Relative), PAnsiChar(S), 0,
+  Result := RegOpenKeyEx(GetBaseKey(Relative), PChar(S), 0,
       KEY_READ, TempKey) = ERROR_SUCCESS;
   if Result then
   begin
