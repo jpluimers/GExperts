@@ -2206,11 +2206,12 @@ begin
 end;
 
 var
-  _ScriptFreeCache: Pointer;
+  _ScriptFreeCache: Pointer = nil;
 
 function ScriptFreeCache;
 begin
-  GetProcedureAddress(_ScriptFreeCache, Usp10DLL, 'ScriptFreeCache');
+  if _ScriptFreeCache = nil then
+    GetProcedureAddress(_ScriptFreeCache, Usp10DLL, 'ScriptFreeCache');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2219,11 +2220,12 @@ begin
 end;
 
 var
-  _ScriptItemize: Pointer;
+  _ScriptItemize: Pointer = nil;
 
 function ScriptItemize;
 begin
-  GetProcedureAddress(_ScriptItemize, Usp10DLL, 'ScriptItemize');
+  if _ScriptItemize = nil then
+    GetProcedureAddress(_ScriptItemize, Usp10DLL, 'ScriptItemize');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2232,11 +2234,12 @@ begin
 end;
 
 var
-  _ScriptLayout: Pointer;
+  _ScriptLayout: Pointer = nil;
 
 function ScriptLayout;
 begin
-  GetProcedureAddress(_ScriptLayout, Usp10DLL, 'ScriptLayout');
+  if _ScriptLayout = nil then
+    GetProcedureAddress(_ScriptLayout, Usp10DLL, 'ScriptLayout');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2245,11 +2248,12 @@ begin
 end;
 
 var
-  _ScriptShape: Pointer;
+  _ScriptShape: Pointer = nil;
 
 function ScriptShape;
 begin
-  GetProcedureAddress(_ScriptShape, Usp10DLL, 'ScriptShape');
+  if _ScriptShape = nil then
+    GetProcedureAddress(_ScriptShape, Usp10DLL, 'ScriptShape');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2258,11 +2262,12 @@ begin
 end;
 
 var
-  _ScriptPlace: Pointer;
+  _ScriptPlace: Pointer = nil;
 
 function ScriptPlace;
 begin
-  GetProcedureAddress(_ScriptPlace, Usp10DLL, 'ScriptPlace');
+  if _ScriptPlace = nil then
+    GetProcedureAddress(_ScriptPlace, Usp10DLL, 'ScriptPlace');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2271,11 +2276,12 @@ begin
 end;
 
 var
-  _ScriptTextOut: Pointer;
+  _ScriptTextOut: Pointer = nil;
 
 function ScriptTextOut;
 begin
-  GetProcedureAddress(_ScriptTextOut, Usp10DLL, 'ScriptTextOut');
+  if _ScriptTextOut = nil then
+    GetProcedureAddress(_ScriptTextOut, Usp10DLL, 'ScriptTextOut');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2284,11 +2290,12 @@ begin
 end;
 
 var
-  _ScriptJustify: Pointer;
+  _ScriptJustify: Pointer = nil;
 
 function ScriptJustify;
 begin
-  GetProcedureAddress(_ScriptJustify, Usp10DLL, 'ScriptJustify');
+  if _ScriptJustify = nil then
+    GetProcedureAddress(_ScriptJustify, Usp10DLL, 'ScriptJustify');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2297,11 +2304,12 @@ begin
 end;
 
 var
-  _ScriptBreak: Pointer;
+  _ScriptBreak: Pointer = nil;
 
 function ScriptBreak;
 begin
-  GetProcedureAddress(_ScriptBreak, Usp10DLL, 'ScriptBreak');
+  if _ScriptBreak = nil then
+    GetProcedureAddress(_ScriptBreak, Usp10DLL, 'ScriptBreak');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2310,11 +2318,12 @@ begin
 end;
 
 var
-  _ScriptCPtoX: Pointer;
+  _ScriptCPtoX: Pointer = nil;
 
 function ScriptCPtoX;
 begin
-  GetProcedureAddress(_ScriptCPtoX, Usp10DLL, 'ScriptCPtoX');
+  if _ScriptCPtoX = nil then
+    GetProcedureAddress(_ScriptCPtoX, Usp10DLL, 'ScriptCPtoX');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2323,11 +2332,12 @@ begin
 end;
 
 var
-  _ScriptXtoCP: Pointer;
+  _ScriptXtoCP: Pointer = nil;
 
 function ScriptXtoCP;
 begin
-  GetProcedureAddress(_ScriptXtoCP, Usp10DLL, 'ScriptXtoCP');
+  if _ScriptXtoCP = nil then
+    GetProcedureAddress(_ScriptXtoCP, Usp10DLL, 'ScriptXtoCP');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2336,11 +2346,12 @@ begin
 end;
 
 var
-  _ScriptGetLogicalWidths: Pointer;
+  _ScriptGetLogicalWidths: Pointer = nil;
 
 function ScriptGetLogicalWidths;
 begin
-  GetProcedureAddress(_ScriptGetLogicalWidths, Usp10DLL, 'ScriptGetLogicalWidths');
+  if _ScriptGetLogicalWidths = nil then
+    GetProcedureAddress(_ScriptGetLogicalWidths, Usp10DLL, 'ScriptGetLogicalWidths');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2349,11 +2360,12 @@ begin
 end;
 
 var
-  _ScriptApplyLogicalWidth: Pointer;
+  _ScriptApplyLogicalWidth: Pointer = nil;
 
 function ScriptApplyLogicalWidth;
 begin
-  GetProcedureAddress(_ScriptApplyLogicalWidth, Usp10DLL, 'ScriptApplyLogicalWidth');
+  if _ScriptApplyLogicalWidth = nil then
+    GetProcedureAddress(_ScriptApplyLogicalWidth, Usp10DLL, 'ScriptApplyLogicalWidth');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2362,11 +2374,12 @@ begin
 end;
 
 var
-  _ScriptGetCMap: Pointer;
+  _ScriptGetCMap: Pointer = nil;
 
 function ScriptGetCMap;
 begin
-  GetProcedureAddress(_ScriptGetCMap, Usp10DLL, 'ScriptGetCMap');
+  if _ScriptGetCMap = nil then
+    GetProcedureAddress(_ScriptGetCMap, Usp10DLL, 'ScriptGetCMap');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2375,11 +2388,12 @@ begin
 end;
 
 var
-  _ScriptGetGlyphABCWidth: Pointer;
+  _ScriptGetGlyphABCWidth: Pointer = nil;
 
 function ScriptGetGlyphABCWidth;
 begin
-  GetProcedureAddress(_ScriptGetGlyphABCWidth, Usp10DLL, 'ScriptGetGlyphABCWidth');
+  if _ScriptGetGlyphABCWidth = nil then
+    GetProcedureAddress(_ScriptGetGlyphABCWidth, Usp10DLL, 'ScriptGetGlyphABCWidth');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2388,11 +2402,12 @@ begin
 end;
 
 var
-  _ScriptGetProperties: Pointer;
+  _ScriptGetProperties: Pointer = nil;
 
 function ScriptGetProperties;
 begin
-  GetProcedureAddress(_ScriptGetProperties, Usp10DLL, 'ScriptGetProperties');
+  if _ScriptGetProperties = nil then
+    GetProcedureAddress(_ScriptGetProperties, Usp10DLL, 'ScriptGetProperties');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2401,11 +2416,12 @@ begin
 end;
 
 var
-  _ScriptGetFontProperties: Pointer;
+  _ScriptGetFontProperties: Pointer = nil;
 
 function ScriptGetFontProperties;
 begin
-  GetProcedureAddress(_ScriptGetFontProperties, Usp10DLL, 'ScriptGetFontProperties');
+  if _ScriptGetFontProperties = nil then
+    GetProcedureAddress(_ScriptGetFontProperties, Usp10DLL, 'ScriptGetFontProperties');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2414,11 +2430,12 @@ begin
 end;
 
 var
-  _ScriptCacheGetHeight: Pointer;
+  _ScriptCacheGetHeight: Pointer = nil;
 
 function ScriptCacheGetHeight;
 begin
-  GetProcedureAddress(_ScriptCacheGetHeight, Usp10DLL, 'ScriptCacheGetHeight');
+  if _ScriptCacheGetHeight = nil then
+    GetProcedureAddress(_ScriptCacheGetHeight, Usp10DLL, 'ScriptCacheGetHeight');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2427,11 +2444,12 @@ begin
 end;
 
 var
-  _ScriptStringAnalyse: Pointer;
+  _ScriptStringAnalyse: Pointer = nil;
 
 function ScriptStringAnalyse;
 begin
-  GetProcedureAddress(_ScriptStringAnalyse, Usp10DLL, 'ScriptStringAnalyse');
+  if _ScriptStringAnalyse = nil then
+    GetProcedureAddress(_ScriptStringAnalyse, Usp10DLL, 'ScriptStringAnalyse');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2440,11 +2458,12 @@ begin
 end;
 
 var
-  _ScriptStringFree: Pointer;
+  _ScriptStringFree: Pointer = nil;
 
 function ScriptStringFree;
 begin
-  GetProcedureAddress(_ScriptStringFree, Usp10DLL, 'ScriptStringFree');
+  if _ScriptStringFree = nil then
+    GetProcedureAddress(_ScriptStringFree, Usp10DLL, 'ScriptStringFree');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2453,11 +2472,12 @@ begin
 end;
 
 var
-  _ScriptString_pSize: Pointer;
+  _ScriptString_pSize: Pointer = nil;
 
 function ScriptString_pSize;
 begin
-  GetProcedureAddress(_ScriptString_pSize, Usp10DLL, 'ScriptString_pSize');
+  if _ScriptString_pSize = nil then
+    GetProcedureAddress(_ScriptString_pSize, Usp10DLL, 'ScriptString_pSize');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2466,11 +2486,12 @@ begin
 end;
 
 var
-  _ScriptString_pcOutChars: Pointer;
+  _ScriptString_pcOutChars: Pointer = nil;
 
 function ScriptString_pcOutChars;
 begin
-  GetProcedureAddress(_ScriptString_pcOutChars, Usp10DLL, 'ScriptString_pcOutChars');
+  if _ScriptString_pcOutChars = nil then
+    GetProcedureAddress(_ScriptString_pcOutChars, Usp10DLL, 'ScriptString_pcOutChars');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2479,11 +2500,12 @@ begin
 end;
 
 var
-  _ScriptString_pLogAttr: Pointer;
+  _ScriptString_pLogAttr: Pointer = nil;
 
 function ScriptString_pLogAttr;
 begin
-  GetProcedureAddress(_ScriptString_pLogAttr, Usp10DLL, 'ScriptString_pLogAttr');
+  if _ScriptString_pLogAttr = nil then
+    GetProcedureAddress(_ScriptString_pLogAttr, Usp10DLL, 'ScriptString_pLogAttr');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2492,11 +2514,12 @@ begin
 end;
 
 var
-  _ScriptStringGetOrder: Pointer;
+  _ScriptStringGetOrder: Pointer = nil;
 
 function ScriptStringGetOrder;
 begin
-  GetProcedureAddress(_ScriptStringGetOrder, Usp10DLL, 'ScriptStringGetOrder');
+  if _ScriptStringGetOrder = nil then
+    GetProcedureAddress(_ScriptStringGetOrder, Usp10DLL, 'ScriptStringGetOrder');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2505,11 +2528,12 @@ begin
 end;
 
 var
-  _ScriptStringCPtoX: Pointer;
+  _ScriptStringCPtoX: Pointer = nil;
 
 function ScriptStringCPtoX;
 begin
-  GetProcedureAddress(_ScriptStringCPtoX, Usp10DLL, 'ScriptStringCPtoX');
+  if _ScriptStringCPtoX = nil then
+    GetProcedureAddress(_ScriptStringCPtoX, Usp10DLL, 'ScriptStringCPtoX');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2518,11 +2542,12 @@ begin
 end;
 
 var
-  _ScriptStringXtoCP: Pointer;
+  _ScriptStringXtoCP: Pointer = nil;
 
 function ScriptStringXtoCP;
 begin
-  GetProcedureAddress(_ScriptStringXtoCP, Usp10DLL, 'ScriptStringXtoCP');
+  if _ScriptStringXtoCP = nil then
+    GetProcedureAddress(_ScriptStringXtoCP, Usp10DLL, 'ScriptStringXtoCP');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2531,11 +2556,12 @@ begin
 end;
 
 var
-  _ScriptStringGetLogicalWidths: Pointer;
+  _ScriptStringGetLogicalWidths: Pointer = nil;
 
 function ScriptStringGetLogicalWidths;
 begin
-  GetProcedureAddress(_ScriptStringGetLogicalWidths, Usp10DLL, 'ScriptStringGetLogicalWidths');
+  if _ScriptStringGetLogicalWidths = nil then
+    GetProcedureAddress(_ScriptStringGetLogicalWidths, Usp10DLL, 'ScriptStringGetLogicalWidths');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2544,11 +2570,12 @@ begin
 end;
 
 var
-  _ScriptStringValidate: Pointer;
+  _ScriptStringValidate: Pointer = nil;
 
 function ScriptStringValidate;
 begin
-  GetProcedureAddress(_ScriptStringValidate, Usp10DLL, 'ScriptStringValidate');
+  if _ScriptStringValidate = nil then
+    GetProcedureAddress(_ScriptStringValidate, Usp10DLL, 'ScriptStringValidate');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2557,11 +2584,12 @@ begin
 end;
 
 var
-  _ScriptStringOut: Pointer;
+  _ScriptStringOut: Pointer = nil;
 
 function ScriptStringOut;
 begin
-  GetProcedureAddress(_ScriptStringOut, Usp10DLL, 'ScriptStringOut');
+  if _ScriptStringOut = nil then
+    GetProcedureAddress(_ScriptStringOut, Usp10DLL, 'ScriptStringOut');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2570,11 +2598,12 @@ begin
 end;
 
 var
-  _ScriptIsComplex: Pointer;
+  _ScriptIsComplex: Pointer = nil;
 
 function ScriptIsComplex;
 begin
-  GetProcedureAddress(_ScriptIsComplex, Usp10DLL, 'ScriptIsComplex');
+  if _ScriptIsComplex = nil then
+    GetProcedureAddress(_ScriptIsComplex, Usp10DLL, 'ScriptIsComplex');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2583,11 +2612,12 @@ begin
 end;
 
 var
-  _ScriptRecordDigitSubstitution: Pointer;
+  _ScriptRecordDigitSubstitution: Pointer = nil;
 
 function ScriptRecordDigitSubstitution;
 begin
-  GetProcedureAddress(_ScriptRecordDigitSubstitution, Usp10DLL, 'ScriptRecordDigitSubstitution');
+  if _ScriptRecordDigitSubstitution = nil then
+    GetProcedureAddress(_ScriptRecordDigitSubstitution, Usp10DLL, 'ScriptRecordDigitSubstitution');
   asm
     MOV ESP, EBP
     POP EBP
@@ -2596,11 +2626,12 @@ begin
 end;
 
 var
-  _ScriptApplyDigitSubstitution: Pointer;
+  _ScriptApplyDigitSubstitution: Pointer = nil;
 
 function ScriptApplyDigitSubstitution;
 begin
-  GetProcedureAddress(_ScriptApplyDigitSubstitution, Usp10DLL, 'ScriptApplyDigitSubstitution');
+  if _ScriptApplyDigitSubstitution = nil then
+    GetProcedureAddress(_ScriptApplyDigitSubstitution, Usp10DLL, 'ScriptApplyDigitSubstitution');
   asm
     MOV ESP, EBP
     POP EBP
