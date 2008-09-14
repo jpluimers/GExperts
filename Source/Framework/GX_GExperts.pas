@@ -57,9 +57,6 @@ uses
   GX_ConfigurationInfo, GX_Configure, GX_KbdShortCutBroker, GX_SharedImages,
   GX_IdeUtils, GX_IdeEnhance;
 
-var
-  FPrivateGExpertsInst: TGExperts = nil;
-
 type
   TInitHelper = class(TObject)
   private
@@ -71,15 +68,16 @@ type
     constructor Create(CallBack: TNotifyEvent);
   end;
 
-var
-  SharedImages: TdmSharedImages = nil;
-
-type
   TUnsupportedIDEMessage = class(TGxMsgBoxAdaptor)
   protected
     function GetMessage: string; override;
     function ShouldShow: Boolean; override;
   end;
+
+var
+  FPrivateGExpertsInst: TGExperts = nil;
+  InitHelper: TInitHelper = nil;
+  SharedImages: TdmSharedImages = nil;
 
 function GExpertsInst(ForceValid: Boolean): TGExperts;
 begin
@@ -128,13 +126,13 @@ begin
   inherited Create;
   FStartingUp := True;
   InitializeGExperts;
-  TInitHelper.Create(DoAfterIDEInitialized); // One time leak
+  InitHelper := TInitHelper.Create(DoAfterIDEInitialized);
 end;
 
 class procedure TGExperts.DelayedRegister;
 begin
   {$IFOPT D+} SendDebug('TGExperts.DelayedRegister'); {$ENDIF}
-  TInitHelper.Create(DoInitialize); // One time leak
+  InitHelper := TInitHelper.Create(DoInitialize);
 end;
 
 procedure TGExperts.InitializeGExperts;
@@ -400,6 +398,11 @@ begin
       FCallback(Self);
   end;
 end;
+
+initialization
+
+finalization
+  FreeAndNil(InitHelper);
 
 end.
 

@@ -489,7 +489,6 @@ end;
 
 destructor TfmClipboardHistory.Destroy;
 begin
-  lvClip.Selected := nil;  // Else Delphi 5 crashes on shutdown
   SaveClips;
 
   // Now free everything.

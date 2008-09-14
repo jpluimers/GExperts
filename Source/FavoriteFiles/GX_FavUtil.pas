@@ -147,7 +147,7 @@ begin
   begin
     CurrItem := TGXFavItem(AList[i]);
     CurrItem.FOwner := nil; // Avoid CurrItem removing itself from list
-    CurrItem.Free;
+    FreeAndNil(CurrItem);
   end;
   AList.Clear;
 end;

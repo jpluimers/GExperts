@@ -223,6 +223,7 @@ type
     property DialogBoxType: string read GetDialogBoxType write SetDialogBoxType;
   public
     constructor Create(AOwner: TComponent; Settings: TMessageDialogSettings); reintroduce;
+    destructor Destroy; override;
     property GeneratedCode: string read GetGeneratedCode;
     property MessageType: TAbstractMessageType read FMessageType write FMessageType;
     property UsesUnit: string read FUsesUnit write FUsesUnit;
@@ -835,6 +836,12 @@ end;
 procedure TfmMessageDialog.cbxTypeEmbeddedChange(Sender: TObject);
 begin
   FixControlsEnablement(False);
+end;
+
+destructor TfmMessageDialog.Destroy;
+begin
+  FreeAndNil(FMessageType);
+  inherited;
 end;
 
 { TMsgExpExpert }

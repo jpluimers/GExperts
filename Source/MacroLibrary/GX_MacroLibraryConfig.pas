@@ -33,7 +33,7 @@ begin
     if Result then
       APromptForName := frm.chk_AutoPrompt.Checked;
   finally
-    frm.Free;
+    FreeAndNil(frm);
   end;
 end;
 

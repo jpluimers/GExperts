@@ -1618,7 +1618,7 @@ begin
   end;
   Item := TClassItem(tvBrowse.Selected.Data);
   tvBrowse.Selected.Free;
-  Item.Free;
+  FreeAndNil(Item);
   if tvBrowse.Selected = nil then
     actFileRemove.Enabled := False;
 end;

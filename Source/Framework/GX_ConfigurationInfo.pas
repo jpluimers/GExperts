@@ -413,7 +413,7 @@ end;
 destructor TConfigInfo.Destroy;
 begin
   {$IFOPT D+} SendDebug('TConfigInfo.Destroy'); {$ENDIF D+}
-  SaveSettings;
+  //SaveSettings; // Call this below to prevent re-creating TConfigInfo
   FreeEditorEnhancements;
 
   inherited Destroy;
@@ -775,11 +775,18 @@ begin
   end;
 end;
 
+procedure FinalizeConfigurationInfo;
+begin
+  if Assigned(FPrivateConfigurationInfo) then
+    FPrivateConfigurationInfo.SaveSettings;
+  FreeAndNil(FPrivateConfigurationInfo);
+end;
+
 initialization
   FPrivateConfigurationInfo := nil;
 
 finalization
-  FreeAndNil(FPrivateConfigurationInfo);
+  FinalizeConfigurationInfo;
 
 end.
 

@@ -655,12 +655,8 @@ begin
           try
             tmpObj.OptionKind := OptionNames[j].Kind;
             lstPrjOptions.Items.AddObject(OptionNames[j].Name, tmpObj);
-          except
-            on E: Exception do
-            begin
-              FreeAndNil(tmpObj);
-              raise;
-            end;
+          finally
+            FreeAndNil(tmpObj);
           end;
         end;
         // Done loading option list

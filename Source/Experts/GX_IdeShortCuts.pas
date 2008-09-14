@@ -194,7 +194,7 @@ procedure TfmIdeShortCuts.InitializeForm;
     try
       ADest.Name := ASource.Name;
     except // Ignore menu items with duplicate names, such as with ModelMaker 6.2 for D7
-      ADest.Free;
+      FreeAndNil(ADest);
       Exit;
     end;
     ADest.Caption := ASource.Caption;

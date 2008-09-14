@@ -322,7 +322,7 @@ procedure TSearcher.SetFileName(const Value: string);
       Lst := TStringList.Create;
       try
         Lst.LoadFromStream(ReaderStream);
-        ReaderStream.Free;
+        FreeAndNil(ReaderStream);
         for i := 0 to Lst.Count - 1 do
           Lst[i] := Utf8ToAnsi(Lst[i]);
 

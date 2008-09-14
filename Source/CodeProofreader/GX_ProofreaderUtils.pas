@@ -244,7 +244,7 @@ begin
   // TODO 3 -cCleanup -oAnyone: Does this prevent all leaks?
   Item := Objects[Index] as TReplacementItem;
   Assert(Assigned(Item));
-  Item.Free;
+  FreeAndNil(Item);
   inherited Delete(Index);
 end;
 

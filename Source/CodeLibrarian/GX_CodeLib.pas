@@ -1525,7 +1525,7 @@ end;
 
 procedure TGXStorageFile.CloseStorage;
 begin
-  //FreeAndNil(FStorage);?
+  FStorage := nil;
 end;
 
 constructor TGXStorageFile.Create(const FileName: TGXUnicodeString);
