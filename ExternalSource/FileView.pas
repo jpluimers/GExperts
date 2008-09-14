@@ -10,9 +10,9 @@ uses
   {$IFDEF SYNEDIT}
   SynEdit, GX_SynMemoUtils, // See GX_CondDefine.inc to remove the SynEdit requirement
   {$ENDIF SYNEDIT}
-  {$IFDEF HAVEJPEG}
-  jpeg,
-  {$ENDIF HAVEJPEG}
+  Jpeg,
+  {$IFDEF GX_VER185_up} GifImg, {$ENDIF}
+  {$IFDEF GX_VER200_up} PngImage, {$ENDIF}
   Classes, ExtCtrls, ComCtrls, GX_GenericUtils;
 
 type
@@ -155,8 +155,11 @@ begin
   try
     Ext := UpperCase(ExtractFileExt(FileName));
 
-    if {$IFDEF HAVEJPEG} (Ext = '.JPG') or {$ENDIF HAVEJPEG}
+    if (Ext = '.JPG') or
+       {$IFDEF GX_VER185_up} (Ext = '.GIF') or {$ENDIF}
+       {$IFDEF GX_VER200_up} (Ext = '.PNG') or {$ENDIF}
        (Ext = '.BMP') or (Ext = '.ICO') then
+    
     begin
       FRichEdit.Visible := False;
       {$IFDEF SYNEDIT}
