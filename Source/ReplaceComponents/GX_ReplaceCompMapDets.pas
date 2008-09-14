@@ -431,7 +431,7 @@ begin
   if Assigned(Item) then
   begin
     Item.Group := nil;
-    Item.Free;
+    FreeAndNil(Item);
   end;
 end;
 

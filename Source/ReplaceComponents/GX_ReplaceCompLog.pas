@@ -229,7 +229,7 @@ begin
     Items.Text := EventText;
     lbxPreviewItems.Items.AddStrings(Items);
   finally
-    Items.Free;
+    FreeAndNil(Items);
   end;
 end;
 
@@ -292,11 +292,11 @@ begin
       FormatEventsAsTabs(List, StrList);
       ClipBoard.AsText := StrList.Text;
     finally
-      StrList.Free;
+      FreeAndNil(StrList);
     end;
 
   finally
-    List.Free;
+    FreeAndNil(List);
   end;
 end;
 
@@ -333,11 +333,11 @@ begin
       FormatEventsAsCSV(List, StrList);
       StrList.SaveToFile(AFileName);
     finally
-      StrList.Free;
+      FreeAndNil(StrList);
     end;
 
   finally
-    List.Free;
+    FreeAndNil(List);
   end;
 end;
 
@@ -377,7 +377,7 @@ begin
     GetSelectedItems(List);
     FLogEvents.SaveAsXML(AFileName, List);
   finally
-    List.Free;
+    FreeAndNil(List);
   end;
 end;
 

@@ -288,8 +288,8 @@ end;
 
 procedure TfmSetComponentPropsConfig.FormDestroy(Sender: TObject);
 begin
-  FActualPropertyNames.Free;
-  FActualPropertyTypes.Free;
+  FreeAndNil(FActualPropertyNames);
+  FreeAndNil(FActualPropertyTypes);
 end;
 
 // Look for a given ComponentName and ComponentProperty in the listview and give back the RowIndex

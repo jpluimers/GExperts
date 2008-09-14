@@ -91,6 +91,7 @@ end;
 // Be sure to free the settings conatiner (TSetComponentPropsSettings)
 destructor TSetComponentPropsExpert.Destroy;
 begin
+  Active := False; // Prevent re-creating TSetComponentPropsSettings later when setting Active=False
   TSetComponentPropsSettings.FreeMe;
   inherited;
 end;
@@ -207,10 +208,10 @@ end;
 destructor TSetComponentPropsSettings.Destroy;
 begin
   RemoveNotifierFromIDE;
-  FComponents.Free;
-  FProperties.Free;
-  FValues.Free;
-  FPropertyTypes.Free;
+  FreeAndNil(FComponents);
+  FreeAndNil(FProperties);
+  FreeAndNil(FValues);
+  FreeAndNil(FPropertyTypes);
   inherited;
 end;
 
@@ -226,27 +227,14 @@ end;
 // Class procedure to Free the settings container
 class procedure TSetComponentPropsSettings.FreeMe;
 begin
-  if Assigned(GxSetComponentPropsSettings) then
-  begin
-    try
-      GxSetComponentPropsSettings.Free;
-    finally
-      GxSetComponentPropsSettings := nil;
-    end;
-  end;
+  FreeAndNil(GxSetComponentPropsSettings);
 end;
 
 // Class function to get a singleton instance of the settings container
 class function TSetComponentPropsSettings.GetInstance: TSetComponentPropsSettings;
 begin
   if not Assigned(GxSetComponentPropsSettings) then
-  begin
-    try
-      GxSetComponentPropsSettings := TSetComponentPropsSettings.Create;
-    except
-      GxSetComponentPropsSettings := nil;
-    end;
-  end;
+    GxSetComponentPropsSettings := TSetComponentPropsSettings.Create;
   Result := GxSetComponentPropsSettings;
 end;
 
@@ -272,7 +260,7 @@ end;
 // Free the output messages list before destroying
 destructor TSetComponentPropsNotifier.Destroy;
 begin
-  FOutputMessages.Free;
+  FreeAndNil(FOutputMessages);
   inherited;
 end;
 

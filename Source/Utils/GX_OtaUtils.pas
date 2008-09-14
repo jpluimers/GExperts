@@ -796,7 +796,7 @@ begin
       OutStream.Position := 0;
       ObjectResourceToText(MemoryStream, OutStream);
     finally
-      MemoryStream.Free;
+      FreeAndNil(MemoryStream);
     end;
   end;
   OutStream.Position := 0;
@@ -812,7 +812,7 @@ begin
     GxOtaGetFormAsText(Form, StringStream);
     Result := StringStream.DataString;
   finally
-    StringStream.Free;
+    FreeAndNil(StringStream);
   end;
 end;
 
@@ -4100,7 +4100,7 @@ begin
     else
       Result := '';
   finally
-    Lines.Free;
+    FreeAndNil(Lines);
   end;
 end;
 

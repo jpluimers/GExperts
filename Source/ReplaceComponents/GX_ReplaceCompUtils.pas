@@ -36,7 +36,7 @@ function ExtractToken(var VStr: string; Delimiter: string): string;
 implementation
 
 uses
-  Variants, GX_GenericUtils;
+  Variants, GX_GenericUtils, SysUtils;
   
 function FlatLine(const AText: string): string;
 begin
@@ -116,8 +116,7 @@ begin
       end;
     end;
   except
-    Result.Free;
-    Result := NIL;
+    FreeAndNil(Result);
   end;
 end;
 
@@ -140,7 +139,7 @@ begin
     for i := 0 to PropertyList.Count-1 do
       Items.Add(PropertyList.Items[i].Name);
   finally
-    PropertyList.Free;
+    FreeAndNil(PropertyList);
   end;
 end;
 

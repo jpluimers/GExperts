@@ -202,7 +202,7 @@ begin
     GetSelectedGroups(SelectedItems);
     DeleteGroups(SelectedItems);
   finally
-    SelectedItems.Free;
+    FreeAndNil(SelectedItems);
   end;
 end;
 
@@ -368,7 +368,7 @@ begin
     GetSelectedGroups(GroupNames);
     FConfigData.SaveTo(FileName, GroupNames);
   finally
-    GroupNames.Free;
+    FreeAndNil(GroupNames);
   end;
 end;
 

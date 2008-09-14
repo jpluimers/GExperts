@@ -122,7 +122,7 @@ begin
   Obj := FList.Objects[AIndex];
   FList.Delete(AIndex);
   if OwnsObjects then
-    Obj.Free;
+    FreeAndNil(Obj);
 end;
 
 // remove but do not free

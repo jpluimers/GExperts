@@ -265,7 +265,7 @@ begin
       SortItems(ItemList, FSortOnColumn);
       LoadItems(ItemList);
     finally
-      ItemList.Free;
+      FreeAndNil(ItemList);
     end;
     UpdateColumnWidths;
     lvMapItems.Invalidate;
@@ -326,7 +326,7 @@ begin
     end;
 
   finally
-    SortedItemList.Free;
+    FreeAndNil(SortedItemList);
   end;
 end;
 
@@ -431,7 +431,7 @@ begin
     if ExecDets(Item, daInsert) then
       RefreshItems;
   except
-    Item.Free;
+    FreeAndNil(Item);
   end;
 end;
 
@@ -446,7 +446,7 @@ begin
   if Assigned(Item) then
   begin
     Item.Group.ExtractItem(Item);
-    Item.Free;
+    FreeAndNil(Item);
   end;  
 end;
 

@@ -273,7 +273,7 @@ begin
       if TCompRepControllerReal(FController).ShowLogWin then
         ShowLogWin(SearchComponent, ReplaceComponent, TCompRepControllerReal(FController).LogEvents);
     finally
-      FController.Free;
+      FreeAndNil(FController);
     end;
   finally
     Screen.Cursor := crDefault;
@@ -682,10 +682,10 @@ end;
 
 destructor TCompRepControllerReal.Destroy;
 begin
-  FLog.Free;
-  FObjectStack.Free;
-  FNameStack.Free;
-  FLogEvents.Free;
+  FreeAndNil(FLog);
+  FreeAndNil(FObjectStack);
+  FreeAndNil(FNameStack);
+  FreeAndNil(FLogEvents);
   inherited;
 end;
 
@@ -898,10 +898,10 @@ begin
           end;
         end;
     finally
-      Scores.Free;
+      FreeAndNil(Scores);
     end;
   finally
-    WorkItem.Free;
+    FreeAndNil(WorkItem);
   end;
 end;
 
@@ -937,10 +937,10 @@ begin
           end;
         end;
     finally
-      Scores.Free;
+      FreeAndNil(Scores);
     end;
   finally
-    WorkItem.Free;
+    FreeAndNil(WorkItem);
   end;
 end;
 
@@ -1027,7 +1027,7 @@ begin
     Items.Text := EventText;
     FLog.AddStrings(Items);
   finally
-    Items.Free;
+    FreeAndNil(Items);
   end;
 
   SaveLog;
