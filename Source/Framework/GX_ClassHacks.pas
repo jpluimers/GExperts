@@ -142,7 +142,7 @@ begin
        InRangeOrNil(PPointer(P + vmtIntfTable)^,    PCodeBegin, PCodeEnd) then
     begin
       FoundClassName := PShortString(PPointer(P + vmtClassName)^);
-      if IsValidIdent(FoundClassName^) and (FoundClassName^ = ClassName) then
+      if IsValidIdent(string(FoundClassName^)) and (string(FoundClassName^) = ClassName) then
       begin
         Result := TClass(P);
         Break;

@@ -48,7 +48,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, SynEditHighlighter, GX_SynMemoUtils, GX_VerDepConst, GX_GenericUtils;
+  SysUtils, SynEditHighlighter, SynUnicode, GX_SynMemoUtils, GX_VerDepConst, GX_GenericUtils;
 
 {$R *.dfm}
 
@@ -216,7 +216,7 @@ end;
 
 procedure TfmSourceExportOptions.SynEditSelectionChange(Sender: TObject; Changes: TSynStatusChanges);
 var
-  Token: {$IFDEF UniSynEdit}WideString{$ELSE}string{$ENDIF};
+  Token: {$IFDEF UniSynEdit}UnicodeString{$ELSE}string{$ENDIF};
   Attributes: TSynHighlighterAttributes;
   i: Integer;
 begin

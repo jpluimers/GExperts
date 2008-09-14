@@ -40,7 +40,7 @@ type
   {$ELSE}
   TGXUnicodeChar = WideChar;
   TGXUnicodeString = WideString;
-  TGXUnicodeStringList = TWideStringList; // This should link to either the JCL or SynEdit TWideStringList in D2006 and lower
+  TGXUnicodeStringList = TUnicodeStringList; // SynEdit TUnicodeStringList in D2007 and lower
   {$ENDIF}
 
   TGXSyntaxHighlighter = (gxpPlaceHolder, gxpNone, gxpPAS, gxpCPP, gxpHTML, gxpSQL, gxpCS, gxpXML);

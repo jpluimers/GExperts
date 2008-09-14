@@ -376,7 +376,7 @@ procedure TPEFileInfo.ReadImportList;
     SPos := FStream.Position;
     FStream.Position := L;
     FStream.Read(Buf, 1024);
-    Result := StrPas(Buf);
+    Result := string(StrPas(Buf));
     FStream.Position := SPos;
   end;
 
@@ -444,7 +444,7 @@ begin
         with ImpExp.Add do
         begin
           Ordinal := ImpF.Ordinal;
-          FunctionName := StrPas(ImpF.Name);
+          FunctionName := string(StrPas(ImpF.Name));
         end;
       end;
       FStream.Position := i;
@@ -520,7 +520,7 @@ begin
       FStream.ReadBuffer(NameAddress, SizeOf(NameAddress));
       FStream.Position := NameAddress - Delta;
       FStream.Read(Buffer, SizeOf(Buffer));
-      FExportList[j] := StrPas(Buffer) + FExportList[j];
+      FExportList[j] := string(StrPas(Buffer)) + FExportList[j];
     end;
     // And finally read the function associated with each export
     FStream.Position := Longint(ExportInfo.AddressOfFunctions) - Delta;

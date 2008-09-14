@@ -8,12 +8,12 @@ function CharsAreNearOnKeyboard(const a, b: Char): Boolean;
 
 var
   KeysWithDistance1: array[1..50] of set of AnsiChar;
-  KeyboardChars, ShiftKeyboardChars, AltGrKeyboardChars: ShortString;
+  KeyboardChars, ShiftKeyboardChars, AltGrKeyboardChars: string;
 
 implementation
 
 uses
-  Windows, GX_GenericUtils;
+  Windows, GX_GenericUtils, SysUtils;
 
 function CharsAreNearOnKeyboard(const a, b: Char): Boolean;
 var
@@ -31,8 +31,7 @@ begin
   if q = 0 then
     q := Pos(b, AltGrKeyboardChars); // FS: added
 
-  Result := (p > 0) and (q > 0) and
-    (KeyboardChars[q] in KeysWithDistance1[p]);
+  Result := (p > 0) and (q > 0) and CharInSet(KeyboardChars[q], KeysWithDistance1[p]);
 end;
 
 var

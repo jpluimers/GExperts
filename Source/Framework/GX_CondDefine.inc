@@ -1,26 +1,25 @@
 { GX_CondDefine.inc }
 
 // Third-Party Product Defines
-// ------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
-// Define SYNEDIT below if you have a copy of the Open Source
-// SynEdit component version 2 or greater.  This component is
-// required for the Source Export expert, and can optionally be
-// used in several others.
-// Download from: http://synedit.sourceforge.net/
-// or via CVS here: http://sourceforge.net/cvs/?group_id=3221
-// For Delphi 2009 or later, UniSynEdit (March 13, 2008 or later) is required:
-// http://mh-nexus.de/en/unisynedit.php
+// Define SYNEDIT below if you want to compile with the unicode SynEdit
+// syntax highlighting text editor component.  It is required to use the
+// Source Export tool and can optionally be used in several other places
+// to show syntax highlighted code.  Note that an appropriately modified
+// version of this component is included with the GExperts source.
+// Delphi 2007 and earlier unconditionally require parts of this library to
+// support TUnicodeStringList.  Home Page: http://mh-nexus.de/en/unisynedit.php
 
 // Define GX_DEBUGLOG below to enable exception and SendDebug logging
-// to <ModuleName>.debuglog. This requires the JCL 1.99+ available at:
+// to <ModuleName>.debuglog.  This requires JCL 1.102 or later from
 // http://sourceforge.net/projects/jcl and a detailed map file
 // (see the linker options in the IDE).  Use sparingly, since this
-// option will slow down the IDE
+// option will slow down the IDE.
 
 {$IFNDEF GX_AutomatedBuild}
   // Turn things on we want compiled into GExperts
-  {.$DEFINE SYNEDIT}
+  {$DEFINE SYNEDIT}
   {.$DEFINE GX_DEBUGLOG}
 {$ENDIF GX_AutomatedBuild}
 
@@ -91,9 +90,7 @@
 // Define GX_ENHANCED_EDITOR if SynEdit is available
 {$IFDEF SYNEDIT}
   {$DEFINE GX_ENHANCED_EDITOR}
-  {$IFDEF GX_VER200_up}
-    {$DEFINE UniSynEdit}
-  {$ENDIF}
+  {$DEFINE UniSynEdit}
 {$ENDIF SYNEDIT}
 
 {$IFOPT B+}

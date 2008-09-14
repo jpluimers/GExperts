@@ -2707,11 +2707,11 @@ begin
     Exit;
 
   case PropertyType of
-    tkLString: Result := Buffer.LString;
+    tkLString: Result := WideString(AnsiString(Buffer.LString));
     {$IFDEF GX_VER200_up}
     tkUString: Result := Buffer.UString;
     {$ENDIF}
-    tkString:  Result := Buffer.SString;
+    tkString:  Result := WideString(Buffer.SString);
     tkInteger: Result := IntToStr(Buffer.Int);
     tkInt64:   Result := IntToStr(Buffer.Int64);
     tkChar:    Result := Buffer.VChar;

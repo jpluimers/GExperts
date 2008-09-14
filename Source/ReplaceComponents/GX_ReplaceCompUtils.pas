@@ -137,7 +137,7 @@ begin
 
   try
     for i := 0 to PropertyList.Count-1 do
-      Items.Add(PropertyList.Items[i].Name);
+      Items.Add(string(PropertyList.Items[i].Name));
   finally
     FreeAndNil(PropertyList);
   end;
@@ -278,7 +278,7 @@ var
 begin
   Result := -1;
   for i := 0 to Count-1 do
-    if Items[i].Name = APropName then
+    if string(Items[i].Name) = APropName then
     begin
       Result := i;
       Break;

@@ -533,10 +533,10 @@ var
 
       for I := 0 to Count - 1 do
       begin
-        if PropList^[I]^.Name = propName then
+        if string(PropList^[I]^.Name) = propName then
         begin
           if propName2 = '' then
-            Result := PropList^[I]^.PropType^.Name
+            Result := string(PropList^[I]^.PropType^.Name)
           else
             Result := PropType(PropList^[I]^.PropType^, propName2);
           Break;
