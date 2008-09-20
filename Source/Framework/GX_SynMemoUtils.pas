@@ -5,7 +5,7 @@ unit GX_SynMemoUtils;
 interface
 
 uses  // If you get errors here, edit GX_CondDefine.inc or add SynEdit to your library path
-  {$IFDEF SYNEDIT} SynEdit, {$ENDIF SYNEDIT}
+  {$IFDEF SYNEDIT} SynEdit, SynUnicode, {$ENDIF SYNEDIT}
   GX_GenericUtils;
 
 function GetGXHighlighterForCurrentSourceEditor: TGXSyntaxHighlighter;
@@ -13,6 +13,13 @@ function GetGXHighlighterForCurrentSourceEditor: TGXSyntaxHighlighter;
 {$IFDEF SYNEDIT}
   procedure SetSynEditHighlighter(SynEdit: TCustomSynEdit; Highlighter: TGXSyntaxHighlighter);
 {$ENDIF SYNEDIT}
+
+const
+  {$IFDEF GX_VER160_up}
+  IDEEditorEncoding = seUTF8;
+  {$ELSE}
+  IDEEditorEncoding = seAnsi;
+  {$ENDIF}
 
 implementation
 
