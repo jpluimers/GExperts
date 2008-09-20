@@ -3339,7 +3339,7 @@ const
 var
   EditReaderPos: Integer;
   ReadDataSize: Integer;
-  Buffer: array[0..BufferSize] of AnsiChar;
+  Buffer: array[0..BufferSize] of AnsiChar; // Array of bytes, might be UTF-8
 begin
   Assert(EditReader <> nil);
   Assert(Stream <> nil);
