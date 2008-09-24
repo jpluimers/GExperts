@@ -17,6 +17,13 @@ interface
 uses
   Graphics, Forms, Menus, ComCtrls, Controls;
 
+type
+  {$IFDEF GX_VER160_up}
+  IDEEditBufferString = UTF8String;
+  {$ELSE}
+  IDEEditBufferString = AnsiString;
+  {$ENDIF}
+
 const
   EditorFormClassName = 'TEditWindow';
   EditorControlName = 'Editor';
