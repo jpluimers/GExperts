@@ -86,6 +86,8 @@ const
   UTF8BOM: array[0..2] of Byte = ($EF, $BB, $BF);
   UTF16BOMLE: array[0..1] of Byte = ($FF, $FE);
   UTF16BOMBE: array[0..1] of Byte = ($FE, $FF);
+  UTF32BOMLE: array [0..3] of Byte = ($FF,$FE,$00,$00);
+  UTF32BOMBE: array [0..3] of Byte = ($00,$00,$FE,$FF);
 
 const
   // constants describing range of the Unicode Private Use Area (Unicode 3.2)
@@ -118,6 +120,13 @@ const
   BOM_MSB_FIRST = WideChar($FFFE);
 
 type
+  TSaveFormat = ( sfUTF16LSB, sfUTF16MSB, sfUTF8, sfAnsi );
+
+const
+  sfUnicodeLSB = sfUTF16LSB;
+  sfUnicodeMSB = sfUTF16MSB;
+
+type
   TFontCharSet = 0..255;
 
 {$IFDEF UNICODE}
@@ -137,11 +146,10 @@ type
   TUnicodeStrings = class(TPersistent)
   private
     FUpdateCount: Integer;
-    FSaved,                 // set in SaveToStream, True in case saving was successfull otherwise False
-    FSaveUnicode: Boolean;  // flag set on loading to keep track in which format to save
-                            // (can be set explicitely, but expect losses if there's true Unicode content
-                            // and this flag is set to False)
+    FSaved: Boolean;        // set in SaveToStream, True in case saving was successfull otherwise False
     FOnConfirmConversion: TConfirmConversionEvent;
+    FSaveFormat: TSaveFormat;  // overrides the FSaveUnicode flag, initialized when a file is loaded,
+                               // expect losses if it is set to sfAnsi before saving
     function GetCommaText: UnicodeString;
     function GetName(Index: Integer): UnicodeString;
     function GetValue(const Name: UnicodeString): UnicodeString;
@@ -149,6 +157,8 @@ type
     procedure SetCommaText(const Value: UnicodeString);
     procedure SetValue(const Name, Value: UnicodeString);
     procedure WriteData(Writer: TWriter);
+    function GetSaveUnicode: Boolean;
+    procedure SetSaveUnicode(const Value: Boolean);
   protected
     procedure DefineProperties(Filer: TFiler); override;
     procedure DoConfirmConversion(var Allowed: Boolean); virtual;
@@ -185,10 +195,10 @@ type
     function IndexOfObject(AObject: TObject): Integer;
     procedure Insert(Index: Integer; const S: UnicodeString); virtual; abstract;
     procedure InsertObject(Index: Integer; const S: UnicodeString; AObject: TObject);
-    procedure LoadFromFile(const FileName: string); virtual;
+    procedure LoadFromFile(const FileName: TFileName); virtual;
     procedure LoadFromStream(Stream: TStream); virtual;
     procedure Move(CurIndex, NewIndex: Integer); virtual;
-    procedure SaveToFile(const FileName: string); virtual;
+    procedure SaveToFile(const FileName: TFileName); virtual;
     procedure SaveToStream(Stream: TStream; WithBOM: Boolean = True); virtual;
     procedure SetTextStr(const Value: UnicodeString); virtual;
 
@@ -199,7 +209,8 @@ type
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
     property Values[const Name: UnicodeString]: UnicodeString read GetValue write SetValue;
     property Saved: Boolean read FSaved;
-    property SaveUnicode: Boolean read FSaveUnicode write FSaveUnicode default True;
+    property SaveUnicode: Boolean read GetSaveUnicode write SetSaveUnicode default True;
+    property SaveFormat: TSaveFormat read FSaveFormat write FSaveFormat default sfUnicodeLSB;
     property Strings[Index: Integer]: UnicodeString read Get write Put; default;
     property Text: UnicodeString read GetTextStr write SetTextStr;
 
@@ -456,7 +467,20 @@ uses
 constructor TUnicodeStrings.Create;
 begin
   inherited;
-  FSaveUnicode := True;
+  FSaveFormat := sfUnicodeLSB;
+end;
+
+function TUnicodeStrings.GetSaveUnicode: Boolean;
+begin
+  Result := SaveFormat = sfUnicodeLSB;
+end;
+
+procedure TUnicodeStrings.SetSaveUnicode(const Value: Boolean);
+begin
+  if Value then
+    SaveFormat := sfUnicodeLSB
+  else
+    SaveFormat := sfAnsi;
 end;
 
 function TUnicodeStrings.Add(const S: UnicodeString): Integer;
@@ -598,7 +622,7 @@ procedure TUnicodeStrings.DefineProperties(Filer: TFiler);
 // Defines a private property for the content of the list.
 // There's a bug in the handling of text DFMs in Classes.pas which prevents
 // UnicodeStrings from loading under some circumstances. Zbysek Hlinka
-// (zhlinka@login.cz) brought this to my attention and supplied also a solution.
+// (zhlinka att login dott cz) brought this to my attention and supplied also a solution.
 // See ReadData and WriteData methods for implementation details.
 
   function DoWrite: Boolean;
@@ -825,25 +849,89 @@ begin
   PutObject(Index, AObject);
 end;
 
-procedure TUnicodeStrings.LoadFromFile(const FileName: string);
+procedure TUnicodeStrings.LoadFromFile(const FileName: TFileName);
 var
   Stream: TStream;
 begin
-  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   try
-    LoadFromStream(Stream);
-  finally
-    Stream.Free;
+    Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
+    try
+      LoadFromStream(Stream);
+    finally
+      Stream.Free;
+    end;
+  except
+    RaiseLastOSError;
   end;
 end;
 
 procedure TUnicodeStrings.LoadFromStream(Stream: TStream);
+// usual loader routine, but enhanced to handle byte order marks in stream
 var
-  Dummy: Boolean;
+  Size,
+  BytesRead: Integer;
+  ByteOrderMask: array [0..5] of Byte; // BOM size is max 5 bytes (cf: wikipedia)
+                                       // but it is easier to implement with a multiple of 2
+  Loaded: Boolean;
+  SW: UnicodeString;
+  SA: AnsiString;
 begin
   BeginUpdate;
   try
-    SynUnicode.LoadFromStream(Self, Stream, Dummy); // Supports ANSI, UTF-8, UTF-16 BE/LE
+    Loaded := False;
+
+    Size := Stream.Size - Stream.Position;
+    BytesRead := Stream.Read(ByteOrderMask[0],SizeOf(ByteOrderMask));
+
+    // UTF16 LSB = Unicode LSB/LE
+    if (BytesRead >= 2) and (ByteOrderMask[0] = UTF16BOMLE[0])
+      and (ByteOrderMask[1] = UTF16BOMLE[1]) then
+    begin
+      FSaveFormat := sfUTF16LSB;
+      SetLength(SW, (Size - 2) div SizeOf(WideChar));
+      Assert((Size and 1) <> 1,'Number of chars must be a multiple of 2');
+      System.Move(ByteOrderMask[2],SW[1],BytesRead-2); // max 4 bytes = 2 widechars
+      Stream.Read(SW[3], Size-BytesRead); // first 2 chars were copied by System.Move
+      SetTextStr(SW);
+      Loaded := True;
+    end;
+
+    // UTF16 MSB = Unicode MSB/BE
+    if (BytesRead >= 2) and (ByteOrderMask[0] = UTF16BOMBE[0])
+      and (ByteOrderMask[1] = UTF16BOMBE[1]) then
+    begin
+      FSaveFormat := sfUTF16MSB;
+      SetLength(SW, (Size - 2) div SizeOf(WideChar));
+      Assert((Size and 1) <> 1,'Number of chars must be a multiple of 2');
+      System.Move(ByteOrderMask[2],SW[1],BytesRead-2); // max 4 bytes = 2 widechars
+      Stream.Read(SW[3], Size-BytesRead); // first 2 chars were copied by System.Move
+      StrSwapByteOrder(PWideChar(SW));
+      SetTextStr(SW);
+      Loaded := True;
+    end;
+
+    // UTF8
+    if (BytesRead >= 3) and (ByteOrderMask[0] = UTF8BOM[0])
+      and (ByteOrderMask[1] = UTF8BOM[1]) and (ByteOrderMask[2] = UTF8BOM[2]) then
+    begin
+      FSaveFormat := sfUTF8;
+      SetLength(SA, (Size-3) div SizeOf(AnsiChar));
+      System.Move(ByteOrderMask[3],SA[1],BytesRead-3); // max 3 bytes = 3 chars
+      Stream.Read(SA[4], Size-BytesRead); // first 3 chars were copied by System.Move
+      SW := UTF8Decode(SA);
+      SetTextStr(SW);
+      Loaded := True;
+    end;
+
+    // default case (Ansi)
+    if not Loaded then
+    begin
+      FSaveFormat := sfAnsi;
+      SetLength(SA, Size div SizeOf(AnsiChar));
+      System.Move(ByteOrderMask[0],SA[1],BytesRead); // max 6 bytes = 6 chars
+      Stream.Read(SA[7], Size-BytesRead); // first 6 chars were copied by System.Move
+      SetTextStr(SA);
+    end;
   finally
     EndUpdate;
   end;
@@ -878,7 +966,7 @@ begin
   end;
 end;
 
-procedure TUnicodeStrings.SaveToFile(const FileName: string);
+procedure TUnicodeStrings.SaveToFile(const FileName: TFileName);
 var
   Stream: TStream;
 begin
@@ -894,7 +982,7 @@ procedure TUnicodeStrings.SaveToStream(Stream: TStream; WithBOM: Boolean = True)
 // Saves the currently loaded text into the given stream. WithBOM determines whether to write a
 // byte order mark or not. Note: when saved as ANSI text there will never be a BOM.
 var
-  SW, BOM: UnicodeString;
+  SW: UnicodeString;
   SA: AnsiString;
   Allowed: Boolean;
   Run: PWideChar;
@@ -910,7 +998,7 @@ begin
   FSaved := False; // be pessimistic
   // A check for potential information loss makes only sense if the application has
   // set an event to be used as call back to ask about the conversion.
-  if not FSaveUnicode and Assigned(FOnConfirmConversion) then
+  if (FSaveFormat = sfAnsi) and Assigned(FOnConfirmConversion) then
   begin
     // application requests to save only ANSI characters, so check the text and
     // call back in case information could be lost
@@ -926,19 +1014,37 @@ begin
   if Allowed then
   begin
     // only save if allowed
-    if FSaveUnicode then
-    begin
-      BOM := BOM_LSB_FIRST;
-      Stream.WriteBuffer(PWideChar(BOM)^, 2);
-      // SW has already been filled
-      Stream.WriteBuffer(PWideChar(SW)^, 2 * Length(SW));
-    end
-    else
-    begin
-      SA := AnsiString(PWideChar(SW));
-      Stream.WriteBuffer(PAnsiChar(SA)^, Length(SA));
+    case SaveFormat of
+      sfUTF16LSB :
+        begin
+          if WithBOM then
+            Stream.WriteBuffer(UTF16BOMLE[0],SizeOf(UTF16BOMLE));
+          Stream.WriteBuffer(SW[1],Length(SW)*SizeOf(WideChar));
+          FSaved := True;
+        end;
+      sfUTF16MSB :
+        begin
+          if WithBOM then
+            Stream.WriteBuffer(UTF16BOMBE[0],SizeOf(UTF16BOMBE));
+          StrSwapByteOrder(PWideChar(SW));
+          Stream.WriteBuffer(SW[1],Length(SW)*SizeOf(WideChar));
+          FSaved := True;
+        end;
+      sfUTF8 :
+        begin
+          if WithBOM then
+            Stream.WriteBuffer(UTF8BOM[0],SizeOf(UTF8BOM));
+          SA := UTF8Encode(SW);
+          Stream.WriteBuffer(SA[1],Length(SA)*SizeOf(AnsiChar));
+          FSaved := True;
+        end;
+      sfAnsi :
+        begin
+          SA := SW;
+          Stream.WriteBuffer(SA[1],Length(SA)*SizeOf(AnsiChar));
+          FSaved := True;
+        end;
     end;
-    FSaved := True;
   end;
 end;
 
