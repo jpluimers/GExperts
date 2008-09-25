@@ -561,10 +561,12 @@ function ConvertToIDEEditorString(const S: string): string;
 {$ENDIF}
 
 {$IFDEF GX_VER160_up}
-function IDEEditorStringToString(const S: UTF8String): string;
-{$ELSE}
-function IDEEditorStringToString(const S: string): string;
+function IDEEditorStringToString(const S: UTF8String): string; overload;
 {$ENDIF}
+
+{$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
+function IDEEditorStringToString(const S: string): string; overload;
+{$IFEND}
 
 type
   TBaseIdeNotifier = class(TNotifierObject, IOTAIDENotifier)
@@ -2722,7 +2724,7 @@ begin
     tkWString:
       begin
         if RunningDelphi2007OrLess then
-          Result := Buffer.LString
+          Result := WideString(Buffer.LString)
         else
           Result := Buffer.WString;
       end;
@@ -3407,11 +3409,11 @@ end;
 
 function ReadEditorTextToString(EditReader: IOTAEditReader; LineStartPos: Integer; LineLength: Integer): string;
 var
-  AString: AnsiString;
+  AString: IDEEditBufferString;
 begin
   SetLength(AString, LineLength);
   EditReader.GetText(Max(LineStartPos, 0), PAnsiChar(AString), LineLength);
-  Result := AString;
+  Result := IDEEditorStringToString(AString);
 end;
 
 function GxOtaGetPreceedingCharactersInLine(View: IOTAEditView): string;
@@ -3495,7 +3497,11 @@ resourcestring
 begin
   EditView := GxOtaGetTopMostEditView;
   Assert(Assigned(EditView), SUnableToWriteToEditor);
+  {$IFDEF UNICODE}
+  EditView.Position.InsertText(Text);
+  {$ELSE}
   EditView.Position.InsertText(ConvertToIDEEditorString(Text));
+  {$ENDIF}
   EditView.Paint;
 end;
 
@@ -4370,12 +4376,14 @@ function IDEEditorStringToString(const S: UTF8String): string;
 begin
   Result := Utf8ToAnsi(S);
 end;
-{$ELSE}
+{$ENDIF}
+
+{$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
 function IDEEditorStringToString(const S: string): string;
 begin
   Result := S;
 end;
-{$ENDIF}
+{$IFEND}
 
 { TBaseIdeNotifier }
 
