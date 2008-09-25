@@ -43,7 +43,7 @@ KNOWN LIMITATIONS/BUGS
 - You should turn off the "Ignore Comments" Grep Search option to perform a
   search and replace on the results (GExperts limitation).
 - Due to either native Open Tools API limitations or bugs, the following
-  items can not be supported under Delphi 8/2005/2006/2007:
+  items can not be supported under Delphi 8/2005/2006/2007/2009:
   Delphi 8 Only:
    - Rename Components (IDE bug setting the Name property)
    - Jumping to a form search match from Grep Results when the source is open
@@ -56,12 +56,13 @@ KNOWN LIMITATIONS/BUGS
      (no WinForms support for IOTAFormEditor/IOTAComponent)
    - Replace Components for VCL.NET (No direct access to components)
    - Components to Code for VCL.NET (No direct access to components)
+  Delphi 8, 2005, 2006, 2007, and 2009:
    - It is no longer possible for addins to override some built-in IDE
      shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
-     Identifier, etc.) to not conflict with your selected keymapping.  Also,
-     the Macro Library can not always intercept the Shift+Ctrl+R keystroke to
-     automatically grab keyboard macros, so you may need to create macros
-     using the recording functions in the toolbar.
+     Identifier, Procedure List, etc.) to not conflict with your selected
+     keymapping.  Also, the Macro Library can not always intercept the
+     Shift+Ctrl+R keystroke to automatically grab keyboard macros, so you may
+     need to create macros using the recording functions in the toolbar.
 
 
 INSTALLATION
@@ -72,13 +73,15 @@ Vista as a non-administrator, you may need to manually register the GExperts
 DLL with the IDE after installation.  This is most easily done using the
 Expert Manager tool in the GExperts start menu group.  If you prefer, you
 can also manually register the DLL with the IDE using the Windows registry
-editor (RegEdit.exe).  Create the following key (the value for X is IDE
-dependent - Delphi 2007 uses 5.0, for example):
-HKEY_CURRENT_USER\Software\Borland\BDS\X.0\Experts\ or
-HKEY_CURRENT_USER\Software\Borland\Delphi\X.0\Experts\
+editor (RegEdit.exe).  Create the a key key similar to the following (the
+version number appearing before "\Experts\" is IDE dependent):
+HKEY_CURRENT_USER\Software\CodeGear\BDS\6.0\Experts\   (Rad Studio 2009)
+HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\    (Rad Studio 2007)
+HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\ (Delphi 7)
 
 Then add a new string value that points to your GExperts DLL (X is the IDE
-version such as 6, 7, 8, 2005, 2006, 2007, etc.):
+version such as 6, 7, 8, 2005, 2006, 2007, 2009, etc.):
+GExperts=C:\Program Files\GExperts\GExpertsRSX.dll
 GExperts=C:\Program Files\GExperts\GExpertsDelphiX.dll
 GExperts=C:\Program Files\GExperts\GExpertsBDSX.dll or
 GExperts=C:\Program Files\GExperts\GExpertsDX.dll or
@@ -96,6 +99,24 @@ Add/Remove Programs or Programs [and Features] tool under Vista.
 
 CHANGE LOG
 ----------------------
+VERSION 1.33 Beta (September 25, 2008)
+- General: Added beta support for RAD Studio 2009.  Some of the tools such
+  as the grep search and replace, source code parser (class browser,
+  procedure list, etc.) have only very limited unicode support.  The Source
+  Export, Code Librarian, and basic editor experts should have full unicode support.
+  Shutdown optimiztions, removal of all known memory leaks, and other minor tweaks.
+- Grep Search: There is a new regular expression engine that supports a large
+  subset of the Perl regular expression syntax, etc.  Grep can now search
+  files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.  Note: Grep replace
+  does not fully support unciode yet.
+- Code Proofreader: Should be slightly more accurate with fewer false positive
+  corrections made to your code.
+- Editor Experts: The main menu contains a submenu item for each editor
+  expert now in Delphi 8 or later.
+- Favorite Files: Supports preview of jpg, png, and gif files if the VCL
+  supports it in your IDE version.
+
+
 VERSION 1.32 (September 11, 2007)
 - General: Added support for RAD Studio 2007
   GExperts data files are saved under the user's Application Data\GExperts
