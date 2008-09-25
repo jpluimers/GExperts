@@ -23,7 +23,6 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
 			<DCC_StringChecks>off</DCC_StringChecks>
 			<DCC_UnitSearchPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
@@ -406,7 +405,7 @@
 						<VersionInfo Name="CodePage">1252</VersionInfo>
 					</VersionInfo>
 					<VersionInfoKeys>
-						<VersionInfoKeys Name="CompanyName">GExperts, Inc. and Erik Berry</VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">Erik Berry and the GExperts Development Team</VersionInfoKeys>
 						<VersionInfoKeys Name="FileDescription">GExperts for RAD Studio 2009</VersionInfoKeys>
 						<VersionInfoKeys Name="FileVersion">1.3.3.0</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName">GExperts for RAD Studio 2009</VersionInfoKeys>
@@ -416,7 +415,7 @@
 						<VersionInfoKeys Name="ProductName">GExperts for RAD Studio 2009</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductVersion">1.33</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
-						<VersionInfoKeys Name="CompileDate">Friday, June 27, 2008 2:01 AM</VersionInfoKeys>
+						<VersionInfoKeys Name="CompileDate">Wednesday, September 24, 2008 4:46 PM</VersionInfoKeys>
 					</VersionInfoKeys>
 					<Source>
 						<Source Name="MainSource">GExpertsRS2009.dpr</Source>
