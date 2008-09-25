@@ -116,31 +116,31 @@ function ExpandTabsInLine(AText: string; ATabSize: Integer): string;
 procedure FindMinIndent(ALines: TStrings; var LineIndex, SpaceCount: Integer);
 
 // Determine if a character represents white space
-function IsCharWhiteSpace(C: Char): Boolean;
-function IsCharWhiteSpaceOrNull(C: Char): Boolean;
-function IsCharWhiteSpaceOrControl(C: Char): Boolean;
-function IsCharLineEnding(C: Char): Boolean;
-function IsCharLineEndingOrNull(C: Char): Boolean; overload;
-function IsCharAlphaNumeric(C: Char): Boolean; overload;
-function IsCharNumeric(C: Char): Boolean; overload;
-function IsCharHexDigit(C: Char): Boolean;
-function IsCharTab(C: Char): Boolean;
-function IsCharSymbol(C: Char): Boolean; overload;
-function IsCharControl(C: Char): Boolean;
+function IsCharWhiteSpace(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharWhiteSpaceOrNull(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharWhiteSpaceOrControl(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharLineEnding(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharLineEndingOrNull(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharAlphaNumeric(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharNumeric(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharHexDigit(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharTab(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharSymbol(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharControl(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 // See if a character is a valid locale identifier character, _, or 0..9
 function IsCharIdentifier(C: Char): Boolean; overload;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
 {$IFDEF UNICODE}
-function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
-function IsCharIdentifier(C: AnsiChar): Boolean; overload;
-function IsCharSymbol(C: AnsiChar): Boolean; overload;
-function IsCharNumeric(C: AnsiChar): Boolean; overload;
-function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload;
-function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload;
+function IsCharIdentifierStart(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharIdentifier(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharSymbol(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharNumeric(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
 {$ELSE not UNICODE}
-function CharInSet(C: Char; CSet: TSysCharSet): Boolean;
-function AnsiStrAlloc(Size: Cardinal): PChar;
-function IsLeadChar(C: Char): Boolean;
+function CharInSet(C: Char; CSet: TSysCharSet): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function AnsiStrAlloc(Size: Cardinal): PChar; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsLeadChar(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 {$ENDIF not UNICODE}
 
 // Transforms all consecutive sequences of #10, #13, #32, and #9 in Str
