@@ -2322,7 +2322,7 @@ end;
 function GxOtaGetIdeBaseRegistryKey: string;
 begin
   if IsStandAlone then
-    Result := 'Software\Borland\' + CompilerDefinedProductRegistryKey
+    Result := 'Software\' + CompilerDefinedProductRegistryKey
   else
     Result := GxOtaGetIDEServices.GetBaseRegistryKey;
 

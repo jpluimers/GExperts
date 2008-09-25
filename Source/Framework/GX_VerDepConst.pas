@@ -289,6 +289,12 @@ TTabDockHostFormName = 'TTabDockHostForm';
 //    Do not localize these strings.
 //
 // *****************************************************
+  {$IFDEF GX_VER200_up}
+  CompanyRegPrefix = 'CodeGear\';
+  {$ELSE}
+  CompanyRegPrefix = 'Borland\';
+  {$ENDIF}
+
   {$UNDEF IdeBaseKey}
   {$IFDEF VER140}
     {$IFDEF LINUX}
@@ -298,9 +304,9 @@ TTabDockHostFormName = 'TTabDockHostForm';
 
     {$IFDEF MSWINDOWS}
       {$IFNDEF BCB}
-      CompilerDefinedProductRegistryKey = 'Delphi\6.0';
+      CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\6.0';
       {$ELSE BCB}
-      CompilerDefinedProductRegistryKey = 'C++Builder\6.0';
+      CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'C++Builder\6.0';
       {$ENDIF BCB}
       {$DEFINE IdeBaseKey}
     {$ENDIF MSWINDOWS}
@@ -314,37 +320,37 @@ TTabDockHostFormName = 'TTabDockHostForm';
 
     {$IFDEF MSWINDOWS}
       {$IFNDEF BCB}
-      CompilerDefinedProductRegistryKey = 'Delphi\7.0';
+      CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\7.0';
       {$ELSE BCB}
-      CompilerDefinedProductRegistryKey = 'C++Builder\7.0';
+      CompilerDefinedProductRegistryKey = CompanyRegPrefix + C++Builder\7.0';
       {$ENDIF BCB}
       {$DEFINE IdeBaseKey}
     {$ENDIF MSWINDOWS}
   {$ENDIF VER150}
 
   {$IFDEF VER160}
-    CompilerDefinedProductRegistryKey = 'BDS\2.0';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\2.0';
     {$DEFINE IdeBaseKey}
   {$ENDIF VER160}
 
   {$IFDEF VER170}
-    // Delphi 9
-    CompilerDefinedProductRegistryKey = 'BDS\3.0';
+    // Delphi 2005
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\3.0';
     {$DEFINE IdeBaseKey}
   {$ENDIF VER170}
 
   {$IFDEF VER180}
     {$IFNDEF VER185}
-    CompilerDefinedProductRegistryKey = 'BDS\4.0'; // BDS 2006
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\4.0'; // BDS 2006
     {$ELSE}
-    CompilerDefinedProductRegistryKey = 'BDS\5.0'; // Delphi 2007
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\5.0'; // Delphi 2007
     {$ENDIF}
     {$DEFINE IdeBaseKey}
   {$ENDIF VER180}
 
   {$IFDEF VER200}
-    // BDS 2007
-    CompilerDefinedProductRegistryKey = 'BDS\6.0';
+    // Rad Studio 2009
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\6.0';
     {$DEFINE IdeBaseKey}
   {$ENDIF VER200}
 
