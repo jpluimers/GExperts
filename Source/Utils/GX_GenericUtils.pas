@@ -1117,7 +1117,7 @@ end;
 function IsCharWhiteSpace(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsWhiteSpace(C) or (CharInSet(C, [#10, #11, #12])); // TODO: See QC 62158
+  Result := TCharacter.IsWhiteSpace(C);
   {$ELSE not UNICODE}
   Result := C in [#9, #10, #11, #12, #13, #32];
   {$ENDIF}
@@ -2744,7 +2744,6 @@ var
   FileStream: TFileStream;
   Word1: Word;
   Word2: Word;
-  Str: string;
   i: Integer;
   BytesRead: Integer;
   BOMSize: Integer;
@@ -2758,6 +2757,8 @@ var
   end;
 
   procedure ReadFullStreamAsASCIIANSI;
+  var
+    Str: AnsiString;
   begin
     RewindStreamPastByte(0);
     SetLength(Str, FileStream.Size);
