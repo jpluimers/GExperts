@@ -3759,8 +3759,6 @@ var
   SourceEditor: IOTASourceEditor;
   Component: TComponent;
   EditStream: TGxEditorReadStream;
-  //i: Integer;
-  //IsUTF8: Boolean;
 begin
   WasBinary := False;
   Assert(Assigned(Lines));
@@ -3843,18 +3841,11 @@ begin
         FileReader := TEditReader.Create(FileName);
         try
           FileReader.SaveToStream(MemStream);
-          //IsUTF8 := FileReader.IsUTF8;
           MemStream.Position := 0;
         finally
           FreeAndNil(FileReader);
         end;
         Lines.LoadFromStream(MemStream);
-        //if IsUTF8 then
-        //begin
-        //  for i := 0 to Lines.Count - 1 do
-        //    // We only support chracters representable in the user's ANSI encoding (not full UNICODE)
-        //    Lines[i] := Utf8ToAnsi(Lines[i]);
-        //end;
       end;
     end;
   finally
