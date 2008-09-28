@@ -116,13 +116,13 @@ function ExpandTabsInLine(AText: string; ATabSize: Integer): string;
 procedure FindMinIndent(ALines: TStrings; var LineIndex, SpaceCount: Integer);
 
 // Determine if a character represents white space
-function IsCharWhiteSpace(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharWhiteSpace(C: Char): Boolean;
 function IsCharWhiteSpaceOrNull(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharWhiteSpaceOrControl(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharLineEnding(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharLineEndingOrNull(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
-function IsCharAlphaNumeric(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
-function IsCharNumeric(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharAlphaNumeric(C: Char): Boolean; overload;
+function IsCharNumeric(C: Char): Boolean; overload;
 function IsCharHexDigit(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharTab(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharSymbol(C: Char): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
@@ -131,8 +131,8 @@ function IsCharControl(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDI
 function IsCharIdentifier(C: Char): Boolean; overload;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
 {$IFDEF UNICODE}
-function IsCharIdentifierStart(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
-function IsCharIdentifier(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
+function IsCharIdentifier(C: AnsiChar): Boolean; overload;
 function IsCharSymbol(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharNumeric(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
@@ -2764,7 +2764,7 @@ var
     SetLength(Str, FileStream.Size);
     if FileStream.Size > 0 then
       FileStream.Read(Str[1], FileStream.Size);
-    Result := Str;
+    Result := WideString(Str);
   end;
 
 const
