@@ -43,7 +43,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_GenericUtils;
+  SysUtils, GX_GenericUtils;
 
 procedure TfmCodeOptions.sbBrowseClick(Sender: TObject);
 var
