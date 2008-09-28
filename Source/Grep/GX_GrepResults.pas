@@ -915,6 +915,7 @@ begin
 
   GoToMatchLine(CurrentLine, GrepExpert.GrepMiddle);
 
+  (*
   // Hide the results window if the window is not configured to stay on top in D8+ and we are floating
   if RunningDelphi8OrGreater then begin
     if (not StayOnTop) and (not Assigned(Self.Parent)) then
@@ -925,6 +926,7 @@ begin
         Hide;
     end;
   end;
+  *)
 end;
 
 constructor TfmGrepResults.Create(AOwner: TComponent);
