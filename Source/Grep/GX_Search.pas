@@ -197,7 +197,7 @@ var
   KeepStream: Boolean;
   Bytes: Integer;
 begin
-  if not IsStandAlone then
+  if RunningInsideIDE then
     FModuleIntf := GxOtaGetModule(FFileName);
   if FModuleIntf <> nil then // The module is open in the IDE
   begin
@@ -355,7 +355,7 @@ begin
   FreeObjects;
   FFileName := Value;
 
-  if not IsStandAlone then
+  if RunningInsideIDE then
   begin
     if not GetModuleInterface and not GetFileInterface then
       FFileName := '';
