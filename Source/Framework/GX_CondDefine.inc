@@ -51,6 +51,7 @@
         {$DEFINE GX_VER160_up}  // Delphi 8
         {$IF CompilerVersion >= 17}
           {$DEFINE GX_VER170_up}  // Delphi 9/2005
+          {$DEFINE SupportsInline}
           {$IF CompilerVersion >= 18}
             {$DEFINE GX_VER180_up}  // BDS 2006
             {$IFDEF VER185}
