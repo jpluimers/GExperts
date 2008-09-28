@@ -14,8 +14,6 @@ type
     cbText: TComboBox;
     gbxOptions: TGroupBox;
     cbNoCase: TCheckBox;
-    cbNoComments: TCheckBox;
-    cbForms: TCheckBox;
     gbxWhere: TGroupBox;
     rbAllProjFiles: TRadioButton;
     rbOpenFiles: TRadioButton;
@@ -34,6 +32,16 @@ type
     btnBrowse: TButton;
     lblDirectory: TLabel;
     rbAllProjGroupFiles: TRadioButton;
+    gbxSections: TGroupBox;
+    cbInterface: TCheckBox;
+    cbInitialization: TCheckBox;
+    cbImplementation: TCheckBox;
+    cbFinalization: TCheckBox;
+    gbxTextTypes: TGroupBox;
+    cbCode: TCheckBox;
+    cbStrings: TCheckBox;
+    cbComments: TCheckBox;
+    cbForms: TCheckBox;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -169,8 +177,8 @@ begin
   if not Assigned(fmGrepResults) then
     raise Exception.Create(SGrepResultsNotActive);
 
-   GrepExpert := fmGrepResults.GrepExpert;
-   Assert(Assigned(GrepExpert));
+  GrepExpert := fmGrepResults.GrepExpert;
+  Assert(Assigned(GrepExpert));
 
   Dialog := TfmGrepOptions.Create(nil);
   try
@@ -231,7 +239,13 @@ begin
   AddMRUString(cbMasks.Text, FGrepExpert.MaskList, False);
 
   FGrepExpert.GrepNoCase := cbNoCase.Checked;
-  FGrepExpert.GrepNoComments := cbNoComments.Checked;
+  FGrepExpert.GrepCode := cbCode.Checked;
+  FGrepExpert.GrepStrings := cbStrings.Checked;
+  FGrepExpert.GrepComments := cbComments.Checked;
+  FGrepExpert.GrepInterface := cbInterface.Checked;
+  FGrepExpert.GrepImplementation := cbImplementation.Checked;
+  FGrepExpert.GrepInitialization := cbInitialization.Checked;
+  FGrepExpert.GrepFinalization := cbFinalization.Checked;
   FGrepExpert.GrepForms := cbForms.Checked;
   FGrepExpert.GrepSub := cbInclude.Checked;
   FGrepExpert.GrepWholeWord := cbWholeWord.Checked;
@@ -298,7 +312,13 @@ begin
   cbMasks.Items.Assign(FGrepExpert.MaskList);
 
   cbNoCase.Checked := FGrepExpert.GrepNoCase;
-  cbNoComments.Checked := FGrepExpert.GrepNoComments;
+  cbCode.Checked := FGrepExpert.GrepCode;
+  cbStrings.Checked := FGrepExpert.GrepStrings;
+  cbComments.Checked := FGrepExpert.GrepComments;
+  cbInterface.Checked := FGrepExpert.GrepInterface;
+  cbImplementation.Checked := FGrepExpert.GrepImplementation;
+  cbInitialization.Checked := FGrepExpert.GrepInitialization;
+  cbFinalization.Checked := FGrepExpert.GrepFinalization;
   cbForms.Checked := FGrepExpert.GrepForms;
   cbInclude.Checked := FGrepExpert.GrepSub;
   cbWholeWord.Checked := FGrepExpert.GrepWholeWord;
@@ -357,7 +377,13 @@ end;
 
 procedure TfmGrepSearch.RetrieveSettings(var Value: TGrepSettings);
 begin
-  Value.NoComments := cbNoComments.Checked;
+  Value.Code := cbCode.Checked;
+  Value.Strings := cbStrings.Checked;
+  Value.Comments := cbComments.Checked;
+  Value.SectionInterface := cbInterface.Checked;
+  Value.SectionImplementation := cbImplementation.Checked;
+  Value.SectionInitialization := cbInitialization.Checked;
+  Value.SectionFinalization := cbFinalization.Checked;
   Value.NoCase := cbNoCase.Checked;
   Value.WholeWord := cbWholeWord.Checked;
   Value.RegEx := cbRegEx.Checked;

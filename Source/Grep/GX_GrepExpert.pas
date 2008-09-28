@@ -17,7 +17,13 @@ type
     FMaskList: TStrings;
     FDirList: TStrings;
     FGrepNoCase: Boolean;
-    FGrepNoComments: Boolean;
+    FGrepCode: Boolean;
+    FGrepStrings: Boolean;
+    FGrepComments: Boolean;
+    FGrepInterface: Boolean;
+    FGrepImplementation: Boolean;
+    FGrepInitialization: Boolean;
+    FGrepFinalization: Boolean;
     FGrepForms: Boolean;
     FGrepSearch: Integer;
     FGrepSub: Boolean;
@@ -49,7 +55,13 @@ type
     property GrepANSICompatible: Boolean read FGrepANSICompatible write FGrepANSICompatible;
     property GrepExpandAll: Boolean read FGrepExpandAll write FGrepExpandAll;
     property GrepNoCase: Boolean read FGrepNoCase write FGrepNoCase;
-    property GrepNoComments: Boolean read FGrepNoComments write FGrepNoComments;
+    property GrepCode: Boolean read FGrepCode write FGrepCode;
+    property GrepStrings: Boolean read FGrepStrings write FGrepStrings;
+    property GrepComments: Boolean read FGrepComments write FGrepComments;
+    property GrepInterface: Boolean read FGrepInterface write FGrepInterface;
+    property GrepImplementation: Boolean read FGrepImplementation write FGrepImplementation;
+    property GrepInitialization: Boolean read FGrepInitialization write FGrepInitialization;
+    property GrepFinalization: Boolean read FGrepFinalization write FGrepFinalization;
     property GrepForms: Boolean read FGrepForms write FGrepForms;
     property GrepSearch: Integer read FGrepSearch write FGrepSearch;
     property GrepSub: Boolean read FGrepSub write FGrepSub;
@@ -181,7 +193,13 @@ begin
   inherited InternalSaveSettings(Settings);
   // do not localize any of the following lines
   Settings.WriteBool(ConfigurationKey, 'NoCase', GrepNoCase);
-  Settings.WriteBool(ConfigurationKey, 'NoComments', GrepNoComments);
+  Settings.WriteBool(ConfigurationKey, 'Code', GrepCode);
+  Settings.WriteBool(ConfigurationKey, 'Strings', GrepStrings);
+  Settings.WriteBool(ConfigurationKey, 'NoComments', not GrepComments);
+  Settings.WriteBool(ConfigurationKey, 'Interface', GrepInterface);
+  Settings.WriteBool(ConfigurationKey, 'Implementation', GrepImplementation);
+  Settings.WriteBool(ConfigurationKey, 'Initialization', GrepInitialization);
+  Settings.WriteBool(ConfigurationKey, 'Finalization', GrepFinalization);
   Settings.WriteBool(ConfigurationKey, 'Forms', GrepForms);
   Settings.WriteInteger(ConfigurationKey, 'Search', GrepSearch);
   Settings.WriteBool(ConfigurationKey, 'SubDirectories', GrepSub);
@@ -241,7 +259,13 @@ begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the following lines
   FGrepNoCase := Settings.ReadBool(ConfigurationKey, 'NoCase', False);
-  FGrepNoComments := Settings.ReadBool(ConfigurationKey, 'NoComments', False);
+  FGrepCode := Settings.ReadBool(ConfigurationKey, 'Code', True);
+  FGrepStrings := Settings.ReadBool(ConfigurationKey, 'Strings', True);
+  FGrepComments := not Settings.ReadBool(ConfigurationKey, 'NoComments', False);
+  FGrepInterface := Settings.ReadBool(ConfigurationKey, 'Interface', True);
+  FGrepImplementation := Settings.ReadBool(ConfigurationKey, 'Implementation', True);
+  FGrepInitialization := Settings.ReadBool(ConfigurationKey, 'Initialization', True);
+  FGrepFinalization := Settings.ReadBool(ConfigurationKey, 'Finalization', True);
   FGrepForms := Settings.ReadBool(ConfigurationKey, 'Forms', False);
   FGrepSearch := Settings.ReadInteger(ConfigurationKey, 'Search', 0);
   FGrepSub := Settings.ReadBool(ConfigurationKey, 'SubDirectories', True);

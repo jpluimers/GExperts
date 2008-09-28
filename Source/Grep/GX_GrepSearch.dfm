@@ -1,10 +1,10 @@
 object fmGrepSearch: TfmGrepSearch
-  Left = 412
-  Top = 114
+  Left = 318
+  Top = 209
   BorderStyle = bsDialog
   Caption = 'Grep Search'
-  ClientHeight = 303
-  ClientWidth = 417
+  ClientHeight = 346
+  ClientWidth = 489
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object fmGrepSearch: TfmGrepSearch
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    417
-    303)
+    489
+    346)
   PixelsPerInch = 96
   TextHeight = 13
   object lblFind: TLabel
@@ -32,7 +32,7 @@ object fmGrepSearch: TfmGrepSearch
   object cbText: TComboBox
     Left = 80
     Top = 8
-    Width = 331
+    Width = 403
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 15
@@ -41,64 +41,49 @@ object fmGrepSearch: TfmGrepSearch
   end
   object gbxOptions: TGroupBox
     Left = 8
-    Top = 40
-    Width = 196
-    Height = 121
+    Top = 35
+    Width = 473
+    Height = 44
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Options'
     TabOrder = 1
     object cbNoCase: TCheckBox
       Left = 10
       Top = 16
-      Width = 165
+      Width = 100
       Height = 17
       Caption = '&Case sensitive'
       TabOrder = 0
     end
-    object cbNoComments: TCheckBox
-      Left = 10
-      Top = 98
-      Width = 165
-      Height = 17
-      Caption = '&Ignore comments'
-      TabOrder = 4
-    end
-    object cbForms: TCheckBox
-      Left = 10
-      Top = 57
-      Width = 165
-      Height = 17
-      Caption = 'Search for&m files'
-      TabOrder = 2
-    end
     object cbWholeWord: TCheckBox
-      Left = 10
-      Top = 36
-      Width = 165
+      Left = 159
+      Top = 16
+      Width = 120
       Height = 17
       Caption = '&Whole word'
       TabOrder = 1
     end
     object cbRegEx: TCheckBox
-      Left = 10
-      Top = 77
-      Width = 165
+      Left = 311
+      Top = 16
+      Width = 136
       Height = 17
       Caption = 'Regular e&xpression'
-      TabOrder = 3
+      TabOrder = 2
     end
   end
   object gbxWhere: TGroupBox
-    Left = 214
-    Top = 40
-    Width = 196
+    Left = 309
+    Top = 85
+    Width = 172
     Height = 121
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Where'
-    TabOrder = 2
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Caption = 'File Selection'
+    TabOrder = 4
     object rbAllProjFiles: TRadioButton
       Left = 10
       Top = 57
-      Width = 177
+      Width = 155
       Height = 17
       Caption = 'All files in &project'
       Checked = True
@@ -109,7 +94,7 @@ object fmGrepSearch: TfmGrepSearch
     object rbOpenFiles: TRadioButton
       Left = 10
       Top = 77
-      Width = 177
+      Width = 155
       Height = 17
       Caption = '&Open project files'
       TabOrder = 3
@@ -118,7 +103,7 @@ object fmGrepSearch: TfmGrepSearch
     object rbDirectories: TRadioButton
       Left = 10
       Top = 98
-      Width = 177
+      Width = 155
       Height = 17
       Caption = 'Search in &directories'
       TabOrder = 4
@@ -127,7 +112,7 @@ object fmGrepSearch: TfmGrepSearch
     object rbCurrentOnly: TRadioButton
       Left = 10
       Top = 16
-      Width = 177
+      Width = 155
       Height = 17
       Caption = 'Current &file only'
       TabOrder = 0
@@ -136,7 +121,7 @@ object fmGrepSearch: TfmGrepSearch
     object rbAllProjGroupFiles: TRadioButton
       Left = 10
       Top = 36
-      Width = 177
+      Width = 155
       Height = 17
       Caption = 'All files in project &group'
       TabOrder = 1
@@ -145,14 +130,14 @@ object fmGrepSearch: TfmGrepSearch
   end
   object gbxDirectories: TGroupBox
     Left = 8
-    Top = 168
-    Width = 403
+    Top = 211
+    Width = 474
     Height = 97
-    Anchors = [akLeft, akTop, akRight]
+    Anchors = [akLeft, akRight, akBottom]
     Caption = 'Directory Search'
-    TabOrder = 3
+    TabOrder = 5
     DesignSize = (
-      403
+      474
       97)
     object lblMasks: TLabel
       Left = 15
@@ -175,7 +160,7 @@ object fmGrepSearch: TfmGrepSearch
     object cbMasks: TComboBox
       Left = 70
       Top = 48
-      Width = 320
+      Width = 369
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
@@ -185,16 +170,18 @@ object fmGrepSearch: TfmGrepSearch
     object cbInclude: TCheckBox
       Left = 70
       Top = 72
-      Width = 322
+      Width = 366
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Include su&bdirectories'
+      Checked = True
+      State = cbChecked
       TabOrder = 3
     end
     object cbDirectory: TComboBox
       Left = 70
       Top = 22
-      Width = 298
+      Width = 369
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
@@ -203,7 +190,7 @@ object fmGrepSearch: TfmGrepSearch
       OnDropDown = cbDirectoryDropDown
     end
     object btnBrowse: TButton
-      Left = 369
+      Left = 440
       Top = 22
       Width = 20
       Height = 20
@@ -218,35 +205,131 @@ object fmGrepSearch: TfmGrepSearch
     end
   end
   object btnOK: TButton
-    Left = 176
-    Top = 271
+    Left = 247
+    Top = 314
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
-    TabOrder = 4
+    TabOrder = 6
     OnClick = btnOKClick
   end
   object btnCancel: TButton
-    Left = 256
-    Top = 271
+    Left = 327
+    Top = 314
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 5
+    TabOrder = 7
   end
   object btnHelp: TButton
-    Left = 336
-    Top = 271
+    Left = 407
+    Top = 314
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = '&Help'
-    TabOrder = 6
+    TabOrder = 8
     OnClick = btnHelpClick
+  end
+  object gbxSections: TGroupBox
+    Left = 157
+    Top = 85
+    Width = 142
+    Height = 121
+    Anchors = [akLeft, akTop, akBottom]
+    Caption = 'Search Delphi Sections'
+    TabOrder = 3
+    object cbInterface: TCheckBox
+      Left = 10
+      Top = 17
+      Width = 125
+      Height = 18
+      Caption = 'Interf&ace'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+    end
+    object cbInitialization: TCheckBox
+      Left = 10
+      Top = 57
+      Width = 125
+      Height = 17
+      Caption = '&Initialization'
+      Checked = True
+      State = cbChecked
+      TabOrder = 2
+    end
+    object cbImplementation: TCheckBox
+      Left = 10
+      Top = 37
+      Width = 125
+      Height = 17
+      Caption = 'Imp&lementation'
+      Checked = True
+      State = cbChecked
+      TabOrder = 1
+    end
+    object cbFinalization: TCheckBox
+      Left = 10
+      Top = 77
+      Width = 125
+      Height = 17
+      Caption = 'Finali&zation'
+      Checked = True
+      State = cbChecked
+      TabOrder = 3
+    end
+  end
+  object gbxTextTypes: TGroupBox
+    Left = 8
+    Top = 85
+    Width = 139
+    Height = 121
+    Anchors = [akLeft, akTop, akBottom]
+    Caption = 'Search (Delphi, C++)'
+    TabOrder = 2
+    object cbCode: TCheckBox
+      Left = 10
+      Top = 17
+      Width = 123
+      Height = 17
+      Caption = 'Cod&e'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+    end
+    object cbStrings: TCheckBox
+      Left = 10
+      Top = 37
+      Width = 123
+      Height = 17
+      Caption = '&Strings'
+      Checked = True
+      State = cbChecked
+      TabOrder = 1
+    end
+    object cbComments: TCheckBox
+      Left = 10
+      Top = 57
+      Width = 123
+      Height = 17
+      Caption = 'Comme&nts'
+      Checked = True
+      State = cbChecked
+      TabOrder = 2
+    end
+    object cbForms: TCheckBox
+      Left = 10
+      Top = 77
+      Width = 123
+      Height = 17
+      Caption = 'Associated for&ms'
+      TabOrder = 3
+    end
   end
 end

@@ -15,7 +15,13 @@ type
 
   // Saved grep settings (used for refresh)
   TGrepSettings = record
-    NoComments: Boolean;
+    Code: Boolean;
+    Strings: Boolean;
+    Comments: Boolean;
+    SectionInterface: Boolean;
+    SectionImplementation: Boolean;
+    SectionInitialization: Boolean;
+    SectionFinalization: Boolean;
     NoCase: Boolean;
     WholeWord: Boolean;
     RegEx: Boolean;
@@ -474,7 +480,14 @@ begin
     FSearcher.OnFound := FoundIt;
     FSearcher.OnStartSearch := StartFileSearch;
 
-    FSearcher.NoComments := FGrepSettings.NoComments;
+    FSearcher.Code := FGrepSettings.Code;
+    FSearcher.Strings := FGrepSettings.Strings;
+    FSearcher.Comments := FGrepSettings.Comments;
+    FSearcher.SectionInterface := FGrepSettings.SectionInterface;
+    FSearcher.SectionImplementation := FGrepSettings.SectionImplementation;
+    FSearcher.SectionInitialization := FGrepSettings.SectionInitialization;
+    FSearcher.SectionFinalization := FGrepSettings.SectionFinalization;
+
     FSearcher.IncludeForms := FGrepSettings.IncludeForms;
     if FGrepSettings.NoCase then
       FSearcher.SearchOptions := [soCaseSensitive];

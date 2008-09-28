@@ -117,6 +117,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure actReplaceAllExecute(Sender: TObject);
     procedure actReplaceSelectedExecute(Sender: TObject);
+    procedure lbResultsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FSearchInProgress: Boolean;
     FReplaceInProgress: Boolean;
@@ -151,7 +152,7 @@ type
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
-    function ConfigurationKey: string; 
+    function ConfigurationKey: string;
   public
     GrepExpert: TGrepExpert;
     constructor Create(AOwner: TComponent); override;
@@ -217,11 +218,12 @@ procedure TfmGrepResults.Execute(DoRefresh: Boolean);
 resourcestring
   SGrepActive = 'A Grep search is currently active; either abort it or wait until it is finished.';
   SGrepSearchStats = 'Searched %d files in %.2f seconds for "%s"';
-  SMatches = '%d matches';
+  SMatches = '%d matches in %d files';
 var
   TimeStart: TDateTime;
   FilesSearched: Cardinal;
   MatchesFound: Cardinal;
+  FilesHit: Cardinal;
   Cursor: IInterface;
 begin
   if FSearchInProgress then
@@ -254,6 +256,8 @@ begin
     FSearchInProgress := False;
   end;
 
+  FilesHit := lbResults.Items.Count;
+
   SetStatusString(Format(SGrepSearchStats, [FilesSearched, (Now - TimeStart) * 24*60*60, FGrepSettings.Pattern]));
 
   lbResults.Sorted := True;  // There is no Sort method
@@ -265,7 +269,7 @@ begin
   end;
 
   lbResults.Refresh;
-  SetMatchString(Format(SMatches, [MatchesFound]));
+  SetMatchString(Format(SMatches, [MatchesFound, FilesHit]));
 end;
 
 procedure TfmGrepResults.ClearResultsListbox;
@@ -376,7 +380,7 @@ begin
     Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
     Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
     Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-    StayOnTop := Settings.ReadBool(ConfigurationKey, 'OnTop', False);
+    StayOnTop := Settings.ReadBool(ConfigurationKey, 'OnTop', True);
     lbResults.Height := Settings.ReadInteger(ConfigurationKey, 'ResultsHeight', lbResults.Height);
     ShowContext := Settings.ReadBool(ConfigurationKey, 'ShowContext', True);
     ToolBar.Visible := Settings.ReadBool(ConfigurationKey, 'ShowToolBar', ToolBar.Visible);
@@ -547,6 +551,36 @@ begin
     finally
       lbResults.Items.EndUpdate;
     end;
+  end;
+end;
+
+procedure TfmGrepResults.lbResultsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  i: Integer;
+begin
+  lbResults.Items.BeginUpdate;
+  try
+    i := lbResults.ItemIndex;
+    if (i < 0) then
+      Exit;
+
+    // Search for a TFileResult above the selected line
+    while (i > 0) and not (lbResults.Items.Objects[i] is TFileResult) do
+      Dec(i);
+
+    if not (lbResults.Items.Objects[i] is TFileResult) then
+      Exit;
+
+    if  (Key in [VK_LEFT, VK_RIGHT])
+      and (TFileResult(lbResults.Items.Objects[i]).Expanded = (Key = VK_LEFT)) then
+    begin
+      lbResults.ItemIndex := i;
+      ToggleFileResultExpanded(i);
+      Key := 0;
+    end;
+
+  finally
+    lbResults.Items.EndUpdate;
   end;
 end;
 
@@ -864,9 +898,6 @@ procedure TfmGrepResults.GotoHighlightedListEntry;
 var
   CurrentLine: TLineResult;
   ResultIndex: Integer;
-  //S: string;
-  //rS: string;
-  //uS: WideString;
 begin
   ResultIndex := lbResults.ItemIndex;
   if ResultIndex < 0 then
@@ -882,12 +913,18 @@ begin
   if CurrentLine = nil then
     Exit;
 
-  //S := lbResults.Items[ResultIndex];
-  //rS := Copy(S, CurrentLine.Matches[0].SPos, CurrentLine.Matches[0].Length);
-  //uS := AnsiToUtf8(S);
-  //CurrentLine.Matches[0].SPos := Pos(AnsiToUtf8(rS), uS);
-  //CurrentLine.Matches[0].EPos := CurrentLine.Matches[0].SPos + Length(AnsiToUtf8(rS)) - 1;
   GoToMatchLine(CurrentLine, GrepExpert.GrepMiddle);
+
+  // Hide the results window if the window is not configured to stay on top in D8+ and we are floating
+  if RunningDelphi8OrGreater then begin
+    if (not StayOnTop) and (not Assigned(Self.Parent)) then
+    begin
+      if IsStandAlone then
+        ModalResult := mrCancel
+      else
+        Hide;
+    end;
+  end;
 end;
 
 constructor TfmGrepResults.Create(AOwner: TComponent);

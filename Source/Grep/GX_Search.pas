@@ -36,6 +36,7 @@ type
     procedure SignalFoundMatch(LineNo: Integer; const Line: string; SPos, FEditReaderPos: Integer); virtual;
   protected
     BLine: PAnsiChar; // The current search line, case-converted if requested
+    OrigLinePos: array of Integer;
     OrgLine: PAnsiChar; // The current search line, without case-conversion
     FLineNo: Integer;
     FEof: Boolean;
@@ -43,7 +44,14 @@ type
     FBufSize: Integer;
     FBufferSearchPos: Integer;
     FBufferDataCount: Integer;
-    FNoComments: Boolean;
+    FSearchLineStart: Integer;
+    FSearchInCode: Boolean;
+    FSearchInStrings: Boolean;
+    FSearchInComments: Boolean;
+    FSectionInterface: Boolean;
+    FSectionImplementation: Boolean;
+    FSectionInitialization: Boolean;
+    FSectionFinalization: Boolean;
     FCurlyCommentActive: Boolean;
     FSearchOptions: TSearchOptions;
     FStarCommentActive: Boolean;
@@ -59,14 +67,19 @@ type
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); virtual; abstract;
     procedure Seek(Offset: Longint; Direction: Integer); virtual; abstract;
     procedure AfterFill; virtual; abstract;
-    //procedure BufferUtf8ToAnsi; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
     procedure SetPattern(const Source: AnsiString);
     property ANSICompatible: Boolean write SetANSICompatible;
     property BufSize: Integer read FBufSize write SetBufSize;
-    property NoComments: Boolean read FNoComments write FNoComments;
+    property Code: Boolean read FSearchInCode write FSearchInCode;
+    property Strings: Boolean read FSearchInStrings write FSearchInStrings;
+    property Comments: Boolean read FSearchInComments write FSearchInComments;
+    property SectionInterface: Boolean read FSectionInterface write FSectionInterface;
+    property SectionImplementation: Boolean read FSectionImplementation write FSectionImplementation;
+    property SectionInitialization: Boolean read FSectionInitialization write FSectionInitialization;
+    property SectionFinalization: Boolean read FSectionFinalization write FSectionFinalization;
     property Pattern: PAnsiChar read FPattern;
     property SearchOptions: TSearchOptions read FSearchOptions write FSearchOptions;
     property OnFound: TFoundEvent read FOnFound write FOnFound;
@@ -91,7 +104,6 @@ type
     procedure ReadIntoBuffer(AmountOfBytesToRead: Cardinal); override;
     procedure Seek(Offset: Longint; Direction: Integer); override;
     procedure AfterFill; override;
-    //procedure BufferUtf8ToAnsi; override;
   public
     constructor Create(const SearchFileName: string);
     destructor Destroy; override;
@@ -316,23 +328,6 @@ procedure TSearcher.SetFileName(const Value: string);
       FEditReader := FEditorIntf.CreateReader;
       if FEditReader = nil then
         Exit;
-      (*
-      // Get Reader interface
-      ReaderStream := TGxEditorReadStream.Create(FEditorIntf);
-      Lst := TStringList.Create;
-      try
-        Lst.LoadFromStream(ReaderStream);
-        FreeAndNil(ReaderStream);
-        for i := 0 to Lst.Count - 1 do
-          Lst[i] := Utf8ToAnsi(Lst[i]);
-
-        FSearchStream := TMemoryStream.Create;
-        Lst.SaveToStream(FSearchStream);
-      finally
-        FreeAndNil(Lst);
-      end;
-      FMode := mmFile;
-      *)
       Result := True;
     end;
   end;
@@ -449,35 +444,6 @@ begin
   Inc(FEditReaderPos, FBufferDataCount);
 end;
 
-(*
-procedure TSearcher.BufferUtf8ToAnsi;
-var
-  UTF: Integer;
-  Lst: TStringList;
-  i: Integer;
-begin
-  if Mode = mmFile then
-  begin
-    FSearchStream.Read(UTF, 3);
-    if (UTF and $00FFFFFF) = $00BFBBEF then
-    begin
-      Lst := TStringList.Create;
-      try
-        Lst.LoadFromStream(FSearchStream);
-        for i := 0 to Lst.Count - 1 do
-          Lst[i] := Utf8ToAnsi(Lst[i]);
-        FreeAndNil(FSearchStream);
-        FSearchStream := TMemoryStream.Create;
-        Lst.SaveToStream(FSearchStream);
-      finally
-        FreeAndNil(Lst);
-      end;
-    end;
-    FSearchStream.Seek(0, soFromBeginning);
-  end;
-end;
-*)
-
 { TBaseSearcher }
 
 constructor TBaseSearcher.Create;
@@ -486,6 +452,7 @@ begin
 
   FBufSize := DefaultBufferSize;
   BLine := AnsiStrAlloc(SearchLineSize);
+  SetLength(OrigLinePos, SearchLineSize);
   OrgLine := AnsiStrAlloc(SearchLineSize);
   FPattern := AnsiStrAlloc(GrepPatternSize);
   LoCase := ASCIILoCase;
@@ -495,6 +462,8 @@ destructor TBaseSearcher.Destroy;
 begin
   StrDispose(FSearchBuffer);
   FSearchBuffer := nil;
+
+  SetLength(OrigLinePos, 0);
 
   StrDispose(BLine);
   BLine := nil;
@@ -586,16 +555,45 @@ begin
   FSearchBuffer[FBufferDataCount] := #0;
 end;
 
+type
+  TUnitSection = (usHeader, usInterface, usImplementation, usInitialization, usFinalization, usEnd);
+  TUnitSections = set of TUnitSection;
+  
+const
+  CSections: array [TUnitSection] of AnsiString = (
+    '',
+    'interface',
+    'implementation',
+    'initialization',
+    'finalization',
+    'end.');
+
 procedure TBaseSearcher.DoSearch(FileComment: TFileComment);
 var
   i: Integer;
   LPos: Integer;
   UseChar: Boolean;
+  ActiveSection: TUnitSection;
+  SectionsToSearch: TUnitSections;
 begin
-  SignalStartSearch;
-  //BufferUtf8ToAnsi;
+  // Determine which sections are to be scanned :
+  SectionsToSearch := [usHeader]; // Everything before 'interface' is always considered
+  if FSectionInterface then
+    Include(SectionsToSearch, usInterface);
+  if FSectionImplementation then
+    Include(SectionsToSearch, usImplementation);
+  if FSectionInitialization then
+    Include(SectionsToSearch, usInitialization);
+  if FSectionFinalization then
+    Include(SectionsToSearch, usFinalization);
+  {if FSectionEndDot then}
+    Include(SectionsToSearch, usEnd); // Everything past 'end.' is always considered
 
-  LPos := 0;
+  // Assume scanning starts in the header of the unit :
+  ActiveSection := usHeader;
+
+  SignalStartSearch;
+
   while not FEof do
   begin
     // Read new data in
@@ -612,10 +610,12 @@ begin
     end;
     if FEof then
       Exit;
+    LPos := 0;
+    FSearchLineStart := FBufferSearchPos;
     i := FBufferSearchPos;
+    UseChar := False;
     while i < FBufferDataCount do
     begin
-      UseChar := False;
       case FSearchBuffer[i] of
         #0:
           begin
@@ -643,7 +643,8 @@ begin
         #13:
           begin
             FBufferSearchPos := i + 1;
-            if FSearchBuffer[FBufferSearchPos] = #10 then Inc(FBufferSearchPos);
+            if FSearchBuffer[FBufferSearchPos] = #10 then
+              Inc(FBufferSearchPos);
 
             FSlashCommentActive := False;
             if FileComment = fcCPP then
@@ -659,136 +660,177 @@ begin
 
             Break;
           end;
-      else
-        if FNoComments then
-        begin
-          case FileComment of
-            fcPas:
+      else // case FSearchBuffer[i]
+        case FileComment of
+          fcPas:
+            begin
+              // Initialy, use the character if the active section is selected :
+              UseChar := (ActiveSection in SectionsToSearch);
+
+              if FQuoteActive then
               begin
-                if FQuoteActive then
-                begin
-                  UseChar := True;
-                  // FQuoteActive isn't updated properly when '' is inside a
-                  // string, but this doesn't affect the actual search results
-                  if FSearchBuffer[i] = '''' then
-                    FQuoteActive := False;
-                end
-                else if FCurlyCommentActive then
-                begin
-                  if FSearchBuffer[i] = '}' then
-                    FCurlyCommentActive := False;
-                end
-                else if FStarCommentActive then
-                begin
-                  if (FSearchBuffer[i] = ')') and (i > 1) and (FSearchBuffer[i - 1] = '*') then
-                    FStarCommentActive := False;
-                end
-                else if not FSlashCommentActive then
-                  case FSearchBuffer[i] of
-                    #39:
-                      begin
-                        FQuoteActive := True;
-                        UseChar := True;
-                      end;
-                    '(':
-                      if (FSearchBuffer[i + 1] = '*') then
-                      begin
-                        FStarCommentActive := True;
-                        Inc(i);
-                      end
-                      else
-                        UseChar := True;
-                    '/':
-                      if (FSearchBuffer[i + 1] = '/') then
-                        FSlashCommentActive := True
-                      else
-                        UseChar := True;
-                    '{':
-                      FCurlyCommentActive := True
-                  else
-                    UseChar := True;
-                  end;
-              end;
-            fcCPP:
+                UseChar := UseChar and FSearchInStrings;
+                // FQuoteActive isn't updated properly when '' is inside a
+                // string, but this doesn't affect the actual search results
+                if FSearchBuffer[i] = '''' then
+                  FQuoteActive := False;
+              end
+              else if FCurlyCommentActive then
               begin
-                // The following odd pattern can confuse the comment parser:
-                // /* a comment *\
-                // /  ShowMessage("coucou");
-                if FQuoteActive then
+                UseChar := UseChar and FSearchInComments;
+                if FSearchBuffer[i] = '}' then
+                  FCurlyCommentActive := False;
+              end
+              else if FStarCommentActive then
+              begin
+                UseChar := UseChar and FSearchInComments;
+                if (FSearchBuffer[i] = ')') and (i > 1) and (FSearchBuffer[i - 1] = '*') then
+                  FStarCommentActive := False;
+              end
+              else if FSlashCommentActive then
+              begin
+                UseChar := UseChar and FSearchInComments;
+                // SlashComments end automatically at end-of-line (see #10/#13 above)
+              end
+              else
+              begin
+                // We're in 'Code active' mode here. Detect section-changes :
+
+                // Are there any sections after the active one?
+                if  (ActiveSection < usEnd)
+                  // Is the previous character not part of the string?
+                  and ((i = 0) or (not IsCharIdentifier(Char(FSearchBuffer[i - 1]))))
+                  // Is the next section keyword present here?
+                  and (StrLIComp(PAnsiChar(FSearchBuffer) + i, PAnsiChar(CSections[Succ(ActiveSection)]), Length(CSections[Succ(ActiveSection)])) = 0)
+                  // Is the following character not part of the string?
+                  and (not IsCharIdentifier(Char(FSearchBuffer[i+Length(CSections[Succ(ActiveSection)])]))) then
                 begin
-                  UseChar := True;
-                  if (FSearchBuffer[i] = #39) and ((i = 1) or (FSearchBuffer[i - 1] <> '\')) then
-                    FQuoteActive := False;
-                end
-                else if FDoubleQuoteActive then
-                begin
-                  UseChar := True;
-                  if (FSearchBuffer[i] = '"') and ((i = 1) or (FSearchBuffer[i - 1] <> '\')) then
-                    FDoubleQuoteActive := False;
-                end
-                else if FStarCommentActive then
-                begin
-                  if (FSearchBuffer[i] = '/') and (i > 1) and (FSearchBuffer[i - 1] = '*') then
-                    FStarCommentActive := False;
-                end
-                else if not FSlashCommentActive then
-                  case FSearchBuffer[i] of
-                    #39:
-                      begin
-                        FQuoteActive := True;
-                        UseChar := True;
-                      end;
-                    '"':
-                      begin
-                        FDoubleQuoteActive := True;
-                        UseChar := True;
-                      end;
-                    '/':
-                      case FSearchBuffer[i + 1] of
-                        '*': begin
-                               FStarCommentActive := True;
-                               i := i + 1;
-                             end;
-                        '/': FSlashCommentActive := True;
-                      else
-                        UseChar := True;
-                      end;
-                  else
-                    UseChar := True;
-                  end;
+                  // Then skip to the next section :
+                  ActiveSection := Succ(ActiveSection);
+                  Inc(i, Length(CSections[ActiveSection]));
+                  // Update the use of this character, if the (new) active section is selected :
+                  UseChar := (ActiveSection in SectionsToSearch);
+                end;
+
+                // The following cases reduces the usage of the character to selected types of text :
+                case FSearchBuffer[i] of
+                  '''':
+                    begin
+                      FQuoteActive := True;
+                      UseChar := UseChar and (FSearchInStrings or FSearchInCode);
+                    end;
+                  '(':
+                    if (FSearchBuffer[i + 1] = '*') then
+                    begin
+                      FStarCommentActive := True;
+                      Inc(i);
+                      UseChar := UseChar and (FSearchInComments or FSearchInCode);
+                    end;
+                  '/':
+                    if (FSearchBuffer[i + 1] = '/') then
+                    begin
+                      FSlashCommentActive := True;
+                      Inc(i);
+                      UseChar := UseChar and (FSearchInComments or FSearchInCode);
+                    end;
+                  '{':
+                    begin
+                      FCurlyCommentActive := True;
+                      UseChar := UseChar and (FSearchInComments or FSearchInCode);
+                    end;
+                else
+                  // Normal code :
+                  UseChar := UseChar and FSearchInCode;
+                end;
               end;
-            else
-              UseChar := True;
             end;
-        end
-        else
+          fcCPP:
+            begin
+              // The following odd pattern can confuse the comment parser:
+              // /* a comment *\
+              // /  ShowMessage("coucou");
+              if FQuoteActive then
+              begin
+                UseChar := FSearchInStrings;
+                if (FSearchBuffer[i] = #39) and ((i = 1) or (FSearchBuffer[i - 1] <> '\')) then
+                  FQuoteActive := False;
+              end
+              else if FDoubleQuoteActive then
+              begin
+                UseChar := FSearchInStrings;
+                if (FSearchBuffer[i] = '"') and ((i = 1) or (FSearchBuffer[i - 1] <> '\')) then
+                  FDoubleQuoteActive := False;
+              end
+              else if FStarCommentActive then
+              begin
+                UseChar := FSearchInComments;
+                if (FSearchBuffer[i] = '/') and (i > 1) and (FSearchBuffer[i - 1] = '*') then
+                  FStarCommentActive := False;
+              end
+              else if FSlashCommentActive then
+              begin
+                UseChar := FSearchInComments;
+                // SlashComments end automatically at end-of-line (see #10/#13 above)
+              end
+              else
+                case FSearchBuffer[i] of
+                  #39:
+                    begin
+                      FQuoteActive := True;
+                      UseChar := FSearchInStrings or FSearchInCode; // Include first char in code too
+                    end;
+                  '"':
+                    begin
+                      FDoubleQuoteActive := True;
+                      UseChar := FSearchInStrings or FSearchInCode;
+                    end;
+                  '/':
+                    case FSearchBuffer[i + 1] of
+                      '*': begin
+                             FStarCommentActive := True;
+                             i := i + 1;
+                             UseChar := FSearchInComments or FSearchInCode;
+                           end;
+                      '/': begin
+                             FSlashCommentActive := True;
+                             UseChar := FSearchInComments or FSearchInCode;
+                           end;
+                    else
+                      UseChar := FSearchInCode;
+                    end;
+                else
+                  UseChar := FSearchInCode;
+                end;
+            end;
+        else // case FileComment
           UseChar := True;
-      end;
+        end;
+      end; // case FSearchBuffer[i]
+
       if UseChar then
       begin
-        if not (soCaseSensitive in SearchOptions) then
-        begin
-          BLine[LPos] := LoCase(FSearchBuffer[i]);
-          OrgLine[LPos] := FSearchBuffer[i];
-        end
+        if soCaseSensitive in SearchOptions then
+          BLine[LPos] := FSearchBuffer[i]
         else
-          BLine[LPos] := FSearchBuffer[i];
+          BLine[LPos] := LoCase(FSearchBuffer[i]);
+        // Calculate the location of this character in the original source-line :
+        OrigLinePos[LPos] := i - FSearchLineStart;
         Inc(LPos);
         if LPos >= SearchLineSize-1 then // Enforce maximum line length constraint
           Exit; // Binary, not text file
       end;
+
       Inc(i);
-    end;
+    end; // while i < FBufferDataCount
+    StrLCopy(OrgLine, PAnsiChar(FSearchBuffer) + FSearchLineStart, i - FSearchLineStart);    
     if FSearchBuffer[i] <> #0 then
       Inc(FLineNo);
     BLine[LPos] := #0;
-    OrgLine[LPos] := #0;
     if BLine[0] <> #0 then
       PatternMatch;
-    LPos := 0;
     if FBufferSearchPos < i then
       FBufferSearchPos := i;
-  end;
+  end; // while not FEof
 end;
 
 procedure TBaseSearcher.SetBufSize(New: Integer);
@@ -821,7 +863,10 @@ var
     cstart := SourceCharIndex;
     Inc(SourceCharIndex);
     if Source[SourceCharIndex] = '^' then
-      Store(opNClass)
+    begin
+      Inc(SourceCharIndex);
+      Store(opNClass);
+    end
     else
       Store(opClass);
 
@@ -973,10 +1018,7 @@ var
       end;
     end;
 
-    if soCaseSensitive in SearchOptions then
-      SignalFoundMatch(FLineNo, BLine, LinePos, l)
-    else
-      SignalFoundMatch(FLineNo, OrgLine, LinePos, l);
+    SignalFoundMatch(FLineNo, string(OrgLine), OrigLinePos[LinePos], OrigLinePos[l]);
   end;
 
 begin
@@ -1058,7 +1100,7 @@ begin
 
         opDigit:
           begin
-            if not (BLine[l] in ['0'..'9']) then
+            if not IsCharNumeric(BLine[l]) then
               Break;
             Inc(p);
           end;
