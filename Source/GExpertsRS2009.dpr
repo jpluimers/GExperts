@@ -1,6 +1,6 @@
 library GExpertsRS2009;
 
-{$R '..\Images\GXIcons.res' '..\Images\GXIcons.rc'}
+{$R 'GXIcons.res' '..\Images\GXIcons.rc'}
 {$R *.res}
 {$E dll}
 
@@ -74,6 +74,7 @@ uses
   GX_GrepExpert in 'Grep\GX_GrepExpert.pas',
   GX_GrepOptions in 'Grep\GX_GrepOptions.pas' {fmGrepOptions},
   GX_GrepPrinting in 'Grep\GX_GrepPrinting.pas',
+  GX_GrepRegExSearch in 'Grep\GX_GrepRegExSearch.pas',
   GX_GrepReplace in 'Grep\GX_GrepReplace.pas' {fmGrepReplace},
   GX_GrepResults in 'Grep\GX_GrepResults.pas' {fmGrepResults},
   GX_GrepResultsOptions in 'Grep\GX_GrepResultsOptions.pas' {fmGrepResultsOptions},
@@ -135,7 +136,6 @@ uses
   GX_ReplaceCompMapGrpList in 'ReplaceComponents\GX_ReplaceCompMapGrpList.pas' {fmReplaceCompMapGrpList},
   GX_ReplaceCompMapList in 'ReplaceComponents\GX_ReplaceCompMapList.pas' {fmReplaceCompMapList},
   GX_ReplaceCompUtils in 'ReplaceComponents\GX_ReplaceCompUtils.pas',
-  GX_Search in 'Grep\GX_Search.pas',
   GX_SetComponentProps in 'SetComponentProperties\GX_SetComponentProps.pas',
   GX_SetComponentPropsConfig in 'SetComponentProperties\GX_SetComponentPropsConfig.pas' {fmSetComponentPropsConfig},
   GX_SetComponentPropsStatus in 'SetComponentProperties\GX_SetComponentPropsStatus.pas' {fmSetComponentPropsStatus},

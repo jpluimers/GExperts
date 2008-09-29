@@ -54,7 +54,7 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<RcCompile Include="..\Images\GXIcons.rc">
-				<Form>..\Images\GXIcons.res</Form>
+				<Form>GXIcons.res</Form>
 			</RcCompile>
 			<DCCReference Include="Framework\GX_About.pas">
 				<Form>fmAbout</Form>
@@ -326,7 +326,6 @@
 				<Form>fmReplaceCompMapList</Form>
 			</DCCReference>
 			<DCCReference Include="ReplaceComponents\GX_ReplaceCompUtils.pas"/>
-			<DCCReference Include="Grep\GX_Search.pas"/>
 			<DCCReference Include="SetComponentProperties\GX_SetComponentProps.pas"/>
 			<DCCReference Include="SetComponentProperties\GX_SetComponentPropsConfig.pas">
 				<Form>fmSetComponentPropsConfig</Form>
@@ -364,6 +363,7 @@
 			<DCCReference Include="Framework\GX_VerDepConst.pas"/>
 			<DCCReference Include="Utils\GX_XmlUtils.pas"/>
 			<DCCReference Include="BackupProject\GX_Zipper.pas"/>
+			<DCCReference Include="Grep\GX_GrepRegExSearch.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
