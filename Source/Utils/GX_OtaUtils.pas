@@ -173,18 +173,16 @@ procedure GxOtaDeleteTextFromPos(StartPos, Count: Longint; SourceEditor: IOTASou
 procedure GxOtaReplaceSelection(const Editor: IOTASourceEditor; ViewNum: Integer;
   const Text: string);
 
-// Get the text of a source file or form whether it is open or not
-// and assign it to Lines.Text
-function GxOtaGetFileAsText(const FileName: string; Lines: TStrings; out WasBinary: Boolean): Boolean;
-// Load a file opened into the IDE to a unciode string list
-procedure GxOtaLoadIDEFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+// Load a file/form opened into the IDE to a unciode string list
+procedure GxOtaLoadIDEFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
 procedure GxOtaLoadSourceEditorToUnicodeStrings(SourceEditor: IOTASourceEditor; Data: TGXUnicodeStringList);
 procedure GxOtaLoadFormEditorToUnicodeStrings(FormEditor: IOTAFormEditor; Data: TGXUnicodeStringList);
 
 
 // Read the requested file's contents into a unicode string list.  This supports
 // open/closed files, UTF-8 in the edior, and UTF-8/16/32 on disk, and form files.
-procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList); overload;
+procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean); overload;
 
 // Test whether the last attribute before the current one is part of another
 // one passed in InElement - or something else.  This is only called if
@@ -3778,115 +3776,7 @@ begin
   end;
 end;
 
-// Should we integrate form support into TEditReader instead of using this?
-function GxOtaGetFileAsText(const FileName: string; Lines: TStrings; out WasBinary: Boolean): Boolean;
-var
-  FileReader: TEditReader;
-  MemStream: TMemoryStream;
-  FormStream: TMemoryStream;
-  BaseFileName: string;
-  Module: IOTAModule;
-  FormEditor: IOTAFormEditor;
-  RootComponent: IOTAComponent;
-  SourceEditor: IOTASourceEditor;
-  Component: TComponent;
-  EditStream: TGxEditorReadStream;
-begin
-  WasBinary := False;
-  Assert(Assigned(Lines));
-  Result := False;
-
-  MemStream := TMemoryStream.Create;
-  try
-    if IsForm(FileName) then
-    begin
-      if IsStandAlone then
-        LoadFormFileToStrings(FileName, Lines, WasBinary)
-      else
-      begin
-        BaseFileName := GxOtaGetBaseModuleFileName(FileName);
-        // Is the form currently open as text
-        if GxOtaIsFileOpen(FileName) then
-        begin
-          Module := GxOtaGetModule(FileName);
-          if not Assigned(Module) then
-            Exit;
-          SourceEditor := GxOtaGetSourceEditorFromModule(Module, FileName);
-          if not Assigned(SourceEditor) then
-            Exit;
-          EditStream := TGxEditorReadStream.Create(SourceEditor);
-          try
-            MemStream.LoadFromStream(EditStream);
-            MemStream.Position := 0;
-          finally
-            FreeAndNil(EditStream);
-          end;
-          Lines.LoadFromStream(MemStream);
-        end
-        else if GxOtaIsFileOpen(BaseFileName) then
-        begin
-          Module := GxOtaGetModule(BaseFileName);
-          if not Assigned(Module) then
-            Exit;
-          FormEditor := GxOtaGetFormEditorFromModule(Module);
-          if not Assigned(FormEditor) then
-            Exit;
-          RootComponent := FormEditor.GetRootComponent;
-          if RootComponent <> nil then
-          begin
-            Component := GxOtaGetNativeComponent(RootComponent);
-            if Component <> nil then
-            begin
-              FormStream :=  TMemoryStream.Create;
-              try
-                FormStream.WriteComponent(Component);
-                FormStream.Position := 0;
-                ObjectBinaryToText(FormStream, MemStream);
-                MemStream.Position := 0;
-              finally;
-                FreeAndNil(FormStream);
-              end;
-              Lines.LoadFromStream(MemStream);
-            end;
-          end;
-        end
-        else
-          LoadFormFileToStrings(FileName, Lines, WasBinary)
-      end;
-    end
-    else
-    begin
-      if IsStandAlone then
-        Lines.LoadFromFile(FileName)
-      else
-      begin
-        BaseFileName := GxOtaGetBaseModuleFileName(FileName);
-        Module := GxOtaGetModule(BaseFileName);
-        if Assigned(Module) then
-        begin
-          SourceEditor := GxOtaGetSourceEditorFromModule(Module, FileName);
-          // If there is no source editor for the file name, we can't load it
-          // We might be trying to load a .pas with the .dfm open as text
-          if (not (IsBdsgroup(FileName) or IsBdsprojOrDproj(FileName))) and (not Assigned(SourceEditor)) then
-            Exit;
-        end;
-        FileReader := TEditReader.Create(FileName);
-        try
-          FileReader.SaveToStream(MemStream);
-          MemStream.Position := 0;
-        finally
-          FreeAndNil(FileReader);
-        end;
-        Lines.LoadFromStream(MemStream);
-      end;
-    end;
-  finally
-    FreeAndNil(MemStream);
-  end;
-  Result := True;
-end;
-
-procedure GxOtaLoadIDEFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+procedure GxOtaLoadIDEFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
 var
   BaseFileName: string;
   Module: IOTAModule;
@@ -3911,7 +3801,7 @@ begin
       GxOtaLoadFormEditorToUnicodeStrings(FormEditor, Data);
     end
     else if FileExists(FileName) then
-      LoadDiskFileToUnicodeStrings(FileName, Data);
+      LoadDiskFileToUnicodeStrings(FileName, Data, WasBinary);
   end
   else
   begin
@@ -3923,7 +3813,7 @@ begin
       GxOtaLoadSourceEditorToUnicodeStrings(GxOtaGetSourceEditor(FileName), Data);
     end
     else if FileExists(FileName) then // This might be an older version, but we have no choice
-      LoadDiskFileToUnicodeStrings(FileName, Data);
+      LoadDiskFileToUnicodeStrings(FileName, Data, WasBinary);
   end;
 end;
 
@@ -3975,17 +3865,25 @@ begin
   end;
 end;
 
-procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList); overload;
+var
+  Dummy: Boolean;
+begin
+  GxOtaLoadFileToUnicodeStrings(FileName, Data, Dummy);
+end;
+
+procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean); overload;
 begin
   Assert(Assigned(Data));
   Data.Clear;
   if IsEmpty(FileName) then
     raise Exception.Create('Blank filenames are not allowed');
+  WasBinary := False;
 
   if RunningInsideIDE and GxOtaIsFileOpen(FileName, True) then
-    GxOtaLoadIDEFileToUnicodeStrings(FileName, Data)
+    GxOtaLoadIDEFileToUnicodeStrings(FileName, Data, WasBinary)
   else
-    LoadDiskFileToUnicodeStrings(FileName, Data)
+    LoadDiskFileToUnicodeStrings(FileName, Data, WasBinary)
 end;
 
 // Test whether the last attribute before the current one is part of another
