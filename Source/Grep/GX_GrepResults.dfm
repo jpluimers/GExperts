@@ -193,6 +193,7 @@ inherited fmGrepResults: TfmGrepResults
       item
         Width = 60
       end>
+    SimplePanel = False
   end
   object MainMenu: TMainMenu
     Images = dmSharedImages.Images
