@@ -199,6 +199,7 @@
 				<Form>fmGrepOptions</Form>
 			</DCCReference>
 			<DCCReference Include="Grep\GX_GrepPrinting.pas"/>
+			<DCCReference Include="Grep\GX_GrepRegExSearch.pas"/>
 			<DCCReference Include="Grep\GX_GrepReplace.pas">
 				<Form>fmGrepReplace</Form>
 			</DCCReference>
@@ -363,7 +364,6 @@
 			<DCCReference Include="Framework\GX_VerDepConst.pas"/>
 			<DCCReference Include="Utils\GX_XmlUtils.pas"/>
 			<DCCReference Include="BackupProject\GX_Zipper.pas"/>
-			<DCCReference Include="Grep\GX_GrepRegExSearch.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

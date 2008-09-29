@@ -130,7 +130,6 @@ function IsCharSymbol(C: Char): Boolean; overload; {$IFDEF SupportsInline} inlin
 function IsCharControl(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 // See if a character is a valid locale identifier character, _, or 0..9
 function IsCharIdentifier(C: Char): Boolean; overload;
-function IsCharIdentifier(C: WideChar): Boolean; overload;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
 {$IFDEF UNICODE}
 function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
@@ -143,6 +142,7 @@ function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload; {$IFDEF Support
 function CharInSet(C: Char; CSet: TSysCharSet): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function AnsiStrAlloc(Size: Cardinal): PChar; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsLeadChar(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
+function IsCharIdentifier(C: WideChar): Boolean; overload;
 {$ENDIF not UNICODE}
 
 // Transforms all consecutive sequences of #10, #13, #32, and #9 in Str
@@ -1142,6 +1142,15 @@ function IsLeadChar(C: Char): Boolean;
 begin
   Result := C in LeadBytes;
 end;
+
+function IsCharIdentifier(C: WideChar): Boolean; overload;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
+  {$ELSE not UNICODE}
+  Result := AnsiChar(C) in LocaleIdentifierChars; // Includes '_'
+  {$ENDIF}
+end;
 {$ENDIF not UNICODE}
 
 function IsCharWhiteSpace(C: Char): Boolean;
@@ -1234,15 +1243,6 @@ begin
   Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
   {$ELSE not UNICODE}
   Result := C in LocaleIdentifierChars; // Includes '_'
-  {$ENDIF}
-end;
-
-function IsCharIdentifier(C: WideChar): Boolean; overload;
-begin
-  {$IFDEF UNICODE}
-  Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
-  {$ELSE not UNICODE}
-  Result := AnsiChar(C) in LocaleIdentifierChars; // Includes '_'
   {$ENDIF}
 end;
 
