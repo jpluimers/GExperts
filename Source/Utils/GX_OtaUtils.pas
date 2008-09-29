@@ -66,25 +66,8 @@ const
   sDesignPersonality = 'Design.Personality';
   {$ENDIF}
 
-type
-  TGxEditorReadStream = class(TStream)
-  private
-    FSize: Longint;
-    FPosition: Longint;
-    FEditReader: IOTAEditReader;
-  protected
-    function GetSize: Int64; {$IFDEF GX_VER150_up} override; {$ENDIF GX_VER150_up}
-  public
-    constructor Create(Editor: IOTASourceEditor);
-    destructor Destroy; override;
-    function Read(var Buffer; Count: Longint): Longint; override;
-    function Seek(Offset: Longint; Origin: Word): Longint; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
-    property Size: Int64 read GetSize;
-  end;
-
 // Save an edit reader to a stream
-procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream);
+procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream; TrailingNull: Boolean = True);
 
 // If UseSelection is True, get the selected text in the current edit view
 // (if any) and return True or get all of the editor's text (if no selection)
@@ -616,7 +599,10 @@ uses
   {$IFDEF LINUX} WinUtils, {$ENDIF}
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
-  GX_EditReader, GX_IdeUtils, GX_VerDepConst;
+  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode;
+
+const
+  EditReaderBufferSize = 1024 * 24;
 
 procedure ClearUnitInfoList(const List: TList);
 var
@@ -3298,95 +3284,30 @@ begin
   Result := not IsStandAlone;
 end;
 
-{ TGxEditorStream }
-
-constructor TGxEditorReadStream.Create(Editor: IOTASourceEditor);
-begin
-  inherited Create;
-
-  Assert(Assigned(Editor));
-  FEditReader := Editor.CreateReader;
-  Assert(Assigned(FEditReader));
-
-  FPosition := 0;
-  FSize := -1;
-end;
-
-destructor TGxEditorReadStream.Destroy;
-begin
-  FEditReader := nil;
-
-  inherited Destroy;
-end;
-
-function TGxEditorReadStream.GetSize: Int64;
-const
-  BufSize = 16384;
-var
-  CurSize, BytesRead: Longint;
-  Buf: array[0..BufSize] of AnsiChar;
-begin
-  Assert(FEditReader <> nil, 'fReader is nil in TEditReaderStream.GetSize');
-
-  if FSize < 0 then
-  begin
-    // IOTAEditReader does not allow us to get the size directly
-    CurSize := 0;
-    repeat
-      BytesRead := FEditReader.GetText(CurSize, Buf, BufSize);
-      Inc(CurSize, BytesRead);
-    until BytesRead < BufSize;
-    FSize := CurSize;
-  end;
-  Result := FSize;
-end;
-
-function TGxEditorReadStream.Read(var Buffer; Count: Integer): Longint;
-begin
-  Result := FEditReader.GetText(FPosition, @Buffer, Count);
-end;
-
-function TGxEditorReadStream.Seek(Offset: Integer; Origin: Word): Longint;
-begin
-  case Origin of
-    soFromBeginning: FPosition := Offset;
-    soFromCurrent:   FPosition := FPosition + Offset;
-    soFromEnd:       FPosition := Size + Offset;
-  else
-    raise Exception.CreateFmt('Invalid seek origin, %d', [Origin]);
-  end;
-  Result := FPosition;
-end;
-
-function TGxEditorReadStream.Write(const Buffer; Count: Integer): Longint;
-begin
-  raise Exception.Create('Cannot write to TGxEditorReadStream');
-end;
-
-procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream);
+procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream; TrailingNull: Boolean);
 const
   // Leave typed constant as is - needed for streaming code.
   TerminatingNullChar: AnsiChar = #0;
-  BufferSize = 1024 * 24;
 var
   EditReaderPos: Integer;
   ReadDataSize: Integer;
-  Buffer: array[0..BufferSize] of AnsiChar; // Array of bytes, might be UTF-8
+  Buffer: array[0..EditReaderBufferSize] of AnsiChar; // Array of bytes, might be UTF-8
 begin
   Assert(EditReader <> nil);
   Assert(Stream <> nil);
 
   EditReaderPos := 0;
-  ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, BufferSize);
+  ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, EditReaderBufferSize);
   Inc(EditReaderPos, ReadDataSize);
-  while ReadDataSize = BufferSize do
+  while ReadDataSize = EditReaderBufferSize do
   begin
     Stream.Write(Buffer, ReadDataSize);
-    ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, BufferSize);
+    ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, EditReaderBufferSize);
     Inc(EditReaderPos, ReadDataSize);
   end;
   Stream.Write(Buffer, ReadDataSize);
-  Stream.Write(TerminatingNullChar, SizeOf(TerminatingNullChar));
+  if TrailingNull then
+    Stream.Write(TerminatingNullChar, SizeOf(TerminatingNullChar)); // The source parsers need this
 end;
 
 function GxOtaGetActiveEditorText(Stream: TStream; UseSelection: Boolean): Boolean;
@@ -3819,17 +3740,26 @@ end;
 
 procedure GxOtaLoadSourceEditorToUnicodeStrings(SourceEditor: IOTASourceEditor; Data: TGXUnicodeStringList);
 var
-  EditStream: TGxEditorReadStream;
+  MemStream: TMemoryStream;
 begin
   Data.Clear;
   if not Assigned(SourceEditor) then
     Exit;
   //TODO: Check stream format for forms as text (Ansi with escaped unicode, or UTF-8) in Delphi 2007/2009
-  EditStream := TGxEditorReadStream.Create(SourceEditor);
+  MemStream := TMemoryStream.Create;
   try
-    Data.LoadFromStream(EditStream {$IFDEF UNICODE}, TEncoding.UTF8{$ENDIF});
+    GxOtaSaveReaderToStream(SourceEditor.CreateReader, MemStream, False);
+    MemStream.Position := 0;
+    {$IFDEF UNICODE}
+    Data.LoadFromStream(MemStream, TEncoding.UTF8);
+    {$ELSE}
+    if RunningDelphi8OrGreater then
+      SynUnicode.LoadFromStream(Data, MemStream, seUTF8)
+    else
+      SynUnicode.LoadFromStream(Data, MemStream, seAnsi);
+    {$ENDIF}
   finally
-    FreeAndNil(EditStream);
+    FreeAndNil(MemStream);
   end;
 end;
 
