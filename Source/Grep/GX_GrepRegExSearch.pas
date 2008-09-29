@@ -8,7 +8,7 @@ uses
   SysUtils, Classes, RegExpr, GX_GenericUtils, GX_OtaUtils;
 
 type
-  TFoundEvent = procedure(LineNo, StartCol, EndCol: Integer; const Line: string) of object;
+  TFoundEvent = procedure(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString) of object;
 
   TSearcher = class(TObject)
   private
