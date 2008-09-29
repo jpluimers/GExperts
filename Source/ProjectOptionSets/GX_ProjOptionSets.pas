@@ -652,12 +652,8 @@ begin
            OptionIsAppropriateForIde(GetOptionCategories(OptionNames[j].Name)) then
         begin
           tmpObj := TKindObject.Create;
-          try
-            tmpObj.OptionKind := OptionNames[j].Kind;
-            lstPrjOptions.Items.AddObject(OptionNames[j].Name, tmpObj);
-          finally
-            FreeAndNil(tmpObj);
-          end;
+          tmpObj.OptionKind := OptionNames[j].Kind;
+          lstPrjOptions.Items.AddObject(OptionNames[j].Name, tmpObj);
         end;
         // Done loading option list
       end;
