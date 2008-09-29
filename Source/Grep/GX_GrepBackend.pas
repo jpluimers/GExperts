@@ -110,7 +110,7 @@ type
     FOnHitMatch: TOnHitMatch;
     FOnSearchFile: TOnSearchFile;
     FStorageTarget: TStrings;
-    FDupeFileList: TStrings;
+    FDupeFileList: TStringList;
     FAbortSignalled: Boolean;
     FFileSearchCount: Integer;
     FMatchCount: Integer;
@@ -471,6 +471,7 @@ begin
 
     FDupeFileList := TStringList.Create;
     try
+    FDupeFileList.Sorted := True;
     case FGrepSettings.GrepAction of
       gaProjGrep:
         GrepProject(GxOtaGetCurrentProject);
