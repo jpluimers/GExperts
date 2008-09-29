@@ -4,8 +4,6 @@ unit FileView;
 
 interface
 
-{.$DEFINE HAVEJPEG}
-
 uses
   {$IFDEF SYNEDIT}
   SynEdit, GX_SynMemoUtils, // See GX_CondDefine.inc to remove the SynEdit requirement
@@ -41,7 +39,7 @@ procedure Register;
 implementation
 
 uses
-  Controls, Forms, Graphics, StdCtrls, SysUtils;
+  Controls, Forms, Graphics, StdCtrls, SysUtils, GX_OtaUtils;
 
 constructor TFileViewer.Create(AOwner: TComponent);
 begin
@@ -118,24 +116,17 @@ procedure TFileViewer.LoadFromFile(const FileName: string);
   {$IFDEF SYNEDIT}
   procedure AssignParser(Parser: TGXSyntaxHighlighter);
   var
-    Strings: TStrings;
-    WasBinary: Boolean;
+    Strings: TGXUnicodeStringList;
   begin
     FRichEdit.Visible := False;
     FImage.Visible := False;
-    if IsForm(FileName) then
-    begin
-      Strings := TStringList.Create;
-      try
-        LoadFormFileToStrings(FileName, Strings, WasBinary);
-        FEditor.Lines.Text := Strings.Text;
-      finally
-        FreeAndNil(Strings);
-      end;
-    end
-    else
-      FEditor.Lines.LoadFromFile(FileName); // Slow for large .sql files (4K lines), for example!
-    if (FGXSyntaxParser <> Parser) then
+    Strings := TGXUnicodeStringList.Create;
+    try
+      GxOtaLoadFileToUnicodeStrings(FileName, Strings);
+      FEditor.Lines.Text := Strings.Text;
+    finally
+      FreeAndNil(Strings);
+    end;
     begin
       SetSynEditHighlighter(FEditor, Parser);
       FGXSyntaxParser := Parser;
@@ -171,16 +162,14 @@ begin
     else
     if (Ext = '.RTF')
     {$IFNDEF GX_ENHANCED_EDITOR}
-        or (Ext = '.TXT') or (Ext = '.ASC') or (Ext = '.ME') or (Ext = '.INI')
-        or (Ext = '.PAS') or (Ext = '.DPR') or (Ext = '.INC') or (Ext = '.DPK')
-        or (Ext = '.BPG') or (Ext = '.PY') or (Ext = '.BAT') or (Ext = '.BPR')
-        or (Ext = '.HTML') or (Ext = '.HTM') or (Ext = '.DIZ')
-        or (Ext = '.C') or (Ext = '.CPP') or (Ext = '.H') or (Ext = '.HPP')
-        or (Ext = '.SQL') or (Ext = '.XML') or (Ext = '.RC') or (Ext = '.BDSGROUP')
-        or (Ext = '.BDSPROJ') or (Ext = '.DPROJ') or (Ext = '.DOF') or (Ext = '.DSK') or (Ext = '.ISS')
-        or (Ext = '.BPF') or (Ext = '.KOF') or (Ext = '.DEBUGLOG') or (Ext = '.CFG')
-        or (Ext = '.DRC') or (Ext = '.MAP') or (Ext = '.CONF')
-        or (Ext = '.LOCAL') or (Ext = '.LOG') or IsForm(FileName)
+        or IsPascalSourceFile(FileName)
+        or IsHtml(FileName)
+        or IsWebFile(FileName)
+        or IsCppSourceModule(FileName)
+        or IsSQL(FileName)
+        or IsCS(FileName)
+        of IsXMLFormat(FileName)
+        or IsForm(FileName)
     {$ENDIF GX_ENHANCED_EDITOR}
     then
     begin
@@ -193,30 +182,24 @@ begin
       FRichEdit.Visible := True;
     end
     {$IFDEF GX_ENHANCED_EDITOR}
-    else
-    if (Ext = '.TXT') or (Ext = '.ASC') or (Ext = '.ME') or (Ext = '.DIZ')
-      or (Ext = '.INI') or (Ext = '.BPG') or (Ext = '.PY')  or (Ext = '.BAT')
-      or (Ext = '.RC')  or (Ext = '.DOF') or (Ext = '.DSK') or (Ext = '.ISS')
-      or (Ext = '.KOF') or (Ext = '.DEBUGLOG') or (Ext = '.CFG')
-      or (Ext = '.DRC') or (Ext = '.MAP') or (Ext = '.CONF')
-      or (Ext = '.LOG') then
+    else if IsTextFile(FileName) or (IsWebFile(FileName) and not IsHtml(FileName)) then
     begin
       {$IFDEF SYNEDIT}
       AssignParser(gxpNone)
       {$ENDIF SYNEDIT}
     end
     else
-      if (Ext = '.PAS') or (Ext = '.DPR') or (Ext = '.INC') or (Ext = '.DPK') or IsForm(FileName) then
+      if IsPascalSourceFile(FileName) or IsForm(FileName) then
         AssignParser(gxpPAS)
-      else if (Ext = '.HTML') or (Ext = '.HTM') or (Ext = '.ASP') then
+      else if IsHtml(FileName) then
         AssignParser(gxpHTML)
-      else if (Ext = '.C') or (Ext = '.CPP') or (Ext = '.H') or (Ext = '.HPP') or (Ext = '.BPF') then
+      else if IsCppSourceModule(FileName) then
         AssignParser(gxpCPP)
-      else if (Ext = '.SQL') then
+      else if IsSQL(FileName) then
         AssignParser(gxpSQL)
       else if (Ext = '.CS') then
         AssignParser(gxpCS)
-      else if (Ext = '.XML') or (Ext = '.BDSPROJ') or (Ext = '.DPROJ') or (Ext = '.BDSGROUP') or (Ext = '.LOCAL')  or (Ext = '.BPR') then
+      else if IsXMLFormat(FileName) then
         AssignParser(gxpXML)
     {$ENDIF GX_ENHANCED_EDITOR}
     else

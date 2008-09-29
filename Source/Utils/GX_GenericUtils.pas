@@ -130,6 +130,7 @@ function IsCharSymbol(C: Char): Boolean; overload; {$IFDEF SupportsInline} inlin
 function IsCharControl(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 // See if a character is a valid locale identifier character, _, or 0..9
 function IsCharIdentifier(C: Char): Boolean; overload;
+function IsCharIdentifier(C: WideChar): Boolean; overload;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
 {$IFDEF UNICODE}
 function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
@@ -371,12 +372,14 @@ function IsNfm(const FileName: string): Boolean;
 function IsDpk(const FileName: string): Boolean;
 function IsDcp(const FileName: string): Boolean;
 function IsBdsgroup(const FileName: string): Boolean;
+function IsGroupproj(const FileName: string): Boolean;
 function IsBdsproj(const FileName: string): Boolean;
 function IsDproj(const FileName: string): Boolean;
 function IsBdsprojOrDproj(const FileName: string): Boolean;
 function IsPackage(const FileName: string): Boolean;
 function IsDelphiPackage(const FileName: string): Boolean;
 function IsCsproj(const FileName: string): Boolean;
+function IsHtml(const FileName: string): Boolean;
 function IsWebFile(const FileName: string): Boolean;
 function IsCs(const FileName: string): Boolean;
 function IsVbFile(const FileName: string): Boolean;
@@ -391,6 +394,9 @@ function IsDcuil(const FileName: string): Boolean;
 function IsTypeLibrary(const FileName: string): Boolean;
 function IsKnownSourceFile(const FileName: string): Boolean;
 function IsTextFile(const FileName: string): Boolean;
+function IsXML(const FileName: string): Boolean;
+function IsXMLFormat(const FileName: string): Boolean;
+function IsSQL(const FileName: string): Boolean;
 
 // RTTI helpers
 function FindPropInfo(Instance: TObject; const PropName: string): PPropInfo;
@@ -503,12 +509,12 @@ function FileNameHasWildcards(const FileName: string): Boolean;
 function GetSystemImageIndexForFile(const FileName: string): Integer;
 
 // Load a binary/text form file into a TStrings object
-procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings; out WasBinary: Boolean); overload;
-procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings); overload;
+procedure LoadFormFileToStrings(const FileName: string; Strings: TGXUnicodeStringList; out WasBinary: Boolean); overload;
+procedure LoadFormFileToStrings(const FileName: string; Strings: TGXUnicodeStringList); overload;
 // Return whether the form is saved in binary format (only useful for saved files)
 function IsBinaryForm(const FileName: string): Boolean;
 // Load a file from disk to a unicode string list
-procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
 
 //
 // Binary module utility functions.
@@ -1228,6 +1234,15 @@ begin
   Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
   {$ELSE not UNICODE}
   Result := C in LocaleIdentifierChars; // Includes '_'
+  {$ENDIF}
+end;
+
+function IsCharIdentifier(C: WideChar): Boolean; overload;
+begin
+  {$IFDEF UNICODE}
+  Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
+  {$ELSE not UNICODE}
+  Result := AnsiChar(C) in LocaleIdentifierChars; // Includes '_'
   {$ENDIF}
 end;
 
@@ -2403,7 +2418,7 @@ end;
 
 function IsPascalSourceFile(const FileName: string): Boolean;
 begin
-  Result := IsDprOrPas(FileName) or IsInc(FileName);
+  Result := IsDprOrPas(FileName) or IsInc(FileName) or IsDelphiPackage(FileName);
 end;
 
 function IsBdsProjectFile(const FileName: string): Boolean;
@@ -2494,6 +2509,11 @@ begin
   Result := FileMatchesExtension(FileName, '.bdsgroup');
 end;
 
+function IsGroupproj(const FileName: string): Boolean;
+begin
+  Result := FileMatchesExtension(FileName, '.groupproj');
+end;
+
 function IsBdsproj(const FileName: string): Boolean;
 begin
   Result := FileMatchesExtension(FileName, '.bdsproj');
@@ -2524,9 +2544,14 @@ begin
   Result := FileMatchesExtension(FileName, '.csproj');
 end;
 
+function IsHtml(const FileName: string): Boolean;
+begin
+  Result := FileMatchesExtensions(FileName, ['.html', '.htm'])
+end;
+
 function IsWebFile(const FileName: string): Boolean;
 begin
-  Result := FileMatchesExtensions(FileName, ['.html', '.js', '.css', '.php', '.asp', '.aspx']);
+  Result := IsHtml(FileName) or FileMatchesExtensions(FileName, ['.js', '.css', '.php', '.php3', '.asp', '.aspx']);
 end;
 
 function IsCs(const FileName: string): Boolean;
@@ -2546,7 +2571,7 @@ end;
 
 function IsCppSourceModule(const FileName: string): Boolean;
 begin
-  Result := FileMatchesExtensions(FileName, ['.cpp', '.c', '.hpp', '.h', '.cxx', '.cc', '.hxx', '.hh', '.asm']);
+  Result := FileMatchesExtensions(FileName, ['.cpp', '.c', '.hpp', '.h', '.cxx', '.cc', '.hxx', '.hh', '.asm', '.bpf']);
 end;
 
 function IsCpp(const FileName: string): Boolean;
@@ -2580,9 +2605,31 @@ begin
 end;
 
 function IsTextFile(const FileName: string): Boolean;
+const
+  TextFileTypes: array[0..38] of string = ('.TXT', '.ASC', '.ME', '.INI', '.DIZ',
+    '.BPG', '.PY', '.BAT', '.RC', '.DOF', '.KOF', '.DSK', '.ISS', '.CFG', '.CONF',
+    '.MAP', '.DEBUGLOG', '.LOG', '.DRC', '.DIFF', '.EXTRA', '.FBPINF', '.FBP',
+    '.FBP2', '.FBP3', '.FBP4', '.FBP5', '.FBP6', '.IDL', '.CSV', '.TSV', 'SLN',
+    '.PHP', '.PHP3', '.USED', '.VB', '.VBE', '.VBS', '.REJ');
 begin
-  Result := FileMatchesExtensions(FileName,
-    ['.rc', '.xml', '.txt', '.me', '.bat', '.local', '.iss', '.dsk', '.dof', '.cfg']);
+  Result := FileMatchesExtensions(FileName, TextFileTypes);
+end;
+
+function IsXML(const FileName: string): Boolean;
+begin
+  Result := FileMatchesExtension(FileName, '.xml');
+end;
+
+function IsXMLFormat(const FileName: string): Boolean;
+begin
+  Result := IsXML(FileName) or IsBDSGroup(FileName) or IsBpr(FileName) or IsBDSProj(FileName)
+    or IsDproj(FileName) or IsGroupProj(FileName) or IsCsproj(FileName)
+    or FileMatchesExtensions(FileName, ['.local', '.manifest', '.resx', '.cmbx', '.prjx', '.user']);
+end;
+
+function IsSQL(const FileName: string): Boolean;
+begin
+  Result := FileMatchesExtension(FileName, '.sql');
 end;
 
 function IsDcu(const FileName: string): Boolean;
@@ -3336,7 +3383,7 @@ begin
     Result := 0;
 end;
 
-procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings; out WasBinary: Boolean);
+procedure LoadFormFileToStrings(const FileName: string; Strings: TGXUnicodeStringList; out WasBinary: Boolean);
 var
   Src: TStream;
   Dest: TStream;
@@ -3360,15 +3407,19 @@ begin
         begin
           ObjectResourceToText(Src, Dest, Format);
           Dest.Position := 0;
+          {$IFDEF GX_VER200_up}
           if Format = sofUTF8Text then
             Strings.LoadFromStream(Dest, TEncoding.UTF8)
           else
-            Strings.LoadFromStream(Dest, TEncoding.Default);
+          {$ENDIF}
+            Strings.LoadFromStream(Dest {$IFDEF GX_VER200_up}, TEncoding.Default{$ENDIF});
         end;
       sofText:
         Strings.LoadFromStream(Src);
+      {$IFDEF GX_VER200_up}
       sofUTF8Text:
         Strings.LoadFromStream(Src, TEncoding.UTF8);
+      {$ENDIF}
     end;
   finally
     FreeAndNil(Src);
@@ -3376,7 +3427,7 @@ begin
   end;
 end;
 
-procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings); overload;
+procedure LoadFormFileToStrings(const FileName: string; Strings: TGXUnicodeStringList); overload;
 var
   WasBinary: Boolean;
 begin
@@ -3405,12 +3456,12 @@ begin
   end;
 end;
 
-procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
 begin
   if not FileExists(FileName) then
     raise Exception.CreateFmt('The file %s does not exist', [FileName]);
   if IsForm(FileName) then
-    LoadFormFileToStrings(FileName, Data)
+    LoadFormFileToStrings(FileName, Data, WasBinary)
   else // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
     Data.LoadFromFile(FileName);
 end;
