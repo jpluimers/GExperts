@@ -94,6 +94,7 @@ function AnsiCaseInsensitivePos(const SubString, S: string): Integer;
 // *before* StartIndex are ignored. E.g. CaseInsensitivePosFrom(Pat, Text, 1)
 // always returns the same as CaseInsensitivePos(Pat, Text).
 function CaseInsensitivePosFrom(const Pat, Text: string; StartIndex: Integer): Integer;
+function PosFrom(const Pat, Text: string; StartIndex: Integer): Integer;
 
 //  See if a string is in the array.  Case insensitive.
 function StringInArray(const S: string; const SArray: array of string): Boolean;
@@ -271,6 +272,7 @@ function Max(const v1, v2: Integer): Integer;
 // not over the Owner property.
 function FindChild(const WindowContainer: TWinControl; const ControlName: string): TControl;
 procedure IterateOverControls(Control: TControl; ActionProc: TForEachControlProc);
+function TryFocusControl(Control: TWinControl): Boolean;
 
 // See is this component owns an object of the specified class name
 function ComponentOwnsClass(Component: TComponent; const ClassName: string): Boolean;
@@ -501,9 +503,12 @@ function FileNameHasWildcards(const FileName: string): Boolean;
 function GetSystemImageIndexForFile(const FileName: string): Integer;
 
 // Load a binary/text form file into a TStrings object
-procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings; out WasBinary: Boolean);
+procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings; out WasBinary: Boolean); overload;
+procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings); overload;
 // Return whether the form is saved in binary format (only useful for saved files)
 function IsBinaryForm(const FileName: string): Boolean;
+// Load a file from disk to a unicode string list
+procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
 
 //
 // Binary module utility functions.
@@ -921,18 +926,37 @@ end; {PosIEx}
 function CaseInsensitivePos(const Pat, Text: string): Integer;
 begin
   {$IFDEF UNICODE}
-  Result := Pos(UpperCase(Pat), UpperCase(Text));
+  Result := Pos(AnsiUpperCase(Pat), AnsiUpperCase(Text));
   {$ELSE}
   Result := PosIEx(Pat, Text);
   {$ENDIF}
 end;
 
+//TODO: Optimize PosFrom* calls to not require a Copy call
 function CaseInsensitivePosFrom(const Pat, Text: string; StartIndex: Integer): Integer;
 var
   S: string;
 begin
-  S := Copy(Text, StartIndex, MaxInt);
-  Result := CaseInsensitivePos(Pat, S);
+  if StartIndex > 1 then
+  begin
+    S := Copy(Text, StartIndex, MaxInt);
+    Result := CaseInsensitivePos(Pat, S);
+  end else
+    Result := CaseInsensitivePos(Pat, Text);
+  if Result > 0 then
+     Inc(Result, Pred(StartIndex));
+end;
+
+function PosFrom(const Pat, Text: string; StartIndex: Integer): Integer;
+var
+  S: string;
+begin
+  if StartIndex > 1 then
+  begin
+    S := Copy(Text, StartIndex, MaxInt);
+    Result := Pos(Pat, S);
+  end else
+    Result := Pos(Pat, Text);
   if Result > 0 then
      Inc(Result, Pred(StartIndex));
 end;
@@ -1875,6 +1899,21 @@ begin
     WinControl := Control as TWinControl;
     for i := 0 to WinControl.ControlCount - 1 do
       IterateOverControls(WinControl.Controls[i], ActionProc);
+  end;
+end;
+
+function TryFocusControl(Control: TWinControl): Boolean;
+begin
+  Result := False;
+  if Assigned(Control) then begin
+    if Control.CanFocus and Control.Visible then begin
+      try
+        Control.SetFocus;
+        Result := True;
+      except
+        // Ignore focus errors
+      end;
+    end;
   end;
 end;
 
@@ -3306,20 +3345,42 @@ begin
   Assert(Assigned(Strings));
   Strings.Clear;
 
+  Dest := nil;
   Src := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   try
     Dest := TMemoryStream.Create;
-    try
-      ObjectResourceToText(Src, Dest, Format);
-      WasBinary := (Format = sofBinary);
-      Dest.Position := 0;
-      Strings.LoadFromStream(Dest);
-    finally
-      FreeAndNil(Dest);
+    Src.Position := 0;
+    Format := TestStreamFormat(Src);
+    Src.Position := 0;
+    WasBinary := (Format = sofBinary);
+    case Format of
+      sofUnknown:
+        raise Exception.CreateFmt('Invalid stream format for form file: %s.  (sofUnknown)', [FileName]);
+      sofBinary:
+        begin
+          ObjectResourceToText(Src, Dest, Format);
+          Dest.Position := 0;
+          if Format = sofUTF8Text then
+            Strings.LoadFromStream(Dest, TEncoding.UTF8)
+          else
+            Strings.LoadFromStream(Dest, TEncoding.Default);
+        end;
+      sofText:
+        Strings.LoadFromStream(Src);
+      sofUTF8Text:
+        Strings.LoadFromStream(Src, TEncoding.UTF8);
     end;
   finally
     FreeAndNil(Src);
+    FreeAndNil(Dest);
   end;
+end;
+
+procedure LoadFormFileToStrings(const FileName: string; Strings: TStrings); overload;
+var
+  WasBinary: Boolean;
+begin
+  LoadFormFileToStrings(FileName, Strings, WasBinary);
 end;
 
 function IsBinaryForm(const FileName: string): Boolean;
@@ -3335,7 +3396,6 @@ begin
       FormStream.Position := 0;
       FormStream.ReadBuffer(Buf, SizeOf(Buf));
       FormStream.Position := 0;
-      // If we have a binary format form, we convert it to text
       Assert((Low(Buf) = 0) and (High(Buf) = 2));
       if (Buf[0] = $FF) and (Buf[1] = $0A) and (Buf[2] = $00) then
         Result := True;
@@ -3343,6 +3403,16 @@ begin
       FreeAndNil(FormStream);
     end;
   end;
+end;
+
+procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+begin
+  if not FileExists(FileName) then
+    raise Exception.CreateFmt('The file %s does not exist', [FileName]);
+  if IsForm(FileName) then
+    LoadFormFileToStrings(FileName, Data)
+  else // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
+    Data.LoadFromFile(FileName);
 end;
 
 function ThisDllName: string;
