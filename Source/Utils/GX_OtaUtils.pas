@@ -176,9 +176,15 @@ procedure GxOtaReplaceSelection(const Editor: IOTASourceEditor; ViewNum: Integer
 // Get the text of a source file or form whether it is open or not
 // and assign it to Lines.Text
 function GxOtaGetFileAsText(const FileName: string; Lines: TStrings; out WasBinary: Boolean): Boolean;
+// Load a file opened into the IDE to a unciode string list
+procedure GxOtaLoadIDEFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+procedure GxOtaLoadSourceEditorToUnicodeStrings(SourceEditor: IOTASourceEditor; Data: TGXUnicodeStringList);
+procedure GxOtaLoadFormEditorToUnicodeStrings(FormEditor: IOTAFormEditor; Data: TGXUnicodeStringList);
 
-// Read the requested file's contents into a WideString.  Supports ANSI and UNICODE files.
-function GxOtaFileToWideString(const FileName: WideString; Data: WideString; out WasBinary: Boolean): Boolean;
+
+// Read the requested file's contents into a unicode string list.  This supports
+// open/closed files, UTF-8 in the edior, and UTF-8/16/32 on disk, and form files.
+procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
 
 // Test whether the last attribute before the current one is part of another
 // one passed in InElement - or something else.  This is only called if
@@ -457,6 +463,7 @@ procedure GxOtaAssertSourceEditorNotReadOnly(SourceEditor: IOTASourceEditor);
 // Returns a module interface for a given filename
 // May return nil if no such module is open.
 function GxOtaGetModule(const FileName: string): IOTAModule;
+function GxOtaGetSourceEditor(const FileName: string): IOTASourceEditor;
 
 // Returns a fully qualified name of the current file,
 // which could either be a form or unit (.pas/.cpp/.dfm/.xfm etc.).
@@ -528,6 +535,7 @@ function GxOtaGetFormBiDiMode(Form: IOTAFormEditor): TBiDiMode;
 function IsValidExpertDll(const FileName: string): Boolean;
 
 function IsStandAlone: Boolean;
+function RunningInsideIDE: Boolean;
 
 // Consolidate with GxOtaGotoPosition?
 procedure GxOtaSetCurrentSourcePosition(Position: Integer);
@@ -567,6 +575,8 @@ function IDEEditorStringToString(const S: UTF8String): string; overload;
 {$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
 function IDEEditorStringToString(const S: string): string; overload;
 {$IFEND}
+
+function HackBadIDEUTF8StringToString(const S: string): string;
 
 type
   TBaseIdeNotifier = class(TNotifierObject, IOTAIDENotifier)
@@ -1383,6 +1393,8 @@ begin
   EditBlock := EditView.Block;
   if Assigned(EditBlock) then begin
     Result := IDEEditorStringToString(EditBlock.Text);
+    Result := HackBadIDEUTF8StringToString(Result);
+
     if not IncludeTrailingCRLF and (EditBlock.Style in [btNonInclusive]) then
       RemoveLastEOL(Result);
   end;
@@ -1900,14 +1912,19 @@ end;
 function GxOtaModuleIsShowingFormSource(Module: IOTAModule): Boolean;
 var
   Editor: IOTAEditor;
+  i: Integer;
 begin
   Result := False;
-  if Module.GetModuleFileCount = 1 then
+  if not Assigned(Module) then
+    Exit;
+  for i := 0 to Module.GetModuleFileCount - 1 do
   begin
-    Editor := GxOtaGetFileEditorForModule(Module, 0);
-    Assert(Assigned(Editor));
-    if IsForm(Editor.GetFileName) then
+    Editor := Module.ModuleFileEditors[i];
+    if Assigned(Editor) and IsForm(Editor.FileName) and Supports(Editor, IOTASourceEditor) then
+    begin
       Result := True;
+      Break;
+    end;
   end;
 end;
 
@@ -2533,6 +2550,16 @@ begin
   Assert(Assigned(ModuleServices));
 
   Result := ModuleServices.FindModule(FileName);
+end;
+
+function GxOtaGetSourceEditor(const FileName: string): IOTASourceEditor;
+var
+  Module: IOTAModule;
+begin
+  Result := nil;
+  Module := GxOtaGetModule(FileName);
+  if Assigned(Module) then
+    Result := GxOtaGetSourceEditorFromModule(Module, FileName)
 end;
 
 function GxOtaGetCurrentSourceFile: string;
@@ -3268,6 +3295,11 @@ begin
   Result := (BorlandIDEServices = nil);
 end;
 
+function RunningInsideIDE: Boolean;
+begin
+  Result := not IsStandAlone;
+end;
+
 { TGxEditorStream }
 
 constructor TGxEditorReadStream.Create(Editor: IOTASourceEditor);
@@ -3854,121 +3886,106 @@ begin
   Result := True;
 end;
 
-function GxOtaFileToWideString(const FileName: WideString; Data: WideString; out WasBinary: Boolean): Boolean;
+procedure GxOtaLoadIDEFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
 var
-  FileReader: TEditReader;
-  MemStream: TMemoryStream;
-  FormStream: TMemoryStream;
-  BaseFileName: WideString;
+  BaseFileName: string;
   Module: IOTAModule;
-  FormEditor: IOTAFormEditor;
-  RootComponent: IOTAComponent;
+  BaseModule: IOTAModule;
   SourceEditor: IOTASourceEditor;
-  Component: TComponent;
-  EditStream: TGxEditorReadStream;
-  FormLines: TStringList;
+  FormEditor: IOTAFormEditor;
 begin
-  WasBinary := False;
-  Result := False;
-  Exit; // NOT IMPLEMENTED YET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Assert(Assigned(Data));
+  Data.Clear;
+  Module := GxOtaGetModule(FileName);
+  BaseFileName := GxOtaGetBaseModuleFileName(FileName);
+  BaseModule := GxOtaGetModule(BaseFileName);
 
-  MemStream := TMemoryStream.Create;
-  try
-    if IsForm(FileName) then
+  if IsForm(FileName) then
+  begin
+    // Is the form currently open as text?
+    if GxOtaModuleIsShowingFormSource(Module) then
+      GxOtaLoadSourceEditorToUnicodeStrings(GxOtaGetSourceEditor(FileName), Data)
+    else if GxOtaIsFileOpen(BaseFileName) then
     begin
-      if IsStandAlone then
-      begin
-        //LoadFormFileToWideString(FileName, Data, WasBinary);
-        FormLines := TStringList.Create;
-        try
-          LoadFormFileToStrings(FileName, FormLines, WasBinary);
-          Data := FormLines.Text;
-        finally
-          FreeAndNil(FormLines);
-        end;
-      end
-      else
-      begin
-        BaseFileName := GxOtaGetBaseModuleFileName(FileName);
-        // Is the form currently open as text
-        if GxOtaIsFileOpen(FileName) then
-        begin
-          Module := GxOtaGetModule(FileName);
-          if not Assigned(Module) then
-            Exit;
-          SourceEditor := GxOtaGetSourceEditorFromModule(Module, FileName);
-          if not Assigned(SourceEditor) then
-            Exit;
-          EditStream := TGxEditorReadStream.Create(SourceEditor);
-          try
-            MemStream.LoadFromStream(EditStream);
-            MemStream.Position := 0;
-          finally
-            FreeAndNil(EditStream);
-          end;
-          AnsiStreamToWideString(MemStream, Data);
-        end
-        else if GxOtaIsFileOpen(BaseFileName) then
-        begin
-          Module := GxOtaGetModule(BaseFileName);
-          if not Assigned(Module) then
-            Exit;
-          FormEditor := GxOtaGetFormEditorFromModule(Module);
-          if not Assigned(FormEditor) then
-            Exit;
-          RootComponent := FormEditor.GetRootComponent;
-          if RootComponent <> nil then
-          begin
-            Component := GxOtaGetNativeComponent(RootComponent);
-            if Component <> nil then
-            begin
-              FormStream :=  TMemoryStream.Create;
-              try
-                FormStream.WriteComponent(Component);
-                FormStream.Position := 0;
-                ObjectBinaryToText(FormStream, MemStream);
-                MemStream.Position := 0;
-              finally;
-                FreeAndNil(FormStream);
-              end;
-              AnsiStreamToWideString(MemStream, Data);
-            end;
-          end;
-        end
-        else
-          //LoadFormFileToStrings(FileName, Lines, WasBinary)
-      end;
+      FormEditor := GxOtaGetFormEditorFromModule(BaseModule);
+      GxOtaLoadFormEditorToUnicodeStrings(FormEditor, Data);
     end
-    else
+    else if FileExists(FileName) then
+      LoadDiskFileToUnicodeStrings(FileName, Data);
+  end
+  else
+  begin
+    SourceEditor := GxOtaGetSourceEditorFromModule(BaseModule, FileName);
+    // If there is no source editor for the file name, we can't load it
+    // We might be trying to load a .pas with the .dfm open as text
+    if Assigned(SourceEditor) then begin
+      // TODO: Test bdsgroup, bdsproj, dproj
+      GxOtaLoadSourceEditorToUnicodeStrings(GxOtaGetSourceEditor(FileName), Data);
+    end
+    else if FileExists(FileName) then // This might be an older version, but we have no choice
+      LoadDiskFileToUnicodeStrings(FileName, Data);
+  end;
+end;
+
+procedure GxOtaLoadSourceEditorToUnicodeStrings(SourceEditor: IOTASourceEditor; Data: TGXUnicodeStringList);
+var
+  EditStream: TGxEditorReadStream;
+begin
+  Data.Clear;
+  if not Assigned(SourceEditor) then
+    Exit;
+  //TODO: Check stream format for forms as text (Ansi with escaped unicode, or UTF-8) in Delphi 2007/2009
+  EditStream := TGxEditorReadStream.Create(SourceEditor);
+  try
+    Data.LoadFromStream(EditStream {$IFDEF UNICODE}, TEncoding.UTF8{$ENDIF});
+  finally
+    FreeAndNil(EditStream);
+  end;
+end;
+
+procedure GxOtaLoadFormEditorToUnicodeStrings(FormEditor: IOTAFormEditor; Data: TGXUnicodeStringList);
+var
+  RootComponent: IOTAComponent;
+  Component: TComponent;
+  FormStream, TextStream: TMemoryStream;
+begin
+  Assert(Assigned(Data));
+  if not Assigned(FormEditor) then
+    Exit;
+  RootComponent := FormEditor.GetRootComponent;
+  if RootComponent <> nil then
+  begin
+    Component := GxOtaGetNativeComponent(RootComponent);
+    if Component <> nil then
     begin
-      if IsStandAlone then
-        //Lines.LoadFromFile(FileName)
-      else
-      begin
-        BaseFileName := GxOtaGetBaseModuleFileName(FileName);
-        Module := GxOtaGetModule(BaseFileName);
-        if Assigned(Module) then
-        begin
-          SourceEditor := GxOtaGetSourceEditorFromModule(Module, FileName);
-          // If there is no source editor for the file name, we can't load it
-          // We might be trying to load a .pas with the .dfm open as text
-          if (not (IsBdsgroup(FileName) or IsBdsprojOrDproj(FileName))) and (not Assigned(SourceEditor)) then
-            Exit;
-        end;
-        FileReader := TEditReader.Create(FileName);
-        try
-          FileReader.SaveToStream(MemStream);
-          MemStream.Position := 0;
-        finally
-          FreeAndNil(FileReader);
-        end;
-        //Lines.LoadFromStream(MemStream);
+      TextStream := nil;
+      FormStream := TMemoryStream.Create;
+      try
+        TextStream := TMemoryStream.Create;
+        FormStream.WriteComponent(Component);
+        FormStream.Position := 0;
+        ObjectBinaryToText(FormStream, TextStream);
+        TextStream.Position := 0;
+        Data.LoadFromStream(TextStream);
+      finally;
+        FreeAndNil(FormStream);
+        FreeAndNil(TextStream);
       end;
     end;
-  finally
-    FreeAndNil(MemStream);
   end;
-  Result := True;
+end;
+
+procedure GxOtaLoadFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList);
+begin
+  Assert(Assigned(Data));
+  Data.Clear;
+  if IsEmpty(FileName) then
+    raise Exception.Create('Blank filenames are not allowed');
+
+  if RunningInsideIDE and GxOtaIsFileOpen(FileName, True) then
+    GxOtaLoadIDEFileToUnicodeStrings(FileName, Data)
+  else
+    LoadDiskFileToUnicodeStrings(FileName, Data)
 end;
 
 // Test whether the last attribute before the current one is part of another
@@ -4138,6 +4155,7 @@ var
   Editor: IOTAEditor;
   i: Integer;
   List: TStringList;
+  ModuleServices: IOTAModuleServices;
 
   procedure AddEditorDetails(AModule: IOTAModule);
   var
@@ -4155,27 +4173,42 @@ begin
   List := TStringList.Create;
   try
     Project := GxOtaGetCurrentProject;
-    Assert(Assigned(Project), 'No project open');
-    List.Add(Format('Project: %s (Personality: %s):', [Project.FileName, GxOtaGetCurrentProjectPersonality]));
-    AddEditorDetails(Project);
-    List.Add('');
-
-    for i := 0 to Project.GetModuleCount - 1 do
+    if not Assigned(Project) then
     begin
-      ModuleInfo := Project.GetModule(i);
-      Assert(Assigned(ModuleInfo));
-      List.Add(Format('ModuleInfo: %s (Name: %s, FormName: %s, DesignClass: %s):', [ModuleInfo.FileName, ModuleInfo.Name, ModuleInfo.FormName, ModuleInfo.DesignClass]));
-      Module := GxOtaGetModule(ModuleInfo.FileName);
-      if not Assigned(Module) then
-        List.Add('  <No IOTAModule>')
-      else
+      ModuleServices := BorlandIDEServices as IOTAModuleServices;
+      for i := 0 to ModuleServices.ModuleCount - 1 do
       begin
-        List.Add(Format('  Module: %s:', [Module.FileName]));
-        AddEditorDetails(Module);
+        Module := ModuleServices.Modules[i];
+        if Assigned(Module) then
+        begin
+          List.Add(Format('  Module: %s:', [Module.FileName]));
+          AddEditorDetails(Module);
+        end;
       end;
+    end
+    else
+    begin
+      List.Add(Format('Project: %s (Personality: %s):', [Project.FileName, GxOtaGetCurrentProjectPersonality]));
+      AddEditorDetails(Project);
       List.Add('');
+
+      for i := 0 to Project.GetModuleCount - 1 do
+      begin
+        ModuleInfo := Project.GetModule(i);
+        Assert(Assigned(ModuleInfo));
+        List.Add(Format('ModuleInfo: %s (Name: %s, FormName: %s, DesignClass: %s):', [ModuleInfo.FileName, ModuleInfo.Name, ModuleInfo.FormName, ModuleInfo.DesignClass]));
+        Module := GxOtaGetModule(ModuleInfo.FileName);
+        if not Assigned(Module) then
+          List.Add('  <No IOTAModule>')
+        else
+        begin
+          List.Add(Format('  Module: %s:', [Module.FileName]));
+          AddEditorDetails(Module);
+        end;
+        List.Add('');
+      end;
     end;
-    MessageBox(0, PChar(List.Text), 'Project Modules and Editors', MB_ICONINFORMATION or MB_OK);
+    MessageBox(0, PChar(List.Text), 'Modules and Editors', MB_ICONINFORMATION or MB_OK);
   finally
     FreeAndNil(List);
   end;
@@ -4310,7 +4343,7 @@ begin
       AddFmt('Block.StartingColumn: %d', [Block.StartingColumn]);
       AddFmt('Block.StartingRow: %d', [Block.StartingRow]);
       AddFmt('Block.Style: %s', [GetEnumName(TypeInfo(TOTABlockType), Ord(Block.Style))]);
-      AddFmt('Block.Text: %s', [Block.Text]);
+      AddFmt('Block.Text: %s', [HackBadIDEUTF8StringToString(Block.Text)]);
     end
     else
       Add('No IOTAEditView.Block');
@@ -4375,6 +4408,17 @@ begin
   Result := S;
 end;
 {$IFEND}
+
+function HackBadIDEUTF8StringToString(const S: string): string;
+begin
+  {$IFDEF UNICODE}
+  // Work around the fact that IOTAEditBlock.Text claims to return a
+  // string/UnicodeString but actually returns a corrupt UTF-8 string
+  Result := UTF8ToUnicodeString(PAnsiChar(AnsiString(S)));
+  {$ELSE}
+  Result := S;
+  {$ENDIF UNICODE}
+end;
 
 { TBaseIdeNotifier }
 
