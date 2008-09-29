@@ -81,6 +81,7 @@ OriginalFilename=GExpertsD6.dll
 ProductName=GExperts for Delphi 6
 ProductVersion=1.33
 Comments=Open Source
+CompileDate=Monday, September 29, 2008 12:24 AM
 [Excluded Packages]
 D:\Borland\Delphi6\Projects\Bpl\JclBaseExpertD60.bpl=JCL Package containing common units for JCL Experts
 D:\Borland\Delphi6\Bin\dclnet60.bpl=Borland Internet Components
