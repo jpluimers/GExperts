@@ -7,22 +7,15 @@ interface
 uses
   Classes,
   ToolsAPI,
-  GX_Search;
-  //GX_RegExp;
+  GX_GrepRegExSearch, GX_GenericUtils;
 
 type
   TGrepAction = (gaProjGrep, gaCurrentOnlyGrep, gaOpenFilesGrep, gaDirGrep, gaProjGroupGrep);
 
   // Saved grep settings (used for refresh)
   TGrepSettings = record
-    Code: Boolean;
-    Strings: Boolean;
-    Comments: Boolean;
-    SectionInterface: Boolean;
-    SectionImplementation: Boolean;
-    SectionInitialization: Boolean;
-    SectionFinalization: Boolean;
-    NoCase: Boolean;
+    IncludeComments: Boolean;
+    CaseSensitive: Boolean;
     WholeWord: Boolean;
     RegEx: Boolean;
     IncludeSubdirs: Boolean;
@@ -68,7 +61,7 @@ type
   TLineResult = class(TCollectionItem)
   private
     FLine: string;
-    FLineNo: Integer;
+    FLineNo: Integer; // 1-based
     FMatches: TLineMatches;
   public
     constructor Create(Collection: TCollection); override;
@@ -76,7 +69,7 @@ type
     function Add: TMatchResult;
   public
     property Line: string read FLine write FLine;
-    property LineNo: Integer read FLineNo write FLineNo;
+    property LineNo: Integer read FLineNo write FLineNo; // 1-based
     // Collection of all matches in a line
     property Matches: TLineMatches read FMatches;
   end;
@@ -124,9 +117,10 @@ type
     FFileResult: TFileResult;
     FSearcher: TSearcher;
     FSearchRoot: string;
-    procedure FoundIt(Sender: TObject; LineNo: Integer; const Line: string;
-      SPos, EPos: Integer);
-    procedure StartFileSearch(Sender: TObject);
+    procedure FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
+    procedure StartFileSearch(const FileName: string);
+    procedure ExecuteSearchOnFile(const FileName: string);
+    procedure SearchFormForFile(const FileName: string);
   private
     FGrepSettings: TGrepSettings;
     procedure GrepFile(const FileName: string);
@@ -152,7 +146,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Forms,
-  GX_GenericUtils, GX_OtaUtils, GX_EditReader;
+  GX_OtaUtils, GX_EditReader, GX_IdeUtils;
 
 { TLineMatches }
 
@@ -260,12 +254,10 @@ begin
 
       Assert(FFileResult = nil, 'FFileResult leak');
       FFileResult := nil;
-      FSearcher.FileName := FileName;
 
-      if (FGrepSettings.GrepAction = gaOpenFilesGrep) and (FSearcher.Mode = mmFile) then
+      if (FGrepSettings.GrepAction = gaOpenFilesGrep) and (not GxOtaIsFileOpen(FileName)) then
         Exit;
-
-      FSearcher.Execute;
+      ExecuteSearchOnFile(FileName);
       FFileResult := nil;
     end;
   except
@@ -358,11 +350,8 @@ begin
   FFileResult := nil;
 
   FSearchRoot := ExtractFilePath(CurrentFile);
-  if CurrentFile <> '' then
-  begin
-    FSearcher.FileName := CurrentFile;
-    FSearcher.Execute;
-  end
+  if NotEmpty(CurrentFile) and (not FileIsWelcomePage(CurrentFile)) then
+    ExecuteSearchOnFile(CurrentFile)
   else
     raise Exception.Create(SNoFileOpen);
 end;
@@ -447,12 +436,7 @@ begin
             FFileResult := nil;
 
             SearchFile := Dir + Search.Name;
-            if FDupeFileList.IndexOf(SearchFile) = -1 then
-            begin
-              FSearcher.FileName := SearchFile;
-              FDupeFileList.Add(SearchFile);
-              FSearcher.Execute;
-            end;
+            ExecuteSearchOnFile(SearchFile);
             FFileResult := nil;
 
             if FAbortSignalled then
@@ -475,29 +459,15 @@ begin
   FFileSearchCount := 0;
   FMatchCount := 0;
 
-  FSearcher := TSearcher.Create('');
+  FSearcher := TSearcher.Create;
   try
     FSearcher.OnFound := FoundIt;
-    FSearcher.OnStartSearch := StartFileSearch;
-
-    FSearcher.Code := FGrepSettings.Code;
-    FSearcher.Strings := FGrepSettings.Strings;
-    FSearcher.Comments := FGrepSettings.Comments;
-    FSearcher.SectionInterface := FGrepSettings.SectionInterface;
-    FSearcher.SectionImplementation := FGrepSettings.SectionImplementation;
-    FSearcher.SectionInitialization := FGrepSettings.SectionInitialization;
-    FSearcher.SectionFinalization := FGrepSettings.SectionFinalization;
-
-    FSearcher.IncludeForms := FGrepSettings.IncludeForms;
-    if FGrepSettings.NoCase then
-      FSearcher.SearchOptions := [soCaseSensitive];
-    if FGrepSettings.WholeWord then
-      FSearcher.SearchOptions := FSearcher.SearchOptions + [soWholeWord];
-    if FGrepSettings.RegEx then
-      FSearcher.SearchOptions := FSearcher.SearchOptions + [soRegEx];
-    FSearcher.ANSICompatible := FGrepSettings.ANSICompatible;
-
-    FSearcher.SetPattern(FGrepSettings.Pattern);
+    //FSearcher.NoComments := FGrepSettings.NoComments;
+    //FSearcher.IncludeForms := FGrepSettings.IncludeForms;
+    FSearcher.CaseSensitive := FGrepSettings.CaseSensitive;
+    FSearcher.WholeWord := FGrepSettings.WholeWord;
+    FSearcher.RegularExpression := FGrepSettings.RegEx;
+    FSearcher.Pattern := FGrepSettings.Pattern;
 
     FDupeFileList := TStringList.Create;
     try
@@ -534,7 +504,44 @@ begin
   end;
 end;
 
-procedure TGrepSearchRunner.FoundIt(Sender: TObject; LineNo: Integer; const Line: string; SPos, EPos: Integer);
+procedure TGrepSearchRunner.SearchFormForFile(const FileName: string);
+var
+  Module: IOTAModule;
+  FormEditor: IOTAFormEditor;
+  FormFile: string;
+begin
+  Module := GxOtaGetModule(FileName);
+  FormEditor := GxOtaGetFormEditorFromModule(Module);
+  if Assigned(FormEditor) then
+    ExecuteSearchOnFile(FormEditor.FileName)
+  else
+  begin
+    FormFile := ChangeFileExt(FileName, '.dfm');
+    if not FileExists(FormFile) then
+      FormFile := ChangeFileExt(FormFile, '.nfm');
+    if not FileExists(FormFile) then
+      FormFile := ChangeFileExt(FormFile, '.xfm');
+    if FileExists(FormFile) then
+      ExecuteSearchOnFile(FormFile);
+  end;
+end;
+
+procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string);
+begin
+  Assert(Assigned(FDupeFileList));
+  if FDupeFileList.IndexOf(FileName) = -1 then
+  begin
+    StartFileSearch(FileName);
+    FSearcher.FileName := FileName;
+    FDupeFileList.Add(FileName);
+    FSearcher.Execute;
+
+    if FGrepSettings.IncludeForms and (IsPas(FileName) or IsCpp(FileName)) then
+      SearchFormForFile(FileName);
+  end;
+end;
+
+procedure TGrepSearchRunner.FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
 var
   ALineResult: TLineResult;
   AMatchResult: TMatchResult;
@@ -572,17 +579,16 @@ begin
   end;
 
   AMatchResult := ALineResult.Add;
-  AMatchResult.SPos := SPos;
-  AMatchResult.EPos := EPos;
+  AMatchResult.SPos := StartCol;
+  AMatchResult.EPos := EndCol;
   FFileResult.TotalMatches := FFileResult.TotalMatches + 1;
 end;
 
-procedure TGrepSearchRunner.StartFileSearch(Sender: TObject);
+procedure TGrepSearchRunner.StartFileSearch(const FileName: string);
 begin
-  Assert(Assigned(Sender as TSearcher));
   Inc(FFileSearchCount);
   if Assigned(FOnSearchFile) then
-    FOnSearchFile(Self, FSearcher.FileName);
+    FOnSearchFile(Self, FileName);
 end;
 
 procedure TGrepSearchRunner.DoHitMatch(LineNo: Integer; const Line: string;

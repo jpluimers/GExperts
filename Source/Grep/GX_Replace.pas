@@ -66,7 +66,7 @@ var
   InMemory: Boolean;
   TempString: string;
   MatchFile: string;
-  TempFile: TStrings;
+  TempFile: TGXUnicodeStringList;
   LineResult : TLineResult;
   Module: IOTAModule;
   EditWriter: IOTAEditWriter;
@@ -85,10 +85,10 @@ var
       SourceEditor := GxOtaGetSourceEditorFromModule(Module, MatchFile);
       if not Assigned(SourceEditor) then
         raise Exception.Create(SUnableToOpen + MatchFile);
-      GxOtaGetFileAsText(SourceEditor.FileName, TempFile, WasBinary);
+      GxOtaLoadFileToUnicodeStrings(SourceEditor.FileName, TempFile, WasBinary);
     end
     else
-      GxOtaGetFileAsText(MatchFile, TempFile, WasBinary);
+      GxOtaLoadFileToUnicodeStrings(MatchFile, TempFile, WasBinary);
   end;
 
   procedure DoReplacement;
@@ -173,7 +173,7 @@ begin
   else
     MatchFile := AFileResult.FileName;
 
-  TempFile := TStringList.Create;
+  TempFile := TGXUnicodeStringList.Create;
   try
     InMemory := GxOtaIsFileOpen(MatchFile, True);
     try

@@ -413,10 +413,9 @@ resourcestring
 var
   CurrentLine: TLineResult;
   MatchLineNo, BeginLineNo, EndLineNo, REMatchLineNo: Integer;
-  FileLines: TStringList;
+  FileLines: TGXUnicodeStringList;
   FileName: string;
   i: Integer;
-  WasBinary: Boolean;
 begin
   if not ShowContext then
     Exit;
@@ -434,9 +433,10 @@ begin
         FileName := TFileResult(CurrentLine.Collection).FileName;
         MatchLineNo := CurrentLine.LineNo - 1;
 
-        FileLines := TStringList.Create;
+        FileLines := TGXUnicodeStringList.Create;
         try
-          if not GxOtaGetFileAsText(FileName, FileLines, WasBinary) then
+          GxOtaLoadFileToUnicodeStrings(FileName, FileLines);
+          if FileLines.Count < 1 then
           begin
             reContext.Lines.Text := SMatchContextNotAvail;
             Exit;
@@ -1165,7 +1165,7 @@ var
   Dlg: TfmGrepReplace;
 begin
   ShowGxMessageBox(TShowUnicodeReplaceMessage);
-  
+
   Result := False;
   Dlg := TfmGrepReplace.Create(nil);
   try

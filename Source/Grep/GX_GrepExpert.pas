@@ -16,7 +16,7 @@ type
     FReplaceList: TStrings;
     FMaskList: TStrings;
     FDirList: TStrings;
-    FGrepNoCase: Boolean;
+    FGrepCaseSensitive: Boolean;
     FGrepCode: Boolean;
     FGrepStrings: Boolean;
     FGrepComments: Boolean;
@@ -54,7 +54,7 @@ type
     property GrepMiddle: Boolean read FGrepMiddle write FGrepMiddle;
     property GrepANSICompatible: Boolean read FGrepANSICompatible write FGrepANSICompatible;
     property GrepExpandAll: Boolean read FGrepExpandAll write FGrepExpandAll;
-    property GrepNoCase: Boolean read FGrepNoCase write FGrepNoCase;
+    property GrepCaseSensitive: Boolean read FGrepCaseSensitive write FGrepCaseSensitive;
     property GrepCode: Boolean read FGrepCode write FGrepCode;
     property GrepStrings: Boolean read FGrepStrings write FGrepStrings;
     property GrepComments: Boolean read FGrepComments write FGrepComments;
@@ -192,7 +192,7 @@ procedure TGrepExpert.InternalSaveSettings(Settings: TGExpertsSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // do not localize any of the following lines
-  Settings.WriteBool(ConfigurationKey, 'NoCase', GrepNoCase);
+  Settings.WriteBool(ConfigurationKey, 'CaseSensitive', GrepCaseSensitive);
   Settings.WriteBool(ConfigurationKey, 'Code', GrepCode);
   Settings.WriteBool(ConfigurationKey, 'Strings', GrepStrings);
   Settings.WriteBool(ConfigurationKey, 'NoComments', not GrepComments);
@@ -258,7 +258,7 @@ var
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the following lines
-  FGrepNoCase := Settings.ReadBool(ConfigurationKey, 'NoCase', False);
+  FGrepCaseSensitive := Settings.ReadBool(ConfigurationKey, 'CaseSensitive', False);
   FGrepCode := Settings.ReadBool(ConfigurationKey, 'Code', True);
   FGrepStrings := Settings.ReadBool(ConfigurationKey, 'Strings', True);
   FGrepComments := not Settings.ReadBool(ConfigurationKey, 'NoComments', False);

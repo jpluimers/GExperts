@@ -13,7 +13,9 @@ type
     lblFind: TLabel;
     cbText: TComboBox;
     gbxOptions: TGroupBox;
-    cbNoCase: TCheckBox;
+    cbCaseSensitive: TCheckBox;
+    cbNoComments: TCheckBox;
+    cbForms: TCheckBox;
     gbxWhere: TGroupBox;
     rbAllProjFiles: TRadioButton;
     rbOpenFiles: TRadioButton;
@@ -32,16 +34,6 @@ type
     btnBrowse: TButton;
     lblDirectory: TLabel;
     rbAllProjGroupFiles: TRadioButton;
-    gbxSections: TGroupBox;
-    cbInterface: TCheckBox;
-    cbInitialization: TCheckBox;
-    cbImplementation: TCheckBox;
-    cbFinalization: TCheckBox;
-    gbxTextTypes: TGroupBox;
-    cbCode: TCheckBox;
-    cbStrings: TCheckBox;
-    cbComments: TCheckBox;
-    cbForms: TCheckBox;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -74,7 +66,8 @@ implementation
 
 uses
   SysUtils, Windows, Messages, Graphics, Menus,
-  GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions;
+  GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions,
+  GX_GrepRegExSearch, RegExpr;
 
 resourcestring
   SGrepResultsNotActive = 'The Grep Results window is not active';
@@ -177,8 +170,8 @@ begin
   if not Assigned(fmGrepResults) then
     raise Exception.Create(SGrepResultsNotActive);
 
-  GrepExpert := fmGrepResults.GrepExpert;
-  Assert(Assigned(GrepExpert));
+   GrepExpert := fmGrepResults.GrepExpert;
+   Assert(Assigned(GrepExpert));
 
   Dialog := TfmGrepOptions.Create(nil);
   try
@@ -223,6 +216,20 @@ begin
   end;
 
   SaveFormSettings;
+
+  if cbRegEx.Checked then
+  try
+    ExecRegExpr(cbText.Text, '');
+  except
+    on E: ERegExpr do begin
+      ShowError(E.Message);
+      TryFocusControl(cbText);
+      cbText.SelStart := E.CompilerErrorPos;
+      cbText.SelLength := 0;
+      Abort;
+    end;
+  end;
+
   ModalResult := mrOk;
 end;
 
@@ -238,14 +245,8 @@ begin
   AddMRUString(cbDirectory.Text, FGrepExpert.DirList, True);
   AddMRUString(cbMasks.Text, FGrepExpert.MaskList, False);
 
-  FGrepExpert.GrepNoCase := cbNoCase.Checked;
-  FGrepExpert.GrepCode := cbCode.Checked;
-  FGrepExpert.GrepStrings := cbStrings.Checked;
-  FGrepExpert.GrepComments := cbComments.Checked;
-  FGrepExpert.GrepInterface := cbInterface.Checked;
-  FGrepExpert.GrepImplementation := cbImplementation.Checked;
-  FGrepExpert.GrepInitialization := cbInitialization.Checked;
-  FGrepExpert.GrepFinalization := cbFinalization.Checked;
+  FGrepExpert.GrepCaseSensitive := cbCaseSensitive.Checked;
+  //FGrepExpert.IncludeComments := not cbNoComments.Checked;
   FGrepExpert.GrepForms := cbForms.Checked;
   FGrepExpert.GrepSub := cbInclude.Checked;
   FGrepExpert.GrepWholeWord := cbWholeWord.Checked;
@@ -311,14 +312,8 @@ begin
   cbDirectory.Items.Assign(FGrepExpert.DirList);
   cbMasks.Items.Assign(FGrepExpert.MaskList);
 
-  cbNoCase.Checked := FGrepExpert.GrepNoCase;
-  cbCode.Checked := FGrepExpert.GrepCode;
-  cbStrings.Checked := FGrepExpert.GrepStrings;
-  cbComments.Checked := FGrepExpert.GrepComments;
-  cbInterface.Checked := FGrepExpert.GrepInterface;
-  cbImplementation.Checked := FGrepExpert.GrepImplementation;
-  cbInitialization.Checked := FGrepExpert.GrepInitialization;
-  cbFinalization.Checked := FGrepExpert.GrepFinalization;
+  cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
+  //cbNoComments.Checked := not FGrepExpert.GrepIncludeComments;
   cbForms.Checked := FGrepExpert.GrepForms;
   cbInclude.Checked := FGrepExpert.GrepSub;
   cbWholeWord.Checked := FGrepExpert.GrepWholeWord;
@@ -377,14 +372,8 @@ end;
 
 procedure TfmGrepSearch.RetrieveSettings(var Value: TGrepSettings);
 begin
-  Value.Code := cbCode.Checked;
-  Value.Strings := cbStrings.Checked;
-  Value.Comments := cbComments.Checked;
-  Value.SectionInterface := cbInterface.Checked;
-  Value.SectionImplementation := cbImplementation.Checked;
-  Value.SectionInitialization := cbInitialization.Checked;
-  Value.SectionFinalization := cbFinalization.Checked;
-  Value.NoCase := cbNoCase.Checked;
+  Value.IncludeComments := not cbNoComments.Checked;
+  Value.CaseSensitive := cbCaseSensitive.Checked;
   Value.WholeWord := cbWholeWord.Checked;
   Value.RegEx := cbRegEx.Checked;
   Value.Pattern := cbText.Text;
