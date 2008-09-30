@@ -2085,7 +2085,7 @@ Action.BuildVersion = BuildVersion
               <Property name="LogOutput" type="WordBool">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dDelphi2007 /dVersion=%ProductVersion%]]>
+              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dRS2009 /dVersion=%ProductVersion%]]>
                 </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
@@ -2127,7 +2127,7 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXDelphi2007-%SetupVersion%%SetupPostfix%.exe</Property>
+              <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXRS2009-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
               </Object>
             </Object>
