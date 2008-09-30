@@ -845,28 +845,25 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="0" name="PropertySetName" type="string">GExpertsVersion</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Object Class="TFBWin32VersionInfoPropertySet" XMLID="{6B0899DD-8531-4643-9541-71E8719661C8}"><Property name="BuildVersion" type="Integer">0</Property>
-                <Property MultiValue="1" name="CompanyName" type="string"><![CDATA[Erik Berry and the GExperts Development Team]]>
-                  </Property>
+              <Object Class="TFBWin32VersionInfoPropertySet" XMLID="{FA6B2A29-EC3F-45D2-AA8F-D37EA4B1AC05}"><Property name="BuildVersion" type="Integer">0</Property>
+                <Property MultiValue="0" name="CompanyName" type="string"></Property>
                 <Property MultiValue="0" name="CompileDate" type="string"></Property>
                 <Property name="DebugBuild" type="Boolean">False</Property>
-                <Property name="DLL" type="Boolean">True</Property>
-                <Property MultiValue="1" name="FileDescription" type="string"><![CDATA[GExperts IDE Addin]]>
-                  </Property>
+                <Property name="DLL" type="Boolean">False</Property>
+                <Property MultiValue="0" name="FileDescription" type="string"></Property>
                 <Property MultiValue="0" name="FileVersion" type="string"></Property>
                 <Property MultiValue="0" name="InternalName" type="string"></Property>
                 <Property MultiValue="0" name="LegalCopyright" type="string"></Property>
                 <Property MultiValue="0" name="LegalTrademarks" type="string"></Property>
-                <Property name="MajorVersion" type="Integer">1</Property>
-                <Property name="MinorVersion" type="Integer">3</Property>
+                <Property name="MajorVersion" type="Integer">0</Property>
+                <Property name="MinorVersion" type="Integer">0</Property>
                 <Property MultiValue="0" name="Name" type="string">GExpertsVersion</Property>
                 <Property MultiValue="0" name="OriginalFilename" type="string"></Property>
                 <Property name="PreReleaseBuild" type="Boolean">False</Property>
                 <Property name="PrivateBuild" type="Boolean">False</Property>
-                <Property MultiValue="1" name="ProductName" type="string"><![CDATA[GExperts IDE Addin]]>
-                  </Property>
-                <Property MultiValue="0" name="ProductVersion" type="string">1.33</Property>
-                <Property name="ReleaseVersion" type="Integer">3</Property>
+                <Property MultiValue="0" name="ProductName" type="string"></Property>
+                <Property MultiValue="0" name="ProductVersion" type="string"></Property>
+                <Property name="ReleaseVersion" type="Integer">0</Property>
                 <Property name="SpecialBuild" type="Boolean">False</Property>
                 <Property MultiValue="0" name="SpecialBuildDetails" type="string"></Property>
                 </Object>
@@ -886,47 +883,49 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="PropertySetName" type="string">GExpertsVersion</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
-              <Property name="SetValuesTo" type="TStrings"><![CDATA[%MajorVersion%
-%MinorVersion%
-%ReleaseVersion%
-%BuildVersion%
+              <Property name="SetValuesTo" type="TStrings"><![CDATA[%BuildVersion%
 Erik Berry and the GExperts Development Team
-GExperts IDE Addin
-
-
-
-
-
-GExperts IDE Addin
-%MajorVersion%.%MinorVersion%%ReleaseVersion%
-
-
-
 
 
 1
+GExperts IDE Addin
+
+
+
+
+%MajorVersion%
+%MinorVersion%
+
+
+
+GExperts IDE Addin
+%MajorVersion%.%MinorVersion%.%ReleaseVersion%
+%ReleaseVersion%
+
+
 ]]>
                 </Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property name="ValuesToSet" type="TStrings"><![CDATA[MajorVersion=-1
-MinorVersion=-1
-ReleaseVersion=-1
-BuildVersion=-1
+              <Property name="ValuesToSet" type="TStrings"><![CDATA[BuildVersion=-1
 CompanyName=-1
+CompileDate=0
+DebugBuild=0
+DLL=-1
 FileDescription=-1
 FileVersion=0
 InternalName=0
 LegalCopyright=0
 LegalTrademarks=0
+MajorVersion=-1
+MinorVersion=-1
 OriginalFilename=0
+PreReleaseBuild=0
+PrivateBuild=0
 ProductName=-1
 ProductVersion=-1
-CompileDate=0
-DebugBuild=0
+ReleaseVersion=-1
 SpecialBuild=0
-PrivateBuild=0
-PreReleaseBuild=0
-DLL=-1
+SpecialBuildDetails=0
 ]]>
                 </Property>
               </Object>
@@ -945,25 +944,26 @@ DLL=-1
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
-              <Property name="PropertiesToUpdate" type="TStrings"><![CDATA[MajorVersion=-1
-MinorVersion=-1
-ReleaseVersion=-1
-BuildVersion=-1
+              <Property name="PropertiesToUpdate" type="TStrings"><![CDATA[BuildVersion=-1
 CompanyName=-1
+CompileDate=0
+DebugBuild=0
+DLL=-1
 FileDescription=-1
 FileVersion=-1
 InternalName=0
 LegalCopyright=0
 LegalTrademarks=0
+MajorVersion=-1
+MinorVersion=-1
 OriginalFilename=0
+PreReleaseBuild=0
+PrivateBuild=0
 ProductName=-1
 ProductVersion=-1
-CompileDate=0
-DebugBuild=0
+ReleaseVersion=-1
 SpecialBuild=0
-PrivateBuild=0
-PreReleaseBuild=0
-DLL=-1
+SpecialBuildDetails=0
 ]]>
                 </Property>
               <Property MultiValue="0" name="PropertySetName" type="string">GExpertsVersion</Property>
@@ -2224,7 +2224,7 @@ Action.BuildVersion = BuildVersion
       </Object>
     <Object Class="TFBVariablesCollection" XMLID="999995"><Property MultiValue="0" name="Name" type="string"></Property>
       <Object Class="TFBVariable" XMLID="{6C587782-7CFE-4E43-AEF8-6D9709A4298A}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string"></Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">Beta1</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
