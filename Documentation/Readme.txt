@@ -1,4 +1,4 @@
-GExperts 1.33
+GExperts 1.33 Beta 1
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -104,7 +104,7 @@ VERSION 1.33 Beta (September 25, 2008)
   as the grep search and replace, source code parser (class browser,
   procedure list, etc.) have only very limited unicode support.  The Source
   Export, Code Librarian, and basic editor experts should have full unicode support.
-  Shutdown optimiztions, removal of all known memory leaks, and other minor tweaks.
+  Shutdown optimizations, removal of all known memory leaks, and other minor tweaks.
 - Grep Search: There is a new regular expression engine that supports a large
   subset of the Perl regular expression syntax, etc.  Grep can now search
   files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.  Note: Grep replace
