@@ -248,10 +248,6 @@ begin
 
     if IsBdsSourceFile(FileName) then
     begin
-      if FDupeFileList.IndexOf(FileName) > -1 then
-        Exit;
-      FDupeFileList.Add(FileName);
-
       Assert(FFileResult = nil, 'FFileResult leak');
       FFileResult := nil;
 
@@ -471,31 +467,31 @@ begin
 
     FDupeFileList := TStringList.Create;
     try
-    FDupeFileList.Sorted := True;
-    case FGrepSettings.GrepAction of
-      gaProjGrep:
-        GrepProject(GxOtaGetCurrentProject);
-      gaProjGroupGrep:
-        GrepProjectGroup;
-      gaCurrentOnlyGrep:
-        GrepCurrentSourceEditor;
-      gaOpenFilesGrep:
-        GrepProject(GxOtaGetCurrentProject);
-      gaDirGrep:
-        begin
-          if Length(Trim(FGrepSettings.Mask)) = 0 then
+      FDupeFileList.Sorted := True;
+      case FGrepSettings.GrepAction of
+        gaProjGrep:
+          GrepProject(GxOtaGetCurrentProject);
+        gaProjGroupGrep:
+          GrepProjectGroup;
+        gaCurrentOnlyGrep:
+          GrepCurrentSourceEditor;
+        gaOpenFilesGrep:
+          GrepProject(GxOtaGetCurrentProject);
+        gaDirGrep:
           begin
-            if GxOtaCurrentProjectIsNativeCpp then
-              GrepDirectories(FGrepSettings.Directories, '*.cpp;*.hpp;*.h;*.pas;*.inc')
-            else if GxOtaCurrentProjectIsCSharp then
-              GrepDirectories(FGrepSettings.Directories, '*.cs')
+            if Length(Trim(FGrepSettings.Mask)) = 0 then
+            begin
+              if GxOtaCurrentProjectIsNativeCpp then
+                GrepDirectories(FGrepSettings.Directories, '*.cpp;*.hpp;*.h;*.pas;*.inc')
+              else if GxOtaCurrentProjectIsCSharp then
+                GrepDirectories(FGrepSettings.Directories, '*.cs')
+              else
+                GrepDirectories(FGrepSettings.Directories, '*.pas;*.dpr;*.inc')
+            end
             else
-              GrepDirectories(FGrepSettings.Directories, '*.pas;*.dpr;*.inc')
-          end
-          else
-            GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
-        end;
-    end;	// end case
+              GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
+          end;
+      end;	// end case
     finally
       FreeAndNil(FDupeFileList);
     end;
