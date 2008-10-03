@@ -227,7 +227,7 @@ type
     {:Stream size. Reintroduced to override GetSize (static in TStream) with
       faster version.
     }
-    property  Size: {$IFDEF D7PLUS}int64{$ELSE}longint{$ENDIF D7PLUS} read GetSize write SetSize;
+    property  Size: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS} read GetSize write SetSize;
     {:Last Windows error code.
     }
     property  WindowsError: DWORD read GetWindowsError;

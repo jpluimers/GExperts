@@ -31,6 +31,9 @@ unit GpStreamWrapper;
   {$IF (RTLVersion >= 14)} // Delphi 6.0 or newer
     {$DEFINE D6PLUS}
   {$IFEND}
+  {$IF (RTLVersion >= 15)} // Delphi 7.0 or newer
+    {$DEFINE D7PLUS}
+  {$IFEND}
 {$ENDIF}
 
 interface
@@ -50,7 +53,7 @@ type
     swStream        : TStream;
   protected
     function  GetPosition: {$IFDEF D6PLUS}int64;{$ELSE}longint;{$ENDIF D6PLUS} virtual;
-    function  GetSize: {$IFDEF D6PLUS}int64; override;{$ELSE}longint; virtual;{$ENDIF D6PLUS}
+    function  GetSize: {$IFDEF D6PLUS}int64; {$IFDEF D7PLUS}override;{$ENDIF} {$ELSE}longint; virtual;{$ENDIF D6PLUS}
     procedure SetPosition(newPosition: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS}); virtual;
     procedure SetSize({$IFDEF D6PLUS}const{$ENDIF D6PLUS}newSize: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS}); override;
     function  WrappedSeek(offset: integer; mode: word): longint; {$IFDEF D6PLUS}overload;{$ENDIF D6PLUS}virtual;
