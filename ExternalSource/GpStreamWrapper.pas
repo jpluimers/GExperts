@@ -1,19 +1,24 @@
 {$B-,H+,J+,Q-,T-,X+}
 
-(*:Base stream wrapper class implementing the delayed Seek to cope with the
-   TStream's GetSize trick.
+(*:Some useful stream wrappers.
    @author Primoz Gabrijelcic
    @desc <pre>
-   (c) 2001 Primoz Gabrijelcic
+   (c) 2006 Primoz Gabrijelcic
    Free for personal and commercial use. No rights reserved.
 
    Author           : Primoz Gabrijelcic
    Creation date    : 2001-07-17
-   Last modification: 2003-05-16
-   Version          : 1.01
+   Last modification: 2006-09-21
+   Version          : 1.04
    </pre>
 *)(*
    History:
+     1.04: 2006-09-21
+       - TGpStreamWindow class moved to the GpStreams unit.
+     1.03: 2006-08-31
+       - Enable int64-based interface for Delphi 6.
+     1.02: 2006-04-14
+       - Added TGpStreamWindow class.
      1.01: 2003-05-16
        - Made Delphi 7 compatible.
      1.0: 2001-07-17
@@ -23,8 +28,8 @@
 unit GpStreamWrapper;
 
 {$IFDEF CONDITIONALEXPRESSIONS}
-  {$IF (RTLVersion >= 15)} // Delphi 7.0 or newer
-    {$DEFINE D7PLUS}
+  {$IF (RTLVersion >= 14)} // Delphi 6.0 or newer
+    {$DEFINE D6PLUS}
   {$IFEND}
 {$ENDIF}
 
@@ -44,18 +49,18 @@ type
     swStoredPosition: longint;
     swStream        : TStream;
   protected
-    function  GetPosition: {$IFDEF D7PLUS}int64;{$ELSE}longint;{$ENDIF D7PLUS} virtual;
-    function  GetSize: {$IFDEF D7PLUS}int64; override;{$ELSE}longint; virtual;{$ENDIF D7PLUS}
-    procedure SetPosition(newPosition: {$IFDEF D7PLUS}int64{$ELSE}longint{$ENDIF D7PLUS}); virtual;
-    procedure SetSize({$IFDEF D7PLUS}const{$ENDIF D7PLUS}newSize: {$IFDEF D7PLUS}int64{$ELSE}longint{$ENDIF D7PLUS}); override;
-    function  WrappedSeek(offset: integer; mode: word): longint; {$IFDEF D7Plus}overload;{$ENDIF D7PLUS}virtual;
-    {$IFDEF D7PLUS}
+    function  GetPosition: {$IFDEF D6PLUS}int64;{$ELSE}longint;{$ENDIF D6PLUS} virtual;
+    function  GetSize: {$IFDEF D6PLUS}int64; override;{$ELSE}longint; virtual;{$ENDIF D6PLUS}
+    procedure SetPosition(newPosition: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS}); virtual;
+    procedure SetSize({$IFDEF D6PLUS}const{$ENDIF D6PLUS}newSize: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS}); override;
+    function  WrappedSeek(offset: integer; mode: word): longint; {$IFDEF D6PLUS}overload;{$ENDIF D6PLUS}virtual;
+    {$IFDEF D6PLUS}
     function  WrappedSeek(offset: int64; origin: TSeekOrigin): int64; overload; virtual;
-    {$ENDIF D7PLUS}
+    {$ENDIF D6PLUS}
   public
     constructor Create(wrappedStream: TStream);
     procedure DelayedSeek; virtual;
-    function  Seek(offset: integer; mode: word): longint; {$IFDEF D7PLUS}overload;{$ENDIF D7PLUS} override;
+    function  Seek(offset: integer; mode: word): longint; {$IFDEF D6PLUS}overload;{$ENDIF D6PLUS} override;
     {:Wrapped (underlying) stream.}
     property  WrappedStream: TStream read swStream;
   end; { TGpStreamWrapper }
@@ -87,7 +92,7 @@ end; { TGpStreamWrapper.DelayedSeek }
   If descendant overrides this method, it must never call TGpStreamWrapper.Seek
   (directly or indirectly).
 }
-function TGpStreamWrapper.GetPosition: {$IFDEF D7PLUS}int64;{$ELSE}longint;{$ENDIF D7PLUS}
+function TGpStreamWrapper.GetPosition: {$IFDEF D6PLUS}int64;{$ELSE}longint;{$ENDIF D6PLUS}
 begin
   Result := WrappedStream.Position;
 end; { TGpStreamWrapper.GetPosition }
@@ -97,7 +102,7 @@ end; { TGpStreamWrapper.GetPosition }
   If descendant overrides this method, it must never call TGpStreamWrapper.Seek
   (directly or indirectly).
 }
-function TGpStreamWrapper.GetSize: {$IFDEF D7PLUS}int64;{$ELSE}longint;{$ENDIF D7PLUS}
+function TGpStreamWrapper.GetSize: {$IFDEF D6PLUS}int64;{$ELSE}longint;{$ENDIF D6PLUS}
 begin
   Result := WrappedStream.Size;
 end; { TGpStreamWrapper.GetSize }
@@ -161,7 +166,7 @@ end; { TGpStreamWrapper.Seek }
   If descendant overrides this method, it must never call TGpStreamWrapper.Seek
   (directly or indirectly).
 }
-procedure TGpStreamWrapper.SetPosition(newPosition: {$IFDEF D7PLUS}int64{$ELSE}longint{$ENDIF D7PLUS});
+procedure TGpStreamWrapper.SetPosition(newPosition: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS});
 begin
   WrappedStream.Position := newPosition;
 end; { TGpStreamWrapper.SetPosition }
@@ -171,7 +176,7 @@ end; { TGpStreamWrapper.SetPosition }
   If descendant overrides this method, it must never call TGpStreamWrapper.Seek
   (directly or indirectly).
 }
-procedure TGpStreamWrapper.SetSize({$IFDEF D7PLUS}const{$ENDIF D7PLUS}newSize: {$IFDEF D7PLUS}int64{$ELSE}longint{$ENDIF D7PLUS});
+procedure TGpStreamWrapper.SetSize({$IFDEF D6PLUS}const{$ENDIF D6PLUS}newSize: {$IFDEF D6PLUS}int64{$ELSE}longint{$ENDIF D6PLUS});
 begin
   WrappedStream.Size := newSize;
 end; { TGpStreamWrapper.SetSize }
@@ -187,11 +192,11 @@ begin
   Result := WrappedStream.Seek(offset, mode);
 end; { TGpStreamWrapper.WrappedSeek }
 
-{$IFDEF D7PLUS}
+{$IFDEF D6PLUS}
 function TGpStreamWrapper.WrappedSeek(offset: int64; origin: TSeekOrigin): int64;
 begin
   Result := WrappedStream.Seek(offset, origin);
 end;
-{$ENDIF D7PLUS}
+{$ENDIF D6PLUS}
 
 end.
