@@ -21,6 +21,8 @@ const
   EmptyString = '';
   // Note these don't handle german/polish/etc. extended ASCII alpha chars that are valid in Delphi 8+
   GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
+  MaxSmallInt = 32767;
+  MaxEditorCol = MaxSmallInt;
 
   {$IFNDEF GX_VER160_up}
   BIF_NONEWFOLDERBUTTON = $200;
