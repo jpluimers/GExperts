@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditPrintHeaderFooter.pas,v 1.10.2.6 2008/09/14 16:24:58 maelh Exp $
+$Id: SynEditPrintHeaderFooter.pas,v 1.10.2.7 2008/09/23 14:02:08 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -439,7 +439,7 @@ begin
     GetMem(Buffer, BufferSize + sizeof(WideChar));
     try
       Read(Buffer^, BufferSize);
-      PWideChar(Buffer)[BufferSize] := #0;
+      PWideChar(Buffer)[BufferSize div sizeof(WideChar)] := #0;
       FText := PWideChar(Buffer);
     finally
       FreeMem(Buffer);
@@ -453,7 +453,7 @@ begin
     GetMem(Buffer, BufferSize + 1);
     try
       Read(Buffer^, BufferSize);
-      PAnsiChar(Buffer)[BufferSize] := #0;
+      PAnsiChar(Buffer)[BufferSize div sizeof(AnsiChar)] := #0;
       aName := string(PAnsiChar(Buffer));
     finally
       FreeMem(Buffer);

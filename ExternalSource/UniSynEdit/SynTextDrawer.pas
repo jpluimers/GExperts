@@ -56,7 +56,7 @@
                         Added BaseStyle property to TheFontFont class.
  ==============================================================================}
 
-// $Id: SynTextDrawer.pas,v 1.6.2.16 2008/09/14 16:25:03 maelh Exp $
+// $Id: SynTextDrawer.pas,v 1.6.2.17 2008/09/17 13:59:12 maelh Exp $
 
 // SynEdit note: The name had to be changed to get SynEdit to install 
 //   together with mwEdit into the same Delphi installation
@@ -253,7 +253,7 @@ function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
 
 implementation
 
-{$IFDEF SynUniscribe}
+{$IFDEF SYN_UNISCRIBE}
 uses
   SynUsp10;
 {$ENDIF}
@@ -282,14 +282,14 @@ end;
 // See here for details: http://groups.google.com/group/microsoft.public.win32.programmer.international/browse_thread/thread/77cd596f2b96dc76/146300208098285c?lnk=st&q=font+substitution+problem#146300208098285c
 function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
   Rect: TRect; Str: PWideChar; Count: Integer; ETODist: PIntegerArray): Boolean;
-{$IFDEF SynUniscribe}
+{$IFDEF SYN_UNISCRIBE}
 const
   SSAnalyseFlags = SSA_GLYPHS or SSA_FALLBACK or SSA_LINK;
   SpaceString: UnicodeString = ' ';
 {$ENDIF}
 var
   TextOutFlags: DWORD;
-{$IFDEF SynUniscribe}
+{$IFDEF SYN_UNISCRIBE}
   GlyphBufferSize: Integer;
   saa: TScriptStringAnalysis;
 {$ENDIF}
@@ -300,7 +300,7 @@ begin
   if tooClipped in Options then
     TextOutFlags := TextOutFlags or ETO_CLIPPED;
 
-{$IFDEF SynUniscribe}
+{$IFDEF SYN_UNISCRIBE}
   if Usp10IsInstalled then
   begin
     // UniScribe requires that the string contains at least one character.
@@ -325,7 +325,7 @@ begin
     // value for GlyphBufferSize (see documentation of cGlyphs parameter of
     // ScriptStringAnalyse function)
     GlyphBufferSize := (3 * Count) div 2 + 16;
-
+    
     Result := Succeeded(ScriptStringAnalyse(DC, Str, Count, GlyphBufferSize, -1,
       SSAnalyseFlags, 0, nil, nil, Pointer(ETODist), nil, nil, @saa));
     Result := Result and Succeeded(ScriptStringOut(saa, X, Y, TextOutFlags,

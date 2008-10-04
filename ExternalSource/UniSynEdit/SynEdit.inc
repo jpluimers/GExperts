@@ -82,6 +82,29 @@
 
 {$DEFINE SYNEDIT_INCLUDE}
 
+{------------------------------------------------------------------------------}
+{ Common compiler defines                                                      }
+{ (remove the dot in front of a define to enable it)                           }
+{------------------------------------------------------------------------------}
+
+{$B-,H+} // defaults are short evaluation of boolean values and long strings
+
+{.$DEFINE SYN_DEVELOPMENT_CHECKS} // additional tests for debugging
+{$IFDEF SYN_DEVELOPMENT_CHECKS}
+  {$R+,Q+,S+,T+}
+{$ENDIF}
+
+{------------------------------------------------------------------------------}
+{ Pull in all defines from jedi.inc (must be done after the common compiler    }
+{ defines to  work correctly)                                                  }
+{------------------------------------------------------------------------------}
+
+{$I jedi.inc}
+
+{------------------------------------------------------------------------------}
+{ SYN_WIN32, SYN_LINUX and SYN_KYLIX defines                                   }
+{------------------------------------------------------------------------------}
+
 {$IFDEF WIN32}
   {$DEFINE SYN_WIN32}
 {$ENDIF}
@@ -93,6 +116,10 @@
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_6}
 {$ENDIF}
+
+{------------------------------------------------------------------------------}
+{ VERXXX to SYN_COMPILERX, SYN_DELPHIX and SYN_CPPBX mappings                  }
+{------------------------------------------------------------------------------}
 
 {$IFDEF VER200}
   {$DEFINE SYN_COMPILER_12}
@@ -440,23 +467,8 @@
 {$ENDIF}
 
 {------------------------------------------------------------------------------}
-{ Common compiler defines                                                      }
-{------------------------------------------------------------------------------}
-
-// defaults are short evaluation of boolean values and long strings
-
-{$B-,H+}
-
-{$IFDEF SYN_WIN32}
-  {$IFNDEF UNICODE}
-    {$DEFINE OWN_UnicodeString_MEMMGR}
-  {$ENDIF}
-{$ENDIF}
-
-{.$DEFINE SynUniscribe} // Turn this off if you don't need complex script support, since it is slower
-
-{------------------------------------------------------------------------------}
-{ Please change this to suit your needs (to activate an option remove the dot) }
+{  Please change this to suit your needs (to activate an option remove the dot }
+{  in front of a DEFINE)                                                       }
 {------------------------------------------------------------------------------}
 
 // "Heredoc" syntax highlighting
@@ -466,14 +478,14 @@
 // properly store Range State information
 {.$DEFINE SYN_HEREDOC}
 
-// additional tests for debugging
-
-{.$DEFINE SYN_DEVELOPMENT_CHECKS}
-
-{$IFDEF SYN_DEVELOPMENT_CHECKS}
-
-{$R+,Q+,S+,T+}
-
+// Define OWN_UnicodeString_MEMMGR to speed up WideStrings-handling
+{$IFDEF SYN_WIN32}
+  {$IFNDEF UNICODE}
+    {$DEFINE OWN_UnicodeString_MEMMGR}
+  {$ENDIF}
 {$ENDIF}
 
-// $Id: SynEdit.inc,v 1.16.2.16 2008/09/14 16:24:57 maelh Exp $
+// Turn this off if you don't need complex script support, since it is slower
+{.$DEFINE SYN_UNISCRIBE}
+
+// $Id: SynEdit.inc,v 1.16.2.17 2008/09/17 13:59:11 maelh Exp $

@@ -26,7 +26,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynUnicode.pas,v 1.1.2.39 2008/09/14 16:25:03 maelh Exp $
+$Id: SynUnicode.pas,v 1.1.2.43 2008/10/03 18:50:12 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -86,8 +86,8 @@ const
   UTF8BOM: array[0..2] of Byte = ($EF, $BB, $BF);
   UTF16BOMLE: array[0..1] of Byte = ($FF, $FE);
   UTF16BOMBE: array[0..1] of Byte = ($FE, $FF);
-  UTF32BOMLE: array [0..3] of Byte = ($FF,$FE,$00,$00);
-  UTF32BOMBE: array [0..3] of Byte = ($00,$00,$FE,$FF);
+  UTF32BOMLE: array[0..3] of Byte = ($FF, $FE, $00, $00);
+  UTF32BOMBE: array[0..3] of Byte = ($00, $00, $FE, $FF);
 
 const
   // constants describing range of the Unicode Private Use Area (Unicode 3.2)
@@ -120,7 +120,7 @@ const
   BOM_MSB_FIRST = WideChar($FFFE);
 
 type
-  TSaveFormat = ( sfUTF16LSB, sfUTF16MSB, sfUTF8, sfAnsi );
+  TSaveFormat = (sfUTF16LSB, sfUTF16MSB, sfUTF8, sfAnsi);
 
 const
   sfUnicodeLSB = sfUTF16LSB;
@@ -330,8 +330,8 @@ function SynWideLowerCase(const S: UnicodeString): UnicodeString;
 function SynIsCharAlpha(const C: WideChar): Boolean;
 function SynIsCharAlphaNumeric(const C: WideChar): Boolean;
 {$IFNDEF UNICODE}
-function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload; {$IFDEF SYN_INLINE} inline; {$ENDIF}
-function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload; {$IFDEF SYN_INLINE} inline; {$ENDIF}
+function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 {$ENDIF}
 
 function WideLastDelimiter(const Delimiters, S: UnicodeString): Integer;
@@ -441,7 +441,7 @@ uses
   QSynEditTextBuffer,
   {$ELSE}
   SynEditTextBuffer,
-    {$IFDEF SynUniscribe}
+    {$IFDEF SYN_UNISCRIBE}
     SynUsp10,
     {$ENDIF}
   {$ENDIF}
@@ -474,7 +474,7 @@ end;
 
 function TUnicodeStrings.GetSaveUnicode: Boolean;
 begin
-  Result := SaveFormat = sfUnicodeLSB;
+  Result := SaveFormat in [sfUTF16LSB, sfUTF16MSB, sfUTF8];
 end;
 
 procedure TUnicodeStrings.SetSaveUnicode(const Value: Boolean);
@@ -872,8 +872,8 @@ procedure TUnicodeStrings.LoadFromStream(Stream: TStream);
 var
   Size,
   BytesRead: Integer;
-  ByteOrderMask: array [0..5] of Byte; // BOM size is max 5 bytes (cf: wikipedia)
-                                       // but it is easier to implement with a multiple of 2
+  ByteOrderMask: array[0..5] of Byte; // BOM size is max 5 bytes (cf: wikipedia)
+                                      // but it is easier to implement with a multiple of 2
   Loaded: Boolean;
   SW: UnicodeString;
   SA: AnsiString;
@@ -883,7 +883,7 @@ begin
     Loaded := False;
 
     Size := Stream.Size - Stream.Position;
-    BytesRead := Stream.Read(ByteOrderMask[0],SizeOf(ByteOrderMask));
+    BytesRead := Stream.Read(ByteOrderMask[0], SizeOf(ByteOrderMask));
 
     // UTF16 LSB = Unicode LSB/LE
     if (BytesRead >= 2) and (ByteOrderMask[0] = UTF16BOMLE[0])
@@ -891,13 +891,13 @@ begin
     begin
       FSaveFormat := sfUTF16LSB;
       SetLength(SW, (Size - 2) div SizeOf(WideChar));
-      Assert((Size and 1) <> 1,'Number of chars must be a multiple of 2');
+      Assert((Size and 1) <> 1, 'Number of chars must be a multiple of 2');
       if BytesRead > 2 then
       begin
-        System.Move(ByteOrderMask[2], SW[1], BytesRead-2); // max 4 bytes = 2 widechars
+        System.Move(ByteOrderMask[2], SW[1], BytesRead - 2); // max 4 bytes = 2 widechars
         if Size > BytesRead then
           // first 2 chars (maximum) were copied by System.Move
-          Stream.Read(SW[3], Size-BytesRead);
+          Stream.Read(SW[3], Size - BytesRead);
       end;
       SetTextStr(SW);
       Loaded := True;
@@ -909,13 +909,13 @@ begin
     begin
       FSaveFormat := sfUTF16MSB;
       SetLength(SW, (Size - 2) div SizeOf(WideChar));
-      Assert((Size and 1) <> 1,'Number of chars must be a multiple of 2');
+      Assert((Size and 1) <> 1, 'Number of chars must be a multiple of 2');
       if BytesRead > 2 then
       begin
-        System.Move(ByteOrderMask[2],SW[1],BytesRead-2); // max 4 bytes = 2 widechars
+        System.Move(ByteOrderMask[2], SW[1] ,BytesRead - 2); // max 4 bytes = 2 widechars
         if Size > BytesRead then
           // first 2 chars (maximum) were copied by System.Move
-          Stream.Read(SW[3], Size-BytesRead);
+          Stream.Read(SW[3], Size - BytesRead);
         StrSwapByteOrder(PWideChar(SW));
       end;
       SetTextStr(SW);
@@ -927,13 +927,13 @@ begin
       and (ByteOrderMask[1] = UTF8BOM[1]) and (ByteOrderMask[2] = UTF8BOM[2]) then
     begin
       FSaveFormat := sfUTF8;
-      SetLength(SA, (Size-3) div SizeOf(AnsiChar));
+      SetLength(SA, (Size - 3) div SizeOf(AnsiChar));
       if BytesRead > 3 then
       begin
-        System.Move(ByteOrderMask[3],SA[1],BytesRead-3); // max 3 bytes = 3 chars
+        System.Move(ByteOrderMask[3], SA[1], BytesRead - 3); // max 3 bytes = 3 chars
         if Size > BytesRead then
           // first 3 chars were copied by System.Move
-          Stream.Read(SA[4], Size-BytesRead);
+          Stream.Read(SA[4], Size - BytesRead);
         SW := UTF8Decode(SA);
       end;
       SetTextStr(SW);
@@ -949,7 +949,7 @@ begin
       begin
         System.Move(ByteOrderMask[0], SA[1], BytesRead); // max 6 bytes = 6 chars
         if Size > BytesRead then
-          Stream.Read(SA[7], Size-BytesRead); // first 6 chars were copied by System.Move
+          Stream.Read(SA[7], Size - BytesRead); // first 6 chars were copied by System.Move
       end;
       SetTextStr(SA);
     end;
@@ -1019,7 +1019,7 @@ begin
   FSaved := False; // be pessimistic
   // A check for potential information loss makes only sense if the application has
   // set an event to be used as call back to ask about the conversion.
-  if (FSaveFormat = sfAnsi) and Assigned(FOnConfirmConversion) then
+  if not SaveUnicode and Assigned(FOnConfirmConversion) then
   begin
     // application requests to save only ANSI characters, so check the text and
     // call back in case information could be lost
@@ -1036,33 +1036,33 @@ begin
   begin
     // only save if allowed
     case SaveFormat of
-      sfUTF16LSB :
+      sfUTF16LSB:
         begin
           if WithBOM then
-            Stream.WriteBuffer(UTF16BOMLE[0],SizeOf(UTF16BOMLE));
-          Stream.WriteBuffer(SW[1],Length(SW)*SizeOf(WideChar));
+            Stream.WriteBuffer(UTF16BOMLE[0], SizeOf(UTF16BOMLE));
+          Stream.WriteBuffer(SW[1], Length(SW) * SizeOf(WideChar));
           FSaved := True;
         end;
-      sfUTF16MSB :
+      sfUTF16MSB:
         begin
           if WithBOM then
-            Stream.WriteBuffer(UTF16BOMBE[0],SizeOf(UTF16BOMBE));
+            Stream.WriteBuffer(UTF16BOMBE[0], SizeOf(UTF16BOMBE));
           StrSwapByteOrder(PWideChar(SW));
-          Stream.WriteBuffer(SW[1],Length(SW)*SizeOf(WideChar));
+          Stream.WriteBuffer(SW[1], Length(SW) * SizeOf(WideChar));
           FSaved := True;
         end;
-      sfUTF8 :
+      sfUTF8:
         begin
           if WithBOM then
-            Stream.WriteBuffer(UTF8BOM[0],SizeOf(UTF8BOM));
+            Stream.WriteBuffer(UTF8BOM[0], SizeOf(UTF8BOM));
           SA := UTF8Encode(SW);
-          Stream.WriteBuffer(SA[1],Length(SA)*SizeOf(AnsiChar));
+          Stream.WriteBuffer(SA[1], Length(SA) * SizeOf(AnsiChar));
           FSaved := True;
         end;
-      sfAnsi :
+      sfAnsi:
         begin
           SA := SW;
-          Stream.WriteBuffer(SA[1],Length(SA)*SizeOf(AnsiChar));
+          Stream.WriteBuffer(SA[1], Length(SA) * SizeOf(AnsiChar));
           FSaved := True;
         end;
     end;
@@ -2414,22 +2414,22 @@ end;
 {$ENDIF}
 
 function GetTextSize(DC: HDC; Str: PWideChar; Count: Integer): TSize;
-{$IFDEF SynUniscribe}
+{$IFDEF SYN_UNISCRIBE}
 const
   SSAnalyseFlags = SSA_GLYPHS or SSA_FALLBACK or SSA_LINK;
 {$ENDIF}
 var
   tm: TTextMetricA;
-  {$IFDEF SynUniscribe}
+  {$IFDEF SYN_UNISCRIBE}
   GlyphBufferSize: Integer;
-  lpSize: PSize;
   saa: TScriptStringAnalysis;
+  lpSize: PSize;
   {$ENDIF}
 begin
   Result.cx := 0;
   Result.cy := 0;
 
-  {$IFDEF SynUniscribe}
+{$IFDEF SYN_UNISCRIBE}
   if Usp10IsInstalled then
   begin
     if Count <= 0 then Exit;
@@ -2456,7 +2456,7 @@ begin
     end;
   end
   else
-  {$ENDIF}
+{$ENDIF}
   begin
     GetTextExtentPoint32W(DC, Str, Count, Result);
     if not Win32PlatformIsUnicode then

@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEdit.pas,v 1.386.2.74 2008/09/14 16:24:57 maelh Exp $
+$Id: SynEdit.pas,v 1.386.2.75 2008/09/17 13:59:11 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -2108,6 +2108,7 @@ end;
 type
   TAccessWinControl = class(TWinControl);
 
+{$MESSAGE 'Check what must be adapted in DoKeyPressW and related methods'}
 procedure TCustomSynEdit.DoKeyPressW(var Message: TWMKey);
 var
   Form: TCustomForm;
@@ -11092,7 +11093,7 @@ initialization
   begin
     // Hooking GetMessage/PeekMessage-calls is necessary as the use of
     // PeekMessageA in TApplication.ProcessMessage mutilates Unicode-messages.
-    GetMsgHook := SetWindowsHookExW(WH_GETMESSAGE, TFNHookProc(@GetMsgProc), 0,
+    GetMsgHook := SetWindowsHookExW(WH_GETMESSAGE, GetMsgProc, 0,
       GetCurrentThreadId);
   end
   else

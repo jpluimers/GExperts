@@ -30,7 +30,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditExport.pas,v 1.17.2.7 2008/09/14 16:24:58 maelh Exp $
+$Id: SynEditExport.pas,v 1.17.2.8 2008/09/17 13:59:12 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
