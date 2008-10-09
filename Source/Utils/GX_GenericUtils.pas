@@ -36,9 +36,17 @@ resourcestring
 
 type
   {$IFDEF UNICODE}
+  TGXStringList = class(TStringList)
+  private
+    LoadedEncoding: TEncoding;
+  public
+    procedure LoadFromFile(const FileName: string); override;
+    procedure SaveToFile(const FileName: string); override;
+  end;
+
   TGXUnicodeChar = Char;
   TGXUnicodeString = string;
-  TGXUnicodeStringList = TStringList;
+  TGXUnicodeStringList = TGXStringList;
   {$ELSE}
   TGXUnicodeChar = WideChar;
   TGXUnicodeString = WideString;
@@ -140,6 +148,7 @@ function IsCharSymbol(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} i
 function IsCharNumeric(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharAlphaNumeric(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
 function IsCharLineEndingOrNull(C: AnsiChar): Boolean; overload; {$IFDEF SupportsInline} inline; {$ENDIF}
+function GetFileEncoding(const FileName: string): TEncoding;
 {$ELSE not UNICODE}
 function CharInSet(C: Char; CSet: TSysCharSet): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
 function AnsiStrAlloc(Size: Cardinal): PChar; {$IFDEF SupportsInline} inline; {$ENDIF}
@@ -1127,6 +1136,40 @@ end;
 function IsCharIdentifier(C: AnsiChar): Boolean; overload;
 begin
   Result := C in LocaleIdentifierChars;
+end;
+
+function GetFileEncoding(const FileName: string): TEncoding;
+const
+  MaxBOMLength = 100;
+var
+  Stream: TStream;
+  Buffer: TBytes;
+begin
+  Result := nil;
+  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
+  try
+    SetLength(Buffer, MaxBOMLength);
+    Stream.Read(Buffer[0], MaxBOMLength);
+    TEncoding.GetBufferEncoding(Buffer, Result);
+  finally
+    Stream.Free;
+  end;
+end;
+
+{ TGXStringList }
+
+procedure TGXStringList.LoadFromFile(const FileName: string);
+begin
+  LoadedEncoding := GetFileEncoding(FileName);
+  inherited LoadFromFile(FileName);
+end;
+
+procedure TGXStringList.SaveToFile(const FileName: string);
+begin
+  if Assigned(LoadedEncoding) then
+    SaveToFile(FileName, LoadedEncoding)
+  else
+    SaveToFile(FileName);
 end;
 
 {$ELSE not UNICODE}
@@ -3422,6 +3465,8 @@ begin
       sofUTF8Text:
         Strings.LoadFromStream(Src, TEncoding.UTF8);
       {$ENDIF}
+      else
+        raise Exception.Create('Unknown form file format: ' + IntToStr(Ord(Format)));
     end;
   finally
     FreeAndNil(Src);
