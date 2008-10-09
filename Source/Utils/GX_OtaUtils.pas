@@ -89,6 +89,8 @@ procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
 // ColumnNo is the current column number (zero-based, can be > then number of chars in line)
 // LineNo is the current line number
 function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer): string;
+function GxOtaGetEditorLine(View: IOTAEditView; LineNo: Integer): UTF8String;
+function GxOtaGetEditorLineAsString(View: IOTAEditView; LineNo: Integer): TGXUnicodeString;
 
 // Get the identifier at the cursor position, similar to above.
 // If an identifier is found then:
@@ -367,6 +369,7 @@ function GxOtaMakeSourceVisible(const FileName: string): Boolean;
 function GxOtaModuleIsShowingFormSource(Module: IOTAModule): Boolean;
 procedure GxOtaGoToFileLine(const FileName: string; Line: Integer);
 procedure GxOtaGoToFileLineColumn(const FileName: string; Line: Integer; StartColumn: Integer = 0; StopColumn: Integer = 0; ShowInMiddle: Boolean = True);
+function GxOtaConvertColumnCharsToBytes(LineData: UTF8String; CharIndex: Integer; EndByte: Boolean): Integer;
 
 // Transform dfm, hpp, etc. references to the base .pas/cpp file name
 function GxOtaGetBaseModuleFileName(const FileName: string): string;
@@ -545,17 +548,17 @@ procedure GxOtaShowEditViewDetails;
 
 {$IFDEF GX_VER160_up}
 function ConvertToIDEEditorString(const S: string): UTF8String;
+function IDEEditorStringToString(const S: UTF8String): string; overload;
 {$ELSE}
 function ConvertToIDEEditorString(const S: string): string;
 {$ENDIF}
-
-{$IFDEF GX_VER160_up}
-function IDEEditorStringToString(const S: UTF8String): string; overload;
-{$ENDIF}
-
 {$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
 function IDEEditorStringToString(const S: string): string; overload;
 {$IFEND}
+
+{$IFNDEF GX_VER200_up}
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+{$ENDIF}
 
 function HackBadIDEUTF8StringToString(const S: string): string;
 
@@ -1462,6 +1465,47 @@ begin
   ColumnNo := CursorPos - StartOffset;
 end;
 
+function GxOtaGetEditorLine(View: IOTAEditView; LineNo: Integer): UTF8String;
+var
+  Buffer: IOTAEditBuffer;
+  LineStartByte: Integer;
+  LineEndByte: Integer;
+  Pos: TOTACharPos;
+  LineData: AnsiString;
+  Reader: IOTAEditReader;
+  LineBytes: Integer;
+begin
+  Assert(Assigned(View));
+  Result := '';
+  Buffer := View.Buffer;
+  if (LineNo > Buffer.GetLinesInBuffer) or (LineNo < 1) then
+    Exit;
+  Pos.CharIndex := 0;
+  Pos.Line := LineNo;
+  LineStartByte := View.CharPosToPos(Pos);
+  Pos.CharIndex := MaxEditorCol;
+  LineEndByte := View.CharPosToPos(Pos);
+  Reader := Buffer.CreateReader;
+  Assert(Assigned(Reader));
+  LineBytes := LineEndByte - LineStartByte;
+  SetLength(LineData, LineBytes);
+  Reader.GetText(LineStartByte, PAnsiChar(LineData), LineBytes);
+  Result := UTF8String(LineData);
+end;
+
+function GxOtaGetEditorLineAsString(View: IOTAEditView; LineNo: Integer): TGXUnicodeString;
+begin
+  {$IFDEF UNICODE} // Delphi 2009 +
+  Result := string(GxOtaGetEditorLine(View, LineNo));
+  {$ELSE}
+    {$IFDEF GX_VER160_up} // Delphi 8+
+    Result := UTF8Decode(GxOtaGetEditorLine(View, LineNo));
+    {$ELSE} // Delphi 6-7
+    Result := GxOtaGetEditorLine(View, LineNo);
+    {$ENDIF}
+  {$ENDIF}
+end;
+
 // TODO 3 -oAnyone -cCleanup : This claims to return TOTAEditPos values but really returns TOTACharPos values
 procedure GxOtaGetCurrentIdentEx(var Ident: string; var IdentOffset: Integer;
   var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer);
@@ -1940,6 +1984,7 @@ var
   CharPos: TOTACharPos;
   EditPos: TOTAEditPos;
   MatchLength: Integer;
+  LineData: UTF8String;
 resourcestring
   SCouldNotOpenFile = 'Could not open file %s';
 begin
@@ -1976,6 +2021,13 @@ begin
 
   GxOtaFocusCurrentIDEEditControl;
 
+  if RunningRS2009OrGreater then
+  begin
+    LineData := GxOtaGetEditorLine(EditView, Line);
+    StartColumn := GxOtaConvertColumnCharsToBytes(LineData, StartColumn, False);
+    StopColumn := GxOtaConvertColumnCharsToBytes(LineData, StopColumn, True);
+  end;
+
   // Position the cursor to the line and column of the match
   CharPos.CharIndex := StartColumn - 1;
   CharPos.Line := Line;
@@ -1993,6 +2045,29 @@ begin
   EditView.Block.EndBlock;
   EditView.Block.SetVisible(True);
   EditView.Paint;
+end;
+
+function GxOtaConvertColumnCharsToBytes(LineData: UTF8String; CharIndex: Integer; EndByte: Boolean): Integer;
+var
+  UString: TGxUnicodeString;
+  FinalUChar: TGXUnicodeString;
+  UTF8Str: UTF8String;
+begin
+  if RunningRS2009OrGreater then
+  begin
+    UString := UTF8ToUnicodeString(LineData);
+    UString := Copy(UString, 1, CharIndex);
+    UTF8Str := UTF8String(UString);
+    Result := Length(UTF8Str);
+    if not EndByte then
+    begin
+      FinalUChar := UString[Length(UString)];
+      UTF8Str := Utf8String(FinalUChar);
+      Result := Result - (Length(UTF8Str)) + 1;
+    end;
+  end
+  else
+    Result := CharIndex;
 end;
 
 function GxOtaGetBaseModuleFileName(const FileName: string): string;
@@ -3744,7 +3819,7 @@ var
 begin
   Data.Clear;
   if not Assigned(SourceEditor) then
-    Exit;
+    raise Exception.Create('No source editor in GxOtaLoadSourceEditorToUnicodeStrings');
   //TODO: Check stream format for forms as text (Ansi with escaped unicode, or UTF-8) in Delphi 2007/2009
   MemStream := TMemoryStream.Create;
   try
@@ -4212,6 +4287,11 @@ begin
 end;
 
 {$IFDEF GX_VER160_up}
+function IDEEditorStringToString(const S: UTF8String): string;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
 function ConvertToIDEEditorString(const S: string): UTF8String;
 begin
   Result := AnsiToUtf8(S);
@@ -4223,19 +4303,19 @@ begin
 end;
 {$ENDIF}
 
-{$IFDEF GX_VER160_up}
-function IDEEditorStringToString(const S: UTF8String): string;
-begin
-  Result := Utf8ToAnsi(S);
-end;
-{$ENDIF}
-
 {$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
 function IDEEditorStringToString(const S: string): string;
 begin
   Result := S;
 end;
 {$IFEND}
+
+{$IFNDEF GX_VER200_up}
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+{$ENDIF}
 
 function HackBadIDEUTF8StringToString(const S: string): string;
 begin
