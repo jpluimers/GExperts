@@ -381,7 +381,7 @@ begin
   FInitTimer := TTimer.Create(nil);
   FInitTimer.Enabled := False;
   FInitTimer.OnTimer := OnInitTimer;
-  FInitTimer.Interval := 200;
+  FInitTimer.Interval := 400;
   FInitTimer.Enabled := True;
   FInitCount := 0;
   FCallback := CallBack;
@@ -390,7 +390,7 @@ end;
 procedure TInitHelper.OnInitTimer(Sender: TObject);
 begin
   Inc(FInitCount);
-  if (FInitCount >= 2) then
+  if (FInitCount >= 4) then
   begin
     FInitTimer.Enabled := False;
     FreeAndNil(FInitTimer);
