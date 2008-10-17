@@ -4188,12 +4188,12 @@ begin
       if Assigned(Position) then
       begin
         AddFmt('Position.Character: %s', [Position.Character]);
+        AddFmt('Position.Row: %d', [Position.Row]);
         AddFmt('Position.Column: %d', [Position.Column]);
         AddFmt('Position.IsSpecialCharacter: %s', [BooleanText(Position.IsSpecialCharacter)]);
         AddFmt('Position.IsWhiteSpace: %s', [BooleanText(Position.IsWhiteSpace)]);
         AddFmt('Position.IsWordCharacter: %s', [BooleanText(Position.IsWordCharacter)]);
         AddFmt('Position.LastRow: %d', [Position.LastRow]);
-        AddFmt('Position.Row: %d', [Position.Row]);
       end
       else
         Add('No IOTAEditView.Position');
