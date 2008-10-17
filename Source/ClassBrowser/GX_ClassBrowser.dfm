@@ -5,6 +5,7 @@ object fmClassBrowser: TfmClassBrowser
   Height = 430
   Caption = 'Class Browser'
   Color = clBtnFace
+  DefaultMonitor = dmDesktop
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
