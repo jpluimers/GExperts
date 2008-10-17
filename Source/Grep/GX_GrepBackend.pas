@@ -146,7 +146,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Forms,
-  GX_OtaUtils, GX_EditReader, GX_IdeUtils;
+  GX_OtaUtils, GX_EditReader, GX_IdeUtils, Dialogs, Controls;
 
 { TLineMatches }
 
@@ -507,8 +507,12 @@ var
   FormEditor: IOTAFormEditor;
   FormFile: string;
 begin
-  Module := GxOtaGetModule(FileName);
-  FormEditor := GxOtaGetFormEditorFromModule(Module);
+  FormEditor := nil;
+  if RunningInsideIDE then
+  begin
+    Module := GxOtaGetModule(FileName);
+    FormEditor := GxOtaGetFormEditorFromModule(Module);
+  end;
   if Assigned(FormEditor) then
     ExecuteSearchOnFile(FormEditor.FileName)
   else
@@ -529,9 +533,17 @@ begin
   if FDupeFileList.IndexOf(FileName) = -1 then
   begin
     StartFileSearch(FileName);
-    FSearcher.FileName := FileName;
-    FDupeFileList.Add(FileName);
-    FSearcher.Execute;
+    try
+      FSearcher.FileName := FileName;
+      FDupeFileList.Add(FileName);
+      FSearcher.Execute;
+    except
+      on E: Exception do
+      begin
+        if MessageDlg(E.Message, mtError, [mbOK, mbCancel], 0) = mrCancel then
+          Abort;
+      end;
+    end;
 
     if FGrepSettings.IncludeForms and (IsPas(FileName) or IsCpp(FileName)) then
       SearchFormForFile(FileName);
