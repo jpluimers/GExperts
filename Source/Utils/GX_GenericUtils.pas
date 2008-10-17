@@ -173,6 +173,7 @@ function StrBeginsWith(const SubStr, Str: string; CaseSensitive: Boolean = True)
 function StrEndsWith(const SubStr, Str: string; CaseSensitive: Boolean = True): Boolean;
 // See is a string contains another substring
 function StrContains(const SubStr, Str: string; CaseSensitive: Boolean = True): Boolean;
+function StrContainsWhiteSpace(const Str: string): Boolean;
 // Check for empty (when trimmed) strings
 function NotEmpty(const Str: string): Boolean;
 function IsEmpty(const Str: string): Boolean;
@@ -1636,6 +1637,19 @@ begin
     Result := Pos(SubStr, Str) > 0
   else
     Result := CaseInsensitivePos(SubStr, Str) > 0;
+end;
+
+function StrContainsWhiteSpace(const Str: string): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := 1 to Length(Str) do
+    if IsCharWhiteSpace(Str[i]) then
+    begin
+      Result := True;
+      Break;
+    end;
 end;
 
 function NotEmpty(const Str: string): Boolean;
