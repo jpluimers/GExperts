@@ -1867,7 +1867,8 @@ begin
     Exit;
   ClassInfos := TBrowseClassInfoCollection(tvBrowse.Selected.Data);
   GxOtaGoToFileLine(ClassInfos.FileName, ClassInfos.RefreshLineNo + 1);
-  Self.Hide;
+  if FAutomaticallyHideBrowser then
+    Self.Hide;
 end;
 
 procedure TfmClassBrowser.ActionsUpdate(Action: TBasicAction; var Handled: Boolean);
