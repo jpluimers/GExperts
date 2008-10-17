@@ -855,15 +855,11 @@ procedure TUnicodeStrings.LoadFromFile(const FileName: TFileName);
 var
   Stream: TStream;
 begin
+  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
-    Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
-    try
-      LoadFromStream(Stream);
-    finally
-      Stream.Free;
-    end;
-  except
-    RaiseLastOSError;
+    LoadFromStream(Stream);
+  finally
+    Stream.Free;
   end;
 end;
 
