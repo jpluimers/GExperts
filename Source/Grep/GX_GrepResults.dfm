@@ -4,6 +4,7 @@ inherited fmGrepResults: TfmGrepResults
   Width = 468
   Height = 360
   Caption = 'Grep Results'
+  DefaultMonitor = dmDesktop
   KeyPreview = True
   Menu = MainMenu
   Position = poScreenCenter
