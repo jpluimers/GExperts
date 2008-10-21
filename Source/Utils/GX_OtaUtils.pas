@@ -211,6 +211,7 @@ procedure GxOtaFillUnitInfoListForCurrentProject(const List: TList);
 //
 
 procedure GxOtaSelectComponentOnCurrentForm(const ComponentName: string);
+procedure GxOtaClearSelectionOnCurrentForm;
 
 // Get a reference to the actual form instance being designed
 function GxOtaGetCurrentDesignForm: TCustomForm;
@@ -832,6 +833,26 @@ begin
 
   FoundComponent.Select(False); // Select, but do not add to an already existing selection
   FormEditor.Show;
+end;
+
+procedure GxOtaClearSelectionOnCurrentForm;
+var
+  FormEditor: IOTAFormEditor;
+  PersistentForm: TPersistent;
+  Designer: IDesigner;
+begin
+  FormEditor := GxOtaGetCurrentFormEditor;
+  if Assigned(FormEditor) then
+  begin
+    if Assigned(FormEditor.GetRootComponent) then
+    begin
+      PersistentForm := GxOtaGetNativePersistent(FormEditor.GetRootComponent);
+      Designer := (FormEditor as INTAFormEditor).FormDesigner;
+      if Assigned(Designer) then
+        if Assigned(PersistentForm) then
+          Designer.SelectComponent(PersistentForm);
+    end;
+  end;
 end;
 
 function GxOtaGetCurrentDesignForm: TCustomForm;

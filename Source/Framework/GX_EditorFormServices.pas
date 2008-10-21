@@ -209,12 +209,8 @@ var
   CBTHook: HHOOK;
 
 function CBTHookProc(nCode: Integer; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
-const
-  ClassNameBufferSize = 200;
 var
-  ClassNameBuffer: array[0..ClassNameBufferSize-1] of Char;
   ClassName: string;
-  ApiResult: Integer;
 begin
   if nCode < 0 then
   begin
@@ -227,10 +223,7 @@ begin
       HCBT_SETFOCUS: // A control with a window handle was focused
         if wParam > 0 then  // wParam is 0 if an Exception happens in HCBT_Setfocus
         begin
-          ApiResult := GetClassName(wParam, ClassNameBuffer, SizeOf(ClassNameBuffer));
-          Win32Check(ApiResult <> 0);
-          Assert(ApiResult < ClassNameBufferSize, 'Found class name larger than fixed buffer size');
-          ClassName := ClassNameBuffer;
+          ClassName := GetWindowClassName(wParam);
 
           {$IFOPT D+} SendDebug('SetFocus hook found: ' + ClassName); {$ENDIF}
           if SameText(ClassName, EditorControlClassName) then

@@ -168,6 +168,7 @@
       <Form>fmExpertManager</Form>
     </DCCReference>
     <DCCReference Include="Experts\GX_FindComponentRef.pas" />
+    <DCCReference Include="Experts\GX_HideNonVisualComps.pas" />
     <DCCReference Include="Experts\GX_IdeShortCuts.pas">
       <Form>fmIdeShortCuts</Form>
     </DCCReference>

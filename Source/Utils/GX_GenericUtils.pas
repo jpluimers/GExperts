@@ -355,6 +355,9 @@ function GetScreenWorkArea(const Form: TCustomForm = nil): TRect;
 // Ensure a form is completely within the visible working area
 procedure EnsureFormVisible(const Form: TCustomForm);
 
+// Get the window handle's class name as a Delphi string
+function GetWindowClassName(WinHandle: THandle): string;
+
 // Take a bitmap with a transparent color and convert it to a TIcon
 procedure ConvertBitmapToIcon(const Bitmap: Graphics.TBitmap; Icon: TIcon);
 
@@ -413,6 +416,7 @@ function IsSQL(const FileName: string): Boolean;
 // RTTI helpers
 function FindPropInfo(Instance: TObject; const PropName: string): PPropInfo;
 function FindTypeInfo(Instance: TObject; const PropName: string): PTypeInfo;
+function IsPropReadOnly(Instance: TObject; const PropName: string): Boolean;
 procedure RaisePropertyError(const PropName: string);
 function ApplyValueToSetProperty(Obj: TObject; const APropertyName, Value: string): Integer;
 function GetEnumValueFromStr(Obj: TObject; const PropertyName, Value: WideString): Integer;
@@ -2349,6 +2353,23 @@ begin
      Form.Top := Rect.Top;
 end;
 
+function GetWindowClassName(WinHandle: THandle): string;
+const
+  ClassNameBufferSize = 254;
+var
+  ClassNameBuffer: array[0..ClassNameBufferSize-1] of Char;
+  ApiResult: Integer;
+begin
+  Result := '';
+  if (WinHandle > 0) then
+  begin
+    ApiResult := GetClassName(WinHandle, ClassNameBuffer, SizeOf(ClassNameBuffer));
+    Win32Check(ApiResult <> 0);
+    Assert(ApiResult < ClassNameBufferSize, 'Found class name larger than fixed buffer size');
+    Result := ClassNameBuffer;
+  end;
+end;
+
 procedure ConvertBitmapToIcon(const Bitmap: Graphics.TBitmap; Icon: TIcon);
 begin
   if (not Assigned(Bitmap)) or (not Assigned(Icon)) then
@@ -2724,6 +2745,15 @@ begin
   Assert(Assigned(PropInfo));
   Result := PPropInfo(PropInfo)^.PropType^;
   Assert(Assigned(Result));
+end;
+
+function IsPropReadOnly(Instance: TObject; const PropName: string): Boolean;
+var
+  PropInfo: PPropInfo;
+begin
+  PropInfo := FindPropInfo(Instance, PropName);
+  Assert(Assigned(PropInfo));
+  Result := Assigned(PropInfo.SetProc);
 end;
 
 function GetMembersValues(TypeInfo: PTypeInfo; const ChangeString: string; var Members: TStringList): Integer;

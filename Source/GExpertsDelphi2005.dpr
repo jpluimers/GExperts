@@ -80,6 +80,7 @@ uses
   GX_GrepResultsOptions in 'Grep\GX_GrepResultsOptions.pas' {fmGrepResultsOptions},
   GX_GrepSearch in 'Grep\GX_GrepSearch.pas' {fmGrepSearch},
   GX_GxUtils in 'Utils\GX_GxUtils.pas',
+  GX_HideNonVisualComps in 'Experts\GX_HideNonVisualComps.pas',
   GX_IconMessageBox in 'Framework\GX_IconMessageBox.pas',
   GX_IdeDock in 'IDEDocking\GX_IdeDock.pas' {fmIdeDockForm},
   GX_IdeEnhance in 'IDE\GX_IdeEnhance.pas',
