@@ -863,13 +863,18 @@ begin
               // Ignore this, it is a "virtual" property
             end
             else
-              if CFmtWith <> '' then
-                Log(impl, CFmtAssign, [propName, propVal])
-              else
-                if CFmtPropertyAccess = '.' then
-                  Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [propName, propVal])
+            begin
+              if IsPropWriteable(Comp, propName) then
+              begin
+                if CFmtWith <> '' then
+                  Log(impl, CFmtAssign, [propName, propVal])
                 else
-                  Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [StringReplace(propName, '.', CFmtPropertyAccess, [rfReplaceAll]), PropC(propVal, propName)]);
+                  if CFmtPropertyAccess = '.' then
+                    Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [propName, propVal])
+                  else
+                    Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [StringReplace(propName, '.', CFmtPropertyAccess, [rfReplaceAll]), PropC(propVal, propName)]);
+              end;
+            end;      
           end; //if p > 0
         end; //else if not skip
       end; //while not EOF

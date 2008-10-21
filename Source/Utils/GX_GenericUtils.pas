@@ -416,7 +416,7 @@ function IsSQL(const FileName: string): Boolean;
 // RTTI helpers
 function FindPropInfo(Instance: TObject; const PropName: string): PPropInfo;
 function FindTypeInfo(Instance: TObject; const PropName: string): PTypeInfo;
-function IsPropReadOnly(Instance: TObject; const PropName: string): Boolean;
+function IsPropWriteable(Instance: TObject; const PropName: string): Boolean;
 procedure RaisePropertyError(const PropName: string);
 function ApplyValueToSetProperty(Obj: TObject; const APropertyName, Value: string): Integer;
 function GetEnumValueFromStr(Obj: TObject; const PropertyName, Value: WideString): Integer;
@@ -2747,13 +2747,19 @@ begin
   Assert(Assigned(Result));
 end;
 
-function IsPropReadOnly(Instance: TObject; const PropName: string): Boolean;
+function IsPropWriteable(Instance: TObject; const PropName: string): Boolean;
 var
   PropInfo: PPropInfo;
 begin
-  PropInfo := FindPropInfo(Instance, PropName);
-  Assert(Assigned(PropInfo));
-  Result := Assigned(PropInfo.SetProc);
+  Result := False;
+  if Assigned(Instance) and NotEmpty(PropName) then
+  begin
+    if not IsPublishedProp(Instance, PropName) then
+      Exit;
+    PropInfo := FindPropInfo(Instance, PropName);
+    if Assigned(PropInfo) then
+      Result := Assigned(PropInfo.SetProc);
+  end;
 end;
 
 function GetMembersValues(TypeInfo: PTypeInfo; const ChangeString: string; var Members: TStringList): Integer;
