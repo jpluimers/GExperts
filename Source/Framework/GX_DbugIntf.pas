@@ -41,7 +41,10 @@ threadvar
   MsgPrefix: string;
 
 const
-  chrClearCommand = #3;
+  chrStringCommand: AnsiChar = {$IFDEF UNICODE} #4 {$ELSE} #1 {$ENDIF};
+  chrSQLCommand: AnsiChar = #2; // Old, unused type
+  chrClearCommand: AnsiChar = #3;
+  chrNull: AnsiChar = #0;
 
 var
   PastFailedAttemptToStartDebugWin: Boolean = False;
@@ -83,10 +86,8 @@ begin
   si.cb := SizeOf(si);
   si.dwFlags := STARTF_USESHOWWINDOW;
   si.wShowWindow := SW_SHOW;
-  if not CreateProcess(PChar(DebugFileName), nil,
-                       nil, nil,
-                       False, 0, nil, nil,
-                       si, pi) then
+  if not CreateProcess(PChar(DebugFileName), nil, nil, nil,
+                       False, 0, nil, nil, si, pi) then
   begin
     PastFailedAttemptToStartDebugWin := True;
     Exit;
@@ -108,6 +109,9 @@ var
   CDS: TCopyDataStruct;
   DebugWin: hWnd;
   MessageString: string;
+  MsgBytes: array of Byte;
+  MsgType: AnsiChar;
+  ByteIndex: Integer;
 {$ENDIF MSWINDOWS}
 {$IFDEF LINUX}
   {$DEFINE NEEDMTYPESTR}
@@ -115,6 +119,22 @@ var
 {$IFDEF GX_DEBUGLOG}
   {$DEFINE NEEDMTYPESTR}
 {$ENDIF GX_DEBUGLOG}
+
+  procedure AddByte(B: Byte);
+  begin
+    MsgBytes[ByteIndex] := B;
+    Inc(ByteIndex);
+  end;
+
+  procedure AddStringBytes(Str: string);
+  var
+    BPointer: {$IFDEF UNICODE} PByte {$ELSE} PAnsiChar {$ENDIF};
+    i: Integer;
+  begin
+    BPointer := Pointer(Str);
+    for i := 0 to ((Length(Str)) * SizeOf(Char)) - 1 do
+      AddByte(Byte(BPointer[i]));
+  end;
 
 {$IFDEF NEEDMTYPESTR}
 const
@@ -139,13 +159,20 @@ begin
 
   if DebugWin <> 0 then
   begin
+    ByteIndex := 0;
     MessageString := MsgPrefix + Msg;
-    CDS.cbData := (Length(MessageString) + 4) * SizeOf(Char);
+    SetLength(MsgBytes, 1 + 1 + (Length(MessageString)* SizeOf(Char)) + 1); // Payload, type, message, null
+    CDS.cbData := Length(MsgBytes);
     CDS.dwData := 0;
-    if Msg = chrClearCommand then
-      CDS.lpData := PChar(chrClearCommand+Char(Ord(MType) + 1)+ MessageString +#0)
+    MsgType := AnsiChar(Ord(MType) + 1);
+    if Msg = string(chrClearCommand) then
+      AddByte(Byte(chrClearCommand))
     else
-      CDS.lpData := PChar(#1+Char(Ord(MType) + 1)+ MessageString +#0);
+      AddByte(Byte(chrStringCommand));
+    AddByte(Byte(MsgType));
+    AddStringBytes(MessageString);
+    AddByte(Byte(chrNull));
+    CDS.lpData := Pointer(MsgBytes);
     SendMessage(DebugWin, WM_COPYDATA, WPARAM(Application.Handle), LPARAM(@CDS));
   end;
 {$ENDIF MSWINDOWS}
@@ -178,7 +205,7 @@ end;
 
 procedure SendDebugClear;
 begin
-  SendDebug(chrClearCommand);
+  SendDebug(string(chrClearCommand));
 end;
 
 const

@@ -109,12 +109,13 @@ uses
   DebugOptions, GX_GenericUtils;
 
 type
-  TDebugType = (dtMessage, dtSQL);
+  TDebugType = (dtAnsiMessage, dtUnicodeMessage, dtSQL);
 
   TDebugMessage = record
     DebugType: TDebugType;
     MessageType: TMsgDlgType;
-    Msg: string;
+    AnsiMsg: AnsiString;
+    UnicodeMsg: TGXUnicodeString;
   end;
 
 const
@@ -143,15 +144,19 @@ var
 
   procedure GetMessage;
   const
-    chrClearCommand = #3;
-    chrDebugTypeSQL = #2;
+    chrDebugTypeANSI    = #1;
+    chrDebugTypeSQL     = #2;
+    chrClearCommand     = #3;
+    chrDebugTypeUnicode = #4;
   var
     CData: TCopyDataStruct;
-    MessageContent: PChar;
+    MessageContent: PAnsiChar;
     i: Integer;
+    CharWord: Word;
+    UChar: TGXUnicodeChar;
   begin
     CData := Message.CopyDataStruct^;
-    MessageContent := CData.lpData;
+    MessageContent := CData.lpData; // TODO: Make this use the passed-in byte count for the payload length
     if MessageContent[0] = chrClearCommand then
     begin
       actEditClearWindow.Execute;
@@ -160,15 +165,28 @@ var
 
     if MessageContent[0] = chrDebugTypeSQL then
       NewMsg.DebugType := dtSQL
+    else if MessageContent[0] = chrDebugTypeUnicode then
+      NewMsg.DebugType := dtUnicodeMessage
     else
-      NewMsg.DebugType := dtMessage;
+      NewMsg.DebugType := dtAnsiMessage;
 
     NewMsg.MessageType := TMsgDlgType(Integer(MessageContent[1]) - 1);
-    i := 2;
+    i := 2; // Byte 0 = payload, Byte 1 = message type
     while MessageContent[i] <> #0 do
     begin
-      NewMsg.Msg := NewMsg.Msg + MessageContent[i];
-      Inc(i);
+      if NewMsg.DebugType = dtUnicodeMessage then
+      begin
+        WordRec(CharWord).Lo := Byte(MessageContent[i]);
+        WordRec(CharWord).Hi := Byte(MessageContent[i+1]);
+        UChar := TGXUnicodeChar(CharWord);
+        NewMsg.UnicodeMsg := NewMsg.UnicodeMsg + UChar; // TODO: This is very slow....
+        Inc(i, 2);
+      end
+      else
+      begin
+        NewMsg.AnsiMsg := NewMsg.AnsiMsg + MessageContent[i];
+        Inc(i);
+      end;
     end;
   end;
 
@@ -179,8 +197,10 @@ begin
   if actFilePause.Checked then
     Exit;
   OldClientWidth := lvMessages.ClientWidth;
-  if NewMsg.DebugType = dtMessage then
-    AddMessage(NewMsg.MessageType, NewMsg.Msg);
+  if NewMsg.DebugType = dtAnsiMessage then
+    AddMessage(NewMsg.MessageType, NewMsg.AnsiMsg)
+  else if NewMsg.DebugType = dtUnicodeMessage then
+    AddMessage(NewMsg.MessageType, NewMsg.UnicodeMsg);
   // Resize the header when the scrollbar is added
   if not (lvMessages.ClientWidth = OldClientWidth) then
     FormResize(Self);
