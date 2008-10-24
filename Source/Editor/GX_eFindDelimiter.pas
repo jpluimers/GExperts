@@ -315,7 +315,7 @@ var
             end;
           else
             if i = 0 then
-              TextToken := Parser.RunToken
+              TextToken := HackBadEditorStringToNativeString(Parser.RunToken)
             else if i = 2 then
             begin
               MessageDlg(Format(SNotValidIdentifier, [TextToken]), mtError, [mbOK], 0);
@@ -533,7 +533,7 @@ var
             end;
           else
             if i = 0 then
-              TextToken := CParser.RunToken
+              TextToken := HackBadEditorStringToNativeString(CParser.RunToken)
             else if i = 2 then
             begin
               MessageDlg(Format(SNotValidIdentifier, [TextToken]), mtError, [mbOK], 0);

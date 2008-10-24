@@ -562,6 +562,9 @@ function UTF8ToUnicodeString(S: UTF8String): WideString;
 {$ENDIF}
 
 function HackBadIDEUTF8StringToString(const S: string): string;
+// Convert an editor string (UTF-8) possibly improperly stored in an
+// AnsiString to a native string type
+function HackBadEditorStringToNativeString(const S: string): string;
 
 type
   TBaseIdeNotifier = class(TNotifierObject, IOTAIDENotifier)
@@ -4347,6 +4350,14 @@ begin
   {$ELSE}
   Result := S;
   {$ENDIF UNICODE}
+end;
+
+function HackBadEditorStringToNativeString(const S: string): string;
+begin
+  if IDEEditorEncodingIsUTF8 then
+    Result := IDEEditorStringToString(UTF8String(Pointer(S)))
+  else
+    Result := S;
 end;
 
 { TBaseIdeNotifier }
