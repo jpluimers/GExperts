@@ -2045,7 +2045,7 @@ begin
 
   GxOtaFocusCurrentIDEEditControl;
 
-  if RunningRS2009OrGreater then
+  if RunningDelphi8OrGreater then
   begin
     LineData := GxOtaGetEditorLine(EditView, Line);
     StartColumn := GxOtaConvertColumnCharsToBytes(LineData, StartColumn, False);
@@ -2077,16 +2077,16 @@ var
   FinalUChar: TGXUnicodeString;
   UTF8Str: UTF8String;
 begin
-  if RunningRS2009OrGreater then
+  if RunningDelphi8OrGreater then
   begin
     UString := UTF8ToUnicodeString(LineData);
     UString := Copy(UString, 1, CharIndex);
-    UTF8Str := UTF8String(UString);
+    UTF8Str := UTF8String(UTF8Encode(UString));
     Result := Length(UTF8Str);
     if not EndByte then
     begin
       FinalUChar := UString[Length(UString)];
-      UTF8Str := Utf8String(FinalUChar);
+      UTF8Str := Utf8String(UTF8Encode(FinalUChar));
       Result := Result - (Length(UTF8Str)) + 1;
     end;
   end
