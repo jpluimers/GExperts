@@ -198,7 +198,7 @@ begin
     Exit;
   OldClientWidth := lvMessages.ClientWidth;
   if NewMsg.DebugType = dtAnsiMessage then
-    AddMessage(NewMsg.MessageType, NewMsg.AnsiMsg)
+    AddMessage(NewMsg.MessageType, string(NewMsg.AnsiMsg))
   else if NewMsg.DebugType = dtUnicodeMessage then
     AddMessage(NewMsg.MessageType, NewMsg.UnicodeMsg);
   // Resize the header when the scrollbar is added
