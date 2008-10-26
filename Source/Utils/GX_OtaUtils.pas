@@ -72,10 +72,11 @@ procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream; T
 // If UseSelection is True, get the selected text in the current edit view
 // (if any) and return True or get all of the editor's text (if no selection)
 // and return False
-function GxOtaGetActiveEditorText(Stream: TStream; UseSelection: Boolean = True): Boolean;
+function GxOtaGetActiveEditorText(Lines: TGXUnicodeStringList; UseSelection: Boolean = True): Boolean;
 
 // Returns the editor's active text as a string, similar to above
 function GxOtaGetActiveEditorTextAsString(var Text: string; UseSelection: Boolean = True): Boolean;
+function GxOtaGetActiveEditorTextAsUnicodeString(var Text: TGXUnicodeString; UseSelection: Boolean = True): Boolean;
 
 // Get current identifier under cursor in the active edit buffer
 // Scans current line from cursor position to left and right for identifier name.
@@ -550,6 +551,7 @@ procedure GxOtaShowEditViewDetails;
 {$IFDEF GX_VER160_up}
 function ConvertToIDEEditorString(const S: string): UTF8String;
 function IDEEditorStringToString(const S: UTF8String): string; overload;
+function IDEEditorStringToUnicodeString(const S: UTF8String): TGXUnicodeString;
 {$ELSE}
 function ConvertToIDEEditorString(const S: string): string;
 {$ENDIF}
@@ -3409,15 +3411,13 @@ begin
     Stream.Write(TerminatingNullChar, SizeOf(TerminatingNullChar)); // The source parsers need this
 end;
 
-function GxOtaGetActiveEditorText(Stream: TStream; UseSelection: Boolean): Boolean;
+function GxOtaGetActiveEditorText(Lines: TGXUnicodeStringList; UseSelection: Boolean): Boolean;
 var
   ISourceEditor: IOTASourceEditor;
   IEditView: IOTAEditView;
-  IEditReader: IOTAEditReader;
-  BlockSelText: string;
 begin
-  Assert(Stream <> nil);
-
+  Assert(Assigned(Lines));
+  Lines.Clear;
   Result := False;
 
   ISourceEditor := GxOtaGetCurrentSourceEditor;
@@ -3427,18 +3427,15 @@ begin
   if ISourceEditor.EditViewCount > 0 then
   begin
     IEditView := GxOtaGetTopMostEditView(ISourceEditor);
-    Assert(IEditView <> nil);
 
-    if (IEditView.Block.Size > 0) and UseSelection then
+    if UseSelection and Assigned(IEditView) and Assigned(IEditView.Block) and (IEditView.Block.Size > 0) then
     begin
-      BlockSelText := IDEEditorStringToString(IEditView.Block.Text);
-      Stream.WriteBuffer(PAnsiChar(ConvertToIDEEditorString(BlockSelText))^, Length(BlockSelText) + SizeOf(Byte(0)));
+      Lines.Text := GxOtaGetCurrentSelection(False);
       Result := True;
     end
     else
     begin
-      IEditReader := ISourceEditor.CreateReader;
-      GxOtaSaveReaderToStream(IEditReader, Stream);
+      GxOtaLoadSourceEditorToUnicodeStrings(ISourceEditor, Lines);
       Result := False;
     end;
   end;
@@ -3446,14 +3443,22 @@ end;
 
 function GxOtaGetActiveEditorTextAsString(var Text: string; UseSelection: Boolean): Boolean;
 var
-  StringStream: TStringStream;
+  Lines: TGXUnicodeString;
 begin
-  StringStream := TStringStream.Create('');
+  Result := GxOtaGetActiveEditorTextAsUnicodeString(Lines, UseSelection);
+  Text := Lines;
+end;
+
+function GxOtaGetActiveEditorTextAsUnicodeString(var Text: TGXUnicodeString; UseSelection: Boolean): Boolean;
+var
+  Lines: TGXUnicodeStringList;
+begin
+  Lines := TGXUnicodeStringList.Create;
   try
-    Result := GxOtaGetActiveEditorText(StringStream, UseSelection);
-    Text := StringStream.DataString;
+    Result := GxOtaGetActiveEditorText(Lines, UseSelection);
+    Text := Lines.Text;
   finally
-    FreeAndNil(StringStream);
+    FreeAndNil(Lines);
   end;
 end;
 
@@ -4319,6 +4324,15 @@ end;
 function ConvertToIDEEditorString(const S: string): UTF8String;
 begin
   Result := AnsiToUtf8(S);
+end;
+
+function IDEEditorStringToUnicodeString(const S: UTF8String): TGXUnicodeString;
+begin
+  {$IFDEF UNICODE}
+  Result := TGXUnicodeString(S);
+  {$ELSE}
+  Result := UTF8Decode(S);
+  {$ENDIF}
 end;
 {$ELSE}
 function ConvertToIDEEditorString(const S: string): string;
