@@ -1,13 +1,14 @@
 The GExperts source code is provided under an Open Source license to
-encourage users to contribute bug fixes and new features.  A basic
-introduction to the source code is given below the compilation steps.
-For the rules reguarding the usage of our source code, see License.txt
-and the FAQs on our web site.
+encourage users to contribute bug fixes and new features.  For the rules
+reguarding the usage of our source code, see License.txt and the FAQs on
+our web site.  A basic introduction to the source code is given below the
+compilation steps.
 
 Compiling the Source Code
 ------------------------------------------------------------------------------
 
 - Open one of the the following projects from the Source directory:
+    GExpertsRS2009.dproj      RAD Studio 2009
     GExpertsDelphi2007.dproj  Delphi 2007
     GExpertsBDS2006.dpr       BDS 2006
     GExpertsDelphi2005.dpr    Delphi 2005 (Delphi 9)
@@ -21,7 +22,7 @@ Compiling the Source Code
 
 - Ensure the following directories exist on the projects search path:
   in the Project Options dialog:
-  - Framework;..\ExternalSource;..\ExternalSource\Abbrevia;
+  - Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit
 
 - Open Project | Options
   - On the Packages page, check the "Build with runtime packages"
@@ -41,20 +42,14 @@ Compiling the Source Code
     Evaluation but leave on assertions, range checks, overflow checks,
     IO checks, etc. 
 
-- If you want to compile GExperts with SynEdit text editor, edit
-  Source\Framework\GX_CondDefine.inc as described there.  Some
-  of the experts require that component.  You may have to edit the
-  global library path for successful compilation.
-
 - Build the project and install the resulting DLL into the IDE using
   the registry editor "Regedit.exe" as described in the included
   Readme.txt file (remove any older versions of GExperts first)
 
 - To build the GExperts Debug Window, compile the project
      Source\StandAlone\DebugWindow\GExpertsDebugWindow.dpr
-  GExperts Debug Window does NOT work under Linux.
-  Do the same for ExpertManager.dpr, GExpertsGrep.dpr, CodeLibrarian.dpr if you would like to
-  have stand-alone versions of these experts.
+  Do the same for ExpertManager.dpr, GExpertsGrep.dpr, CodeLibrarian.dpr if
+  you want stand-alone versions of these experts.
 
 NOTE: If, while opening forms at runtime or designtime, you get
 errors stating things like "Property XXX does not exist", you need to

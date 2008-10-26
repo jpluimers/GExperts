@@ -1,4 +1,4 @@
-GExperts 1.33 Beta 1
+GExperts 1.33 Beta 2
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -94,27 +94,30 @@ the latest updates and patches for your IDE available from:
 UNINSTALLATION
 ----------------------
 Uninstallation of GExperts can be done from the Control Panel's
-Add/Remove Programs or Programs [and Features] tool under Vista.
+Add/Remove Programs or Programs [and Features] tool (under Vista).
 
 
 CHANGE LOG
 ----------------------
-VERSION 1.33 Beta (September 25, 2008)
-- General: Added beta support for RAD Studio 2009.  Some of the tools such
-  as the grep search and replace, source code parser (class browser,
-  procedure list, etc.) have only very limited unicode support.  The Source
-  Export, Code Librarian, and basic editor experts should have full unicode support.
-  Shutdown optimizations, removal of all known memory leaks, and other minor tweaks.
+VERSION 1.33 Beta (October, 2008)
+- General: Added basic support for RAD Studio 2009.  Note that some of the
+  tools that require our source code parser (Procedure List, Class Browser,
+  To Do List, Delimiter Editor Experts, etc.) do not have full unicode support.
+  Other tools such as the Grep Search/Replace, Source Export, Code Librarian,
+  etc. should support UNICODE files just fine.  Also included are some shutdown
+  optimizations, removal of all known memory leaks, and other minor tweaks.
 - Grep Search: There is a new regular expression engine that supports a large
-  subset of the Perl regular expression syntax, etc.  Grep can now search
-  files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.  Note: Grep replace
-  does not fully support unciode yet.
-- Code Proofreader: Should be slightly more accurate with fewer false positive
-  corrections made to your code.
+  subset of the Perl regular expression syntax.  Grep can now search and
+  replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.
+- Hide/Show Non-Visual Components: This new tool allows temporarily hiding
+  non-visual components on a form, so you can visualize the form as it will
+  appear at tunrime.
 - Editor Experts: The main menu contains a submenu item for each editor
   expert now in Delphi 8 or later.
 - Favorite Files: Supports preview of jpg, png, and gif files if the VCL
   supports it in your IDE version.
+- Code Proofreader: Should be slightly more accurate with fewer false positive
+  corrections made to your code.
 
 
 VERSION 1.32 (September 11, 2007)
@@ -186,253 +189,6 @@ VERSION 1.30 (October 26, 2006)
    Delphi 6/7 no longer requires a restart (Erik)
 
 
-VERSION 1.22 (January, 2005)
- - General: Work around new Delphi 2005 Update 1 bug causing various
-   "Interface not supported" errors for Grep Search, Message Dialog, etc.
- - Procedure List: Fix parsing of non-compiling C++ code to avoid infinite loops
- - Rename Components: Works for both string/widestring name properties
- - Code Proofreader: Prevent Delphi 7/2005 from popping up a dialog stating
-   "Unable to invoke Code Completion due to errors in source code" with unknown
-   identifiers present.
- - Clipboard History: Speed up save/load of clipboard history items with a
-   stored maximum of 100, fix copying/deleting of individual saved items.
-
-
-VERSION 1.21 (November, 2004)
- - General: Added basic support for Delphi 2005
- - Macro Templates: Improve saving macros with trailing CRLF characters
- - Editor Experts: Improve handling of UNIX-style line endings
-	 Fix parsing of empty strings and strings with embedded quotes
- - Backup Project: Fix finding files to backup on the IDE library path
- - Components to Code: Support exporting whole forms at once
- - Component Grid: Add support for variant Tag properties
- - Grep Search: Fix searches of root directories of disk drives
-
-
-VERSION 1.20 (August, 2004)
- - General: Several of the tools now save their data to XML files using
-   OmniXML (http://omnixml.com/), update to SynEdit 1.2+ for syntax
-   highlighting, new shared toolbar/button bitmaps throughout GExperts,
-   Components to Code and Copy Component Names are available from the
-   form designer menu, lots of internal changes to improve code clarity
-   and safety.
- - Delphi 8: Preliminary Delphi 8 support is included.  It is largely
-   untested and has several limitations as documented in the "KNOWN
-   LIMITATIONS/BUGS" section.  This includes basic support for some Delphi
-   8 syntax elements such as operator, static, strict, dotted class names,
-   nested classes, and .nfm form files.
- - Macro Templates: New editor expert that allows you to define an
-   unlimited number of templates to insert into the editor, similar to
-   the IDE's code templates, but with support for lots of replaceable
-   macros, like %PROJECTNAME% (Piotr Likus, Erik).
- - Rename Components - Define component renaming rules that execute when
-   components are added to a form.  The rules can be completely automatic,
-   or allow the user to override the new name (Achim Kalwa, Erik).
- - Copy Component Names - New tool to copy the form designer's selected
-   component names to the clipboard (Alexander Golovko)
- - Clipboard History: Saves the clipboard text items to an XML file.
- - Grep Search: New configuration option to make the default search string
-   the identifier under the edit cursor, allow skipping comments in
-   Delphi/C++ source files (Benjamin Fournier), multi-file search and
-   replace inside the grep results (Jim Campbell, Erik)
- - Grep Results: New view option to hide the toolbar, show path names
-   relative to the search root, new options dialog (Peter Nagel, Erik)
- - Class Browser: Allows searching by a partial class name
- - Code Librarian: Always sort folders before code snippets.  Stores the
-   code snippets using a custom structured storage library written
-   by Primož Gabrijelcic to remove the database dependencies (Erik).
- - Backup Project: Include h/bpr/dof/todo files when backing up a project,
-   C++ support to add files using "#pragma backup FileSpec" (Benjamin
-   Fournier), support quoted names and relative paths when using #backup.
-   Abbrevia is now the library we use to create .zip files.
- - Macros: Many new substitution macros: %VERFILEVERSION%, %VERPRODUCTVERSION%,
-   %VERMAJOR%, %VERMINOR%, %VERRELEASE%, %VERBUILD%, %SELECTION%, %CLIPBOARD%,
-   %USER%, %BEFORE%, %INTERFACE%, %IDENT%, %INPUTVAR%, etc.
-   See the help file for more details.
- - Project Option Sets: New tabbed GUI that is easier to use when docked
-   and conversion to an XML storage format (John Hansen)
- - Editor Experts: Removed procedure/unit header experts, since the
-   macro templates editor expert provides all of their functionality,
-   New editor expert to reverse all assignment statements and for loops in
-   a selected block of code (help from Per-Eric Larsson, Ulrich Gerhardt),
-   Support for matching delimiters in C++ code and matching from ending to
-   beginning delimiters (Benjamin Fournier), Added Delphi delimiter matching
-   support for with, while, then, do, if, else, for, class, record, array,
-   interface, implementation, uses, private, protected, public, and published
-   (Erik), New editor expert to change the selection case (Thomas Due, Erik),
-   New editor expert to select the current identifier.
- - Uses Clause Manager: New editor expert to add and remove items from
-   uses clauses.  It allows incremental search to add a unit from the
-   library path, project, etc. (Erik, Per-Eric Larsson, and Eyal Post)
- - Procedure List: C++ Nested procedure/namespace/.h support and other
-   C++ parsing improvements (John Hansen, Erik)
- - Components to Code: Added C++ support (Benjamin Fournier)
- - To Do List: Added C++ support (Benjamin Fournier)
- - Code Proofreader: Basic support for compiler-assisted correction under
-   Delphi 7+.  It does not work when a symbol is terminated with a '.'.
-   Saves the configuration data to CodeProofreader.xml instead of a
-   TClientDataSet .cds file (Ulrich Gerhardt, Erik).
- - IDE Enhancements: Under Delphi 7+, the popup menu of tab names is now
-   activated by a button to the right of the palette to work around the
-   lack of menu columns/scrolling in the IDE context menu (Achim Kalwa).
-   The GExperts main menu items now automatically arrange themselves in a
-   submenu on low resolution screens to ensure all menu items are available.
- - Replace Components: New option to not use with statements when
-   generating Delphi code (Benjamin Fournier)
- - Project Dependencies: Custom dependency filtering and the ability to
-   export the dependency list (John Hansen, Erik)
- - Message Dialog: Added support for MessageBox dialogs, New options to
-   embed the dialog call in a case statement, quote or not quote the
-   message string, and copy the code to the clipboard (Paul Gardner, Erik)
- - Set Tab Order: Added the ability to estimate the best tab order for
-   children of the selected parent component by comparing the Top/Left
-   properties of the children. Changed the tab order display to be a
-   drag and drop tree rather than a list. (Alessandro Storniolo)
- - Favorite Files: The data is now saved to an XML file called
-   FavoriteFiles.xml (help from Ulrich Gerhardt).
- - Help File: Updated for 1.2 (Mike Gallaher, Erik)
-
-
-VERSION 1.12 (August, 2002)
- - General: Added support for Delphi 7 and C++Builder 6.01/6.02
- - Remove RLE compressed bitmaps to satisfy buggy video drivers
- - Procedure List: Fix infinite loop parsing some C++ source files
- - Backup Project: Remove .bpg extension from %PROJECTGROUPNAME% macro
- - Grep: Never search the same file twice when searching project groups
-   Highlighting a matched search term deals better with leading tabs
-   Deal better with corrupt DFMs, and accidental grep of binary files
-   Search the project file when searching all files in the project
- - Editor Experts: Header experts use C++ comments under BCB by default
- - Clean Directories: Added check/uncheck all and invert to popup menus
- - Editor Toolbar: Don't allow Close and Close All toolbar buttons,
-   since they aren't stable
- - Replace Components: Support recreating TTabSheet components
- - Code Proofreader: Fixed an odd AV with lots of help from Eyal Post
- - Project Dependencies: Allow aborting a dependency scan
-
-
-VERSION 1.11 (February 19, 2002)
- - General: Fixed problems creating menu items in French IDE editions
-   Added support for Delphi 6.02 and C++Builder 6 (largely untested)
- - Clipboard History: Options were not always saved
- - Grep Search: Treat '_' and numeric characters as part of a word
-   when searching in "Whole word" matching mode
- - Code Proofreader: Allow the same dictionary word to be added to
-   more than one correction language
- - PE Information: Detect more binary/subsystem/CPU types and report
-   more detailed image/DLL characteristics
- - Priority Booster: Removed this expert since it wasn't working/useful
-
-
-VERSION 1.1 (January 23, 2002)
- - General: Conversion to use the new Open Tools API (ToolsAPI.pas)
-   Underlying expert architecture completely redesigned (Stefan)
-   Removed support for Delphi 3, 4 and C++Builder 3, 4
-   Added Delphi 6 and very limited Kylix support
-   Added support for CLX/XFM forms in many experts
-   Main configuration dialog is resizable
-   All of the database experts use Client DataSets instead of the BDE
-   under Delphi 6 Professional/Enterprise and Delphi 5 Enterprise
-   Lots of minor UI changes, features, and bug fixes....
- - To Do List: Support for scanning an entire project group and multiple
-   (semicolon separated) directories
- - Grep Search: Support for scanning an entire project group and multiple
-   (semicolon separated) directories
- - Grep Results: Support for showing the context around matched lines
-   Jumping to a match selects the match in the editor (Rick Hollerich)
-   Results can be exported to the clipboard or a file (Rick Hollerich)
-   Multiple matches on a single line are consolidated (Rick Hollerich)
-   New option to always expand matches when searching completes
- - Message Dialog: Optionally generates a supporting if statement
-   Automatically adds [Q]Dialogs to the uses clause if it is not already
-   present (from Krzysztof Jez)
- - Debug Window: UI cleanup, added "Hide Toolbar", "Stay on Top", "Pause",
-   and remote clear capability (see DbugIntf.pas)
- - Code Librarian: Snippets can be stored in a TClientDataSet
-   You must set the read-only attribute on the CodeDB.cds file to safely
-   share it over a network
- - Code Proofreader: Configuration dialog is resizable
-   Dictionary and Auto Correct entries can be stored in a TClientDataSet
-   and can contain replacement/dictionary strings up to 75 characters
- - IDE Enhancements: The top-level GExperts menu item can optionally
-   be placed in the Tools menu (Michael Beck)
-   The Object Inspector can be configured to show font names in the
-   drop-down list using each font's typeface
- - Editor Toolbar: More comprehensive set of possible toolbar buttons
-   Toolbar bitmaps match those used by the IDE (Stefan)
-   Toolbar buttons automatically enable/disable as necessary
-   New button to show/open units used by the current unit (John Hansen)
-   New button to jump to specific positions in a unit (John Hansen)
- - Editor Experts: New editor expert to sort the selected lines
-   New editor experts to jump to the previous/next occurrence of the
-   current identifier (from Max Vlasov)
- - Procedure List: Procedure extraction is about 4 times faster
-   Added support for parsing C++ files (Ales Kahanek)
- - Clean Directories: The unit output and executable output directories
-   can be included in the default list of cleanable directories
- - Backup Project: Searches both the IDE and project library paths
-   looking for included files.  Project parsing progress is reported.
- - Project Dependencies: Can open any unit found on the library path.
- - Feedback Wizard: The GExperts about box can bring up a wizard that
-   makes it easy to send "useful" bug reports and other feedback.
-   Please do not send feedback directly to the developers via email
-   any longer. (Stig Jørgensen)
- - Help File: Updated to reflect the latest changes (James Roberts).
-
-
-VERSION 1.01 (May 19, 2001)
- - General: All known bugs are fixed
- - Clean Directories: Recursive deletion was not working under Delphi 3
- - Clipboard History: Coexists with other clipboard history applications
- - Code Librarian: Fixed a possible AV when using "Contract All"
- - Replace Components: Works for data modules now
- - Grep Search: Disabled the "Ignore comments" option until it is fixed
- - PE Information: Allow clipboard copying of the "Exports" tab
- - Project Option Sets: Fixed option filtering/sorting problems
-
-
-VERSION 1.00 (February, 2001)
- - General: All of the experts except the Code Proofreader can be
-   dynamically enabled and disabled from the configuration dialog.
-   Modified docked window menus to only activate when the docked form
-   contains the currently focused control.  GExperts menu items can
-   now be placed on the IDE's toolbar. Menu shortcuts are no longer
-   lost when loading a project group.
- - Editor Experts: Fixed a possible range check error in the
-   delimiter experts when the cursor was near the top of a unit.
-   Comment and uncomment experts work around a common IDE AV. Procedure
-   header has two new macros: %RESULT% and %ARGUMENTS%.
- - Perfect Layout: Improved the results when the Object Inspector
-   is docked into the edit window.  Loads data from the right registry
-   key (Thomas Mueller).
- - Grep Results: Fixed some minor problems opening and setting focus
-   to DFM files when jumping to a grep match.  It still isn't perfect.
-   Fixed a possible memory leak.
- - Replace Components: Works with modules outside the current project.
- - Editor Toolbar: Improved sizing and positioning with respect to
-   docked windows.
- - Code Proofreader: The '|' character can be used in AutoCorrect
-   entries to determine the cursor position after a correction.
- - Code Librarian: Double-clicking a code snippet node copies the text
-   into the code editor and closes the Code Librarian.
- - To Do List: A cosmetic problem left the to do entry's displayed line
-   number off by one.  Now supports jumping to one of multiple to do
-   entries with the exact same comment text.
- - Class Browser: Works better with method resolution clauses (method
-   redirections), multiple interface inheritance, non-standard calling
-   conventions, multiple variable declarations on a single line,
-   property overrides, non-standard line endings, and is generally more
-   accurate when jumping to or viewing the code for class members.
- - Favorite Files: Projects, project groups, and packages will by default
-   try to close the current project before opening themselves.
-   Splitter position is saved/restored correctly.  The modified flag is
-   set after editing the file list.
- - Project Option Sets: Fixed an issue preventing setting environment
-   options that were comma delimited strings.
- - Backup Project: Reports files it is unable to find or open.
- - Help File: Updated to reflect the latest changes.
-
-
 FUTURE ENHANCEMENTS?
 ----------------------
 - [Unassigned] Persistent editor bookmarks
@@ -441,11 +197,8 @@ FUTURE ENHANCEMENTS?
   FileVersion with ProductVersion
 - [Unassigned] Add GX_MessageBox warnings to the Pascal only experts
   when used under C++Builder
-- [Unassigned] Save/Restore of editor macros
 - [Unassigned] Replace SortGrid with a TListView and make the various
   TListViews sortable
-- [Unassigned] Integrate a full regular expression parser as a
-  compile-time option to the grep search
 - [Unassigned] Allow adding some common editor and object inspector
   actions to the editor toolbar?
 - [Unassigned] Add support for hiding the toolbar on all dockable experts
