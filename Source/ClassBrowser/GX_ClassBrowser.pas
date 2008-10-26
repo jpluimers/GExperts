@@ -748,8 +748,7 @@ procedure TfmClassBrowser.LoadCode;
 
   procedure LoadCodePane(const F: string);
   var
-    EditRead: TEditReader;
-    AMemoryStream: TMemoryStream;
+    Lines: TGXUnicodeStringList;
   begin
     if FCurrentCodePaneFile = F then
     begin
@@ -759,19 +758,12 @@ procedure TfmClassBrowser.LoadCode;
     else
       FCurrentCodePaneFile := F;
 
-    FCodeText.Clear;
-    EditRead := TEditReader.Create(F);
+    Lines := TGXUnicodeStringList.Create;
     try
-      AMemoryStream := TMemoryStream.Create;
-      try
-        EditRead.SaveToStream(AMemoryStream);
-        AMemoryStream.Position := 0;
-        FCodeText.LoadFromStream(AMemoryStream);
-      finally
-        FreeAndNil(AMemoryStream);
-      end;
+      GxOtaLoadFileToUnicodeStrings(F, Lines);
+      FCodeText.Text := Lines.Text;
     finally
-      FreeAndNil(EditRead);
+      FreeAndNil(Lines);
     end;
   end;
 
