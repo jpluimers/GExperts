@@ -68,6 +68,8 @@ function GetIdeEditorBackgroundColor: TColor;
 procedure SetNonModalFormPopupMode(Form: TCustomForm);
 procedure SetModalFormPopupMode(Form: TCustomForm);
 
+function GetIDEVersionID: string;
+
 function RunningWindows: Boolean;
 function RunningLinux: Boolean;
 function RunningDelphi8: Boolean;
@@ -369,6 +371,20 @@ begin
   if Assigned(Form) then
     Form.PopupMode := pmAuto;
   {$ENDIF GX_VER160_up}
+end;
+
+function GetIDEVersionID: string;
+var
+  RegKey: string;
+  LastSlashPos: Integer;
+  Version: string;
+begin
+  RegKey := GxOtaGetIdeBaseRegistryKey;
+  LastSlashPos := LastCharPos(RegKey, '\');
+  Version := Copy(RegKey, LastSlashPos + 1, 999);
+  Result := Version;
+  if RunningDelphi8OrGreater then
+    Result := 'BDS' + Version;
 end;
 
 function RunningWindows: Boolean;
