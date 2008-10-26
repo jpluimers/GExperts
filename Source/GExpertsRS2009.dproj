@@ -213,6 +213,7 @@
 				<Form>fmGrepSearch</Form>
 			</DCCReference>
 			<DCCReference Include="Utils\GX_GxUtils.pas"/>
+			<DCCReference Include="Experts\GX_HideNonVisualComps.pas"/>
 			<DCCReference Include="Framework\GX_IconMessageBox.pas"/>
 			<DCCReference Include="IDEDocking\GX_IdeDock.pas">
 				<Form>fmIdeDockForm</Form>
@@ -364,7 +365,6 @@
 			<DCCReference Include="Framework\GX_VerDepConst.pas"/>
 			<DCCReference Include="Utils\GX_XmlUtils.pas"/>
 			<DCCReference Include="BackupProject\GX_Zipper.pas"/>
-			<DCCReference Include="Experts\GX_HideNonVisualComps.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
