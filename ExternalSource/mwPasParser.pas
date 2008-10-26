@@ -135,11 +135,12 @@ begin
   Length := 0;
 end; { Create }
 
-function TmPasToken.GetData;
+function TmPasToken.GetData: string; // This incorrectly returns data as UTF-8 for D8+
 begin
   SetString(Result, (Origin + Position), Length);
-end; { GetData }
+end;
 
+{ GetData }
 
 destructor TmPasParser.Destroy;
 begin
