@@ -4,7 +4,7 @@ Open Source Programming Tools for Delphi and C++Builder
 Source code, the FAQ, and the latest news are available at:
   http://www.gexperts.org/
 
-Please send bug reports and comments using the feedback wizard
+Please send all bug reports and suggestions using the feedback wizard
 available in the GExperts about box.  You may send other GExperts
 related queries to the project leader at:
   Erik Berry <eberry@gexperts.org> or <eb@techie.com>
@@ -28,20 +28,16 @@ GExperts contains numerous experts.  See the online help
 
 KNOWN LIMITATIONS/BUGS
 -----------------------------------------------
-- The following features are not supported under Delphi 8/2005/2006/2007:
-  UNICODE format text files, inner classes, class helpers, and generics in
-  the Class Browser, and some of the old editor tab enhancements, such as
+- The following features are not supported under Delphi 8 - 2009:
+  Inner classes, class helpers, anonymous methods, and generics in the
+  Class Browser, and some of the old editor tab enhancements, such as
   multiline editor tabs.  Note that the IDE converts some high ANSI and MBCS
   characters to UTF-8 UNICODE when loaded in the code editor, so you may
-  experience problems searching for or viewing those characters.  Those IDEs
-  also no longer have a tabbed component palette, so those options are no
-  longer supported, as well.
+  experience problems with those files (especially in Delphi 2007 and earlier).
 - The compiler replacement option of the Code Proofreader is only partially
-  working under Delphi 7-2005.  It does not correct when an identifier is
+  working under Delphi 7-2009.  It does not correct when an identifier is
   terminated by pressing a symbol key such as a period or open parenthesis,
   but works fine when the symbol is terminated by a space (IDE limitation).
-- You should turn off the "Ignore Comments" Grep Search option to perform a
-  search and replace on the results (GExperts limitation).
 - Due to either native Open Tools API limitations or bugs, the following
   items can not be supported under Delphi 8/2005/2006/2007/2009:
   Delphi 8 Only:
@@ -51,12 +47,12 @@ KNOWN LIMITATIONS/BUGS
   Delphi 2005 Only:
    - The Project Option Sets environment options (IDE bug)
    - Set Tab Order: Selecting components in the desired tab order (IDE bug)
-  Delphi 8, 2005, 2006, and 2007:
+  Delphi 8 - 2007:
    - Any interaction at all with the WinForms/.NET form designer/components
      (no WinForms support for IOTAFormEditor/IOTAComponent)
    - Replace Components for VCL.NET (No direct access to components)
    - Components to Code for VCL.NET (No direct access to components)
-  Delphi 8, 2005, 2006, 2007, and 2009:
+  Delphi 8 - 2009:
    - It is no longer possible for addins to override some built-in IDE
      shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
      Identifier, Procedure List, etc.) to not conflict with your selected
@@ -67,7 +63,7 @@ KNOWN LIMITATIONS/BUGS
 
 INSTALLATION
 ----------------------
-  GExperts is distributed as a self-installing executable that should
+GExperts is distributed as a self-installing executable that should
 automatically install itself into the IDE.  If you are installing under
 Vista as a non-administrator, you may need to manually register the GExperts
 DLL with the IDE after installation.  This is most easily done using the
@@ -86,7 +82,7 @@ GExperts=C:\Program Files\GExperts\GExpertsDelphiX.dll
 GExperts=C:\Program Files\GExperts\GExpertsBDSX.dll or
 GExperts=C:\Program Files\GExperts\GExpertsDX.dll or
 
-  Before installing GExperts, it is strongly recommended that you install
+Before installing GExperts, it is strongly recommended that you install
 the latest updates and patches for your IDE available from:
   http://www.codegear.com/
 
@@ -233,11 +229,8 @@ MISCELLANEOUS NOTES
 
 THANKS
 ----------------------
-Vincent Parrett donated a copy of FinalBuilder 5
+Vincent Parrett donated a copy of FinalBuilder 6
 http://www.atozedsoftware.com/
-
-AutomatedQA donated copies of AQTime and TestComplete
-http://www.automatedqa.com/
 
 Alexander Halser donated a copy of Help and Manual 3
 http://www.helpandmanual.com/
