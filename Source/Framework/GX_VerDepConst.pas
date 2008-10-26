@@ -319,11 +319,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
     {$ENDIF LINUX}
 
     {$IFDEF MSWINDOWS}
-      {$IFNDEF BCB}
       CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\7.0';
-      {$ELSE BCB}
-      CompilerDefinedProductRegistryKey = CompanyRegPrefix + C++Builder\7.0';
-      {$ENDIF BCB}
       {$DEFINE IdeBaseKey}
     {$ENDIF MSWINDOWS}
   {$ENDIF VER150}
@@ -377,11 +373,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
   {$ENDIF VER140}
 
   {$IFDEF VER150}
-    {$IFNDEF BCB}
     ClassBrowserStorageFolder = 'Storage7';
-    {$ELSE BCB}
-    ClassBrowserStorageFolder = 'Storage7.BCB';
-    {$ENDIF BCB}
     {$DEFINE ClassBrowserStorageDefined}
   {$ENDIF VER150}
 

@@ -113,22 +113,15 @@ var
 
 function TfmSourceExport.FillEditControlWithIdeData: Boolean;
 var
-  MemStream: TMemoryStream;
-  WithBOM: Boolean;
+  Lines: TGXUnicodeString;
 begin
   Assert(Assigned(FEditor));
 
   FEditor.ClearAll;
   SetSynEditHighlighter(FEditor, GetGXHighlighterForCurrentSourceEditor);
 
-  MemStream := TMemoryStream.Create;
-  try
-    Result := GxOtaGetActiveEditorText(MemStream);
-    MemStream.Position := 0;
-    SynUnicode.LoadFromStream(FEditor.Lines, MemStream, GX_SynMemoUtils.IDEEditorEncoding, WithBOM);
-  finally
-    FreeAndNil(MemStream);
-  end;
+  Result := GxOtaGetActiveEditorTextAsUnicodeString(Lines);
+  FEditor.Lines.Text := Lines;
 end;
 
 procedure TfmSourceExport.LoadSettings;

@@ -48,7 +48,8 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, SynEditHighlighter, SynUnicode, GX_SynMemoUtils, GX_VerDepConst, GX_GenericUtils;
+  SysUtils, SynEditHighlighter, SynUnicode, GX_SynMemoUtils, GX_VerDepConst, GX_GenericUtils,
+  GX_IdeUtils;
 
 {$R *.dfm}
 
@@ -179,7 +180,7 @@ begin
     FSampleEditor.Highlighter.EnumUserSettings(UserSettings);
     for i := UserSettings.Count - 1 downto 0 do
     begin
-      if StrBeginsWith(MajorVersionNumberChar + '.', UserSettings[i]) then
+      if StrBeginsWith(GetIDEVersionID, UserSettings[i]) then
       begin
         if not FSampleEditor.Highlighter.UseUserSettings(i) then
           MessageDlg(ErrorLoadingIDESettings, mtError, [mbOK], 0);

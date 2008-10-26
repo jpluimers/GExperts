@@ -6,7 +6,7 @@ interface
 
 uses  // If you get errors here, edit GX_CondDefine.inc or add SynEdit to your library path
   {$IFDEF SYNEDIT} SynEdit, SynUnicode, {$ENDIF SYNEDIT}
-  GX_GenericUtils;
+  GX_GenericUtils, GX_IDEUtils;
 
 function GetGXHighlighterForCurrentSourceEditor: TGXSyntaxHighlighter;
 
@@ -67,7 +67,7 @@ begin
     SynEdit.Highlighter := TSynGeneralSyn.Create(SynEdit);
   end;
   if Highlighter in [gxpPAS, gxpCPP, gxpSQL, gxpCS] then
-    GxGetIDEHighLigherSettings(SynEdit.Highlighter, GX_VerDepConst.MajorVersionNumberChar + '.0');
+    GxGetIDEHighLigherSettings(SynEdit.Highlighter, GetIDEVersionID);
 end;
 
 {$ENDIF SYNEDIT}
