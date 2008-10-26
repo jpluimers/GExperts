@@ -172,8 +172,11 @@ end;
 
 procedure TfmCompRenameConfig.FormResize(Sender: TObject);
 begin
-  Grid.ColWidths[0] := (Grid.ClientWidth div 2) - 1;
-  Grid.ColWidths[1] := Grid.ColWidths[0];
+  if Assigned(Grid) then // Or Delphi 2009 crashes here...
+  begin
+    Grid.ColWidths[0] := (Grid.ClientWidth div 2) - 1;
+    Grid.ColWidths[1] := Grid.ColWidths[0];
+  end;
 end;
 
 procedure TfmCompRenameConfig.CopyValuesToGrid;
