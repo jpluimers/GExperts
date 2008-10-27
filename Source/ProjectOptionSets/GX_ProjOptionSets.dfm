@@ -1,8 +1,8 @@
 inherited fmProjOptionSets: TfmProjOptionSets
   Left = 399
   Top = 185
-  Width = 198
-  Height = 357
+  Width = 238
+  Height = 430
   Caption = 'Project Option Sets'
   Position = poScreenCenter
   OnHide = FormHide
@@ -13,8 +13,8 @@ inherited fmProjOptionSets: TfmProjOptionSets
   object pcSettings: TPageControl
     Left = 0
     Top = 42
-    Width = 190
-    Height = 286
+    Width = 222
+    Height = 352
     ActivePage = tabSets
     Align = alClient
     TabIndex = 0
@@ -23,13 +23,13 @@ inherited fmProjOptionSets: TfmProjOptionSets
       Caption = '&Sets'
       ImageIndex = 2
       DesignSize = (
-        182
-        258)
+        214
+        324)
       object lstSets: TListBox
         Left = 2
         Top = 5
-        Width = 177
-        Height = 252
+        Width = 217
+        Height = 325
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         PopupMenu = pmuSets
@@ -48,24 +48,24 @@ inherited fmProjOptionSets: TfmProjOptionSets
       end
       object pnlFilterComboHost: TPanel
         Left = 0
-        Top = 230
-        Width = 182
+        Top = 296
+        Width = 214
         Height = 28
         Align = alBottom
         BevelOuter = bvNone
         FullRepaint = False
         TabOrder = 0
         DesignSize = (
-          182
+          214
           28)
         object cbFilter: TComboBox
           Left = 2
           Top = 3
-          Width = 178
+          Width = 210
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          DropDownCount = 12
+          DropDownCount = 16
           ItemHeight = 13
           TabOrder = 0
           OnChange = cbFilterChange
@@ -74,8 +74,8 @@ inherited fmProjOptionSets: TfmProjOptionSets
       object pnlCheckListHost: TPanel
         Left = 0
         Top = 0
-        Width = 182
-        Height = 230
+        Width = 214
+        Height = 296
         Align = alClient
         BevelOuter = bvNone
         Caption = 'TCheckListBox Created At Runtime'
@@ -103,7 +103,7 @@ inherited fmProjOptionSets: TfmProjOptionSets
   object pnlCurrentSet: TPanel
     Left = 0
     Top = 22
-    Width = 190
+    Width = 222
     Height = 20
     Align = alTop
     Alignment = taLeftJustify
@@ -115,7 +115,7 @@ inherited fmProjOptionSets: TfmProjOptionSets
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 190
+    Width = 222
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

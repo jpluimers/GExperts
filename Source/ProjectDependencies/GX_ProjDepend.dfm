@@ -1,8 +1,8 @@
 object fmProjDepend: TfmProjDepend
   Left = 282
   Top = 149
-  Width = 539
-  Height = 409
+  Width = 683
+  Height = 568
   Caption = 'Project Dependencies'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,16 +20,16 @@ object fmProjDepend: TfmProjDepend
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter: TSplitter
-    Left = 190
+    Left = 213
     Top = 22
     Width = 3
-    Height = 319
+    Height = 471
     Cursor = crHSplit
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 341
-    Width = 531
+    Top = 493
+    Width = 667
     Height = 19
     Panels = <>
     SimplePanel = False
@@ -37,8 +37,8 @@ object fmProjDepend: TfmProjDepend
   object tvUnits: TTreeView
     Left = 0
     Top = 22
-    Width = 190
-    Height = 319
+    Width = 213
+    Height = 471
     Align = alLeft
     HideSelection = False
     Images = dmSharedImages.Images
@@ -53,10 +53,10 @@ object fmProjDepend: TfmProjDepend
     OnKeyDown = tvUnitsKeyDown
   end
   object pnlPageControlHost: TPanel
-    Left = 193
+    Left = 216
     Top = 22
-    Width = 338
-    Height = 319
+    Width = 451
+    Height = 471
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
@@ -64,10 +64,11 @@ object fmProjDepend: TfmProjDepend
     object pcData: TPageControl
       Left = 0
       Top = 0
-      Width = 338
-      Height = 319
+      Width = 451
+      Height = 471
       ActivePage = tshUnitUses
       Align = alClient
+      TabIndex = 0
       TabOrder = 0
       OnChange = pcDataChange
       object tshUnitUses: TTabSheet
@@ -75,8 +76,8 @@ object fmProjDepend: TfmProjDepend
         object lvUnitUses: TListView
           Left = 0
           Top = 0
-          Width = 330
-          Height = 291
+          Width = 443
+          Height = 443
           Align = alClient
           Columns = <
             item
@@ -103,8 +104,8 @@ object fmProjDepend: TfmProjDepend
         object lvUsedBy: TListView
           Left = 0
           Top = 0
-          Width = 330
-          Height = 291
+          Width = 443
+          Height = 443
           Align = alClient
           Columns = <
             item
@@ -131,8 +132,8 @@ object fmProjDepend: TfmProjDepend
         object lvIndirect: TListView
           Left = 0
           Top = 0
-          Width = 330
-          Height = 291
+          Width = 443
+          Height = 443
           Align = alClient
           Columns = <
             item
@@ -160,7 +161,7 @@ object fmProjDepend: TfmProjDepend
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 531
+    Width = 667
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

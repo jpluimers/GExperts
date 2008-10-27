@@ -42,7 +42,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
       BevelOuter = bvNone
       TabOrder = 2
       object btnOK: TButton
-        Left = 16
+        Left = 18
         Top = 43
         Width = 75
         Height = 25
@@ -51,7 +51,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 0
       end
       object btnClose: TButton
-        Left = 108
+        Left = 105
         Top = 43
         Width = 75
         Height = 25
@@ -120,7 +120,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
       end
       object btnDelete: TButton
         Left = 369
-        Top = 48
+        Top = 50
         Width = 100
         Height = 28
         Action = acDelete
@@ -139,7 +139,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
       end
       object btnOtherProperties: TButton
         Left = 369
-        Top = 80
+        Top = 84
         Width = 100
         Height = 28
         Action = acOtherProperties

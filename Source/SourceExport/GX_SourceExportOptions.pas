@@ -33,7 +33,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure cbxAttributesChange(Sender: TObject);
     procedure btnLoadIdeClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure btnBackgroundColorClick(Sender: TObject);
   private
     FSampleEditor: TSynEdit;
@@ -220,8 +219,6 @@ var
   Attributes: TSynHighlighterAttributes;
   i: Integer;
 begin
-  // This code requires SynEdit 1.1 or greater, such as the CVS releases from:
-  // http://sourceforge.net/cvs/?group_id=3221
   FSampleEditor.GetHighlighterAttriAtRowCol(FSampleEditor.CaretXY, Token, Attributes);
   if Attributes = nil then
     Exit;
@@ -234,14 +231,6 @@ begin
       Break;
     end;
   end;
-end;
-
-procedure TfmSourceExportOptions.FormShow(Sender: TObject);
-begin
-  // Doing this in FormCreate causes the buttons to be placed badly in D5
-  FSampleEditor.Anchors := [akLeft, akTop, akBottom, akRight];
-  btnOK.Anchors := [akBottom, akRight];
-  btnCancel.Anchors := btnOK.Anchors;
 end;
 
 procedure TfmSourceExportOptions.btnBackgroundColorClick(Sender: TObject);

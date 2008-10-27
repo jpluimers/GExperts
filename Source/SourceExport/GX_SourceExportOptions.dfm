@@ -15,7 +15,6 @@ object fmSourceExportOptions: TfmSourceExportOptions
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object pnlSettings: TPanel

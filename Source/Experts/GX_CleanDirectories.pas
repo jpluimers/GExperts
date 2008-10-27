@@ -669,8 +669,9 @@ end;
 procedure TCleanExpert.Configure;
 resourcestring
   SAddExeDcuDirsToCleanList =
-    'Would you like the project''s unit output and executable output ' + sLineBreak +
-    'directories included in the default cleanable directory list?';
+    'Would you like the project''s unit output and executable' + sLineBreak +
+    'output directories included in the default cleanable' + sLineBreak +
+    'directory list?';
 begin
   FIncludeBinaryDirs := MessageDlg(SAddExeDcuDirsToCleanList,
       mtConfirmation, [mbYes, mbNo], 0) = mrYes;
