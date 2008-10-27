@@ -1,8 +1,8 @@
 object fmProofreaderConfig: TfmProofreaderConfig
   Left = 279
   Top = 203
-  Width = 560
-  Height = 451
+  Width = 539
+  Height = 526
   BorderIcons = [biSystemMenu]
   Caption = 'Code Proofreader'
   Color = clBtnFace
@@ -23,63 +23,66 @@ object fmProofreaderConfig: TfmProofreaderConfig
   object pnlMain: TPanel
     Left = 0
     Top = 30
-    Width = 552
-    Height = 392
+    Width = 523
+    Height = 460
     Align = alClient
     BevelOuter = bvNone
-    BorderWidth = 4
+    BorderWidth = 6
     TabOrder = 1
     object pnlButtons: TPanel
-      Left = 4
-      Top = 357
-      Width = 544
-      Height = 31
+      Left = 6
+      Top = 421
+      Width = 511
+      Height = 33
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
-      DesignSize = (
-        544
-        31)
-      object btnOK: TButton
-        Left = 297
-        Top = 6
-        Width = 75
-        Height = 25
-        Anchors = [akRight, akBottom]
-        Caption = 'OK'
-        Default = True
-        ModalResult = 1
+      object pnlButtonsRight: TPanel
+        Left = 214
+        Top = 0
+        Width = 297
+        Height = 33
+        Align = alRight
+        BevelOuter = bvNone
         TabOrder = 0
-        OnClick = btnOKClick
-      end
-      object btnCancel: TButton
-        Left = 383
-        Top = 6
-        Width = 75
-        Height = 25
-        Anchors = [akRight, akBottom]
-        Cancel = True
-        Caption = 'Cancel'
-        ModalResult = 2
-        TabOrder = 1
-      end
-      object btnHelp: TButton
-        Left = 469
-        Top = 6
-        Width = 75
-        Height = 25
-        Anchors = [akRight, akBottom]
-        Caption = '&Help'
-        TabOrder = 2
-        OnClick = btnHelpClick
+        object btnOK: TButton
+          Left = 50
+          Top = 7
+          Width = 75
+          Height = 25
+          Caption = 'OK'
+          Default = True
+          ModalResult = 1
+          TabOrder = 0
+          OnClick = btnOKClick
+        end
+        object btnCancel: TButton
+          Left = 136
+          Top = 7
+          Width = 75
+          Height = 25
+          Cancel = True
+          Caption = 'Cancel'
+          ModalResult = 2
+          TabOrder = 1
+        end
+        object btnHelp: TButton
+          Left = 222
+          Top = 7
+          Width = 75
+          Height = 25
+          Caption = '&Help'
+          TabOrder = 2
+          OnClick = btnHelpClick
+        end
       end
     end
     object Pages: TPageControl
       Tag = 1
-      Left = 4
-      Top = 4
-      Width = 544
-      Height = 353
+      Left = 6
+      Top = 6
+      Width = 511
+      Height = 415
       ActivePage = tabReplacement
       Align = alClient
       MultiLine = True
@@ -91,8 +94,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
         object pnlReplacement: TPanel
           Left = 0
           Top = 0
-          Width = 536
-          Height = 325
+          Width = 503
+          Height = 387
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 4
@@ -100,8 +103,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
           object lvReplacement: TListView
             Left = 4
             Top = 32
-            Width = 528
-            Height = 289
+            Width = 495
+            Height = 351
             Align = alClient
             Columns = <
               item
@@ -131,7 +134,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
           object pnlACHeader: TPanel
             Left = 4
             Top = 4
-            Width = 528
+            Width = 495
             Height = 28
             Align = alTop
             BevelOuter = bvNone
@@ -187,8 +190,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
         object pnlDictionary: TPanel
           Left = 0
           Top = 0
-          Width = 536
-          Height = 325
+          Width = 503
+          Height = 387
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 4
@@ -196,16 +199,16 @@ object fmProofreaderConfig: TfmProofreaderConfig
           object gbxWords: TGroupBox
             Left = 4
             Top = 4
-            Width = 263
-            Height = 317
+            Width = 230
+            Height = 379
             Align = alClient
             Caption = 'Dictionary Words'
             TabOrder = 0
             object pnlWords: TPanel
               Left = 2
               Top = 15
-              Width = 259
-              Height = 300
+              Width = 226
+              Height = 362
               Align = alClient
               BevelOuter = bvNone
               BorderWidth = 4
@@ -213,7 +216,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object tbrDictionary: TToolBar
                 Left = 4
                 Top = 4
-                Width = 251
+                Width = 218
                 Height = 24
                 DisabledImages = dmSharedImages.DisabledImages
                 EdgeBorders = []
@@ -256,8 +259,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object lvDictionary: TListView
                 Left = 4
                 Top = 28
-                Width = 251
-                Height = 268
+                Width = 218
+                Height = 330
                 Align = alClient
                 Columns = <
                   item
@@ -280,16 +283,16 @@ object fmProofreaderConfig: TfmProofreaderConfig
             end
           end
           object pnlDictOptions: TPanel
-            Left = 267
+            Left = 234
             Top = 4
             Width = 265
-            Height = 317
+            Height = 379
             Align = alRight
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
               265
-              317)
+              379)
             object gbReplaceIf: TGroupBox
               Left = 8
               Top = 48
@@ -389,8 +392,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
         object pnlHistory: TPanel
           Left = 0
           Top = 0
-          Width = 536
-          Height = 325
+          Width = 503
+          Height = 387
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 4
@@ -398,8 +401,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
           object lvHistory: TListView
             Left = 4
             Top = 4
-            Width = 528
-            Height = 286
+            Width = 495
+            Height = 348
             Align = alClient
             Columns = <
               item
@@ -420,17 +423,17 @@ object fmProofreaderConfig: TfmProofreaderConfig
           end
           object pnlHistoryButtons: TPanel
             Left = 4
-            Top = 290
-            Width = 528
+            Top = 352
+            Width = 495
             Height = 31
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
-              528
+              495
               31)
             object btnDisableRule: TButton
-              Left = 362
+              Left = 329
               Top = 5
               Width = 166
               Height = 26
@@ -446,17 +449,17 @@ object fmProofreaderConfig: TfmProofreaderConfig
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 552
+    Width = 523
     Height = 30
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      552
+      523
       30)
     object lblRules: TLabel
       Left = 19
-      Top = 8
+      Top = 9
       Width = 42
       Height = 13
       Alignment = taRightJustify
@@ -465,7 +468,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
     end
     object cbLanguage: TComboBox
       Left = 68
-      Top = 5
+      Top = 6
       Width = 185
       Height = 21
       Style = csDropDownList
@@ -475,8 +478,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
       OnChange = cbLanguageChange
     end
     object cbBeep: TCheckBox
-      Left = 402
-      Top = 8
+      Left = 333
+      Top = 9
       Width = 180
       Height = 17
       Anchors = [akTop, akRight]

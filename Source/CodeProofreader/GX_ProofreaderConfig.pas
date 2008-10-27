@@ -29,9 +29,6 @@ type
     pmiDisableRule: TMenuItem;
     pnlMain: TPanel;
     pnlButtons: TPanel;
-    btnOK: TButton;
-    btnCancel: TButton;
-    btnHelp: TButton;
     Pages: TPageControl;
     tabReplacement: TTabSheet;
     pnlReplacement: TPanel;
@@ -76,6 +73,10 @@ type
     cbBeep: TCheckBox;
     actImportWords: TAction;
     actExportWords: TAction;
+    pnlButtonsRight: TPanel;
+    btnOK: TButton;
+    btnCancel: TButton;
+    btnHelp: TButton;
     procedure FormShow(Sender: TObject);
     procedure cbLanguageChange(Sender: TObject);
     procedure btnOKClick(Sender: TObject);

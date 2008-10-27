@@ -21,10 +21,10 @@ object fmTabOrder: TfmTabOrder
   PixelsPerInch = 96
   TextHeight = 13
   object pnlButtons: TPanel
-    Left = 294
+    Left = 286
     Top = 0
     Width = 102
-    Height = 371
+    Height = 364
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 1
@@ -79,37 +79,44 @@ object fmTabOrder: TfmTabOrder
   object pnlComponents: TPanel
     Left = 0
     Top = 0
-    Width = 294
-    Height = 371
+    Width = 286
+    Height = 364
     Align = alClient
     BevelOuter = bvNone
-    BorderWidth = 5
+    BorderWidth = 6
     TabOrder = 0
     object gbxComponents: TGroupBox
-      Left = 5
-      Top = 5
-      Width = 284
-      Height = 361
+      Left = 6
+      Top = 6
+      Width = 274
+      Height = 352
       Align = alClient
       Caption = 'Arrange Components'
       TabOrder = 0
-      DesignSize = (
-        284
-        361)
-      object tvComps: TTreeView
-        Left = 8
-        Top = 17
-        Width = 268
-        Height = 336
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        DragMode = dmAutomatic
-        Indent = 19
-        ReadOnly = True
+      object pnlComponentTree: TPanel
+        Left = 2
+        Top = 15
+        Width = 270
+        Height = 335
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
         TabOrder = 0
-        OnClick = tvCompsClick
-        OnDragDrop = tvCompsDragDrop
-        OnDragOver = tvCompsDragOver
-        OnKeyUp = tvCompsKeyUp
+        object tvComps: TTreeView
+          Left = 6
+          Top = 6
+          Width = 258
+          Height = 323
+          Align = alClient
+          DragMode = dmAutomatic
+          Indent = 19
+          ReadOnly = True
+          TabOrder = 0
+          OnClick = tvCompsClick
+          OnDragDrop = tvCompsDragDrop
+          OnDragOver = tvCompsDragOver
+          OnKeyUp = tvCompsKeyUp
+        end
       end
     end
   end

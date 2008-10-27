@@ -3,8 +3,8 @@ object fmCodeOptions: TfmCodeOptions
   Top = 167
   BorderStyle = bsDialog
   Caption = 'Code Librarian Options'
-  ClientHeight = 231
-  ClientWidth = 284
+  ClientHeight = 241
+  ClientWidth = 324
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,33 +18,33 @@ object fmCodeOptions: TfmCodeOptions
   PixelsPerInch = 96
   TextHeight = 13
   object btnOK: TButton
-    Left = 124
-    Top = 200
+    Left = 154
+    Top = 205
     Width = 75
     Height = 26
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 206
-    Top = 200
+    Left = 239
+    Top = 205
     Width = 75
     Height = 26
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 1
+    TabOrder = 2
   end
   object pgeCodeOpt: TPageControl
-    Left = 0
-    Top = 0
-    Width = 281
-    Height = 193
+    Left = 9
+    Top = 9
+    Width = 305
+    Height = 185
     ActivePage = tabPaths
     TabIndex = 0
-    TabOrder = 2
+    TabOrder = 0
     object tabPaths: TTabSheet
       Caption = 'Paths'
       object lblStoragePath: TLabel
@@ -55,7 +55,7 @@ object fmCodeOptions: TfmCodeOptions
         Caption = 'Code Librarian Storage Location'
       end
       object sbBrowse: TButton
-        Left = 244
+        Left = 268
         Top = 32
         Width = 21
         Height = 21
@@ -66,7 +66,7 @@ object fmCodeOptions: TfmCodeOptions
       object edPath: TEdit
         Left = 8
         Top = 32
-        Width = 237
+        Width = 259
         Height = 21
         TabOrder = 0
       end
@@ -74,7 +74,7 @@ object fmCodeOptions: TfmCodeOptions
     object tabLayout: TTabSheet
       Caption = 'Layout'
       object rbSide: TRadioButton
-        Left = 13
+        Left = 22
         Top = 16
         Width = 137
         Height = 17
@@ -82,13 +82,13 @@ object fmCodeOptions: TfmCodeOptions
         TabOrder = 0
       end
       object pnlSideSide: TPanel
-        Left = 13
+        Left = 22
         Top = 40
         Width = 105
         Height = 89
         BevelOuter = bvLowered
         Color = clWindow
-        TabOrder = 1
+        TabOrder = 2
         object shpLeft: TShape
           Left = 8
           Top = 8
@@ -103,15 +103,15 @@ object fmCodeOptions: TfmCodeOptions
         end
       end
       object rbTop: TRadioButton
-        Left = 152
+        Left = 160
         Top = 16
         Width = 113
         Height = 17
         Caption = 'Top to bottom'
-        TabOrder = 2
+        TabOrder = 1
       end
       object pnlTopBottom: TPanel
-        Left = 152
+        Left = 160
         Top = 40
         Width = 105
         Height = 89
@@ -149,7 +149,7 @@ object fmCodeOptions: TfmCodeOptions
         Caption = 'Editor'
       end
       object lblSize: TLabel
-        Left = 208
+        Left = 232
         Top = 13
         Width = 41
         Height = 17
@@ -160,23 +160,25 @@ object fmCodeOptions: TfmCodeOptions
       object fcTreeview: TComboBox
         Left = 8
         Top = 32
-        Width = 193
+        Width = 205
         Height = 21
         Style = csDropDownList
+        DropDownCount = 18
         ItemHeight = 13
         TabOrder = 0
       end
       object fcEditor: TComboBox
         Left = 8
         Top = 80
-        Width = 193
+        Width = 205
         Height = 21
         Style = csDropDownList
+        DropDownCount = 18
         ItemHeight = 13
         TabOrder = 3
       end
       object udTreeview: TUpDown
-        Left = 249
+        Left = 273
         Top = 32
         Width = 15
         Height = 21
@@ -188,7 +190,7 @@ object fmCodeOptions: TfmCodeOptions
         Wrap = False
       end
       object udEditor: TUpDown
-        Left = 249
+        Left = 273
         Top = 80
         Width = 15
         Height = 21
@@ -200,7 +202,7 @@ object fmCodeOptions: TfmCodeOptions
         Wrap = False
       end
       object eTreeview: TEdit
-        Left = 208
+        Left = 232
         Top = 32
         Width = 41
         Height = 21
@@ -209,7 +211,7 @@ object fmCodeOptions: TfmCodeOptions
         OnKeyPress = eNumericKeyPress
       end
       object eEditor: TEdit
-        Left = 208
+        Left = 232
         Top = 80
         Width = 41
         Height = 21

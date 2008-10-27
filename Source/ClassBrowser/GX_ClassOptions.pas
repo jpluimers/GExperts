@@ -3,18 +3,30 @@ unit GX_ClassOptions;
 interface
 
 uses
-  Classes, StdCtrls, Controls, ComCtrls, Forms;
+  Classes, StdCtrls, Controls, ComCtrls, Forms, ExtCtrls;
 
 type
   TfmClassOptions = class(TForm)
-    btnCancel: TButton;
-    btnOK: TButton;
+    pnlButtons: TPanel;
+    pnlContent: TPanel;
+    pnlButtonsRight: TPanel;
     pcClassOptions: TPageControl;
     tshGeneric: TTabSheet;
-    tshFilters: TTabSheet;
     gbxFonts: TGroupBox;
     lblTreeViewFont: TLabel;
     lblListViewFont: TLabel;
+    lblEditorFont: TLabel;
+    cbTreeView: TComboBox;
+    cbListView: TComboBox;
+    cbEditor: TComboBox;
+    sTreeView: TEdit;
+    sListView: TEdit;
+    sEditor: TEdit;
+    udTree: TUpDown;
+    udList: TUpDown;
+    udEditor: TUpDown;
+    cbAutoHide: TCheckBox;
+    tshFilters: TTabSheet;
     gbxFilters: TGroupBox;
     cbConstants: TCheckBox;
     cbMethods: TCheckBox;
@@ -27,20 +39,11 @@ type
     cbPublished: TCheckBox;
     gbxDiagram: TGroupBox;
     cbTop: TCheckBox;
-    lblEditorFont: TLabel;
-    cbTreeView: TComboBox;
-    cbListView: TComboBox;
-    cbEditor: TComboBox;
     cbStayInPackage: TCheckBox;
     gbxSearch: TGroupBox;
     cbParseRecursing: TCheckBox;
-    cbAutoHide: TCheckBox;
-    sTreeView: TEdit;
-    sListView: TEdit;
-    sEditor: TEdit;
-    udTree: TUpDown;
-    udList: TUpDown;
-    udEditor: TUpDown;
+    btnOK: TButton;
+    btnCancel: TButton;
     procedure FormCreate(Sender: TObject);
   end;
 

@@ -15,9 +15,10 @@ type
     btnHelp: TButton;
     pnlButtons: TPanel;
     pnlComponents: TPanel;
-    tvComps: TTreeView;
     btnOrderByPosition: TButton;
     btnResetOrder: TButton;
+    pnlComponentTree: TPanel;
+    tvComps: TTreeView;
     procedure btnHelpClick(Sender: TObject);
     procedure tvCompsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure tvCompsDragOver(Sender, Source: TObject; X, Y: Integer;

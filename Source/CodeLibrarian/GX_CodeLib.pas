@@ -1015,9 +1015,9 @@ begin
         rbSide.Checked := True
       else
         rbTop.Checked := True;
-      {$IFOPT D+}SendDebug('Setting fcTreeView.Text to '+tvTopics.Font.Name);{$ENDIF}
+      {$IFOPT D+}SendDebug('Setting fcTreeView.Text to ' + tvTopics.Font.Name);{$ENDIF}
       fcTreeView.ItemIndex := fcTreeView.Items.IndexOf(tvTopics.Font.Name);
-      {$IFOPT D+}SendDebug('fcTreeView.Text is '+fcTreeView.Text);{$ENDIF}
+      {$IFOPT D+}SendDebug('fcTreeView.Text is ' + fcTreeView.Text);{$ENDIF}
       udTreeView.Position := tvTopics.Font.Size;
       fcEditor.ItemIndex := fcEditor.Items.IndexOf(FCodeText.Font.Name);
       udEditor.Position := FCodeText.Font.Size;

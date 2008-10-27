@@ -10,8 +10,6 @@ uses
 
 type
   TfmConfiguration = class(TForm)
-    btnOK: TButton;
-    btnHelp: TButton;
     pnlMain: TPanel;
     pnlButtons: TPanel;
     pcConfig: TPageControl;
@@ -29,7 +27,6 @@ type
     edConfigPath: TEdit;
     edHelpFile: TEdit;
     dlgHelpFile: TOpenDialog;
-    btnCancel: TButton;
     tshIDE: TTabSheet;
     tshEditorExperts: TTabSheet;
     gbxKeyboard: TGroupBox;
@@ -86,6 +83,10 @@ type
     edtMinutes: TEdit;
     udMinutes: TUpDown;
     btnEditView: TButton;
+    pnlButtonsRight: TPanel;
+    btnHelp: TButton;
+    btnCancel: TButton;
+    btnOK: TButton;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);

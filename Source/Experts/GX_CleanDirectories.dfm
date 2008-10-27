@@ -1,9 +1,8 @@
 object fmCleanDirectories: TfmCleanDirectories
-  Left = 303
-  Top = 168
-  Width = 490
-  Height = 430
-  ActiveControl = btnClean
+  Left = 297
+  Top = 185
+  Width = 569
+  Height = 548
   BorderIcons = [biSystemMenu]
   Caption = 'Clean Directories'
   Color = clBtnFace
@@ -23,192 +22,294 @@ object fmCleanDirectories: TfmCleanDirectories
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBottom: TPanel
+  object pnlButtons: TPanel
     Left = 0
-    Top = 160
-    Width = 482
-    Height = 241
+    Top = 475
+    Width = 553
+    Height = 37
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
-    TabOrder = 1
+    TabOrder = 3
     DesignSize = (
-      482
-      241)
-    object laStatus: TLabel
-      Left = 59
-      Top = 1
-      Width = 417
-      Height = 13
-      Anchors = [akLeft, akRight, akBottom]
-      AutoSize = False
-      Caption = 'Status'
-    end
-    object lCleaning: TLabel
-      Left = 8
-      Top = 1
-      Width = 44
-      Height = 13
-      Anchors = [akLeft, akBottom]
-      Caption = 'Cleaning:'
-      Visible = False
+      553
+      37)
+    object pnlButtonsRight: TPanel
+      Left = 280
+      Top = 0
+      Width = 273
+      Height = 37
+      Align = alRight
+      BevelOuter = bvNone
+      FullRepaint = False
+      TabOrder = 1
+      object btnHelp: TButton
+        Left = 190
+        Top = 3
+        Width = 75
+        Height = 26
+        Caption = '&Help'
+        TabOrder = 2
+        OnClick = btnHelpClick
+      end
+      object btnClean: TButton
+        Left = 22
+        Top = 3
+        Width = 75
+        Height = 26
+        Caption = 'Clean'
+        Default = True
+        TabOrder = 0
+        OnClick = btnCleanClick
+      end
+      object btnCancel: TButton
+        Left = 106
+        Top = 3
+        Width = 75
+        Height = 26
+        Cancel = True
+        Caption = 'Cancel'
+        ModalResult = 2
+        TabOrder = 1
+      end
     end
     object chkReportErrors: TCheckBox
       Left = 8
-      Top = 215
+      Top = 9
       Width = 161
       Height = 17
       Anchors = [akLeft, akBottom]
       Caption = 'Re&port errors'
       Checked = True
       State = cbChecked
-      TabOrder = 1
-    end
-    object gbxExtensions: TGroupBox
-      Left = 7
-      Top = 18
-      Width = 468
-      Height = 185
-      Anchors = [akLeft, akRight, akBottom]
-      Caption = 'Remove Files with E&xtensions'
       TabOrder = 0
-      DesignSize = (
-        468
-        185)
-      object clbExtensions: TCheckListBox
-        Left = 8
-        Top = 16
-        Width = 367
-        Height = 161
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        Columns = 4
-        ItemHeight = 13
-        PopupMenu = pmuExts
-        Sorted = True
-        TabOrder = 0
-        OnClick = clbExtensionsClick
-        OnKeyPress = clbExtensionsKeyPress
-      end
-      object btnAddExt: TButton
-        Left = 383
-        Top = 16
-        Width = 75
-        Height = 26
-        Anchors = [akTop, akRight]
-        Caption = 'A&dd'
-        TabOrder = 1
-        OnClick = btnAddExtClick
-      end
-      object btnRemoveExt: TButton
-        Left = 383
-        Top = 50
-        Width = 75
-        Height = 26
-        Anchors = [akTop, akRight]
-        Caption = 'Re&move'
-        Enabled = False
-        TabOrder = 2
-        OnClick = btnRemoveExtClick
-      end
-    end
-    object btnHelp: TButton
-      Left = 399
-      Top = 209
-      Width = 75
-      Height = 26
-      Anchors = [akRight, akBottom]
-      Caption = '&Help'
-      TabOrder = 4
-      OnClick = btnHelpClick
-    end
-    object btnCancel: TButton
-      Left = 318
-      Top = 209
-      Width = 75
-      Height = 26
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 3
-    end
-    object btnClean: TButton
-      Left = 237
-      Top = 209
-      Width = 75
-      Height = 26
-      Anchors = [akRight, akBottom]
-      Caption = 'Clean'
-      Default = True
-      TabOrder = 2
-      OnClick = btnCleanClick
     end
   end
-  object pnlDirectories: TPanel
+  object pnlDirs: TPanel
     Left = 0
     Top = 0
-    Width = 482
-    Height = 160
+    Width = 553
+    Height = 241
     Align = alClient
     BevelOuter = bvNone
+    BorderWidth = 6
+    FullRepaint = False
     TabOrder = 0
-    DesignSize = (
-      482
-      160)
-    object gbxDirectories: TGroupBox
-      Left = 7
-      Top = 5
-      Width = 468
-      Height = 151
-      Anchors = [akLeft, akTop, akRight, akBottom]
-      Caption = 'Clean Dir&ectories'
+    object pnlDirectories: TPanel
+      Left = 6
+      Top = 6
+      Width = 541
+      Height = 229
+      Align = alClient
+      BevelOuter = bvNone
+      FullRepaint = False
       TabOrder = 0
-      DesignSize = (
-        468
-        151)
-      object laRecursingNote: TLabel
-        Left = 8
-        Top = 131
-        Width = 345
-        Height = 13
-        Anchors = [akLeft, akBottom]
-        Caption = 
-          'All listed directories are cleaned.  Check a directory to clean ' +
-          'it recursively.'
-      end
-      object btnAdd: TButton
-        Left = 383
-        Top = 16
-        Width = 75
-        Height = 26
-        Anchors = [akTop, akRight]
-        Caption = '&Add'
-        TabOrder = 1
-        OnClick = btnAddClick
-      end
-      object btnRemove: TButton
-        Left = 383
-        Top = 49
-        Width = 75
-        Height = 26
-        Anchors = [akTop, akRight]
-        Caption = '&Remove'
-        Enabled = False
-        TabOrder = 2
-        OnClick = btnRemoveClick
-      end
-      object clbDirs: TCheckListBox
-        Left = 8
-        Top = 16
-        Width = 368
-        Height = 111
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        ItemHeight = 13
-        PopupMenu = pmuDirs
+      object gbxDirectories: TGroupBox
+        Left = 0
+        Top = 0
+        Width = 541
+        Height = 229
+        Align = alClient
+        Caption = 'Clean Dir&ectories'
         TabOrder = 0
-        OnClick = clbDirsClick
-        OnKeyPress = clbDirsKeyPress
+        DesignSize = (
+          541
+          229)
+        object laRecursingNote: TLabel
+          Left = 8
+          Top = 209
+          Width = 3
+          Height = 13
+          Anchors = [akLeft, akBottom]
+        end
+        object pnlDirList: TPanel
+          Left = 2
+          Top = 15
+          Width = 453
+          Height = 191
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 6
+          FullRepaint = False
+          TabOrder = 0
+          object clbDirs: TCheckListBox
+            Left = 6
+            Top = 6
+            Width = 441
+            Height = 179
+            Align = alClient
+            ItemHeight = 13
+            PopupMenu = pmuDirs
+            TabOrder = 0
+            OnClick = clbDirsClick
+            OnKeyPress = clbDirsKeyPress
+          end
+        end
+        object pnlDirButtons: TPanel
+          Left = 455
+          Top = 15
+          Width = 84
+          Height = 191
+          Align = alRight
+          BevelOuter = bvNone
+          FullRepaint = False
+          TabOrder = 1
+          DesignSize = (
+            84
+            191)
+          object btnAdd: TButton
+            Left = 1
+            Top = 6
+            Width = 75
+            Height = 26
+            Anchors = [akTop, akRight]
+            Caption = '&Add'
+            TabOrder = 0
+            OnClick = btnAddClick
+          end
+          object btnRemove: TButton
+            Left = 1
+            Top = 39
+            Width = 75
+            Height = 26
+            Anchors = [akTop, akRight]
+            Caption = '&Remove'
+            Enabled = False
+            TabOrder = 1
+            OnClick = btnRemoveClick
+          end
+        end
+        object pnlDirMessage: TPanel
+          Left = 2
+          Top = 206
+          Width = 537
+          Height = 21
+          Align = alBottom
+          BevelOuter = bvNone
+          BorderWidth = 1
+          FullRepaint = False
+          TabOrder = 2
+          object lblDirMessage: TLabel
+            Left = 1
+            Top = 1
+            Width = 535
+            Height = 19
+            Align = alClient
+            Caption = 
+              '   All listed directories are cleaned.  Check a directory to cle' +
+              'an it recursively.'
+          end
+        end
       end
+    end
+  end
+  object pnlBottom: TPanel
+    Left = 0
+    Top = 257
+    Width = 553
+    Height = 218
+    Align = alBottom
+    BevelOuter = bvNone
+    BorderWidth = 6
+    FullRepaint = False
+    TabOrder = 2
+    object gbxExtensions: TGroupBox
+      Left = 6
+      Top = 6
+      Width = 541
+      Height = 206
+      Align = alClient
+      Caption = 'Remove Files with E&xtensions'
+      TabOrder = 0
+      object pnlExtButtons: TPanel
+        Left = 455
+        Top = 15
+        Width = 84
+        Height = 189
+        Align = alRight
+        BevelOuter = bvNone
+        FullRepaint = False
+        TabOrder = 1
+        DesignSize = (
+          84
+          189)
+        object btnAddExt: TButton
+          Left = 1
+          Top = 5
+          Width = 75
+          Height = 26
+          Anchors = [akTop, akRight]
+          Caption = 'A&dd'
+          TabOrder = 0
+          OnClick = btnAddExtClick
+        end
+        object btnRemoveExt: TButton
+          Left = 1
+          Top = 39
+          Width = 75
+          Height = 26
+          Anchors = [akTop, akRight]
+          Caption = 'Re&move'
+          Enabled = False
+          TabOrder = 1
+          OnClick = btnRemoveExtClick
+        end
+      end
+      object pnlExtensions: TPanel
+        Left = 2
+        Top = 15
+        Width = 453
+        Height = 189
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        FullRepaint = False
+        TabOrder = 0
+        object clbExtensions: TCheckListBox
+          Left = 6
+          Top = 6
+          Width = 441
+          Height = 177
+          Align = alClient
+          Columns = 4
+          ItemHeight = 13
+          PopupMenu = pmuExts
+          Sorted = True
+          TabOrder = 0
+          OnClick = clbExtensionsClick
+          OnKeyPress = clbExtensionsKeyPress
+        end
+      end
+    end
+  end
+  object pnlMessage: TPanel
+    Left = 0
+    Top = 241
+    Width = 553
+    Height = 16
+    Align = alBottom
+    BevelOuter = bvNone
+    FullRepaint = False
+    TabOrder = 1
+    DesignSize = (
+      553
+      16)
+    object lCleaning: TLabel
+      Left = 8
+      Top = 1
+      Width = 44
+      Height = 13
+      Caption = 'Cleaning:'
+      Visible = False
+    end
+    object laStatus: TLabel
+      Left = 60
+      Top = 1
+      Width = 484
+      Height = 13
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      Caption = 'Status'
     end
   end
   object ActionList: TActionList

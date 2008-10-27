@@ -1,8 +1,8 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  Width = 519
-  Height = 520
+  Width = 523
+  Height = 525
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
   Color = clBtnFace
@@ -25,17 +25,18 @@ object fmConfiguration: TfmConfiguration
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 503
-    Height = 450
+    Width = 507
+    Height = 455
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 7
+    FullRepaint = False
     TabOrder = 0
     object pcConfig: TPageControl
       Left = 7
       Top = 7
-      Width = 497
-      Height = 443
+      Width = 493
+      Height = 441
       ActivePage = tshExperts
       Align = alClient
       HotTrack = True
@@ -48,8 +49,8 @@ object fmConfiguration: TfmConfiguration
         object sbxExperts: TScrollBox
           Left = 0
           Top = 0
-          Width = 481
-          Height = 408
+          Width = 485
+          Height = 413
           VertScrollBar.Increment = 40
           VertScrollBar.Range = 920
           VertScrollBar.Tracking = True
@@ -61,18 +62,18 @@ object fmConfiguration: TfmConfiguration
       object tshGeneral: TTabSheet
         Caption = 'File Locations'
         DesignSize = (
-          489
-          415)
+          485
+          413)
         object gbxLocations: TGroupBox
           Left = 8
           Top = 8
-          Width = 471
+          Width = 475
           Height = 169
           Anchors = [akLeft, akTop, akRight]
           Caption = 'File Locations'
           TabOrder = 0
           DesignSize = (
-            471
+            475
             169)
           object lblVCL: TLabel
             Left = 12
@@ -99,7 +100,7 @@ object fmConfiguration: TfmConfiguration
             FocusControl = edHelpFile
           end
           object sbVCLDir: TButton
-            Left = 438
+            Left = 442
             Top = 40
             Width = 21
             Height = 21
@@ -109,7 +110,7 @@ object fmConfiguration: TfmConfiguration
             OnClick = sbVCLDirClick
           end
           object sbConfigDir: TButton
-            Left = 438
+            Left = 442
             Top = 88
             Width = 21
             Height = 21
@@ -119,7 +120,7 @@ object fmConfiguration: TfmConfiguration
             OnClick = sbConfigDirClick
           end
           object sbHelpFile: TButton
-            Left = 438
+            Left = 442
             Top = 136
             Width = 21
             Height = 21
@@ -131,7 +132,7 @@ object fmConfiguration: TfmConfiguration
           object edVCLPath: TEdit
             Left = 12
             Top = 40
-            Width = 426
+            Width = 430
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
@@ -139,7 +140,7 @@ object fmConfiguration: TfmConfiguration
           object edConfigPath: TEdit
             Left = 12
             Top = 88
-            Width = 426
+            Width = 430
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 2
@@ -147,7 +148,7 @@ object fmConfiguration: TfmConfiguration
           object edHelpFile: TEdit
             Left = 12
             Top = 136
-            Width = 426
+            Width = 430
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 4
@@ -157,21 +158,21 @@ object fmConfiguration: TfmConfiguration
       object tshEditorExperts: TTabSheet
         Caption = 'Editor Experts'
         DesignSize = (
-          489
-          415)
+          485
+          413)
         object gbxKeyboard: TGroupBox
           Left = 8
           Top = 8
-          Width = 472
-          Height = 397
+          Width = 476
+          Height = 402
           Anchors = [akLeft, akTop, akRight, akBottom]
           Caption = 'Editor Experts'
           TabOrder = 0
           DesignSize = (
-            472
-            397)
+            476
+            402)
           object btnConfigure: TButton
-            Left = 387
+            Left = 391
             Top = 80
             Width = 75
             Height = 26
@@ -182,7 +183,7 @@ object fmConfiguration: TfmConfiguration
             OnClick = btnConfigureClick
           end
           object btnShortcut: TButton
-            Left = 387
+            Left = 391
             Top = 116
             Width = 75
             Height = 26
@@ -194,8 +195,8 @@ object fmConfiguration: TfmConfiguration
           end
           object meHelp: TMemo
             Left = 10
-            Top = 269
-            Width = 452
+            Top = 274
+            Width = 456
             Height = 118
             TabStop = False
             Anchors = [akLeft, akRight, akBottom]
@@ -205,7 +206,7 @@ object fmConfiguration: TfmConfiguration
             TabOrder = 4
           end
           object chkDisableEditorExperts: TCheckBox
-            Left = 387
+            Left = 391
             Top = 22
             Width = 82
             Height = 21
@@ -217,8 +218,8 @@ object fmConfiguration: TfmConfiguration
           object lvEditorExperts: TListView
             Left = 10
             Top = 22
-            Width = 369
-            Height = 240
+            Width = 373
+            Height = 245
             Anchors = [akLeft, akTop, akRight, akBottom]
             Columns = <
               item
@@ -651,46 +652,57 @@ object fmConfiguration: TfmConfiguration
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 457
-    Width = 511
+    Top = 455
+    Width = 507
     Height = 34
     Align = alBottom
     BevelOuter = bvNone
+    FullRepaint = False
     TabOrder = 1
-    DesignSize = (
-      511
-      34)
-    object btnOK: TButton
-      Left = 269
-      Top = 1
-      Width = 75
-      Height = 26
-      Anchors = [akRight, akBottom]
-      Caption = 'OK'
-      Default = True
+    object pnlButtonsRight: TPanel
+      Left = 220
+      Top = 0
+      Width = 287
+      Height = 34
+      Align = alRight
+      BevelOuter = bvNone
+      FullRepaint = False
       TabOrder = 0
-      OnClick = btnOKClick
-    end
-    object btnCancel: TButton
-      Left = 349
-      Top = 1
-      Width = 75
-      Height = 26
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 1
-    end
-    object btnHelp: TButton
-      Left = 429
-      Top = 1
-      Width = 75
-      Height = 26
-      Anchors = [akRight, akBottom]
-      Caption = '&Help'
-      TabOrder = 2
-      OnClick = btnHelpClick
+      DesignSize = (
+        287
+        34)
+      object btnOK: TButton
+        Left = 33
+        Top = 1
+        Width = 75
+        Height = 26
+        Anchors = [akRight, akBottom]
+        Caption = 'OK'
+        Default = True
+        TabOrder = 0
+        OnClick = btnOKClick
+      end
+      object btnCancel: TButton
+        Left = 120
+        Top = 1
+        Width = 75
+        Height = 26
+        Anchors = [akRight, akBottom]
+        Cancel = True
+        Caption = 'Cancel'
+        ModalResult = 2
+        TabOrder = 1
+      end
+      object btnHelp: TButton
+        Left = 204
+        Top = 1
+        Width = 75
+        Height = 26
+        Anchors = [akRight, akBottom]
+        Caption = '&Help'
+        TabOrder = 2
+        OnClick = btnHelpClick
+      end
     end
   end
   object dlgHelpFile: TOpenDialog

@@ -11,7 +11,7 @@ uses
 
 type
   TBackupExpert = class;
-
+  
   TBackupType = (btFile, btDir);
 
   TBackupScope = (bsActiveProject, bsProjectGroup);
@@ -20,15 +20,19 @@ type
     pnlButtons: TPanel;
     pnlFiles: TPanel;
     gbxFiles: TGroupBox;
-    lbFiles: TListBox;
-    btnAdd: TButton;
-    btnRemove: TButton;
-    btnCancel: TButton;
-    btnBackup: TButton;
     dlgSave: TSaveDialog;
     dlgOpen: TOpenDialog;
+    pnlButtonsRight: TPanel;
+    btnBackup: TButton;
+    btnCancel: TButton;
     btnHelp: TButton;
+    pnlFileList: TPanel;
+    lbFiles: TListBox;
+    pnlFileButtons: TPanel;
+    pnlFileButtonsRight: TPanel;
     btnOptions: TButton;
+    btnRemove: TButton;
+    btnAdd: TButton;
     procedure btnBackupClick(Sender: TObject);
     procedure btnAddClick(Sender: TObject);
     procedure btnRemoveClick(Sender: TObject);
