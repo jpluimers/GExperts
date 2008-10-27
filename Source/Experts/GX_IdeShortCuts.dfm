@@ -1,8 +1,8 @@
 object fmIdeShortCuts: TfmIdeShortCuts
   Left = 296
   Top = 249
-  Width = 574
-  Height = 237
+  Width = 690
+  Height = 254
   BorderIcons = [biSystemMenu]
   Caption = 'IDE Menu Shortcuts'
   Color = clBtnFace
@@ -22,16 +22,16 @@ object fmIdeShortCuts: TfmIdeShortCuts
   TextHeight = 13
   object pnlControls: TPanel
     Left = 0
-    Top = 62
-    Width = 566
-    Height = 146
+    Top = 67
+    Width = 674
+    Height = 113
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 0
     DesignSize = (
-      566
-      146)
+      674
+      113)
     object lblMenuStruc: TLabel
       Left = 21
       Top = 35
@@ -61,7 +61,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
     object edtMenuStructure: TEdit
       Left = 100
       Top = 31
-      Width = 456
+      Width = 564
       Height = 21
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
@@ -72,7 +72,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
     object edtMenuItemName: TEdit
       Left = 100
       Top = 3
-      Width = 456
+      Width = 564
       Height = 21
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
@@ -91,38 +91,53 @@ object fmIdeShortCuts: TfmIdeShortCuts
       TabOrder = 2
       OnClick = chkUseShortcutClick
     end
-    object btOK: TButton
-      Left = 289
-      Top = 110
-      Width = 82
-      Height = 27
-      Anchors = [akRight, akBottom]
-      Caption = 'OK'
-      Default = True
-      ModalResult = 1
-      TabOrder = 3
-      OnClick = btOKClick
-    end
-    object btCancel: TButton
-      Left = 382
-      Top = 110
-      Width = 82
-      Height = 27
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 4
-    end
-    object btnHelp: TButton
-      Left = 474
-      Top = 110
-      Width = 82
-      Height = 27
-      Anchors = [akRight, akBottom]
-      Caption = '&Help'
-      TabOrder = 5
-      OnClick = btnHelpClick
+  end
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 180
+    Width = 674
+    Height = 38
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    object pnlButtonsRight: TPanel
+      Left = 388
+      Top = 0
+      Width = 286
+      Height = 38
+      Align = alRight
+      BevelOuter = bvNone
+      TabOrder = 0
+      object btOK: TButton
+        Left = 9
+        Top = 3
+        Width = 82
+        Height = 27
+        Caption = 'OK'
+        Default = True
+        ModalResult = 1
+        TabOrder = 0
+        OnClick = btOKClick
+      end
+      object btCancel: TButton
+        Left = 102
+        Top = 3
+        Width = 82
+        Height = 27
+        Cancel = True
+        Caption = 'Cancel'
+        ModalResult = 2
+        TabOrder = 1
+      end
+      object btnHelp: TButton
+        Left = 194
+        Top = 3
+        Width = 82
+        Height = 27
+        Caption = '&Help'
+        TabOrder = 2
+        OnClick = btnHelpClick
+      end
     end
   end
   object MainMenu: TMainMenu

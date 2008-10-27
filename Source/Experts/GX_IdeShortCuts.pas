@@ -19,10 +19,12 @@ type
     edtMenuItemName: TEdit;
     chkUseShortCut: TCheckBox;
     lblShortCut: TLabel;
+    pnlControls: TPanel;
+    pnlButtons: TPanel;
+    pnlButtonsRight: TPanel;
     btOK: TButton;
     btCancel: TButton;
     btnHelp: TButton;
-    pnlControls: TPanel;
     procedure MenuClick(Sender: TObject);
     procedure ShortCutChange(Sender: TObject);
     procedure chkUseShortCutClick(Sender: TObject);

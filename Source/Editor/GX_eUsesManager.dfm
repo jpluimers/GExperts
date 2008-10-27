@@ -1,8 +1,8 @@
 object fmUsesManager: TfmUsesManager
   Left = 311
   Top = 202
-  Width = 578
-  Height = 432
+  Width = 586
+  Height = 514
   ActiveControl = edtFilter
   BorderIcons = [biSystemMenu]
   Caption = 'Uses Clause Manager'
@@ -26,24 +26,24 @@ object fmUsesManager: TfmUsesManager
     Left = 266
     Top = 0
     Width = 3
-    Height = 366
+    Height = 441
     Cursor = crHSplit
   end
   object pnlUnits: TPanel
     Left = 269
     Top = 0
     Width = 301
-    Height = 366
+    Height = 441
     Align = alClient
     BevelOuter = bvNone
-    BorderWidth = 2
+    BorderWidth = 6
     FullRepaint = False
     TabOrder = 1
     object pcUnits: TPageControl
-      Left = 2
-      Top = 43
-      Width = 297
-      Height = 321
+      Left = 6
+      Top = 47
+      Width = 289
+      Height = 388
       ActivePage = tabSearchPath
       Align = alClient
       TabIndex = 0
@@ -53,8 +53,8 @@ object fmUsesManager: TfmUsesManager
         ImageIndex = 3
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 259
-          Width = 289
+          Top = 326
+          Width = 281
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -79,8 +79,8 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 289
-          Height = 259
+          Width = 281
+          Height = 326
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -89,8 +89,8 @@ object fmUsesManager: TfmUsesManager
           object lbxSearchPath: TListBox
             Left = 3
             Top = 3
-            Width = 283
-            Height = 253
+            Width = 275
+            Height = 320
             Align = alClient
             Color = clBtnFace
             DragMode = dmAutomatic
@@ -111,8 +111,8 @@ object fmUsesManager: TfmUsesManager
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 289
-          Height = 259
+          Width = 281
+          Height = 326
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -121,8 +121,8 @@ object fmUsesManager: TfmUsesManager
           object lbxProject: TListBox
             Left = 3
             Top = 3
-            Width = 283
-            Height = 253
+            Width = 275
+            Height = 320
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 13
@@ -137,8 +137,8 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 259
-          Width = 289
+          Top = 326
+          Width = 281
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -167,8 +167,8 @@ object fmUsesManager: TfmUsesManager
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 289
-          Height = 259
+          Width = 281
+          Height = 326
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -177,8 +177,8 @@ object fmUsesManager: TfmUsesManager
           object lbxCommon: TListBox
             Left = 3
             Top = 3
-            Width = 283
-            Height = 253
+            Width = 275
+            Height = 320
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 13
@@ -193,8 +193,8 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 259
-          Width = 289
+          Top = 326
+          Width = 281
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -223,8 +223,8 @@ object fmUsesManager: TfmUsesManager
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 289
-          Height = 230
+          Width = 281
+          Height = 297
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -233,8 +233,8 @@ object fmUsesManager: TfmUsesManager
           object lbxFavorite: TListBox
             Left = 3
             Top = 3
-            Width = 283
-            Height = 224
+            Width = 275
+            Height = 291
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 13
@@ -249,8 +249,8 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 230
-          Width = 289
+          Top = 297
+          Width = 281
           Height = 63
           Align = alBottom
           BevelOuter = bvNone
@@ -261,7 +261,7 @@ object fmUsesManager: TfmUsesManager
             Width = 125
             Height = 25
             Action = actAvailAddToIntf
-            TabOrder = 0
+            TabOrder = 2
           end
           object btnFavoriteAddToImplementation: TButton
             Left = 136
@@ -269,15 +269,15 @@ object fmUsesManager: TfmUsesManager
             Width = 125
             Height = 25
             Action = actAvailAddToImpl
-            TabOrder = 1
+            TabOrder = 3
           end
           object btnFavoriteAddToFavorites: TButton
             Left = 136
-            Top = 2
+            Top = 3
             Width = 125
             Height = 25
             Action = actFavAdd
-            TabOrder = 2
+            TabOrder = 1
           end
           object btnFavoriteDeleteFromFavorites: TButton
             Left = 4
@@ -285,31 +285,23 @@ object fmUsesManager: TfmUsesManager
             Width = 125
             Height = 25
             Action = actFavDelete
-            TabOrder = 3
+            TabOrder = 0
           end
         end
       end
     end
     object pnlAvailableHeader: TPanel
-      Left = 2
-      Top = 2
-      Width = 297
+      Left = 6
+      Top = 6
+      Width = 289
       Height = 41
       Align = alTop
       BevelOuter = bvNone
       FullRepaint = False
       TabOrder = 0
       DesignSize = (
-        297
+        289
         41)
-      object lblUnits: TLabel
-        Left = 0
-        Top = 0
-        Width = 297
-        Height = 13
-        Align = alTop
-        Caption = 'Available Units'
-      end
       object lblFilter: TLabel
         Left = 18
         Top = 20
@@ -321,12 +313,24 @@ object fmUsesManager: TfmUsesManager
       object edtFilter: TEdit
         Left = 48
         Top = 16
-        Width = 245
+        Width = 225
         Height = 21
         Anchors = [akLeft, akTop, akRight]
-        TabOrder = 0
+        TabOrder = 1
         OnChange = edtFilterChange
         OnKeyDown = edtFilterKeyDown
+      end
+      object lblUnits: TPanel
+        Left = 0
+        Top = 0
+        Width = 289
+        Height = 14
+        Align = alTop
+        AutoSize = True
+        BevelOuter = bvNone
+        Caption = 'Available Units'
+        ParentColor = True
+        TabOrder = 0
       end
     end
   end
@@ -334,36 +338,28 @@ object fmUsesManager: TfmUsesManager
     Left = 0
     Top = 0
     Width = 266
-    Height = 366
+    Height = 441
     Align = alLeft
     BevelOuter = bvNone
-    BorderWidth = 2
+    BorderWidth = 6
     FullRepaint = False
     TabOrder = 0
-    object lblUses: TLabel
-      Left = 2
-      Top = 2
-      Width = 262
-      Height = 13
-      Align = alTop
-      Caption = 'Used Units '
-    end
     object pcUses: TPageControl
-      Left = 2
-      Top = 15
-      Width = 262
-      Height = 349
+      Left = 6
+      Top = 20
+      Width = 254
+      Height = 415
       ActivePage = tabInterface
       Align = alClient
       TabIndex = 0
-      TabOrder = 0
+      TabOrder = 1
       object tabInterface: TTabSheet
         Caption = 'I&nterface'
         object pnlInterface: TPanel
           Left = 0
           Top = 0
-          Width = 254
-          Height = 287
+          Width = 246
+          Height = 353
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -372,8 +368,8 @@ object fmUsesManager: TfmUsesManager
           object lbxInterface: TListBox
             Left = 3
             Top = 3
-            Width = 248
-            Height = 281
+            Width = 240
+            Height = 347
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 13
@@ -388,8 +384,8 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlIntfFooter: TPanel
           Left = 0
-          Top = 287
-          Width = 254
+          Top = 353
+          Width = 246
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -418,8 +414,8 @@ object fmUsesManager: TfmUsesManager
         object pnlImplementation: TPanel
           Left = 0
           Top = 0
-          Width = 254
-          Height = 287
+          Width = 246
+          Height = 353
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -428,8 +424,8 @@ object fmUsesManager: TfmUsesManager
           object lbxImplementation: TListBox
             Left = 3
             Top = 3
-            Width = 248
-            Height = 281
+            Width = 240
+            Height = 347
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 13
@@ -444,8 +440,8 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlImplFooter: TPanel
           Left = 0
-          Top = 287
-          Width = 254
+          Top = 353
+          Width = 246
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -469,10 +465,22 @@ object fmUsesManager: TfmUsesManager
         end
       end
     end
+    object lblUses: TPanel
+      Left = 6
+      Top = 6
+      Width = 254
+      Height = 14
+      Align = alTop
+      AutoSize = True
+      BevelOuter = bvNone
+      Caption = 'Used Units '
+      ParentColor = True
+      TabOrder = 0
+    end
   end
   object pnlFooter: TPanel
     Left = 0
-    Top = 366
+    Top = 441
     Width = 570
     Height = 37
     Align = alBottom
@@ -484,36 +492,43 @@ object fmUsesManager: TfmUsesManager
       37)
     object chkSingleActionMode: TCheckBox
       Left = 8
-      Top = 10
-      Width = 285
+      Top = 9
+      Width = 293
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Single action/quic&k add mode'
       TabOrder = 0
     end
-    object btnCancel: TButton
-      Left = 486
-      Top = 6
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 2
-    end
-    object btnOK: TButton
-      Left = 402
-      Top = 6
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'OK'
-      Default = True
-      ModalResult = 1
+    object pnlButtonsRight: TPanel
+      Left = 384
+      Top = 0
+      Width = 186
+      Height = 37
+      Align = alRight
+      BevelOuter = bvNone
       TabOrder = 1
-      OnClick = btnOKClick
+      object btnCancel: TButton
+        Left = 105
+        Top = 4
+        Width = 75
+        Height = 25
+        Cancel = True
+        Caption = 'Cancel'
+        ModalResult = 2
+        TabOrder = 1
+      end
+      object btnOK: TButton
+        Left = 21
+        Top = 4
+        Width = 75
+        Height = 25
+        Cancel = True
+        Caption = 'OK'
+        Default = True
+        ModalResult = 1
+        TabOrder = 0
+        OnClick = btnOKClick
+      end
     end
   end
   object pmuUses: TPopupMenu

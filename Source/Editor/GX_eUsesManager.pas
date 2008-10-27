@@ -50,7 +50,6 @@ type
     tabFavorite: TTabSheet;
     pnlFavorite: TPanel;
     lbxFavorite: TListBox;
-    lblUses: TLabel;
     pcUses: TPageControl;
     tabInterface: TTabSheet;
     pnlInterface: TPanel;
@@ -61,7 +60,6 @@ type
     mitUsesOpenUnit: TMenuItem;
     mitIntfSep1: TMenuItem;
     pnlFooter: TPanel;
-    btnOK: TButton;
     pnlFavFooter: TPanel;
     btnFavoriteAddToInterface: TButton;
     btnFavoriteAddToImplementation: TButton;
@@ -96,13 +94,11 @@ type
     pnlSearchPath: TPanel;
     lbxSearchPath: TListBox;
     pnlAvailableHeader: TPanel;
-    lblUnits: TLabel;
     edtFilter: TEdit;
     lblFilter: TLabel;
     mitAvailAddToFav: TMenuItem;
     mitAvailDelFromFav: TMenuItem;
     mitAvailSep1: TMenuItem;
-    btnCancel: TButton;
     chkSingleActionMode: TCheckBox;
     actAvailOpenUnit: TAction;
     mitAvailSep2: TMenuItem;
@@ -110,6 +106,11 @@ type
     actUsesAddToFavorites: TAction;
     mitUsesMoveToInterface: TMenuItem;
     mitUsesAddToFavorites: TMenuItem;
+    lblUnits: TPanel;
+    lblUses: TPanel;
+    pnlButtonsRight: TPanel;
+    btnCancel: TButton;
+    btnOK: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);

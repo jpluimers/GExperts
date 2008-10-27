@@ -1,8 +1,8 @@
 object fmToDo: TfmToDo
   Left = 268
   Top = 187
-  Width = 477
-  Height = 307
+  Width = 523
+  Height = 325
   ActiveControl = lvTodo
   Caption = 'To Do List'
   Color = clBtnFace
@@ -22,8 +22,8 @@ object fmToDo: TfmToDo
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 259
-    Width = 469
+    Top = 270
+    Width = 507
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -31,8 +31,8 @@ object fmToDo: TfmToDo
   object lvTodo: TListView
     Left = 0
     Top = 22
-    Width = 469
-    Height = 237
+    Width = 507
+    Height = 248
     Align = alClient
     Columns = <
       item
@@ -67,7 +67,7 @@ object fmToDo: TfmToDo
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 469
+    Width = 507
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

@@ -2,7 +2,7 @@ object fmProjDependFilter: TfmProjDependFilter
   Left = 333
   Top = 160
   Width = 221
-  Height = 400
+  Height = 434
   BorderIcons = [biSystemMenu]
   Caption = 'Unit Filter'
   Color = clBtnFace
@@ -22,81 +22,98 @@ object fmProjDependFilter: TfmProjDependFilter
   TextHeight = 13
   object pnlFooter: TPanel
     Left = 0
-    Top = 339
-    Width = 213
+    Top = 366
+    Width = 205
     Height = 32
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    object btnCancel: TButton
-      Left = 119
-      Top = 0
-      Width = 75
-      Height = 25
-      Anchors = [akTop]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 1
-    end
     object btnOK: TButton
-      Left = 19
+      Left = 23
       Top = 0
       Width = 75
       Height = 25
-      Anchors = [akTop]
       Caption = 'OK'
       Default = True
       ModalResult = 1
       TabOrder = 0
     end
+    object btnCancel: TButton
+      Left = 106
+      Top = 0
+      Width = 75
+      Height = 25
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 1
+    end
   end
   object pnlFilters: TPanel
     Left = 0
     Top = 0
-    Width = 213
-    Height = 339
+    Width = 205
+    Height = 366
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    object lblExcluded: TLabel
-      Left = 8
-      Top = 6
-      Width = 71
-      Height = 13
-      Caption = 'E&xcluded Units'
-      FocusControl = lbFilter
-    end
-    object btnAdd: TButton
-      Left = 157
-      Top = 307
-      Width = 49
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = '&Add'
-      TabOrder = 2
-      OnClick = btnAddClick
-    end
-    object edtUnitName: TEdit
-      Left = 8
-      Top = 309
-      Width = 142
-      Height = 21
-      Anchors = [akLeft, akRight, akBottom]
+    object pnlListFooter: TPanel
+      Left = 0
+      Top = 325
+      Width = 205
+      Height = 41
+      Align = alBottom
+      BevelOuter = bvNone
       TabOrder = 1
-      OnChange = edtUnitNameChange
+      object btnAdd: TButton
+        Left = 143
+        Top = 5
+        Width = 49
+        Height = 25
+        Caption = '&Add'
+        TabOrder = 1
+        OnClick = btnAddClick
+      end
+      object edtUnitName: TEdit
+        Left = 8
+        Top = 7
+        Width = 128
+        Height = 21
+        TabOrder = 0
+        OnChange = edtUnitNameChange
+      end
     end
-    object lbFilter: TListBox
-      Left = 8
-      Top = 22
-      Width = 198
-      Height = 279
-      Anchors = [akLeft, akTop, akRight, akBottom]
-      ItemHeight = 13
-      MultiSelect = True
-      PopupMenu = mnuPopup
-      Sorted = True
+    object pnlUnits: TPanel
+      Left = 0
+      Top = 0
+      Width = 205
+      Height = 325
+      Align = alClient
+      BevelOuter = bvNone
+      BorderWidth = 6
       TabOrder = 0
+      object lbFilter: TListBox
+        Left = 6
+        Top = 22
+        Width = 193
+        Height = 297
+        Align = alClient
+        ItemHeight = 13
+        MultiSelect = True
+        PopupMenu = mnuPopup
+        Sorted = True
+        TabOrder = 1
+      end
+      object pnlUnitsHeader: TPanel
+        Left = 6
+        Top = 6
+        Width = 193
+        Height = 16
+        Align = alTop
+        BevelOuter = bvNone
+        Caption = 'Units To Hide'
+        TabOrder = 0
+      end
     end
   end
   object dlgOpen: TOpenDialog

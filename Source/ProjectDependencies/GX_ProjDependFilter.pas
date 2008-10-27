@@ -7,16 +7,10 @@ uses
 
 type
   TfmProjDependFilter = class(TForm)
-    lblExcluded: TLabel;
-    lbFilter: TListBox;
     dlgOpen: TOpenDialog;
     mnuPopup: TPopupMenu;
     mitAddFiles: TMenuItem;
     mitDeleteFiles: TMenuItem;
-    btnOK: TButton;
-    btnCancel: TButton;
-    edtUnitName: TEdit;
-    btnAdd: TButton;
     mitClear: TMenuItem;
     mitSep1: TMenuItem;
     mitSave: TMenuItem;
@@ -25,6 +19,14 @@ type
     dlgFilterSave: TSaveDialog;
     pnlFooter: TPanel;
     pnlFilters: TPanel;
+    pnlListFooter: TPanel;
+    btnAdd: TButton;
+    edtUnitName: TEdit;
+    pnlUnits: TPanel;
+    lbFilter: TListBox;
+    pnlUnitsHeader: TPanel;
+    btnOK: TButton;
+    btnCancel: TButton;
     procedure mitAddFilesClick(Sender: TObject);
     procedure mitDeleteFilesClick(Sender: TObject);
     procedure btnAddClick(Sender: TObject);

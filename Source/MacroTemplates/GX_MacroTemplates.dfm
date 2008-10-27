@@ -25,17 +25,18 @@ object fmMacroTemplates: TfmMacroTemplates
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 592
-    Height = 390
+    Width = 584
+    Height = 383
     ActivePage = tabTemplates
     Align = alClient
+    TabIndex = 0
     TabOrder = 0
     object tabTemplates: TTabSheet
       Caption = 'Templates'
       object splTemplates: TSplitter
         Left = 0
         Top = 170
-        Width = 584
+        Width = 576
         Height = 8
         Cursor = crVSplit
         Align = alTop
@@ -45,7 +46,7 @@ object fmMacroTemplates: TfmMacroTemplates
       object pnlList: TPanel
         Left = 0
         Top = 0
-        Width = 584
+        Width = 576
         Height = 170
         Align = alTop
         BevelOuter = bvNone
@@ -56,7 +57,7 @@ object fmMacroTemplates: TfmMacroTemplates
         object lvTemplates: TListView
           Left = 0
           Top = 0
-          Width = 499
+          Width = 491
           Height = 170
           Align = alClient
           Columns = <
@@ -92,7 +93,7 @@ object fmMacroTemplates: TfmMacroTemplates
           OnSelectItem = lvTemplatesSelectItem
         end
         object Panel2: TPanel
-          Left = 499
+          Left = 491
           Top = 0
           Width = 85
           Height = 170
@@ -153,8 +154,8 @@ object fmMacroTemplates: TfmMacroTemplates
       object pnlMacroDetails: TPanel
         Left = 0
         Top = 178
-        Width = 584
-        Height = 184
+        Width = 576
+        Height = 177
         Align = alClient
         BevelOuter = bvNone
         FullRepaint = False
@@ -162,17 +163,18 @@ object fmMacroTemplates: TfmMacroTemplates
         object pnlEditMacro: TPanel
           Left = 0
           Top = 0
-          Width = 584
-          Height = 184
+          Width = 576
+          Height = 177
           Align = alClient
           BevelOuter = bvNone
           FullRepaint = False
           TabOrder = 0
           object splUses: TSplitter
-            Left = 428
+            Left = 420
             Top = 0
             Width = 5
-            Height = 184
+            Height = 177
+            Cursor = crHSplit
             Align = alRight
             AutoSnap = False
             Beveled = True
@@ -180,8 +182,8 @@ object fmMacroTemplates: TfmMacroTemplates
           object pnlMacroText: TPanel
             Left = 0
             Top = 0
-            Width = 428
-            Height = 184
+            Width = 420
+            Height = 177
             Align = alClient
             BevelOuter = bvNone
             BorderWidth = 5
@@ -196,10 +198,10 @@ object fmMacroTemplates: TfmMacroTemplates
             TabOrder = 0
           end
           object pnlUses: TPanel
-            Left = 433
+            Left = 425
             Top = 0
             Width = 151
-            Height = 184
+            Height = 177
             Align = alRight
             BevelOuter = bvNone
             BorderWidth = 5
@@ -209,7 +211,7 @@ object fmMacroTemplates: TfmMacroTemplates
             OnResize = pnlUsesResize
             object pnlUsesImplementation: TPanel
               Left = 5
-              Top = 91
+              Top = 84
               Width = 141
               Height = 88
               Align = alBottom
@@ -254,7 +256,7 @@ object fmMacroTemplates: TfmMacroTemplates
               Left = 5
               Top = 5
               Width = 141
-              Height = 86
+              Height = 79
               Align = alClient
               BevelOuter = bvNone
               FullRepaint = False
@@ -263,7 +265,7 @@ object fmMacroTemplates: TfmMacroTemplates
                 Left = 0
                 Top = 16
                 Width = 141
-                Height = 70
+                Height = 63
                 Align = alClient
                 Columns = <
                   item
@@ -422,15 +424,22 @@ object fmMacroTemplates: TfmMacroTemplates
           Width = 289
           Height = 33
           Max = 20
+          Orientation = trHorizontal
+          Frequency = 1
+          Position = 0
+          SelEnd = 0
+          SelStart = 0
           TabOrder = 1
+          TickMarks = tmBottomRight
+          TickStyle = tsAuto
         end
       end
     end
   end
   object pnlFooter: TPanel
     Left = 0
-    Top = 390
-    Width = 592
+    Top = 383
+    Width = 584
     Height = 36
     Align = alBottom
     BevelOuter = bvNone
@@ -439,7 +448,7 @@ object fmMacroTemplates: TfmMacroTemplates
     FullRepaint = False
     TabOrder = 1
     object pnlFooterButtons: TPanel
-      Left = 328
+      Left = 320
       Top = 0
       Width = 264
       Height = 36

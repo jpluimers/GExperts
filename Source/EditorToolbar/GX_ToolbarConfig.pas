@@ -8,28 +8,34 @@ uses
 
 type
   TfmToolbarConfig = class(TForm)
-    lbCategories: TListBox;
-    lblCategories: TLabel;
-    lblAvailable: TLabel;
-    lbAvailable: TListBox;
-    btnOK: TButton;
-    btnCancel: TButton;
-    btnHelp: TButton;
-    btnAdd: TBitBtn;
-    btnRemove: TBitBtn;
-    btnAddSeparator: TBitBtn;
-    lblToolbar: TLabel;
-    lbToolbar: TListBox;
     Actions: TActionList;
     actAddButton: TAction;
     actRemoveButton: TAction;
     actAddSeparator: TAction;
-    btnUp: TBitBtn;
-    btnDown: TBitBtn;
     actMoveDown: TAction;
     actMoveUp: TAction;
     pnlButtons: TPanel;
     pnlContent: TPanel;
+    pnlButtonsRight: TPanel;
+    btnOK: TButton;
+    btnCancel: TButton;
+    btnHelp: TButton;
+    pnlCategories: TPanel;
+    pnlAvailButtons: TPanel;
+    pnlToolbarButtons: TPanel;
+    pnlToolButtons: TPanel;
+    btnDown: TBitBtn;
+    btnUp: TBitBtn;
+    btnRemove: TBitBtn;
+    btnAdd: TBitBtn;
+    pnlCatHeader: TPanel;
+    pnlAvailButtonHeader: TPanel;
+    pnlToolbarHeader: TPanel;
+    lbCategories: TListBox;
+    lbAvailable: TListBox;
+    lbToolbar: TListBox;
+    pnlSep: TPanel;
+    btnAddSeparator: TBitBtn;
     procedure btnHelpClick(Sender: TObject);
     procedure actAddButtonExecute(Sender: TObject);
     procedure actRemoveButtonExecute(Sender: TObject);

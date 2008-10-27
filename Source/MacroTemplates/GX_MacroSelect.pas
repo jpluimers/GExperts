@@ -8,10 +8,11 @@ uses
 type
   TfmMacroSelect = class(TForm)
     pnlMain: TPanel;
-    tbEnter: TMemo;
-    pnlFooter: TPanel;
-    btnConfiguration: TButton;
     lvMacros: TListView;
+    pnlFooter: TPanel;
+    tbEnter: TMemo;
+    pnlButtonsRight: TPanel;
+    btnConfiguration: TButton;
     procedure tbEnterChange(Sender: TObject);
     procedure lstMacrosDblClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

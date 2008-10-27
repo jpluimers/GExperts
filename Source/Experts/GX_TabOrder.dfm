@@ -1,8 +1,8 @@
 object fmTabOrder: TfmTabOrder
   Left = 376
   Top = 207
-  Width = 404
-  Height = 400
+  Width = 512
+  Height = 513
   BorderIcons = [biSystemMenu]
   Caption = 'Set Tab Order'
   Color = clBtnFace
@@ -21,10 +21,10 @@ object fmTabOrder: TfmTabOrder
   PixelsPerInch = 96
   TextHeight = 13
   object pnlButtons: TPanel
-    Left = 286
+    Left = 394
     Top = 0
     Width = 102
-    Height = 364
+    Height = 477
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 1
@@ -79,8 +79,8 @@ object fmTabOrder: TfmTabOrder
   object pnlComponents: TPanel
     Left = 0
     Top = 0
-    Width = 286
-    Height = 364
+    Width = 394
+    Height = 477
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -88,16 +88,16 @@ object fmTabOrder: TfmTabOrder
     object gbxComponents: TGroupBox
       Left = 6
       Top = 6
-      Width = 274
-      Height = 352
+      Width = 382
+      Height = 465
       Align = alClient
       Caption = 'Arrange Components'
       TabOrder = 0
       object pnlComponentTree: TPanel
         Left = 2
         Top = 15
-        Width = 270
-        Height = 335
+        Width = 378
+        Height = 448
         Align = alClient
         BevelOuter = bvNone
         BorderWidth = 6
@@ -105,8 +105,8 @@ object fmTabOrder: TfmTabOrder
         object tvComps: TTreeView
           Left = 6
           Top = 6
-          Width = 258
-          Height = 323
+          Width = 366
+          Height = 436
           Align = alClient
           DragMode = dmAutomatic
           Indent = 19

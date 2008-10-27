@@ -1,8 +1,8 @@
 object fmMacroSelect: TfmMacroSelect
   Left = 366
   Top = 321
-  Width = 410
-  Height = 210
+  Width = 439
+  Height = 281
   BorderStyle = bsSizeToolWin
   Caption = 'Select Macro Template'
   Color = clBtnFace
@@ -24,48 +24,17 @@ object fmMacroSelect: TfmMacroSelect
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 402
-    Height = 181
+    Width = 423
+    Height = 213
     Align = alClient
     BevelOuter = bvNone
-    BorderWidth = 5
+    BorderWidth = 6
     TabOrder = 0
-    object pnlFooter: TPanel
-      Left = 5
-      Top = 147
-      Width = 392
-      Height = 29
-      Align = alBottom
-      BevelOuter = bvNone
-      TabOrder = 1
-      object tbEnter: TMemo
-        Left = 0
-        Top = 7
-        Width = 285
-        Height = 20
-        Anchors = [akLeft, akTop, akRight]
-        TabOrder = 0
-        WantReturns = False
-        WordWrap = False
-        OnChange = tbEnterChange
-        OnKeyDown = tbEnterKeyDown
-      end
-      object btnConfiguration: TButton
-        Left = 295
-        Top = 4
-        Width = 97
-        Height = 25
-        Anchors = [akTop, akRight]
-        Caption = '&Configuration...'
-        TabOrder = 1
-        OnClick = btnConfigurationClick
-      end
-    end
     object lvMacros: TListView
-      Left = 5
-      Top = 5
-      Width = 392
-      Height = 142
+      Left = 6
+      Top = 6
+      Width = 411
+      Height = 201
       Align = alClient
       Columns = <
         item
@@ -86,6 +55,48 @@ object fmMacroSelect: TfmMacroSelect
       TabOrder = 0
       ViewStyle = vsReport
       OnDblClick = lstMacrosDblClick
+    end
+  end
+  object pnlFooter: TPanel
+    Left = 0
+    Top = 213
+    Width = 423
+    Height = 32
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    DesignSize = (
+      423
+      32)
+    object tbEnter: TMemo
+      Left = 6
+      Top = 4
+      Width = 282
+      Height = 20
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 0
+      WantReturns = False
+      WordWrap = False
+      OnChange = tbEnterChange
+      OnKeyDown = tbEnterKeyDown
+    end
+    object pnlButtonsRight: TPanel
+      Left = 298
+      Top = 0
+      Width = 125
+      Height = 32
+      Align = alRight
+      BevelOuter = bvNone
+      TabOrder = 1
+      object btnConfiguration: TButton
+        Left = 21
+        Top = 1
+        Width = 97
+        Height = 25
+        Caption = '&Configuration...'
+        TabOrder = 0
+        OnClick = btnConfigurationClick
+      end
     end
   end
 end
