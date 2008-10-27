@@ -218,13 +218,17 @@ procedure TfmGrepResults.Execute(DoRefresh: Boolean);
 resourcestring
   SGrepActive = 'A Grep search is currently active; either abort it or wait until it is finished.';
   SGrepSearchStats = 'Searched %d files in %.2f seconds for "%s"';
-  SMatches = '%d matches in %d files';
+  SMatches = '%d matches';
+  SMatches1 = '%d match';
+  SFiles = 'in %d files';
+  SFiles1 = 'in %d file';
 var
   TimeStart: TDateTime;
   FilesSearched: Cardinal;
   MatchesFound: Cardinal;
   FilesHit: Cardinal;
   Cursor: IInterface;
+  MatchString: string;
 begin
   if FSearchInProgress then
     raise Exception.Create(SGrepActive);
@@ -269,7 +273,18 @@ begin
   end;
 
   lbResults.Refresh;
-  SetMatchString(Format(SMatches, [MatchesFound, FilesHit]));
+
+  if MatchesFound = 1 then
+    MatchString := Format(SMatches1, [MatchesFound])
+  else
+    MatchString := Format(SMatches, [MatchesFound]);
+
+  if FilesHit = 1 then
+    MatchString := MatchString + ' ' + Format(SFiles1, [FilesHit])
+  else
+    MatchString := MatchString + ' ' + Format(SFiles, [FilesHit]);
+
+  SetMatchString(MatchString);
 end;
 
 procedure TfmGrepResults.ClearResultsListbox;
