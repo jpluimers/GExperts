@@ -10,7 +10,6 @@ type
   TGrepExpert = class(TGX_Expert)
   private
     FGrepMiddle: Boolean;
-    FGrepANSICompatible: Boolean;
     FGrepExpandAll: Boolean;
     FSearchList: TStrings;
     FReplaceList: TStrings;
@@ -52,7 +51,6 @@ type
     procedure Click(Sender: TObject); override;
     procedure Configure; override;
     property GrepMiddle: Boolean read FGrepMiddle write FGrepMiddle;
-    property GrepANSICompatible: Boolean read FGrepANSICompatible write FGrepANSICompatible;
     property GrepExpandAll: Boolean read FGrepExpandAll write FGrepExpandAll;
     property GrepCaseSensitive: Boolean read FGrepCaseSensitive write FGrepCaseSensitive;
     property GrepCode: Boolean read FGrepCode write FGrepCode;
@@ -107,7 +105,6 @@ begin
   FContextMatchColor := clHighlight;
   FNumContextLines := 2;
   
-  FGrepANSICompatible := False;
   FGrepExpandAll := False;
   FGrepUseCurrentIdent := False;
   ShortCut := Menus.ShortCut(Word('R'), [ssCtrl, ssAlt]);
@@ -203,7 +200,6 @@ begin
   Settings.WriteBool(ConfigurationKey, 'Forms', GrepForms);
   Settings.WriteInteger(ConfigurationKey, 'Search', GrepSearch);
   Settings.WriteBool(ConfigurationKey, 'SubDirectories', GrepSub);
-  Settings.WriteBool(ConfigurationKey, 'ANSICompatible', GrepANSICompatible);
   Settings.WriteBool(ConfigurationKey, 'ExpandAll', GrepExpandAll);
   Settings.WriteBool(ConfigurationKey, 'Whole Word', GrepWholeWord);
   Settings.WriteBool(ConfigurationKey, 'Middle', GrepMiddle);
@@ -269,7 +265,6 @@ begin
   FGrepForms := Settings.ReadBool(ConfigurationKey, 'Forms', False);
   FGrepSearch := Settings.ReadInteger(ConfigurationKey, 'Search', 0);
   FGrepSub := Settings.ReadBool(ConfigurationKey, 'SubDirectories', True);
-  FGrepANSICompatible := Settings.ReadBool(ConfigurationKey, 'ANSICompatible', False);
   FGrepExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', False);
   FGrepWholeWord := Settings.ReadBool(ConfigurationKey, 'Whole Word', False);
   FGrepMiddle := Settings.ReadBool(ConfigurationKey, 'Middle', True);

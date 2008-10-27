@@ -10,7 +10,6 @@ type
     gbxOptions: TGroupBox;
     btnOK: TButton;
     btnCancel: TButton;
-    chkGrepANSI: TCheckBox;
     chkGrepUseCurrentIdent: TCheckBox;
   end;
 

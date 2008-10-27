@@ -3,7 +3,7 @@ object fmGrepOptions: TfmGrepOptions
   Top = 263
   BorderStyle = bsDialog
   Caption = 'Grep Search Options'
-  ClientHeight = 123
+  ClientHeight = 104
   ClientWidth = 335
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,36 +16,28 @@ object fmGrepOptions: TfmGrepOptions
   Scaled = False
   DesignSize = (
     335
-    123)
+    104)
   PixelsPerInch = 96
   TextHeight = 13
   object gbxOptions: TGroupBox
     Left = 8
     Top = 8
     Width = 318
-    Height = 75
+    Height = 55
     Caption = 'Grep Options'
     TabOrder = 0
-    object chkGrepANSI: TCheckBox
-      Left = 12
-      Top = 21
-      Width = 301
-      Height = 17
-      Caption = '&ANSI compatible grep (slower)'
-      TabOrder = 0
-    end
     object chkGrepUseCurrentIdent: TCheckBox
       Left = 12
-      Top = 44
+      Top = 22
       Width = 301
       Height = 17
-      Caption = 'Use &current identifier as the default search string'
-      TabOrder = 1
+      Caption = 'Use &current editor identifier as the default search string'
+      TabOrder = 0
     end
   end
   object btnOK: TButton
     Left = 168
-    Top = 91
+    Top = 72
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -56,7 +48,7 @@ object fmGrepOptions: TfmGrepOptions
   end
   object btnCancel: TButton
     Left = 251
-    Top = 91
+    Top = 72
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

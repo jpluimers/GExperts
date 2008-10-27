@@ -26,7 +26,6 @@ type
     GrepAction: TGrepAction;
     CanRefresh: Boolean;
     IncludeForms: Boolean;
-    ANSICompatible: Boolean;
   end;
 
 type
@@ -303,35 +302,6 @@ begin
   end;
 end;
 
-type
-  IGxGrepSearchAdapter = interface
-  ['{2A8DD529-D06F-4CA7-83E5-E4880477BE31}']
-    function GetText(Position: Longint; Buffer: PAnsiChar; Count: Longint): Longint;
-  end;
-
-type
-  TGrepStreamAdapter = class(TInterfacedObject, IGxGrepSearchAdapter)
-  private
-    function GetText(Position: Longint; Buffer: PAnsiChar; Count: Longint): Longint;
-  private
-    FOwned: Boolean;
-    FStream: TStream;
-  public
-    constructor Create(Stream: TStream; Owned: Boolean = False);
-    destructor Destroy; override;
-  end;
-
-type
-  TGrepOtaAdapter = class(TInterfacedObject, IGxGrepSearchAdapter)
-  private
-    function GetText(Position: Longint; Buffer: PAnsiChar; Count: Longint): Longint;
-  private
-    FEditReader: IOTAEditReader;
-  public
-    constructor Create(EditReader: IOTAEditReader);
-  end;
-
-
 procedure TGrepSearchRunner.GrepCurrentSourceEditor;
 resourcestring
   SNoFileOpen = 'No file is currently open';
@@ -605,48 +575,6 @@ procedure TGrepSearchRunner.DoHitMatch(LineNo: Integer; const Line: string;
 begin
   if Assigned(FOnHitMatch) then
     FOnHitMatch(Self, LineNo, Line, SPos, EPos);
-end;
-
-{ TGrepStreamAdapter }
-
-constructor TGrepStreamAdapter.Create(Stream: TStream; Owned: Boolean);
-begin
-  inherited Create;
-
-  Assert(Assigned(Stream));
-  FStream := Stream;
-  FOwned := Owned;
-end;
-
-destructor TGrepStreamAdapter.Destroy;
-begin
-  if FOwned then
-    FreeAndNil(FStream);
-
-  inherited Destroy;
-end;
-
-function TGrepStreamAdapter.GetText(Position: Integer; Buffer: PAnsiChar;
-  Count: Integer): Longint;
-begin
-  FStream.Position := Position;
-  Result := FStream.Read(Buffer^, Count);
-end;
-
-{ TGrepOtaAdapter }
-
-constructor TGrepOtaAdapter.Create(EditReader: IOTAEditReader);
-begin
-  inherited Create;
-
-  Assert(Assigned(EditReader));
-  FEditReader := EditReader;
-end;
-
-function TGrepOtaAdapter.GetText(Position: Integer; Buffer: PAnsiChar;
-  Count: Integer): Longint;
-begin
-  Result := FEditReader.GetText(Position, Buffer, Count);
 end;
 
 { TMatchResult }

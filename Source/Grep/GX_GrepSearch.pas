@@ -175,11 +175,9 @@ begin
 
   Dialog := TfmGrepOptions.Create(nil);
   try
-    Dialog.chkGrepANSI.Checked := GrepExpert.GrepANSICompatible;
     Dialog.chkGrepUseCurrentIdent.Checked := GrepExpert.GrepUseCurrentIdent;
     if Dialog.ShowModal = mrOk then
     begin
-      GrepExpert.GrepANSICompatible := Dialog.chkGrepANSI.Checked;
       GrepExpert.GrepUseCurrentIdent := Dialog.chkGrepUseCurrentIdent.Checked;
     end;
   finally
@@ -381,7 +379,6 @@ begin
   Value.Mask := '';
   Value.Directories := '';
   Value.IncludeForms := cbForms.Checked;
-  Value.ANSICompatible := GrepExpert.GrepANSICompatible;
 
   if rbAllProjFiles.Checked then
     Value.GrepAction := gaProjGrep
