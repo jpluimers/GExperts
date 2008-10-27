@@ -1,9 +1,8 @@
 object fmMessageDialog: TfmMessageDialog
   Left = 339
   Top = 215
-  Width = 490
-  Height = 520
-  ActiveControl = mmoMessage
+  Width = 496
+  Height = 540
   Anchors = [akLeft, akBottom]
   BorderIcons = [biSystemMenu]
   Caption = 'Message Dialog'
@@ -20,61 +19,36 @@ object fmMessageDialog: TfmMessageDialog
   Position = poScreenCenter
   Scaled = False
   OnKeyPress = FormKeyPress
-  DesignSize = (
-    482
-    491)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblMessage: TLabel
-    Left = 8
-    Top = 7
-    Width = 43
-    Height = 13
-    Caption = '&Message'
-    FocusControl = mmoMessage
-  end
   object pnlMain: TPanel
     Left = 0
-    Top = 125
-    Width = 482
-    Height = 334
+    Top = 114
+    Width = 480
+    Height = 354
     Align = alBottom
     BevelOuter = bvNone
+    BorderWidth = 6
     FullRepaint = False
-    TabOrder = 2
-    object lblEmbed: TLabel
-      Left = 134
-      Top = 9
-      Width = 33
-      Height = 13
-      Caption = 'Embe&d'
-      FocusControl = cbxTypeEmbedded
-    end
-    object lblHelpContext: TLabel
-      Left = 346
-      Top = 9
-      Width = 60
-      Height = 13
-      Caption = 'Help conte&xt'
-      FocusControl = edtHelpContext
-    end
+    TabOrder = 1
     object pgeMessageDialog: TPageControl
-      Left = 7
-      Top = 30
-      Width = 467
-      Height = 298
+      Left = 6
+      Top = 47
+      Width = 468
+      Height = 301
       ActivePage = tabMessageDlg
+      Align = alClient
       TabIndex = 0
-      TabOrder = 4
+      TabOrder = 1
       OnChange = pgeMessageDialogChange
       object tabMessageDlg: TTabSheet
         Caption = 'MessageDlg'
         DesignSize = (
-          459
-          270)
+          460
+          273)
         object pnlMessageDlg: TPanel
           Left = 21
-          Top = 18
+          Top = 19
           Width = 417
           Height = 233
           Anchors = []
@@ -808,11 +782,11 @@ object fmMessageDialog: TfmMessageDialog
         Caption = 'MessageBox'
         ImageIndex = 1
         DesignSize = (
-          459
-          270)
+          460
+          273)
         object pnlMessageBox: TPanel
-          Left = 2
-          Top = -1
+          Left = 3
+          Top = 0
           Width = 456
           Height = 270
           Anchors = []
@@ -1258,127 +1232,180 @@ object fmMessageDialog: TfmMessageDialog
         end
       end
     end
-    object cbxTypeEmbedded: TComboBox
-      Left = 177
-      Top = 5
-      Width = 144
-      Height = 21
-      Style = csDropDownList
-      ItemHeight = 13
-      TabOrder = 1
-      OnChange = cbxTypeEmbeddedChange
-    end
-    object chkDefaults: TCheckBox
-      Left = 8
-      Top = 8
-      Width = 109
-      Height = 16
-      Caption = '&Save as defaults'
+    object pnlSettings: TPanel
+      Left = 6
+      Top = 6
+      Width = 468
+      Height = 41
+      Align = alTop
+      BevelOuter = bvNone
       TabOrder = 0
+      object lblHelpContext: TLabel
+        Left = 332
+        Top = 9
+        Width = 60
+        Height = 13
+        Caption = 'Help conte&xt'
+        FocusControl = edtHelpContext
+      end
+      object lblEmbed: TLabel
+        Left = 131
+        Top = 9
+        Width = 33
+        Height = 13
+        Caption = 'Embe&d'
+        FocusControl = cbxTypeEmbedded
+      end
+      object edtHelpContext: TEdit
+        Left = 402
+        Top = 5
+        Width = 45
+        Height = 21
+        TabOrder = 2
+        Text = '0'
+      end
+      object udHelpContext: TUpDown
+        Left = 447
+        Top = 5
+        Width = 16
+        Height = 21
+        Associate = edtHelpContext
+        Min = 0
+        Max = 32767
+        Position = 0
+        TabOrder = 3
+        Wrap = False
+      end
+      object cbxTypeEmbedded: TComboBox
+        Left = 173
+        Top = 5
+        Width = 141
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
+        TabOrder = 1
+        OnChange = cbxTypeEmbeddedChange
+      end
+      object chkDefaults: TCheckBox
+        Left = 8
+        Top = 8
+        Width = 109
+        Height = 16
+        Caption = '&Save as defaults'
+        TabOrder = 0
+      end
     end
-    object edtHelpContext: TEdit
-      Left = 417
-      Top = 4
-      Width = 45
-      Height = 21
-      TabOrder = 2
-      Text = '0'
-    end
-    object udHelpContext: TUpDown
-      Left = 462
-      Top = 4
-      Width = 12
-      Height = 21
-      Associate = edtHelpContext
-      Min = 0
-      Max = 32767
-      Position = 0
-      TabOrder = 3
-      Wrap = False
-    end
-  end
-  object mmoMessage: TMemo
-    Left = 8
-    Top = 24
-    Width = 466
-    Height = 96
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    ScrollBars = ssBoth
-    TabOrder = 1
-    WordWrap = False
-    OnKeyDown = mmoMessageKeyDown
-  end
-  object chkQuotes: TCheckBox
-    Left = 92
-    Top = 6
-    Width = 161
-    Height = 17
-    Caption = '&Quote message text'
-    TabOrder = 0
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 459
-    Width = 482
-    Height = 32
+    Top = 468
+    Width = 480
+    Height = 36
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
-    TabOrder = 3
-    DesignSize = (
-      482
-      32)
-    object btnCancel: TButton
-      Left = 316
-      Top = 1
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = '&Cancel'
-      ModalResult = 2
-      TabOrder = 3
-    end
-    object btnCopyToClipboard: TButton
-      Left = 152
-      Top = 1
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = 'Clipboa&rd'
-      TabOrder = 1
-      OnClick = btnCopyToClipboardClick
-    end
-    object btnHelp: TButton
-      Left = 399
-      Top = 1
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = '&Help'
-      TabOrder = 4
-      OnClick = btnHelpClick
-    end
-    object btnOK: TButton
-      Left = 234
-      Top = 1
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = '&OK'
-      Default = True
-      ModalResult = 1
-      TabOrder = 2
-    end
-    object btnTest: TButton
-      Left = 70
-      Top = 1
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = '&Test'
+    TabOrder = 2
+    object pnlButtonsRight: TPanel
+      Left = 30
+      Top = 0
+      Width = 450
+      Height = 36
+      Align = alRight
+      BevelOuter = bvNone
       TabOrder = 0
-      OnClick = btnTestClick
+      object btnHelp: TButton
+        Left = 369
+        Top = 3
+        Width = 75
+        Height = 25
+        Caption = '&Help'
+        TabOrder = 4
+        OnClick = btnHelpClick
+      end
+      object btnCancel: TButton
+        Left = 286
+        Top = 3
+        Width = 75
+        Height = 25
+        Cancel = True
+        Caption = '&Cancel'
+        ModalResult = 2
+        TabOrder = 3
+      end
+      object btnOK: TButton
+        Left = 204
+        Top = 3
+        Width = 75
+        Height = 25
+        Caption = '&OK'
+        Default = True
+        ModalResult = 1
+        TabOrder = 2
+      end
+      object btnCopyToClipboard: TButton
+        Left = 122
+        Top = 3
+        Width = 75
+        Height = 25
+        Caption = 'Clipboa&rd'
+        TabOrder = 1
+        OnClick = btnCopyToClipboardClick
+      end
+      object btnTest: TButton
+        Left = 40
+        Top = 3
+        Width = 75
+        Height = 25
+        Caption = '&Test'
+        TabOrder = 0
+        OnClick = btnTestClick
+      end
+    end
+  end
+  object pnlMessage: TPanel
+    Left = 0
+    Top = 0
+    Width = 480
+    Height = 114
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 6
+    TabOrder = 0
+    object mmoMessage: TMemo
+      Left = 6
+      Top = 28
+      Width = 468
+      Height = 80
+      Align = alClient
+      ScrollBars = ssBoth
+      TabOrder = 1
+      WordWrap = False
+      OnKeyDown = mmoMessageKeyDown
+    end
+    object pnlMessageTop: TPanel
+      Left = 6
+      Top = 6
+      Width = 468
+      Height = 22
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 0
+      object lblMessage: TLabel
+        Left = 3
+        Top = 4
+        Width = 43
+        Height = 13
+        Caption = '&Message'
+        FocusControl = mmoMessage
+      end
+      object chkQuotes: TCheckBox
+        Left = 96
+        Top = 3
+        Width = 161
+        Height = 17
+        Caption = '&Quote message text'
+        TabOrder = 0
+      end
     end
   end
 end

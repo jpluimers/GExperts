@@ -8,7 +8,7 @@ unit GX_SetComponentPropsConfig;
 interface
 
 uses
-  Classes, Controls, Forms, ActnList, Menus, StdCtrls, ComCtrls;
+  Classes, Controls, Forms, ActnList, Menus, StdCtrls, ComCtrls, ExtCtrls;
 
 type
   TfmSetComponentPropsConfig = class(TForm)
@@ -22,18 +22,6 @@ type
     actnHelp: TAction;
     Actions: TActionList;
     actnModifyPropertyType: TAction;
-    btnAddRule: TButton;
-    btnCancel: TButton;
-    btnDeleteRule: TButton;
-    btnHelp: TButton;
-    btnOK: TButton;
-    chkSimulate: TCheckBox;
-    chkVerbose: TCheckBox;
-    cbxComponents: TComboBox;
-    cbxProperty: TComboBox;
-    edtValue: TEdit;
-    gbxOptions: TGroupBox;
-    gbxPropertyToSet: TGroupBox;
     itmAdd: TMenuItem;
     itmClearRules: TMenuItem;
     itmDefaultRules: TMenuItem;
@@ -41,16 +29,36 @@ type
     itmDelete: TMenuItem;
     itmModify: TMenuItem;
     itmN1: TMenuItem;
-    lblComponent: TLabel;
-    lblGrid: TLabel;
-    lblProperty: TLabel;
-    lblPropertyTpes: TLabel;
-    lblValue: TLabel;
-    lbxPropertyTypes: TListBox;
     pmuProperties: TPopupMenu;
     pnuPropertyTypes: TPopupMenu;
-    lvProperties: TListView;
+    pnlContent: TPanel;
+    pnlButtons: TPanel;
+    pnlButtonsRight: TPanel;
+    pnlOptions: TPanel;
+    pnlPropDetails: TPanel;
+    pnlList: TPanel;
+    pnlPropTypes: TPanel;
+    pnlPropList: TPanel;
+    pnlPropListHeader: TPanel;
+    pnlPropTypesHeader: TPanel;
+    btnOK: TButton;
+    btnCancel: TButton;
+    btnHelp: TButton;
+    gbxOptions: TGroupBox;
+    chkSimulate: TCheckBox;
+    chkVerbose: TCheckBox;
     chkOnlyOpenFiles: TCheckBox;
+    gbxPropertyToSet: TGroupBox;
+    lblComponent: TLabel;
+    lblProperty: TLabel;
+    lblValue: TLabel;
+    cbxComponents: TComboBox;
+    cbxProperty: TComboBox;
+    edtValue: TEdit;
+    btnAddRule: TButton;
+    btnDeleteRule: TButton;
+    lbxPropertyTypes: TListBox;
+    lvProperties: TListView;
     procedure actnAddPropertyTypeExecute(Sender: TObject);
     procedure actnAddRuleExecute(Sender: TObject);
     procedure actnClearRulesExecute(Sender: TObject);

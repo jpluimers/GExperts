@@ -1,11 +1,13 @@
 object fmSourceExport: TfmSourceExport
   Left = 277
   Top = 216
-  Width = 475
-  Height = 375
+  Width = 575
+  Height = 485
   BorderIcons = [biSystemMenu]
   Caption = 'Source Export'
   Color = clBtnFace
+  Constraints.MinHeight = 400
+  Constraints.MinWidth = 535
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -20,12 +22,12 @@ object fmSourceExport: TfmSourceExport
   TextHeight = 13
   object pnlFooter: TPanel
     Left = 0
-    Top = 272
-    Width = 467
+    Top = 375
+    Width = 559
     Height = 74
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 0
+    TabOrder = 2
     object lblTitle: TLabel
       Left = 14
       Top = 16
@@ -34,39 +36,6 @@ object fmSourceExport: TfmSourceExport
       Alignment = taRightJustify
       Caption = 'Title'
     end
-    object btnCopy: TButton
-      Left = 99
-      Top = 43
-      Width = 84
-      Height = 26
-      Action = actCopy
-      Default = True
-      TabOrder = 2
-    end
-    object btnPrint: TButton
-      Left = 191
-      Top = 43
-      Width = 84
-      Height = 26
-      Action = actFilePrint
-      TabOrder = 3
-    end
-    object btnConfig: TButton
-      Left = 283
-      Top = 43
-      Width = 84
-      Height = 26
-      Action = actFileConfigure
-      TabOrder = 4
-    end
-    object btnSave: TButton
-      Left = 7
-      Top = 43
-      Width = 84
-      Height = 26
-      Action = actFileSave
-      TabOrder = 1
-    end
     object edtTitle: TEdit
       Left = 40
       Top = 12
@@ -74,20 +43,81 @@ object fmSourceExport: TfmSourceExport
       Height = 21
       TabOrder = 0
     end
-    object btnClose: TButton
-      Left = 375
-      Top = 43
-      Width = 84
-      Height = 26
-      Action = actFileExit
-      Cancel = True
-      TabOrder = 5
+    object pnlButtons: TPanel
+      Left = 0
+      Top = 36
+      Width = 559
+      Height = 38
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 1
+      object pnlButtonsRight: TPanel
+        Left = 92
+        Top = 0
+        Width = 467
+        Height = 38
+        Align = alRight
+        BevelOuter = bvNone
+        TabOrder = 0
+        object btnClose: TButton
+          Left = 375
+          Top = 5
+          Width = 84
+          Height = 26
+          Action = actFileExit
+          Cancel = True
+          TabOrder = 4
+        end
+        object btnConfig: TButton
+          Left = 283
+          Top = 5
+          Width = 84
+          Height = 26
+          Action = actFileConfigure
+          TabOrder = 3
+        end
+        object btnPrint: TButton
+          Left = 191
+          Top = 5
+          Width = 84
+          Height = 26
+          Action = actFilePrint
+          TabOrder = 2
+        end
+        object btnCopy: TButton
+          Left = 99
+          Top = 5
+          Width = 84
+          Height = 26
+          Action = actCopy
+          Default = True
+          TabOrder = 1
+        end
+        object btnSave: TButton
+          Left = 7
+          Top = 5
+          Width = 84
+          Height = 26
+          Action = actFileSave
+          TabOrder = 0
+        end
+      end
     end
+  end
+  object pnlEditor: TPanel
+    Left = 0
+    Top = 24
+    Width = 559
+    Height = 351
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 6
+    TabOrder = 1
   end
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 467
+    Width = 559
     Height = 24
     AutoSize = True
     ButtonHeight = 24
@@ -100,7 +130,7 @@ object fmSourceExport: TfmSourceExport
     Images = dmSharedImages.Images
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 1
+    TabOrder = 0
     Wrapable = False
     object tbnRefresh: TToolButton
       Left = 0
@@ -126,42 +156,42 @@ object fmSourceExport: TfmSourceExport
       Style = tbsDropDown
     end
     object ToolButton3: TToolButton
-      Left = 88
+      Left = 90
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnPrint: TToolButton
-      Left = 96
+      Left = 98
       Top = 0
       Action = actFilePrint
       ParentShowHint = False
       ShowHint = True
     end
     object ToolButton2: TToolButton
-      Left = 121
+      Left = 123
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnConfigure: TToolButton
-      Left = 129
+      Left = 131
       Top = 0
       Action = actFileConfigure
       ParentShowHint = False
       ShowHint = True
     end
     object ToolButton1: TToolButton
-      Left = 154
+      Left = 156
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnHelp: TToolButton
-      Left = 162
+      Left = 164
       Top = 0
       Action = actHelpHelp
       ParentShowHint = False

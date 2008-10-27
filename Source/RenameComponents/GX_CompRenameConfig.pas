@@ -30,8 +30,6 @@ type
   end;
 
   TfmCompRenameConfig = class(TForm)
-    btnOK: TButton;
-    btnClose: TButton;
     chkShowDialog: TCheckBox;
     chkAutoAdd: TCheckBox;
     pnlNames: TGroupBox;
@@ -56,12 +54,15 @@ type
     mnuSortByRule: TMenuItem;
     FindDialog: TFindDialog;
     btnDefaults: TButton;
-    btnHelp: TButton;
     pnlFooter: TPanel;
     pnlRules: TPanel;
     btnOtherProperties: TButton;
     acOtherProperties: TAction;
     mnuOtherProperties: TMenuItem;
+    pnlButtonsRight: TPanel;
+    btnOK: TButton;
+    btnClose: TButton;
+    btnHelp: TButton;
     procedure acOtherPropertiesExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);

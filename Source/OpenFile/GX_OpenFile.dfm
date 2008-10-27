@@ -1,8 +1,8 @@
 object fmOpenFile: TfmOpenFile
   Left = 297
   Top = 241
-  Width = 563
-  Height = 476
+  Width = 637
+  Height = 556
   ActiveControl = edtFilter
   Caption = 'Open Unit'
   Color = clBtnFace
@@ -23,18 +23,18 @@ object fmOpenFile: TfmOpenFile
   object pnlUnits: TPanel
     Left = 0
     Top = 27
-    Width = 555
-    Height = 383
+    Width = 621
+    Height = 458
     Align = alClient
     BevelOuter = bvNone
-    BorderWidth = 2
+    BorderWidth = 6
     FullRepaint = False
     TabOrder = 1
     object pcUnits: TPageControl
-      Left = 2
-      Top = 35
-      Width = 551
-      Height = 346
+      Left = 6
+      Top = 39
+      Width = 609
+      Height = 413
       ActivePage = tabSearchPath
       Align = alClient
       TabIndex = 0
@@ -47,8 +47,8 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabSearchPathShow
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 285
-          Width = 543
+          Top = 352
+          Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -65,8 +65,8 @@ object fmOpenFile: TfmOpenFile
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 543
-          Height = 285
+          Width = 601
+          Height = 352
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -75,8 +75,8 @@ object fmOpenFile: TfmOpenFile
           object lvSearchPath: TListView
             Left = 3
             Top = 3
-            Width = 537
-            Height = 279
+            Width = 595
+            Height = 346
             Align = alClient
             Columns = <
               item
@@ -112,8 +112,8 @@ object fmOpenFile: TfmOpenFile
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 543
-          Height = 284
+          Width = 601
+          Height = 352
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -122,8 +122,8 @@ object fmOpenFile: TfmOpenFile
           object lvProjects: TListView
             Left = 3
             Top = 3
-            Width = 537
-            Height = 278
+            Width = 595
+            Height = 346
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -138,8 +138,8 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 285
-          Width = 543
+          Top = 352
+          Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -161,8 +161,8 @@ object fmOpenFile: TfmOpenFile
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 543
-          Height = 284
+          Width = 601
+          Height = 352
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -171,8 +171,8 @@ object fmOpenFile: TfmOpenFile
           object lvCommon: TListView
             Left = 3
             Top = 3
-            Width = 537
-            Height = 278
+            Width = 595
+            Height = 346
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -187,8 +187,8 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 285
-          Width = 543
+          Top = 352
+          Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -210,8 +210,8 @@ object fmOpenFile: TfmOpenFile
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 543
-          Height = 285
+          Width = 601
+          Height = 352
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -220,8 +220,8 @@ object fmOpenFile: TfmOpenFile
           object lvFavorite: TListView
             Left = 3
             Top = 3
-            Width = 537
-            Height = 279
+            Width = 595
+            Height = 346
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -236,8 +236,8 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 285
-          Width = 543
+          Top = 352
+          Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -248,7 +248,7 @@ object fmOpenFile: TfmOpenFile
             Width = 125
             Height = 25
             Action = actFavDeleteFromFavorites
-            TabOrder = 0
+            TabOrder = 1
           end
           object btnFavoriteAddToFavorites: TButton
             Left = 4
@@ -256,7 +256,7 @@ object fmOpenFile: TfmOpenFile
             Width = 125
             Height = 25
             Action = actFavAddToFavorites
-            TabOrder = 1
+            TabOrder = 0
           end
         end
       end
@@ -266,8 +266,8 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabRecentShow
         object pnlRecentFooter: TPanel
           Left = 0
-          Top = 285
-          Width = 543
+          Top = 352
+          Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -278,7 +278,7 @@ object fmOpenFile: TfmOpenFile
             Width = 125
             Height = 25
             Action = actClearRecentList
-            TabOrder = 0
+            TabOrder = 1
           end
           object btnRecentAddToFavorites: TButton
             Left = 4
@@ -286,14 +286,14 @@ object fmOpenFile: TfmOpenFile
             Width = 125
             Height = 25
             Action = actAddToFavorites
-            TabOrder = 1
+            TabOrder = 0
           end
         end
         object pnlRecent: TPanel
           Left = 0
           Top = 0
-          Width = 543
-          Height = 285
+          Width = 601
+          Height = 352
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -301,8 +301,8 @@ object fmOpenFile: TfmOpenFile
           object lvRecent: TListView
             Left = 3
             Top = 3
-            Width = 537
-            Height = 279
+            Width = 595
+            Height = 346
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -318,16 +318,16 @@ object fmOpenFile: TfmOpenFile
       end
     end
     object pnlAvailableHeader: TPanel
-      Left = 2
-      Top = 2
-      Width = 551
+      Left = 6
+      Top = 6
+      Width = 609
       Height = 33
       Align = alTop
       BevelOuter = bvNone
       FullRepaint = False
       TabOrder = 0
       DesignSize = (
-        551
+        609
         33)
       object lblFilter: TLabel
         Left = 19
@@ -339,7 +339,7 @@ object fmOpenFile: TfmOpenFile
         FocusControl = edtFilter
       end
       object lblExtension: TLabel
-        Left = 388
+        Left = 454
         Top = 10
         Width = 24
         Height = 13
@@ -351,7 +351,7 @@ object fmOpenFile: TfmOpenFile
       object edtFilter: TEdit
         Left = 48
         Top = 6
-        Width = 323
+        Width = 389
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
@@ -359,7 +359,7 @@ object fmOpenFile: TfmOpenFile
         OnKeyDown = edtFilterKeyDown
       end
       object cbxType: TComboBox
-        Left = 418
+        Left = 484
         Top = 6
         Width = 113
         Height = 21
@@ -373,51 +373,55 @@ object fmOpenFile: TfmOpenFile
   end
   object pnlOKCancel: TPanel
     Left = 0
-    Top = 410
-    Width = 555
-    Height = 38
+    Top = 485
+    Width = 621
+    Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    DesignSize = (
-      555
-      38)
     object chkDefault: TCheckBox
-      Left = 8
-      Top = 10
+      Left = 9
+      Top = 8
       Width = 177
       Height = 17
       Caption = 'Default'
       TabOrder = 0
     end
-    object btnCancel: TButton
-      Left = 473
-      Top = 7
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 2
-    end
-    object btnOK: TButton
-      Left = 389
-      Top = 7
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = 'OK'
-      Default = True
-      ModalResult = 1
+    object pnlButtonsRight: TPanel
+      Left = 420
+      Top = 0
+      Width = 201
+      Height = 35
+      Align = alRight
+      BevelOuter = bvNone
       TabOrder = 1
-      OnClick = btnOKClick
+      object btnOK: TButton
+        Left = 36
+        Top = 2
+        Width = 75
+        Height = 25
+        Caption = 'OK'
+        Default = True
+        ModalResult = 1
+        TabOrder = 0
+        OnClick = btnOKClick
+      end
+      object btnCancel: TButton
+        Left = 120
+        Top = 2
+        Width = 75
+        Height = 25
+        Cancel = True
+        Caption = 'Cancel'
+        ModalResult = 2
+        TabOrder = 1
+      end
     end
   end
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 555
+    Width = 621
     Height = 27
     AutoSize = True
     ButtonHeight = 23

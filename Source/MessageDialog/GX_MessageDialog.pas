@@ -51,13 +51,7 @@ type
   end;
 
   TfmMessageDialog = class(TForm)
-    btnCancel: TButton;
-    btnCopyToClipboard: TButton;
-    btnHelp: TButton;
-    btnOK: TButton;
-    btnTest: TButton;
     chkDefaultButton: TCheckBox;
-    chkDefaults: TCheckBox;
     chkMbAbort: TCheckBox;
     chkMbAll: TCheckBox;
     chkMbCancel: TCheckBox;
@@ -78,8 +72,6 @@ type
     chkMrOK: TCheckBox;
     chkMrRetry: TCheckBox;
     chkMrYes: TCheckBox;
-    chkQuotes: TCheckBox;
-    cbxTypeEmbedded: TComboBox;
     rbnAbortRetryIgnore: TRadioButton;
     chkYes: TCheckBox;
     chkNo: TCheckBox;
@@ -117,10 +109,6 @@ type
     imgInformation: TImage;
     imgMsgBoxWarning: TImage;
     imgWarning: TImage;
-    lblEmbed: TLabel;
-    lblHelpContext: TLabel;
-    lblMessage: TLabel;
-    mmoMessage: TMemo;
     tabMessageBox: TTabSheet;
     pgeMessageDialog: TPageControl;
     tabMessageDlg: TTabSheet;
@@ -151,10 +139,26 @@ type
     pnlMain: TPanel;
     chkMrNoToAll: TCheckBox;
     chkMrYesToAll: TCheckBox;
-    edtHelpContext: TEdit;
-    udHelpContext: TUpDown;
     edtDefaultButton: TEdit;
     udDefaultButton: TUpDown;
+    pnlMessage: TPanel;
+    mmoMessage: TMemo;
+    pnlMessageTop: TPanel;
+    chkQuotes: TCheckBox;
+    lblMessage: TLabel;
+    pnlButtonsRight: TPanel;
+    btnHelp: TButton;
+    btnCancel: TButton;
+    btnOK: TButton;
+    btnCopyToClipboard: TButton;
+    btnTest: TButton;
+    pnlSettings: TPanel;
+    edtHelpContext: TEdit;
+    udHelpContext: TUpDown;
+    lblHelpContext: TLabel;
+    cbxTypeEmbedded: TComboBox;
+    lblEmbed: TLabel;
+    chkDefaults: TCheckBox;
     procedure btnCopyToClipboardClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure btnTestClick(Sender: TObject);

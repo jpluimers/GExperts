@@ -1,8 +1,8 @@
 object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
-  Left = 349
-  Top = 289
-  Width = 427
-  Height = 521
+  Left = 374
+  Top = 244
+  Width = 457
+  Height = 557
   BorderIcons = [biSystemMenu]
   Caption = 'Set Component Properties Configuration'
   Color = clBtnFace
@@ -17,214 +17,289 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  DesignSize = (
-    419
-    492)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblGrid: TLabel
-    Left = 8
-    Top = 8
-    Width = 202
-    Height = 13
-    Caption = 'Processed Properties Before Each Compile'
-  end
-  object lblPropertyTpes: TLabel
-    Left = 295
-    Top = 8
-    Width = 107
-    Height = 13
-    Anchors = [akTop, akRight]
-    Caption = 'Shown Property Types'
-  end
-  object lbxPropertyTypes: TListBox
-    Left = 294
-    Top = 24
-    Width = 117
-    Height = 232
-    Anchors = [akTop, akRight, akBottom]
-    ItemHeight = 13
-    MultiSelect = True
-    PopupMenu = pnuPropertyTypes
-    Sorted = True
-    TabOrder = 1
-  end
-  object btnOK: TButton
-    Left = 162
-    Top = 458
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 4
-  end
-  object btnCancel: TButton
-    Left = 249
-    Top = 458
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 5
-  end
-  object gbxPropertyToSet: TGroupBox
-    Left = 8
-    Top = 262
-    Width = 403
-    Height = 100
-    Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Property to Set'
-    TabOrder = 2
-    DesignSize = (
-      403
-      100)
-    object lblComponent: TLabel
-      Left = 8
-      Top = 24
-      Width = 54
-      Height = 13
-      Caption = 'Component'
-    end
-    object lblProperty: TLabel
-      Left = 8
-      Top = 48
-      Width = 39
-      Height = 13
-      Caption = 'Property'
-    end
-    object lblValue: TLabel
-      Left = 8
-      Top = 72
-      Width = 27
-      Height = 13
-      Caption = 'Value'
-    end
-    object cbxComponents: TComboBox
-      Left = 80
-      Top = 20
-      Width = 203
-      Height = 21
-      Anchors = [akLeft, akTop, akRight]
-      DropDownCount = 18
-      ItemHeight = 13
-      Sorted = True
-      TabOrder = 0
-    end
-    object cbxProperty: TComboBox
-      Left = 80
-      Top = 44
-      Width = 203
-      Height = 21
-      Anchors = [akLeft, akTop, akRight]
-      DropDownCount = 18
-      ItemHeight = 13
-      Sorted = True
-      TabOrder = 1
-      OnEnter = cbxPropertyEnter
-    end
-    object edtValue: TEdit
-      Left = 80
-      Top = 68
-      Width = 203
-      Height = 21
-      Anchors = [akLeft, akTop, akRight]
-      TabOrder = 2
-    end
-    object btnAddRule: TButton
-      Left = 290
-      Top = 20
-      Width = 105
-      Height = 25
-      Action = actnAddRule
-      Anchors = [akTop, akRight]
-      TabOrder = 3
-    end
-    object btnDeleteRule: TButton
-      Left = 290
-      Top = 64
-      Width = 105
-      Height = 25
-      Action = actnDeleteRule
-      Anchors = [akTop, akRight]
-      TabOrder = 4
-    end
-  end
-  object btnHelp: TButton
-    Left = 336
-    Top = 458
-    Width = 75
-    Height = 25
-    Action = actnHelp
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    TabOrder = 6
-  end
-  object gbxOptions: TGroupBox
-    Left = 8
-    Top = 369
-    Width = 403
-    Height = 81
-    Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Options'
-    TabOrder = 3
-    object chkSimulate: TCheckBox
-      Left = 12
-      Top = 38
-      Width = 361
-      Height = 17
-      Caption = 'Only simulate and log property changes'
-      TabOrder = 1
-      OnClick = chkSimulateClick
-    end
-    object chkVerbose: TCheckBox
-      Left = 12
-      Top = 57
-      Width = 361
-      Height = 17
-      Caption = 'Verbose status display and logging'
-      TabOrder = 2
-      OnClick = chkVerboseClick
-    end
-    object chkOnlyOpenFiles: TCheckBox
-      Left = 12
-      Top = 18
-      Width = 361
-      Height = 17
-      Caption = 'Only process currently open files'
-      TabOrder = 0
-      OnClick = chkOnlyOpenFilesClick
-    end
-  end
-  object lvProperties: TListView
-    Left = 8
-    Top = 24
-    Width = 283
-    Height = 232
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Columns = <
-      item
-        Caption = 'Component'
-        Width = 91
-      end
-      item
-        Caption = 'Property'
-        Width = 75
-      end
-      item
-        Caption = 'Value'
-        Width = 87
-      end>
-    GridLines = True
-    ReadOnly = True
-    RowSelect = True
-    PopupMenu = pmuProperties
+  object pnlContent: TPanel
+    Left = 0
+    Top = 0
+    Width = 441
+    Height = 521
+    Align = alClient
+    BevelOuter = bvNone
     TabOrder = 0
-    ViewStyle = vsReport
-    OnChange = lvPropertiesChange
+    object pnlButtons: TPanel
+      Left = 0
+      Top = 484
+      Width = 441
+      Height = 37
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 3
+      object pnlButtonsRight: TPanel
+        Left = 179
+        Top = 0
+        Width = 262
+        Height = 37
+        Align = alRight
+        BevelOuter = bvNone
+        TabOrder = 0
+        object btnOK: TButton
+          Left = 6
+          Top = 4
+          Width = 75
+          Height = 25
+          Caption = 'OK'
+          Default = True
+          ModalResult = 1
+          TabOrder = 0
+        end
+        object btnCancel: TButton
+          Left = 93
+          Top = 4
+          Width = 75
+          Height = 25
+          Cancel = True
+          Caption = 'Cancel'
+          ModalResult = 2
+          TabOrder = 1
+        end
+        object btnHelp: TButton
+          Left = 180
+          Top = 4
+          Width = 75
+          Height = 25
+          Action = actnHelp
+          Cancel = True
+          TabOrder = 2
+        end
+      end
+    end
+    object pnlOptions: TPanel
+      Left = 0
+      Top = 389
+      Width = 441
+      Height = 95
+      Align = alBottom
+      BevelOuter = bvNone
+      BorderWidth = 6
+      TabOrder = 2
+      object gbxOptions: TGroupBox
+        Left = 6
+        Top = 6
+        Width = 429
+        Height = 83
+        Align = alClient
+        Caption = 'Options'
+        TabOrder = 0
+        object chkSimulate: TCheckBox
+          Left = 12
+          Top = 38
+          Width = 340
+          Height = 17
+          Caption = 'Only simulate and log property changes'
+          TabOrder = 1
+          OnClick = chkSimulateClick
+        end
+        object chkVerbose: TCheckBox
+          Left = 12
+          Top = 57
+          Width = 340
+          Height = 17
+          Caption = 'Verbose status display and logging'
+          TabOrder = 2
+          OnClick = chkVerboseClick
+        end
+        object chkOnlyOpenFiles: TCheckBox
+          Left = 12
+          Top = 18
+          Width = 340
+          Height = 17
+          Caption = 'Only process currently open files'
+          TabOrder = 0
+          OnClick = chkOnlyOpenFilesClick
+        end
+      end
+    end
+    object pnlPropDetails: TPanel
+      Left = 0
+      Top = 277
+      Width = 441
+      Height = 112
+      Align = alBottom
+      BevelOuter = bvNone
+      BorderWidth = 6
+      TabOrder = 1
+      object gbxPropertyToSet: TGroupBox
+        Left = 6
+        Top = 6
+        Width = 429
+        Height = 100
+        Align = alClient
+        Caption = 'Property to Set'
+        TabOrder = 0
+        DesignSize = (
+          429
+          100)
+        object lblComponent: TLabel
+          Left = 8
+          Top = 24
+          Width = 54
+          Height = 13
+          Caption = 'Component'
+        end
+        object lblProperty: TLabel
+          Left = 8
+          Top = 48
+          Width = 39
+          Height = 13
+          Caption = 'Property'
+        end
+        object lblValue: TLabel
+          Left = 8
+          Top = 72
+          Width = 27
+          Height = 13
+          Caption = 'Value'
+        end
+        object cbxComponents: TComboBox
+          Left = 80
+          Top = 20
+          Width = 229
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          DropDownCount = 18
+          ItemHeight = 13
+          Sorted = True
+          TabOrder = 0
+        end
+        object cbxProperty: TComboBox
+          Left = 80
+          Top = 44
+          Width = 229
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          DropDownCount = 18
+          ItemHeight = 13
+          Sorted = True
+          TabOrder = 1
+          OnEnter = cbxPropertyEnter
+        end
+        object edtValue: TEdit
+          Left = 80
+          Top = 68
+          Width = 229
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 2
+        end
+        object btnAddRule: TButton
+          Left = 316
+          Top = 20
+          Width = 105
+          Height = 25
+          Action = actnAddRule
+          Anchors = [akTop, akRight]
+          TabOrder = 3
+        end
+        object btnDeleteRule: TButton
+          Left = 316
+          Top = 64
+          Width = 105
+          Height = 25
+          Action = actnDeleteRule
+          Anchors = [akTop, akRight]
+          TabOrder = 4
+        end
+      end
+    end
+    object pnlList: TPanel
+      Left = 0
+      Top = 0
+      Width = 441
+      Height = 277
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 0
+      object pnlPropTypes: TPanel
+        Left = 308
+        Top = 0
+        Width = 133
+        Height = 277
+        Align = alRight
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 1
+        object pnlPropTypesHeader: TPanel
+          Left = 6
+          Top = 6
+          Width = 121
+          Height = 20
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'Show Property Types'
+          TabOrder = 0
+        end
+        object lbxPropertyTypes: TListBox
+          Left = 6
+          Top = 26
+          Width = 121
+          Height = 245
+          Align = alClient
+          ItemHeight = 13
+          MultiSelect = True
+          PopupMenu = pnuPropertyTypes
+          Sorted = True
+          TabOrder = 1
+        end
+      end
+      object pnlPropList: TPanel
+        Left = 0
+        Top = 0
+        Width = 308
+        Height = 277
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 0
+        object pnlPropListHeader: TPanel
+          Left = 6
+          Top = 6
+          Width = 296
+          Height = 20
+          Align = alTop
+          BevelOuter = bvNone
+          Caption = 'Properties Processed Before Each Compile'
+          TabOrder = 0
+        end
+        object lvProperties: TListView
+          Left = 6
+          Top = 26
+          Width = 296
+          Height = 245
+          Align = alClient
+          Columns = <
+            item
+              Caption = 'Component'
+              Width = 91
+            end
+            item
+              Caption = 'Property'
+              Width = 75
+            end
+            item
+              Caption = 'Value'
+              Width = 87
+            end>
+          GridLines = True
+          ReadOnly = True
+          RowSelect = True
+          PopupMenu = pmuProperties
+          TabOrder = 1
+          ViewStyle = vsReport
+          OnChange = lvPropertiesChange
+        end
+      end
+    end
   end
   object pnuPropertyTypes: TPopupMenu
     Left = 204

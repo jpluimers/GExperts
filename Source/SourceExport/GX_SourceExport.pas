@@ -21,29 +21,14 @@ type
 
   TfmSourceExport = class(TForm)
     pnlFooter: TPanel;
-    btnCopy: TButton;
-    btnPrint: TButton;
-    btnConfig: TButton;
     dlgSave: TSaveDialog;
-    btnSave: TButton;
     edtTitle: TEdit;
     lblTitle: TLabel;
-    btnClose: TButton;
-    ToolBar: TToolBar;
-    tbnRefresh: TToolButton;
-    tbnSave: TToolButton;
-    tbnCopy: TToolButton;
-    tbnPrint: TToolButton;
-    tbnConfigure: TToolButton;
-    tbnHelp: TToolButton;
     pmuCopy: TPopupMenu;
     mitCopyHtml: TMenuItem;
     mitCopyRtf: TMenuItem;
     mitCopy: TMenuItem;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
     Actions: TActionList;
-    ToolButton3: TToolButton;
     actFileRefresh: TAction;
     actFileSave: TAction;
     actCopy: TAction;
@@ -54,6 +39,24 @@ type
     actFileConfigure: TAction;
     actHelpHelp: TAction;
     actFileExit: TAction;
+    pnlEditor: TPanel;
+    pnlButtons: TPanel;
+    pnlButtonsRight: TPanel;
+    btnClose: TButton;
+    btnConfig: TButton;
+    btnPrint: TButton;
+    btnCopy: TButton;
+    btnSave: TButton;
+    ToolBar: TToolBar;
+    tbnRefresh: TToolButton;
+    tbnSave: TToolButton;
+    tbnCopy: TToolButton;
+    ToolButton3: TToolButton;
+    tbnPrint: TToolButton;
+    ToolButton2: TToolButton;
+    tbnConfigure: TToolButton;
+    ToolButton1: TToolButton;
+    tbnHelp: TToolButton;
     procedure actHelpExecute(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure actRefreshExecute(Sender: TObject);
@@ -348,7 +351,7 @@ begin
   with FEditor do
   begin
     Lines.Clear;
-    Parent := Self;
+    Parent := pnlEditor;
     Align := alClient;
     TabOrder := 0;
     Gutter.Width := 0;

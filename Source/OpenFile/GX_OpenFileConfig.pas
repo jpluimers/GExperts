@@ -80,12 +80,16 @@ type
   end;
 
   TfmOpenFileConfig = class(TForm)
-    pcConfigPages: TPageControl;
-    tsIDEOptions: TTabSheet;
-    tsTypes: TTabSheet;
-    btnOK: TButton;
+    pnlButtons: TPanel;
+    pnlConfig: TPanel;
+    pnlButtonsRight: TPanel;
+    btnHelp: TButton;
     btnCancel: TButton;
+    btnOK: TButton;
+    pcConfigPages: TPageControl;
+    tsTypes: TTabSheet;
     lblExtension: TLabel;
+    lblMaxRecentFiles: TLabel;
     gbxCustomDirectory: TGroupBox;
     btnDirectory: TSpeedButton;
     lbxDirectoryList: TListBox;
@@ -98,7 +102,12 @@ type
     edtExtension: TEdit;
     btnTypeAdd: TBitBtn;
     btnTypeDelete: TBitBtn;
+    edtMaxRecentFiles: TEdit;
+    tsIDEOptions: TTabSheet;
     gbxIDEMenuItems: TGroupBox;
+    lblMenuItem: TLabel;
+    lblFileGroup: TLabel;
+    bvlRow: TBevel;
     chkOverrideViewUnit: TCheckBox;
     chkOverrideViewForm: TCheckBox;
     cbxViewUnitType: TComboBox;
@@ -106,15 +115,10 @@ type
     chkOverrideOpenProject: TCheckBox;
     cbxOpenProjectType: TComboBox;
     gbxGeneralSettings: TGroupBox;
-    cbxDefaultFileTypes: TComboBox;
     lblDefault: TLabel;
+    cbxDefaultFileTypes: TComboBox;
     chkMatchAnywhere: TCheckBox;
-    lblMenuItem: TLabel;
-    lblFileGroup: TLabel;
-    bvlRow: TBevel;
-    edtMaxRecentFiles: TEdit;
     chkCustomDirectoryList: TCheckBox;
-    btnHelp: TButton;
     procedure chkCustomDirectoryListClick(Sender: TObject);
     procedure btnTypeAddClick(Sender: TObject);
     procedure lbxTypeListClick(Sender: TObject);

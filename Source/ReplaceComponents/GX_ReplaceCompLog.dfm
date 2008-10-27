@@ -21,8 +21,8 @@ object fmReplaceCompLog: TfmReplaceCompLog
   TextHeight = 13
   object Splitter: TSplitter
     Left = 0
-    Top = 301
-    Width = 612
+    Top = 294
+    Width = 604
     Height = 7
     Cursor = crVSplit
     Align = alBottom
@@ -31,7 +31,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
   object pnlHeader: TPanel
     Left = 0
     Top = 0
-    Width = 612
+    Width = 604
     Height = 33
     Align = alTop
     BevelOuter = bvNone
@@ -53,7 +53,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
     object edtDestClassName: TEdit
       Left = 295
       Top = 8
-      Width = 165
+      Width = 170
       Height = 21
       Color = clBtnFace
       TabOrder = 1
@@ -61,7 +61,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
     object edtSourceClassName: TEdit
       Left = 49
       Top = 8
-      Width = 165
+      Width = 170
       Height = 21
       Color = clBtnFace
       TabOrder = 0
@@ -70,17 +70,17 @@ object fmReplaceCompLog: TfmReplaceCompLog
   object pnlLog: TPanel
     Left = 0
     Top = 33
-    Width = 612
-    Height = 268
+    Width = 604
+    Height = 261
     Align = alClient
     BevelOuter = bvNone
-    BorderWidth = 5
+    BorderWidth = 6
     TabOrder = 1
     object lvLogItems: TListView
-      Left = 5
-      Top = 5
-      Width = 602
-      Height = 258
+      Left = 6
+      Top = 6
+      Width = 592
+      Height = 249
       Align = alClient
       Columns = <
         item
@@ -111,63 +111,74 @@ object fmReplaceCompLog: TfmReplaceCompLog
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 308
-    Width = 612
+    Top = 301
+    Width = 604
     Height = 149
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    DesignSize = (
-      612
-      149)
-    object btnSaveAs: TButton
-      Left = 331
-      Top = 115
-      Width = 85
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = '&Save As...'
-      TabOrder = 1
-      OnClick = btnSaveAsClick
-    end
-    object btnCopy: TButton
-      Left = 425
-      Top = 115
-      Width = 85
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = 'C&opy'
-      TabOrder = 2
-      OnClick = btnCopyClick
-    end
-    object btnClose: TButton
-      Left = 519
-      Top = 115
-      Width = 85
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = '&Close'
-      TabOrder = 3
-      OnClick = btnCloseClick
-    end
     object pnlDetails: TPanel
       Left = 0
       Top = 0
-      Width = 612
-      Height = 110
-      Align = alTop
-      Anchors = [akLeft, akTop, akRight, akBottom]
+      Width = 604
+      Height = 113
+      Align = alClient
       BevelOuter = bvNone
-      BorderWidth = 5
+      BorderWidth = 6
       TabOrder = 0
       object lbxPreviewItems: TListBox
-        Left = 5
-        Top = 5
-        Width = 602
-        Height = 100
+        Left = 6
+        Top = 6
+        Width = 592
+        Height = 101
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
+      end
+    end
+    object pnlButtons: TPanel
+      Left = 0
+      Top = 113
+      Width = 604
+      Height = 36
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 1
+      object pnlButtonsRight: TPanel
+        Left = 299
+        Top = 0
+        Width = 305
+        Height = 36
+        Align = alRight
+        BevelOuter = bvNone
+        TabOrder = 0
+        object btnSaveAs: TButton
+          Left = 25
+          Top = 3
+          Width = 85
+          Height = 25
+          Caption = '&Save As...'
+          TabOrder = 0
+          OnClick = btnSaveAsClick
+        end
+        object btnCopy: TButton
+          Left = 119
+          Top = 3
+          Width = 85
+          Height = 25
+          Caption = 'C&opy'
+          TabOrder = 1
+          OnClick = btnCopyClick
+        end
+        object btnClose: TButton
+          Left = 213
+          Top = 3
+          Width = 85
+          Height = 25
+          Caption = '&Close'
+          TabOrder = 2
+          OnClick = btnCloseClick
+        end
       end
     end
   end

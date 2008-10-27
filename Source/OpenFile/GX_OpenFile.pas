@@ -73,8 +73,6 @@ type
     lblFilter: TLabel;
     edtFilter: TEdit;
     pnlOKCancel: TPanel;
-    btnCancel: TButton;
-    btnOK: TButton;
     btnCommonAddToFavorites: TButton;
     btnProjectAddToFavorites: TButton;
     btnSearchAddToFavorites: TButton;
@@ -113,6 +111,9 @@ type
     actFavDeleteFromFavorites: TAction;
     actClearRecentList: TAction;
     tmrFilter: TTimer;
+    pnlButtonsRight: TPanel;
+    btnOK: TButton;
+    btnCancel: TButton;
     procedure tmrFilterTimer(Sender: TObject);
     procedure actHelpExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);

@@ -2,7 +2,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   Left = 336
   Top = 315
   Width = 507
-  Height = 425
+  Height = 464
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
   Color = clBtnFace
@@ -24,45 +24,51 @@ object fmCompRenameConfig: TfmCompRenameConfig
   TextHeight = 13
   object pnlFooter: TPanel
     Left = 0
-    Top = 320
-    Width = 499
+    Top = 352
+    Width = 491
     Height = 76
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      499
+      491
       76)
-    object btnOK: TButton
-      Left = 248
-      Top = 45
-      Width = 75
-      Height = 25
-      Action = acOK
-      Anchors = [akRight, akBottom]
-      Default = True
+    object pnlButtonsRight: TPanel
+      Left = 218
+      Top = 0
+      Width = 273
+      Height = 76
+      Align = alRight
+      BevelOuter = bvNone
       TabOrder = 2
-    end
-    object btnClose: TButton
-      Left = 332
-      Top = 45
-      Width = 75
-      Height = 25
-      Action = acCancel
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      TabOrder = 3
-    end
-    object btnHelp: TButton
-      Left = 417
-      Top = 45
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = '&Help'
-      TabOrder = 4
-      OnClick = btnHelpClick
+      object btnOK: TButton
+        Left = 16
+        Top = 43
+        Width = 75
+        Height = 25
+        Action = acOK
+        Default = True
+        TabOrder = 0
+      end
+      object btnClose: TButton
+        Left = 108
+        Top = 43
+        Width = 75
+        Height = 25
+        Action = acCancel
+        Cancel = True
+        TabOrder = 1
+      end
+      object btnHelp: TButton
+        Left = 190
+        Top = 43
+        Width = 75
+        Height = 25
+        Cancel = True
+        Caption = '&Help'
+        TabOrder = 2
+        OnClick = btnHelpClick
+      end
     end
     object chkAutoAdd: TCheckBox
       Left = 8
@@ -86,27 +92,25 @@ object fmCompRenameConfig: TfmCompRenameConfig
   object pnlRules: TPanel
     Left = 0
     Top = 0
-    Width = 499
-    Height = 320
+    Width = 491
+    Height = 352
     Align = alClient
     BevelOuter = bvNone
+    BorderWidth = 6
     TabOrder = 0
-    DesignSize = (
-      499
-      320)
     object pnlNames: TGroupBox
-      Left = 8
-      Top = 8
-      Width = 483
-      Height = 303
-      Anchors = [akLeft, akTop, akRight, akBottom]
+      Left = 6
+      Top = 6
+      Width = 479
+      Height = 340
+      Align = alClient
       Caption = 'Rename &Rules'
       TabOrder = 0
       DesignSize = (
-        483
-        303)
+        479
+        340)
       object btnAdd: TButton
-        Left = 373
+        Left = 369
         Top = 16
         Width = 100
         Height = 28
@@ -115,7 +119,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 0
       end
       object btnDelete: TButton
-        Left = 373
+        Left = 369
         Top = 48
         Width = 100
         Height = 28
@@ -124,8 +128,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 1
       end
       object btnDefaults: TButton
-        Left = 373
-        Top = 269
+        Left = 369
+        Top = 306
         Width = 100
         Height = 25
         Anchors = [akRight, akBottom]
@@ -134,7 +138,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         OnClick = btnDefaultsClick
       end
       object btnOtherProperties: TButton
-        Left = 373
+        Left = 369
         Top = 80
         Width = 100
         Height = 28

@@ -12,20 +12,23 @@ uses
 
 type
   TfmSourceExportOptions = class(TForm)
-    btnCancel: TButton;
+    pnlSettings: TPanel;
+    dlgBackground: TColorDialog;
+    pnlButtons: TPanel;
+    pnlButtonsRight: TPanel;
     btnOK: TButton;
-    rbxCopySettings: TRadioGroup;
-    cbxAttributes: TComboBox;
+    btnCancel: TButton;
+    pnlCode: TPanel;
     gbxAttributes: TGroupBox;
     chkBold: TCheckBox;
     chkItalic: TCheckBox;
     chkUnderline: TCheckBox;
     chkStrikeOut: TCheckBox;
+    cbxAttributes: TComboBox;
+    rbxCopySettings: TRadioGroup;
+    btnBackgroundColor: TButton;
     btnLoadIde: TButton;
     lblElement: TLabel;
-    pnlCodeSize: TPanel;
-    btnBackgroundColor: TButton;
-    dlgBackground: TColorDialog;
     procedure AttributeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure cbxAttributesChange(Sender: TObject);
@@ -81,13 +84,9 @@ begin
   FSampleEditor := TSynEdit.Create(Self);
   with FSampleEditor do
   begin
-    Parent := Self;
+    Parent := pnlCode;
     ReadOnly := True;
-    Left := pnlCodeSize.Left;
-    Top := pnlCodeSize.Top;
-    Width := pnlCodeSize.Width;
-    Height := pnlCodeSize.Height;
-    TabOrder := 4;
+    Align := alClient;
     Gutter.Width := 0;
     Options := Options + [eoNoCaret, eoNoSelection, eoHideShowScrollbars, eoAutoSizeMaxScrollWidth] - [eoScrollPastEof, eoScrollPastEol];
     OnStatusChange := SynEditSelectionChange;

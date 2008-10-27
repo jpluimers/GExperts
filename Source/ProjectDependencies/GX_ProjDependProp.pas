@@ -3,17 +3,20 @@ unit GX_ProjDependProp;
 interface
 
 uses
-  Classes, StdCtrls, Controls, ComCtrls, Forms;
+  Classes, StdCtrls, Controls, ComCtrls, Forms, ExtCtrls;
 
 type
   TfmProjDependProp = class(TForm)
+    pnlButtons: TPanel;
+    pnlButtonsRight: TPanel;
+    btnOK: TButton;
+    pnlContent: TPanel;
     pgeProperties: TPageControl;
     tabProperties: TTabSheet;
-    btnOK: TButton;
     lblFileName: TLabel;
+    lblSource: TLabel;
     laFileName: TStaticText;
     lbxSource: TListBox;
-    lblSource: TLabel;
   end;
 
 implementation
