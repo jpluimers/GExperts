@@ -81,23 +81,20 @@ begin
   end;
 
   FSampleEditor := TSynEdit.Create(Self);
-  with FSampleEditor do
-  begin
-    Parent := pnlCode;
-    ReadOnly := True;
-    Align := alClient;
-    Gutter.Width := 0;
-    Options := Options + [eoNoCaret, eoNoSelection, eoHideShowScrollbars, eoAutoSizeMaxScrollWidth] - [eoScrollPastEof, eoScrollPastEol];
-    OnStatusChange := SynEditSelectionChange;
-    GXHighlighter := GetGXHighlighterForCurrentSourceEditor;
+  FSampleEditor.Parent := pnlCode;
+  FSampleEditor.ReadOnly := True;
+  FSampleEditor.Align := alClient;
+  FSampleEditor.Gutter.Width := 0;
+  FSampleEditor.Options := FSampleEditor.Options + [eoNoCaret, eoNoSelection, eoHideShowScrollbars, eoAutoSizeMaxScrollWidth] - [eoScrollPastEof, eoScrollPastEol];
+  FSampleEditor.OnStatusChange := SynEditSelectionChange;
+  GXHighlighter := GetGXHighlighterForCurrentSourceEditor;
 
-    SetSynEditHighlighter(FSampleEditor, GXHighlighter);
-    Lines.Text := FSampleEditor.Highlighter.SampleSource;
-    if Trim(Lines.Text) = '' then
-      Lines.Text := 'No sample source available';
-    if GXHighlighter in [gxpHTML, gxpSQL] then
-      btnLoadIde.Enabled := False;
-  end;
+  SetSynEditHighlighter(FSampleEditor, GXHighlighter);
+  FSampleEditor.Lines.Text := FSampleEditor.Highlighter.SampleSource;
+  if Trim(FSampleEditor.Lines.Text) = '' then
+    FSampleEditor.Lines.Text := 'No sample source available';
+  if GXHighlighter in [gxpHTML, gxpSQL] then
+    btnLoadIde.Enabled := False;
 
   BorderStyle := bsSizeable;
   Constraints.MinHeight := Height;

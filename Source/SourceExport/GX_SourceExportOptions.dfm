@@ -3,8 +3,8 @@ object fmSourceExportOptions: TfmSourceExportOptions
   Top = 144
   BorderStyle = bsDialog
   Caption = 'Source Export Configuration'
-  ClientHeight = 442
-  ClientWidth = 451
+  ClientHeight = 456
+  ClientWidth = 491
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,12 +20,11 @@ object fmSourceExportOptions: TfmSourceExportOptions
   object pnlSettings: TPanel
     Left = 0
     Top = 0
-    Width = 451
+    Width = 491
     Height = 168
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    Visible = False
     object lblElement: TLabel
       Left = 202
       Top = 11
@@ -122,14 +121,14 @@ object fmSourceExportOptions: TfmSourceExportOptions
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 403
-    Width = 451
+    Top = 417
+    Width = 491
     Height = 39
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     object pnlButtonsRight: TPanel
-      Left = 266
+      Left = 306
       Top = 0
       Width = 185
       Height = 39
@@ -161,8 +160,8 @@ object fmSourceExportOptions: TfmSourceExportOptions
   object pnlCode: TPanel
     Left = 0
     Top = 168
-    Width = 451
-    Height = 235
+    Width = 491
+    Height = 249
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -170,7 +169,7 @@ object fmSourceExportOptions: TfmSourceExportOptions
   end
   object dlgBackground: TColorDialog
     Ctl3D = True
-    Left = 8
-    Top = 336
+    Left = 216
+    Top = 56
   end
 end

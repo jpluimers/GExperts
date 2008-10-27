@@ -1,13 +1,13 @@
 object fmSourceExport: TfmSourceExport
   Left = 277
   Top = 216
-  Width = 575
-  Height = 485
+  Width = 700
+  Height = 560
   BorderIcons = [biSystemMenu]
   Caption = 'Source Export'
   Color = clBtnFace
   Constraints.MinHeight = 400
-  Constraints.MinWidth = 535
+  Constraints.MinWidth = 550
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -22,8 +22,8 @@ object fmSourceExport: TfmSourceExport
   TextHeight = 13
   object pnlFooter: TPanel
     Left = 0
-    Top = 375
-    Width = 559
+    Top = 450
+    Width = 684
     Height = 74
     Align = alBottom
     BevelOuter = bvNone
@@ -39,20 +39,20 @@ object fmSourceExport: TfmSourceExport
     object edtTitle: TEdit
       Left = 40
       Top = 12
-      Width = 369
+      Width = 409
       Height = 21
       TabOrder = 0
     end
     object pnlButtons: TPanel
       Left = 0
       Top = 36
-      Width = 559
+      Width = 684
       Height = 38
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       object pnlButtonsRight: TPanel
-        Left = 92
+        Left = 217
         Top = 0
         Width = 467
         Height = 38
@@ -107,8 +107,8 @@ object fmSourceExport: TfmSourceExport
   object pnlEditor: TPanel
     Left = 0
     Top = 24
-    Width = 559
-    Height = 351
+    Width = 684
+    Height = 426
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -117,7 +117,7 @@ object fmSourceExport: TfmSourceExport
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 559
+    Width = 684
     Height = 24
     AutoSize = True
     ButtonHeight = 24
