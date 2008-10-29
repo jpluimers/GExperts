@@ -255,6 +255,7 @@ begin
     Panel.Parent := sbxExperts;
     Panel.SetBounds(0, i * RowHeight, RowWidth, RowHeight);
     Panel.Tag := i;
+    Panel.FullRepaint := False;
 
     AnExpert := GExpertsInst.ExpertList[i];
 
