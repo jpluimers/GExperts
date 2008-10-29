@@ -1,9 +1,10 @@
 object fmAsciiChart: TfmAsciiChart
   Left = 422
   Top = 177
-  Width = 448
-  Height = 358
+  AutoScroll = False
   Caption = 'ASCII Chart'
+  ClientHeight = 322
+  ClientWidth = 432
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -29,7 +30,7 @@ object fmAsciiChart: TfmAsciiChart
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 440
+    Width = 432
     Height = 22
     AutoSize = True
     ButtonWidth = 26

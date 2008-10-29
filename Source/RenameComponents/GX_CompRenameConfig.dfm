@@ -1,10 +1,11 @@
 object fmCompRenameConfig: TfmCompRenameConfig
   Left = 336
   Top = 315
-  Width = 507
-  Height = 464
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
+  ClientHeight = 428
+  ClientWidth = 491
   Color = clBtnFace
   Constraints.MinHeight = 270
   Constraints.MinWidth = 425

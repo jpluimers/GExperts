@@ -1,9 +1,10 @@
 object fmProjDepend: TfmProjDepend
   Left = 282
   Top = 149
-  Width = 683
-  Height = 568
+  AutoScroll = False
   Caption = 'Project Dependencies'
+  ClientHeight = 512
+  ClientWidth = 667
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

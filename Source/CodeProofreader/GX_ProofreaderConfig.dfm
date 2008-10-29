@@ -1,10 +1,11 @@
 object fmProofreaderConfig: TfmProofreaderConfig
   Left = 279
   Top = 203
-  Width = 539
-  Height = 526
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Code Proofreader'
+  ClientHeight = 490
+  ClientWidth = 523
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 450

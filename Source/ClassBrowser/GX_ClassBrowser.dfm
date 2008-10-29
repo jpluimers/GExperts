@@ -1,9 +1,10 @@
 object fmClassBrowser: TfmClassBrowser
   Left = 241
   Top = 191
-  Width = 580
-  Height = 430
+  AutoScroll = False
   Caption = 'Class Browser'
+  ClientHeight = 374
+  ClientWidth = 564
   Color = clBtnFace
   DefaultMonitor = dmDesktop
   Font.Charset = DEFAULT_CHARSET
@@ -24,13 +25,13 @@ object fmClassBrowser: TfmClassBrowser
     Left = 175
     Top = 30
     Width = 3
-    Height = 332
+    Height = 325
     Cursor = crHSplit
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 362
-    Width = 572
+    Top = 355
+    Width = 564
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -38,8 +39,8 @@ object fmClassBrowser: TfmClassBrowser
   object pnlData: TPanel
     Left = 178
     Top = 30
-    Width = 394
-    Height = 332
+    Width = 386
+    Height = 325
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
@@ -48,8 +49,8 @@ object fmClassBrowser: TfmClassBrowser
     object pcMain: TPageControl
       Left = 0
       Top = 0
-      Width = 394
-      Height = 332
+      Width = 386
+      Height = 325
       ActivePage = tshMembers
       Align = alClient
       TabIndex = 0
@@ -59,16 +60,16 @@ object fmClassBrowser: TfmClassBrowser
         Caption = 'Members'
         object Splitter2: TSplitter
           Left = 0
-          Top = 240
-          Width = 386
+          Top = 233
+          Width = 378
           Height = 4
           Cursor = crVSplit
           Align = alBottom
         end
         object pnlMethod: TPanel
           Left = 0
-          Top = 244
-          Width = 386
+          Top = 237
+          Width = 378
           Height = 60
           Align = alBottom
           BevelOuter = bvNone
@@ -80,8 +81,8 @@ object fmClassBrowser: TfmClassBrowser
         object lvInfo: TListView
           Left = 0
           Top = 0
-          Width = 386
-          Height = 240
+          Width = 378
+          Height = 233
           Align = alClient
           Columns = <
             item
@@ -142,7 +143,7 @@ object fmClassBrowser: TfmClassBrowser
     Left = 0
     Top = 30
     Width = 175
-    Height = 332
+    Height = 325
     Align = alLeft
     HideSelection = False
     Images = dmSharedImages.Images
@@ -159,7 +160,7 @@ object fmClassBrowser: TfmClassBrowser
   object ControlBar: TControlBar
     Left = 0
     Top = 0
-    Width = 572
+    Width = 564
     Height = 30
     Align = alTop
     AutoSize = True

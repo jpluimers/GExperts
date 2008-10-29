@@ -1,10 +1,11 @@
 object fmTabOrder: TfmTabOrder
   Left = 376
   Top = 207
-  Width = 512
-  Height = 513
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Set Tab Order'
+  ClientHeight = 477
+  ClientWidth = 496
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 300

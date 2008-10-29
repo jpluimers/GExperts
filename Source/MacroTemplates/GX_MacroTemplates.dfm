@@ -1,10 +1,11 @@
 object fmMacroTemplates: TfmMacroTemplates
   Left = 263
   Top = 193
-  Width = 600
-  Height = 455
+  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Macro Templates'
+  ClientHeight = 419
+  ClientWidth = 584
   Color = clBtnFace
   Constraints.MinHeight = 387
   Constraints.MinWidth = 353

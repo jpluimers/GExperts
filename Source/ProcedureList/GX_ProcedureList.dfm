@@ -1,11 +1,12 @@
 object fmProcedureList: TfmProcedureList
   Left = 264
   Top = 199
-  Width = 553
-  Height = 477
   ActiveControl = edtMethods
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Procedure List'
+  ClientHeight = 441
+  ClientWidth = 537
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,10 +23,10 @@ object fmProcedureList: TfmProcedureList
   PixelsPerInch = 96
   TextHeight = 13
   object splSeparator: TSplitter
-    Left = 530
+    Left = 522
     Top = 0
     Width = 3
-    Height = 429
+    Height = 422
     Cursor = crHSplit
     Align = alRight
     OnMoved = splSeparatorMoved
@@ -33,8 +34,8 @@ object fmProcedureList: TfmProcedureList
   object pnlFuncHolder: TPanel
     Left = 0
     Top = 0
-    Width = 530
-    Height = 429
+    Width = 522
+    Height = 422
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
@@ -42,8 +43,8 @@ object fmProcedureList: TfmProcedureList
     object pnHolder: TPanel
       Left = 0
       Top = 60
-      Width = 530
-      Height = 369
+      Width = 522
+      Height = 362
       Align = alClient
       BevelOuter = bvNone
       FullRepaint = False
@@ -51,8 +52,8 @@ object fmProcedureList: TfmProcedureList
       object lvProcs: TListView
         Left = 0
         Top = 0
-        Width = 530
-        Height = 369
+        Width = 522
+        Height = 362
         Align = alClient
         Columns = <
           item
@@ -86,7 +87,7 @@ object fmProcedureList: TfmProcedureList
     object pnlHeader: TPanel
       Left = 0
       Top = 24
-      Width = 530
+      Width = 522
       Height = 36
       Align = alTop
       BevelOuter = bvNone
@@ -128,7 +129,7 @@ object fmProcedureList: TfmProcedureList
       object pnlHeaderRight: TPanel
         Left = 260
         Top = 0
-        Width = 270
+        Width = 262
         Height = 36
         Align = alClient
         BevelOuter = bvNone
@@ -161,7 +162,7 @@ object fmProcedureList: TfmProcedureList
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 530
+      Width = 522
       Height = 24
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
@@ -273,8 +274,8 @@ object fmProcedureList: TfmProcedureList
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 429
-    Width = 545
+    Top = 422
+    Width = 537
     Height = 19
     Panels = <
       item
@@ -287,10 +288,10 @@ object fmProcedureList: TfmProcedureList
     SimplePanel = False
   end
   object pnlFunctionBody: TPanel
-    Left = 533
+    Left = 525
     Top = 0
     Width = 12
-    Height = 429
+    Height = 422
     Align = alRight
     BevelOuter = bvLowered
     Caption = 'Editor Created at Runtime'

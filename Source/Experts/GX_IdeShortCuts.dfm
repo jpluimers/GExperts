@@ -1,10 +1,11 @@
 object fmIdeShortCuts: TfmIdeShortCuts
   Left = 296
   Top = 249
-  Width = 690
-  Height = 254
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'IDE Menu Shortcuts'
+  ClientHeight = 218
+  ClientWidth = 674
   Color = clBtnFace
   Constraints.MinHeight = 200
   Constraints.MinWidth = 500

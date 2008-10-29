@@ -1,10 +1,11 @@
 object fmProjDependFilter: TfmProjDependFilter
   Left = 333
   Top = 160
-  Width = 221
-  Height = 434
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Unit Filter'
+  ClientHeight = 398
+  ClientWidth = 205
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 221

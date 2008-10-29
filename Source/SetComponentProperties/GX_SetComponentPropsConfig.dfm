@@ -1,10 +1,11 @@
 object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
   Left = 374
   Top = 244
-  Width = 457
-  Height = 557
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Set Component Properties Configuration'
+  ClientHeight = 521
+  ClientWidth = 441
   Color = clBtnFace
   Constraints.MinHeight = 320
   Constraints.MinWidth = 400

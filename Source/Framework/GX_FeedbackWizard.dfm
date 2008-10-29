@@ -1,10 +1,11 @@
 object fmFeedbackWizard: TfmFeedbackWizard
   Left = 285
   Top = 155
-  Width = 600
-  Height = 435
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Feedback Wizard'
+  ClientHeight = 399
+  ClientWidth = 584
   Color = clBtnFace
   Constraints.MinHeight = 414
   Constraints.MinWidth = 554
@@ -23,7 +24,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 592
+    Width = 584
     Height = 83
     Align = alTop
     BevelOuter = bvNone
@@ -32,14 +33,14 @@ object fmFeedbackWizard: TfmFeedbackWizard
     object pnlHeader: TPanel
       Left = 0
       Top = 0
-      Width = 592
+      Width = 584
       Height = 43
       Align = alTop
       BevelOuter = bvNone
       Color = 6488064
       TabOrder = 0
       DesignSize = (
-        592
+        584
         43)
       object lblFeeedback: TLabel
         Left = 9
@@ -61,7 +62,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
     object pnlDescription: TPanel
       Left = 0
       Top = 43
-      Width = 592
+      Width = 584
       Height = 40
       Align = alClient
       BevelInner = bvRaised
@@ -72,7 +73,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
       object lblDescription: TLabel
         Left = 2
         Top = 2
-        Width = 588
+        Width = 580
         Height = 36
         Align = alClient
         Alignment = taCenter
@@ -90,17 +91,17 @@ object fmFeedbackWizard: TfmFeedbackWizard
   object pnlContent: TPanel
     Left = 0
     Top = 83
-    Width = 592
-    Height = 287
+    Width = 584
+    Height = 280
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 1
     object Splitter: TSplitter
-      Left = 384
+      Left = 376
       Top = 0
       Width = 5
-      Height = 287
+      Height = 280
       Cursor = crHSplit
       Align = alRight
       AutoSnap = False
@@ -108,10 +109,10 @@ object fmFeedbackWizard: TfmFeedbackWizard
       MinSize = 100
     end
     object pgeInfo: TPageControl
-      Left = 389
+      Left = 381
       Top = 0
       Width = 203
-      Height = 287
+      Height = 280
       ActivePage = tshInfoHelp
       Align = alRight
       MultiLine = True
@@ -123,7 +124,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
           Left = 0
           Top = 0
           Width = 195
-          Height = 259
+          Height = 252
           Align = alClient
           Color = 15858687
           Font.Charset = DEFAULT_CHARSET
@@ -162,8 +163,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
     object pnlMain: TPanel
       Left = 0
       Top = 0
-      Width = 384
-      Height = 287
+      Width = 376
+      Height = 280
       Align = alClient
       BorderWidth = 1
       FullRepaint = False
@@ -171,8 +172,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
       object pgeMain: TPageControl
         Left = 2
         Top = 2
-        Width = 380
-        Height = 283
+        Width = 372
+        Height = 276
         ActivePage = tshType
         Align = alClient
         TabIndex = 0
@@ -427,8 +428,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 370
-    Width = 592
+    Top = 363
+    Width = 584
     Height = 36
     Align = alBottom
     BevelOuter = bvNone

@@ -1,11 +1,12 @@
 object fmMessageDialog: TfmMessageDialog
   Left = 339
   Top = 215
-  Width = 496
-  Height = 540
   Anchors = [akLeft, akBottom]
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Message Dialog'
+  ClientHeight = 504
+  ClientWidth = 480
   Color = clBtnFace
   Constraints.MinHeight = 480
   Constraints.MinWidth = 490

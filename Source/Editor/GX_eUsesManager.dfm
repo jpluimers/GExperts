@@ -1,11 +1,12 @@
 object fmUsesManager: TfmUsesManager
   Left = 311
   Top = 202
-  Width = 586
-  Height = 514
   ActiveControl = edtFilter
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Uses Clause Manager'
+  ClientHeight = 478
+  ClientWidth = 570
   Color = clBtnFace
   Constraints.MinHeight = 240
   Constraints.MinWidth = 560

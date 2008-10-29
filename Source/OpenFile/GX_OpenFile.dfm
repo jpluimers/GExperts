@@ -1,10 +1,11 @@
 object fmOpenFile: TfmOpenFile
   Left = 297
   Top = 241
-  Width = 637
-  Height = 556
   ActiveControl = edtFilter
+  AutoScroll = False
   Caption = 'Open Unit'
+  ClientHeight = 520
+  ClientWidth = 621
   Color = clBtnFace
   Constraints.MinHeight = 325
   Constraints.MinWidth = 350

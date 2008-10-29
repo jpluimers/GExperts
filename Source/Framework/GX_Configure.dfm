@@ -1,10 +1,11 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  Width = 523
-  Height = 525
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
+  ClientHeight = 489
+  ClientWidth = 507
   Color = clBtnFace
   Constraints.MinHeight = 520
   Constraints.MinWidth = 493

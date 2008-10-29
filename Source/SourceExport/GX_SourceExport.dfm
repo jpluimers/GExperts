@@ -1,10 +1,11 @@
 object fmSourceExport: TfmSourceExport
   Left = 277
   Top = 216
-  Width = 700
-  Height = 560
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Source Export'
+  ClientHeight = 524
+  ClientWidth = 684
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 550

@@ -1,10 +1,11 @@
 object fmBackup: TfmBackup
   Left = 318
   Top = 175
-  Width = 616
-  Height = 471
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Backup Project'
+  ClientHeight = 435
+  ClientWidth = 600
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 400

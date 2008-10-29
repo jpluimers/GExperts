@@ -1,10 +1,11 @@
 object fmReplaceCompMapDets: TfmReplaceCompMapDets
   Left = 260
   Top = 222
-  Width = 410
-  Height = 374
+  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Replace Components - Mapping Details'
+  ClientHeight = 338
+  ClientWidth = 394
   Color = clBtnFace
   Constraints.MinHeight = 360
   Constraints.MinWidth = 363

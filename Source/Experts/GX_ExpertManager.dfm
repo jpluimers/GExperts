@@ -1,11 +1,12 @@
 object fmExpertManager: TfmExpertManager
   Left = 277
   Top = 202
-  Width = 594
-  Height = 319
   ActiveControl = lvExperts
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Expert Manager'
+  ClientHeight = 263
+  ClientWidth = 578
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

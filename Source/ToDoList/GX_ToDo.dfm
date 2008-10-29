@@ -1,10 +1,11 @@
 object fmToDo: TfmToDo
   Left = 268
   Top = 187
-  Width = 523
-  Height = 325
   ActiveControl = lvTodo
+  AutoScroll = False
   Caption = 'To Do List'
+  ClientHeight = 289
+  ClientWidth = 507
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

@@ -1,8 +1,6 @@
 inherited fmPeInformation: TfmPeInformation
   Left = 375
   Top = 189
-  Width = 454
-  Height = 298
   Caption = 'PE Information'
   KeyPreview = True
   Menu = MainMenu
@@ -14,12 +12,13 @@ inherited fmPeInformation: TfmPeInformation
   object pcMain: TPageControl
     Left = 0
     Top = 22
-    Width = 446
-    Height = 227
+    Width = 304
+    Height = 182
     ActivePage = tshMSDOS
     Align = alClient
     HotTrack = True
     MultiLine = True
+    TabIndex = 0
     TabOrder = 0
     OnChange = pcMainChange
     object tshMSDOS: TTabSheet
@@ -27,8 +26,8 @@ inherited fmPeInformation: TfmPeInformation
       object lvMSDOS: TListView
         Left = 0
         Top = 0
-        Width = 438
-        Height = 199
+        Width = 296
+        Height = 136
         Align = alClient
         Columns = <
           item
@@ -135,8 +134,8 @@ inherited fmPeInformation: TfmPeInformation
       object lvImportFunctions: TListView
         Left = 108
         Top = 0
-        Width = 330
-        Height = 199
+        Width = 188
+        Height = 136
         Align = alClient
         Columns = <
           item
@@ -190,7 +189,7 @@ inherited fmPeInformation: TfmPeInformation
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 446
+    Width = 304
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

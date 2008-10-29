@@ -1,9 +1,10 @@
 object fmCodeLib: TfmCodeLib
   Left = 344
   Top = 191
-  Width = 552
-  Height = 425
+  AutoScroll = False
   Caption = 'Code Librarian'
+  ClientHeight = 369
+  ClientWidth = 536
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,9 +23,9 @@ object fmCodeLib: TfmCodeLib
   TextHeight = 13
   object Splitter: TSplitter
     Left = 169
-    Top = 22
+    Top = 24
     Width = 3
-    Height = 327
+    Height = 325
     Cursor = crHSplit
   end
   object StatusBar: TStatusBar
@@ -44,9 +45,9 @@ object fmCodeLib: TfmCodeLib
   end
   object pnlView: TPanel
     Left = 172
-    Top = 22
+    Top = 24
     Width = 364
-    Height = 327
+    Height = 325
     Align = alClient
     BevelOuter = bvLowered
     Caption = 'This editor is created at runtime'
@@ -55,9 +56,9 @@ object fmCodeLib: TfmCodeLib
   end
   object tvTopics: TTreeView
     Left = 0
-    Top = 22
+    Top = 24
     Width = 169
-    Height = 327
+    Height = 325
     Align = alLeft
     DragMode = dmAutomatic
     HideSelection = False
@@ -84,7 +85,7 @@ object fmCodeLib: TfmCodeLib
     Left = 0
     Top = 0
     Width = 536
-    Height = 22
+    Height = 24
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
     EdgeBorders = [ebBottom]

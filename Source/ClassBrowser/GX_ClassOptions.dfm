@@ -1,10 +1,11 @@
 object fmClassOptions: TfmClassOptions
   Left = 274
   Top = 170
-  Width = 439
-  Height = 421
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Class Browser Options'
+  ClientHeight = 385
+  ClientWidth = 423
   Color = clBtnFace
   Constraints.MinHeight = 365
   Constraints.MinWidth = 360

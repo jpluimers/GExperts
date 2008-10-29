@@ -1,10 +1,11 @@
 object fmOpenFileConfig: TfmOpenFileConfig
   Left = 332
   Top = 206
-  Width = 621
-  Height = 488
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Open Unit Configuration'
+  ClientHeight = 452
+  ClientWidth = 605
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 550
@@ -292,7 +293,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 21
             Style = csDropDownList
-            ItemHeight = 13
+            ItemHeight = 0
             TabOrder = 1
           end
           object cbxViewFormType: TComboBox
@@ -301,7 +302,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 21
             Style = csDropDownList
-            ItemHeight = 13
+            ItemHeight = 0
             TabOrder = 3
           end
           object chkOverrideOpenProject: TCheckBox
@@ -318,7 +319,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 21
             Style = csDropDownList
-            ItemHeight = 13
+            ItemHeight = 0
             TabOrder = 5
           end
         end
@@ -342,7 +343,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 21
             Style = csDropDownList
-            ItemHeight = 13
+            ItemHeight = 0
             TabOrder = 1
           end
           object chkMatchAnywhere: TCheckBox

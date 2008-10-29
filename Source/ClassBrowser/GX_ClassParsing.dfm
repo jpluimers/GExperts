@@ -32,6 +32,7 @@ object fmClassParsing: TfmClassParsing
     Top = 8
     Width = 80
     Height = 50
+    Active = False
     CommonAVI = aviFindFolder
     StopFrame = 29
   end

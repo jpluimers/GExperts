@@ -1,10 +1,11 @@
 object fmCleanDirectories: TfmCleanDirectories
   Left = 297
   Top = 185
-  Width = 569
-  Height = 548
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Clean Directories'
+  ClientHeight = 512
+  ClientWidth = 553
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 400

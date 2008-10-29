@@ -1,11 +1,12 @@
 object fmReplaceCompLog: TfmReplaceCompLog
   Left = 255
   Top = 214
-  Width = 620
-  Height = 486
   ActiveControl = edtSourceClassName
+  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Replace Components - Results'
+  ClientHeight = 450
+  ClientWidth = 604
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

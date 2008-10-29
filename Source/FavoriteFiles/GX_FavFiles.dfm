@@ -1,9 +1,10 @@
 object fmFavFiles: TfmFavFiles
   Left = 402
   Top = 273
-  Width = 511
-  Height = 398
+  AutoScroll = False
   Caption = 'Favorite Files'
+  ClientHeight = 342
+  ClientWidth = 495
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -24,14 +25,14 @@ object fmFavFiles: TfmFavFiles
     Left = 121
     Top = 22
     Width = 3
-    Height = 308
+    Height = 301
     Cursor = crHSplit
   end
   object tvFolders: TTreeView
     Left = 0
     Top = 22
     Width = 121
-    Height = 308
+    Height = 301
     Align = alLeft
     DragMode = dmAutomatic
     HideSelection = False
@@ -51,8 +52,8 @@ object fmFavFiles: TfmFavFiles
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 330
-    Width = 503
+    Top = 323
+    Width = 495
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -60,15 +61,15 @@ object fmFavFiles: TfmFavFiles
   object pnlFiles: TPanel
     Left = 124
     Top = 22
-    Width = 379
-    Height = 308
+    Width = 371
+    Height = 301
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
     object splFileView: TSplitter
       Left = 0
-      Top = 158
-      Width = 379
+      Top = 151
+      Width = 371
       Height = 3
       Cursor = crVSplit
       Align = alBottom
@@ -76,8 +77,8 @@ object fmFavFiles: TfmFavFiles
     object ListView: TListView
       Left = 0
       Top = 0
-      Width = 379
-      Height = 158
+      Width = 371
+      Height = 151
       Align = alClient
       Columns = <
         item
@@ -114,8 +115,8 @@ object fmFavFiles: TfmFavFiles
     end
     object pnlFileView: TPanel
       Left = 0
-      Top = 161
-      Width = 379
+      Top = 154
+      Width = 371
       Height = 147
       Align = alBottom
       BevelOuter = bvNone
@@ -127,7 +128,7 @@ object fmFavFiles: TfmFavFiles
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 503
+    Width = 495
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

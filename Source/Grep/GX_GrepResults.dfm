@@ -1,8 +1,6 @@
 inherited fmGrepResults: TfmGrepResults
   Left = 371
   Top = 313
-  Width = 468
-  Height = 360
   Caption = 'Grep Results'
   DefaultMonitor = dmDesktop
   KeyPreview = True
@@ -16,16 +14,16 @@ inherited fmGrepResults: TfmGrepResults
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 452
-    Height = 285
+    Width = 304
+    Height = 185
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 0
     object Splitter: TSplitter
       Left = 0
-      Top = 189
-      Width = 452
+      Top = 89
+      Width = 304
       Height = 8
       Cursor = crVSplit
       Align = alBottom
@@ -36,8 +34,8 @@ inherited fmGrepResults: TfmGrepResults
     object lbResults: TListBox
       Left = 0
       Top = 22
-      Width = 452
-      Height = 167
+      Width = 304
+      Height = 67
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -54,7 +52,7 @@ inherited fmGrepResults: TfmGrepResults
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 452
+      Width = 304
       Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
@@ -172,8 +170,8 @@ inherited fmGrepResults: TfmGrepResults
     end
     object reContext: TRichEdit
       Left = 0
-      Top = 197
-      Width = 452
+      Top = 97
+      Width = 304
       Height = 88
       Align = alBottom
       ReadOnly = True
@@ -184,8 +182,8 @@ inherited fmGrepResults: TfmGrepResults
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 285
-    Width = 452
+    Top = 185
+    Width = 304
     Height = 19
     Panels = <
       item

@@ -1,10 +1,11 @@
 object fmToolbarConfig: TfmToolbarConfig
   Left = 253
   Top = 198
-  Width = 603
-  Height = 399
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Editor Toolbar Configuration'
+  ClientHeight = 363
+  ClientWidth = 587
   Color = clBtnFace
   Constraints.MinHeight = 340
   Constraints.MinWidth = 450

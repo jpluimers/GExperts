@@ -1,10 +1,11 @@
 object fmReplaceCompMapList: TfmReplaceCompMapList
   Left = 283
   Top = 224
-  Width = 495
-  Height = 405
+  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Replace Components - Mapping Definition List'
+  ClientHeight = 369
+  ClientWidth = 479
   Color = clBtnFace
   Constraints.MinHeight = 171
   Constraints.MinWidth = 285
@@ -23,7 +24,7 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
   object pnlHeader: TPanel
     Left = 0
     Top = 0
-    Width = 487
+    Width = 479
     Height = 34
     Align = alTop
     BevelOuter = bvNone
@@ -70,8 +71,8 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
   object pnlMain: TPanel
     Left = 0
     Top = 34
-    Width = 487
-    Height = 342
+    Width = 479
+    Height = 335
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 3
@@ -79,8 +80,8 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
     object pnlMappings: TPanel
       Left = 3
       Top = 25
-      Width = 481
-      Height = 314
+      Width = 473
+      Height = 307
       Align = alClient
       BevelOuter = bvNone
       BorderWidth = 3
@@ -88,8 +89,8 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
       object lvMapItems: TListView
         Left = 3
         Top = 3
-        Width = 475
-        Height = 308
+        Width = 467
+        Height = 301
         Align = alClient
         Columns = <
           item
@@ -117,7 +118,7 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
     object tbrReplacement: TToolBar
       Left = 3
       Top = 3
-      Width = 481
+      Width = 473
       Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages

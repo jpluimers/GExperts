@@ -1,10 +1,11 @@
 object fmProjDependProp: TfmProjDependProp
   Left = 338
   Top = 216
-  Width = 369
-  Height = 456
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Dependency Properties'
+  ClientHeight = 420
+  ClientWidth = 353
   Color = clBtnFace
   Constraints.MinHeight = 260
   Constraints.MinWidth = 215

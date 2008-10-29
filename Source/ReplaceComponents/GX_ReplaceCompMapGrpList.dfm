@@ -1,10 +1,11 @@
 object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
   Left = 279
   Top = 250
-  Width = 371
-  Height = 322
+  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Replace Components - Mapping Groups'
+  ClientHeight = 286
+  ClientWidth = 355
   Color = clBtnFace
   Constraints.MinWidth = 265
   Font.Charset = DEFAULT_CHARSET
@@ -23,17 +24,17 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 363
-    Height = 257
+    Width = 355
+    Height = 250
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 3
     TabOrder = 0
     object pnlButtons: TPanel
-      Left = 269
+      Left = 261
       Top = 3
       Width = 91
-      Height = 251
+      Height = 244
       Align = alRight
       BevelOuter = bvNone
       BorderWidth = 3
@@ -96,8 +97,8 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
     object pnlList: TPanel
       Left = 3
       Top = 3
-      Width = 266
-      Height = 251
+      Width = 258
+      Height = 244
       Align = alClient
       BevelOuter = bvNone
       BorderWidth = 3
@@ -105,8 +106,8 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
       object lbxGroups: TListBox
         Left = 3
         Top = 3
-        Width = 260
-        Height = 245
+        Width = 252
+        Height = 238
         Align = alClient
         Constraints.MinHeight = 180
         Constraints.MinWidth = 127
@@ -120,8 +121,8 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
   end
   object pnlFooter: TPanel
     Left = 0
-    Top = 257
-    Width = 363
+    Top = 250
+    Width = 355
     Height = 36
     Align = alBottom
     BevelOuter = bvNone
@@ -130,7 +131,7 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
     FullRepaint = False
     TabOrder = 1
     object pnlFooterButtons: TPanel
-      Left = 99
+      Left = 91
       Top = 0
       Width = 264
       Height = 36

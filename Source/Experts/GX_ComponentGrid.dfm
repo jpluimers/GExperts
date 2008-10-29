@@ -1,10 +1,11 @@
 object fmComponentGrid: TfmComponentGrid
   Left = 426
   Top = 235
-  Width = 556
-  Height = 456
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Component Grid'
+  ClientHeight = 420
+  ClientWidth = 540
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -23,7 +24,7 @@ object fmComponentGrid: TfmComponentGrid
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 548
+    Width = 540
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
