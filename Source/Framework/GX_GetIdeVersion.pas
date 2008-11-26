@@ -15,7 +15,7 @@ type
      ideD900, ideD901, ideD902, ideD903,
      ideBDS2006,
      ideDelphi2007,
-     ideRS2009,
+     ideRS2009, ideRS2009U1,
      ideCSB100,
      ideBCB600, ideBCB601, ideBCB602, ideBCB604,
      ideKylix100,
@@ -300,7 +300,7 @@ begin
 end;
 
 {
-  Delphi 9.00 (2005):
+  Delphi 2005:
 
   File                 File Version   Size       Modified Time
   delphicoreide9.bpl   9.0.1761.24408 2,891,264  Friday, October 22, 2004, 10:00:00 AM
@@ -312,7 +312,7 @@ end;
   B.Studio.Host.dll    9.0.1761.24408 688,128    Friday, October 22, 2004, 10:00:00 AM
   bordbk9.dll          90.1.1.1       779,264    Friday, October 22, 2004, 10:00:00 AM
 
-  Delphi 9.01 (2005 Update 1):
+  Delphi 2005 Update 1:
 
   File                 File Version   Size       Modified Time
   delphicoreide9.bpl   9.0.1810.11291 2,891,776  Thursday, December 09, 2004, 9:01:00 AM
@@ -324,7 +324,7 @@ end;
   B.Studio.Host.dll    9.0.1810.11291 688,128    Thursday, December 09, 2004, 9:01:00 AM
   bordbk9.dll          90.1.2.1       782,336    Thursday, December 09, 2004, 9:01:00 AM
 
-  Delphi 9.03 (2005 Update 3):
+  Delphi 2005 Update 3:
 
   File                 File Version   Size       Modified Time
   delphicoreide9.bpl   9.0.1882.30496 2,899,968  Friday, March 04, 2005, 12:02:00 PM
@@ -423,10 +423,25 @@ begin
   end;
 end;
 
+{
+  Delphi 2009:
+  File                 File Version    Size       Modified Time
+  delphicoreide110.bpl 12.0.3170.16989 3,099,136  Friday, August 29, 2008, 2:00:00 PM
+  coreide110.bpl       12.0.3170.16989 4,571,136  Friday, August 29, 2008, 2:00:00 PM
+  bds.exe              12.0.3170.16989 983,552    Friday, August 29, 2008, 2:00:00 PM
+  dcldb120.bpl         12.0.3170.16989 286,720    Friday, August 29, 2008, 2:00:00 PM
+
+  Delphi 2009 Update 1:
+  File                 File Version    Size       Modified Time
+  delphicoreide110.bpl 12.0.3210.17555 3,099,136  Wednesday, October 01, 2008, 2:01:00 PM
+  coreide110.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
+  bds.exe              12.0.3210.17555 983,552    Wednesday, October 01, 2008, 2:01:00 PM
+  dcldb120.bpl         12.0.3210.17555 286,720    Wednesday, October 01, 2008, 2:01:00 PM
+}
 function GetRS2009Version: TBorlandIdeVersion;
 const
   CoreIde1200: TVersionNumber =
-    (Minor: 0; Major: 0; Build: 0; Release: 0);
+    (Minor: 0; Major: 12; Build: 16989; Release: 3170);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
@@ -435,7 +450,7 @@ begin
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide120.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1200);
   if VersionNumber > 0 then begin
-    //Result := ideRS2009Update1;
+    Result := ideRS2009U1;
   end;
 end;
 
@@ -504,7 +519,7 @@ begin
 
   {$IFDEF VER200}
     Result := GetRS2009Version;
-    Assert(Result in [ideRS2009]);
+    Assert(Result in [ideRS2009, ideRS2009U1]);
   {$ENDIF VER200}
 
   if Result = ideUnknown then
