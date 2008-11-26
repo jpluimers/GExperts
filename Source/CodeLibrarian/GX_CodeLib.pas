@@ -37,6 +37,7 @@ type
     constructor Create(const FileName: TGXUnicodeString);
     procedure CompactStorage;
     procedure CloseStorage;
+    procedure OpenStorage(const FileName: WideString);
     procedure SaveStorage;
 
     procedure OpenFile(const FullPath: TGXUnicodeString); overload;
@@ -1096,7 +1097,7 @@ end;
 
 procedure TfmCodeLib.FormShow(Sender: TObject);
 begin
-  // CodeDB.Open;
+  CodeDB.OpenStorage(StoragePath + DefaultFileName);
 end;
 
 procedure TfmCodeLib.SortNodes;
@@ -1531,11 +1532,7 @@ end;
 constructor TGXStorageFile.Create(const FileName: TGXUnicodeString);
 begin
   inherited Create;
-  FStorage := CreateStructuredStorage;
-  if SysUtils.FileExists(FileName) then
-    FStorage.Initialize(FileName, fmOpenReadWrite)
-  else
-    FStorage.Initialize(FileName, fmCreate or fmOpenReadWrite);
+  OpenStorage(FileName);
 end;
 
 procedure TGXStorageFile.CreateFolder(const FolderName: TGXUnicodeString);
@@ -1610,9 +1607,21 @@ begin
   OpenFile(MakeFileName(FolderName, FileName));
 end;
 
+procedure TGXStorageFile.OpenStorage(const FileName: WideString);
+begin
+  if not Assigned(FStorage) then begin
+    FStorage := CreateStructuredStorage;
+    if SysUtils.FileExists(FileName) then
+      FStorage.Initialize(FileName, fmOpenReadWrite)
+    else
+      FStorage.Initialize(FileName, fmCreate or fmOpenReadWrite);
+  end;
+end;
+
 procedure TGXStorageFile.OpenFile(const FullPath: TGXUnicodeString);
 begin
   FreeAndNil(FFile);
+  Assert(Assigned(FStorage));
   AssertValidFolderName(FullPath);
   Assert(Length(FullPath) > 0);
   FFile := FStorage.OpenFile(FullPath, fmCreate or fmOpenReadWrite);
