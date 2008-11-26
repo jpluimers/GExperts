@@ -107,7 +107,7 @@ VERSION 1.33 Beta (October, 2008)
   replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.
 - Hide/Show Non-Visual Components: This new tool allows temporarily hiding
   non-visual components on a form, so you can visualize the form as it will
-  appear at tunrime.
+  appear at runtime.
 - Editor Experts: The main menu contains a submenu item for each editor
   expert now in Delphi 8 or later.
 - Favorite Files: Supports preview of jpg, png, and gif files if the VCL
