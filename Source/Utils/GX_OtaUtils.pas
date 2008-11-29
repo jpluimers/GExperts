@@ -3436,7 +3436,7 @@ begin
     else
     begin
       GxOtaLoadSourceEditorToUnicodeStrings(ISourceEditor, Lines);
-      Result := False;
+      Result := True;
     end;
   end;
 end;
