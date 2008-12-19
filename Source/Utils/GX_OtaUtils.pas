@@ -2087,9 +2087,14 @@ begin
     Result := Length(UTF8Str);
     if not EndByte then
     begin
-      FinalUChar := UString[Length(UString)];
-      UTF8Str := Utf8String(UTF8Encode(FinalUChar));
-      Result := Result - (Length(UTF8Str)) + 1;
+      if Length(UString) = 0 then
+        Result := 0
+      else
+      begin
+        FinalUChar := UString[Length(UString)];
+        UTF8Str := Utf8String(UTF8Encode(FinalUChar));
+        Result := Result - (Length(UTF8Str)) + 1;
+      end;
     end;
   end
   else
