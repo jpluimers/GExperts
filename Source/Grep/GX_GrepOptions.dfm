@@ -24,6 +24,7 @@ object fmGrepOptions: TfmGrepOptions
     Top = 8
     Width = 318
     Height = 55
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Grep Options'
     TabOrder = 0
     object chkGrepUseCurrentIdent: TCheckBox
