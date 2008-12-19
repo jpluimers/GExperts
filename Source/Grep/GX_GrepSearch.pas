@@ -288,7 +288,7 @@ procedure TfmGrepSearch.LoadFormSettings;
     cbText.SelectAll;
   end;
 
-  procedure SetupPattern;
+  procedure SetDefaultSearchPattern;
   var
     Selection: string;
   begin
@@ -335,7 +335,7 @@ begin
 
   if not IsStandAlone then
   begin
-    SetupPattern;
+    SetDefaultSearchPattern;
 
     if Trim(GxOtaGetCurrentProjectName) = '' then
     begin
