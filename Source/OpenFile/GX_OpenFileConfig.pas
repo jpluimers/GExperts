@@ -421,6 +421,8 @@ end;
 procedure TfmOpenFileConfig.chkCustomDirectoryListClick(Sender: TObject);
 begin
   SetEnabledOnControlAndChildren(gbxCustomDirectory, chkCustomDirectoryList.Checked);
+  chkCustomDirectoryList.Enabled := True;
+  gbxCustomDirectory.Enabled := True;
 end;
 
 procedure TfmOpenFileConfig.btnTypeAddClick(Sender: TObject);
