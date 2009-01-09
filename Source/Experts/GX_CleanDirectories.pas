@@ -119,7 +119,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, SysUtils, FileCtrl, Dialogs,
-  ToolsAPI, GX_GxUtils, GX_GenericUtils, GX_OtaUtils;
+  ToolsAPI, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, Math;
 
 resourcestring
   SCouldNotDelete = 'Could not delete %s' + sLineBreak +

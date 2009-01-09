@@ -67,7 +67,7 @@ implementation
 uses
   SysUtils, Windows, Messages, Graphics, Menus,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions,
-  GX_GrepRegExSearch, RegExpr;
+  GX_GrepRegExSearch, RegExpr, Math;
 
 resourcestring
   SGrepResultsNotActive = 'The Grep Results window is not active';

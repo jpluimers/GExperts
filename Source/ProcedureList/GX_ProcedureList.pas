@@ -119,7 +119,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Windows, Clipbrd, Menus,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_IdeUtils,
-  GX_SharedImages, GX_Experts;
+  GX_SharedImages, GX_Experts, Math;
 
 resourcestring
   SAllString = '<All>';

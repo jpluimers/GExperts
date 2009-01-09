@@ -57,7 +57,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, GX_GenericUtils, GX_OtaUtils, GX_IdeUtils;
+  SysUtils, GX_GenericUtils, GX_OtaUtils, GX_IdeUtils, Math;
 
 type
   TModuleFreeNotifier = class(TNotifierObject, IOTAModuleNotifier)

@@ -177,7 +177,7 @@ uses
   GX_ConfigurationInfo, GX_Experts, GX_GExperts,
   {$ENDIF STANDALONE}
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_SharedImages, OmniXML,
-  GX_XmlUtils, GX_IdeUtils;
+  GX_XmlUtils, GX_IdeUtils, Math;
 
 type
   EFavFiles = class(Exception);

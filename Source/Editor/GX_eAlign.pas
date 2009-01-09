@@ -29,7 +29,7 @@ implementation
 uses
   SysUtils,
   GX_OtaUtils, GX_GenericUtils, GX_ConfigurationInfo,
-  GX_EditorExpert, GX_eSelectionEditorExpert, GX_eAlignOptions;
+  GX_EditorExpert, GX_eSelectionEditorExpert, GX_eAlignOptions, Math;
 
 const
   DEFAULT_WHITESPACE = 0;

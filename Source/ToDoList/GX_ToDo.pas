@@ -163,7 +163,7 @@ uses
   SysUtils, Dialogs, Clipbrd, Graphics, Windows,
   mPasLex, mwBCBTokenList,
   GX_GxUtils, GX_GenericUtils, GX_EditReader,
-  GX_ToDoOptions, GX_SharedImages;
+  GX_ToDoOptions, GX_SharedImages, Math;
 
 resourcestring
   SParsingError = 'A parsing error occurred in file %s.' + sLineBreak;

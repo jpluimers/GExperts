@@ -175,7 +175,7 @@ uses
   SysUtils, Messages, ToolsAPI,
   GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_GrepPrinting, GX_GrepSearch,
   GX_GExperts, GX_ConfigurationInfo, GX_SharedImages, GX_Replace, GX_GrepReplace,
-  GX_MessageBox, GX_IdeUtils;
+  GX_MessageBox, GX_IdeUtils, Math;
 
 type
   TShowUnicodeReplaceMessage = class(TGxMsgBoxAdaptor)

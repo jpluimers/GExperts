@@ -238,7 +238,7 @@ uses
   SysUtils, Windows, Messages, StdCtrls, Printers,
   GX_VerDepConst, GX_ClassIdentify, GX_ConfigurationInfo, GX_EditReader,
   GX_ClassProp, GX_ClassOptions, GX_ClassReport, GX_GExperts,
-  GX_GxUtils, GX_GenericUtils, GX_SharedImages, GX_IdeUtils;
+  GX_GxUtils, GX_GenericUtils, GX_SharedImages, GX_IdeUtils, Math;
 
 function ExpertClassKey: string;
 begin

@@ -139,7 +139,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Windows, Messages, SysUtils, Clipbrd, Dialogs, OmniXML,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
-  GX_GExperts, GX_ClipboardOptions, GX_SharedImages, GX_XmlUtils;
+  GX_GExperts, GX_ClipboardOptions, GX_SharedImages, GX_XmlUtils, Math;
 
 const
   ClipStorageFileName = 'ClipboardHistory.xml';

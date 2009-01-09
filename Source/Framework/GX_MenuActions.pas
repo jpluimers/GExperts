@@ -32,7 +32,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Windows, Classes, Graphics, ActnList, Menus,
   GX_GenericClasses, GX_ActionBroker, GX_ConfigurationInfo,
-  GX_GExperts, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils;
+  GX_GExperts, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils, Math;
 
 // We can enable a hack / kludge to get around
 // menu shortcut an initialization issue in

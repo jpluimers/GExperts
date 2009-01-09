@@ -309,7 +309,8 @@ implementation
 
 uses
   SysUtils, Windows, Graphics, Clipbrd, GX_SharedImages,
-  GX_GxUtils, GX_MacroParser, GX_MacroTemplateEdit, GX_OtaUtils, GX_IdeUtils;
+  GX_GxUtils, GX_MacroParser, GX_MacroTemplateEdit, GX_OtaUtils, GX_IdeUtils,
+  Math;
 
 var
   ProgInfoProc: TGetProgrammerInfo;

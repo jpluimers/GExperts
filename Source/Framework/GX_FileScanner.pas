@@ -121,7 +121,7 @@ type
 
 implementation
 
-uses SysUtils, Contnrs, GX_GenericUtils;
+uses SysUtils, Contnrs, GX_GenericUtils, Math;
 
 resourcestring
   SUnknown = 'Unknown';

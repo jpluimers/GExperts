@@ -128,7 +128,8 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils,
   GX_EditorEnhancements, GX_MessageBox,
-  GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils, GX_VerDepConst;
+  GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils, GX_VerDepConst,
+  Math;
 
 type
   TConfigInfo = class(TSingletonInterfacedObject, IConfigInfo)

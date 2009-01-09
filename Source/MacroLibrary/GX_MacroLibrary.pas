@@ -189,7 +189,7 @@ uses
   ActiveX,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
-  GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig;
+  GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math;
 
 const
   MacroLibraryStorageFileName = 'MacroLibrary.xml';

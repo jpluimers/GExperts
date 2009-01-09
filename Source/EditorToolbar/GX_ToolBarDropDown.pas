@@ -132,7 +132,7 @@ uses
   Graphics, StdCtrls, Forms, Dialogs,
   GX_Actions, GX_ActionBroker,
   GX_GxUtils, GX_GenericUtils, GX_IdeUtils,
-  GX_EditReader, GX_UsesManager, GX_UnitPositions;
+  GX_EditReader, GX_UsesManager, GX_UnitPositions, Math;
 
 const
   MinMenuLines = 5;

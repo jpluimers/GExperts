@@ -109,7 +109,7 @@ implementation
 
 uses
   SysUtils, GX_GxUtils, GX_GenericUtils, GX_Experts,
-  GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages;
+  GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math;
 
 var
   fmPeInformation: TfmPeInformation = nil;

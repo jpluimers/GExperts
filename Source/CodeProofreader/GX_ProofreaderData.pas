@@ -99,7 +99,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Dialogs,
   GX_ProofreaderCorrection, GX_ProofreaderKeyboard, GX_GenericUtils,
-  GX_ConfigurationInfo, GX_XmlUtils;
+  GX_ConfigurationInfo, GX_XmlUtils, Math;
 
 type
   EProofreader = class(Exception);
