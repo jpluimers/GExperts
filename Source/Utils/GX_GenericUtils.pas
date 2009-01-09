@@ -22,7 +22,7 @@ const
   // Note these don't handle german/polish/etc. extended ASCII alpha chars that are valid in Delphi 8+
   GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
   MaxSmallInt = 32767;
-  MaxEditorCol = MaxSmallInt;
+  MaxEditorCol = {$IFDEF GX_VER160_up} MaxSmallInt {$ELSE} 1023 {$ENDIF};
 
   {$IFNDEF GX_VER160_up}
   BIF_NONEWFOLDERBUTTON = $200;
@@ -274,9 +274,7 @@ procedure AppendStrings(const Destination, Source: TStrings);
 // TStringList.Sort is case-INsensitive.
 procedure SortStringsCaseSensitive(const AStrings: TStrings);
 
-
-function Min(const v1, v2: Integer): Integer;
-function Max(const v1, v2: Integer): Integer;
+function EnforceMinMax(Value, Min, Max: Integer): Integer;
 
 // Find control named ControlName which is a direct
 // or indirect child window of WindowContainer.
@@ -613,7 +611,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   {$IFDEF GX_DEBUGLOG} GX_Debug, {$ENDIF}
   {$IFDEF UNICODE} Character, {$ENDIF}
-  ShellAPI, ShlObj, ActiveX, StrUtils;
+  ShellAPI, ShlObj, ActiveX, StrUtils, Math;
 
 type
   TTempHourClassCursor = class(TInterfacedObject, IInterface)
@@ -1929,20 +1927,13 @@ begin
     QuickSort(0, AStrings.Count - 1);
 end;
 
-function Min(const v1, v2: Integer): Integer;
+function EnforceMinMax(Value, Min, Max: Integer): Integer;
 begin
-  if v1 < v2 then
-    Result := v1
-  else
-    Result := v2;
-end;
-
-function Max(const v1, v2: Integer): Integer;
-begin
-  if v1 > v2 then
-    Result := v1
-  else
-    Result := v2;
+  Result := Value;
+  if Result < Min then
+    Result := Min;
+  if Result > Max then
+    Result := Max;
 end;
 
 function FindChild(const WindowContainer: TWinControl; const ControlName: string): TControl;
