@@ -253,6 +253,9 @@ begin
       if (FGrepSettings.GrepAction = gaOpenFilesGrep) and (not GxOtaIsFileOpen(FileName)) then
         Exit;
       ExecuteSearchOnFile(FileName);
+      if IsCpp(FileName) and (FGrepSettings.GrepAction in [gaProjGrep, gaOpenFilesGrep, gaProjGroupGrep]) then
+        if GxOtaFileOrModuleExists(ChangeFileExt(FileName, '.h')) then
+          ExecuteSearchOnFile(ChangeFileExt(FileName, '.h'));
       FFileResult := nil;
     end;
   except
