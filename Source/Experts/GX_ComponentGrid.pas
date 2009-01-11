@@ -452,7 +452,7 @@ begin
     Align := alClient;
     ColCount := FixedColumns + Length(GridProperties);
     DefaultRowHeight := 18;
-    DefaultColWidth := 95;
+    DefaultColWidth := 130;
     FixedCols := FixedColumns;
     RowCount := 2;
     Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing, goTabs, goColSizing];
