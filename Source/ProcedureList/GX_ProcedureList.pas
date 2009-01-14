@@ -284,6 +284,8 @@ begin
     if lvProcs.Items.Count = 0 then
       UpdateCodeView(nil);
   finally
+    if RunningRS2009OrGreater then
+      lvProcs.AlphaSort; // This no longer happens automatically?
     lvProcs.Items.EndUpdate;
     FocusAndSelectFirstItem;
   end;
@@ -598,6 +600,7 @@ constructor TfmProcedureList.Create(AOwner: TComponent);
 begin
   inherited;
   SetToolbarGradient(ToolBar);
+  lvProcs.DoubleBuffered := True;
   InitializeForm;
 end;
 
@@ -757,7 +760,7 @@ end;
 procedure TfmProcedureList.lvProcsCompare(Sender: TObject; Item1,
   Item2: TListItem; Data: Integer; var Compare: Integer);
   
-  function FillChar(const Value: string): string;
+  function PadNumber(const Value: string): string;
   var
     i: Integer;
   begin
@@ -771,8 +774,8 @@ var
 begin
   if FOptions.SortOnColumn = 3 then
   begin
-    Item1Value := FillChar(Item1.SubItems[FOptions.SortOnColumn - 1]);
-    Item2Value := FillChar(Item2.SubItems[FOptions.SortOnColumn - 1]);
+    Item1Value := PadNumber(Item1.SubItems[FOptions.SortOnColumn - 1]);
+    Item2Value := PadNumber(Item2.SubItems[FOptions.SortOnColumn - 1]);
   end
   else
   begin
