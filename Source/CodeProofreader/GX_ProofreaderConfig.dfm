@@ -8,7 +8,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
   ClientWidth = 523
   Color = clBtnFace
   Constraints.MinHeight = 400
-  Constraints.MinWidth = 450
+  Constraints.MinWidth = 460
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -479,9 +479,9 @@ object fmProofreaderConfig: TfmProofreaderConfig
       OnChange = cbLanguageChange
     end
     object cbBeep: TCheckBox
-      Left = 333
+      Left = 338
       Top = 9
-      Width = 180
+      Width = 175
       Height = 17
       Anchors = [akTop, akRight]
       Caption = '&Beep when correcting'
