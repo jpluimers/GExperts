@@ -11,7 +11,7 @@ uses
 
 type
   TBackupExpert = class;
-  
+
   TBackupType = (btFile, btDir);
 
   TBackupScope = (bsActiveProject, bsProjectGroup);
