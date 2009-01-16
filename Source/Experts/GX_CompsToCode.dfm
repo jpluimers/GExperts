@@ -3,7 +3,7 @@ object fmCompsToCode: TfmCompsToCode
   Top = 212
   BorderStyle = bsDialog
   Caption = 'Components to Code'
-  ClientHeight = 266
+  ClientHeight = 271
   ClientWidth = 288
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -17,12 +17,12 @@ object fmCompsToCode: TfmCompsToCode
   Scaled = False
   DesignSize = (
     288
-    266)
+    271)
   PixelsPerInch = 96
   TextHeight = 14
   object btnOK: TButton
     Left = 21
-    Top = 234
+    Top = 239
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -33,7 +33,7 @@ object fmCompsToCode: TfmCompsToCode
   end
   object btnCancel: TButton
     Left = 107
-    Top = 234
+    Top = 239
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -60,7 +60,7 @@ object fmCompsToCode: TfmCompsToCode
     Left = 7
     Top = 168
     Width = 274
-    Height = 57
+    Height = 61
     Anchors = [akLeft, akTop, akRight]
     Caption = ' Language '
     ItemIndex = 0
@@ -79,7 +79,7 @@ object fmCompsToCode: TfmCompsToCode
     TabOrder = 1
     object chkPrepend: TCheckBox
       Left = 11
-      Top = 16
+      Top = 18
       Width = 259
       Height = 17
       Caption = '&Prepend original component source'
@@ -89,7 +89,7 @@ object fmCompsToCode: TfmCompsToCode
     end
     object chkUseDelphiWith: TCheckBox
       Left = 11
-      Top = 36
+      Top = 38
       Width = 261
       Height = 17
       Caption = 'Use Delphi '#39'&with'#39' statement'
@@ -100,7 +100,7 @@ object fmCompsToCode: TfmCompsToCode
   end
   object btnHelp: TButton
     Left = 193
-    Top = 233
+    Top = 238
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

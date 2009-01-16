@@ -18,7 +18,6 @@ object fmTabOrder: TfmTabOrder
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 14
   object pnlButtons: TPanel
@@ -96,9 +95,9 @@ object fmTabOrder: TfmTabOrder
       TabOrder = 0
       object pnlComponentTree: TPanel
         Left = 2
-        Top = 15
+        Top = 16
         Width = 366
-        Height = 448
+        Height = 447
         Align = alClient
         BevelOuter = bvNone
         BorderWidth = 6
@@ -107,7 +106,7 @@ object fmTabOrder: TfmTabOrder
           Left = 6
           Top = 6
           Width = 354
-          Height = 436
+          Height = 435
           Align = alClient
           DragMode = dmAutomatic
           Indent = 19
