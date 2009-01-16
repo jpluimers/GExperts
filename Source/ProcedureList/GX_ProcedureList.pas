@@ -7,13 +7,13 @@ interface
 uses
   SysUtils, Classes, ActnList, Dialogs, ComCtrls, ToolWin, StdCtrls,
   Controls, ExtCtrls, Messages, Forms, GX_EnhancedEditor,
-  GX_ProcedureListOptions, GX_FileScanner, GX_EditReader;
+  GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
 
 type
-  TfmProcedureList = class(TForm)
+  TfmProcedureList = class(TfmBaseForm)
     pnlFuncHolder: TPanel;
     pnHolder: TPanel;
     lvProcs: TListView;
@@ -617,7 +617,6 @@ end;
 procedure TfmProcedureList.InitializeForm;
 begin
   SetupSyntaxHighlightingControl;
-  GxSetDefaultFont(Self);
 
   FObjectStrings := TStringList.Create;
   FObjectStrings.Sorted := True;

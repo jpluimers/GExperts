@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls,
-  GX_ReplaceCompData;
+  GX_ReplaceCompData, GX_BaseForm;
 
 type
-  TfmReplaceCompMapGrpList = class(TForm)
+  TfmReplaceCompMapGrpList = class(TfmBaseForm)
     pnlButtons: TPanel;
     btnAdd: TButton;
     btnEdit: TButton;

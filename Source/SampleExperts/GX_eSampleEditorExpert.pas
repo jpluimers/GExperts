@@ -14,7 +14,7 @@ interface
 uses
   GX_Experts, GX_EditorExpert, GX_ConfigurationInfo,
   SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls,
-  ExtCtrls, ComCtrls;
+  ExtCtrls, ComCtrls, GX_BaseForm;
 
 type
   TGxSampleEditorExpert = class(TEditorExpert)
@@ -34,7 +34,7 @@ type
   end;
 
 type
-  TfmSampleEditorExpertConfig = class(TForm)
+  TfmSampleEditorExpertConfig = class(TfmBaseForm)
     btnCancel: TButton;
     btnOK: TButton;
     lblData: TLabel;
@@ -188,4 +188,3 @@ end;
 initialization
   RegisterEditorExpert(TGxSampleEditorExpert);
 end.
-

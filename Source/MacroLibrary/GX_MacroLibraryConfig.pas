@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
+  Dialogs, StdCtrls, GX_BaseForm;
 
 type
-  TfmGxMacroLibraryConfig = class(TForm)
+  TfmGxMacroLibraryConfig = class(TfmBaseForm)
     chk_AutoPrompt: TCheckBox;
     b_Ok: TButton;
     b_Cancel: TButton;

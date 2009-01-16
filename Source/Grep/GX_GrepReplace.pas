@@ -4,10 +4,10 @@ interface
 
 uses
   Classes, Controls, StdCtrls, Forms,
-  GX_GrepExpert, GX_GrepBackend;
+  GX_GrepExpert, GX_GrepBackend, GX_BaseForm;
 
 type
-  TfmGrepReplace = class(TForm)
+  TfmGrepReplace = class(TfmBaseForm)
     lblWith: TLabel;
     cbReplace: TComboBox;
     btnOK: TButton;

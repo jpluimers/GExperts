@@ -3,7 +3,8 @@ unit GX_MacroTemplateEdit;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ComCtrls, GX_MacroFile, GXHotKey;
+  Classes, Controls, Forms, StdCtrls, ComCtrls, GX_MacroFile, GXHotKey,
+  GX_BaseForm;
 
 type
   TMacroTemplate = record
@@ -13,7 +14,7 @@ type
     InsertPos: TTemplateInsertPos;
   end;
 
-  TfmMacroTemplateEdit = class(TForm)
+  TfmMacroTemplateEdit = class(TfmBaseForm)
     edtName: TEdit;
     edtDescription: TEdit;
     lblName: TLabel;

@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, Graphics, Controls, Forms, Dialogs, ComCtrls, ExtCtrls, StdCtrls,
-  GX_ReplaceCompData;
+  GX_ReplaceCompData, GX_BaseForm;
 
 type
-  TfmReplaceCompLog = class(TForm)
+  TfmReplaceCompLog = class(TfmBaseForm)
     pnlHeader: TPanel;
     lblDest: TLabel;
     edtDestClassName: TEdit;

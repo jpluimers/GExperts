@@ -7,7 +7,7 @@ interface
 uses
   Classes, Controls, Forms, ActnList, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, GX_OpenFileConfig,
-  Messages;
+  Messages, GX_BaseForm;
 
 const
   UM_REFRESHLIST = WM_USER + 746;
@@ -53,7 +53,7 @@ type
     procedure HaltThreads;
   end;
 
-  TfmOpenFile = class(TForm)
+  TfmOpenFile = class(TfmBaseForm)
     pnlUnits: TPanel;
     pcUnits: TPageControl;
     tabSearchPath: TTabSheet;
@@ -630,7 +630,6 @@ end;
 procedure TfmOpenFile.FormCreate(Sender: TObject);
 begin
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   lvSearchPath.Color := clBtnFace;
   lvSearchPath.Enabled := False;
   lvCommon.Color := clBtnFace;

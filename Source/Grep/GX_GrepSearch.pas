@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls,
-  GX_Experts, GX_GrepExpert, GX_GrepBackend;
+  GX_Experts, GX_GrepExpert, GX_GrepBackend, GX_BaseForm;
 
 type
-  TfmGrepSearch = class(TForm)
+  TfmGrepSearch = class(TfmBaseForm)
     lblFind: TLabel;
     cbText: TComboBox;
     gbxOptions: TGroupBox;
@@ -303,7 +303,6 @@ procedure TfmGrepSearch.LoadFormSettings;
 begin
   if not Assigned(fmGrepResults) then
     raise Exception.Create(SGrepResultsNotActive);
-  GxSetDefaultFont(Self);
 
   FGrepExpert := fmGrepResults.GrepExpert;
   cbText.Items.Assign(FGrepExpert.SearchList);

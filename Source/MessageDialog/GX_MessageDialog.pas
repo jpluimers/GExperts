@@ -5,7 +5,7 @@ unit GX_MessageDialog;
 interface
 
 uses
-  Classes, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls;
+  Classes, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls, GX_BaseForm;
 
 type
   TSourceType = (stPascal, stCpp);
@@ -50,7 +50,7 @@ type
     property SourceType: TSourceType read FSourceType write FSourceType;
   end;
 
-  TfmMessageDialog = class(TForm)
+  TfmMessageDialog = class(TfmBaseForm)
     chkDefaultButton: TCheckBox;
     chkMbAbort: TCheckBox;
     chkMbAll: TCheckBox;
@@ -335,7 +335,6 @@ type
 constructor TfmMessageDialog.Create(AOwner: TComponent; Settings: TMessageDialogSettings);
 begin
   inherited Create(AOwner);
-  GxSetDefaultFont(Self);
   FMessageType := nil;
   pgeMessageDialogChange(Self);
   FSettings := Settings;

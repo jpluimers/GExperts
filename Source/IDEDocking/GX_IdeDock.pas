@@ -57,7 +57,7 @@ function IdeDockManager: IIdeDockManager;
 implementation
 
 uses
-  Windows, DeskForm, DeskUtil, GX_GenericClasses;
+  Windows, DeskForm, DeskUtil, GX_GenericClasses, GX_GxUtils;
 
 {$R *.dfm}
 
@@ -126,7 +126,8 @@ end;
 
 constructor TfmIdeDockForm.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
+  GxSetDefaultFont(Self);
 
   {$IFDEF EnableIdeDockingSupport}
   if Menu <> nil then

@@ -8,10 +8,10 @@ interface
 
 uses
   Classes, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ColorGrd,
-  SynEdit, Dialogs;
+  SynEdit, Dialogs, GX_BaseForm;
 
 type
-  TfmSourceExportOptions = class(TForm)
+  TfmSourceExportOptions = class(TfmBaseForm)
     pnlSettings: TPanel;
     dlgBackground: TColorDialog;
     pnlButtons: TPanel;

@@ -3,10 +3,10 @@ unit GX_CompRenameAdvanced;
 interface
 
 uses
-  Classes, Controls, StdCtrls, Forms;
+  Classes, Controls, StdCtrls, Forms, GX_BaseForm;
 
 type
-  TfmCompRenameAdvanced = class(TForm)
+  TfmCompRenameAdvanced = class(TfmBaseForm)
     lblComponentClass: TLabel;
     lblProperties: TLabel;
     btnOk: TButton;

@@ -6,10 +6,10 @@ unit GX_SetComponentPropsStatus;
 interface
 
 uses
-  Forms, StdCtrls, ExtCtrls, Classes, Controls;
+  Forms, StdCtrls, ExtCtrls, Classes, Controls, GX_BaseForm;
 
 type
-  TfmSetComponentPropsStatus = class(TForm)
+  TfmSetComponentPropsStatus = class(TfmBaseForm)
     grpbxStatus: TGroupBox;
     pnlProcessedFile: TPanel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

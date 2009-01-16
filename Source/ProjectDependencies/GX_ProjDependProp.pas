@@ -3,10 +3,10 @@ unit GX_ProjDependProp;
 interface
 
 uses
-  Classes, StdCtrls, Controls, ComCtrls, Forms, ExtCtrls;
+  Classes, StdCtrls, Controls, ComCtrls, Forms, ExtCtrls, GX_BaseForm;
 
 type
-  TfmProjDependProp = class(TForm)
+  TfmProjDependProp = class(TfmBaseForm)
     pnlButtons: TPanel;
     pnlButtonsRight: TPanel;
     btnOK: TButton;

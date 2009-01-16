@@ -3,10 +3,10 @@ unit GX_GrepResultsOptions;
 interface
 
 uses
-  StdCtrls, Dialogs, Controls, ExtCtrls, Classes, Forms, ComCtrls;
+  StdCtrls, Dialogs, Controls, ExtCtrls, Classes, Forms, ComCtrls, GX_BaseForm;
 
 type
-  TfmGrepResultsOptions = class(TForm)
+  TfmGrepResultsOptions = class(TfmBaseForm)
     gbxMatchList: TGroupBox;
     pnlListFont: TPanel;
     gbxMatchContext: TGroupBox;

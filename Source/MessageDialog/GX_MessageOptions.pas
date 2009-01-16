@@ -3,10 +3,10 @@ unit GX_MessageOptions;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls;
+  Classes, Controls, Forms, StdCtrls, GX_BaseForm;
 
 type
-  TfmMessageOptions = class(TForm)
+  TfmMessageOptions = class(TfmBaseForm)
     gbxOptions: TGroupBox;
     lblConcat: TLabel;
     edtMsgString: TEdit;

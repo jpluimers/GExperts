@@ -10,7 +10,8 @@ interface
 uses
   Classes, Controls, Forms, ComCtrls, ExtCtrls,
   StdCtrls, Menus, Dialogs, ActnList, StdActns,
-  GX_ConfigurationInfo, GX_MacroFile, GX_EnhancedEditor, GX_GenericUtils;
+  GX_ConfigurationInfo, GX_MacroFile, GX_EnhancedEditor, GX_GenericUtils,
+  GX_BaseForm;
 
 const
   DefaultMacroFileName = 'MacroTemplates.xml';
@@ -61,7 +62,7 @@ type
     constructor Create;
   end;
 
-  TfmMacroTemplates = class(TForm)
+  TfmMacroTemplates = class(TfmBaseForm)
     PageControl: TPageControl;
     pmMacros: TPopupMenu;
     PROCNAMEMacro1: TMenuItem;

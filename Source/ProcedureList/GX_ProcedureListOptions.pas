@@ -3,7 +3,7 @@ unit GX_ProcedureListOptions;
 interface
 
 uses
-  Classes, Graphics, Controls, Forms, ExtCtrls, StdCtrls;
+  Classes, Graphics, Controls, Forms, ExtCtrls, StdCtrls, GX_BaseForm;
 
 type
   TProcedureListOptions = class(TObject)
@@ -44,7 +44,7 @@ type
     destructor Destroy; override;
   end;
 
-  TfmProcedureListOptions = class(TForm)
+  TfmProcedureListOptions = class(TfmBaseForm)
     btnOK: TButton;
     btnCancel: TButton;
     gbCodeView: TGroupBox;

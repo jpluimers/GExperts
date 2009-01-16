@@ -4,7 +4,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, Buttons, ComCtrls, ExtCtrls,
-  GX_ConfigurationInfo;
+  GX_ConfigurationInfo, GX_BaseForm;
 
 type
   TIDEOverride = class(TStringList)
@@ -79,7 +79,7 @@ type
     procedure SaveToRegistry(Settings: TGExpertsSettings); overload;
   end;
 
-  TfmOpenFileConfig = class(TForm)
+  TfmOpenFileConfig = class(TfmBaseForm)
     pnlButtons: TPanel;
     pnlConfig: TPanel;
     pnlButtonsRight: TPanel;

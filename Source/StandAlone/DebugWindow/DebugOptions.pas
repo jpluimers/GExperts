@@ -35,7 +35,7 @@ var
 
 implementation
 
-uses Registry;
+uses Registry, GX_GenericUtils;
 
 {$R *.dfm}
 
@@ -77,6 +77,7 @@ end;
 
 procedure TfmDebugOptions.FormCreate(Sender: TObject);
 begin
+  SetDefaultFont(Self);
   chkShowOnStartup.Checked := ConfigInfo.Start;
   chkShowOnMessage.Checked := ConfigInfo.OnMessage;
   chkNewAtBottom.Checked := ConfigInfo.Bottom;

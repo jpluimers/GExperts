@@ -7,13 +7,13 @@ interface
 uses
   Messages, Classes, Controls, Forms, ComCtrls, StdCtrls,
   ExtCtrls, Contnrs, ToolWin, ImgList, ActnList,
-  GX_ReplaceCompData, GX_SharedImages, GX_ReplaceCompMapDets;
+  GX_ReplaceCompData, GX_SharedImages, GX_ReplaceCompMapDets, GX_BaseForm;
 
 const
   UM_UPDATECOLS = WM_USER + 632;
 
 type
-  TfmReplaceCompMapList = class(TForm)
+  TfmReplaceCompMapList = class(TfmBaseForm)
     pnlHeader: TPanel;
     lblGroup: TLabel;
     comGroupName: TComboBox;

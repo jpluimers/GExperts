@@ -854,7 +854,6 @@ procedure TfmMacroLibrary.FormCreate(Sender: TObject);
 begin
   inherited;
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   //lvMacros.DoubleBuffered := True;  // Causing D2005 paint issues for docked/pinned windows
 end;
 

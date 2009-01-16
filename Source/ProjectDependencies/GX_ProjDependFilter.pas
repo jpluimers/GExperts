@@ -3,10 +3,10 @@ unit GX_ProjDependFilter;
 interface
 
 uses
-  Classes, Controls, Forms, Dialogs, StdCtrls, Menus, ExtCtrls;
+  Classes, Controls, Forms, Dialogs, StdCtrls, Menus, ExtCtrls, GX_BaseForm;
 
 type
-  TfmProjDependFilter = class(TForm)
+  TfmProjDependFilter = class(TfmBaseForm)
     dlgOpen: TOpenDialog;
     mnuPopup: TPopupMenu;
     mitAddFiles: TMenuItem;

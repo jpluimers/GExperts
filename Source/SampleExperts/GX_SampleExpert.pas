@@ -13,10 +13,10 @@ unit GX_SampleExpert;
 interface
 
 uses
-  GX_Experts, SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls;
+  GX_Experts, SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, GX_BaseForm;
 
 type
-  TfmGxSampleExpertForm = class(TForm)
+  TfmGxSampleExpertForm = class(TfmBaseForm)
     btnOK: TButton;
     lblNote: TLabel;
     lblData: TLabel;
@@ -195,4 +195,3 @@ end;
 initialization
   RegisterGX_Expert(TGxSampleExpert);
 end.
-

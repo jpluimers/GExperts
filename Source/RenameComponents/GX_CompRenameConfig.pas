@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, StdCtrls, Classes, Controls, Messages, Grids, Menus, Dialogs, ActnList,
-  ExtCtrls;
+  ExtCtrls, GX_BaseForm;
 
 const
   UM_SHOW_CONTROL = WM_USER + 133;
@@ -29,7 +29,7 @@ type
     destructor Destroy; override;
   end;
 
-  TfmCompRenameConfig = class(TForm)
+  TfmCompRenameConfig = class(TfmBaseForm)
     chkShowDialog: TCheckBox;
     chkAutoAdd: TCheckBox;
     pnlNames: TGroupBox;
@@ -239,16 +239,14 @@ end;
 
 procedure TfmCompRenameConfig.acAddExecute(Sender: TObject);
 begin
-  if Grid.CanFocus then
-    Grid.SetFocus;
+  TryFocusControl(Grid);
   GridAddRow;
   FormResize(Self);
 end;
 
 procedure TfmCompRenameConfig.acDeleteExecute(Sender: TObject);
 begin
-  if Grid.CanFocus then
-    Grid.SetFocus;
+  TryFocusControl(Grid);
   GridDeleteRow(Grid.Row);
   if Grid.RowCount <= Grid.FixedRows then
     GridAddRow;

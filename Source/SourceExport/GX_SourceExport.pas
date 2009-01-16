@@ -12,14 +12,14 @@ uses
   Classes, Graphics, Controls, Forms, Dialogs, ActnList, ComCtrls,
   Menus, StdCtrls, ExtCtrls, ToolWin,
   SynEdit, // This expert requires SynEdit from http://synedit.sf.net/
-  GX_Experts, GX_ConfigurationInfo;
+  GX_Experts, GX_ConfigurationInfo, GX_BaseForm;
 
 type
   TGXCopyFormat = (cfText, cfHTMLFragment, cfRTFFragment);
 
   TSourceExportExpert = class;
 
-  TfmSourceExport = class(TForm)
+  TfmSourceExport = class(TfmBaseForm)
     pnlFooter: TPanel;
     dlgSave: TSaveDialog;
     edtTitle: TEdit;
@@ -345,7 +345,6 @@ begin
   inherited;
 
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   // Destroyed with form
   FEditor := TSynEdit.Create(Self);
   with FEditor do

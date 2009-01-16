@@ -948,7 +948,6 @@ constructor TfmGrepResults.Create(AOwner: TComponent);
 begin
   inherited;
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
 
   FSearchInProgress := False;
   lbResults.DoubleBuffered := True;

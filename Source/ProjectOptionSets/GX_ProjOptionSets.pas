@@ -1429,7 +1429,6 @@ procedure TfmProjOptionSets.FormCreate(Sender: TObject);
 begin
   inherited;
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   pcSettings.ActivePage := tabSets;
 end;
 

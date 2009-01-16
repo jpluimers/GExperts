@@ -7,10 +7,10 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Classes, Controls, StdCtrls, Forms;
+  Classes, Controls, StdCtrls, Forms, GX_BaseForm;
 
 type
-  TfmToDoOptions = class(TForm)
+  TfmToDoOptions = class(TfmBaseForm)
     btnOK: TButton;
     btnCancel: TButton;
     gbxTokens: TGroupBox;

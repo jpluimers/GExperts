@@ -12,7 +12,8 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI,
-  GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs;
+  GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs,
+  GX_BaseForm;
 
 type
   TCompRenameExpert = class;
@@ -20,7 +21,7 @@ type
   TIsValidComponentName = function (const OldName, NewName: WideString; var Reason: WideString): Boolean of object;
 
   // Simple rename dialog that shows the old and new component name
-  TfmCompRename = class(TForm)
+  TfmCompRename = class(TfmBaseForm)
     lblOldName: TLabel;
     edtOldName: TEdit;
     lblNewName: TLabel;
@@ -827,7 +828,6 @@ end;
 procedure TfmCompRename.FormCreate(Sender: TObject);
 begin
   SetModalFormPopupMode(Self);
-  GxSetDefaultFont(Self);
   lblReason.Font.Color := clRed;
 end;
 

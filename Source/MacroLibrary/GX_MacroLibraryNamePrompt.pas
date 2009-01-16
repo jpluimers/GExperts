@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
+  Dialogs, StdCtrls, GX_BaseForm;
 
 type
-  TfmMacroLibraryNamePrompt = class(TForm)
+  TfmMacroLibraryNamePrompt = class(TfmBaseForm)
     lblMacroName: TLabel;
     edtMacroName: TEdit;
     chkDoNotShowAgain: TCheckBox;

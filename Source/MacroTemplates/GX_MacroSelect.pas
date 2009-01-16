@@ -3,10 +3,11 @@ unit GX_MacroSelect;
 
 interface
 uses
-  Classes, Controls, Forms, ExtCtrls, StdCtrls, ComCtrls, CommCtrl, GX_MacroFile;
+  Classes, Controls, Forms, ExtCtrls, StdCtrls, ComCtrls, CommCtrl, GX_MacroFile,
+  GX_BaseForm;
 
 type
-  TfmMacroSelect = class(TForm)
+  TfmMacroSelect = class(TfmBaseForm)
     pnlMain: TPanel;
     lvMacros: TListView;
     pnlFooter: TPanel;
@@ -186,7 +187,6 @@ end;
 procedure TfmMacroSelect.FormCreate(Sender: TObject);
 begin
   LoadFormLayout;
-  GxSetDefaultFont(Self);
 end;
 
 procedure TfmMacroSelect.FormClose(Sender: TObject; var Action: TCloseAction);

@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, Controls, ComCtrls, ActnList, Menus, ToolWin, ExtCtrls,
-  Forms, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, Dialogs;
+  Forms, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, Dialogs, GX_BaseForm;
 
 type
-  TfmProjDepend = class(TForm)
+  TfmProjDepend = class(TfmBaseForm)
     StatusBar: TStatusBar;
     tvUnits: TTreeView;
     Splitter: TSplitter;
@@ -750,7 +750,6 @@ constructor TfmProjDepend.Create(AOwner: TComponent);
 begin
   inherited;
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   SetNonModalFormPopupMode(Self);
   FFilterList := TStringList.Create;
 

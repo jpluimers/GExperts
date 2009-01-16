@@ -906,7 +906,6 @@ constructor TfmToDo.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
 
   FIsFirstActivation := True;
   FColumnIndex := -1;

@@ -6,10 +6,10 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, ToolsAPI,
-  RplWizInfo, GX_ReplaceCompData;
+  RplWizInfo, GX_ReplaceCompData, GX_BaseForm;
 
 type
-  TfmReplaceComp = class(TForm)
+  TfmReplaceComp = class(TfmBaseForm)
     lblSeach: TLabel;
     cbSearch: TComboBox;
     lblReplace: TLabel;
@@ -449,8 +449,6 @@ end;
 constructor TfmReplaceComp.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  GxSetDefaultFont(Self);
-
   LoadFormSettings;
   SetupControls;
 end;

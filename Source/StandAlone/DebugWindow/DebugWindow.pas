@@ -420,6 +420,7 @@ resourcestring
   SAlwaysFStayOnTop = '&Always On Top';
 begin
   inherited Create(AOwner);
+  SetDefaultFont(Self);
   SetToolbarGradient(Toolbar);
   Application.OnMessage := ApplicationMsgHandler;
   FStayOnTop := False;

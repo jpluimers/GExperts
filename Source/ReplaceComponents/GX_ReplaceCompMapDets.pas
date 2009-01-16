@@ -6,12 +6,12 @@ interface
 
 uses
   Classes, Graphics, Controls, Forms, ExtCtrls, StdCtrls, ActnList, ImgList,
-  ComCtrls, ToolWin, GX_SharedImages, GX_ReplaceCompData;
+  ComCtrls, ToolWin, GX_SharedImages, GX_ReplaceCompData, GX_BaseForm;
 
 type
   TDataAction = (daUnknown, daInsert, daEdit, daDelete);
 
-  TfmReplaceCompMapDets = class(TForm)
+  TfmReplaceCompMapDets = class(TfmBaseForm)
     Actions: TActionList;
     actAdd: TAction;
     actDelete: TAction;
@@ -106,7 +106,6 @@ type
     procedure SetComboColor(Combo: TComboBox; Color: TColor);
     procedure SetEditsColor(Color: TColor);
     procedure ExecApply;
-    procedure TryFocus(AControl: TWinControl);
     procedure ShowRequiredError(const FieldName: string);
     procedure UpdateItemStatus;
     procedure LoadSettings;
@@ -346,12 +345,6 @@ begin
   MessageDlg(Msg, mtError, [mbOK], 0);
 end;
 
-procedure TfmReplaceCompMapDets.TryFocus(AControl: TWinControl);
-begin
-  if AControl.CanFocus and AControl.Enabled then
-    AControl.SetFocus;
-end;
-
 procedure TfmReplaceCompMapDets.ShowRequiredError(const FieldName: string);
 resourcestring
   SNoFieldValue = 'have to be filled-in!';
@@ -369,31 +362,31 @@ resourcestring
 begin
   if Trim(cbxGroupName.Text) = '' then
   begin
-    TryFocus(cbxGroupName);
+    TryFocusControl(cbxGroupName);
     ShowRequiredError(SGroupName);
     Abort;
   end;
   if Trim(cbxSourceClassName.Text) = '' then
   begin
-    TryFocus(cbxSourceClassName);
+    TryFocusControl(cbxSourceClassName);
     ShowRequiredError(SSourceClass);
     Abort;
   end;
   if Trim(cbxDestClassName.Text) = '' then
   begin
-    TryFocus(cbxDestClassName);
+    TryFocusControl(cbxDestClassName);
     ShowRequiredError(SDestClass);
     Abort;
   end;
   if (Trim(cbxSourcePropName.Text) = '') and (not chkUseConstValue.Checked) then
   begin
-    TryFocus(cbxSourcePropName);
+    TryFocusControl(cbxSourcePropName);
     ShowRequiredError(SSourceProp);
     Abort;
   end;
   if Trim(cbxDestPropName.Text) = '' then
   begin
-    TryFocus(cbxDestPropName);
+    TryFocusControl(cbxDestPropName);
     ShowRequiredError(SDestProp);
     Abort;
   end;
