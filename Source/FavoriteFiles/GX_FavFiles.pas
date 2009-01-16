@@ -6,10 +6,10 @@ interface
 
 uses
   GX_FavUtil, DropTarget, FileView, Windows, SysUtils, Classes, Controls, Forms,
-  ComCtrls, Menus, ExtCtrls, ImgList, ActnList, ToolWin, Dialogs;
+  ComCtrls, Menus, ExtCtrls, ImgList, ActnList, ToolWin, Dialogs, GX_BaseForm;
 
 type
-  TfmFavFiles = class(TForm)
+  TfmFavFiles = class(TfmBaseForm)
     MainMenu: TMainMenu;
     mitFile: TMenuItem;
     mitNewFile: TMenuItem;
@@ -1271,7 +1271,6 @@ begin
   inherited;
 
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   pnlFileView.Caption := '';
   SetNonModalFormPopupMode(Self);
   splTreeView.AutoSnap := False;

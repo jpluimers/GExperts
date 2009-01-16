@@ -4,10 +4,10 @@ unit GX_PerfectLayout;
 
 interface
 
-uses Forms, StdCtrls, Controls, ExtCtrls, Classes;
+uses Forms, StdCtrls, Controls, ExtCtrls, Classes, GX_BaseForm;
 
 type
-  TfmPerfectLayout = class(TForm)
+  TfmPerfectLayout = class(TfmBaseForm)
     gbxLayout: TGroupBox;
     pnlLayout1: TPanel;
     shpMain1: TShape;

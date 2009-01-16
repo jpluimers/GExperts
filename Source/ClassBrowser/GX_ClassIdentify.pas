@@ -3,10 +3,10 @@ unit GX_ClassIdentify;
 interface
 
 uses
-  StdCtrls, Controls, Classes, Forms;
+  StdCtrls, Controls, Classes, Forms, GX_BaseForm;
 
 type
-  TfmClassIdentify = class(TForm)
+  TfmClassIdentify = class(TfmBaseForm)
     gbxIdentifier: TGroupBox;
     lblNotes: TLabel;
     lblIdentifier: TLabel;

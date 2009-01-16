@@ -5,7 +5,7 @@ unit GX_MessageBox;
 interface
 
 uses
-  Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls;
+  Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, GX_BaseForm;
 
 type
   TGxMsgBoxAdaptor = class(TObject)
@@ -38,7 +38,7 @@ type
     function ConfigurationKey: string;
   end;
 
-  TfmGxMessageBox = class(TForm)
+  TfmGxMessageBox = class(TfmBaseForm)
     chkNeverShowAgain: TCheckBox;
     bvlFrame: TBevel;
     mmoMessage: TMemo;
@@ -140,7 +140,6 @@ begin
     begin
       Dlg := TfmGxMessageBox.Create(nil);
       try
-        GxSetDefaultFont(Dlg);
         Dlg.Caption := Adaptor.GetCaption;
         Dlg.chkNeverShowAgain.Enabled := Adaptor.AllowSuppress;
         Dlg.mmoMessage.Lines.Text := Adaptor.GetMessage;

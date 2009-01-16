@@ -3,10 +3,10 @@ unit GX_ClassOptions;
 interface
 
 uses
-  Classes, StdCtrls, Controls, ComCtrls, Forms, ExtCtrls;
+  Classes, StdCtrls, Controls, ComCtrls, Forms, ExtCtrls, GX_BaseForm;
 
 type
-  TfmClassOptions = class(TForm)
+  TfmClassOptions = class(TfmBaseForm)
     pnlButtons: TPanel;
     pnlContent: TPanel;
     pnlButtonsRight: TPanel;

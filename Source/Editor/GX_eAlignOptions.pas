@@ -5,10 +5,10 @@ unit GX_eAlignOptions;
 interface
 
 uses
-  Classes, Controls, StdCtrls, Forms;
+  Classes, Controls, StdCtrls, Forms, GX_BaseForm;
 
 type
-  TfmAlignOptions = class(TForm)
+  TfmAlignOptions = class(TfmBaseForm)
     btnOK: TButton;
     btnCancel: TButton;
     gbxTokens: TGroupBox;

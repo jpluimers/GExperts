@@ -6,7 +6,7 @@ interface
 
 uses
   GX_eSelectionEditorExpert, GX_ConfigurationInfo,
-  Classes, StdCtrls, Controls, Forms;
+  Classes, StdCtrls, Controls, Forms, GX_BaseForm;
 
 type
   TCommentType = (ctSlash, ctC, ctPascal, ctCpp);
@@ -46,7 +46,7 @@ type
     function HasConfigOptions: Boolean; override;
   end;
 
-  TfmCommentConfig = class(TForm)
+  TfmCommentConfig = class(TfmBaseForm)
     GroupBox1: TGroupBox;
     rbSlash: TRadioButton;
     rbC: TRadioButton;

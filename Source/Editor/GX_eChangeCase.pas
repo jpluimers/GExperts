@@ -3,10 +3,10 @@ unit GX_eChangeCase;
 interface
 
 uses
-  Classes, Controls, StdCtrls, ExtCtrls, Forms;
+  Classes, Controls, StdCtrls, ExtCtrls, Forms, GX_BaseForm;
 
 type
-  TfmChangeCase = class(TForm)
+  TfmChangeCase = class(TfmBaseForm)
     grpCaseSelection: TRadioGroup;
     btnOK: TButton;
     btnCancel: TButton;

@@ -10,7 +10,7 @@ uses
   GX_Experts, GX_EnhancedEditor,
   Forms, Controls, StdActns, Classes, ActnList,
   Dialogs, Menus, ComCtrls, ToolWin, ExtCtrls, GpStructuredStorage,
-  GX_GenericUtils;
+  GX_GenericUtils, GX_BaseForm;
 
 type
   TSearchRecord = record
@@ -61,7 +61,7 @@ type
     function GetObjectAttribute(const ObjectName, AttrName: TGXUnicodeString): TGXUnicodeString;
   end;
 
-  TfmCodeLib = class(TForm)
+  TfmCodeLib = class(TfmBaseForm)
     StatusBar: TStatusBar;
     Splitter: TSplitter;
     MainMenu: TMainMenu;
@@ -1186,7 +1186,6 @@ begin
   inherited;
   SetNonModalFormPopupMode(Self);
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   SetupSyntaxHighlightingControl;
 
   Screen.Cursor := crHourglass;

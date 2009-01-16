@@ -5,10 +5,10 @@ unit GX_TabOrder;
 interface
 
 uses
-  Classes, Forms, Controls, ExtCtrls, ToolsAPI, ComCtrls, StdCtrls;
+  Classes, Forms, Controls, ExtCtrls, ToolsAPI, ComCtrls, StdCtrls, GX_BaseForm;
 
 type
-  TfmTabOrder = class(TForm)
+  TfmTabOrder = class(TfmBaseForm)
     gbxComponents: TGroupBox;
     btnOK: TButton;
     btnClose: TButton;
@@ -27,7 +27,6 @@ type
     procedure tvCompsKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnOrderByPositionClick(Sender: TObject);
     procedure btnResetOrderClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
   private
     FormEditor: IOTAFormEditor;
     FBiDiMode: TBiDiMode;
@@ -458,11 +457,6 @@ end;
 procedure TfmTabOrder.btnResetOrderClick(Sender: TObject);
 begin
   SortTreeViewComponentsByOriginalTabOrder;
-end;
-
-procedure TfmTabOrder.FormCreate(Sender: TObject);
-begin
-  GxSetDefaultFont(Self);
 end;
 
 initialization

@@ -4,10 +4,10 @@ interface
 
 uses
   Classes, Windows, Controls, Forms,
-  StdCtrls, ExtCtrls, ComCtrls, ActnList, Buttons;
+  StdCtrls, ExtCtrls, ComCtrls, ActnList, Buttons, GX_BaseForm;
 
 type
-  TfmToolbarConfig = class(TForm)
+  TfmToolbarConfig = class(TfmBaseForm)
     Actions: TActionList;
     actAddButton: TAction;
     actRemoveButton: TAction;

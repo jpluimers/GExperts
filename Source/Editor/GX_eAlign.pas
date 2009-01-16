@@ -7,10 +7,10 @@ unit GX_eAlign;
 interface
 
 uses
-  Classes, Controls, StdCtrls, Forms, Menus;
+  Classes, Controls, StdCtrls, Forms, Menus, GX_BaseForm;
 
 type
-  TfmAlign = class(TForm)
+  TfmAlign = class(TfmBaseForm)
     btnOK: TButton;
     btnCancel: TButton;
     lstTokens: TListBox;

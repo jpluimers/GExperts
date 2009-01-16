@@ -3,10 +3,10 @@ unit GX_ClassParsing;
 interface
 
 uses
-  ComCtrls, Controls, Classes, StdCtrls, Forms;
+  ComCtrls, Controls, Classes, StdCtrls, Forms, GX_BaseForm;
 
 type
-  TfmClassParsing = class(TForm)
+  TfmClassParsing = class(TfmBaseForm)
     aniFlashlight: TAnimate;
     lblParsing: TLabel;
     Progress: TProgressBar;

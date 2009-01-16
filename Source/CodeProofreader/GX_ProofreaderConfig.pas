@@ -7,13 +7,14 @@ interface
 uses
   Classes, Controls, Forms, Dialogs, ComCtrls, StdCtrls,
   ActnList, ToolWin, ExtCtrls, Menus, Messages,
-  GX_ProofreaderExpert, GX_ProofreaderData, GX_ProofreaderUtils, GX_SharedImages;
+  GX_ProofreaderExpert, GX_ProofreaderData, GX_ProofreaderUtils, GX_SharedImages,
+  GX_BaseForm;
 
 const
   UM_UPDATECOLS = WM_USER + 632;
 
 type
-  TfmProofreaderConfig = class(TForm)
+  TfmProofreaderConfig = class(TfmBaseForm)
     dlgGetWordlist: TOpenDialog;
     dlgPutWordlist: TSaveDialog;
     Actions: TActionList;
@@ -129,7 +130,6 @@ begin
 
   SetToolbarGradient(tbrReplacement);
   SetToolbarGradient(tbrDictionary);
-  GxSetDefaultFont(Self);
   Assert(Assigned(ProofreaderExpert));
   FProofreaderExpert := ProofreaderExpert;
   Assert(Assigned(ProofreaderData));

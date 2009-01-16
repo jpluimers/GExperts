@@ -3,10 +3,10 @@ unit GX_FavFileProp;
 interface
 
 uses
-  Classes, Controls, Forms, ExtCtrls, StdCtrls, ComCtrls;
+  Classes, Controls, Forms, ExtCtrls, StdCtrls, ComCtrls, GX_BaseForm;
 
 type
-  TfmFavFileProp = class(TForm)
+  TfmFavFileProp = class(TfmBaseForm)
     pgeProperties: TPageControl;
     tabProperties: TTabSheet;
     lblFile: TLabel;

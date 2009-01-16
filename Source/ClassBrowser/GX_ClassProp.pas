@@ -3,10 +3,10 @@ unit GX_ClassProp;
 interface
 
 uses
-  StdCtrls, Controls, ComCtrls, Classes, Forms;
+  StdCtrls, Controls, ComCtrls, Classes, Forms, GX_BaseForm;
 
 type
-  TfmClassProp = class(TForm)
+  TfmClassProp = class(TfmBaseForm)
     pgeProperties: TPageControl;
     tabProps: TTabSheet;
     lblClassName: TLabel;

@@ -3,10 +3,10 @@ unit GX_ClipboardOptions;
 interface
 
 uses
-  Classes, StdCtrls, Controls, Forms;
+  Classes, StdCtrls, Controls, Forms, GX_BaseForm;
 
 type
-  TfmClipboardOptions = class(TForm)
+  TfmClipboardOptions = class(TfmBaseForm)
     gbxClipboardOptions: TGroupBox;
     lblMaxEntries: TLabel;
     edtMaxClip: TEdit;

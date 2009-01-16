@@ -4,10 +4,10 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls,
-  GX_ProofreaderUtils;
+  GX_ProofreaderUtils, GX_BaseForm;
 
 type
-  TfmProofreaderAutoCorrectEntry = class(TForm)
+  TfmProofreaderAutoCorrectEntry = class(TfmBaseForm)
     lblReplaceWhat: TLabel;
     edtReplaceWhat: TEdit;
     btnOK: TButton;

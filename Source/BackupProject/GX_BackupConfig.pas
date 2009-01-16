@@ -5,10 +5,10 @@ unit GX_BackupConfig;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls;
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
 
 type
-  TfmBackupConfig = class(TForm)
+  TfmBackupConfig = class(TfmBaseForm)
     gbxOptions: TGroupBox;
     cbBackupInc: TCheckBox;
     cbIncludeDir: TCheckBox;

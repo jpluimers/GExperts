@@ -3,10 +3,10 @@ unit GX_CodeSrch;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls;
+  Classes, Controls, Forms, StdCtrls, GX_BaseForm;
 
 type
-  TfmCodeSearch = class(TForm)
+  TfmCodeSearch = class(TfmBaseForm)
     lblFind: TLabel;
     edSearch: TEdit;
     gbxOptions: TGroupBox;

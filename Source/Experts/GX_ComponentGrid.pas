@@ -6,10 +6,10 @@ interface
 
 uses
   GX_Experts, Classes, Controls, Forms, Grids, SortGrid,
-  StdCtrls, ComCtrls, ActnList, ToolWin;
+  StdCtrls, ComCtrls, ActnList, ToolWin, GX_BaseForm;
 
 type
-  TfmComponentGrid = class(TForm)
+  TfmComponentGrid = class(TfmBaseForm)
     ToolBar: TToolBar;
     tbnSave: TToolButton;
     tbnSep1: TToolButton;
@@ -440,7 +440,6 @@ end;
 procedure TfmComponentGrid.FormCreate(Sender: TObject);
 begin
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   StringGrid := TSortGrid.Create(Self);
   with StringGrid do
   begin

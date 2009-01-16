@@ -3,10 +3,10 @@ unit GX_EditorShortcut;
 interface
 
 uses
-  Classes, Controls, StdCtrls, ComCtrls, Forms, GXHotKey;
+  Classes, Controls, StdCtrls, ComCtrls, Forms, GXHotKey, GX_BaseForm;
 
 type
-  TfmEditorShortcut = class(TForm)
+  TfmEditorShortcut = class(TfmBaseForm)
     gbxShortCut: TGroupBox;
     lblShortCut: TLabel;
     btnCancel: TButton;

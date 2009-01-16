@@ -4,7 +4,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls,
-  GX_EditorExpert, GX_ConfigurationInfo;
+  GX_EditorExpert, GX_ConfigurationInfo, GX_BaseForm;
 
 type
   TDateExpert = class(TEditorExpert)
@@ -24,7 +24,7 @@ type
   end;
 
 type
-  TfmDateFormat = class(TForm)
+  TfmDateFormat = class(TfmBaseForm)
     lblFormat: TLabel;
     cbFormat: TComboBox;
     btnOK: TButton;

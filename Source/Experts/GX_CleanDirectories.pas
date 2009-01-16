@@ -11,12 +11,12 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, CheckLst, ExtCtrls, ActnList, Menus,
-  GX_Experts, GX_ConfigurationInfo;
+  GX_Experts, GX_ConfigurationInfo, GX_BaseForm;
 
 type
   TCleanExpert = class;
 
-  TfmCleanDirectories = class(TForm)
+  TfmCleanDirectories = class(TfmBaseForm)
     ActionList: TActionList;
     actDirsCheckAll: TAction;
     actDirsUncheckAll: TAction;
@@ -428,7 +428,6 @@ var
 begin
   laStatus.Caption := '';
   LoadSettings;
-  GxSetDefaultFont(Self);
 
   if CleanExpert.ExtensionList.Count > 0 then
     clbExtensions.Items.Assign(CleanExpert.ExtensionList)

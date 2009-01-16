@@ -3,10 +3,10 @@ unit GX_ClassReport;
 interface
 
 uses
-  StdCtrls, Controls, Classes, Forms, ComCtrls;
+  StdCtrls, Controls, Classes, Forms, ComCtrls, GX_BaseForm;
 
 type
-  TfmClassReport = class(TForm)
+  TfmClassReport = class(TfmBaseForm)
     gbxPageSettings: TGroupBox;
     lblFont: TLabel;
     lblFontSize: TLabel;

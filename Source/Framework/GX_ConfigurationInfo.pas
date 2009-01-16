@@ -135,7 +135,7 @@ uses
   SysUtils,
   GX_EditorEnhancements, GX_MessageBox,
   GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils, GX_VerDepConst,
-  Math, GX_BaseForm;
+  Math, GX_BaseForm, GX_IdeDock;
 
 type
   TConfigInfo = class(TSingletonInterfacedObject, IConfigInfo)
@@ -608,7 +608,7 @@ begin
   for i := 0 to Screen.FormCount - 1 do
   begin
     Form := Screen.Forms[i];
-    if Form is TfmBaseForm then
+    if (Form is TfmBaseForm) or (Form is TfmIdeDockForm) then
       Form.Font.Assign(FCustomFont);
   end;
 end;

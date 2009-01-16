@@ -3,10 +3,10 @@ unit GX_FavOptions;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls;
+  Classes, Controls, Forms, StdCtrls, GX_BaseForm;
 
 type
-  TfmFavOptions = class(TForm)
+  TfmFavOptions = class(TfmBaseForm)
     gbxFavOptions: TGroupBox;
     chkConfirmFolderDelete: TCheckBox;
     chkExpandAllOnLoad: TCheckBox;

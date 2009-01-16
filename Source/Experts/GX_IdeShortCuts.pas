@@ -652,7 +652,6 @@ end;
 
 procedure TfmIdeShortCuts.FormCreate(Sender: TObject);
 begin
-  GxSetDefaultFont(Self);
   hkShortCut := TGXHotKey.Create(Self);
   hkShortCut.Parent := pnlControls;
   hkShortCut.SetBounds(edtMenuStructure.Left, lblShortCut.Top - 3, 150, edtMenuStructure.Height);

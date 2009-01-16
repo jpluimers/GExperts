@@ -3,10 +3,10 @@ unit GX_CodeOpt;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls;
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls, GX_BaseForm;
 
 type
-  TfmCodeOptions = class(TForm)
+  TfmCodeOptions = class(TfmBaseForm)
     btnOK: TButton;
     btnCancel: TButton;
     pgeCodeOpt: TPageControl;

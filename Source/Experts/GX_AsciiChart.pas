@@ -9,10 +9,10 @@ interface
 
 uses
   Forms, ExtCtrls, Controls, Classes, StdCtrls, Menus, ComCtrls, ActnList,
-  ToolWin, ImgList;
+  ToolWin, ImgList, GX_BaseForm;
 
 type
-  TfmAsciiChart = class(TForm)
+  TfmAsciiChart = class(TfmBaseForm)
     pmContext: TPopupMenu;
     mitSep4: TMenuItem;
     mitAbout: TMenuItem;
@@ -150,6 +150,8 @@ const
     'Substitute', 'Escape', 'File Separator', 'Group Separator',
     'Record Separator', 'Unit Separator');
 
+  MinimumDisplayFontSize = 4;
+  MaximumDisplayFontSize = 26;
   DefaultDisplayFontSize = 10;
   DefaultFontName = 'Tahoma';
 
@@ -504,9 +506,6 @@ begin
 end;
 
 procedure TfmAsciiChart.edFontSizeChange(Sender: TObject);
-const
-  MinimumDisplayFontSize = 6;
-  MaximumDisplayFontSize = 26;
 var
   NewFontSize: Integer;
 begin
@@ -722,10 +721,11 @@ begin
   inherited;
 
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   SetNonModalFormPopupMode(Self);
   GetFonts;
   CenterForm(Self);
+  updFontSize.Max := MaximumDisplayFontSize;
+  updFontSize.Min := MinimumDisplayFontSize;
   Settings := TGExpertsSettings.Create;
   try
     // Do not localize any of the following items.

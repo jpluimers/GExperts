@@ -7,7 +7,7 @@ interface
 uses
   Classes, Controls, Forms, ExtCtrls, Dialogs, StdCtrls,
   ToolsAPI, GX_Progress, GX_Experts, GX_ConfigurationInfo,
-  GX_Zipper, AbArcTyp, AbUtils;
+  GX_Zipper, AbArcTyp, AbUtils, GX_BaseForm;
 
 type
   TBackupExpert = class;
@@ -16,7 +16,7 @@ type
 
   TBackupScope = (bsActiveProject, bsProjectGroup);
 
-  TfmBackup = class(TForm)
+  TfmBackup = class(TfmBaseForm)
     pnlButtons: TPanel;
     pnlFiles: TPanel;
     gbxFiles: TGroupBox;
@@ -413,7 +413,6 @@ end;
 constructor TfmBackup.Create(AOwner: TComponent);
 begin
   inherited;
-  GxSetDefaultFont(Self);
 
   FLibraryPath := TStringList.Create;
   FLibraryPath.Duplicates := dupIgnore;

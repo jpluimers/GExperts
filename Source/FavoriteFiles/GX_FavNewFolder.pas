@@ -3,10 +3,10 @@ unit GX_FavNewFolder;
 interface
 
 uses
-  Windows, Classes, Controls, Forms, StdCtrls;
+  Windows, Classes, Controls, Forms, StdCtrls, GX_BaseForm;
 
 type
-  TfmFavNewFolder = class(TForm)
+  TfmFavNewFolder = class(TfmBaseForm)
     gbxNewFolder: TGroupBox;
     lblFolderName: TLabel;
     edtFolderName: TEdit;

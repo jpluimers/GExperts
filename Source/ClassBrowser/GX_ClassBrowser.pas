@@ -10,12 +10,12 @@ interface
 uses
   GX_ClassMgr, GX_ClassParsing, GX_Experts, GX_OtaUtils, GX_EnhancedEditor,
   Classes, Controls, Forms, Dialogs, ActnList, ToolWin, ToolsAPI,
-  Graphics, Menus, ExtCtrls, ComCtrls, ImgList;
+  Graphics, Menus, ExtCtrls, ComCtrls, ImgList, GX_BaseForm;
 
 type
   TInfoViewMode = (vmList, vmTree);
 
-  TfmClassBrowser = class(TForm)
+  TfmClassBrowser = class(TfmBaseForm)
     StatusBar: TStatusBar;
     Splitter1: TSplitter;
     pnlData: TPanel;
@@ -1411,7 +1411,6 @@ begin
   SetToolbarGradient(tbMain);
   SetToolbarGradient(tbKinds);
   SetToolbarGradient(tbVisibility);
-  GxSetDefaultFont(Self);
 
   SetNonModalFormPopupMode(Self);
   FStartingDir := ExtractFilePath(Application.ExeName);

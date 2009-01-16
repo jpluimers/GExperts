@@ -10,12 +10,13 @@ interface
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, ComCtrls, ActnList;
+  Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, ComCtrls, ActnList,
+  GX_BaseForm;
 
 type
   TFeedbackType = (fbBug, fbFeature);
 
-  TfmFeedbackWizard = class(TForm)
+  TfmFeedbackWizard = class(TfmBaseForm)
     pnlTop: TPanel;
     pnlHeader: TPanel;
     lblFeeedback: TLabel;
@@ -866,4 +867,3 @@ begin
 end;
 
 end.
-

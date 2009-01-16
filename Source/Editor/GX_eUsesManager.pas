@@ -7,7 +7,7 @@ interface
 uses
   Classes, Controls, Forms, Menus, ComCtrls,
   ExtCtrls, ActnList, Dialogs, StdCtrls,
-  GX_ConfigurationInfo, GX_EditorExpert, GX_GenericUtils;
+  GX_ConfigurationInfo, GX_EditorExpert, GX_GenericUtils, GX_BaseForm;
 
 type
   TUsesExpert = class(TEditorExpert)
@@ -30,7 +30,7 @@ type
   end;
 
 type
-  TfmUsesManager = class(TForm)
+  TfmUsesManager = class(TfmBaseForm)
     pnlUnits: TPanel;
     Splitter: TSplitter;
     pmuUses: TPopupMenu;

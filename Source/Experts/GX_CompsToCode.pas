@@ -21,10 +21,10 @@ interface
 
 uses
   GX_Experts, GX_ConfigurationInfo,
-  Classes, Controls, Forms, StdCtrls, ExtCtrls, ActnList;
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, ActnList, GX_BaseForm;
 
 type
-  TfmCompsToCode = class(TForm)
+  TfmCompsToCode = class(TfmBaseForm)
     btnOK: TButton;
     btnCancel: TButton;
     rgpBinProps: TRadioGroup;

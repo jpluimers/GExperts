@@ -457,7 +457,6 @@ begin
   inherited;
 
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   {$IFOPT D+} SendDebug('Creating clipboard history data list'); {$ENDIF}
   FDataList := TList.Create;
   SplitterRatio := 0.50;

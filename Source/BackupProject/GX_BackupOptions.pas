@@ -5,10 +5,10 @@ unit GX_BackupOptions;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls;
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
 
 type
-  TfmBackupOptions = class(TForm)
+  TfmBackupOptions = class(TfmBaseForm)
     gbBackupOptions: TGroupBox;
     btnOK: TButton;
     btnCancel: TButton;
@@ -22,7 +22,7 @@ type
 
 implementation
 
-uses Graphics;
+uses Graphics, GX_GenericUtils;
 
 {$R *.dfm}
 
@@ -32,12 +32,7 @@ begin
   if edPassword.Enabled then
   begin
     edPassword.Color := clWindow;
-    try
-      if edPassword.CanFocus and Visible then
-        edPassword.SetFocus;
-    except
-      // Ignore all exceptions.
-    end;
+    TryFocusControl(edPassword);
   end
   else
     edPassword.Color := clBtnface;

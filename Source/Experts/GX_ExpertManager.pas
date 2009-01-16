@@ -10,12 +10,12 @@ interface
 uses
   DropTarget, DropSource,
   Windows, Classes, ImgList, Controls, Forms, Dialogs,
-  Menus, ComCtrls, ActnList, ToolWin, GX_Experts;
+  Menus, ComCtrls, ActnList, ToolWin, GX_Experts, GX_BaseForm;
 
 type
   TExpertManagerExpert = class;
 
-  TfmExpertManager = class(TForm)
+  TfmExpertManager = class(TfmBaseForm)
     lvExperts: TListView;
     dlgAddExpert: TOpenDialog;
     pmItems: TPopupMenu;
@@ -247,7 +247,6 @@ begin
   inherited Create(AOwner);
 
   SetToolbarGradient(ToolBar);
-  GxSetDefaultFont(Self);
   SetNonModalFormPopupMode(Self);
 
   FFileDrop := TDropFileTarget.Create(nil);

@@ -8,7 +8,7 @@ interface
 
 uses
   Classes, Forms, Controls, ExtCtrls, ToolsAPI, ComCtrls, StdCtrls, Dialogs,
-  ActnList, ImgList, Graphics, Buttons, DesignWindows;
+  ActnList, ImgList, Graphics, Buttons, DesignWindows, GX_BaseForm;
 
 type
   TComponentInfo = record
@@ -16,7 +16,7 @@ type
     rType: WideString;
   end;
 
-  TSelectComponentsForm = class(TForm)
+  TSelectComponentsForm = class(TfmBaseForm)
     TreeView: TTreeView;
     ActionList: TActionList;
     FindPanel: TPanel;
@@ -440,8 +440,7 @@ end;
 
 procedure TSelectComponentsForm.FocusSearchEdit;
 begin
-  if SearchEdit.CanFocus then
-    SearchEdit.SetFocus;
+  TryFocusControl(SearchEdit);
 end;
 
 procedure TSelectComponentsForm.FormActivate(Sender: TObject);
