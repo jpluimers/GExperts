@@ -30,6 +30,7 @@ object fmDateFormat: TfmDateFormat
     Top = 9
     Width = 209
     Height = 22
+    DropDownCount = 18
     ItemHeight = 14
     TabOrder = 0
     Text = 'cbFormat'

@@ -160,26 +160,13 @@ object fmConfiguration: TfmConfiguration
           Anchors = [akLeft, akTop, akRight]
           Caption = 'User Interface'
           TabOrder = 1
-          DesignSize = (
-            469
-            65)
-          object Button3: TButton
-            Left = 436
-            Top = 136
-            Width = 21
-            Height = 21
-            Anchors = [akTop, akRight]
-            Caption = '...'
-            TabOrder = 0
-            OnClick = sbHelpFileClick
-          end
           object chkUseCustomFont: TCheckBox
             Left = 16
             Top = 27
             Width = 153
             Height = 21
             Caption = 'Use custom UI font'
-            TabOrder = 1
+            TabOrder = 0
           end
           object btnCustomFont: TButton
             Left = 176
@@ -187,7 +174,7 @@ object fmConfiguration: TfmConfiguration
             Width = 75
             Height = 25
             Caption = 'Font...'
-            TabOrder = 2
+            TabOrder = 1
             OnClick = btnCustomFontClick
           end
         end
