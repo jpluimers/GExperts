@@ -1,16 +1,15 @@
 object fmMacroSelect: TfmMacroSelect
   Left = 366
   Top = 321
-  AutoScroll = False
+  Width = 439
+  Height = 281
   BorderStyle = bsSizeToolWin
   Caption = 'Select Macro Template'
-  ClientHeight = 245
-  ClientWidth = 423
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -10
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
@@ -21,7 +20,7 @@ object fmMacroSelect: TfmMacroSelect
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlMain: TPanel
     Left = 0
     Top = 0
@@ -90,9 +89,9 @@ object fmMacroSelect: TfmMacroSelect
       BevelOuter = bvNone
       TabOrder = 1
       object btnConfiguration: TButton
-        Left = 21
+        Left = 15
         Top = 1
-        Width = 97
+        Width = 103
         Height = 25
         Caption = '&Configuration...'
         TabOrder = 0

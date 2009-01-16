@@ -4,23 +4,23 @@ object fmChangeCase: TfmChangeCase
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Change Case'
-  ClientHeight = 170
-  ClientWidth = 173
+  ClientHeight = 176
+  ClientWidth = 181
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object grpCaseSelection: TRadioGroup
-    Left = 10
-    Top = 7
-    Width = 155
+    Left = 11
+    Top = 8
+    Width = 161
     Height = 125
     Caption = 'Change Case'
     Items.Strings = (
@@ -32,8 +32,8 @@ object fmChangeCase: TfmChangeCase
     TabOrder = 0
   end
   object btnOK: TButton
-    Left = 9
-    Top = 137
+    Left = 10
+    Top = 141
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -42,8 +42,8 @@ object fmChangeCase: TfmChangeCase
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 89
-    Top = 137
+    Left = 96
+    Top = 141
     Width = 75
     Height = 25
     Cancel = True

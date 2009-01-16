@@ -7,19 +7,19 @@ object fmGxMacroLibraryConfig: TfmGxMacroLibraryConfig
   ClientHeight = 73
   ClientWidth = 218
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object chk_AutoPrompt: TCheckBox
     Left = 16
     Top = 16
-    Width = 169
+    Width = 193
     Height = 17
     Caption = 'Auto-Prompt for Name'
     TabOrder = 0

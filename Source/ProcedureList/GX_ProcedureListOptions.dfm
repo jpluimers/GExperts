@@ -5,23 +5,23 @@ object fmProcedureListOptions: TfmProcedureListOptions
   BorderStyle = bsDialog
   Caption = 'Procedure List Configuration'
   ClientHeight = 196
-  ClientWidth = 508
+  ClientWidth = 526
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   OnShow = FormShow
   DesignSize = (
-    508
+    526
     196)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object btnOK: TButton
-    Left = 332
+    Left = 350
     Top = 159
     Width = 75
     Height = 26
@@ -33,7 +33,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
     OnClick = btnOKClick
   end
   object btnCancel: TButton
-    Left = 419
+    Left = 437
     Top = 159
     Width = 75
     Height = 26
@@ -44,7 +44,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
     TabOrder = 3
   end
   object gbCodeView: TGroupBox
-    Left = 270
+    Left = 288
     Top = 9
     Width = 225
     Height = 140
@@ -54,17 +54,17 @@ object fmProcedureListOptions: TfmProcedureListOptions
     object lblDock: TLabel
       Left = 16
       Top = 50
-      Width = 26
-      Height = 13
+      Width = 27
+      Height = 14
       Caption = 'Dock'
     end
     object cbCVDock: TComboBox
       Left = 64
       Top = 46
       Width = 145
-      Height = 21
+      Height = 22
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 14
       TabOrder = 1
       OnChange = cbCVDockChange
       Items.Strings = (
@@ -82,9 +82,9 @@ object fmProcedureListOptions: TfmProcedureListOptions
       TabOrder = 2
     end
     object btnChangeCodeViewFont: TButton
-      Left = 134
+      Left = 130
       Top = 86
-      Width = 80
+      Width = 85
       Height = 25
       Caption = 'Change Font'
       TabOrder = 3
@@ -102,7 +102,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
   object gbDialog: TGroupBox
     Left = 12
     Top = 9
-    Width = 247
+    Width = 265
     Height = 140
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Procedure List'
@@ -118,7 +118,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
     object btnChgDialogFont: TButton
       Left = 134
       Top = 96
-      Width = 80
+      Width = 85
       Height = 25
       Caption = 'Change Font'
       TabOrder = 4
@@ -127,7 +127,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
     object chkShowObjectName: TCheckBox
       Left = 16
       Top = 22
-      Width = 220
+      Width = 246
       Height = 17
       Caption = 'Show object names'
       TabOrder = 0
@@ -135,7 +135,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
     object chkMatchAnywhere: TCheckBox
       Left = 16
       Top = 65
-      Width = 220
+      Width = 246
       Height = 17
       Caption = 'Match anywhere in the name'
       TabOrder = 2
@@ -143,7 +143,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
     object chkMatchClass: TCheckBox
       Left = 16
       Top = 43
-      Width = 220
+      Width = 246
       Height = 17
       Caption = 'Match in both class and method names'
       TabOrder = 1

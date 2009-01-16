@@ -9,10 +9,10 @@ object fmBackup: TfmBackup
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 400
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -21,7 +21,7 @@ object fmBackup: TfmBackup
   OnActivate = FormActivate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlButtons: TPanel
     Left = 0
     Top = 397
@@ -91,9 +91,9 @@ object fmBackup: TfmBackup
       TabOrder = 0
       object pnlFileList: TPanel
         Left = 2
-        Top = 15
+        Top = 16
         Width = 584
-        Height = 332
+        Height = 331
         Align = alClient
         BevelOuter = bvNone
         BorderWidth = 6
@@ -103,9 +103,9 @@ object fmBackup: TfmBackup
           Left = 6
           Top = 6
           Width = 572
-          Height = 320
+          Height = 319
           Align = alClient
-          ItemHeight = 13
+          ItemHeight = 14
           MultiSelect = True
           TabOrder = 0
           OnKeyDown = lbFilesKeyDown

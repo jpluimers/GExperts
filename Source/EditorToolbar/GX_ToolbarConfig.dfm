@@ -9,16 +9,16 @@ object fmToolbarConfig: TfmToolbarConfig
   Color = clBtnFace
   Constraints.MinHeight = 340
   Constraints.MinWidth = 450
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlButtons: TPanel
     Left = 0
     Top = 327
@@ -90,7 +90,7 @@ object fmToolbarConfig: TfmToolbarConfig
         Left = 6
         Top = 6
         Width = 125
-        Height = 18
+        Height = 19
         Align = alTop
         BevelOuter = bvNone
         Caption = 'Categories'
@@ -98,11 +98,11 @@ object fmToolbarConfig: TfmToolbarConfig
       end
       object lbCategories: TListBox
         Left = 6
-        Top = 24
+        Top = 25
         Width = 125
-        Height = 297
+        Height = 296
         Align = alClient
-        ItemHeight = 13
+        ItemHeight = 14
         TabOrder = 1
         OnClick = lbCategoriesClick
       end
@@ -120,7 +120,7 @@ object fmToolbarConfig: TfmToolbarConfig
         Left = 6
         Top = 6
         Width = 234
-        Height = 18
+        Height = 19
         Align = alTop
         BevelOuter = bvNone
         Caption = 'Available Buttons'
@@ -128,9 +128,9 @@ object fmToolbarConfig: TfmToolbarConfig
       end
       object lbAvailable: TListBox
         Left = 6
-        Top = 24
+        Top = 25
         Width = 234
-        Height = 297
+        Height = 296
         Style = lbOwnerDrawFixed
         Align = alClient
         DragMode = dmAutomatic
@@ -155,7 +155,7 @@ object fmToolbarConfig: TfmToolbarConfig
         Left = 6
         Top = 6
         Width = 165
-        Height = 18
+        Height = 19
         Align = alTop
         BevelOuter = bvNone
         Caption = 'Editor Toolbar Buttons'
@@ -163,9 +163,9 @@ object fmToolbarConfig: TfmToolbarConfig
       end
       object lbToolbar: TListBox
         Left = 6
-        Top = 24
+        Top = 25
         Width = 165
-        Height = 271
+        Height = 270
         Style = lbOwnerDrawFixed
         Align = alClient
         DragMode = dmAutomatic

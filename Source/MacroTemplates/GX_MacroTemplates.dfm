@@ -9,10 +9,10 @@ object fmMacroTemplates: TfmMacroTemplates
   Color = clBtnFace
   Constraints.MinHeight = 387
   Constraints.MinWidth = 353
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -10
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -22,7 +22,7 @@ object fmMacroTemplates: TfmMacroTemplates
   OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object PageControl: TPageControl
     Left = 0
     Top = 0
@@ -156,7 +156,7 @@ object fmMacroTemplates: TfmMacroTemplates
         Left = 0
         Top = 178
         Width = 576
-        Height = 177
+        Height = 176
         Align = alClient
         BevelOuter = bvNone
         FullRepaint = False
@@ -165,7 +165,7 @@ object fmMacroTemplates: TfmMacroTemplates
           Left = 0
           Top = 0
           Width = 576
-          Height = 177
+          Height = 176
           Align = alClient
           BevelOuter = bvNone
           FullRepaint = False
@@ -174,7 +174,7 @@ object fmMacroTemplates: TfmMacroTemplates
             Left = 420
             Top = 0
             Width = 5
-            Height = 177
+            Height = 176
             Cursor = crHSplit
             Align = alRight
             AutoSnap = False
@@ -184,7 +184,7 @@ object fmMacroTemplates: TfmMacroTemplates
             Left = 0
             Top = 0
             Width = 420
-            Height = 177
+            Height = 176
             Align = alClient
             BevelOuter = bvNone
             BorderWidth = 5
@@ -202,7 +202,7 @@ object fmMacroTemplates: TfmMacroTemplates
             Left = 425
             Top = 0
             Width = 151
-            Height = 177
+            Height = 176
             Align = alRight
             BevelOuter = bvNone
             BorderWidth = 5
@@ -212,7 +212,7 @@ object fmMacroTemplates: TfmMacroTemplates
             OnResize = pnlUsesResize
             object pnlUsesImplementation: TPanel
               Left = 5
-              Top = 84
+              Top = 83
               Width = 141
               Height = 88
               Align = alBottom
@@ -221,9 +221,9 @@ object fmMacroTemplates: TfmMacroTemplates
               TabOrder = 1
               object lvLocalUses: TListView
                 Left = 0
-                Top = 17
+                Top = 18
                 Width = 141
-                Height = 71
+                Height = 70
                 Align = alClient
                 Columns = <
                   item
@@ -245,7 +245,7 @@ object fmMacroTemplates: TfmMacroTemplates
                 Left = 0
                 Top = 0
                 Width = 141
-                Height = 17
+                Height = 18
                 Align = alTop
                 BevelOuter = bvNone
                 Caption = 'Add to Implementation'
@@ -257,7 +257,7 @@ object fmMacroTemplates: TfmMacroTemplates
               Left = 5
               Top = 5
               Width = 141
-              Height = 79
+              Height = 78
               Align = alClient
               BevelOuter = bvNone
               FullRepaint = False
@@ -266,7 +266,7 @@ object fmMacroTemplates: TfmMacroTemplates
                 Left = 0
                 Top = 16
                 Width = 141
-                Height = 63
+                Height = 62
                 Align = alClient
                 Columns = <
                   item
@@ -305,54 +305,54 @@ object fmMacroTemplates: TfmMacroTemplates
       object grpUserDetails: TGroupBox
         Left = 16
         Top = 16
-        Width = 304
+        Width = 353
         Height = 69
         Caption = 'User Details'
         TabOrder = 0
         object lblFullName: TLabel
           Left = 10
-          Top = 20
-          Width = 47
-          Height = 13
+          Top = 19
+          Width = 52
+          Height = 14
           Caption = '&Full Name'
           FocusControl = edProgrammerName
         end
         object lblInitials: TLabel
-          Left = 227
-          Top = 20
-          Width = 29
-          Height = 13
+          Left = 267
+          Top = 19
+          Width = 33
+          Height = 14
           Caption = 'I&nitials'
           FocusControl = edInitials
         end
         object edProgrammerName: TEdit
           Left = 10
           Top = 36
-          Width = 207
-          Height = 21
+          Width = 243
+          Height = 22
           TabOrder = 0
           OnChange = edProgrammerNameChange
         end
         object edInitials: TEdit
-          Left = 227
+          Left = 267
           Top = 36
-          Width = 62
-          Height = 21
+          Width = 68
+          Height = 22
           TabOrder = 1
         end
       end
       object grpSequenceNumber: TGroupBox
         Left = 16
         Top = 97
-        Width = 304
+        Width = 353
         Height = 65
         Caption = 'Sequence Number'
         TabOrder = 1
         object lblCurrentValue: TLabel
-          Left = 16
+          Left = 13
           Top = 30
-          Width = 64
-          Height = 13
+          Width = 75
+          Height = 14
           Caption = 'Current &Value'
           FocusControl = edGenValue
         end
@@ -360,7 +360,7 @@ object fmMacroTemplates: TfmMacroTemplates
           Left = 104
           Top = 26
           Width = 105
-          Height = 21
+          Height = 22
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 0
@@ -378,43 +378,43 @@ object fmMacroTemplates: TfmMacroTemplates
       object gbxExpansion: TGroupBox
         Left = 16
         Top = 177
-        Width = 304
+        Width = 353
         Height = 121
         Caption = 'Template Expansion'
         TabOrder = 2
         object lblExpandDelay: TLabel
           Left = 16
           Top = 44
-          Width = 27
-          Height = 13
+          Width = 29
+          Height = 14
           Caption = '&Delay'
           FocusControl = tbExpandDelay
         end
         object lb01Sec: TLabel
           Left = 16
           Top = 92
-          Width = 26
-          Height = 13
+          Width = 29
+          Height = 14
           Caption = '0 sec'
         end
         object lbl2Sec: TLabel
           Left = 264
           Top = 92
-          Width = 26
-          Height = 13
+          Width = 29
+          Height = 14
           Caption = '2 sec'
         end
         object lbl1Sec: TLabel
           Left = 140
           Top = 92
-          Width = 26
-          Height = 13
+          Width = 29
+          Height = 14
           Caption = '1 sec'
         end
         object cbExpandWithChar: TCheckBox
           Left = 16
           Top = 22
-          Width = 281
+          Width = 332
           Height = 17
           Caption = 'Auto-e&xpand typed templates after pressing space'
           TabOrder = 0

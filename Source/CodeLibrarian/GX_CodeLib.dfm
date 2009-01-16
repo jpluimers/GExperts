@@ -6,10 +6,10 @@ object fmCodeLib: TfmCodeLib
   ClientHeight = 369
   ClientWidth = 536
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   Menu = MainMenu
@@ -20,7 +20,7 @@ object fmCodeLib: TfmCodeLib
   OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter: TSplitter
     Left = 169
     Top = 24
@@ -40,7 +40,9 @@ object fmCodeLib: TfmCodeLib
       item
         Width = 70
       end>
+    ParentFont = True
     SimplePanel = False
+    UseSystemFont = False
     OnResize = StatusBarResize
   end
   object pnlView: TPanel

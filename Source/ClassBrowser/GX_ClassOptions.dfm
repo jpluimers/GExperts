@@ -9,17 +9,17 @@ object fmClassOptions: TfmClassOptions
   Color = clBtnFace
   Constraints.MinHeight = 365
   Constraints.MinWidth = 360
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlContent: TPanel
     Left = 0
     Top = 0
@@ -42,7 +42,7 @@ object fmClassOptions: TfmClassOptions
         Caption = 'Display'
         DesignSize = (
           403
-          311)
+          310)
         object gbxFonts: TGroupBox
           Left = 8
           Top = 8
@@ -55,67 +55,67 @@ object fmClassOptions: TfmClassOptions
             387
             105)
           object lblTreeViewFont: TLabel
-            Left = 27
+            Left = 22
             Top = 24
-            Width = 43
-            Height = 13
+            Width = 53
+            Height = 14
             Alignment = taRightJustify
             Caption = '&Tree font'
             FocusControl = cbTreeView
           end
           object lblListViewFont: TLabel
-            Left = 33
+            Left = 30
             Top = 49
-            Width = 37
-            Height = 13
+            Width = 45
+            Height = 14
             Alignment = taRightJustify
             Caption = '&List font'
             FocusControl = cbListView
           end
           object lblEditorFont: TLabel
-            Left = 22
+            Left = 16
             Top = 73
-            Width = 48
-            Height = 13
+            Width = 59
+            Height = 14
             Alignment = taRightJustify
             Caption = '&Editor font'
             FocusControl = cbEditor
           end
           object cbTreeView: TComboBox
-            Left = 77
+            Left = 82
             Top = 21
-            Width = 238
-            Height = 21
+            Width = 233
+            Height = 22
             Style = csDropDownList
             Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
+            ItemHeight = 14
             TabOrder = 0
           end
           object cbListView: TComboBox
-            Left = 77
+            Left = 82
             Top = 45
-            Width = 238
-            Height = 21
+            Width = 233
+            Height = 22
             Style = csDropDownList
             Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
+            ItemHeight = 14
             TabOrder = 3
           end
           object cbEditor: TComboBox
-            Left = 77
+            Left = 82
             Top = 69
-            Width = 238
-            Height = 21
+            Width = 233
+            Height = 22
             Style = csDropDownList
             Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
+            ItemHeight = 14
             TabOrder = 6
           end
           object sTreeView: TEdit
             Left = 319
             Top = 21
             Width = 35
-            Height = 21
+            Height = 22
             Anchors = [akTop, akRight]
             TabOrder = 1
             Text = '1'
@@ -124,7 +124,7 @@ object fmClassOptions: TfmClassOptions
             Left = 319
             Top = 45
             Width = 35
-            Height = 21
+            Height = 22
             Anchors = [akTop, akRight]
             TabOrder = 4
             Text = '1'
@@ -133,7 +133,7 @@ object fmClassOptions: TfmClassOptions
             Left = 319
             Top = 69
             Width = 35
-            Height = 21
+            Height = 22
             Anchors = [akTop, akRight]
             TabOrder = 7
             Text = '1'
@@ -142,7 +142,7 @@ object fmClassOptions: TfmClassOptions
             Left = 354
             Top = 21
             Width = 16
-            Height = 21
+            Height = 22
             Anchors = [akTop, akRight]
             Associate = sTreeView
             Min = 1
@@ -154,7 +154,7 @@ object fmClassOptions: TfmClassOptions
             Left = 354
             Top = 45
             Width = 16
-            Height = 21
+            Height = 22
             Anchors = [akTop, akRight]
             Associate = sListView
             Min = 1
@@ -166,7 +166,7 @@ object fmClassOptions: TfmClassOptions
             Left = 354
             Top = 69
             Width = 16
-            Height = 21
+            Height = 22
             Anchors = [akTop, akRight]
             Associate = sEditor
             Min = 1
@@ -178,7 +178,7 @@ object fmClassOptions: TfmClassOptions
         object cbAutoHide: TCheckBox
           Left = 10
           Top = 128
-          Width = 343
+          Width = 359
           Height = 25
           Caption = '&Auto-hide window when jumping to class/member'
           TabOrder = 1
@@ -188,7 +188,7 @@ object fmClassOptions: TfmClassOptions
         Caption = 'Configuration'
         DesignSize = (
           403
-          311)
+          310)
         object gbxFilters: TGroupBox
           Left = 8
           Top = 8

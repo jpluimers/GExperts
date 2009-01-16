@@ -6,10 +6,10 @@ object fmAlignOptions: TfmAlignOptions
   ClientHeight = 353
   ClientWidth = 245
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -18,7 +18,7 @@ object fmAlignOptions: TfmAlignOptions
     245
     353)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxTokens: TGroupBox
     Left = 8
     Top = 6
@@ -74,8 +74,8 @@ object fmAlignOptions: TfmAlignOptions
     object lblWhitespace: TLabel
       Left = 15
       Top = 22
-      Width = 115
-      Height = 13
+      Width = 129
+      Height = 14
       Caption = 'Minimum leading spaces'
       FocusControl = edtWhitespace
     end
@@ -83,7 +83,7 @@ object fmAlignOptions: TfmAlignOptions
       Left = 152
       Top = 18
       Width = 63
-      Height = 21
+      Height = 22
       TabOrder = 0
     end
   end

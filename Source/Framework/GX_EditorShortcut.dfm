@@ -6,17 +6,17 @@ object fmEditorShortcut: TfmEditorShortcut
   ClientHeight = 126
   ClientWidth = 221
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxShortcut: TGroupBox
     Left = 6
     Top = 8
@@ -25,10 +25,10 @@ object fmEditorShortcut: TfmEditorShortcut
     Caption = 'Editor Expert Name'
     TabOrder = 0
     object lblShortCut: TLabel
-      Left = 8
+      Left = 9
       Top = 24
-      Width = 41
-      Height = 13
+      Width = 48
+      Height = 14
       Caption = '&Shortcut'
     end
   end

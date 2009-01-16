@@ -6,10 +6,10 @@ object fmProjDepend: TfmProjDepend
   ClientHeight = 512
   ClientWidth = 667
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   Menu = MainMenu
@@ -19,7 +19,7 @@ object fmProjDepend: TfmProjDepend
   OnActivate = FormActivate
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter: TSplitter
     Left = 213
     Top = 22
@@ -33,7 +33,9 @@ object fmProjDepend: TfmProjDepend
     Width = 667
     Height = 19
     Panels = <>
+    ParentFont = True
     SimplePanel = False
+    UseSystemFont = False
   end
   object tvUnits: TTreeView
     Left = 0
@@ -78,12 +80,12 @@ object fmProjDepend: TfmProjDepend
           Left = 0
           Top = 0
           Width = 443
-          Height = 443
+          Height = 442
           Align = alClient
           Columns = <
             item
               Caption = 'Unit'
-              Width = 120
+              Width = 140
             end
             item
               Caption = 'Location'
@@ -106,12 +108,12 @@ object fmProjDepend: TfmProjDepend
           Left = 0
           Top = 0
           Width = 443
-          Height = 443
+          Height = 442
           Align = alClient
           Columns = <
             item
               Caption = 'Unit'
-              Width = 120
+              Width = 140
             end
             item
               Caption = 'Location'
@@ -134,12 +136,12 @@ object fmProjDepend: TfmProjDepend
           Left = 0
           Top = 0
           Width = 443
-          Height = 443
+          Height = 442
           Align = alClient
           Columns = <
             item
               Caption = 'Unit'
-              Width = 120
+              Width = 140
             end
             item
               Caption = 'Source Files'

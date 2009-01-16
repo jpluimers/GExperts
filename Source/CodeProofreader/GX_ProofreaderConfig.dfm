@@ -9,10 +9,10 @@ object fmProofreaderConfig: TfmProofreaderConfig
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 460
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -20,7 +20,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
   ShowHint = True
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlMain: TPanel
     Left = 0
     Top = 30
@@ -96,7 +96,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
           Left = 0
           Top = 0
           Width = 503
-          Height = 387
+          Height = 386
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 4
@@ -105,7 +105,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             Left = 4
             Top = 32
             Width = 495
-            Height = 351
+            Height = 350
             Align = alClient
             Columns = <
               item
@@ -192,7 +192,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
           Left = 0
           Top = 0
           Width = 503
-          Height = 387
+          Height = 386
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 4
@@ -200,16 +200,16 @@ object fmProofreaderConfig: TfmProofreaderConfig
           object gbxWords: TGroupBox
             Left = 4
             Top = 4
-            Width = 230
-            Height = 379
+            Width = 214
+            Height = 378
             Align = alClient
             Caption = 'Dictionary Words'
             TabOrder = 0
             object pnlWords: TPanel
               Left = 2
-              Top = 15
-              Width = 226
-              Height = 362
+              Top = 16
+              Width = 210
+              Height = 360
               Align = alClient
               BevelOuter = bvNone
               BorderWidth = 4
@@ -217,7 +217,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object tbrDictionary: TToolBar
                 Left = 4
                 Top = 4
-                Width = 218
+                Width = 202
                 Height = 24
                 DisabledImages = dmSharedImages.DisabledImages
                 EdgeBorders = []
@@ -260,8 +260,8 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object lvDictionary: TListView
                 Left = 4
                 Top = 28
-                Width = 218
-                Height = 330
+                Width = 202
+                Height = 328
                 Align = alClient
                 Columns = <
                   item
@@ -284,20 +284,20 @@ object fmProofreaderConfig: TfmProofreaderConfig
             end
           end
           object pnlDictOptions: TPanel
-            Left = 234
+            Left = 218
             Top = 4
-            Width = 265
-            Height = 379
+            Width = 281
+            Height = 378
             Align = alRight
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
-              265
-              379)
+              281
+              378)
             object gbReplaceIf: TGroupBox
               Left = 8
               Top = 48
-              Width = 257
+              Width = 273
               Height = 147
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Replace When'
@@ -305,7 +305,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object cbOneCharIncorrect: TCheckBox
                 Left = 8
                 Top = 37
-                Width = 246
+                Width = 262
                 Height = 17
                 Caption = 'One character is wrong'
                 TabOrder = 1
@@ -314,7 +314,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object cbAllowOneCharacterMissing: TCheckBox
                 Left = 8
                 Top = 81
-                Width = 246
+                Width = 262
                 Height = 17
                 Caption = 'One character is missing'
                 TabOrder = 3
@@ -322,7 +322,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object cbAllowExtraChar: TCheckBox
                 Left = 8
                 Top = 101
-                Width = 246
+                Width = 262
                 Height = 17
                 Caption = 'An extra character is inserted'
                 TabOrder = 4
@@ -330,7 +330,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object cbCaseDiffer: TCheckBox
                 Left = 8
                 Top = 17
-                Width = 246
+                Width = 262
                 Height = 17
                 Caption = 'Word case is different'
                 TabOrder = 0
@@ -338,7 +338,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object cbAllowSwitchedChars: TCheckBox
                 Left = 8
                 Top = 121
-                Width = 246
+                Width = 262
                 Height = 17
                 Caption = 'Two characters are switched'
                 TabOrder = 5
@@ -346,7 +346,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object cbMustBeNearbyLetter: TCheckBox
                 Left = 21
                 Top = 59
-                Width = 232
+                Width = 249
                 Height = 17
                 Caption = 'Character must be nearby correct key'
                 TabOrder = 2
@@ -355,7 +355,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             object cbFirstCharMustBeCorrect: TCheckBox
               Left = 8
               Top = 202
-              Width = 257
+              Width = 271
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Don'#39't replace if the first character is different'
@@ -365,7 +365,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               Tag = 2
               Left = 8
               Top = 4
-              Width = 257
+              Width = 271
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Enable dictionary replacement'
@@ -377,7 +377,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             object cbEnableCompiler: TCheckBox
               Left = 8
               Top = 24
-              Width = 257
+              Width = 271
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Enable compiler-assisted replacement'
@@ -394,7 +394,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
           Left = 0
           Top = 0
           Width = 503
-          Height = 387
+          Height = 386
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 4
@@ -403,7 +403,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             Left = 4
             Top = 4
             Width = 495
-            Height = 348
+            Height = 347
             Align = alClient
             Columns = <
               item
@@ -424,7 +424,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
           end
           object pnlHistoryButtons: TPanel
             Left = 4
-            Top = 352
+            Top = 351
             Width = 495
             Height = 31
             Align = alBottom
@@ -434,9 +434,9 @@ object fmProofreaderConfig: TfmProofreaderConfig
               495
               31)
             object btnDisableRule: TButton
-              Left = 329
+              Left = 327
               Top = 5
-              Width = 166
+              Width = 168
               Height = 26
               Action = actDisableRule
               Anchors = [akRight, akBottom]
@@ -459,10 +459,10 @@ object fmProofreaderConfig: TfmProofreaderConfig
       523
       30)
     object lblRules: TLabel
-      Left = 19
+      Left = 14
       Top = 9
-      Width = 42
-      Height = 13
+      Width = 47
+      Height = 14
       Alignment = taRightJustify
       Caption = '&Rules for'
       FocusControl = cbLanguage
@@ -471,10 +471,10 @@ object fmProofreaderConfig: TfmProofreaderConfig
       Left = 68
       Top = 6
       Width = 185
-      Height = 21
+      Height = 22
       Style = csDropDownList
       DropDownCount = 15
-      ItemHeight = 13
+      ItemHeight = 14
       TabOrder = 0
       OnChange = cbLanguageChange
     end

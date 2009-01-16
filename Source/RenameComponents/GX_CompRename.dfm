@@ -5,43 +5,43 @@ object fmCompRename: TfmCompRename
   BorderStyle = bsDialog
   Caption = 'GExperts Rename Component'
   ClientHeight = 97
-  ClientWidth = 355
+  ClientWidth = 392
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
   DesignSize = (
-    355
+    392
     97)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblOldName: TLabel
     Left = 10
     Top = 12
-    Width = 45
-    Height = 13
+    Width = 52
+    Height = 14
     Caption = '&Old name'
     FocusControl = edtOldName
   end
   object lblNewName: TLabel
     Left = 10
     Top = 36
-    Width = 51
-    Height = 13
+    Width = 59
+    Height = 14
     Caption = '&New name'
     FocusControl = edtNewName
   end
   object lblReason: TLabel
     Left = 10
     Top = 70
-    Width = 73
-    Height = 13
+    Width = 85
+    Height = 14
     Anchors = [akLeft, akBottom]
     Caption = 'Invalid identifier'
     Visible = False
@@ -49,8 +49,8 @@ object fmCompRename: TfmCompRename
   object edtOldName: TEdit
     Left = 91
     Top = 8
-    Width = 256
-    Height = 21
+    Width = 293
+    Height = 22
     TabStop = False
     Anchors = [akLeft, akTop, akRight]
     ReadOnly = True
@@ -59,15 +59,15 @@ object fmCompRename: TfmCompRename
   object edtNewName: TEdit
     Left = 91
     Top = 32
-    Width = 256
-    Height = 21
+    Width = 293
+    Height = 22
     Anchors = [akLeft, akTop, akRight]
     AutoSelect = False
     TabOrder = 1
     OnChange = edtNewNameChange
   end
   object btnCancel: TButton
-    Left = 192
+    Left = 229
     Top = 65
     Width = 75
     Height = 25
@@ -78,7 +78,7 @@ object fmCompRename: TfmCompRename
     TabOrder = 3
   end
   object btnOK: TButton
-    Left = 112
+    Left = 149
     Top = 65
     Width = 75
     Height = 25
@@ -89,7 +89,7 @@ object fmCompRename: TfmCompRename
     TabOrder = 2
   end
   object btnSettings: TButton
-    Left = 272
+    Left = 309
     Top = 65
     Width = 75
     Height = 25

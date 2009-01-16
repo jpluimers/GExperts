@@ -8,10 +8,10 @@ object fmProcedureList: TfmProcedureList
   ClientHeight = 441
   ClientWidth = 537
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -21,7 +21,7 @@ object fmProcedureList: TfmProcedureList
   OnKeyPress = edtMethodsKeyPress
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object splSeparator: TSplitter
     Left = 522
     Top = 0
@@ -100,7 +100,7 @@ object fmProcedureList: TfmProcedureList
       object pnlHeaderLeft: TPanel
         Left = 0
         Top = 0
-        Width = 260
+        Width = 252
         Height = 36
         Align = alLeft
         BevelOuter = bvNone
@@ -109,17 +109,17 @@ object fmProcedureList: TfmProcedureList
         object lblMethods: TLabel
           Left = 14
           Top = 10
-          Width = 34
-          Height = 13
+          Width = 37
+          Height = 14
           Alignment = taRightJustify
           Caption = '&Search'
           FocusControl = edtMethods
         end
         object edtMethods: TEdit
-          Left = 53
+          Left = 56
           Top = 6
-          Width = 200
-          Height = 21
+          Width = 194
+          Height = 22
           TabOrder = 0
           OnChange = edtMethodsChange
           OnKeyDown = edtMethodsKeyDown
@@ -127,31 +127,31 @@ object fmProcedureList: TfmProcedureList
         end
       end
       object pnlHeaderRight: TPanel
-        Left = 260
+        Left = 252
         Top = 0
-        Width = 262
+        Width = 270
         Height = 36
         Align = alClient
         BevelOuter = bvNone
         FullRepaint = False
         TabOrder = 1
         object lblObjects: TLabel
-          Left = 16
+          Left = 14
           Top = 8
-          Width = 36
-          Height = 13
+          Width = 42
+          Height = 14
           Alignment = taRightJustify
           Caption = '&Objects'
           FocusControl = cbxObjects
         end
         object cbxObjects: TComboBox
-          Left = 56
+          Left = 62
           Top = 4
-          Width = 196
-          Height = 21
+          Width = 198
+          Height = 22
           Style = csDropDownList
           DropDownCount = 16
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 0
           OnChange = cbxObjectsChange
@@ -285,7 +285,9 @@ object fmProcedureList: TfmProcedureList
         Text = '999/999'
         Width = 50
       end>
+    ParentFont = True
     SimplePanel = False
+    UseSystemFont = False
   end
   object pnlFunctionBody: TPanel
     Left = 525
@@ -299,10 +301,10 @@ object fmProcedureList: TfmProcedureList
     Visible = False
   end
   object dlgProcFont: TFontDialog
-    Font.Charset = DEFAULT_CHARSET
+    Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
+    Font.Height = -12
+    Font.Name = 'Tahoma'
     Font.Style = []
     MinFontSize = 0
     MaxFontSize = 0

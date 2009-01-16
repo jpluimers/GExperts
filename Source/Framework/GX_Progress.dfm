@@ -6,17 +6,17 @@ object fmProgress: TfmProgress
   ClientHeight = 37
   ClientWidth = 269
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Progress: TProgressBar
     Left = 8
     Top = 8

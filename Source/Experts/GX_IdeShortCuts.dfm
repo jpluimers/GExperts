@@ -5,65 +5,64 @@ object fmIdeShortCuts: TfmIdeShortCuts
   BorderIcons = [biSystemMenu]
   Caption = 'IDE Menu Shortcuts'
   ClientHeight = 218
-  ClientWidth = 674
+  ClientWidth = 650
   Color = clBtnFace
-  Constraints.MinHeight = 200
+  Constraints.MinHeight = 235
   Constraints.MinWidth = 500
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
-  Scaled = False
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlControls: TPanel
     Left = 0
     Top = 67
-    Width = 674
+    Width = 650
     Height = 113
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 0
     DesignSize = (
-      674
+      650
       113)
     object lblMenuStruc: TLabel
-      Left = 21
+      Left = 24
       Top = 35
-      Width = 71
-      Height = 13
+      Width = 84
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Menu &structure'
       FocusControl = edtMenuStructure
     end
     object lblMenuItemName: TLabel
-      Left = 14
+      Left = 16
       Top = 6
-      Width = 78
-      Height = 13
+      Width = 92
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Menu item &name'
       FocusControl = edtMenuItemName
     end
     object lblShortcut: TLabel
-      Left = 52
+      Left = 60
       Top = 87
-      Width = 40
-      Height = 13
+      Width = 48
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Sh&ortcut'
     end
     object edtMenuStructure: TEdit
-      Left = 100
+      Left = 116
       Top = 31
-      Width = 564
-      Height = 21
+      Width = 524
+      Height = 22
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
@@ -71,10 +70,10 @@ object fmIdeShortCuts: TfmIdeShortCuts
       TabOrder = 1
     end
     object edtMenuItemName: TEdit
-      Left = 100
+      Left = 116
       Top = 3
-      Width = 564
-      Height = 21
+      Width = 524
+      Height = 22
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
       Color = clBtnFace
@@ -83,9 +82,9 @@ object fmIdeShortCuts: TfmIdeShortCuts
       Text = ' '
     end
     object chkUseShortcut: TCheckBox
-      Left = 100
+      Left = 116
       Top = 62
-      Width = 285
+      Width = 357
       Height = 13
       Caption = '&Apply a custom shortcut to this menu item'
       Enabled = False
@@ -96,13 +95,13 @@ object fmIdeShortCuts: TfmIdeShortCuts
   object pnlButtons: TPanel
     Left = 0
     Top = 180
-    Width = 674
+    Width = 650
     Height = 38
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 388
+      Left = 364
       Top = 0
       Width = 286
       Height = 38

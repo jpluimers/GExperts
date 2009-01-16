@@ -6,16 +6,16 @@ object fmPerfectLayout: TfmPerfectLayout
   ClientHeight = 228
   ClientWidth = 386
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxLayout: TGroupBox
     Left = 8
     Top = 7
@@ -62,30 +62,30 @@ object fmPerfectLayout: TfmPerfectLayout
       object lblWatch1: TLabel
         Left = 43
         Top = 77
-        Width = 32
-        Height = 13
+        Width = 36
+        Height = 14
         Caption = 'Watch'
         Transparent = True
       end
       object lblMain1: TLabel
         Left = 48
         Top = 7
-        Width = 23
-        Height = 13
+        Width = 24
+        Height = 14
         Caption = 'Main'
       end
       object lblOI1: TLabel
         Left = 8
         Top = 40
-        Width = 11
-        Height = 13
+        Width = 13
+        Height = 14
         Caption = 'OI'
       end
       object lblEditor1: TLabel
         Left = 59
         Top = 40
-        Width = 27
-        Height = 13
+        Width = 32
+        Height = 14
         Caption = 'Editor'
       end
     end
@@ -128,30 +128,30 @@ object fmPerfectLayout: TfmPerfectLayout
       object lblWatch2: TLabel
         Left = 44
         Top = 77
-        Width = 32
-        Height = 13
+        Width = 36
+        Height = 14
         Caption = 'Watch'
         Transparent = True
       end
       object lblMain2: TLabel
         Left = 48
         Top = 7
-        Width = 23
-        Height = 13
+        Width = 24
+        Height = 14
         Caption = 'Main'
       end
       object lblOI2: TLabel
         Left = 102
         Top = 40
-        Width = 11
-        Height = 13
+        Width = 13
+        Height = 14
         Caption = 'OI'
       end
       object lblEditor2: TLabel
         Left = 35
         Top = 40
-        Width = 27
-        Height = 13
+        Width = 32
+        Height = 14
         Caption = 'Editor'
       end
     end

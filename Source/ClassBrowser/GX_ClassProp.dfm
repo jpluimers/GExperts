@@ -1,78 +1,86 @@
 object fmClassProp: TfmClassProp
   Left = 227
   Top = 125
+  Width = 479
+  Height = 303
   ActiveControl = btnOK
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsDialog
   Caption = 'Class Properties'
-  ClientHeight = 260
-  ClientWidth = 371
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
+  DesignSize = (
+    463
+    267)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pgeProperties: TPageControl
     Left = 8
     Top = 8
-    Width = 356
-    Height = 213
+    Width = 449
+    Height = 220
     ActivePage = tabProps
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabIndex = 0
     TabOrder = 0
     TabStop = False
     object tabProps: TTabSheet
       Caption = 'Class Properties'
+      DesignSize = (
+        441
+        191)
       object lblClassName: TLabel
-        Left = 31
+        Left = 26
         Top = 16
-        Width = 54
-        Height = 13
+        Width = 59
+        Height = 14
         Alignment = taRightJustify
         Caption = 'Class name'
       end
       object lblDerivedFrom: TLabel
-        Left = 25
+        Left = 15
         Top = 40
-        Width = 60
-        Height = 13
+        Width = 70
+        Height = 14
         Alignment = taRightJustify
         Caption = 'Derived from'
       end
       object lblFileName: TLabel
-        Left = 40
+        Left = 34
         Top = 104
-        Width = 45
-        Height = 13
+        Width = 51
+        Height = 14
         Alignment = taRightJustify
         Caption = 'File name'
       end
       object lblLineNumber: TLabel
-        Left = 27
+        Left = 17
         Top = 160
-        Width = 58
-        Height = 13
+        Width = 68
+        Height = 14
         Alignment = taRightJustify
         Caption = 'Line number'
       end
       object lblUnit: TLabel
-        Left = 66
+        Left = 63
         Top = 84
-        Width = 19
-        Height = 13
+        Width = 22
+        Height = 14
         Alignment = taRightJustify
         Caption = 'Unit'
       end
       object edtClassName: TEdit
         Left = 93
         Top = 12
-        Width = 248
-        Height = 21
+        Width = 337
+        Height = 22
+        Anchors = [akLeft, akTop, akRight]
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 0
@@ -80,8 +88,9 @@ object fmClassProp: TfmClassProp
       object edtDerivedFrom: TEdit
         Left = 93
         Top = 36
-        Width = 248
-        Height = 21
+        Width = 337
+        Height = 22
+        Anchors = [akLeft, akTop, akRight]
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 1
@@ -89,8 +98,9 @@ object fmClassProp: TfmClassProp
       object edtLineNo: TEdit
         Left = 93
         Top = 156
-        Width = 248
-        Height = 21
+        Width = 337
+        Height = 22
+        Anchors = [akLeft, akTop, akRight]
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 4
@@ -98,8 +108,9 @@ object fmClassProp: TfmClassProp
       object mmoFileName: TMemo
         Left = 93
         Top = 104
-        Width = 248
+        Width = 337
         Height = 49
+        Anchors = [akLeft, akTop, akRight]
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 3
@@ -107,8 +118,9 @@ object fmClassProp: TfmClassProp
       object edtUnit: TEdit
         Left = 93
         Top = 80
-        Width = 248
-        Height = 21
+        Width = 337
+        Height = 22
+        Anchors = [akLeft, akTop, akRight]
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 2
@@ -116,10 +128,11 @@ object fmClassProp: TfmClassProp
     end
   end
   object btnOK: TButton
-    Left = 289
-    Top = 228
+    Left = 382
+    Top = 235
     Width = 75
     Height = 26
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'OK'
     Default = True

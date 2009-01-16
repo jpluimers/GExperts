@@ -3,111 +3,119 @@ object fmClassReport: TfmClassReport
   Top = 215
   BorderStyle = bsDialog
   Caption = 'Class Hierarchy Report'
-  ClientHeight = 177
-  ClientWidth = 298
+  ClientHeight = 184
+  ClientWidth = 307
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
+  DesignSize = (
+    307
+    184)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxPageSettings: TGroupBox
     Left = 9
     Top = 8
-    Width = 281
-    Height = 129
+    Width = 290
+    Height = 139
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Report Settings'
     TabOrder = 0
+    DesignSize = (
+      290
+      139)
     object lblFont: TLabel
-      Left = 63
-      Top = 28
-      Width = 21
-      Height = 13
+      Left = 65
+      Top = 26
+      Width = 25
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Font'
     end
     object lblFontSize: TLabel
       Left = 42
-      Top = 52
-      Width = 42
-      Height = 13
+      Top = 53
+      Width = 48
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Font size'
     end
     object lblBoxSize: TLabel
-      Left = 45
-      Top = 76
-      Width = 39
-      Height = 13
+      Left = 47
+      Top = 80
+      Width = 43
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Box size'
     end
     object lblInCharacters: TLabel
-      Left = 152
-      Top = 76
-      Width = 50
-      Height = 13
+      Left = 158
+      Top = 80
+      Width = 56
+      Height = 14
       Caption = 'characters'
     end
     object lblBoxSpacing: TLabel
       Left = 26
-      Top = 100
-      Width = 58
-      Height = 13
+      Top = 108
+      Width = 64
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Box spacing'
     end
     object lblInPixels: TLabel
-      Left = 152
-      Top = 100
-      Width = 26
-      Height = 13
+      Left = 158
+      Top = 108
+      Width = 29
+      Height = 14
       Caption = 'pixels'
     end
     object cbxFont: TComboBox
-      Left = 90
-      Top = 24
-      Width = 181
-      Height = 21
+      Left = 96
+      Top = 22
+      Width = 183
+      Height = 22
       Style = csDropDownList
-      ItemHeight = 13
+      Anchors = [akLeft, akTop, akRight]
+      ItemHeight = 14
       TabOrder = 0
     end
     object spnFontSize: TEdit
-      Left = 90
-      Top = 48
+      Left = 96
+      Top = 49
       Width = 45
-      Height = 21
+      Height = 22
       TabOrder = 1
       Text = '1'
     end
     object spnBoxSize: TEdit
-      Left = 90
-      Top = 72
+      Left = 96
+      Top = 76
       Width = 45
-      Height = 21
+      Height = 22
       TabOrder = 3
       Text = '1'
     end
     object spnBoxSpacing: TEdit
-      Left = 90
-      Top = 96
+      Left = 96
+      Top = 104
       Width = 45
-      Height = 21
+      Height = 22
       TabOrder = 5
       Text = '1'
     end
     object udBoxSize: TUpDown
-      Left = 135
-      Top = 72
+      Left = 141
+      Top = 76
       Width = 12
-      Height = 21
+      Height = 22
       Associate = spnBoxSize
       Min = 1
       Position = 1
@@ -115,10 +123,10 @@ object fmClassReport: TfmClassReport
       Wrap = False
     end
     object udBoxSpacing: TUpDown
-      Left = 135
-      Top = 96
+      Left = 141
+      Top = 104
       Width = 12
-      Height = 21
+      Height = 22
       Associate = spnBoxSpacing
       Min = 1
       Position = 1
@@ -126,10 +134,10 @@ object fmClassReport: TfmClassReport
       Wrap = False
     end
     object udFontSize: TUpDown
-      Left = 135
-      Top = 48
+      Left = 141
+      Top = 49
       Width = 12
-      Height = 21
+      Height = 22
       Associate = spnFontSize
       Min = 1
       Position = 1
@@ -138,20 +146,22 @@ object fmClassReport: TfmClassReport
     end
   end
   object btnOK: TButton
-    Left = 132
-    Top = 144
+    Left = 141
+    Top = 153
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 214
-    Top = 144
+    Left = 223
+    Top = 153
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2

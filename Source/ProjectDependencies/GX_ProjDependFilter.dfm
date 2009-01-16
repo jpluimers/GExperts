@@ -9,10 +9,10 @@ object fmProjDependFilter: TfmProjDependFilter
   Color = clBtnFace
   Constraints.MinHeight = 300
   Constraints.MinWidth = 221
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
@@ -20,7 +20,7 @@ object fmProjDependFilter: TfmProjDependFilter
   Scaled = False
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
     Top = 366
@@ -79,7 +79,7 @@ object fmProjDependFilter: TfmProjDependFilter
         Left = 8
         Top = 7
         Width = 128
-        Height = 21
+        Height = 22
         TabOrder = 0
         OnChange = edtUnitNameChange
       end
@@ -95,11 +95,11 @@ object fmProjDependFilter: TfmProjDependFilter
       TabOrder = 0
       object lbFilter: TListBox
         Left = 6
-        Top = 22
+        Top = 23
         Width = 193
-        Height = 297
+        Height = 296
         Align = alClient
-        ItemHeight = 13
+        ItemHeight = 14
         MultiSelect = True
         PopupMenu = mnuPopup
         Sorted = True
@@ -109,7 +109,7 @@ object fmProjDependFilter: TfmProjDependFilter
         Left = 6
         Top = 6
         Width = 193
-        Height = 16
+        Height = 17
         Align = alTop
         BevelOuter = bvNone
         Caption = 'Units To Hide'

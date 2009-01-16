@@ -8,10 +8,10 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
   ClientWidth = 355
   Color = clBtnFace
   Constraints.MinWidth = 265
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
@@ -20,7 +20,7 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlMain: TPanel
     Left = 0
     Top = 0
@@ -40,54 +40,54 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
       BorderWidth = 3
       TabOrder = 1
       object btnAdd: TButton
-        Left = 9
+        Left = 7
         Top = 11
-        Width = 75
+        Width = 79
         Height = 25
         Caption = 'Add...'
         TabOrder = 0
         OnClick = btnAddClick
       end
       object btnEdit: TButton
-        Left = 9
-        Top = 38
-        Width = 75
+        Left = 7
+        Top = 40
+        Width = 79
         Height = 25
         Caption = 'Edit...'
         TabOrder = 1
         OnClick = btnEditClick
       end
       object btnDelete: TButton
-        Left = 9
-        Top = 65
-        Width = 75
+        Left = 7
+        Top = 69
+        Width = 79
         Height = 25
         Caption = 'Delete...'
         TabOrder = 2
         OnClick = btnDeleteClick
       end
       object btnExport: TButton
-        Left = 9
-        Top = 119
-        Width = 75
+        Left = 7
+        Top = 127
+        Width = 79
         Height = 25
         Caption = 'Export...'
         TabOrder = 4
         OnClick = btnExportClick
       end
       object btnImport: TButton
-        Left = 9
-        Top = 92
-        Width = 75
+        Left = 7
+        Top = 98
+        Width = 79
         Height = 25
         Caption = 'Import...'
         TabOrder = 3
         OnClick = btnImportClick
       end
       object btnClear: TButton
-        Left = 9
-        Top = 146
-        Width = 75
+        Left = 7
+        Top = 156
+        Width = 79
         Height = 25
         Caption = 'Clear...'
         TabOrder = 5
@@ -111,7 +111,7 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
         Align = alClient
         Constraints.MinHeight = 180
         Constraints.MinWidth = 127
-        ItemHeight = 13
+        ItemHeight = 14
         MultiSelect = True
         TabOrder = 0
         OnClick = lbxGroupsClick

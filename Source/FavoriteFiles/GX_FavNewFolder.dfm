@@ -6,10 +6,10 @@ object fmFavNewFolder: TfmFavNewFolder
   ClientHeight = 127
   ClientWidth = 293
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -17,7 +17,7 @@ object fmFavNewFolder: TfmFavNewFolder
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxNewFolder: TGroupBox
     Left = 8
     Top = 8
@@ -26,19 +26,19 @@ object fmFavNewFolder: TfmFavNewFolder
     Caption = ' New Folder '
     TabOrder = 0
     object lblFolderName: TLabel
-      Left = 23
+      Left = 14
       Top = 24
-      Width = 58
-      Height = 13
+      Width = 67
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Folder &name'
       FocusControl = edtFolderName
     end
     object lblFolderType: TLabel
-      Left = 29
+      Left = 19
       Top = 50
-      Width = 52
-      Height = 13
+      Width = 62
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Folder &type'
       FocusControl = cbxFolderType
@@ -47,7 +47,7 @@ object fmFavNewFolder: TfmFavNewFolder
       Left = 90
       Top = 20
       Width = 176
-      Height = 21
+      Height = 22
       TabOrder = 0
       OnChange = edtFolderNameChange
     end

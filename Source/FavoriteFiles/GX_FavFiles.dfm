@@ -6,10 +6,10 @@ object fmFavFiles: TfmFavFiles
   ClientHeight = 342
   ClientWidth = 495
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   Menu = MainMenu
@@ -20,7 +20,7 @@ object fmFavFiles: TfmFavFiles
   OnHide = FormHide
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object splTreeView: TSplitter
     Left = 121
     Top = 22
@@ -56,7 +56,9 @@ object fmFavFiles: TfmFavFiles
     Width = 495
     Height = 19
     Panels = <>
+    ParentFont = True
     SimplePanel = True
+    UseSystemFont = False
   end
   object pnlFiles: TPanel
     Left = 124

@@ -7,10 +7,10 @@ object fmMacroLibrary: TfmMacroLibrary
   ClientHeight = 377
   ClientWidth = 331
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -18,7 +18,7 @@ object fmMacroLibrary: TfmMacroLibrary
   OnCreate = FormCreate
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter: TSplitter
     Left = 0
     Top = 307
@@ -179,15 +179,15 @@ object fmMacroLibrary: TfmMacroLibrary
       Left = 0
       Top = 0
       Width = 331
-      Height = 13
+      Height = 14
       Align = alTop
       Caption = '  Macro Description'
     end
     object mmoMacroDescription: TMemo
       Left = 0
-      Top = 13
+      Top = 14
       Width = 331
-      Height = 53
+      Height = 52
       Align = alClient
       ScrollBars = ssVertical
       TabOrder = 0

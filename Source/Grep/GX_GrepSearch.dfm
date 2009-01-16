@@ -3,40 +3,40 @@ object fmGrepSearch: TfmGrepSearch
   Top = 209
   BorderStyle = bsDialog
   Caption = 'Grep Search'
-  ClientHeight = 303
-  ClientWidth = 485
+  ClientHeight = 305
+  ClientWidth = 486
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    485
-    303)
+    486
+    305)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblFind: TLabel
-    Left = 21
+    Left = 14
     Top = 12
-    Width = 53
-    Height = 13
+    Width = 66
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Text to find'
     FocusControl = cbText
   end
   object cbText: TComboBox
-    Left = 80
+    Left = 85
     Top = 8
-    Width = 399
-    Height = 21
+    Width = 394
+    Height = 22
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 15
-    ItemHeight = 13
+    ItemHeight = 14
     TabOrder = 0
   end
   object gbxOptions: TGroupBox
@@ -148,58 +148,58 @@ object fmGrepSearch: TfmGrepSearch
     Left = 8
     Top = 168
     Width = 471
-    Height = 97
+    Height = 99
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Directory Search'
     TabOrder = 3
     DesignSize = (
       471
-      97)
+      99)
     object lblMasks: TLabel
       Left = 15
       Top = 52
-      Width = 49
-      Height = 13
+      Width = 53
+      Height = 14
       Alignment = taRightJustify
       Caption = 'File mas&ks'
       FocusControl = cbMasks
     end
     object lblDirectory: TLabel
-      Left = 14
+      Left = 11
       Top = 26
-      Width = 50
-      Height = 13
+      Width = 57
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Di&rectories'
       FocusControl = cbDirectory
     end
     object cbMasks: TComboBox
-      Left = 70
+      Left = 74
       Top = 48
-      Width = 366
-      Height = 21
+      Width = 362
+      Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 13
+      ItemHeight = 14
       TabOrder = 2
     end
     object cbInclude: TCheckBox
-      Left = 70
-      Top = 72
-      Width = 390
+      Left = 74
+      Top = 74
+      Width = 386
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Include su&bdirectories'
       TabOrder = 3
     end
     object cbDirectory: TComboBox
-      Left = 70
+      Left = 74
       Top = 22
-      Width = 366
-      Height = 21
+      Width = 362
+      Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 13
+      ItemHeight = 14
       TabOrder = 0
       OnDropDown = cbDirectoryDropDown
     end
@@ -220,7 +220,7 @@ object fmGrepSearch: TfmGrepSearch
   end
   object btnOK: TButton
     Left = 244
-    Top = 271
+    Top = 273
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -231,7 +231,7 @@ object fmGrepSearch: TfmGrepSearch
   end
   object btnCancel: TButton
     Left = 324
-    Top = 271
+    Top = 273
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -242,7 +242,7 @@ object fmGrepSearch: TfmGrepSearch
   end
   object btnHelp: TButton
     Left = 404
-    Top = 271
+    Top = 273
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

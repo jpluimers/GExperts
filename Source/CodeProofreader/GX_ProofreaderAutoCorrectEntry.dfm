@@ -3,61 +3,61 @@ object fmProofreaderAutoCorrectEntry: TfmProofreaderAutoCorrectEntry
   Top = 228
   BorderStyle = bsDialog
   Caption = 'Edit AutoCorrect Entry'
-  ClientHeight = 117
-  ClientWidth = 412
+  ClientHeight = 126
+  ClientWidth = 418
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    412
-    117)
+    418
+    126)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblReplaceWhat: TLabel
-    Left = 17
+    Left = 21
     Top = 13
-    Width = 64
-    Height = 13
+    Width = 72
+    Height = 14
     Alignment = taRightJustify
     Caption = 'Replace &Text'
     FocusControl = edtReplaceWhat
   end
   object lblLocation: TLabel
-    Left = 40
-    Top = 37
-    Width = 41
-    Height = 13
+    Left = 47
+    Top = 39
+    Width = 46
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Location'
     FocusControl = cbxLocation
   end
   object lblReplaceWith: TLabel
-    Left = 16
-    Top = 61
-    Width = 65
-    Height = 13
+    Left = 21
+    Top = 65
+    Width = 72
+    Height = 14
     Alignment = taRightJustify
     Caption = 'Replace &With'
     FocusControl = edtReplaceWith
   end
   object edtReplaceWhat: TEdit
-    Left = 88
+    Left = 100
     Top = 9
-    Width = 175
-    Height = 21
+    Width = 181
+    Height = 22
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
     OnChange = EditBoxChange
   end
   object btnOK: TButton
-    Left = 245
-    Top = 86
+    Left = 248
+    Top = 93
     Width = 74
     Height = 25
     Anchors = [akRight, akBottom]
@@ -67,8 +67,8 @@ object fmProofreaderAutoCorrectEntry: TfmProofreaderAutoCorrectEntry
     TabOrder = 3
   end
   object btnCancel: TButton
-    Left = 330
-    Top = 86
+    Left = 333
+    Top = 93
     Width = 74
     Height = 25
     Anchors = [akRight, akBottom]
@@ -78,22 +78,22 @@ object fmProofreaderAutoCorrectEntry: TfmProofreaderAutoCorrectEntry
     TabOrder = 4
   end
   object edtReplaceWith: TEdit
-    Left = 88
-    Top = 57
-    Width = 316
-    Height = 21
+    Left = 100
+    Top = 61
+    Width = 307
+    Height = 22
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 2
     OnChange = EditBoxChange
   end
   object cbxLocation: TComboBox
-    Left = 88
-    Top = 33
-    Width = 175
-    Height = 21
+    Left = 100
+    Top = 35
+    Width = 181
+    Height = 22
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 13
+    ItemHeight = 14
     TabOrder = 1
   end
 end

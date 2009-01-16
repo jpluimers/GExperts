@@ -6,16 +6,19 @@ object fmGxMessageBox: TfmGxMessageBox
   ClientHeight = 244
   ClientWidth = 409
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
+  DesignSize = (
+    409
+    244)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object bvlFrame: TBevel
     Left = 8
     Top = 8
@@ -26,7 +29,7 @@ object fmGxMessageBox: TfmGxMessageBox
   object chkNeverShowAgain: TCheckBox
     Left = 16
     Top = 172
-    Width = 297
+    Width = 337
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = '&Never show this message again'

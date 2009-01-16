@@ -9,10 +9,10 @@ object fmOpenFile: TfmOpenFile
   Color = clBtnFace
   Constraints.MinHeight = 325
   Constraints.MinWidth = 350
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -20,7 +20,7 @@ object fmOpenFile: TfmOpenFile
   OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlUnits: TPanel
     Left = 0
     Top = 27
@@ -48,7 +48,7 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabSearchPathShow
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 352
+          Top = 351
           Width = 601
           Height = 33
           Align = alBottom
@@ -57,7 +57,7 @@ object fmOpenFile: TfmOpenFile
           object btnSearchAddToFavorites: TButton
             Left = 4
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actAddToFavorites
             TabOrder = 0
@@ -67,7 +67,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 601
-          Height = 352
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -77,7 +77,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 595
-            Height = 346
+            Height = 345
             Align = alClient
             Columns = <
               item
@@ -93,7 +93,7 @@ object fmOpenFile: TfmOpenFile
               item
                 Caption = 'Extension'
                 MinWidth = 55
-                Width = 63
+                Width = 70
               end>
             DragMode = dmAutomatic
             Enabled = False
@@ -114,7 +114,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 601
-          Height = 352
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -124,7 +124,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 595
-            Height = 346
+            Height = 345
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -139,7 +139,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 352
+          Top = 351
           Width = 601
           Height = 33
           Align = alBottom
@@ -148,7 +148,7 @@ object fmOpenFile: TfmOpenFile
           object btnProjectAddToFavorites: TButton
             Left = 4
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actAddToFavorites
             TabOrder = 0
@@ -163,7 +163,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 601
-          Height = 352
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -173,7 +173,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 595
-            Height = 346
+            Height = 345
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -188,7 +188,7 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 352
+          Top = 351
           Width = 601
           Height = 33
           Align = alBottom
@@ -197,7 +197,7 @@ object fmOpenFile: TfmOpenFile
           object btnCommonAddToFavorites: TButton
             Left = 4
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actAddToFavorites
             TabOrder = 0
@@ -212,7 +212,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 601
-          Height = 352
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -222,7 +222,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 595
-            Height = 346
+            Height = 345
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -237,16 +237,16 @@ object fmOpenFile: TfmOpenFile
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 352
+          Top = 351
           Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           object btnFavoriteDeleteFromFavorites: TButton
-            Left = 140
+            Left = 150
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actFavDeleteFromFavorites
             TabOrder = 1
@@ -254,7 +254,7 @@ object fmOpenFile: TfmOpenFile
           object btnFavoriteAddToFavorites: TButton
             Left = 4
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actFavAddToFavorites
             TabOrder = 0
@@ -267,16 +267,16 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabRecentShow
         object pnlRecentFooter: TPanel
           Left = 0
-          Top = 352
+          Top = 351
           Width = 601
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           object btnClearRecent: TButton
-            Left = 140
+            Left = 150
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actClearRecentList
             TabOrder = 1
@@ -284,7 +284,7 @@ object fmOpenFile: TfmOpenFile
           object btnRecentAddToFavorites: TButton
             Left = 4
             Top = 3
-            Width = 125
+            Width = 135
             Height = 25
             Action = actAddToFavorites
             TabOrder = 0
@@ -294,7 +294,7 @@ object fmOpenFile: TfmOpenFile
           Left = 0
           Top = 0
           Width = 601
-          Height = 352
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -303,7 +303,7 @@ object fmOpenFile: TfmOpenFile
             Left = 3
             Top = 3
             Width = 595
-            Height = 346
+            Height = 345
             Align = alClient
             Columns = <>
             DragMode = dmAutomatic
@@ -331,29 +331,29 @@ object fmOpenFile: TfmOpenFile
         609
         33)
       object lblFilter: TLabel
-        Left = 19
+        Left = 17
         Top = 10
-        Width = 22
-        Height = 13
+        Width = 26
+        Height = 14
         Alignment = taRightJustify
         Caption = '&Filter'
         FocusControl = edtFilter
       end
       object lblExtension: TLabel
-        Left = 454
+        Left = 450
         Top = 10
-        Width = 24
-        Height = 13
+        Width = 28
+        Height = 14
         Alignment = taRightJustify
         Anchors = [akTop, akRight]
         Caption = '&Type'
         FocusControl = edtFilter
       end
       object edtFilter: TEdit
-        Left = 48
+        Left = 50
         Top = 6
-        Width = 389
-        Height = 21
+        Width = 382
+        Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
         OnChange = edtFilterChange
@@ -363,10 +363,10 @@ object fmOpenFile: TfmOpenFile
         Left = 484
         Top = 6
         Width = 113
-        Height = 21
+        Height = 22
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 14
         TabOrder = 1
         OnChange = cbxTypeChange
       end

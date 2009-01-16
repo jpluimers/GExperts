@@ -9,10 +9,10 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
   Color = clBtnFace
   Constraints.MinHeight = 171
   Constraints.MinWidth = 285
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -20,7 +20,7 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlHeader: TPanel
     Left = 0
     Top = 0
@@ -30,19 +30,20 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
     BevelOuter = bvNone
     TabOrder = 0
     object lblGroup: TLabel
-      Left = 16
+      Left = 17
       Top = 12
-      Width = 32
-      Height = 13
-      Caption = 'Group:'
+      Width = 33
+      Height = 14
+      Alignment = taRightJustify
+      Caption = 'Group'
     end
     object comGroupName: TComboBox
       Left = 56
       Top = 8
       Width = 145
-      Height = 21
+      Height = 22
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 14
       TabOrder = 0
       OnChange = comGroupNameChange
     end

@@ -1,23 +1,23 @@
 object fmCommentConfig: TfmCommentConfig
-  Left = 341
-  Top = 135
+  Left = 311
+  Top = 211
   BorderStyle = bsDialog
   Caption = 'Comment Expert'
   ClientHeight = 127
-  ClientWidth = 262
+  ClientWidth = 270
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object GroupBox1: TGroupBox
-    Left = 8
+    Left = 9
     Top = 5
     Width = 169
     Height = 92
@@ -57,8 +57,8 @@ object fmCommentConfig: TfmCommentConfig
     end
   end
   object btnOK: TButton
-    Left = 184
-    Top = 8
+    Left = 186
+    Top = 11
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -67,8 +67,8 @@ object fmCommentConfig: TfmCommentConfig
     TabOrder = 2
   end
   object btnCancel: TButton
-    Left = 184
-    Top = 40
+    Left = 186
+    Top = 43
     Width = 75
     Height = 25
     Cancel = True
@@ -77,8 +77,8 @@ object fmCommentConfig: TfmCommentConfig
     TabOrder = 3
   end
   object chkInsertSpace: TCheckBox
-    Left = 8
-    Top = 104
+    Left = 9
+    Top = 103
     Width = 217
     Height = 17
     Caption = 'Insert and remove &space'

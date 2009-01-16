@@ -10,10 +10,10 @@ object SelectComponentsForm: TSelectComponentsForm
   Color = clBtnFace
   Constraints.MinHeight = 175
   Constraints.MinWidth = 190
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -21,30 +21,30 @@ object SelectComponentsForm: TSelectComponentsForm
   OnActivate = FormActivate
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object FindPanel: TPanel
     Left = 0
     Top = 0
-    Width = 396
+    Width = 388
     Height = 32
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      396
+      388
       32)
     object FilterLabel: TLabel
-      Left = 9
+      Left = 12
       Top = 9
-      Width = 22
-      Height = 13
+      Width = 26
+      Height = 14
       Caption = 'Filter'
     end
     object SearchEdit: TEdit
       Left = 43
       Top = 5
-      Width = 250
-      Height = 21
+      Width = 242
+      Height = 22
       Hint = 'Find a component by name and/or type: [<name>][:][<type>]'
       Anchors = [akLeft, akTop, akRight]
       ParentShowHint = False
@@ -55,9 +55,9 @@ object SelectComponentsForm: TSelectComponentsForm
       OnKeyUp = SearchEditKeyUp
     end
     object SelectAllButton: TBitBtn
-      Left = 294
+      Left = 287
       Top = 4
-      Width = 69
+      Width = 61
       Height = 24
       Action = SelectAllAction
       Anchors = [akTop, akRight]
@@ -66,7 +66,7 @@ object SelectComponentsForm: TSelectComponentsForm
       TabOrder = 1
     end
     object ResizeButton: TBitBtn
-      Left = 363
+      Left = 350
       Top = 4
       Width = 28
       Height = 24
@@ -113,20 +113,20 @@ object SelectComponentsForm: TSelectComponentsForm
   object TreePanel: TPanel
     Left = 0
     Top = 32
-    Width = 396
-    Height = 327
+    Width = 388
+    Height = 320
     Align = alClient
     BevelOuter = bvNone
     Caption = 'TreePanel'
     TabOrder = 1
     DesignSize = (
-      396
-      327)
+      388
+      320)
     object TreeView: TTreeView
-      Left = 4
-      Top = -1
-      Width = 388
-      Height = 305
+      Left = 6
+      Top = 2
+      Width = 373
+      Height = 295
       Anchors = [akLeft, akTop, akRight, akBottom]
       DragMode = dmAutomatic
       HideSelection = False
@@ -138,14 +138,14 @@ object SelectComponentsForm: TSelectComponentsForm
     end
     object BottomPanel: TPanel
       Left = 0
-      Top = 309
-      Width = 396
+      Top = 302
+      Width = 388
       Height = 18
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       object StayOnTopCheckBox: TCheckBox
-        Left = 4
+        Left = 8
         Top = 0
         Width = 100
         Height = 13
@@ -154,18 +154,18 @@ object SelectComponentsForm: TSelectComponentsForm
         OnClick = StayOnTopCheckBoxClick
       end
       object ExactNameCheckBox: TCheckBox
-        Left = 99
+        Left = 112
         Top = 0
-        Width = 100
+        Width = 98
         Height = 13
         Caption = 'Exact &name'
         TabOrder = 1
         OnClick = ExactCheckBoxClick
       end
       object ExactTypeCheckBox: TCheckBox
-        Left = 204
+        Left = 217
         Top = 0
-        Width = 100
+        Width = 104
         Height = 13
         Caption = 'Exact &type'
         TabOrder = 2

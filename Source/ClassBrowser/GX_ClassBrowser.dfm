@@ -3,14 +3,14 @@ object fmClassBrowser: TfmClassBrowser
   Top = 191
   AutoScroll = False
   Caption = 'Class Browser'
-  ClientHeight = 374
-  ClientWidth = 564
+  ClientHeight = 463
+  ClientWidth = 620
   Color = clBtnFace
   DefaultMonitor = dmDesktop
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   Menu = MainMenu
@@ -20,27 +20,29 @@ object fmClassBrowser: TfmClassBrowser
   OnActivate = FormActivate
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter1: TSplitter
     Left = 175
     Top = 30
     Width = 3
-    Height = 325
+    Height = 414
     Cursor = crHSplit
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 355
-    Width = 564
+    Top = 444
+    Width = 620
     Height = 19
     Panels = <>
+    ParentFont = True
     SimplePanel = True
+    UseSystemFont = False
   end
   object pnlData: TPanel
     Left = 178
     Top = 30
-    Width = 386
-    Height = 325
+    Width = 442
+    Height = 414
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
@@ -49,8 +51,8 @@ object fmClassBrowser: TfmClassBrowser
     object pcMain: TPageControl
       Left = 0
       Top = 0
-      Width = 386
-      Height = 325
+      Width = 442
+      Height = 414
       ActivePage = tshMembers
       Align = alClient
       TabIndex = 0
@@ -60,16 +62,16 @@ object fmClassBrowser: TfmClassBrowser
         Caption = 'Members'
         object Splitter2: TSplitter
           Left = 0
-          Top = 233
-          Width = 378
+          Top = 321
+          Width = 434
           Height = 4
           Cursor = crVSplit
           Align = alBottom
         end
         object pnlMethod: TPanel
           Left = 0
-          Top = 237
-          Width = 378
+          Top = 325
+          Width = 434
           Height = 60
           Align = alBottom
           BevelOuter = bvNone
@@ -81,33 +83,33 @@ object fmClassBrowser: TfmClassBrowser
         object lvInfo: TListView
           Left = 0
           Top = 0
-          Width = 378
-          Height = 233
+          Width = 434
+          Height = 321
           Align = alClient
           Columns = <
             item
               Caption = 'Vi'
-              Width = 26
+              Width = 28
             end
             item
               Caption = 'Ty'
-              Width = 26
+              Width = 28
             end
             item
               Caption = 'Vr'
-              Width = 26
+              Width = 28
             end
             item
               Caption = 'Ab'
-              Width = 26
+              Width = 28
             end
             item
               Caption = 'Ov'
-              Width = 26
+              Width = 28
             end
             item
               Caption = 'Name'
-              Width = 174
+              Width = 250
             end>
           ColumnClick = False
           HideSelection = False
@@ -126,8 +128,8 @@ object fmClassBrowser: TfmClassBrowser
         object scInherit: TScrollBox
           Left = 0
           Top = 0
-          Width = 386
-          Height = 304
+          Width = 434
+          Height = 385
           Align = alClient
           Color = clWindow
           ParentColor = False
@@ -143,7 +145,7 @@ object fmClassBrowser: TfmClassBrowser
     Left = 0
     Top = 30
     Width = 175
-    Height = 325
+    Height = 414
     Align = alLeft
     HideSelection = False
     Images = dmSharedImages.Images
@@ -160,7 +162,7 @@ object fmClassBrowser: TfmClassBrowser
   object ControlBar: TControlBar
     Left = 0
     Top = 0
-    Width = 564
+    Width = 620
     Height = 30
     Align = alTop
     AutoSize = True

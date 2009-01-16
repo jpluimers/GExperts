@@ -10,10 +10,10 @@ object fmUsesManager: TfmUsesManager
   Color = clBtnFace
   Constraints.MinHeight = 240
   Constraints.MinWidth = 560
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -22,7 +22,7 @@ object fmUsesManager: TfmUsesManager
   OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter: TSplitter
     Left = 266
     Top = 0
@@ -54,7 +54,7 @@ object fmUsesManager: TfmUsesManager
         ImageIndex = 3
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 326
+          Top = 325
           Width = 281
           Height = 34
           Align = alBottom
@@ -71,7 +71,7 @@ object fmUsesManager: TfmUsesManager
           object btnSearchPathAddToImpl: TButton
             Left = 136
             Top = 4
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
@@ -81,7 +81,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 281
-          Height = 326
+          Height = 325
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -91,12 +91,12 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 275
-            Height = 320
+            Height = 319
             Align = alClient
             Color = clBtnFace
             DragMode = dmAutomatic
             Enabled = False
-            ItemHeight = 13
+            ItemHeight = 14
             MultiSelect = True
             PopupMenu = pmuAvail
             Sorted = True
@@ -113,7 +113,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 281
-          Height = 326
+          Height = 325
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -123,10 +123,10 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 275
-            Height = 320
+            Height = 319
             Align = alClient
             DragMode = dmAutomatic
-            ItemHeight = 13
+            ItemHeight = 14
             MultiSelect = True
             PopupMenu = pmuAvail
             Sorted = True
@@ -138,7 +138,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 326
+          Top = 325
           Width = 281
           Height = 34
           Align = alBottom
@@ -155,7 +155,7 @@ object fmUsesManager: TfmUsesManager
           object btnProjectAddToImplementation: TButton
             Left = 136
             Top = 4
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
@@ -169,7 +169,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 281
-          Height = 326
+          Height = 325
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -179,10 +179,10 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 275
-            Height = 320
+            Height = 319
             Align = alClient
             DragMode = dmAutomatic
-            ItemHeight = 13
+            ItemHeight = 14
             MultiSelect = True
             PopupMenu = pmuAvail
             Sorted = True
@@ -194,7 +194,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 326
+          Top = 325
           Width = 281
           Height = 34
           Align = alBottom
@@ -211,7 +211,7 @@ object fmUsesManager: TfmUsesManager
           object btnCommonAddToImplementation: TButton
             Left = 136
             Top = 4
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
@@ -225,7 +225,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 281
-          Height = 297
+          Height = 296
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -235,10 +235,10 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 275
-            Height = 291
+            Height = 290
             Align = alClient
             DragMode = dmAutomatic
-            ItemHeight = 13
+            ItemHeight = 14
             MultiSelect = True
             PopupMenu = pmuAvail
             Sorted = True
@@ -250,7 +250,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 297
+          Top = 296
           Width = 281
           Height = 63
           Align = alBottom
@@ -267,7 +267,7 @@ object fmUsesManager: TfmUsesManager
           object btnFavoriteAddToImplementation: TButton
             Left = 136
             Top = 33
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 3
@@ -275,7 +275,7 @@ object fmUsesManager: TfmUsesManager
           object btnFavoriteAddToFavorites: TButton
             Left = 136
             Top = 3
-            Width = 125
+            Width = 140
             Height = 25
             Action = actFavAdd
             TabOrder = 1
@@ -304,10 +304,10 @@ object fmUsesManager: TfmUsesManager
         289
         41)
       object lblFilter: TLabel
-        Left = 18
+        Left = 17
         Top = 20
-        Width = 22
-        Height = 13
+        Width = 26
+        Height = 14
         Caption = 'Filte&r'
         FocusControl = edtFilter
       end
@@ -315,7 +315,7 @@ object fmUsesManager: TfmUsesManager
         Left = 48
         Top = 16
         Width = 225
-        Height = 21
+        Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 1
         OnChange = edtFilterChange
@@ -325,7 +325,7 @@ object fmUsesManager: TfmUsesManager
         Left = 0
         Top = 0
         Width = 289
-        Height = 14
+        Height = 15
         Align = alTop
         AutoSize = True
         BevelOuter = bvNone
@@ -347,9 +347,9 @@ object fmUsesManager: TfmUsesManager
     TabOrder = 0
     object pcUses: TPageControl
       Left = 6
-      Top = 20
+      Top = 21
       Width = 254
-      Height = 415
+      Height = 414
       ActivePage = tabInterface
       Align = alClient
       TabIndex = 0
@@ -360,7 +360,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 246
-          Height = 353
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -370,10 +370,10 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 240
-            Height = 347
+            Height = 345
             Align = alClient
             DragMode = dmAutomatic
-            ItemHeight = 13
+            ItemHeight = 14
             MultiSelect = True
             PopupMenu = pmuUses
             Sorted = True
@@ -385,7 +385,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlIntfFooter: TPanel
           Left = 0
-          Top = 353
+          Top = 351
           Width = 246
           Height = 34
           Align = alBottom
@@ -402,7 +402,7 @@ object fmUsesManager: TfmUsesManager
           object btnIntfMoveToImpl: TButton
             Left = 88
             Top = 4
-            Width = 137
+            Width = 152
             Height = 25
             Action = actIntfMoveToImpl
             TabOrder = 1
@@ -416,7 +416,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 246
-          Height = 353
+          Height = 351
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -426,10 +426,10 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 240
-            Height = 347
+            Height = 345
             Align = alClient
             DragMode = dmAutomatic
-            ItemHeight = 13
+            ItemHeight = 14
             MultiSelect = True
             PopupMenu = pmuUses
             Sorted = True
@@ -441,7 +441,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlImplFooter: TPanel
           Left = 0
-          Top = 353
+          Top = 351
           Width = 246
           Height = 34
           Align = alBottom
@@ -458,7 +458,7 @@ object fmUsesManager: TfmUsesManager
           object btnImplMoveToIntf: TButton
             Left = 88
             Top = 4
-            Width = 137
+            Width = 152
             Height = 25
             Action = actImplMoveToIntf
             TabOrder = 1
@@ -470,7 +470,7 @@ object fmUsesManager: TfmUsesManager
       Left = 6
       Top = 6
       Width = 254
-      Height = 14
+      Height = 15
       Align = alTop
       AutoSize = True
       BevelOuter = bvNone

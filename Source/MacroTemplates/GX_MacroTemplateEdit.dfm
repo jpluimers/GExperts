@@ -6,64 +6,64 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
   ClientHeight = 172
   ClientWidth = 392
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -10
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblName: TLabel
-    Left = 57
+    Left = 58
     Top = 15
-    Width = 28
-    Height = 13
+    Width = 31
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Name'
     FocusControl = edtName
   end
   object lblDescription: TLabel
-    Left = 32
+    Left = 29
     Top = 44
-    Width = 53
-    Height = 13
+    Width = 60
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Description'
     FocusControl = edtDescription
   end
   object lblShortcut: TLabel
-    Left = 45
+    Left = 41
     Top = 76
-    Width = 40
-    Height = 13
+    Width = 48
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Shortcut'
   end
   object lblInsertPos: TLabel
-    Left = 19
+    Left = 11
     Top = 108
-    Width = 66
-    Height = 13
+    Width = 78
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Insert Position'
     FocusControl = cbxInsertPos
   end
   object edtName: TEdit
-    Left = 95
+    Left = 99
     Top = 11
     Width = 148
-    Height = 21
+    Height = 22
     TabOrder = 0
   end
   object edtDescription: TEdit
-    Left = 95
+    Left = 99
     Top = 40
     Width = 280
-    Height = 21
+    Height = 22
     TabOrder = 1
   end
   object btnOK: TButton
@@ -87,12 +87,12 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
     TabOrder = 4
   end
   object cbxInsertPos: TComboBox
-    Left = 95
+    Left = 99
     Top = 104
     Width = 148
-    Height = 21
+    Height = 22
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 14
     TabOrder = 2
     Items.Strings = (
       'Cursor Position'

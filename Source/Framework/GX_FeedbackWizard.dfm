@@ -4,15 +4,15 @@ object fmFeedbackWizard: TfmFeedbackWizard
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Feedback Wizard'
-  ClientHeight = 399
-  ClientWidth = 584
+  ClientHeight = 515
+  ClientWidth = 701
   Color = clBtnFace
   Constraints.MinHeight = 414
   Constraints.MinWidth = 554
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -20,11 +20,11 @@ object fmFeedbackWizard: TfmFeedbackWizard
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 584
+    Width = 701
     Height = 83
     Align = alTop
     BevelOuter = bvNone
@@ -33,26 +33,27 @@ object fmFeedbackWizard: TfmFeedbackWizard
     object pnlHeader: TPanel
       Left = 0
       Top = 0
-      Width = 584
+      Width = 701
       Height = 43
       Align = alTop
       BevelOuter = bvNone
       Color = 6488064
       TabOrder = 0
       DesignSize = (
-        584
+        701
         43)
       object lblFeeedback: TLabel
         Left = 9
-        Top = 10
-        Width = 275
-        Height = 24
-        Alignment = taRightJustify
+        Top = 8
+        Width = 680
+        Height = 29
+        Alignment = taCenter
         Anchors = [akLeft, akTop, akRight]
+        AutoSize = False
         Caption = 'GExperts Feedback Wizard'
         Font.Charset = ANSI_CHARSET
         Font.Color = clWhite
-        Font.Height = -21
+        Font.Height = -24
         Font.Name = 'Arial'
         Font.Style = [fsBold]
         ParentFont = False
@@ -62,7 +63,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
     object pnlDescription: TPanel
       Left = 0
       Top = 43
-      Width = 584
+      Width = 701
       Height = 40
       Align = alClient
       BevelInner = bvRaised
@@ -73,14 +74,14 @@ object fmFeedbackWizard: TfmFeedbackWizard
       object lblDescription: TLabel
         Left = 2
         Top = 2
-        Width = 580
+        Width = 697
         Height = 36
         Align = alClient
         Alignment = taCenter
         Caption = 'Feedback Type'
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
-        Font.Height = -19
+        Font.Height = -21
         Font.Name = 'Arial'
         Font.Style = [fsBold]
         ParentFont = False
@@ -91,17 +92,17 @@ object fmFeedbackWizard: TfmFeedbackWizard
   object pnlContent: TPanel
     Left = 0
     Top = 83
-    Width = 584
-    Height = 280
+    Width = 701
+    Height = 396
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 1
     object Splitter: TSplitter
-      Left = 376
+      Left = 493
       Top = 0
       Width = 5
-      Height = 280
+      Height = 396
       Cursor = crHSplit
       Align = alRight
       AutoSnap = False
@@ -109,10 +110,10 @@ object fmFeedbackWizard: TfmFeedbackWizard
       MinSize = 100
     end
     object pgeInfo: TPageControl
-      Left = 381
+      Left = 498
       Top = 0
       Width = 203
-      Height = 280
+      Height = 396
       ActivePage = tshInfoHelp
       Align = alRight
       MultiLine = True
@@ -124,15 +125,9 @@ object fmFeedbackWizard: TfmFeedbackWizard
           Left = 0
           Top = 0
           Width = 195
-          Height = 252
+          Height = 367
           Align = alClient
           Color = 15858687
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
           ReadOnly = True
           TabOrder = 0
           OnEnter = InfoMemoEnter
@@ -148,12 +143,6 @@ object fmFeedbackWizard: TfmFeedbackWizard
           Height = 238
           Align = alClient
           Color = 15858687
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
           ReadOnly = True
           TabOrder = 0
           OnEnter = InfoMemoEnter
@@ -163,8 +152,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
     object pnlMain: TPanel
       Left = 0
       Top = 0
-      Width = 376
-      Height = 280
+      Width = 493
+      Height = 396
       Align = alClient
       BorderWidth = 1
       FullRepaint = False
@@ -172,8 +161,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
       object pgeMain: TPageControl
         Left = 2
         Top = 2
-        Width = 372
-        Height = 276
+        Width = 489
+        Height = 392
         ActivePage = tshType
         Align = alClient
         TabIndex = 0
@@ -201,8 +190,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
           object mmoDescription: TMemo
             Left = 0
             Top = 0
-            Width = 372
-            Height = 255
+            Width = 481
+            Height = 363
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
@@ -221,8 +210,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
             object lblPercent: TLabel
               Left = 70
               Top = 48
-              Width = 60
-              Height = 13
+              Width = 78
+              Height = 14
               Caption = '% of the &time'
               FocusControl = edtPercent
             end
@@ -246,7 +235,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
               Left = 26
               Top = 44
               Width = 39
-              Height = 21
+              Height = 22
               MaxLength = 3
               TabOrder = 1
               Text = '100'
@@ -271,8 +260,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
           object mmoBugSteps: TMemo
             Left = 0
             Top = 0
-            Width = 372
-            Height = 255
+            Width = 481
+            Height = 363
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
@@ -379,43 +368,43 @@ object fmFeedbackWizard: TfmFeedbackWizard
           object mmoReport: TMemo
             Left = 0
             Top = 0
-            Width = 265
-            Height = 255
+            Width = 364
+            Height = 363
             Align = alClient
             ScrollBars = ssBoth
             TabOrder = 0
             WordWrap = False
           end
           object pnlReportButtons: TPanel
-            Left = 265
+            Left = 364
             Top = 0
-            Width = 107
-            Height = 255
+            Width = 117
+            Height = 363
             Align = alRight
             BevelOuter = bvNone
             TabOrder = 1
             object btnSave: TButton
-              Left = 4
+              Left = 5
               Top = 46
-              Width = 103
+              Width = 110
               Height = 27
               Caption = '&Save Report...'
               TabOrder = 1
               OnClick = btnSaveClick
             end
             object btnCopy: TButton
-              Left = 4
+              Left = 5
               Top = 6
-              Width = 103
+              Width = 110
               Height = 27
               Caption = 'Copy to &Clipboard'
               TabOrder = 0
               OnClick = btnCopyClick
             end
             object btnEmail: TButton
-              Left = 4
+              Left = 5
               Top = 86
-              Width = 103
+              Width = 110
               Height = 27
               Caption = 'Compose &Email'
               TabOrder = 2
@@ -428,8 +417,8 @@ object fmFeedbackWizard: TfmFeedbackWizard
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 363
-    Width = 584
+    Top = 479
+    Width = 701
     Height = 36
     Align = alBottom
     BevelOuter = bvNone

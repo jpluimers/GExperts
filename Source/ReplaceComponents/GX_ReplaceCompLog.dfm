@@ -8,10 +8,10 @@ object fmReplaceCompLog: TfmReplaceCompLog
   ClientHeight = 450
   ClientWidth = 604
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
@@ -19,7 +19,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter: TSplitter
     Left = 0
     Top = 294
@@ -38,32 +38,34 @@ object fmReplaceCompLog: TfmReplaceCompLog
     BevelOuter = bvNone
     TabOrder = 0
     object lblDest: TLabel
-      Left = 235
+      Left = 260
       Top = 11
-      Width = 53
-      Height = 13
+      Width = 61
+      Height = 14
+      Alignment = taRightJustify
       Caption = 'Destination'
     end
     object lblSource: TLabel
-      Left = 8
+      Left = 17
       Top = 12
-      Width = 34
-      Height = 13
+      Width = 38
+      Height = 14
+      Alignment = taRightJustify
       Caption = 'Source'
     end
     object edtDestClassName: TEdit
-      Left = 295
+      Left = 327
       Top = 8
-      Width = 170
-      Height = 21
+      Width = 175
+      Height = 22
       Color = clBtnFace
       TabOrder = 1
     end
     object edtSourceClassName: TEdit
-      Left = 49
+      Left = 62
       Top = 8
-      Width = 170
-      Height = 21
+      Width = 175
+      Height = 22
       Color = clBtnFace
       TabOrder = 0
     end
@@ -90,7 +92,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
           Width = 80
         end
         item
-          Caption = '[ ! ]'
+          Caption = '[!]'
           Width = 30
         end
         item
@@ -133,7 +135,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
         Width = 592
         Height = 101
         Align = alClient
-        ItemHeight = 13
+        ItemHeight = 14
         TabOrder = 0
       end
     end

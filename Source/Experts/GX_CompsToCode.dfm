@@ -6,10 +6,10 @@ object fmCompsToCode: TfmCompsToCode
   ClientHeight = 266
   ClientWidth = 288
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -19,7 +19,7 @@ object fmCompsToCode: TfmCompsToCode
     288
     266)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object btnOK: TButton
     Left = 21
     Top = 234

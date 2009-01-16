@@ -1,36 +1,36 @@
 object fmCodeSearch: TfmCodeSearch
-  Left = 237
-  Top = 181
+  Left = 280
+  Top = 201
   BorderStyle = bsDialog
   Caption = 'Code Librarian Search'
   ClientHeight = 143
   ClientWidth = 279
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblFind: TLabel
-    Left = 10
-    Top = 11
-    Width = 53
-    Height = 13
+    Left = 12
+    Top = 14
+    Width = 66
+    Height = 14
     Alignment = taRightJustify
     Caption = '&Text to find'
     FocusControl = edSearch
   end
   object edSearch: TEdit
-    Left = 72
-    Top = 7
-    Width = 201
-    Height = 21
+    Left = 87
+    Top = 10
+    Width = 186
+    Height = 22
     TabOrder = 0
   end
   object gbxOptions: TGroupBox
@@ -43,7 +43,7 @@ object fmCodeSearch: TfmCodeSearch
     object cbCaseSensitive: TCheckBox
       Left = 8
       Top = 21
-      Width = 161
+      Width = 200
       Height = 17
       Caption = '&Case sensitive'
       TabOrder = 0
@@ -51,7 +51,7 @@ object fmCodeSearch: TfmCodeSearch
     object cbWholeWord: TCheckBox
       Left = 8
       Top = 40
-      Width = 161
+      Width = 200
       Height = 17
       Caption = '&Whole words only'
       TabOrder = 1

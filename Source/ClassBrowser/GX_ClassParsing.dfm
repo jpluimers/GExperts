@@ -6,10 +6,10 @@ object fmClassParsing: TfmClassParsing
   ClientHeight = 94
   ClientWidth = 382
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = True
@@ -17,11 +17,11 @@ object fmClassParsing: TfmClassParsing
   Scaled = False
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblParsing: TLabel
-    Left = 86
+    Left = 91
     Top = 16
-    Width = 291
+    Width = 286
     Height = 33
     AutoSize = False
     Caption = 'Parsing classes, please wait...'

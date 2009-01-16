@@ -1,8 +1,10 @@
 inherited fmClipboardHistory: TfmClipboardHistory
-  Left = 428
-  Top = 141
+  Left = 356
+  Top = 273
   ActiveControl = lvClip
   Caption = 'Clipboard History'
+  ClientHeight = 428
+  ClientWidth = 550
   KeyPreview = True
   Menu = MainMenu
   Position = poScreenCenter
@@ -13,8 +15,8 @@ inherited fmClipboardHistory: TfmClipboardHistory
   TextHeight = 13
   object Splitter: TSplitter
     Left = 0
-    Top = 54
-    Width = 304
+    Top = 278
+    Width = 550
     Height = 4
     Cursor = crVSplit
     Align = alBottom
@@ -22,8 +24,8 @@ inherited fmClipboardHistory: TfmClipboardHistory
   end
   object mmoClipText: TMemo
     Left = 0
-    Top = 58
-    Width = 304
+    Top = 282
+    Width = 550
     Height = 146
     Align = alBottom
     ReadOnly = True
@@ -34,8 +36,8 @@ inherited fmClipboardHistory: TfmClipboardHistory
   object lvClip: TListView
     Left = 0
     Top = 22
-    Width = 304
-    Height = 32
+    Width = 550
+    Height = 256
     Align = alClient
     Columns = <
       item
@@ -64,7 +66,7 @@ inherited fmClipboardHistory: TfmClipboardHistory
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 304
+    Width = 550
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

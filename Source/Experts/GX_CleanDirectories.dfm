@@ -7,12 +7,12 @@ object fmCleanDirectories: TfmCleanDirectories
   ClientHeight = 512
   ClientWidth = 553
   Color = clBtnFace
-  Constraints.MinHeight = 400
-  Constraints.MinWidth = 400
-  Font.Charset = DEFAULT_CHARSET
+  Constraints.MinHeight = 425
+  Constraints.MinWidth = 450
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -22,7 +22,7 @@ object fmCleanDirectories: TfmCleanDirectories
   OnDestroy = FormDestroy
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlButtons: TPanel
     Left = 0
     Top = 475
@@ -35,6 +35,17 @@ object fmCleanDirectories: TfmCleanDirectories
     DesignSize = (
       553
       37)
+    object chkReportErrors: TCheckBox
+      Left = 8
+      Top = 9
+      Width = 161
+      Height = 17
+      Anchors = [akLeft, akBottom]
+      Caption = 'Re&port errors'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+    end
     object pnlButtonsRight: TPanel
       Left = 280
       Top = 0
@@ -74,17 +85,6 @@ object fmCleanDirectories: TfmCleanDirectories
         TabOrder = 1
       end
     end
-    object chkReportErrors: TCheckBox
-      Left = 8
-      Top = 9
-      Width = 161
-      Height = 17
-      Anchors = [akLeft, akBottom]
-      Caption = 'Re&port errors'
-      Checked = True
-      State = cbChecked
-      TabOrder = 0
-    end
   end
   object pnlDirs: TPanel
     Left = 0
@@ -119,15 +119,15 @@ object fmCleanDirectories: TfmCleanDirectories
         object laRecursingNote: TLabel
           Left = 8
           Top = 209
-          Width = 3
-          Height = 13
+          Width = 4
+          Height = 14
           Anchors = [akLeft, akBottom]
         end
         object pnlDirList: TPanel
           Left = 2
-          Top = 15
+          Top = 16
           Width = 453
-          Height = 191
+          Height = 190
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 6
@@ -137,9 +137,9 @@ object fmCleanDirectories: TfmCleanDirectories
             Left = 6
             Top = 6
             Width = 441
-            Height = 179
+            Height = 178
             Align = alClient
-            ItemHeight = 13
+            ItemHeight = 14
             PopupMenu = pmuDirs
             TabOrder = 0
             OnClick = clbDirsClick
@@ -148,16 +148,16 @@ object fmCleanDirectories: TfmCleanDirectories
         end
         object pnlDirButtons: TPanel
           Left = 455
-          Top = 15
+          Top = 16
           Width = 84
-          Height = 191
+          Height = 190
           Align = alRight
           BevelOuter = bvNone
           FullRepaint = False
           TabOrder = 1
           DesignSize = (
             84
-            191)
+            190)
           object btnAdd: TButton
             Left = 1
             Top = 6
@@ -224,16 +224,16 @@ object fmCleanDirectories: TfmCleanDirectories
       TabOrder = 0
       object pnlExtButtons: TPanel
         Left = 455
-        Top = 15
+        Top = 16
         Width = 84
-        Height = 189
+        Height = 188
         Align = alRight
         BevelOuter = bvNone
         FullRepaint = False
         TabOrder = 1
         DesignSize = (
           84
-          189)
+          188)
         object btnAddExt: TButton
           Left = 1
           Top = 5
@@ -258,9 +258,9 @@ object fmCleanDirectories: TfmCleanDirectories
       end
       object pnlExtensions: TPanel
         Left = 2
-        Top = 15
+        Top = 16
         Width = 453
-        Height = 189
+        Height = 188
         Align = alClient
         BevelOuter = bvNone
         BorderWidth = 6
@@ -270,10 +270,10 @@ object fmCleanDirectories: TfmCleanDirectories
           Left = 6
           Top = 6
           Width = 441
-          Height = 177
+          Height = 176
           Align = alClient
           Columns = 4
-          ItemHeight = 13
+          ItemHeight = 14
           PopupMenu = pmuExts
           Sorted = True
           TabOrder = 0
@@ -298,8 +298,8 @@ object fmCleanDirectories: TfmCleanDirectories
     object lCleaning: TLabel
       Left = 8
       Top = 1
-      Width = 44
-      Height = 13
+      Width = 49
+      Height = 14
       Caption = 'Cleaning:'
       Visible = False
     end

@@ -1,36 +1,36 @@
 object fmDateFormat: TfmDateFormat
-  Left = 229
-  Top = 131
+  Left = 285
+  Top = 201
   BorderStyle = bsDialog
   Caption = 'Date/Time Format'
-  ClientHeight = 70
+  ClientHeight = 74
   ClientWidth = 337
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblFormat: TLabel
-    Left = 33
-    Top = 12
-    Width = 79
-    Height = 13
+    Left = 17
+    Top = 13
+    Width = 95
+    Height = 14
     Alignment = taRightJustify
     Caption = 'Date/time &format'
     FocusControl = cbFormat
   end
   object cbFormat: TComboBox
     Left = 120
-    Top = 8
+    Top = 9
     Width = 209
-    Height = 21
-    ItemHeight = 13
+    Height = 22
+    ItemHeight = 14
     TabOrder = 0
     Text = 'cbFormat'
     Items.Strings = (
@@ -61,7 +61,7 @@ object fmDateFormat: TfmDateFormat
   end
   object btnOK: TButton
     Left = 168
-    Top = 40
+    Top = 41
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -71,7 +71,7 @@ object fmDateFormat: TfmDateFormat
   end
   object btnCancel: TButton
     Left = 252
-    Top = 40
+    Top = 41
     Width = 75
     Height = 25
     Cancel = True

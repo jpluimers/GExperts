@@ -7,10 +7,10 @@ object fmComponentGrid: TfmComponentGrid
   ClientHeight = 443
   ClientWidth = 685
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -20,7 +20,7 @@ object fmComponentGrid: TfmComponentGrid
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object ToolBar: TToolBar
     Left = 0
     Top = 0
@@ -74,14 +74,14 @@ object fmComponentGrid: TfmComponentGrid
     object lblStart: TLabel
       Left = 93
       Top = 0
-      Width = 176
+      Width = 181
       Height = 22
-      Caption = '   Renumber HelpContext S&tarting at  '
+      Caption = '   Renumber HelpContex&t from:  '
       FocusControl = edtStart
       Layout = tlCenter
     end
     object edtStart: TEdit
-      Left = 269
+      Left = 274
       Top = 0
       Width = 50
       Height = 22
@@ -89,7 +89,7 @@ object fmComponentGrid: TfmComponentGrid
       Text = '0'
     end
     object udStart: TUpDown
-      Left = 319
+      Left = 324
       Top = 0
       Width = 12
       Height = 22
@@ -101,9 +101,9 @@ object fmComponentGrid: TfmComponentGrid
       Wrap = False
     end
     object lblSkipBy: TLabel
-      Left = 331
+      Left = 336
       Top = 0
-      Width = 47
+      Width = 55
       Height = 22
       Alignment = taRightJustify
       Caption = '  S&kip by  '
@@ -111,7 +111,7 @@ object fmComponentGrid: TfmComponentGrid
       Layout = tlCenter
     end
     object edtSkipBy: TEdit
-      Left = 378
+      Left = 391
       Top = 0
       Width = 50
       Height = 22
@@ -119,7 +119,7 @@ object fmComponentGrid: TfmComponentGrid
       Text = '1'
     end
     object udSkipBy: TUpDown
-      Left = 428
+      Left = 441
       Top = 0
       Width = 12
       Height = 22
@@ -131,14 +131,14 @@ object fmComponentGrid: TfmComponentGrid
       Wrap = False
     end
     object tbnSep4: TToolButton
-      Left = 440
+      Left = 453
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnRenumber: TToolButton
-      Left = 448
+      Left = 461
       Top = 0
       Action = actFileRenumber
     end

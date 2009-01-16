@@ -5,14 +5,14 @@ object fmCompRenameConfig: TfmCompRenameConfig
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
   ClientHeight = 428
-  ClientWidth = 491
+  ClientWidth = 497
   Color = clBtnFace
   Constraints.MinHeight = 270
   Constraints.MinWidth = 425
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
@@ -22,20 +22,20 @@ object fmCompRenameConfig: TfmCompRenameConfig
   OnDestroy = FormDestroy
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
     Top = 352
-    Width = 491
+    Width = 497
     Height = 76
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      491
+      497
       76)
     object pnlButtonsRight: TPanel
-      Left = 218
+      Left = 224
       Top = 0
       Width = 273
       Height = 76
@@ -73,8 +73,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
     end
     object chkAutoAdd: TCheckBox
       Left = 8
-      Top = 20
-      Width = 236
+      Top = 21
+      Width = 350
       Height = 17
       Anchors = [akLeft, akBottom]
       Caption = 'Auto-add rules for new components'
@@ -83,7 +83,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
     object chkShowDialog: TCheckBox
       Left = 8
       Top = 2
-      Width = 236
+      Width = 350
       Height = 17
       Anchors = [akLeft, akBottom]
       Caption = 'Show rename dialog for new components'
@@ -93,7 +93,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   object pnlRules: TPanel
     Left = 0
     Top = 0
-    Width = 491
+    Width = 497
     Height = 352
     Align = alClient
     BevelOuter = bvNone
@@ -102,34 +102,34 @@ object fmCompRenameConfig: TfmCompRenameConfig
     object pnlNames: TGroupBox
       Left = 6
       Top = 6
-      Width = 479
+      Width = 485
       Height = 340
       Align = alClient
       Caption = 'Rename &Rules'
       TabOrder = 0
       DesignSize = (
-        479
+        485
         340)
       object btnAdd: TButton
-        Left = 369
+        Left = 358
         Top = 16
-        Width = 100
+        Width = 117
         Height = 28
         Action = acAdd
         Anchors = [akTop, akRight]
         TabOrder = 0
       end
       object btnDelete: TButton
-        Left = 369
+        Left = 358
         Top = 50
-        Width = 100
+        Width = 117
         Height = 28
         Action = acDelete
         Anchors = [akTop, akRight]
         TabOrder = 1
       end
       object btnDefaults: TButton
-        Left = 369
+        Left = 375
         Top = 306
         Width = 100
         Height = 25
@@ -139,9 +139,9 @@ object fmCompRenameConfig: TfmCompRenameConfig
         OnClick = btnDefaultsClick
       end
       object btnOtherProperties: TButton
-        Left = 369
+        Left = 358
         Top = 84
-        Width = 100
+        Width = 117
         Height = 28
         Action = acOtherProperties
         Anchors = [akTop, akRight]

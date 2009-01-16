@@ -9,10 +9,10 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   Color = clBtnFace
   Constraints.MinHeight = 360
   Constraints.MinWidth = 363
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -20,7 +20,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlDetails: TPanel
     Left = 0
     Top = 42
@@ -55,45 +55,45 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
         object lblGroup: TLabel
           Left = 7
           Top = 0
-          Width = 29
-          Height = 13
+          Width = 33
+          Height = 14
           Caption = 'Group'
         end
         object lblSourceComp: TLabel
           Left = 7
           Top = 48
-          Width = 90
-          Height = 13
+          Width = 105
+          Height = 14
           Caption = 'Source component'
         end
         object lblDestComp: TLabel
           Left = 7
           Top = 96
-          Width = 109
-          Height = 13
+          Width = 128
+          Height = 14
           Caption = 'Destination component'
         end
         object lblSourceProp: TLabel
           Left = 167
           Top = 48
-          Width = 75
-          Height = 13
+          Width = 89
+          Height = 14
           Caption = 'Source property'
         end
         object lblDestProp: TLabel
           Left = 167
           Top = 96
-          Width = 94
-          Height = 13
+          Width = 112
+          Height = 14
           Caption = 'Destination property'
         end
         object cbxGroupName: TComboBox
           Left = 7
           Top = 16
           Width = 145
-          Height = 21
+          Height = 22
           DropDownCount = 16
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 0
         end
@@ -101,9 +101,9 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Left = 7
           Top = 64
           Width = 145
-          Height = 21
+          Height = 22
           DropDownCount = 16
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 1
           OnChange = cbxSourceClassNameChange
@@ -112,9 +112,9 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Left = 7
           Top = 112
           Width = 145
-          Height = 21
+          Height = 22
           DropDownCount = 16
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 3
           OnChange = cbxDestClassNameChange
@@ -123,10 +123,10 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Left = 167
           Top = 64
           Width = 186
-          Height = 21
+          Height = 22
           Anchors = [akLeft, akTop, akRight]
           DropDownCount = 16
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 2
         end
@@ -134,17 +134,17 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Left = 167
           Top = 112
           Width = 186
-          Height = 21
+          Height = 22
           Anchors = [akLeft, akTop, akRight]
           DropDownCount = 16
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 4
         end
         object chkBiDirEnabled: TCheckBox
           Left = 167
           Top = 144
-          Width = 97
+          Width = 150
           Height = 17
           Caption = 'Bi-directional'
           Checked = True
@@ -154,7 +154,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
         object chkDisabled: TCheckBox
           Left = 7
           Top = 144
-          Width = 97
+          Width = 150
           Height = 17
           Caption = 'Disabled'
           Checked = True
@@ -164,7 +164,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
         object chkUseConstValue: TCheckBox
           Left = 7
           Top = 168
-          Width = 145
+          Width = 150
           Height = 17
           Caption = 'Assign constant value'
           TabOrder = 7
@@ -174,13 +174,13 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Left = 7
           Top = 192
           Width = 145
-          Height = 21
+          Height = 22
           TabOrder = 9
         end
         object chkLogValues: TCheckBox
           Left = 167
           Top = 168
-          Width = 97
+          Width = 150
           Height = 17
           Caption = 'Log values'
           TabOrder = 8
@@ -189,7 +189,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
         object chkLogNonDef: TCheckBox
           Left = 183
           Top = 194
-          Width = 129
+          Width = 150
           Height = 17
           Caption = 'Only if not default'
           TabOrder = 10
@@ -251,21 +251,22 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
     object bvlPos: TBevel
       Left = 178
       Top = 10
-      Width = 107
+      Width = 112
       Height = 25
     end
     object lblPos: TLabel
-      Left = 185
+      Left = 181
       Top = 16
-      Width = 40
-      Height = 13
+      Width = 46
+      Height = 14
+      Alignment = taRightJustify
       Caption = 'Position:'
     end
     object lblPosition: TLabel
-      Left = 227
+      Left = 229
       Top = 16
-      Width = 41
-      Height = 13
+      Width = 47
+      Height = 14
       Caption = '999/999'
     end
     object pnlToolbar: TPanel

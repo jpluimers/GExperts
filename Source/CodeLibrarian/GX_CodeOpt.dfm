@@ -6,17 +6,17 @@ object fmCodeOptions: TfmCodeOptions
   ClientHeight = 241
   ClientWidth = 324
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object btnOK: TButton
     Left = 154
     Top = 205
@@ -49,9 +49,9 @@ object fmCodeOptions: TfmCodeOptions
       Caption = 'Paths'
       object lblStoragePath: TLabel
         Left = 8
-        Top = 16
-        Width = 152
-        Height = 13
+        Top = 15
+        Width = 173
+        Height = 14
         Caption = 'Code Librarian Storage Location'
       end
       object sbBrowse: TButton
@@ -67,7 +67,7 @@ object fmCodeOptions: TfmCodeOptions
         Left = 8
         Top = 32
         Width = 259
-        Height = 21
+        Height = 22
         TabOrder = 0
       end
     end
@@ -137,15 +137,15 @@ object fmCodeOptions: TfmCodeOptions
       object lblTreeView: TLabel
         Left = 8
         Top = 16
-        Width = 44
-        Height = 13
+        Width = 51
+        Height = 14
         Caption = 'Treeview'
       end
       object lblEditor: TLabel
         Left = 8
         Top = 64
-        Width = 27
-        Height = 13
+        Width = 32
+        Height = 14
         Caption = 'Editor'
       end
       object lblSize: TLabel
@@ -161,20 +161,20 @@ object fmCodeOptions: TfmCodeOptions
         Left = 8
         Top = 32
         Width = 205
-        Height = 21
+        Height = 22
         Style = csDropDownList
         DropDownCount = 18
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object fcEditor: TComboBox
         Left = 8
         Top = 80
         Width = 205
-        Height = 21
+        Height = 22
         Style = csDropDownList
         DropDownCount = 18
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 3
       end
       object udTreeview: TUpDown
@@ -205,7 +205,7 @@ object fmCodeOptions: TfmCodeOptions
         Left = 232
         Top = 32
         Width = 41
-        Height = 21
+        Height = 22
         TabOrder = 1
         Text = '8'
         OnKeyPress = eNumericKeyPress
@@ -214,7 +214,7 @@ object fmCodeOptions: TfmCodeOptions
         Left = 232
         Top = 80
         Width = 41
-        Height = 21
+        Height = 22
         TabOrder = 4
         Text = '8'
       end

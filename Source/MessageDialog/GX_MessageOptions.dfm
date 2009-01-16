@@ -6,16 +6,16 @@ object fmMessageOptions: TfmMessageOptions
   ClientHeight = 176
   ClientWidth = 329
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxOptions: TGroupBox
     Left = 8
     Top = 8
@@ -26,16 +26,16 @@ object fmMessageOptions: TfmMessageOptions
     object lblConcat: TLabel
       Left = 8
       Top = 26
-      Width = 247
-      Height = 13
+      Width = 282
+      Height = 14
       Caption = 'Concatenation string for line breaks in &Pascal source'
       FocusControl = edtMsgString
     end
     object lblCppConcat: TLabel
       Left = 8
       Top = 74
-      Width = 234
-      Height = 13
+      Width = 273
+      Height = 14
       Caption = 'Concatenation string for line breaks in &C++ source'
       FocusControl = edtCppMsgString
     end
@@ -43,14 +43,14 @@ object fmMessageOptions: TfmMessageOptions
       Left = 8
       Top = 48
       Width = 297
-      Height = 21
+      Height = 22
       TabOrder = 0
     end
     object edtCppMsgString: TEdit
       Left = 8
       Top = 92
       Width = 297
-      Height = 21
+      Height = 22
       TabOrder = 1
     end
   end

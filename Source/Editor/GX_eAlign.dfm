@@ -5,34 +5,34 @@ object fmAlign: TfmAlign
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Align Lines'
-  ClientHeight = 256
+  ClientHeight = 268
   ClientWidth = 181
   Color = clBtnFace
   Constraints.MinHeight = 200
   Constraints.MinWidth = 135
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   DesignSize = (
     181
-    256)
+    268)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblToken: TLabel
     Left = 8
-    Top = 8
-    Width = 71
-    Height = 13
+    Top = 7
+    Width = 84
+    Height = 14
     Caption = '&Align on token:'
     FocusControl = lstTokens
   end
   object btnOK: TButton
     Left = 8
-    Top = 223
+    Top = 235
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -43,7 +43,7 @@ object fmAlign: TfmAlign
   end
   object btnCancel: TButton
     Left = 97
-    Top = 223
+    Top = 235
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -56,21 +56,21 @@ object fmAlign: TfmAlign
     Left = 8
     Top = 25
     Width = 163
-    Height = 169
+    Height = 181
     Anchors = [akLeft, akTop, akRight, akBottom]
-    ItemHeight = 13
+    ItemHeight = 14
     PopupMenu = pmuTokens
     TabOrder = 0
     OnDblClick = lstTokensDblClick
   end
   object cbxMode: TComboBox
     Left = 8
-    Top = 198
+    Top = 210
     Width = 164
-    Height = 21
+    Height = 22
     Style = csDropDownList
     Anchors = [akLeft, akRight, akBottom]
-    ItemHeight = 13
+    ItemHeight = 14
     ItemIndex = 0
     TabOrder = 1
     Text = 'Align at rightmost token'

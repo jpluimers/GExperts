@@ -4,33 +4,36 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Grep Results Options'
-  ClientHeight = 288
-  ClientWidth = 280
+  ClientHeight = 295
+  ClientWidth = 317
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    280
-    288)
+    317
+    295)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxMatchList: TGroupBox
     Left = 9
     Top = 8
-    Width = 261
-    Height = 103
+    Width = 298
+    Height = 106
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Match Results List'
     TabOrder = 0
+    DesignSize = (
+      298
+      106)
     object pnlListFont: TPanel
-      Left = 28
-      Top = 60
+      Left = 48
+      Top = 62
       Width = 197
       Height = 33
       BevelWidth = 2
@@ -41,39 +44,41 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object chkGrepMiddle: TCheckBox
       Left = 12
-      Top = 36
-      Width = 241
+      Top = 39
+      Width = 277
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'Jump to matches in the &middle of the editor'
       TabOrder = 1
     end
     object chkGrepExpandAll: TCheckBox
       Left = 12
-      Top = 16
-      Width = 241
+      Top = 19
+      Width = 277
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = '&Expand all matches after searching'
       TabOrder = 0
     end
   end
   object gbxMatchContext: TGroupBox
     Left = 9
-    Top = 118
-    Width = 261
-    Height = 129
+    Top = 124
+    Width = 298
+    Height = 132
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Match Context Display'
     TabOrder = 1
     object lblContextLines: TLabel
-      Left = 28
-      Top = 101
-      Width = 111
-      Height = 13
+      Left = 48
+      Top = 104
+      Width = 132
+      Height = 14
       Caption = 'Number of context lines'
     end
     object pnlContextFont: TPanel
-      Left = 28
-      Top = 18
+      Left = 48
+      Top = 21
       Width = 197
       Height = 33
       BevelWidth = 2
@@ -83,8 +88,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       OnClick = pnlContextFontClick
     end
     object pnlMatchLineColor: TPanel
-      Left = 28
-      Top = 58
+      Left = 48
+      Top = 61
       Width = 197
       Height = 33
       BevelWidth = 2
@@ -94,18 +99,18 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       OnClick = pnlMatchLineColorClick
     end
     object edtContextLines: TEdit
-      Left = 167
-      Top = 98
+      Left = 187
+      Top = 101
       Width = 46
-      Height = 21
+      Height = 22
       TabOrder = 2
-      Text = '0'
+      Text = '1'
     end
     object udContextLines: TUpDown
-      Left = 213
-      Top = 98
+      Left = 233
+      Top = 101
       Width = 12
-      Height = 21
+      Height = 22
       Associate = edtContextLines
       Min = 1
       Position = 1
@@ -114,8 +119,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
   end
   object btnOK: TButton
-    Left = 110
-    Top = 255
+    Left = 147
+    Top = 262
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -125,8 +130,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     TabOrder = 2
   end
   object btnCancel: TButton
-    Left = 195
-    Top = 255
+    Left = 232
+    Top = 262
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -136,31 +141,31 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     TabOrder = 3
   end
   object dlgGrepListFont: TFontDialog
-    Font.Charset = DEFAULT_CHARSET
+    Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'MS Sans Serif'
+    Font.Name = 'Tahoma'
     Font.Style = []
     MinFontSize = 0
     MaxFontSize = 0
-    Left = 183
+    Left = 255
     Top = 66
   end
   object dlgGrepContextFont: TFontDialog
-    Font.Charset = DEFAULT_CHARSET
+    Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'MS Sans Serif'
+    Font.Name = 'Courier New'
     Font.Style = []
     MinFontSize = 0
     MaxFontSize = 0
-    Left = 184
-    Top = 132
+    Left = 256
+    Top = 140
   end
   object dlgContextFontColor: TColorDialog
     Ctl3D = True
     Options = [cdSolidColor]
-    Left = 183
-    Top = 172
+    Left = 255
+    Top = 180
   end
 end
