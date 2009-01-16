@@ -201,6 +201,9 @@
     </DCCReference>
     <DCCReference Include="Framework\GX_ActionBroker.pas" />
     <DCCReference Include="Framework\GX_Actions.pas" />
+    <DCCReference Include="Framework\GX_BaseForm.pas">
+      <Form>fmBaseForm</Form>
+    </DCCReference>
     <DCCReference Include="Framework\GX_ClassHacks.pas" />
     <DCCReference Include="Framework\GX_ClassMgr.pas" />
     <DCCReference Include="Framework\GX_ConfigurationInfo.pas" />
@@ -237,8 +240,8 @@
       <Form>fmProgress</Form>
     </DCCReference>
     <DCCReference Include="Framework\GX_SharedImages.pas">
-      <Form>dmSharedImages</Form>
       <DesignClass>TDataModule</DesignClass>
+      <Form>dmSharedImages</Form>
     </DCCReference>
     <DCCReference Include="Framework\GX_SynMemoUtils.pas" />
     <DCCReference Include="Framework\GX_UnitPositions.pas" />

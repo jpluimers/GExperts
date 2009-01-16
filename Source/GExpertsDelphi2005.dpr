@@ -12,6 +12,7 @@ uses
   GX_Backup in 'BackupProject\GX_Backup.pas' {fmBackup},
   GX_BackupConfig in 'BackupProject\GX_BackupConfig.pas' {fmBackupConfig},
   GX_BackupOptions in 'BackupProject\GX_BackupOptions.pas' {fmBackupOptions},
+  GX_BaseForm in 'Framework\GX_BaseForm.pas' {fmBaseForm},
   GX_ClassBrowser in 'ClassBrowser\GX_ClassBrowser.pas' {fmClassBrowser},
   GX_ClassHacks in 'Framework\GX_ClassHacks.pas',
   GX_ClassIdentify in 'ClassBrowser\GX_ClassIdentify.pas' {fmClassIdentify},

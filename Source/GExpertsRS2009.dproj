@@ -76,6 +76,9 @@
 			<DCCReference Include="ClassBrowser\GX_ClassBrowser.pas">
 				<Form>fmClassBrowser</Form>
 			</DCCReference>
+			<DCCReference Include="Framework\GX_BaseForm.pas">
+				<Form>fmBaseForm</Form>
+			</DCCReference>
 			<DCCReference Include="Framework\GX_ClassHacks.pas"/>
 			<DCCReference Include="ClassBrowser\GX_ClassIdentify.pas">
 				<Form>fmClassIdentify</Form>
