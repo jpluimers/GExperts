@@ -247,7 +247,7 @@ begin
   inherited Create(AOwner);
 
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   SetNonModalFormPopupMode(Self);
 
   FFileDrop := TDropFileTarget.Create(nil);

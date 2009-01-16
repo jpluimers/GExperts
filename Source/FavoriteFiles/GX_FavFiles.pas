@@ -1271,7 +1271,7 @@ begin
   inherited;
 
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   pnlFileView.Caption := '';
   SetNonModalFormPopupMode(Self);
   splTreeView.AutoSnap := False;

@@ -6,10 +6,10 @@ interface
 
 uses
   Windows, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert;
+  StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert, GX_BaseForm;
 
 type
-  TfmConfiguration = class(TForm)
+  TfmConfiguration = class(TfmBaseForm)
     pnlMain: TPanel;
     pnlButtons: TPanel;
     pcConfig: TPageControl;
@@ -43,7 +43,7 @@ type
     chkEditorToolBar: TCheckBox;
     gbxIDEMenu: TGroupBox;
     chkDisableEditorExperts: TCheckBox;
-    dlgFont: TFontDialog;
+    dlgUIFont: TFontDialog;
     chkDisableEDTEnhancements: TCheckBox;
     chkEditTabButtonsFlat: TCheckBox;
     rgAlign: TRadioGroup;
@@ -87,6 +87,10 @@ type
     btnHelp: TButton;
     btnCancel: TButton;
     btnOK: TButton;
+    gbxCustomFont: TGroupBox;
+    chkUseCustomFont: TCheckBox;
+    btnCustomFont: TButton;
+    dlgFont: TFontDialog;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -123,6 +127,7 @@ type
     procedure btnGetFontsClick(Sender: TObject);
     procedure btnAppBuilderClick(Sender: TObject);
     procedure btnEditViewClick(Sender: TObject);
+    procedure btnCustomFontClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -183,7 +188,6 @@ constructor TfmConfiguration.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  SetDefaultFont(Self);
   FOIFont := TFont.Create;
   FCPFont := TFont.Create;
 
@@ -217,22 +221,21 @@ end;
 
 procedure TfmConfiguration.LoadGeneral;
 begin
-  with ConfigInfo do
-  begin
-    edVCLPath.Text := VclPath;
-    edConfigPath.Text := ConfigPath;
-    edHelpFile.Text := HelpFile;
-  end;
+  edVCLPath.Text := ConfigInfo.VclPath;
+  edConfigPath.Text := ConfigInfo.ConfigPath;
+  edHelpFile.Text := ConfigInfo.HelpFile;
+  chkUseCustomFont.Checked := ConfigInfo.EnableCustomFont;
+  dlgUIFont.Font.Assign(ConfigInfo.CustomFont);
 end;
 
 procedure TfmConfiguration.SaveGeneral;
 begin
-  with ConfigInfo do
-  begin
-    VclPath := edVCLPath.Text;
-    ConfigPath := edConfigPath.Text;
-    HelpFile := edHelpFile.Text;
-  end;
+  ConfigInfo.VclPath := edVCLPath.Text;
+  ConfigInfo.ConfigPath := edConfigPath.Text;
+  ConfigInfo.HelpFile := edHelpFile.Text;
+  ConfigInfo.EnableCustomFont := chkUseCustomFont.Checked;
+  ConfigInfo.CustomFont.Assign(dlgUIFont.Font);
+  ConfigInfo.UpdateScreenForms;
 end;
 
 procedure TfmConfiguration.LoadExperts;
@@ -248,7 +251,7 @@ const
   RowHeight = 40;
 begin
   FThumbSize := RowHeight;
-  RowWidth := sbxExperts.Width;
+  RowWidth := sbxExperts.Width * 3;
   for i := 0 to GExpertsInst.ExpertCount - 1 do
   begin
     Panel := TPanel.Create(Self);
@@ -265,6 +268,8 @@ begin
       SetBounds(4, 4, 32, 32);
       Picture.Bitmap.Assign(AnExpert.Bitmap);
       Transparent := True;
+      Center := True;
+      Stretch := True;
     end;
 
     with TCheckBox.Create(sbxExperts) do
@@ -959,6 +964,16 @@ end;
 procedure TfmConfiguration.btnEditViewClick(Sender: TObject);
 begin
   GxOtaShowEditViewDetails;
+end;
+
+procedure TfmConfiguration.btnCustomFontClick(Sender: TObject);
+begin
+  dlgUIFont.Font.Assign(ConfigInfo.CustomFont);
+  if dlgUIFont.Execute then
+  begin
+    chkUseCustomFont.Checked := True;
+    Self.Font.Assign(dlgUIFont.Font);
+  end;
 end;
 
 end.

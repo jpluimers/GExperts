@@ -29,7 +29,6 @@ type
     HintTimer: TTimer;
     mitShowHints: TMenuItem;
     mitHelp: TMenuItem;
-    ilActions: TImageList;
     Actions: TActionList;
     ToolBar: TToolBar;
     tbnCharLow: TToolButton;
@@ -151,7 +150,7 @@ const
     'Substitute', 'Escape', 'File Separator', 'Group Separator',
     'Record Separator', 'Unit Separator');
 
-  DefaultDisplayFontSize = 8;
+  DefaultDisplayFontSize = 10;
   DefaultFontName = 'Tahoma';
 
 procedure TfmAsciiChart.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -194,7 +193,7 @@ begin
   Canvas.Brush.Style := bsClear;
   { draw the character value as Int or Hex on screen }
   Canvas.Font.Name := 'Tahoma';  // do not localize
-  Canvas.Font.Size := 8;
+  Canvas.Font.Size := 9;
   Canvas.Font.Color := clGrayText;
   { Only do the if check once for improved speed rather than every iteration }
   if FShowHex then
@@ -507,7 +506,7 @@ end;
 procedure TfmAsciiChart.edFontSizeChange(Sender: TObject);
 const
   MinimumDisplayFontSize = 6;
-  MaximumDisplayFontSize = 20;
+  MaximumDisplayFontSize = 26;
 var
   NewFontSize: Integer;
 begin
@@ -595,6 +594,7 @@ begin
     Exit;
 
   FDisplayFontSize := Size;
+  edFontSize.Text := IntToStr(Size);
   Self.Refresh;
 end;
 
@@ -719,10 +719,10 @@ constructor TfmAsciiChart.Create(AOwner: TComponent);
 var
   Settings: TGExpertsSettings;
 begin
-  inherited Create(AOwner);
+  inherited;
 
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   SetNonModalFormPopupMode(Self);
   GetFonts;
   CenterForm(Self);

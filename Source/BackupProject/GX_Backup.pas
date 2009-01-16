@@ -412,8 +412,8 @@ end;
 
 constructor TfmBackup.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  SetDefaultFont(Self);
+  inherited;
+  GxSetDefaultFont(Self);
 
   FLibraryPath := TStringList.Create;
   FLibraryPath.Duplicates := dupIgnore;

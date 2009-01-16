@@ -105,7 +105,7 @@ procedure TfmMacroTemplateEdit.FormCreate(Sender: TObject);
 begin
   edtShortCut := TGXHotKey.Create(Self);
   edtShortCut.Parent := Self;
-  edtShortCut.SetBounds(95, 72, 148, 21);
+  edtShortCut.SetBounds(edtDescription.Left, lblShortCut.Top - 2, cbxInsertPos.Width, edtDescription.Height);
   edtShortCut.TabOrder := 2;
 end;
 

@@ -617,7 +617,7 @@ end;
 procedure TfmProcedureList.InitializeForm;
 begin
   SetupSyntaxHighlightingControl;
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 
   FObjectStrings := TStringList.Create;
   FObjectStrings.Sorted := True;

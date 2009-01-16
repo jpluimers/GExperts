@@ -117,7 +117,7 @@ implementation
 
 uses
   SysUtils, Windows, Menus, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
-  GX_IdeUtils, Graphics;
+  GX_IdeUtils, Graphics, GX_GxUtils;
 
 resourcestring
   SPropertyNotFound = 'Property not found';
@@ -827,7 +827,7 @@ end;
 procedure TfmCompRename.FormCreate(Sender: TObject);
 begin
   SetModalFormPopupMode(Self);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   lblReason.Font.Color := clRed;
 end;
 

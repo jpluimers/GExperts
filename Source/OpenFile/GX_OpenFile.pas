@@ -630,7 +630,7 @@ end;
 procedure TfmOpenFile.FormCreate(Sender: TObject);
 begin
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   lvSearchPath.Color := clBtnFace;
   lvSearchPath.Enabled := False;
   lvCommon.Color := clBtnFace;

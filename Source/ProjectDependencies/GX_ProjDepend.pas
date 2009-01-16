@@ -748,9 +748,9 @@ end;
 
 constructor TfmProjDepend.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   SetNonModalFormPopupMode(Self);
   FFilterList := TStringList.Create;
 

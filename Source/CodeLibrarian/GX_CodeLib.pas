@@ -1183,10 +1183,10 @@ end;
 
 constructor TfmCodeLib.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
   SetNonModalFormPopupMode(Self);
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   SetupSyntaxHighlightingControl;
 
   Screen.Cursor := crHourglass;

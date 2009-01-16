@@ -342,10 +342,10 @@ end;
 
 constructor TfmSourceExport.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
 
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   // Destroyed with form
   FEditor := TSynEdit.Create(Self);
   with FEditor do

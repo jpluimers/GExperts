@@ -303,7 +303,7 @@ procedure TfmGrepSearch.LoadFormSettings;
 begin
   if not Assigned(fmGrepResults) then
     raise Exception.Create(SGrepResultsNotActive);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 
   FGrepExpert := fmGrepResults.GrepExpert;
   cbText.Items.Assign(FGrepExpert.SearchList);

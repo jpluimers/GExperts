@@ -449,7 +449,7 @@ end;
 constructor TfmReplaceComp.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 
   LoadFormSettings;
   SetupControls;

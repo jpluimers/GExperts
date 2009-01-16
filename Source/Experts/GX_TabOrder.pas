@@ -462,7 +462,7 @@ end;
 
 procedure TfmTabOrder.FormCreate(Sender: TObject);
 begin
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 end;
 
 initialization

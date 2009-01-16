@@ -591,7 +591,7 @@ begin
   inherited Create(AOwner);
 
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   FileDrop := TDropFileTarget.Create(nil);
   FileDrop.OnDrop := DropFiles;
   FileDrop.DragTypes := [dtCopy, dtMove, dtLink];

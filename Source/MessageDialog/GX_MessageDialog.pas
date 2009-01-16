@@ -335,7 +335,7 @@ type
 constructor TfmMessageDialog.Create(AOwner: TComponent; Settings: TMessageDialogSettings);
 begin
   inherited Create(AOwner);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   FMessageType := nil;
   pgeMessageDialogChange(Self);
   FSettings := Settings;

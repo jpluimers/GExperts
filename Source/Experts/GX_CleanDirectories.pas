@@ -428,7 +428,7 @@ var
 begin
   laStatus.Caption := '';
   LoadSettings;
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 
   if CleanExpert.ExtensionList.Count > 0 then
     clbExtensions.Items.Assign(CleanExpert.ExtensionList)

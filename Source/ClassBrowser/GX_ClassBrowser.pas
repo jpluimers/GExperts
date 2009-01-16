@@ -1407,11 +1407,11 @@ end;
 
 constructor TfmClassBrowser.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
   SetToolbarGradient(tbMain);
   SetToolbarGradient(tbKinds);
   SetToolbarGradient(tbVisibility);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 
   SetNonModalFormPopupMode(Self);
   FStartingDir := ExtractFilePath(Application.ExeName);

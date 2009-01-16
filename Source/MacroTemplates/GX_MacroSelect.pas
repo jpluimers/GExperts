@@ -41,7 +41,7 @@ implementation
 uses
   Messages, Windows,
   GX_MacroTemplates, GX_MacroTemplatesExpert, GX_ConfigurationInfo,
-  GX_GenericUtils;
+  GX_GenericUtils, GX_GxUtils;
 
 {$R *.dfm}
 
@@ -186,7 +186,7 @@ end;
 procedure TfmMacroSelect.FormCreate(Sender: TObject);
 begin
   LoadFormLayout;
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
 end;
 
 procedure TfmMacroSelect.FormClose(Sender: TObject; var Action: TCloseAction);

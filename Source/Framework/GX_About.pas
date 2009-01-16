@@ -3,10 +3,10 @@ unit GX_About;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls;
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
 
 type
-  TfmAbout = class(TForm)
+  TfmAbout = class(TfmBaseForm)
     lblGExperts: TLabel;
     btnClose: TButton;
     lblVersion: TLabel;
@@ -64,8 +64,7 @@ end;
 
 constructor TfmAbout.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  SetDefaultFont(Self);
+  inherited;
   SetFontBold(lblContributors);
   SetFontBold(lblProjectLeader);
   SetFontBold(lblWebSite);

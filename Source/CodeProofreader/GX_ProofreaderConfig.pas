@@ -129,7 +129,7 @@ begin
 
   SetToolbarGradient(tbrReplacement);
   SetToolbarGradient(tbrDictionary);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   Assert(Assigned(ProofreaderExpert));
   FProofreaderExpert := ProofreaderExpert;
   Assert(Assigned(ProofreaderData));

@@ -55,7 +55,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Consts,
-  GX_ConfigurationInfo, GX_GenericUtils;
+  GX_ConfigurationInfo, GX_GenericUtils, GX_GxUtils;
 
 const
   MsgDlgResults: array[TMsgDlgBtn] of Integer = (
@@ -140,7 +140,7 @@ begin
     begin
       Dlg := TfmGxMessageBox.Create(nil);
       try
-        SetDefaultFont(Dlg);
+        GxSetDefaultFont(Dlg);
         Dlg.Caption := Adaptor.GetCaption;
         Dlg.chkNeverShowAgain.Enabled := Adaptor.AllowSuppress;
         Dlg.mmoMessage.Lines.Text := Adaptor.GetMessage;

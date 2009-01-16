@@ -32,6 +32,10 @@ type
     function GetVclPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
     function GetEnableKeyboardShortcuts: Boolean;
+    function GetEnableCustomFont: Boolean;
+    procedure SetEnableCustomFont(const Value: Boolean);
+    function GetCustomFont: TFont;
+    procedure UpdateScreenForms;
 
     // Return the IDE's base registry key without a
     // trailing backslash, e.g.
@@ -60,6 +64,8 @@ type
     property PlaceGxMainMenuInToolsMenu: Boolean read GetPlaceGxMainMenuInToolsMenu write SetPlaceGxMainMenuInToolsMenu;
     property GExpertsPath: string read GetGExpertsPath;
     property EnableKeyboardShortcuts: Boolean read GetEnableKeyboardShortcuts;
+    property EnableCustomFont: Boolean read GetEnableCustomFont write SetEnableCustomFont;
+    property CustomFont: TFont read GetCustomFont;
   end;
 
   TGXFontFlag = (ffColor);
@@ -129,7 +135,7 @@ uses
   SysUtils,
   GX_EditorEnhancements, GX_MessageBox,
   GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils, GX_VerDepConst,
-  Math;
+  Math, GX_BaseForm;
 
 type
   TConfigInfo = class(TSingletonInterfacedObject, IConfigInfo)
@@ -143,6 +149,8 @@ type
     FAlphabetizeMenu: Boolean;
     FPlaceGxMainMenuInToolsMenu: Boolean;
     FEnableKeyboardShortcuts: Boolean;
+    FEnableCustomFont: Boolean;
+    FCustomFont: TFont;
     procedure LoadSettings;
     function DefaultConfigPath: string;
   protected
@@ -166,6 +174,10 @@ type
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
     function ConfigurationKey: string;
     function GetEnableKeyboardShortcuts: Boolean;
+    function GetEnableCustomFont: Boolean;
+    procedure SetEnableCustomFont(const Value: Boolean);
+    function GetCustomFont: TFont;
+    procedure UpdateScreenForms;
   public
     constructor Create;
     destructor Destroy; override;
@@ -382,6 +394,7 @@ begin
   {$IFOPT D+} SendDebug('Creating configuration info'); {$ENDIF D+}
   inherited Create;
   FPrivateConfigurationInfo := Self;
+  FCustomFont := TFont.Create;
 
   FIdeRootRegistryKey := GxOtaGetIdeBaseRegistryKey;
   FVclPath := AddSlash(GetIdeRootDirectory) +
@@ -416,6 +429,7 @@ begin
   {$IFOPT D+} SendDebug('TConfigInfo.Destroy'); {$ENDIF D+}
   //SaveSettings; // Call this below to prevent re-creating TConfigInfo
   FreeEditorEnhancements;
+  FreeAndNil(FCustomFont);
 
   inherited Destroy;
 end;
@@ -439,6 +453,8 @@ begin
     FEditorExpertsEnabled := Settings.ReadBool(ConfigurationKey, 'EditorExpertsEnabled', True);
     FPlaceGxMainMenuInToolsMenu := Settings.ReadBool(ConfigurationKey, 'PlaceGxMainMenuInToolsMenu', False);
     FEnableKeyboardShortcuts := Settings.ReadBool(ConfigurationKey, 'EnableKeyboardShortcuts', True);
+    FEnableCustomFont := Settings.ReadBool(ConfigurationKey, 'EnableCustomFont', False);
+    Settings.LoadFont(AddSlash(ConfigurationKey) + 'CustomFont', FCustomFont);
 
     Setting := Settings.ReadBool(ConfigurationKey, 'EditorEnhancementsEnabled', False);
     EditorEnhancements.Enabled := Setting and not IsStandAlone;
@@ -464,6 +480,8 @@ begin
     Settings.WriteBool(ConfigurationKey, 'EditorExpertsEnabled', FEditorExpertsEnabled);
     Settings.WriteBool(ConfigurationKey, 'PlaceGxMainMenuInToolsMenu', FPlaceGxMainMenuInToolsMenu);
     Settings.WriteBool(ConfigurationKey, 'EditorEnhancementsEnabled', EditorEnhancements.Enabled);
+    Settings.WriteBool(ConfigurationKey, 'EnableCustomFont', FEnableCustomFont);
+    Settings.SaveFont(AddSlash(ConfigurationKey) + 'CustomFont', FCustomFont);
   finally
     FreeAndNil(Settings);
   end;
@@ -570,6 +588,34 @@ end;
 function TConfigInfo.GetEnableKeyboardShortcuts: Boolean;
 begin
   Result := FEnableKeyboardShortcuts;
+end;
+
+function TConfigInfo.GetCustomFont: TFont;
+begin
+  Result := FCustomFont;
+end;
+
+function TConfigInfo.GetEnableCustomFont: Boolean;
+begin
+  Result := FEnableCustomFont;
+end;
+
+procedure TConfigInfo.UpdateScreenForms;
+var
+  i: Integer;
+  Form: TCustomForm;
+begin
+  for i := 0 to Screen.FormCount - 1 do
+  begin
+    Form := Screen.Forms[i];
+    if Form is TfmBaseForm then
+      Form.Font.Assign(FCustomFont);
+  end;
+end;
+
+procedure TConfigInfo.SetEnableCustomFont(const Value: Boolean);
+begin
+  FEnableCustomFont := Value;
 end;
 
 { TShowBadDirectoryMessage }

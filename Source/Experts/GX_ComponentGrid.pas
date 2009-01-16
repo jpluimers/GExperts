@@ -87,15 +87,15 @@ const // Do not localize.
   GridProperties: array[0..2] of TGridProperty = (
     (
       PropertyName: STagPropertyName;
-      ColWidth: 50;
+      ColWidth: 55;
     ),
     (
       PropertyName: SHelpContextPropertyName;
-      ColWidth: 65;
+      ColWidth: 75;
     ),
     (
       PropertyName: SHintPropertyName;
-      ColWidth: 100;
+      ColWidth: 150;
     ));
 
 resourcestring
@@ -326,6 +326,7 @@ begin
 
   StringGrid.FixedCols := FixedColumns;
   StringGrid.FixedRows := 1;
+  StringGridResize(StringGrid);
 end;
 
 constructor TfmComponentGrid.Create(AOwner: TComponent);
@@ -360,7 +361,7 @@ begin
   Assert(Assigned(SendingGrid));
 
   WidthDelta := SendingGrid.ClientWidth;
-  for i := 0 to SendingGrid.ColCount-1 do
+  for i := 0 to SendingGrid.ColCount - 1 do
     Dec(WidthDelta, SendingGrid.ColWidths[i]);
   Dec(WidthDelta, SendingGrid.ColCount * SendingGrid.GridLineWidth);
 
@@ -439,7 +440,7 @@ end;
 procedure TfmComponentGrid.FormCreate(Sender: TObject);
 begin
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   StringGrid := TSortGrid.Create(Self);
   with StringGrid do
   begin

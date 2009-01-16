@@ -8,10 +8,10 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, Menus, ExtCtrls, ComCtrls,
-  GX_Experts, GX_OtaUtils, GXHotKey;
+  GX_Experts, GX_OtaUtils, GXHotKey, GX_BaseForm;
 
 type
-  TfmIdeShortCuts = class(TForm)
+  TfmIdeShortCuts = class(TfmBaseForm)
     MainMenu: TMainMenu;
     lblMenuStruc: TLabel;
     edtMenuStructure: TEdit;
@@ -652,10 +652,10 @@ end;
 
 procedure TfmIdeShortCuts.FormCreate(Sender: TObject);
 begin
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   hkShortCut := TGXHotKey.Create(Self);
   hkShortCut.Parent := pnlControls;
-  hkShortCut.SetBounds(100, 83, 160, 21);
+  hkShortCut.SetBounds(edtMenuStructure.Left, lblShortCut.Top - 3, 150, edtMenuStructure.Height);
   hkShortCut.Enabled := False;
   hkShortCut.HotKey := 0;
   hkShortCut.InvalidKeys := [];

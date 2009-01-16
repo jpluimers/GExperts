@@ -454,10 +454,10 @@ constructor TfmClipboardHistory.Create(AOwner: TComponent);
 resourcestring
   SLoadingFailed = 'Loading of stored clipboard clips failed.' + sLineBreak;
 begin
-  inherited Create(AOwner);
+  inherited;
 
   SetToolbarGradient(ToolBar);
-  SetDefaultFont(Self);
+  GxSetDefaultFont(Self);
   {$IFOPT D+} SendDebug('Creating clipboard history data list'); {$ENDIF}
   FDataList := TList.Create;
   SplitterRatio := 0.50;

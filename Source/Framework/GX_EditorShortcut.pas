@@ -24,7 +24,7 @@ procedure TfmEditorShortcut.FormCreate(Sender: TObject);
 begin
   hkyShortCut := TGXHotKey.Create(Self);
   hkyShortCut.Parent := gbxShortCut;
-  hkyShortCut.SetBounds(8, 44, 193, 22);
+  hkyShortCut.SetBounds(lblShortCut.Left, lblShortCut.Top + lblShortCut.Height + 8, gbxShortCut.ClientWidth - (lblShortCut.Left * 2), 22);
   lblShortCut.FocusControl := hkyShortCut;
 end;
 
