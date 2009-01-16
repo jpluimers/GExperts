@@ -35,6 +35,8 @@ function GxLoadBitmapFromFile(FileName: string; var TargetBitmap: Graphics.TBitm
 procedure GxContextHelp(const HelpOwner: TWinControl; const ContextID: Integer);
 procedure GxContextHelpContents(const HelpOwner: TWinControl);
 
+procedure GxSetDefaultFont(Control: TControl);
+
 // Determine what runtime features are available to be exposed or disabled
 // These are dependent on the IDE version, etc.
 function ComponentPaletteAvailable: Boolean;
@@ -163,6 +165,17 @@ begin
   {$ELSE not GX_EditorEnhancements}
   Result := False;
   {$ENDIF}
+end;
+
+type
+  TControlCracker = class(TControl);
+
+procedure GxSetDefaultFont(Control: TControl);
+begin
+  if ConfigInfo.EnableCustomFont then
+    TControlCracker(Control).Font.Assign(ConfigInfo.CustomFont)
+  else
+    SetDefaultFont(Control);
 end;
 
 end.

@@ -2154,6 +2154,10 @@ begin
     else
       TControlCracker(Control).Font.Name := 'MS Shell Dlg';
     Result := TControlCracker(Control).Font.Name;
+    if IsWindowsVistaOrLater then // Vista and later default the UI to 9 point (not 8)
+      TControlCracker(Control).Font.Size := 9
+    else
+      TControlCracker(Control).Font.Size := 8;
   end;
 end;
 
@@ -2302,6 +2306,8 @@ begin
   if Form = nil then
     Exit;
 
+  if not Form.Floating then
+    Exit;
   Rect := GetScreenWorkArea;
   with Form do
   begin
@@ -2331,17 +2337,20 @@ end;
 
 procedure EnsureFormVisible(const Form: TCustomForm);
 var
-   Rect: TRect;
+  Rect: TRect;
 begin
-   Rect := GetScreenWorkArea(Form);
-   if (Form.Left + Form.Width > Rect.Right) then
-     Form.Left := Form.Left - ((Form.Left + Form.Width) - Rect.Right);
-   if (Form.Top + Form.Height > Rect.Bottom) then
-     Form.Top := Form.Top - ((Form.Top + Form.Height) - Rect.Bottom);
-   if Form.Left < Rect.Left then
-     Form.Left := Rect.Left;
-   if Form.Top < Rect.Top then
-     Form.Top := Rect.Top;
+  Assert(Assigned(Form));
+  if not Form.Floating then
+    Exit;
+  Rect := GetScreenWorkArea(Form);
+  if (Form.Left + Form.Width > Rect.Right) then
+    Form.Left := Form.Left - ((Form.Left + Form.Width) - Rect.Right);
+  if (Form.Top + Form.Height > Rect.Bottom) then
+    Form.Top := Form.Top - ((Form.Top + Form.Height) - Rect.Bottom);
+  if Form.Left < Rect.Left then
+    Form.Left := Rect.Left;
+  if Form.Top < Rect.Top then
+    Form.Top := Rect.Top;
 end;
 
 function GetWindowClassName(WinHandle: THandle): string;
