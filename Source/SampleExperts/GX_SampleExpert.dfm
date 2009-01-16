@@ -6,27 +6,30 @@ object fmGxSampleExpertForm: TfmGxSampleExpertForm
   ClientHeight = 124
   ClientWidth = 290
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblNote: TLabel
-    Left = 44
+    Left = 8
     Top = 12
-    Width = 196
-    Height = 13
+    Width = 273
+    Height = 15
+    Alignment = taCenter
+    AutoSize = False
     Caption = 'Well, this is just a sample. Not a lot here...'
   end
   object lblData: TLabel
-    Left = 12
+    Left = 13
     Top = 48
-    Width = 152
-    Height = 13
-    Caption = 'This data is saved to the registry'
+    Width = 154
+    Height = 14
+    Alignment = taRightJustify
+    Caption = 'Data is saved to the registry'
   end
   object btnOK: TButton
     Left = 64
@@ -39,10 +42,10 @@ object fmGxSampleExpertForm: TfmGxSampleExpertForm
     TabOrder = 0
   end
   object edtData: TEdit
-    Left = 172
+    Left = 180
     Top = 44
-    Width = 109
-    Height = 21
+    Width = 93
+    Height = 22
     TabOrder = 1
   end
   object btnCancel: TButton

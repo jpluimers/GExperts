@@ -9,10 +9,10 @@ object fmSourceExport: TfmSourceExport
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 550
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -20,7 +20,7 @@ object fmSourceExport: TfmSourceExport
   OnActivate = FormActivate
   OnClose = FormClose
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
     Top = 450
@@ -30,18 +30,18 @@ object fmSourceExport: TfmSourceExport
     BevelOuter = bvNone
     TabOrder = 2
     object lblTitle: TLabel
-      Left = 14
+      Left = 17
       Top = 16
-      Width = 20
-      Height = 13
+      Width = 24
+      Height = 14
       Alignment = taRightJustify
       Caption = 'Title'
     end
     object edtTitle: TEdit
-      Left = 40
+      Left = 48
       Top = 12
-      Width = 409
-      Height = 21
+      Width = 415
+      Height = 22
       TabOrder = 0
     end
     object pnlButtons: TPanel

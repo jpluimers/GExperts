@@ -4,49 +4,52 @@ object fmSampleEditorExpertConfig: TfmSampleEditorExpertConfig
   BorderStyle = bsDialog
   Caption = 'Sample Editor Expert Config'
   ClientHeight = 124
-  ClientWidth = 290
+  ClientWidth = 301
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object lblNote: TLabel
-    Left = 44
+    Left = 8
     Top = 12
-    Width = 196
-    Height = 13
+    Width = 281
+    Height = 16
+    Alignment = taCenter
+    AutoSize = False
     Caption = 'Well, this is just a sample. Not a lot here...'
   end
   object lblData: TLabel
-    Left = 12
+    Left = 19
     Top = 48
-    Width = 152
-    Height = 13
-    Caption = 'This data is saved to the registry'
+    Width = 154
+    Height = 14
+    Alignment = taRightJustify
+    Caption = 'Data is saved to the registry'
   end
   object btnOK: TButton
-    Left = 64
+    Left = 74
     Top = 84
     Width = 75
     Height = 25
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
-  end
-  object edtData: TEdit
-    Left = 172
-    Top = 44
-    Width = 109
-    Height = 21
     TabOrder = 1
   end
+  object edtData: TEdit
+    Left = 188
+    Top = 44
+    Width = 101
+    Height = 22
+    TabOrder = 0
+  end
   object btnCancel: TButton
-    Left = 152
+    Left = 162
     Top = 84
     Width = 75
     Height = 25

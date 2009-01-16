@@ -9,17 +9,17 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
   Color = clBtnFace
   Constraints.MinHeight = 320
   Constraints.MinWidth = 400
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlContent: TPanel
     Left = 0
     Top = 0
@@ -144,32 +144,32 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
         object lblComponent: TLabel
           Left = 8
           Top = 24
-          Width = 54
-          Height = 13
+          Width = 64
+          Height = 14
           Caption = 'Component'
         end
         object lblProperty: TLabel
           Left = 8
           Top = 48
-          Width = 39
-          Height = 13
+          Width = 47
+          Height = 14
           Caption = 'Property'
         end
         object lblValue: TLabel
           Left = 8
           Top = 72
-          Width = 27
-          Height = 13
+          Width = 30
+          Height = 14
           Caption = 'Value'
         end
         object cbxComponents: TComboBox
           Left = 80
           Top = 20
           Width = 229
-          Height = 21
+          Height = 22
           Anchors = [akLeft, akTop, akRight]
           DropDownCount = 18
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 0
         end
@@ -177,10 +177,10 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
           Left = 80
           Top = 44
           Width = 229
-          Height = 21
+          Height = 22
           Anchors = [akLeft, akTop, akRight]
           DropDownCount = 18
-          ItemHeight = 13
+          ItemHeight = 14
           Sorted = True
           TabOrder = 1
           OnEnter = cbxPropertyEnter
@@ -189,7 +189,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
           Left = 80
           Top = 68
           Width = 229
-          Height = 21
+          Height = 22
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
         end
@@ -222,9 +222,9 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
       BevelOuter = bvNone
       TabOrder = 0
       object pnlPropTypes: TPanel
-        Left = 308
+        Left = 303
         Top = 0
-        Width = 133
+        Width = 138
         Height = 277
         Align = alRight
         BevelOuter = bvNone
@@ -233,7 +233,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
         object pnlPropTypesHeader: TPanel
           Left = 6
           Top = 6
-          Width = 121
+          Width = 126
           Height = 20
           Align = alTop
           BevelOuter = bvNone
@@ -243,10 +243,10 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
         object lbxPropertyTypes: TListBox
           Left = 6
           Top = 26
-          Width = 121
+          Width = 126
           Height = 245
           Align = alClient
-          ItemHeight = 13
+          ItemHeight = 14
           MultiSelect = True
           PopupMenu = pnuPropertyTypes
           Sorted = True
@@ -256,7 +256,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
       object pnlPropList: TPanel
         Left = 0
         Top = 0
-        Width = 308
+        Width = 303
         Height = 277
         Align = alClient
         BevelOuter = bvNone
@@ -265,7 +265,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
         object pnlPropListHeader: TPanel
           Left = 6
           Top = 6
-          Width = 296
+          Width = 291
           Height = 20
           Align = alTop
           BevelOuter = bvNone
@@ -275,7 +275,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
         object lvProperties: TListView
           Left = 6
           Top = 26
-          Width = 296
+          Width = 291
           Height = 245
           Align = alClient
           Columns = <

@@ -6,17 +6,17 @@ object fmSourceExportOptions: TfmSourceExportOptions
   ClientHeight = 456
   ClientWidth = 491
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlSettings: TPanel
     Left = 0
     Top = 0
@@ -26,24 +26,24 @@ object fmSourceExportOptions: TfmSourceExportOptions
     BevelOuter = bvNone
     TabOrder = 0
     object lblElement: TLabel
-      Left = 202
+      Left = 210
       Top = 11
-      Width = 38
-      Height = 13
+      Width = 45
+      Height = 14
       Alignment = taRightJustify
       Caption = '&Element'
     end
     object gbxAttributes: TGroupBox
-      Left = 196
+      Left = 216
       Top = 32
-      Width = 215
+      Width = 221
       Height = 123
       Caption = ' Element Attributes '
       TabOrder = 4
       object chkBold: TCheckBox
         Left = 123
         Top = 17
-        Width = 89
+        Width = 92
         Height = 17
         Caption = '&Bold'
         TabOrder = 0
@@ -51,8 +51,8 @@ object fmSourceExportOptions: TfmSourceExportOptions
       end
       object chkItalic: TCheckBox
         Left = 123
-        Top = 35
-        Width = 89
+        Top = 36
+        Width = 92
         Height = 17
         Caption = '&Italic'
         TabOrder = 1
@@ -60,8 +60,8 @@ object fmSourceExportOptions: TfmSourceExportOptions
       end
       object chkUnderline: TCheckBox
         Left = 123
-        Top = 54
-        Width = 89
+        Top = 56
+        Width = 92
         Height = 17
         Caption = '&Underline'
         TabOrder = 2
@@ -69,8 +69,8 @@ object fmSourceExportOptions: TfmSourceExportOptions
       end
       object chkStrikeOut: TCheckBox
         Left = 123
-        Top = 73
-        Width = 89
+        Top = 76
+        Width = 92
         Height = 17
         Caption = '&Strikeout'
         TabOrder = 3
@@ -78,20 +78,20 @@ object fmSourceExportOptions: TfmSourceExportOptions
       end
     end
     object cbxAttributes: TComboBox
-      Left = 245
+      Left = 274
       Top = 8
-      Width = 158
-      Height = 21
+      Width = 164
+      Height = 22
       Style = csDropDownList
       DropDownCount = 14
-      ItemHeight = 13
+      ItemHeight = 14
       TabOrder = 3
       OnChange = cbxAttributesChange
     end
     object rbxCopySettings: TRadioGroup
       Left = 8
       Top = 8
-      Width = 181
+      Width = 197
       Height = 81
       Caption = ' Default Clipboard Format '
       Items.Strings = (
@@ -101,7 +101,7 @@ object fmSourceExportOptions: TfmSourceExportOptions
       TabOrder = 0
     end
     object btnBackgroundColor: TButton
-      Left = 9
+      Left = 23
       Top = 97
       Width = 160
       Height = 25
@@ -110,7 +110,7 @@ object fmSourceExportOptions: TfmSourceExportOptions
       OnClick = btnBackgroundColorClick
     end
     object btnLoadIde: TButton
-      Left = 9
+      Left = 23
       Top = 129
       Width = 160
       Height = 25
@@ -169,7 +169,7 @@ object fmSourceExportOptions: TfmSourceExportOptions
   end
   object dlgBackground: TColorDialog
     Ctl3D = True
-    Left = 216
+    Left = 232
     Top = 56
   end
 end

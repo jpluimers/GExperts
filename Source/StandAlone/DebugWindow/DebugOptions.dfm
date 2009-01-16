@@ -3,39 +3,48 @@ object fmDebugOptions: TfmDebugOptions
   Top = 224
   BorderStyle = bsDialog
   Caption = 'Debug Window Options'
-  ClientHeight = 136
-  ClientWidth = 320
+  ClientHeight = 177
+  ClientWidth = 312
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  DesignSize = (
+    312
+    177)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object gbxView: TGroupBox
     Left = 8
     Top = 8
-    Width = 225
+    Width = 294
     Height = 65
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'View Options'
     TabOrder = 0
+    DesignSize = (
+      294
+      65)
     object chkShowOnStartup: TCheckBox
       Left = 8
       Top = 21
-      Width = 177
+      Width = 274
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'Show on startup'
       TabOrder = 0
     end
     object chkShowOnMessage: TCheckBox
       Left = 8
       Top = 40
-      Width = 209
+      Width = 274
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'Show on message received'
       TabOrder = 1
     end
@@ -43,24 +52,30 @@ object fmDebugOptions: TfmDebugOptions
   object gbxMessages: TGroupBox
     Left = 8
     Top = 80
-    Width = 225
+    Width = 294
     Height = 49
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Message Options'
     TabOrder = 1
+    DesignSize = (
+      294
+      49)
     object chkNewAtBottom: TCheckBox
       Left = 8
       Top = 23
-      Width = 209
+      Width = 274
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = 'New messages added to the bottom'
       TabOrder = 0
     end
   end
   object btnOK: TButton
-    Left = 240
-    Top = 12
+    Left = 140
+    Top = 140
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -68,10 +83,11 @@ object fmDebugOptions: TfmDebugOptions
     OnClick = btnOKClick
   end
   object btnCancel: TButton
-    Left = 240
-    Top = 44
+    Left = 228
+    Top = 140
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2

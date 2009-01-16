@@ -1,16 +1,16 @@
 object fmToDo: TfmToDo
   Left = 268
-  Top = 187
+  Top = 191
   ActiveControl = lvTodo
   AutoScroll = False
   Caption = 'To Do List'
   ClientHeight = 289
   ClientWidth = 507
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -12
+  Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
@@ -20,14 +20,16 @@ object fmToDo: TfmToDo
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object StatusBar: TStatusBar
     Left = 0
     Top = 270
     Width = 507
     Height = 19
     Panels = <>
+    ParentFont = True
     SimplePanel = True
+    UseSystemFont = False
   end
   object lvTodo: TListView
     Left = 0
@@ -38,7 +40,7 @@ object fmToDo: TfmToDo
     Columns = <
       item
         Caption = '!'
-        Width = 15
+        Width = 16
       end
       item
         Caption = 'Description'

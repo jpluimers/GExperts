@@ -1,15 +1,16 @@
 object fmDebug: TfmDebug
   Left = 310
   Top = 241
-  Width = 435
-  Height = 287
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Debug Window'
+  ClientHeight = 260
+  ClientWidth = 484
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   Icon.Data = {
     0000010001002020000000000000A80800001600000028000000200000004000
@@ -173,7 +174,7 @@ object fmDebug: TfmDebug
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 427
+    Width = 484
     Height = 24
     AutoSize = True
     Caption = 'ToolBar'
@@ -228,17 +229,17 @@ object fmDebug: TfmDebug
   object lvMessages: TListView
     Left = 0
     Top = 24
-    Width = 427
-    Height = 214
+    Width = 484
+    Height = 236
     Align = alClient
     Columns = <
       item
         Caption = 'Message'
-        Width = 330
+        Width = 350
       end
       item
         Caption = 'Time'
-        Width = 93
+        Width = 100
       end>
     ColumnClick = False
     MultiSelect = True
