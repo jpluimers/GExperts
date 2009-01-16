@@ -372,6 +372,7 @@ function GxOtaModuleIsShowingFormSource(Module: IOTAModule): Boolean;
 procedure GxOtaGoToFileLine(const FileName: string; Line: Integer);
 procedure GxOtaGoToFileLineColumn(const FileName: string; Line: Integer; StartColumn: Integer = 0; StopColumn: Integer = 0; ShowInMiddle: Boolean = True);
 function GxOtaConvertColumnCharsToBytes(LineData: UTF8String; CharIndex: Integer; EndByte: Boolean): Integer;
+function GxOtaConvertColumnBytesToChars(LineData: UTF8String; ByteIndex: Integer): Integer;
 
 // Transform dfm, hpp, etc. references to the base .pas/cpp file name
 function GxOtaGetBaseModuleFileName(const FileName: string): string;
@@ -608,7 +609,7 @@ uses
   {$IFDEF LINUX} WinUtils, {$ENDIF}
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
-  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode;
+  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode, Math;
 
 const
   EditReaderBufferSize = 1024 * 24;
@@ -2099,6 +2100,21 @@ begin
   end
   else
     Result := CharIndex;
+end;
+
+function GxOtaConvertColumnBytesToChars(LineData: UTF8String; ByteIndex: Integer): Integer;
+var
+  UString: TGxUnicodeString;
+  UTF8Str: UTF8String;
+begin
+  if RunningDelphi8OrGreater then
+  begin
+    UTF8Str := Copy(UTF8Str, 1, ByteIndex);
+    UString := UTF8ToUnicodeString(UTF8Str);
+    Result := Length(UString);
+  end
+  else
+    Result := ByteIndex;
 end;
 
 function GxOtaGetBaseModuleFileName(const FileName: string): string;
