@@ -3223,11 +3223,26 @@ begin
                end;
           end;
         end
-        else if (Win32MajorVersion = 6) and (Win32MinorVersion = 0) then
+        else if (Win32MajorVersion = 6) then
         begin
-          OSPlatform := 'Windows Vista';
-          if (VerInfoEx.dwOSVersionInfoSize > 0) and (VerInfoEx.wProductType <> VER_NT_WORKSTATION) then
-            OSPlatform := 'Windows Server 2008';
+          case Win32MinorVersion of
+          0:
+            begin
+              OSPlatform := 'Windows Vista';
+              if (VerInfoEx.dwOSVersionInfoSize > 0) and (VerInfoEx.wProductType <> VER_NT_WORKSTATION) then
+                OSPlatform := 'Windows Server 2008';
+            end;
+          1:
+            begin
+              if (VerInfoEx.dwOSVersionInfoSize > 0) then
+              begin
+                if (VerInfoEx.wProductType = VER_NT_WORKSTATION) then
+                  OSPlatform := 'Windows 7'
+                else if (VerInfoEx.wProductType <> VER_NT_WORKSTATION) then
+                  OSPlatform := 'Windows Server 2008 R2';
+              end;
+            end;
+          end;
         end;
         BuildNumber := Win32BuildNumber;
       end;
