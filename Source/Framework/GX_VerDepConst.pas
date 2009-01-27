@@ -121,6 +121,7 @@ TTabDockHostFormName = 'TTabDockHostForm';
 
   {$IFDEF VER150}
     MajorVersionNumberChar = '7';  // Delphi 7, C++Builder 7
+    {$DEFINE MajorVersionNumber}
   {$ENDIF VER150}
 
   {$IFDEF VER160}
