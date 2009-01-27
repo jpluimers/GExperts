@@ -14,6 +14,7 @@ object fmGxMacroLibraryConfig: TfmGxMacroLibraryConfig
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   PixelsPerInch = 96
   TextHeight = 14
   object chk_AutoPrompt: TCheckBox

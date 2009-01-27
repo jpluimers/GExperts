@@ -13,29 +13,30 @@ object fmAbout: TfmAbout
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
+  Scaled = False
   PixelsPerInch = 96
   TextHeight = 14
   object lblGExperts: TLabel
     Left = 346
-    Top = 19
+    Top = 14
     Width = 140
-    Height = 20
+    Height = 22
     Alignment = taCenter
     AutoSize = False
     Caption = 'GExperts'
   end
   object lblVersion: TLabel
     Left = 346
-    Top = 38
+    Top = 35
     Width = 140
-    Height = 20
+    Height = 22
     Alignment = taCenter
     AutoSize = False
     Caption = 'Version ?.??'
   end
   object lblWebPage: TLabel
-    Left = 358
-    Top = 76
+    Left = 368
+    Top = 72
     Width = 147
     Height = 14
     Cursor = crHandPoint
@@ -44,24 +45,24 @@ object fmAbout: TfmAbout
     OnClick = lblWebPageClick
   end
   object lblProjectLeader: TLabel
-    Left = 264
-    Top = 96
+    Left = 275
+    Top = 91
     Width = 84
     Height = 14
     Alignment = taRightJustify
     Caption = 'Project Leader:'
   end
   object lblContributors: TLabel
-    Left = 244
-    Top = 118
+    Left = 255
+    Top = 112
     Width = 104
     Height = 14
     Alignment = taRightJustify
     Caption = 'Major Contributors:'
   end
   object lblErik: TLabel
-    Left = 358
-    Top = 96
+    Left = 368
+    Top = 91
     Width = 189
     Height = 14
     Cursor = crHandPoint
@@ -69,8 +70,8 @@ object fmAbout: TfmAbout
     OnClick = btnEmailClick
   end
   object lblWebSite: TLabel
-    Left = 293
-    Top = 76
+    Left = 304
+    Top = 72
     Width = 55
     Height = 14
     Alignment = taRightJustify
@@ -78,7 +79,7 @@ object fmAbout: TfmAbout
   end
   object lblPreRelease1: TLabel
     Left = 241
-    Top = 30
+    Top = 27
     Width = 101
     Height = 19
     Alignment = taCenter
@@ -88,7 +89,7 @@ object fmAbout: TfmAbout
   end
   object lblPreRelease2: TLabel
     Left = 489
-    Top = 30
+    Top = 27
     Width = 101
     Height = 19
     Alignment = taCenter
@@ -110,47 +111,8 @@ object fmAbout: TfmAbout
       'Please report all bugs to email@domain.com.')
     ParentCtl3D = False
     ReadOnly = True
-    TabOrder = 4
-    Visible = False
-  end
-  object pnlContributors: TPanel
-    Left = 358
-    Top = 118
-    Width = 250
-    Height = 122
-    BevelOuter = bvNone
-    Enabled = False
     TabOrder = 3
-    object lbxContributors: TListBox
-      Left = 0
-      Top = 0
-      Width = 250
-      Height = 122
-      TabStop = False
-      Align = alClient
-      BorderStyle = bsNone
-      Columns = 2
-      ItemHeight = 14
-      Items.Strings = (
-        'ArentJan Banck'
-        'Jim Campbell'
-        'Primoz Gabrijelcic'
-        'Ulrich Gerhardt'
-        'Benjamin Fournier'
-        'John Hansen'
-        'Taz Higgins'
-        'Stefan Hoffmeister'
-        'Rick Hollerich'
-        'Per-Eric Larsson'
-        'Piotr Likus'
-        'Ray Lischner'
-        'Gerald Nunn'
-        'Alex Petrov'
-        'Puthoon'
-        'Martin Waldenburg')
-      ParentColor = True
-      TabOrder = 0
-    end
+    Visible = False
   end
   object btnClose: TButton
     Left = 473
@@ -188,5 +150,37 @@ object fmAbout: TfmAbout
     Caption = '&Send a Bug Report/Suggestion'
     TabOrder = 0
     OnClick = btnEmailClick
+  end
+  object mmoContributors: TMemo
+    Left = 367
+    Top = 112
+    Width = 223
+    Height = 121
+    BevelInner = bvNone
+    BevelOuter = bvNone
+    BorderStyle = bsNone
+    Color = clBtnFace
+    Ctl3D = False
+    Lines.Strings = (
+      'ArentJan Banck'
+      'Jim Campbell'
+      'Primoz Gabrijelcic'
+      'Ulrich Gerhardt'
+      'Benjamin Fournier'
+      'John Hansen'
+      'Taz Higgins'
+      'Stefan Hoffmeister'
+      'Rick Hollerich'
+      'Per-Eric Larsson'
+      'Piotr Likus'
+      'Ray Lischner'
+      'Gerald Nunn'
+      'Alex Petrov'
+      'Puthoon'
+      'Martin Waldenburg')
+    ParentCtl3D = False
+    ReadOnly = True
+    ScrollBars = ssVertical
+    TabOrder = 4
   end
 end

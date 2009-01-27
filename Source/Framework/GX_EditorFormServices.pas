@@ -76,9 +76,6 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, TypInfo, {$ENDIF}
-{$IFDEF LINUX}
-  WinUtils,
-{$ENDIF LINUX}
   Windows, SysUtils, Classes, Contnrs,
   GX_GenericUtils, GX_IdeUtils, GX_GenericClasses;
 

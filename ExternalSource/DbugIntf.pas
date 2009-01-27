@@ -111,7 +111,6 @@ begin
 end;
 
 procedure SendDebugEx(const Msg: string; MType: TMsgDlgType);
-{$IFDEF MSWINDOWS}
 var
   CDS: TCopyDataStruct;
   DebugWin: hWnd;
@@ -119,10 +118,6 @@ var
   MsgBytes: array of Byte;
   MsgType: AnsiChar;
   ByteIndex: Integer;
-{$ENDIF MSWINDOWS}
-{$IFDEF LINUX}
-  {$DEFINE NEEDMTYPESTR}
-{$ENDIF LINUX}
 {$IFDEF GX_DEBUGLOG}
   {$DEFINE NEEDMTYPESTR}
 {$ENDIF GX_DEBUGLOG}
@@ -152,9 +147,6 @@ begin
   if SendPaused then
     Exit;
 
-{$IFDEF LINUX}
-  Writeln('GX: ' + MTypeStr[MType] + Msg);
-{$ENDIF LINUX}
 {$IFDEF GX_DEBUGLOG}
   GxAddToDebugLog(MTypeStr[MType] + Msg);
 {$ENDIF GX_DEBUGLOG}

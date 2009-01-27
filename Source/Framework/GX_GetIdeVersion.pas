@@ -471,22 +471,8 @@ begin
       Assert(Result in [ideBCB600, ideBCB601, ideBCB602, ideBCB604]);
     end
     else begin
-      if RunningLinux then
-      begin
-        {$IF System.RTLVersion > 14.0 }
-          {$IF System.RTLVersion >= 14.5 }
-            Result := ideKylix300;
-          {$ELSE}
-            Result := ideKylix200;
-          {$IFEND}
-        {$ELSE}
-          Result := ideKylix100;
-        {$IFEND}
-      end else
-      begin
-        Result := GetDelphi6IdeVersion;
-        Assert(Result in [ideD600, ideD601R, ideD601F, ideD602]);
-      end;
+      Result := GetDelphi6IdeVersion;
+      Assert(Result in [ideD600, ideD601R, ideD601F, ideD602]);
     end;
   {$ENDIF VER140}
 

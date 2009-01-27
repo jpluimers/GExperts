@@ -8,16 +8,11 @@ interface
 
 uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
-  {$IFDEF LINUX} DialogsToQDialogs, libc, {$ENDIF LINUX}
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
   Types, CheckLst, TypInfo, ExtCtrls, ComCtrls;
 
 const
-  {$IFDEF LINUX}
-  AllFilesWildCard = '*';
-  {$ELSE}
   AllFilesWildCard = '*.*';
-  {$ENDIF LINUX}
   EmptyString = '';
   // Note these don't handle german/polish/etc. extended ASCII alpha chars that are valid in Delphi 8+
   GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
@@ -471,10 +466,6 @@ function GetUserApplicationDataFolder: string;
 
 // See if the current OS is Windows
 function RunningWindows: Boolean;
-// See if the current OS is some variant of UNIX
-function RunningUnix: Boolean;
-// See if the current OS is Linux
-function RunningLinux: Boolean;
 
 // Get a string representing the OS and version
 function GetOSString: string;
@@ -1687,10 +1678,7 @@ end;
 
 function IsPathAbsolute(const FileName: string): Boolean;
 begin
-  if RunningLinux then
-    Result := (FileName <> '') and (FileName[1] = '/')
-  else
-    Result := ExtractFileDrive(FileName) <> '';
+  Result := ExtractFileDrive(FileName) <> '';
 end;
 
 {$UNDEF IPlusOn}
@@ -3067,13 +3055,6 @@ begin
 end;
 {$ENDIF MSWINDOWS}
 
-{$IFDEF LINUX}
-function GetFileVersionNumber(const FileName: string; MustExist: Boolean): TVersionNumber;
-begin
-  FillChar(Result, SizeOf(Result), 0);
-end;
-{$ENDIF LINUX}
-
 function GetFileVersionString(const FileName: string; MustExist: Boolean): string;
 var
   Version: TVersionNumber;
@@ -3137,28 +3118,6 @@ begin
   Result := False;
   {$ENDIF}
 end;
-
-function RunningUnix: Boolean;
-begin
-  // This will need to be updated if Kylix/Delphi is ported to more platforms
-  Result := RunningLinux;
-end;
-
-function RunningLinux: Boolean;
-begin
-  {$IFDEF LINUX}
-  Result := True;
-  {$ELSE not LINUX}
-  Result := False;
-  {$ENDIF}
-end;
-
-{$IFDEF LINUX}
-function GetOSString: string;
-begin
-  Result := 'Linux'; // use uname data here under Kylix?
-end;
-{$ENDIF LINUX}
 
 {$IFDEF MSWINDOWS}
 function GetVersionExA(lpVersionInformation: Pointer): BOOL; stdcall;
@@ -3286,22 +3245,6 @@ begin
 end;
 {$ENDIF MSWINDOWS}
 
-{$IFDEF LINUX}
-function GetCurrentUser: string;
-var
-  PasswordRecord: PPasswordRecord;
-begin
-  PasswordRecord := getpwuid(getuid());
-  if Assigned(PasswordRecord) then
-  begin
-    // Use the login name, not the real name.
-    Result := PasswordRecord^.pw_name;
-  end
-  else
-    Result := '';
-end;
-{$ENDIF LINUX}
-
 function ExtractUpperFileExt(const FileName: string): string;
 begin
   Result := AnsiUpperCase(ExtractFileExt(FileName));
@@ -3344,14 +3287,6 @@ begin
   end;
 end;
 
-{$IFDEF LINUX}
-function GxSelectDirectory(const Caption: string; const Root: WideString;
-  var Directory: string; Owner: HWND): Boolean;
-begin
-  Result := QSelDirDialogExecute(Caption, Directory, Root);
-end;
-{$ENDIF LINUX}
-
 function GetDirectory(var Dir: string; Owner: TCustomForm): Boolean;
 resourcestring
   SSelDir = 'Select a Directory';
@@ -3380,12 +3315,7 @@ end;
 
 function GetOpenSaveDialogExecute(Dialog: TOpenDialog): Boolean;
 begin
-  {$IFDEF LINUX}
-    Result := QDialogExecute(Dialog);
-  {$ENDIF LINUX}
-  {$IFDEF MSWINDOWS}
-    Result := Dialog.Execute;
-  {$ENDIF MSWINDOWS}
+  Result := Dialog.Execute;
 end;
 
 function WildcardCompare(const FileWildcard, FileName: string; const IgnoreCase: Boolean): Boolean;

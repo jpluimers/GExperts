@@ -2227,7 +2227,7 @@ Action.BuildVersion = BuildVersion
       </Object>
     <Object Class="TFBVariablesCollection" XMLID="999995"><Property MultiValue="0" name="Name" type="string"></Property>
       <Object Class="TFBVariable" XMLID="{6C587782-7CFE-4E43-AEF8-6D9709A4298A}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">Beta2</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">Beta3</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>

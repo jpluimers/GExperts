@@ -15,6 +15,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  Scaled = False
   OnClose = FormClose
   OnKeyDown = FormKeyDown
   OnShow = FormShow

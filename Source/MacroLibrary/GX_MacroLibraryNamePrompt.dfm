@@ -14,6 +14,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  Scaled = False
   PixelsPerInch = 96
   TextHeight = 13
   object lblMacroName: TLabel

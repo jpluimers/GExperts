@@ -10,7 +10,7 @@ inherited fmPeInformation: TfmPeInformation
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pcMain: TPageControl
     Left = 0
     Top = 22
@@ -29,7 +29,7 @@ inherited fmPeInformation: TfmPeInformation
         Left = 0
         Top = 0
         Width = 466
-        Height = 409
+        Height = 408
         Align = alClient
         Columns = <
           item
@@ -137,7 +137,7 @@ inherited fmPeInformation: TfmPeInformation
         Left = 108
         Top = 0
         Width = 358
-        Height = 409
+        Height = 408
         Align = alClient
         Columns = <
           item
@@ -242,7 +242,7 @@ inherited fmPeInformation: TfmPeInformation
     Filter = 
       'PE Binary Files (*.exe, *.dll, *.bpl, *.dpl, *.ocx)|*.exe;*.dll;' +
       '*.bpl;*.dpl;*.ocx|EXE Files (*.exe)|*.EXE|DLL Files (*.dll)|*.dl' +
-      'l|Borland Packages (*.bpl, *.dpl)|*.dpl;*.bpl|OCX Controls (*.oc' +
+      'l|CodeGear Packages (*.bpl, *.dpl)|*.dpl;*.bpl|OCX Controls (*.oc' +
       'x)|*.ocx|All Files (*.*)|*.*'
     Left = 128
     Top = 76

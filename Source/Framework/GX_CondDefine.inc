@@ -36,15 +36,6 @@
 
   {$IF CompilerVersion >= 14}
     {$DEFINE GX_VER140_up} // Delphi 6
-    {$IFDEF LINUX}
-      {$DEFINE GX_KYLIX}
-      {$IF RTLVersion = 14.2}
-        {$DEFINE GX_KYLIX2} // Kylix 2
-      {$IFEND}
-      {$IF RTLVersion = 14.5}
-        {$DEFINE GX_KYLIX3} // Kylix 3
-      {$IFEND}
-    {$ENDIF}
     {$IF CompilerVersion >= 15}
       {$DEFINE GX_VER150_up}  // Delphi 7
       {$IF CompilerVersion >= 16}
@@ -75,18 +66,15 @@
   support for your IDE.
 {$ENDIF}
 
+{$IFDEF LINUX}
+Kylix is no longer supported.  You can try compiling with the GExperts source from early 2009.
+{$ENDIF}
 
 // Turn on IDE docking support
 {$DEFINE EnableIdeDockingSupport}
 
 // All IDEs support this feature to some degree (though Delphi 8+ do not support multiline editor tabs)
 {$DEFINE GX_EditorEnhancements}
-
-// JCL stack tracing and SynEdit only work under Windows
-{$IFNDEF MSWINDOWS}
-  {$UNDEF GX_DEBUGLOG}
-  {$UNDEF SYNEDIT}
-{$ENDIF not MSWINDOWS}
 
 // Define GX_ENHANCED_EDITOR if SynEdit is available
 {$IFDEF SYNEDIT}

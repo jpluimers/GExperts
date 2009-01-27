@@ -609,7 +609,7 @@ end;
 
 procedure TReplaceCompData.LoadDefaultPropertyMaps;
 const
-  DefaultGroupName = 'Borland VCL';
+  DefaultGroupName = 'Default VCL Mappings';
 var
   i: Integer;
   MapGroup: TCompRepMapGroupItem;

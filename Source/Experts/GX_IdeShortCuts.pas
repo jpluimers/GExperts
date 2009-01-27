@@ -8,7 +8,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, Menus, ExtCtrls, ComCtrls,
-  GX_Experts, GX_OtaUtils, GXHotKey, GX_BaseForm;
+  GX_Experts, GX_OtaUtils, GX_BaseForm;
 
 type
   TfmIdeShortCuts = class(TfmBaseForm)
@@ -25,15 +25,14 @@ type
     btOK: TButton;
     btCancel: TButton;
     btnHelp: TButton;
+    hkShortCut: THotKey;
     procedure MenuClick(Sender: TObject);
     procedure ShortCutChange(Sender: TObject);
     procedure chkUseShortCutClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btOKClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
   private
-    hkShortCut: TGXHotKey;
     procedure ReadFromRegistryCFG;
     procedure InitializeForm;
     procedure LoadSettings;
@@ -648,20 +647,6 @@ begin
   // in lots of situations, but this detects most of them.
   if NotifyCode in [ofnPackageInstalled, ofnActiveProjectChanged] then
     FShortCutExpert.QueueReinitializeShortcuts;
-end;
-
-procedure TfmIdeShortCuts.FormCreate(Sender: TObject);
-begin
-  hkShortCut := TGXHotKey.Create(Self);
-  hkShortCut.Parent := pnlControls;
-  hkShortCut.SetBounds(edtMenuStructure.Left, lblShortCut.Top - 3, 150, edtMenuStructure.Height);
-  hkShortCut.Enabled := False;
-  hkShortCut.HotKey := 0;
-  hkShortCut.InvalidKeys := [];
-  hkShortCut.Modifiers := [];
-  hkShortCut.TabOrder := 3;
-  hkShortCut.OnChange := ShortCutChange;
-  lblShortCut.FocusControl := hkShortCut;
 end;
 
 { TProcessNotifier }

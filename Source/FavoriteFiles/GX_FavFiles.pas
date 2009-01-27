@@ -1296,10 +1296,7 @@ begin
   // Assign a default entry file location.  Do not localize.
   if IsStandAlone then
   begin
-    if RunningLinux then
-      FEntryFile := '~/' + FaveFavFile
-    else
-      FEntryFile := 'C:\' + FaveFavFile;
+    FEntryFile := 'C:\' + FaveFavFile;
   end
   else
     FEntryFile := AddSlash(ConfigInfo.ConfigPath) + FaveFavFile;

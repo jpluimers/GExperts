@@ -922,14 +922,12 @@ begin
   if Assigned(EditControl) then
   begin
     //FEditorHandle := EditControl.Handle;
-    {$IFNDEF LINUX}
     FNewEditControlWndProc := Classes.MakeObjectInstance(EditControlWndProc);
     FOldEditControlWndProc := SetWindowLong(EditControl.Handle, GWL_WNDPROC, Integer(FNewEditControlWndProc));
     if FOldEditControlWndProc = 0 then
     begin
       {$IFOPT D+} SendDebugError('Windows error hooking EditorWndProc'); {$ENDIF}
     end;
-    {$ENDIF LINUX}
   end
   else
   begin
@@ -960,10 +958,8 @@ begin
     begin
       {$IFOPT D+} SendDebugError('Windows error unhooking EditorWndProc'); {$ENDIF}
     end;
-    {$IFNDEF LINUX}
     if Assigned(FNewEditControlWndProc) then
       Classes.FreeObjectInstance(FNewEditControlWndProc);
-    {$ENDIF LINUX}
     FOldEditControlWndProc := 0;
     //FEditorHandle := 0;
     {$IFOPT D+} SendDebug('Successful unhook procedure'); {$ENDIF}

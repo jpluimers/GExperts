@@ -123,13 +123,9 @@ begin
     GxOtaGetIDEProductIdentifier + MajorVersionNumberChar));
   if (GXVersionMutex <> 0) and (GetLastError = ERROR_ALREADY_EXISTS) then
   begin
-    // No multiple instance warning under Linux
-    if not RunningLinux then
-    begin
-      // The mutex already exists, so there is a good chance that a copy
-      // of this version of GExperts is already loaded into memory.
-      ShowGxMessageBox(TGxMultipleInstancesMessage);
-    end;
+    // The mutex already exists, so there is a good chance that a copy
+    // of this version of GExperts is already loaded into memory.
+    ShowGxMessageBox(TGxMultipleInstancesMessage);
   end;
 end;
 

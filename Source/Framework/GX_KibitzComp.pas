@@ -46,27 +46,6 @@ type
 {$IFNDEF GX_KIBITZ_OTA}
 const
   {$IFDEF VER140}
-    {$IFDEF LINUX}
-      {$IFDEF GX_KYLIX1}
-        CorIdeLibName = 'bplcoreide.so.6';
-        DphIdeLibName = 'bpldelphide.so.6';
-        dccLibName = 'libdcc.so.6';
-        {$DEFINE LibNamesDefined}
-      {$ENDIF GX_KYLIX1}
-      {$IFDEF GX_KYLIX2}
-        CorIdeLibName = 'bplcoreide.so.6';    // ???
-        DphIdeLibName = 'bpldelphide.so.6';   // ???
-        dccLibName = 'libdcc.so.6';           // ???
-        {$DEFINE LibNamesDefined}
-      {$ENDIF GX_KYLIX2}
-      {$IFDEF GX_KYLIX3}
-        CorIdeLibName = 'bplcoreide.so.6.9';
-        DphIdeLibName = 'bpldelphide.so.6.9';
-        dccLibName = 'libdcc.so.6.9';
-        {$DEFINE LibNamesDefined}
-      {$ENDIF GX_KYLIX3}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
     CorIdeLibName = 'coreide60.bpl';
     {$IFDEF BCB}
     DphIdeLibName = 'bcbide60.bpl';
@@ -75,7 +54,6 @@ const
     {$ENDIF BCB}
     dccLibName = 'dcc60.dll';
     {$DEFINE LibNamesDefined}
-    {$ENDIF MSWINDOWS}
   {$ENDIF VER140}
 
   // dphideXX.bpl

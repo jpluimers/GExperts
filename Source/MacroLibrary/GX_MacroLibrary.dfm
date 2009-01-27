@@ -14,6 +14,7 @@ object fmMacroLibrary: TfmMacroLibrary
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  Scaled = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize

@@ -21,8 +21,7 @@ uses GX_GenericUtils;
 
 procedure TfmClassParsing.FormShow(Sender: TObject);
 begin
-  if not RunningLinux then
-    aniFlashlight.Active := True;
+  aniFlashlight.Active := True;
 end;
 
 end.

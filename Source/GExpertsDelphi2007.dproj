@@ -240,8 +240,8 @@
       <Form>fmProgress</Form>
     </DCCReference>
     <DCCReference Include="Framework\GX_SharedImages.pas">
-      <DesignClass>TDataModule</DesignClass>
       <Form>dmSharedImages</Form>
+      <DesignClass>TDataModule</DesignClass>
     </DCCReference>
     <DCCReference Include="Framework\GX_SynMemoUtils.pas" />
     <DCCReference Include="Framework\GX_UnitPositions.pas" />

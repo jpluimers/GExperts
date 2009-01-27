@@ -16,6 +16,7 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
@@ -48,7 +49,7 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
       OnChange = comGroupNameChange
     end
     object tbrGroups: TToolBar
-      Left = 204
+      Left = 203
       Top = 8
       Width = 23
       Height = 22

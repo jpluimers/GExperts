@@ -166,6 +166,8 @@ procedure TfmReplaceCompMapList.FormCreate(Sender: TObject);
 begin
   SetToolbarGradient(tbrReplacement);
   SetToolbarGradient(tbrGroups);
+  tbrGroups.Left := comGroupName.Left + comGroupName.Width + 4;
+  tbrGroups.Top := comGroupName.Top;
 end;
 
 function TfmReplaceCompMapList.SelectedGroupName: string;

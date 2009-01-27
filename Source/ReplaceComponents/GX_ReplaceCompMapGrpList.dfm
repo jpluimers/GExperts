@@ -16,6 +16,7 @@ object fmReplaceCompMapGrpList: TfmReplaceCompMapGrpList
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   OnClose = FormClose
   OnKeyDown = FormKeyDown
   OnShow = FormShow

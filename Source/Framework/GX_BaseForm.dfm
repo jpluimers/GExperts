@@ -9,6 +9,7 @@ object fmBaseForm: TfmBaseForm
   ParentFont = True
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   PixelsPerInch = 96
   TextHeight = 13
 end

@@ -16,6 +16,7 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
+  Scaled = False
   DesignSize = (
     268
     265)

@@ -71,7 +71,6 @@ procedure SetModalFormPopupMode(Form: TCustomForm);
 function GetIDEVersionID: string;
 
 function RunningWindows: Boolean;
-function RunningLinux: Boolean;
 function RunningDelphi8: Boolean;
 function RunningDelphi8OrGreater: Boolean;
 function RunningDelphi7OrLess: Boolean;
@@ -93,9 +92,6 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  {$IFDEF LINUX}
-    WinUtils,
-  {$ENDIF}
   SysUtils, Windows, Classes, Registry,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, StrUtils;
 
@@ -390,15 +386,6 @@ end;
 function RunningWindows: Boolean;
 begin
   {$IFDEF MSWINDOWS}
-  Result := True;
-  {$ELSE}
-  Result := False;
-  {$ENDIF}
-end;
-
-function RunningLinux: Boolean;
-begin
-  {$IFDEF LINUX}
   Result := True;
   {$ELSE}
   Result := False;

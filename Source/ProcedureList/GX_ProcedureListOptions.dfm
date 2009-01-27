@@ -14,6 +14,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   OnShow = FormShow
   DesignSize = (
     526

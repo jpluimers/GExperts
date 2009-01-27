@@ -18,11 +18,10 @@ type
     lblContributors: TLabel;
     lblErik: TLabel;
     lblWebSite: TLabel;
-    pnlContributors: TPanel;
-    lbxContributors: TListBox;
     lblPreRelease1: TLabel;
     lblPreRelease2: TLabel;
     mmoBuildDetails: TMemo;
+    mmoContributors: TMemo;
     procedure btnEmailClick(Sender: TObject);
     procedure lblWebPageClick(Sender: TObject);
   private

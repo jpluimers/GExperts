@@ -15,6 +15,7 @@ object fmSetComponentPropsStatus: TfmSetComponentPropsStatus
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   OnClose = FormClose
   DesignSize = (
     517

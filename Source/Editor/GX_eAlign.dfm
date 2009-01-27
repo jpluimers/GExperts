@@ -17,6 +17,7 @@ object fmAlign: TfmAlign
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  Scaled = False
   DesignSize = (
     181
     268)

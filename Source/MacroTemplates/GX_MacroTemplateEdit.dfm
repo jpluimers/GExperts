@@ -14,7 +14,6 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 14
   object lblName: TLabel
@@ -42,6 +41,7 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
     Height = 14
     Alignment = taRightJustify
     Caption = '&Shortcut'
+    FocusControl = edtShortCut
   end
   object lblInsertPos: TLabel
     Left = 11
@@ -73,7 +73,7 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 3
+    TabOrder = 4
     OnClick = btnOKClick
   end
   object btnCancel: TButton
@@ -84,7 +84,7 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 5
   end
   object cbxInsertPos: TComboBox
     Left = 99
@@ -93,10 +93,20 @@ object fmMacroTemplateEdit: TfmMacroTemplateEdit
     Height = 22
     Style = csDropDownList
     ItemHeight = 14
-    TabOrder = 2
+    TabOrder = 3
     Items.Strings = (
       'Cursor Position'
       'Beginning of File'
       'Beginning of Line')
+  end
+  object edtShortCut: THotKey
+    Left = 99
+    Top = 72
+    Width = 148
+    Height = 22
+    HotKey = 32833
+    InvalidKeys = [hcNone, hcShift]
+    Modifiers = [hkAlt]
+    TabOrder = 2
   end
 end

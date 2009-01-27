@@ -3,7 +3,7 @@ unit GX_MacroTemplateEdit;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ComCtrls, GX_MacroFile, GXHotKey,
+  Classes, Controls, Forms, StdCtrls, ComCtrls, GX_MacroFile,
   GX_BaseForm;
 
 type
@@ -24,10 +24,8 @@ type
     lblShortCut: TLabel;
     lblInsertPos: TLabel;
     cbxInsertPos: TComboBox;
+    edtShortCut: THotKey;
     procedure btnOKClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-  public
-    edtShortCut: TGXHotKey;
   end;
 
 function GetMacroTemplate(var VMacroTemplate: TMacroTemplate): Boolean;
@@ -100,14 +98,6 @@ begin
     MessageDlg(InvalidIdentTemplateName, mtError, [mbOK], 0)
   else
     ModalResult := mrOk;
-end;
-
-procedure TfmMacroTemplateEdit.FormCreate(Sender: TObject);
-begin
-  edtShortCut := TGXHotKey.Create(Self);
-  edtShortCut.Parent := Self;
-  edtShortCut.SetBounds(edtDescription.Left, lblShortCut.Top - 2, cbxInsertPos.Width, edtDescription.Height);
-  edtShortCut.TabOrder := 2;
 end;
 
 end.

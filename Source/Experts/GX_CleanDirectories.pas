@@ -249,10 +249,7 @@ begin
   // We explicitly do not search for r/o files since we cannot
   // delete them anyway; alternatively do search r/o files and have
   // an error reported?
-  if RunningLinux then
-    SearchAttr := 0
-  else
-    SearchAttr := faHidden or faSysFile or faArchive;
+  SearchAttr := faHidden or faSysFile or faArchive;
 
   if Recursing then
     SearchAttr := SearchAttr or faDirectory;

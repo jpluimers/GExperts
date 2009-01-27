@@ -3,8 +3,8 @@ object fmEditorShortcut: TfmEditorShortcut
   Top = 219
   BorderStyle = bsDialog
   Caption = 'Define Shortcut'
-  ClientHeight = 126
-  ClientWidth = 221
+  ClientHeight = 129
+  ClientWidth = 228
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -14,13 +14,12 @@ object fmEditorShortcut: TfmEditorShortcut
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 14
   object gbxShortcut: TGroupBox
-    Left = 6
+    Left = 9
     Top = 8
-    Width = 209
+    Width = 211
     Height = 81
     Caption = 'Editor Expert Name'
     TabOrder = 0
@@ -31,9 +30,19 @@ object fmEditorShortcut: TfmEditorShortcut
       Height = 14
       Caption = '&Shortcut'
     end
+    object hkyShortCut: THotKey
+      Left = 9
+      Top = 47
+      Width = 189
+      Height = 22
+      HotKey = 32833
+      InvalidKeys = [hcNone, hcShift]
+      Modifiers = [hkAlt]
+      TabOrder = 0
+    end
   end
   object btnCancel: TButton
-    Left = 140
+    Left = 145
     Top = 96
     Width = 75
     Height = 25

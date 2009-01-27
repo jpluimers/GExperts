@@ -1,13 +1,13 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  Width = 523
-  Height = 525
+  Width = 567
+  Height = 533
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
   Color = clBtnFace
-  Constraints.MinHeight = 520
-  Constraints.MinWidth = 512
+  Constraints.MinHeight = 530
+  Constraints.MinWidth = 520
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -15,6 +15,7 @@ object fmConfiguration: TfmConfiguration
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = True
+  Scaled = False
   OnKeyDown = FormKeyDown
   OnMouseWheelDown = sbxExpertsMouseWheelDown
   OnMouseWheelUp = sbxExpertsMouseWheelUp
@@ -23,8 +24,8 @@ object fmConfiguration: TfmConfiguration
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 507
-    Height = 455
+    Width = 551
+    Height = 463
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 7
@@ -33,8 +34,8 @@ object fmConfiguration: TfmConfiguration
     object pcConfig: TPageControl
       Left = 7
       Top = 7
-      Width = 493
-      Height = 441
+      Width = 537
+      Height = 449
       ActivePage = tshExperts
       Align = alClient
       HotTrack = True
@@ -47,221 +48,286 @@ object fmConfiguration: TfmConfiguration
         object sbxExperts: TScrollBox
           Left = 0
           Top = 0
-          Width = 485
-          Height = 412
+          Width = 529
+          Height = 420
           VertScrollBar.Increment = 40
           VertScrollBar.Range = 920
           VertScrollBar.Tracking = True
           Align = alClient
           AutoScroll = False
           TabOrder = 0
+          object pnlExpertLayout: TPanel
+            Left = 0
+            Top = 0
+            Width = 507
+            Height = 40
+            TabOrder = 0
+            object imgExpert: TImage
+              Left = 4
+              Top = 4
+              Width = 32
+              Height = 32
+              Center = True
+              Proportional = True
+              Transparent = True
+            end
+            object chkExpert: TCheckBox
+              Left = 40
+              Top = 12
+              Width = 222
+              Height = 17
+              Caption = 'Set Component Properties'
+              TabOrder = 0
+            end
+            object edtExpert: THotKey
+              Left = 267
+              Top = 10
+              Width = 121
+              Height = 22
+              HotKey = 32833
+              InvalidKeys = [hcNone, hcShift]
+              Modifiers = [hkAlt]
+              TabOrder = 1
+            end
+            object btnExpert: TButton
+              Left = 399
+              Top = 8
+              Width = 98
+              Height = 25
+              Caption = 'Configure...'
+              TabOrder = 2
+            end
+          end
         end
       end
       object tshGeneral: TTabSheet
         Caption = 'General'
-        DesignSize = (
-          485
-          412)
-        object gbxLocations: TGroupBox
-          Left = 8
-          Top = 8
-          Width = 469
-          Height = 169
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'File Locations'
+        object pnlGeneral: TPanel
+          Left = 0
+          Top = 0
+          Width = 529
+          Height = 420
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 8
           TabOrder = 0
-          DesignSize = (
-            469
-            169)
-          object lblVCL: TLabel
-            Left = 12
-            Top = 24
-            Width = 113
-            Height = 14
-            Caption = '&VCL source directory'
-            FocusControl = edVCLPath
-          end
-          object lblConfig: TLabel
-            Left = 12
-            Top = 72
-            Width = 146
-            Height = 14
-            Caption = '&GExperts storage directory'
-            FocusControl = edConfigPath
-          end
-          object lblHelp: TLabel
-            Left = 12
-            Top = 120
-            Width = 43
-            Height = 14
-            Caption = 'Help &file'
-            FocusControl = edHelpFile
-          end
-          object sbVCLDir: TButton
-            Left = 436
-            Top = 40
-            Width = 21
-            Height = 21
-            Anchors = [akTop, akRight]
-            Caption = '...'
-            TabOrder = 1
-            OnClick = sbVCLDirClick
-          end
-          object sbConfigDir: TButton
-            Left = 436
-            Top = 88
-            Width = 21
-            Height = 21
-            Anchors = [akTop, akRight]
-            Caption = '...'
-            TabOrder = 3
-            OnClick = sbConfigDirClick
-          end
-          object sbHelpFile: TButton
-            Left = 436
-            Top = 136
-            Width = 21
-            Height = 21
-            Anchors = [akTop, akRight]
-            Caption = '...'
-            TabOrder = 5
-            OnClick = sbHelpFileClick
-          end
-          object edVCLPath: TEdit
-            Left = 12
-            Top = 40
-            Width = 424
-            Height = 22
-            Anchors = [akLeft, akTop, akRight]
+          object gbxLocations: TGroupBox
+            Left = 8
+            Top = 8
+            Width = 513
+            Height = 169
+            Align = alTop
+            Caption = 'File Locations'
             TabOrder = 0
+            DesignSize = (
+              513
+              169)
+            object lblVCL: TLabel
+              Left = 12
+              Top = 24
+              Width = 113
+              Height = 14
+              Caption = '&VCL source directory'
+              FocusControl = edVCLPath
+            end
+            object lblConfig: TLabel
+              Left = 12
+              Top = 72
+              Width = 146
+              Height = 14
+              Caption = '&GExperts storage directory'
+              FocusControl = edConfigPath
+            end
+            object lblHelp: TLabel
+              Left = 12
+              Top = 120
+              Width = 43
+              Height = 14
+              Caption = 'Help &file'
+              FocusControl = edHelpFile
+            end
+            object sbVCLDir: TButton
+              Left = 480
+              Top = 40
+              Width = 21
+              Height = 21
+              Anchors = [akTop, akRight]
+              Caption = '...'
+              TabOrder = 1
+              OnClick = sbVCLDirClick
+            end
+            object sbConfigDir: TButton
+              Left = 480
+              Top = 88
+              Width = 21
+              Height = 21
+              Anchors = [akTop, akRight]
+              Caption = '...'
+              TabOrder = 3
+              OnClick = sbConfigDirClick
+            end
+            object sbHelpFile: TButton
+              Left = 480
+              Top = 136
+              Width = 21
+              Height = 21
+              Anchors = [akTop, akRight]
+              Caption = '...'
+              TabOrder = 5
+              OnClick = sbHelpFileClick
+            end
+            object edVCLPath: TEdit
+              Left = 12
+              Top = 40
+              Width = 468
+              Height = 22
+              Anchors = [akLeft, akTop, akRight]
+              TabOrder = 0
+            end
+            object edConfigPath: TEdit
+              Left = 12
+              Top = 88
+              Width = 468
+              Height = 22
+              Anchors = [akLeft, akTop, akRight]
+              TabOrder = 2
+            end
+            object edHelpFile: TEdit
+              Left = 12
+              Top = 136
+              Width = 468
+              Height = 22
+              Anchors = [akLeft, akTop, akRight]
+              TabOrder = 4
+            end
           end
-          object edConfigPath: TEdit
-            Left = 12
-            Top = 88
-            Width = 424
-            Height = 22
-            Anchors = [akLeft, akTop, akRight]
+          object gbxCustomFont: TGroupBox
+            Left = 8
+            Top = 183
+            Width = 513
+            Height = 65
+            Align = alTop
+            Caption = 'User Interface'
+            TabOrder = 1
+            object chkUseCustomFont: TCheckBox
+              Left = 16
+              Top = 27
+              Width = 153
+              Height = 21
+              Caption = 'Use custom UI font'
+              TabOrder = 0
+            end
+            object btnCustomFont: TButton
+              Left = 174
+              Top = 24
+              Width = 79
+              Height = 25
+              Caption = 'Font...'
+              TabOrder = 1
+              OnClick = btnCustomFontClick
+            end
+          end
+          object pnlGeneralSpacer: TPanel
+            Left = 8
+            Top = 177
+            Width = 513
+            Height = 6
+            Align = alTop
+            BevelOuter = bvNone
             TabOrder = 2
-          end
-          object edHelpFile: TEdit
-            Left = 12
-            Top = 136
-            Width = 424
-            Height = 22
-            Anchors = [akLeft, akTop, akRight]
-            TabOrder = 4
-          end
-        end
-        object gbxCustomFont: TGroupBox
-          Left = 9
-          Top = 184
-          Width = 469
-          Height = 65
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'User Interface'
-          TabOrder = 1
-          object chkUseCustomFont: TCheckBox
-            Left = 16
-            Top = 27
-            Width = 153
-            Height = 21
-            Caption = 'Use custom UI font'
-            TabOrder = 0
-          end
-          object btnCustomFont: TButton
-            Left = 176
-            Top = 24
-            Width = 75
-            Height = 25
-            Caption = 'Font...'
-            TabOrder = 1
-            OnClick = btnCustomFontClick
           end
         end
       end
       object tshEditorExperts: TTabSheet
         Caption = 'Editor Experts'
-        DesignSize = (
-          485
-          412)
-        object gbxKeyboard: TGroupBox
-          Left = 8
-          Top = 8
-          Width = 469
-          Height = 397
-          Anchors = [akLeft, akTop, akRight, akBottom]
-          Caption = 'Editor Experts'
+        object pnlExperts: TPanel
+          Left = 0
+          Top = 0
+          Width = 529
+          Height = 420
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 8
           TabOrder = 0
-          DesignSize = (
-            469
-            397)
-          object btnConfigure: TButton
-            Left = 384
-            Top = 80
-            Width = 75
-            Height = 26
-            Anchors = [akTop, akRight]
-            Caption = '&Configure'
-            Enabled = False
-            TabOrder = 2
-            OnClick = btnConfigureClick
-          end
-          object btnShortcut: TButton
-            Left = 384
-            Top = 116
-            Width = 75
-            Height = 26
-            Anchors = [akTop, akRight]
-            Caption = '&Shortcut'
-            Enabled = False
-            TabOrder = 3
-            OnClick = btnShortcutClick
-          end
-          object meHelp: TMemo
-            Left = 10
-            Top = 269
-            Width = 449
-            Height = 118
-            TabStop = False
-            Anchors = [akLeft, akRight, akBottom]
-            Color = clInfoBk
-            ReadOnly = True
-            ScrollBars = ssVertical
-            TabOrder = 4
-          end
-          object chkDisableEditorExperts: TCheckBox
-            Left = 384
-            Top = 22
-            Width = 82
-            Height = 21
-            Anchors = [akTop, akRight]
-            Caption = '&Disable'
-            TabOrder = 1
-            OnClick = chkDisableEditorExpertsClick
-          end
-          object lvEditorExperts: TListView
-            Left = 10
-            Top = 22
-            Width = 366
-            Height = 240
-            Anchors = [akLeft, akTop, akRight, akBottom]
-            Columns = <
-              item
-                AutoSize = True
-                Caption = 'Expert'
-              end
-              item
-                Caption = 'Shortcut'
-                Width = 130
-              end>
-            ColumnClick = False
-            HideSelection = False
-            ReadOnly = True
-            RowSelect = True
+          object gbxKeyboard: TGroupBox
+            Left = 8
+            Top = 8
+            Width = 513
+            Height = 404
+            Align = alClient
+            Caption = 'Editor Experts'
             TabOrder = 0
-            ViewStyle = vsReport
-            OnChange = lvEditorExpertsChange
-            OnDblClick = lvEditorExpertsDblClick
+            DesignSize = (
+              513
+              404)
+            object btnConfigure: TButton
+              Left = 426
+              Top = 80
+              Width = 77
+              Height = 26
+              Anchors = [akTop, akRight]
+              Caption = '&Configure'
+              Enabled = False
+              TabOrder = 2
+              OnClick = btnConfigureClick
+            end
+            object btnShortcut: TButton
+              Left = 426
+              Top = 116
+              Width = 77
+              Height = 26
+              Anchors = [akTop, akRight]
+              Caption = '&Shortcut'
+              Enabled = False
+              TabOrder = 3
+              OnClick = btnShortcutClick
+            end
+            object meHelp: TMemo
+              Left = 10
+              Top = 276
+              Width = 493
+              Height = 118
+              TabStop = False
+              Anchors = [akLeft, akRight, akBottom]
+              Color = clInfoBk
+              ReadOnly = True
+              ScrollBars = ssVertical
+              TabOrder = 4
+            end
+            object chkDisableEditorExperts: TCheckBox
+              Left = 426
+              Top = 22
+              Width = 84
+              Height = 21
+              Anchors = [akTop, akRight]
+              Caption = '&Disable'
+              TabOrder = 1
+              OnClick = chkDisableEditorExpertsClick
+            end
+            object lvEditorExperts: TListView
+              Left = 10
+              Top = 22
+              Width = 408
+              Height = 247
+              Anchors = [akLeft, akTop, akRight, akBottom]
+              Columns = <
+                item
+                  AutoSize = True
+                  Caption = 'Expert'
+                end
+                item
+                  Caption = 'Shortcut'
+                  Width = 130
+                end>
+              ColumnClick = False
+              HideSelection = False
+              ReadOnly = True
+              RowSelect = True
+              TabOrder = 0
+              ViewStyle = vsReport
+              OnChange = lvEditorExpertsChange
+              OnDblClick = lvEditorExpertsDblClick
+            end
           end
         end
       end
@@ -498,9 +564,9 @@ object fmConfiguration: TfmConfiguration
             TabOrder = 1
           end
           object btnConfigureToolBar: TButton
-            Left = 40
+            Left = 36
             Top = 138
-            Width = 137
+            Width = 145
             Height = 25
             Caption = 'Configure Toolbar...'
             TabOrder = 2
@@ -653,7 +719,7 @@ object fmConfiguration: TfmConfiguration
             Left = 102
             Top = 40
             Width = 16
-            Height = 21
+            Height = 22
             Associate = edtMinutes
             Min = 1
             Max = 1000
@@ -676,15 +742,15 @@ object fmConfiguration: TfmConfiguration
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 455
-    Width = 507
+    Top = 463
+    Width = 551
     Height = 34
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 220
+      Left = 264
       Top = 0
       Width = 287
       Height = 34

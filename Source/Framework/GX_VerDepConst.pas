@@ -18,24 +18,8 @@ const
 // *****************************************************
   {$UNDEF GExpertsDllNameDefined}
   {$IFDEF VER140}
-    {$IFDEF LINUX}
-      {$IFDEF GX_KYLIX1}
-        GExpertsDll = 'libGExpertsKylix1.so';
-        {$DEFINE GExpertsDllNameDefined}
-      {$ENDIF GX_KYLIX1}
-      {$IFDEF GX_KYLIX2}
-        GExpertsDll = 'libGExpertsKylix2.so';
-        {$DEFINE GExpertsDllNameDefined}
-      {$ENDIF GX_KYLIX2}
-      {$IFDEF GX_KYLIX3}
-        GExpertsDll = 'libGExpertsKylix3.so';
-        {$DEFINE GExpertsDllNameDefined}
-      {$ENDIF GX_KYLIX3}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
-      GExpertsDll = 'GExpertsD6.dll';
-      {$DEFINE GExpertsDllNameDefined}
-    {$ENDIF LINUX}
+    GExpertsDll = 'GExpertsD6.dll';
+    {$DEFINE GExpertsDllNameDefined}
   {$ENDIF VER140}
 
   {$IFDEF VER150}
@@ -80,35 +64,13 @@ const
 // *****************************************************
   {$UNDEF TTabDockHostFormClassContainerDefined}
   {$IFDEF VER140}
-    {$IFDEF LINUX}
-      {$IFDEF GX_KYLIX1}
-        TTabDockHostFormClassContainer = 'bpldesignide.so.6';
-        {$DEFINE TTabDockHostFormClassContainerDefined}
-      {$ENDIF GX_KYLIX1}
-      {$IFDEF GX_KYLIX2}
-        TTabDockHostFormClassContainer = 'bpldesignide.so.6';   // ???
-        {$DEFINE TTabDockHostFormClassContainerDefined}
-      {$ENDIF GX_KYLIX2}
-      {$IFDEF GX_KYLIX3}
-        TTabDockHostFormClassContainer = 'bpldesignide.so.6.9';
-        {$DEFINE TTabDockHostFormClassContainerDefined}
-      {$ENDIF GX_KYLIX3}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
-      TTabDockHostFormClassContainer = 'designide60.bpl';
-      {$DEFINE TTabDockHostFormClassContainerDefined}
-    {$ENDIF MSWINDOWS}
+    TTabDockHostFormClassContainer = 'designide60.bpl';
+    {$DEFINE TTabDockHostFormClassContainerDefined}
   {$ENDIF VER140}
 
   {$IFDEF VER150}
-    {$IFDEF LINUX}
-      TTabDockHostFormClassContainer = 'bpldesignide.so.7';
-      {$DEFINE TTabDockHostFormClassContainerDefined}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
-      TTabDockHostFormClassContainer = 'designide70.bpl';
-      {$DEFINE TTabDockHostFormClassContainerDefined}
-    {$ENDIF MSWINDOWS}
+    TTabDockHostFormClassContainer = 'designide70.bpl';
+    {$DEFINE TTabDockHostFormClassContainerDefined}
   {$ENDIF VER150}
 
   {$IFDEF VER160}
@@ -153,35 +115,12 @@ TTabDockHostFormName = 'TTabDockHostForm';
 // *****************************************************
   {$UNDEF MajorVersionNumber}
   {$IFDEF VER140}
-    {$IFDEF LINUX}
-      {$IFDEF GX_KYLIX1}
-        MajorVersionNumberChar = '1';  // Kylix 1
-        {$DEFINE MajorVersionNumber}
-      {$ENDIF GX_KYLIX1}
-      {$IFDEF GX_KYLIX2}
-        MajorVersionNumberChar = '2';  // Kylix 2
-        {$DEFINE MajorVersionNumber}
-      {$ENDIF GX_KYLIX2}
-      {$IFDEF GX_KYLIX3}
-        MajorVersionNumberChar = '3';  // Kylix 3
-        {$DEFINE MajorVersionNumber}
-      {$ENDIF GX_KYLIX3}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
-      MajorVersionNumberChar = '6';  // Delphi 6, C++Builder 6
-      {$DEFINE MajorVersionNumber}
-    {$ENDIF MSWINDOWS}
+    MajorVersionNumberChar = '6';  // Delphi 6, C++Builder 6
+    {$DEFINE MajorVersionNumber}
   {$ENDIF VER140}
 
   {$IFDEF VER150}
-    {$IFDEF LINUX}
-      MajorVersionNumberChar = '4';  // Kylix 4??
-      {$DEFINE MajorVersionNumber}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
-      MajorVersionNumberChar = '7';  // Delphi 7, C++Builder 7
-      {$DEFINE MajorVersionNumber}
-    {$ENDIF MSWINDOWS}
+    MajorVersionNumberChar = '7';  // Delphi 7, C++Builder 7
   {$ENDIF VER150}
 
   {$IFDEF VER160}
@@ -221,29 +160,13 @@ TTabDockHostFormName = 'TTabDockHostForm';
 // *****************************************************
   {$UNDEF IDEEnglishNameDefined}
   {$IFDEF VER140}
-    {$IFDEF LINUX}
-      {$IFDEF GX_KYLIX1}
-        IDEEnglishName = 'Kylix 1';
-        {$DEFINE IDEEnglishNameDefined}
-      {$ENDIF GX_KYLIX1}
-      {$IFDEF GX_KYLIX2}
-        IDEEnglishName = 'Kylix 2';
-        {$DEFINE IDEEnglishNameDefined}
-      {$ENDIF GX_KYLIX2}
-      {$IFDEF GX_KYLIX3}
-        IDEEnglishName = 'Kylix 3';
-        {$DEFINE IDEEnglishNameDefined}
-      {$ENDIF GX_KYLIX3}
-    {$ENDIF LINUX}
-    {$IFDEF MSWINDOWS}
-      {$IFDEF BCB}
-      IDEEnglishName = 'C++Builder 6';
-      {$DEFINE IDEEnglishNameDefined}
-      {$ELSE}
-      IDEEnglishName = 'Delphi 6';
-      {$DEFINE IDEEnglishNameDefined}
-      {$ENDIF}
-    {$ENDIF MSWINDOWS}
+    {$IFDEF BCB}
+    IDEEnglishName = 'C++Builder 6';
+    {$DEFINE IDEEnglishNameDefined}
+    {$ELSE}
+    IDEEnglishName = 'Delphi 6';
+    {$DEFINE IDEEnglishNameDefined}
+    {$ENDIF}
   {$ENDIF VER140}
 
   {$IFDEF VER150}
@@ -297,31 +220,17 @@ TTabDockHostFormName = 'TTabDockHostForm';
 
   {$UNDEF IdeBaseKey}
   {$IFDEF VER140}
-    {$IFDEF LINUX}
-      CompilerDefinedProductRegistryKey = '--- void ---';
-      {$DEFINE IdeBaseKey}
-    {$ENDIF LINUX}
-
-    {$IFDEF MSWINDOWS}
-      {$IFNDEF BCB}
-      CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\6.0';
-      {$ELSE BCB}
-      CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'C++Builder\6.0';
-      {$ENDIF BCB}
-      {$DEFINE IdeBaseKey}
-    {$ENDIF MSWINDOWS}
+    {$IFNDEF BCB}
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\6.0';
+    {$ELSE BCB}
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'C++Builder\6.0';
+    {$ENDIF BCB}
+    {$DEFINE IdeBaseKey}
   {$ENDIF VER140}
 
   {$IFDEF VER150}
-    {$IFDEF LINUX}
-      CompilerDefinedProductRegistryKey = '--- void ---';
-      {$DEFINE IdeBaseKey}
-    {$ENDIF LINUX}
-
-    {$IFDEF MSWINDOWS}
-      CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\7.0';
-      {$DEFINE IdeBaseKey}
-    {$ENDIF MSWINDOWS}
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'Delphi\7.0';
+    {$DEFINE IdeBaseKey}
   {$ENDIF VER150}
 
   {$IFDEF VER160}
@@ -408,15 +317,11 @@ TTabDockHostFormName = 'TTabDockHostForm';
 
 
 // Used to identify the running IDE
-{$IFDEF LINUX}
-  IdeProductName = 'Kylix';
-{$ELSE}
   {$IFDEF GX_BCB}
     IdeProductName = 'BCB';
   {$ELSE}
     IdeProductName = 'Delphi';
   {$ENDIF GX_BCB}
-{$ENDIF LINUX}
 
 implementation
 

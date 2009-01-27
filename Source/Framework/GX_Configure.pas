@@ -16,24 +16,9 @@ type
     tshExperts: TTabSheet;
     tshGeneral: TTabSheet;
     sbxExperts: TScrollBox;
-    gbxLocations: TGroupBox;
-    lblVCL: TLabel;
-    sbVCLDir: TButton;
-    lblConfig: TLabel;
-    sbConfigDir: TButton;
-    lblHelp: TLabel;
-    sbHelpFile: TButton;
-    edVCLPath: TEdit;
-    edConfigPath: TEdit;
-    edHelpFile: TEdit;
     dlgHelpFile: TOpenDialog;
     tshIDE: TTabSheet;
     tshEditorExperts: TTabSheet;
-    gbxKeyboard: TGroupBox;
-    lvEditorExperts: TListView;
-    btnConfigure: TButton;
-    btnShortCut: TButton;
-    meHelp: TMemo;
     tshEditor: TTabSheet;
     gbxEditor: TGroupBox;
     chkMultiLine: TCheckBox;
@@ -42,7 +27,6 @@ type
     gbxToolBar: TGroupBox;
     chkEditorToolBar: TCheckBox;
     gbxIDEMenu: TGroupBox;
-    chkDisableEditorExperts: TCheckBox;
     dlgUIFont: TFontDialog;
     chkDisableEDTEnhancements: TCheckBox;
     chkEditTabButtonsFlat: TCheckBox;
@@ -87,10 +71,34 @@ type
     btnHelp: TButton;
     btnCancel: TButton;
     btnOK: TButton;
+    dlgFont: TFontDialog;
+    pnlExperts: TPanel;
+    gbxKeyboard: TGroupBox;
+    btnConfigure: TButton;
+    btnShortcut: TButton;
+    meHelp: TMemo;
+    chkDisableEditorExperts: TCheckBox;
+    lvEditorExperts: TListView;
+    pnlGeneral: TPanel;
+    gbxLocations: TGroupBox;
+    lblVCL: TLabel;
+    lblConfig: TLabel;
+    lblHelp: TLabel;
+    sbVCLDir: TButton;
+    sbConfigDir: TButton;
+    sbHelpFile: TButton;
+    edVCLPath: TEdit;
+    edConfigPath: TEdit;
+    edHelpFile: TEdit;
     gbxCustomFont: TGroupBox;
     chkUseCustomFont: TCheckBox;
     btnCustomFont: TButton;
-    dlgFont: TFontDialog;
+    pnlGeneralSpacer: TPanel;
+    pnlExpertLayout: TPanel;
+    imgExpert: TImage;
+    chkExpert: TCheckBox;
+    edtExpert: THotKey;
+    btnExpert: TButton;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -245,13 +253,12 @@ var
   Panel: TPanel;
   i: Integer;
   AnExpert: TGX_Expert;
-  ShortCutEdit: TEdit;
   RowWidth: Integer;
-const
-  RowHeight = 40;
+  RowHeight: Integer;
 begin
-  FThumbSize := RowHeight;
   RowWidth := sbxExperts.Width * 3;
+  RowHeight := pnlExpertLayout.Height;
+  FThumbSize := RowHeight;
   for i := 0 to GExpertsInst.ExpertCount - 1 do
   begin
     Panel := TPanel.Create(Self);
@@ -265,48 +272,29 @@ begin
     with TImage.Create(Self) do
     begin
       Parent := Panel;
-      SetBounds(4, 4, 32, 32);
+      SetBounds(imgExpert.Left, imgExpert.Top, imgExpert.Width, imgExpert.Height);
       Picture.Bitmap.Assign(AnExpert.Bitmap);
       Transparent := True;
       Center := True;
-      Stretch := True;
+      Stretch := False;
     end;
 
     with TCheckBox.Create(sbxExperts) do
     begin
       Parent := Panel;
-      SetBounds(43, (RowHeight - Height) div 2, sbxExperts.Width - 140, Height);
+      SetBounds(chkExpert.Left, chkExpert.Top, chkExpert.Width, chkExpert.Height);
       Caption := AnExpert.GetDisplayName;
       Checked := AnExpert.Active;
       Tag := i;
     end;
 
-    // THotKey is broken under Linux (tested with Kylix 3)
-    // TGXHotKey is a bit slow to use here due to the size of the Items list
-    if RunningLinux then
+    with THotKey.Create(sbxExperts) do
     begin
-      ShortCutEdit := TEdit.Create(sbxExperts);
-      with ShortCutEdit do
-      begin
-        Parent := Panel;
-        SetBounds(sbxExperts.Width - 245, (RowHeight - Height) div 2, 130, Height);
-        ReadOnly := True;
-        Text := ShortCutToText(AnExpert.ShortCut);
-        Visible := AnExpert.HasMenuItem;
-        ShortCutEdit.OnClick := EditShortCutClick;
-        Tag := i;
-      end;
-    end
-    else // Windows
-    begin
-      with THotKey.Create(sbxExperts) do
-      begin
-        Parent := Panel;
-        SetBounds(sbxExperts.Width - 245, (RowHeight - Height) div 2, 130, Height);
-        HotKey := AnExpert.ShortCut;
-        Visible := AnExpert.HasMenuItem;
-        Tag := i;
-      end;
+      Parent := Panel;
+      SetBounds(edtExpert.Left, edtExpert.Top, edtExpert.Width, edtExpert.Height);
+      HotKey := AnExpert.ShortCut;
+      Visible := AnExpert.HasMenuItem;
+      Tag := i;
     end;
 
     if AnExpert.HasConfigOptions then
@@ -315,13 +303,14 @@ begin
       begin
         Parent := Panel;
         Caption := SConfigureButtonCaption;
-        SetBounds(sbxExperts.Width - Width - 30, (RowHeight - Height) div 2, Width, Height);
+        SetBounds(btnExpert.Left, btnExpert.Top, btnExpert.Width, btnExpert.Height);
         OnClick := ConfigureEditorExpertClick;
         Tag := i;
       end;
     end;
   end;
   sbxExperts.VertScrollBar.Range := GExpertsInst.ExpertCount * RowHeight;
+  pnlExpertLayout.Visible := False;
 end;
 
 procedure TfmConfiguration.SaveExperts;
@@ -337,8 +326,6 @@ begin
     AnExpert := GExpertsInst.ExpertList[AControl.Tag];
     if AControl is TCheckBox then
       AnExpert.Active := TCheckBox(AControl).Checked
-    else if RunningLinux and (AControl is TEdit) then
-      AnExpert.ShortCut := TextToShortCut(TEdit(AControl).Text)
     else if AControl is THotKey then
       AnExpert.ShortCut := THotKey(AControl).HotKey;
   end;

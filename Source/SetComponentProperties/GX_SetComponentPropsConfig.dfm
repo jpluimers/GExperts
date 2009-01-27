@@ -16,6 +16,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  Scaled = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96

@@ -606,7 +606,6 @@ const
 implementation
 
 uses
-  {$IFDEF LINUX} WinUtils, {$ENDIF}
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
   GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode, Math;
@@ -963,10 +962,7 @@ end;
 
 function GxOtaGetActiveDesignerType: string;
 begin
-  if RunningLinux then
-    Result := dCLX
-  else
-    Result := GxOtaGetIDEServices.GetActiveDesignerType;
+  Result := GxOtaGetIDEServices.GetActiveDesignerType;
 end;
 
 function GxOtaActiveDesignerIsVCL: Boolean;
@@ -1162,14 +1158,7 @@ var
 begin
   Result := False;
   EditControl := GxOtaGetCurrentIDEEditControl;
-  if EditControl.CanFocus then begin
-    try
-      EditControl.SetFocus;
-      Result := True;
-    except
-      // Ignore exceptions and return False
-    end;
-  end;
+  TryFocusControl(EditControl)
 end;
 
 function GxOtaGetProjectFileName(Project: IOTAProject; NormalizeBdsProj: Boolean = False): string;
@@ -1658,6 +1647,45 @@ var
 begin
   GxOtaGetCurrentIdentEx(Result, IdentOffset, StartPos, CurrentPos, AfterLen);
 end;
+
+(* // A start at making this support the UTF-8 returned by the editor
+function GxOtaGetCurrentIdent: string;
+var
+  Line: TGXUnicodeString;
+  EditView: IOTAEditView;
+  HaveIdent: Boolean;
+  IdentStart: Integer;
+  IdentEnd: Integer;
+  EditPos: TOTAEditPos;
+  CharPos: TOTACharPos;
+begin
+  Result := '';
+  EditView := GxOtaGetTopmostEditView;
+  if Assigned(EditView) then
+  begin
+    Line := GxOtaGetEditorLineAsString(EditView, EditView.Position.Row);
+    if Length(Line) > 0 then
+    begin
+      EditPos := EditView.CursorPos;
+      EditView.ConvertPos(True, EditPos, CharPos);
+      IdentStart := EnforceMinMax(CharPos.CharIndex + 1, 1, Length(Line));
+      HaveIdent := IsCharIdentifier(Line[IdentStart]) or ((IdentStart > 1) and (IsCharIdentifier(Line[IdentStart - 1])));
+      if HaveIdent then
+      begin
+        if (not IsCharIdentifier(Line[IdentStart])) and ((IdentStart > 1) and (IsCharIdentifier(Line[IdentStart - 1]))) then
+          Dec(IdentStart);
+        IdentEnd := IdentStart;
+        while (IdentStart > 1) and (IsCharIdentifier(Line[IdentStart - 1])) do
+          Dec(IdentStart);
+        while (IdentEnd < Length(Line)) and (IsCharIdentifier(Line[IdentEnd])) and (IsCharIdentifier(Line[IdentEnd + 1])) do
+          Inc(IdentEnd);
+        Result := Copy(Line, IdentStart, IdentEnd - IdentStart + 1);
+        Result := Trim(Result);
+      end;
+    end;
+  end;
+end;
+*)
 
 procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
 var
@@ -2467,12 +2495,10 @@ begin
   begin
     if RunningCppBuilder then
       Result := 'C++Builder'
-    else if RunningLinux then
-      Result := 'Kylix'
     else if RunningBDS2006 then
       Result := 'Borland Developer Studio'
     else
-      Result := 'Delphi';  // Delphi 6/7/8/2005/2007.  Check Cogswell.
+      Result := 'Delphi';  // Delphi 6/7/8/2005/2007/2009.
   end
   else
   begin
@@ -3022,7 +3048,7 @@ begin
           VInteger := GetEnumValueFromStr(NativeObject, PropertyName, Value);
           Result := AComponent.SetPropByName(PropertyName, VInteger);
         end
-        else begin // VCL.NET error in BDS 2006: "Invalid property typeinfo type": http://qc.borland.com/wc/qcmain.aspx?d=42751
+        else begin // VCL.NET error in BDS 2006: "Invalid property typeinfo type": http://qc.codegear.com/wc/qcmain.aspx?d=42751
           if SameText(Value, 'TRUE') or SameText(Value, 'FALSE') then begin
             VBoolean := SameText(Value, 'TRUE');
             Result := AComponent.SetPropByName(PropertyName, VBoolean);
@@ -3366,33 +3392,29 @@ end;
 
 function IsValidExpertDll(const FileName: string): Boolean;
 {$IFDEF LoadAndCheckEntryPoint}
-{$IFDEF MSWINDOWS}
 var
   DllHandle: THandle;
-{$ENDIF MSWINDOWS}
 {$ENDIF LoadAndCheckEntryPoint}
 begin
   Result := True;
 
 {$IFDEF LoadAndCheckEntryPoint}
-  {$IFDEF MSWINDOWS}
-    // Check that the DLL *really* is a valid expert or wizard DLL
-    // (supported on Windows NT only).
-    if Win32Platform = VER_PLATFORM_WIN32_NT then
+  // Check that the DLL *really* is a valid expert or wizard DLL
+  // (supported on Windows NT only).
+  if Win32Platform = VER_PLATFORM_WIN32_NT then
+  begin
+    DllHandle := LoadLibraryEx(PChar(FileName), 0, DONT_RESOLVE_DLL_REFERENCES {NT only!});
+    if DllHandle <> 0 then
     begin
-      DllHandle := LoadLibraryEx(PChar(FileName), 0, DONT_RESOLVE_DLL_REFERENCES {NT only!});
-      if DllHandle <> 0 then
-      begin
-        try
-          Result := (GetProcAddress(DllHandle, ExptIntfExpertEntryPoint) <> nil);
-          if not Result then
-            Result := (GetProcAddress(DllHandle, WizardEntryPoint) <> nil);
-        finally
-          FreeLibrary(DllHandle);
-        end;
+      try
+        Result := (GetProcAddress(DllHandle, ExptIntfExpertEntryPoint) <> nil);
+        if not Result then
+          Result := (GetProcAddress(DllHandle, WizardEntryPoint) <> nil);
+      finally
+        FreeLibrary(DllHandle);
       end;
-    end; {NT Check}
-  {$ENDIF MSWINDOWS}
+    end;
+  end; {NT Check}
 {$ENDIF LoadAndCheckEntryPoint}
 end;
 

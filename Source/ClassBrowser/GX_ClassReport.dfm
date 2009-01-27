@@ -1,9 +1,9 @@
 object fmClassReport: TfmClassReport
   Left = 416
-  Top = 215
+  Top = 216
   BorderStyle = bsDialog
   Caption = 'Class Hierarchy Report'
-  ClientHeight = 184
+  ClientHeight = 183
   ClientWidth = 307
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -17,20 +17,20 @@ object fmClassReport: TfmClassReport
   OnCreate = FormCreate
   DesignSize = (
     307
-    184)
+    183)
   PixelsPerInch = 96
   TextHeight = 14
   object gbxPageSettings: TGroupBox
     Left = 9
     Top = 8
     Width = 290
-    Height = 139
+    Height = 138
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Report Settings'
     TabOrder = 0
     DesignSize = (
       290
-      139)
+      138)
     object lblFont: TLabel
       Left = 65
       Top = 26
@@ -147,7 +147,7 @@ object fmClassReport: TfmClassReport
   end
   object btnOK: TButton
     Left = 141
-    Top = 153
+    Top = 152
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -158,7 +158,7 @@ object fmClassReport: TfmClassReport
   end
   object btnCancel: TButton
     Left = 223
-    Top = 153
+    Top = 152
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

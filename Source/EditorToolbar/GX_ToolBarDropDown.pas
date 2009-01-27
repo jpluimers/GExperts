@@ -128,7 +128,6 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils,
-  {$IFDEF LINUX} WinUtils, {$ENDIF}
   Graphics, StdCtrls, Forms, Dialogs,
   GX_Actions, GX_ActionBroker,
   GX_GxUtils, GX_GenericUtils, GX_IdeUtils,

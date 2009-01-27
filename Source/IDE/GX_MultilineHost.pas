@@ -32,7 +32,6 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  {$IFDEF LINUX} WinUtils, {$ENDIF LINUX}
   SysUtils, Windows, Forms, Menus, ComCtrls, ImgList,
   GX_VerDepConst, GX_ClassHacks;
 

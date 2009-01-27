@@ -12,7 +12,7 @@ Compiling the Source Code
     GExpertsDelphi2007.dproj  Delphi 2007
     GExpertsBDS2006.dpr       BDS 2006
     GExpertsDelphi2005.dpr    Delphi 2005 (Delphi 9)
-    GExpertsD8.dpr            Delphi 8 (See: http://cc.borland.com/ccweb.exe/listing?id=21448)
+    GExpertsD8.dpr            Delphi 8 (See: http://cc.codegear.com/Item/21448)
     GExpertsD7.dpr            Delphi 7
     GExpertsD6.dpr            Delphi 6
 
@@ -134,13 +134,10 @@ international environments, refer to the IDE documentation under
  Programming with Delphi: Creating international applications
  Programming with C++Builder: Creating international applications
 
-as well as the relevant Borland.com newsgroups at
-
-  nntp://forums.borland.com/
-
-and their archives at
-
-  http://groups.google.com/
+as well as the relevant CodeGear newsgroups at
+ https://forums.codegear.com/
+and the old arvhives that are searchable here:
+ http://groups.google.com/
 
 Specific to the localization of GExperts are the following items:
 

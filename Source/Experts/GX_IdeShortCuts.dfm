@@ -16,7 +16,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
-  OnCreate = FormCreate
+  Scaled = False
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 14
@@ -57,6 +57,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
       Height = 14
       Alignment = taRightJustify
       Caption = 'Sh&ortcut'
+      FocusControl = hkShortCut
     end
     object edtMenuStructure: TEdit
       Left = 116
@@ -90,6 +91,17 @@ object fmIdeShortCuts: TfmIdeShortCuts
       Enabled = False
       TabOrder = 2
       OnClick = chkUseShortcutClick
+    end
+    object hkShortCut: THotKey
+      Left = 116
+      Top = 84
+      Width = 157
+      Height = 22
+      HotKey = 0
+      InvalidKeys = []
+      Modifiers = []
+      TabOrder = 3
+      OnChange = ShortCutChange
     end
   end
   object pnlButtons: TPanel

@@ -5,11 +5,7 @@ unit GX_ConfigurationInfo;
 interface
 
 uses
-  {$IFDEF LINUX}
-    IniFiles,
-  {$ELSE}
-    Registry,
-  {$ENDIF}
+  Registry,
   Graphics, Classes, TypInfo, Forms, ComCtrls;
 
 type
@@ -74,11 +70,7 @@ type
   TFormSaveFlag = (fsSize, fsPosition);
   TFormSaveFlags = set of TFormSaveFlag;
 
-{$IFDEF LINUX}
-  TGExpertsBaseSettings = class(TIniFile);
-{$ELSE}
   TGExpertsBaseSettings = class(TRegistryIniFile);
-{$ENDIF}
 
   TGExpertsSettings = class(TGExpertsBaseSettings)
   public
@@ -402,16 +394,8 @@ begin
               {$IFDEF GX_VER170_up} AddSlash('Win32') + {$ENDIF}
               AddSlash('VCL'); // Do not localize.
 
-  if RunningLinux then
-  begin
-    FGExpertsPath := AddSlash(GetGExpertsIdeRootRegistryKey);
-    FConfigPath := AddSlash(GetGExpertsIdeRootRegistryKey);
-  end
-  else // Windows
-  begin
-    FGExpertsPath := AddSlash(ExtractFilePath(ThisDllName));
-    FConfigPath := DefaultConfigPath;
-  end;
+  FGExpertsPath := AddSlash(ExtractFilePath(ThisDllName));
+  FConfigPath := DefaultConfigPath;
 
   EditorEnhancements.Enabled := False;
 
@@ -496,10 +480,7 @@ function TConfigInfo.GetGExpertsIdeRootRegistryKey: string;
 const
   SGExpertsString = 'GExperts-1.3';
 begin
-  if RunningLinux then
-    Result := AddSlash(ExpandFileName('~/.borland')) + SGExpertsString
-  else
-    Result := AddSlash(FIdeRootRegistryKey) + SGExpertsString;
+  Result := AddSlash(FIdeRootRegistryKey) + SGExpertsString;
 end;
 
 procedure TConfigInfo.SetConfigPath(const Value: string);
@@ -659,36 +640,11 @@ const
 { TGExpertsSettings }
 
 constructor TGExpertsSettings.Create(const FileName: string);
-var
-  UseFileName: string;
-  UseFileDir: string;
 begin
-  if RunningLinux then
-  begin
-    if FileExists(FileName) and not DirectoryExists(FileName) then
-      UseFileName := FileName
-    else
-    begin
-      if FileName = '' then
-        UseFileName := ConfigInfo.GExpertsIdeRootRegistryKey
-      else
-        UseFileName := FileName;
-      UseFileName := AddSlash(UseFileName) + 'GExpertsRegistry.txt';
-
-      UseFileDir := ExtractFileDir(UseFileName);
-      if not DirectoryExists(UseFileDir) then
-        ForceDirectories(UseFileDir);
-      {$IFOPT D+} SendDebug('Settings FileName: '+ UseFileName); {$ENDIF}
-    end;
-    inherited Create(UseFileName);
-  end
-  else // Windows
-  begin
-    if FileName = '' then
-      inherited Create(ConfigInfo.GExpertsIdeRootRegistryKey)
-    else
-      inherited Create(FileName);
-  end;
+  if FileName = '' then
+    inherited Create(ConfigInfo.GExpertsIdeRootRegistryKey)
+  else
+    inherited Create(FileName);
 end;
 
 procedure TGExpertsSettings.SaveFont(const Section: string; const Font: TFont; Flags: TGXFontFlags);

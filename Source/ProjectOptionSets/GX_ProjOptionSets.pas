@@ -48,14 +48,10 @@ type
     mniModifyEnvOptionValues: TMenuItem;
     pcSettings: TPageControl;
     tabSets: TTabSheet;
-    lstSets: TListBox;
     tabProject: TTabSheet;
     lblProjectSettings: TLabel;
-    pnlFilterComboHost: TPanel;
-    cbFilter: TComboBox;
     pnlCheckListHost: TPanel;
     tabEnvironment: TTabSheet;
-    lblCheckListNot: TLabel;
     pnlCurrentSet: TPanel;
     ToolBar: TToolBar;
     Actions: TActionList;
@@ -79,6 +75,11 @@ type
     mitPopSep: TMenuItem;
     actRenameSet: TAction;
     mitPopRename: TMenuItem;
+    pnlSets: TPanel;
+    lstSets: TListBox;
+    pnlEnvironment: TPanel;
+    pnlFilterComboHost: TPanel;
+    cbFilter: TComboBox;
     procedure lstSetsClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mniPrjClearAllClick(Sender: TObject);
@@ -99,6 +100,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure actRenameSetExecute(Sender: TObject);
     procedure mniModifyPrjOptionValuesClick(Sender: TObject);
+    procedure pnlFilterComboHostResize(Sender: TObject);
   private
     lstPrjOptions: TCheckListBox;
     lstEnvOptions: TCheckListBox;
@@ -1132,7 +1134,7 @@ begin
 
   lstEnvOptions := TCheckListBoxWithHints.Create(Self);
   lstEnvOptions.Align := alClient;
-  lstEnvOptions.Parent := tabEnvironment;
+  lstEnvOptions.Parent := pnlEnvironment;
   lstEnvOptions.PopupMenu := pmuEnvOptions;
   lstEnvOptions.OnClickCheck := lstEnvironmentOptClickCheck;
   lstEnvOptions.OnMouseDown  := lstEnvironmentOptMouseDown;
@@ -1656,6 +1658,11 @@ end;
 procedure TfmProjOptionSets.mniModifyPrjOptionValuesClick(Sender: TObject);
 begin
   // This event is assignned at runtime to an internal IDE event handler
+end;
+
+procedure TfmProjOptionSets.pnlFilterComboHostResize(Sender: TObject);
+begin
+  cbFilter.Width := pnlFilterComboHost.ClientWidth - (2 * cbFilter.Left);
 end;
 
 initialization

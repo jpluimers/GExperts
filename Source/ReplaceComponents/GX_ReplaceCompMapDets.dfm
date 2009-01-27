@@ -16,6 +16,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  Scaled = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow

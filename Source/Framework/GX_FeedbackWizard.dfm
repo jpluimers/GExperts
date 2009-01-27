@@ -314,7 +314,7 @@ object fmFeedbackWizard: TfmFeedbackWizard
               Top = 40
               Width = 280
               Height = 17
-              Caption = 'Borland &IDE Version'
+              Caption = '&IDE Version'
               Checked = True
               Enabled = False
               State = cbChecked

@@ -84,10 +84,10 @@ object fmProofreaderConfig: TfmProofreaderConfig
       Top = 6
       Width = 511
       Height = 415
-      ActivePage = tabReplacement
+      ActivePage = tabDictionary
       Align = alClient
       MultiLine = True
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       OnChange = PagesChange
       object tabReplacement: TTabSheet
@@ -200,7 +200,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
           object gbxWords: TGroupBox
             Left = 4
             Top = 4
-            Width = 214
+            Width = 194
             Height = 378
             Align = alClient
             Caption = 'Dictionary Words'
@@ -208,7 +208,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             object pnlWords: TPanel
               Left = 2
               Top = 16
-              Width = 210
+              Width = 190
               Height = 360
               Align = alClient
               BevelOuter = bvNone
@@ -217,7 +217,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object tbrDictionary: TToolBar
                 Left = 4
                 Top = 4
-                Width = 202
+                Width = 182
                 Height = 24
                 DisabledImages = dmSharedImages.DisabledImages
                 EdgeBorders = []
@@ -260,7 +260,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               object lvDictionary: TListView
                 Left = 4
                 Top = 28
-                Width = 202
+                Width = 182
                 Height = 328
                 Align = alClient
                 Columns = <
@@ -284,20 +284,20 @@ object fmProofreaderConfig: TfmProofreaderConfig
             end
           end
           object pnlDictOptions: TPanel
-            Left = 218
+            Left = 198
             Top = 4
-            Width = 281
+            Width = 301
             Height = 378
             Align = alRight
             BevelOuter = bvNone
             TabOrder = 1
             DesignSize = (
-              281
+              301
               378)
             object gbReplaceIf: TGroupBox
               Left = 8
               Top = 48
-              Width = 273
+              Width = 293
               Height = 147
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Replace When'
@@ -355,7 +355,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             object cbFirstCharMustBeCorrect: TCheckBox
               Left = 8
               Top = 202
-              Width = 271
+              Width = 291
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Don'#39't replace if the first character is different'
@@ -365,7 +365,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
               Tag = 2
               Left = 8
               Top = 4
-              Width = 271
+              Width = 291
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Enable dictionary replacement'
@@ -377,7 +377,7 @@ object fmProofreaderConfig: TfmProofreaderConfig
             object cbEnableCompiler: TCheckBox
               Left = 8
               Top = 24
-              Width = 271
+              Width = 291
               Height = 17
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Enable compiler-assisted replacement'

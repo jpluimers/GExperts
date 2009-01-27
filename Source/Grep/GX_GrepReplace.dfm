@@ -3,8 +3,8 @@ object fmGrepReplace: TfmGrepReplace
   Top = 227
   BorderStyle = bsDialog
   Caption = 'Replace Matches'
-  ClientHeight = 138
-  ClientWidth = 396
+  ClientHeight = 155
+  ClientWidth = 432
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -15,8 +15,8 @@ object fmGrepReplace: TfmGrepReplace
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    396
-    138)
+    432
+    155)
   PixelsPerInch = 96
   TextHeight = 14
   object lblWith: TLabel
@@ -37,9 +37,9 @@ object fmGrepReplace: TfmGrepReplace
   object lblInString: TLabel
     Left = 61
     Top = 57
-    Width = 328
-    Height = 42
-    Anchors = [akLeft, akTop, akRight]
+    Width = 364
+    Height = 58
+    Anchors = [akLeft, akTop, akRight, akBottom]
     AutoSize = False
     ShowAccelChar = False
     WordWrap = True
@@ -61,15 +61,15 @@ object fmGrepReplace: TfmGrepReplace
   object cbReplace: TComboBox
     Left = 61
     Top = 30
-    Width = 328
+    Width = 364
     Height = 22
     Anchors = [akLeft, akTop, akRight]
     ItemHeight = 14
     TabOrder = 0
   end
   object btnOK: TButton
-    Left = 155
-    Top = 105
+    Left = 191
+    Top = 122
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -79,8 +79,8 @@ object fmGrepReplace: TfmGrepReplace
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 234
-    Top = 105
+    Left = 270
+    Top = 122
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -90,8 +90,8 @@ object fmGrepReplace: TfmGrepReplace
     TabOrder = 2
   end
   object btnHelp: TButton
-    Left = 313
-    Top = 105
+    Left = 349
+    Top = 122
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
