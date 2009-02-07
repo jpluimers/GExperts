@@ -95,11 +95,12 @@
 {$ENDIF}
 
 {------------------------------------------------------------------------------}
-{ Pull in all defines from jedi.inc (must be done after the common compiler    }
-{ defines to  work correctly)                                                  }
+{ Pull in all defines from SynEditJedi.inc (must be done after the common      }
+{ compiler defines to  work correctly). Use SynEdit-prefix to avoid problems   }
+{ with other versions of jedi.inc in the search-path.                          }
 {------------------------------------------------------------------------------}
 
-{$I jedi.inc}
+{$I SynEditJedi.inc}
 
 {------------------------------------------------------------------------------}
 { SYN_WIN32, SYN_LINUX and SYN_KYLIX defines                                   }
@@ -488,4 +489,4 @@
 // Turn this off if you don't need complex script support, since it is slower
 {.$DEFINE SYN_UNISCRIBE}
 
-// $Id: SynEdit.inc,v 1.16.2.17 2008/09/17 13:59:11 maelh Exp $
+// $Id: SynEdit.inc,v 1.16.2.18 2009/01/06 16:26:01 maelh Exp $
