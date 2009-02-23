@@ -388,6 +388,10 @@ begin
       cClass := Settings.Components[IndexComponents];
       cProperty := Settings.Properties[IndexComponents];
       cValue := Settings.Values[IndexComponents];
+      cValue := AnsiDequotedStr(cValue, #39);
+      if (cValue= #39#39) then
+        cValue := '';
+
       if InheritsFromClass(NativeComponent.ClassType, cClass) then
       begin
         PropType := Component.GetPropTypeByName(cProperty);
