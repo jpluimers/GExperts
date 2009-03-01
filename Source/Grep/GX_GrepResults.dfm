@@ -12,7 +12,7 @@ inherited fmGrepResults: TfmGrepResults
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object pnlMain: TPanel
     Left = 0
     Top = 0
