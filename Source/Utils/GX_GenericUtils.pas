@@ -80,6 +80,7 @@ type
   TOSVersionInfoEx = TOSVersionInfoExA;
 
   EVersionInfoNotFound = class(Exception);
+  EGXFileNotFound = class(Exception);
 
   TListBoxCheckAction = (chAll, chNone, chInvert);
 
@@ -3501,7 +3502,7 @@ end;
 procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
 begin
   if not FileExists(FileName) then
-    raise Exception.CreateFmt('The file %s does not exist', [FileName]);
+    raise EGXFileNotFound.CreateFmt('The file %s does not exist.', [FileName]);
   if IsForm(FileName) then
     LoadFormFileToStrings(FileName, Data, WasBinary)
   else // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
