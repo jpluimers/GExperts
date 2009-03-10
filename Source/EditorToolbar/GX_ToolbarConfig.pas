@@ -215,6 +215,7 @@ procedure TfmToolbarConfig.lbCategoriesClick(Sender: TObject);
 var
   i: Integer;
   Category: string;
+  ActionName: string;
 begin
   lbAvailable.Items.BeginUpdate;
   try
@@ -224,8 +225,9 @@ begin
     Category := lbCategories.Items[lbCategories.ItemIndex];
     for i := 0 to GxActionBroker.ActionCount - 1 do
     begin
-      // Close just causes AVs, so we don't allow it
-      if StrBeginsWith('FileClose', GxActionBroker.Actions[i].Name) then
+      ActionName := GxActionBroker.Actions[i].Name;
+      // Close All causes AVs, so we don't allow it.  More/Editor Experts are not useful.
+      if StrBeginsWith('FileClose', ActionName) or StrContains('GExpertsMoreAction', ActionName, False) then
         Continue;
       if Category = SAllButtonsCategory then
         AddActionToListbox(GxActionBroker.Actions[i], lbAvailable, False)
