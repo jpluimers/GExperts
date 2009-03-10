@@ -27,7 +27,7 @@ implementation
 uses
   SysUtils, Windows, Controls,
   GX_GExperts, GX_OtaUtils, GX_ActionBroker, GX_IdeUtils,
-  GX_EditorExpert, GX_EditorExpertManager;
+  GX_EditorExpert, GX_EditorExpertManager, ComCtrls;
 
 var
   InternalPopupMenu: TPopupMenu;
@@ -56,8 +56,10 @@ procedure TGxMenusForEditorExperts.Click(Sender: TObject);
 var
   MousePosition: TPoint;
   APopupMenu: TPopupMenu;
+  IsToolButton: Boolean;
 begin
-  if SupportsSubmenu then
+  IsToolButton := Assigned(Sender) and (Sender is TCustomAction) and ((Sender as TCustomAction).ActionComponent is TToolButton);
+  if SupportsSubmenu and (not IsToolButton) then
   begin
     // The submenu items perform all actions
   end
