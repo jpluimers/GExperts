@@ -413,6 +413,7 @@ begin
   Show;
   BringToFront;
   Application.BringToFront;
+  EnsureFormVisible(Self);
 end;
 
 constructor TfmDebug.Create(AOwner: TComponent);
