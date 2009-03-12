@@ -126,7 +126,6 @@ type
     FGrepSettings: TGrepSettings;
     FSearcher: TGrepSearchRunner;
     FShowContext: Boolean;
-    FStayOnTop: Boolean;
     FDoSearchReplace: Boolean;
     procedure SetStayOnTop(Value: Boolean);
     procedure RefreshContextLines;
@@ -149,6 +148,7 @@ type
     procedure SetMatchString(const MatchStr: string);
     function DoingSearchOrReplace: Boolean;
     procedure ExpandOrContractList(Expand: Boolean);
+    function GetStayOnTop: Boolean;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
@@ -158,7 +158,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Execute(DoRefresh: Boolean);
-    property StayOnTop: Boolean read FStayOnTop write SetStayOnTop;
+    property StayOnTop: Boolean read GetStayOnTop write SetStayOnTop;
     property ShowContext: Boolean read FShowContext write SetShowContext;
     property DoSearchReplace: Boolean read FDoSearchReplace write FDoSearchReplace;
   end;
@@ -763,10 +763,9 @@ end;
 
 procedure TfmGrepResults.SetStayOnTop(Value: Boolean);
 begin
-  if FStayOnTop <> Value then
+  // Stay on top hides some modal dialogs
+  if (StayOnTop <> Value) and IsStandAlone then
   begin
-    FStayOnTop := Value;
-
     if Value then
       Self.FormStyle := fsStayOnTop
     else
@@ -909,6 +908,11 @@ begin
   ExpandOrContractList(False);
 end;
 
+function TfmGrepResults.GetStayOnTop: Boolean;
+begin
+  Result := (FormStyle = fsStayOnTop);
+end;
+
 procedure TfmGrepResults.GotoHighlightedListEntry;
 var
   CurrentLine: TLineResult;
@@ -990,11 +994,12 @@ begin
   actListContract.Enabled := not Processing and HaveItems;
   actListExpand.Enabled := not Processing and HaveItems;
   actFileAbort.Enabled := Processing;
-  actViewStayOnTop.Checked := FStayOnTop;
+  actViewStayOnTop.Checked := StayOnTop;
   actViewShowContext.Checked := ShowContext;
   actViewToolBar.Checked := ToolBar.Visible;
   actReplaceSelected.Enabled := not Processing and HaveItems;
   actReplaceAll.Enabled := not Processing and HaveItems;
+  actViewStayOnTop.Visible := IsStandAlone;
 end;
 
 function TfmGrepResults.ShowModalForm(Dlg: TCustomForm): TModalResult;
@@ -1002,11 +1007,10 @@ var
   SavedOnTop: Boolean;
 begin
   Result := mrCancel;
-  SavedOnTop := FStayOnTop;
+  SavedOnTop := StayOnTop;
   try
-    // The search dialog gets hidden behind the results if we don't do this
-    if IsStandAlone then
-      StayOnTop := False;
+    // The search dialog can get hidden behind the results if we don't do this
+    StayOnTop := False;
 
     if Dlg.ShowModal <> mrOk then
       Exit;
