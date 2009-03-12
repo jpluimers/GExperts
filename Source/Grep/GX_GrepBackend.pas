@@ -118,11 +118,11 @@ type
     FSearchRoot: string;
     procedure FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
     procedure StartFileSearch(const FileName: string);
-    procedure ExecuteSearchOnFile(const FileName: string);
+    procedure ExecuteSearchOnFile(const FileName: string; FromProject: Boolean = False);
     procedure SearchFormForFile(const FileName: string);
   private
     FGrepSettings: TGrepSettings;
-    procedure GrepFile(const FileName: string);
+    procedure GrepProjectFile(const FileName: string);
   protected
     procedure DoHitMatch(LineNo: Integer; const Line: string;
       SPos, EPos: Integer); virtual;
@@ -240,7 +240,7 @@ end;
 
 { TGrepSearchRunner }
 
-procedure TGrepSearchRunner.GrepFile(const FileName: string);
+procedure TGrepSearchRunner.GrepProjectFile(const FileName: string);
 begin
   try
     Application.ProcessMessages;
@@ -252,10 +252,10 @@ begin
 
       if (FGrepSettings.GrepAction = gaOpenFilesGrep) and (not GxOtaIsFileOpen(FileName)) then
         Exit;
-      ExecuteSearchOnFile(FileName);
+      ExecuteSearchOnFile(FileName, True);
       if IsCpp(FileName) and (FGrepSettings.GrepAction in [gaProjGrep, gaOpenFilesGrep, gaProjGroupGrep]) then
         if GxOtaFileOrModuleExists(ChangeFileExt(FileName, '.h')) then
-          ExecuteSearchOnFile(ChangeFileExt(FileName, '.h'));
+          ExecuteSearchOnFile(ChangeFileExt(FileName, '.h'), True);
       FFileResult := nil;
     end;
   except
@@ -282,7 +282,7 @@ begin
   if ProjectGroup = nil then
     Exit;
   FSearchRoot := ExtractFilePath(ProjectGroup.FileName);
-  GrepFile(ProjectGroup.FileName);
+  GrepProjectFile(ProjectGroup.FileName);
   for i := 0 to ProjectGroup.ProjectCount - 1 do
     GrepProject(ProjectGroup.Projects[i]);
 end;
@@ -295,11 +295,11 @@ begin
     Exit;
 
   FSearchRoot := ExtractFilePath(Project.FileName);
-  GrepFile(GxOtaGetProjectFileName(Project, True));
+  GrepProjectFile(GxOtaGetProjectFileName(Project, True));
 
   for i := 0 to Project.GetModuleCount - 1 do
   begin
-    GrepFile(Project.GetModule(i).GetFileName);
+    GrepProjectFile(Project.GetModule(i).GetFileName);
     if FAbortSignalled then
       Break;
   end;
@@ -500,7 +500,7 @@ begin
   end;
 end;
 
-procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string);
+procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string; FromProject: Boolean);
 begin
   Assert(Assigned(FDupeFileList));
   if FDupeFileList.IndexOf(FileName) = -1 then
@@ -513,6 +513,8 @@ begin
     except
       on E: Exception do
       begin
+        if FromProject and (E is EGXFileNotFound) then
+          E.Message := E.Message + '  Please check your dpr/dproj files and correct the path/filename referenced there.';
         if MessageDlg(E.Message, mtError, [mbOK, mbCancel], 0) = mrCancel then
           Abort;
       end;
