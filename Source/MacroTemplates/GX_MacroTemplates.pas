@@ -590,6 +590,9 @@ begin
   if MacroObject <> nil then
   begin
     MacroText := FTemplateText.Text;
+    // D2009 macros were getting saved with an extra CRLF due to the change to the native TStringList for internal storage
+    if RunningRS2009OrGreater then
+      MacroText := RemoveTrailingEOL(MacroText);
     MacroObject.Text := MacroText;
     LoadUsesToMacroObject(MacroObject.PubUnits, lvGlobalUses);
     LoadUsesToMacroObject(MacroObject.PrivUnits, lvLocalUses);
