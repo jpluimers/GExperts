@@ -762,7 +762,7 @@ object fmConfiguration: TfmConfiguration
         287
         34)
       object btnOK: TButton
-        Left = 33
+        Left = 30
         Top = 1
         Width = 75
         Height = 25
@@ -773,7 +773,7 @@ object fmConfiguration: TfmConfiguration
         OnClick = btnOKClick
       end
       object btnCancel: TButton
-        Left = 120
+        Left = 117
         Top = 1
         Width = 75
         Height = 25
