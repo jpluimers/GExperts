@@ -7,7 +7,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   ClientHeight = 428
   ClientWidth = 497
   Color = clBtnFace
-  Constraints.MinHeight = 270
+  Constraints.MinHeight = 285
   Constraints.MinWidth = 425
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -114,7 +114,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 358
         Top = 16
         Width = 117
-        Height = 28
+        Height = 26
         Action = acAdd
         Anchors = [akTop, akRight]
         TabOrder = 0
@@ -123,16 +123,16 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 358
         Top = 50
         Width = 117
-        Height = 28
+        Height = 26
         Action = acDelete
         Anchors = [akTop, akRight]
         TabOrder = 1
       end
       object btnDefaults: TButton
-        Left = 375
-        Top = 306
-        Width = 100
-        Height = 25
+        Left = 358
+        Top = 301
+        Width = 117
+        Height = 26
         Anchors = [akRight, akBottom]
         Caption = '&Defaults'
         TabOrder = 3
@@ -142,7 +142,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 358
         Top = 84
         Width = 117
-        Height = 28
+        Height = 26
         Action = acOtherProperties
         Anchors = [akTop, akRight]
         TabOrder = 2
