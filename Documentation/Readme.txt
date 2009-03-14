@@ -1,4 +1,4 @@
-GExperts 1.33 Beta 2
+GExperts 1.33
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -59,6 +59,9 @@ KNOWN LIMITATIONS/BUGS
      keymapping.  Also, the Macro Library can not always intercept the
      Shift+Ctrl+R keystroke to automatically grab keyboard macros, so you may
      need to create macros using the recording functions in the toolbar.
+  Delphi 2009 Only:
+   - Playing back recorded macros in the Marco Library does not work.  This
+     appears to be an IDE bug handling editor macro streams.
 
 
 INSTALLATION
@@ -95,16 +98,20 @@ Add/Remove Programs or Programs [and Features] tool (under Vista).
 
 CHANGE LOG
 ----------------------
-VERSION 1.33 Beta (October, 2008)
-- General: Added basic support for RAD Studio 2009.  Note that some of the
-  tools that require our source code parser (Procedure List, Class Browser,
-  To Do List, Delimiter Editor Experts, etc.) do not have full unicode support.
+VERSION 1.33 (March, 2009)
+- General: Added support for RAD Studio 2009.  Note that some of the tools that
+  require our source code parser (Procedure List, Class Browser, To Do List,
+  Delimiter Editor Experts, etc.) do not have full unicode support.
   Other tools such as the Grep Search/Replace, Source Export, Code Librarian,
   etc. should support UNICODE files just fine.  Also included are some shutdown
   optimizations, removal of all known memory leaks, and other minor tweaks.
+  All GExperts forms use the OS default font face/size.  You can also override
+  the UI font in the General tab of the settings. 
 - Grep Search: There is a new regular expression engine that supports a large
   subset of the Perl regular expression syntax.  Grep can now search and
-  replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.
+  replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.  The stay on
+  top feature was removed when running inside the IDE, since it could hide modal
+  dialogs.
 - Hide/Show Non-Visual Components: This new tool allows temporarily hiding
   non-visual components on a form, so you can visualize the form as it will
   appear at runtime.
@@ -239,7 +246,7 @@ http://www.helpandmanual.com/
 GEXPERTS LICENSE
 ----------------------
 
-GExperts is copyright 1996-2008 by GExperts, Inc, Erik Berry, and several
+GExperts is copyright 1996-2009 by GExperts, Inc, Erik Berry, and several
 other authors who have submitted their code for inclusion. This license
 agreement only covers code written by GExperts, Inc. and Erik Berry. You
 should contact the other authors concerning their respective copyrights
