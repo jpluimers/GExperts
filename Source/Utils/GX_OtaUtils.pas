@@ -1522,7 +1522,7 @@ begin
   {$ENDIF}
 end;
 
-// TODO 3 -oAnyone -cCleanup : This claims to return TOTAEditPos values but really returns TOTACharPos values
+// TODO 3 -oAnyone -cCleanup: This claims to return TOTAEditPos values but really returns TOTACharPos values
 procedure GxOtaGetCurrentIdentEx(var Ident: string; var IdentOffset: Integer;
   var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer);
 

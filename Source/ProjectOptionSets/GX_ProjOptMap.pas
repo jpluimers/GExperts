@@ -81,7 +81,7 @@ type
     Translator: TGxOptionValueTranslator;
   end;
 
-// TODO 4 -oAnyone -cFeature : Add similar maps for the environment options?
+// TODO 4 -oAnyone -cFeature: Add similar maps for the environment options?
 
 const
   {$IFDEF GX_VER200_up}
@@ -2584,7 +2584,7 @@ begin
   // VERSIONINFO module attributes don't make it through in D5/6/7
   Result := ValueString;
 
-  // TODO 4 -oAnyone -cFeature : Implement version info attribute translators
+  // TODO 4 -oAnyone -cFeature: Implement version info attribute translators
 end;
 
 end.

@@ -49,7 +49,7 @@ type
     procedure DirEnable(New: Boolean);
   end;
 
-// #ToDo:4 test2
+// #ToDo:4 Test2
 
 implementation
 
@@ -76,7 +76,7 @@ begin
   btnRemove.Enabled := IsListItemSelected;
   btnApply.Enabled := HasTokenText and IsListItemSelected and TokenTextInList;
 
-  // #ToDo2 rewrite this to make it readable!!!
+  // #ToDo2 Rewrite this to make it readable!!!
   if TextIsCurrentListItem then
     with lstTokens do
     begin
