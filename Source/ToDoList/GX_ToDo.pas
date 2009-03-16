@@ -59,7 +59,6 @@ type
 
   TfmToDo = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
-    ilToDo: TImageList;
     lvToDo: TListView;
     Popup: TPopupMenu;
     mitGoto: TMenuItem;
@@ -377,7 +376,7 @@ end;
 
 {#todo2 test this carefully}
 
-{#todo3 another test}
+{#todo3 Another test}
 
 resourcestring
   SDoneTodoDesignation = 'Done';
@@ -514,15 +513,32 @@ begin
       m := Min(m, Min(j, k));
       // The +1 is necessary to match IDE's line numbering
       Info.Display := Trim(Copy(TokenString, n, (m - n) + 1));
+      // Delete -C and -O options from ToDo text
+      if Pos(' -C', UpperCase(Info.Display)) > 0 then
+        Delete(Info.Display, Pos(' -C', UpperCase(Info.Display)), Length(Info.ToDoClass) + 3);
+      if Pos(' -O', UpperCase(Info.Display)) > 0 then
+        Delete(Info.Display, Pos(' -O', UpperCase(Info.Display)), Length(Info.Owner) + 3);
+      // Remove "TODO "...
+      //Delete(Info.Display, 1, Pos(' ', Info.Display));
+      // Remove excess whitespace
+      Info.Display := Trim(CompressWhiteSpace(Info.Display));
+      if StrBeginsWith(':', Info.Display) then
+      begin
+        Delete(Info.Display, 1, 1);
+        Info.Display := Trim(Info.Display);
+      end;
+      
       Info.LineNo := LineNumber;
       Info.FileName := FileName;
       FDataList.Add(Info);
       CListItem := lvToDo.Items.Add;
+      ClistItem.SubItems.Add(Info.ToDoClass);
+      ClistItem.SubItems.Add(Info.Owner);
       ClistItem.SubItems.Add(Info.Display);
       ClistItem.SubItems.Add(ExtractFileName(Info.FileName));
       ClistItem.SubItems.Add(IntToStr(Info.LineNo));
       CListItem.Data := Info;
-      CListItem.ImageIndex := Ord(Info.Priority);
+      CListItem.ImageIndex := ImageIndexToDoPriority + Ord(Info.Priority);
 
       Assert(Assigned(ToDoExpert));
       if ToDoExpert.FAddMessage then
@@ -880,7 +896,9 @@ begin
       ClipText.Add(IntToStr(lvToDo.Items[i].ImageIndex) + #9 +
         lvToDo.Items[i].SubItems[0] + #9 +
         lvToDo.Items[i].SubItems[1] + #9 +
-        lvToDo.Items[i].SubItems[2]);
+        lvToDo.Items[i].SubItems[2] + #9 +
+        lvToDo.Items[i].SubItems[3] + #9 +
+        lvToDo.Items[i].SubItems[4]);
     end;
     Clipboard.AsText := ClipText.Text;
   finally
@@ -1068,7 +1086,7 @@ begin
   case FColumnIndex of
     -1: Compare := 0;
     0: Compare := Item1.ImageIndex - Item2.ImageIndex; // priority
-    3: try
+    5: try
         // Odd bug workaround
         if ((Item1.SubItems.Count > 2) and (Item2.SubItems.Count > 2)) then
           Compare := StrToInt(Item1.SubItems[FColumnIndex - 1]) -
@@ -1123,13 +1141,15 @@ begin
   NewWidth :=
     lvToDo.ClientWidth
     - lvToDo.Columns[0].Width
+    - lvToDo.Columns[1].Width
     - lvToDo.Columns[2].Width
-    - lvToDo.Columns[3].Width;
+    - lvToDo.Columns[4].Width
+    - lvToDo.Columns[5].Width;
 
   if NewWidth < 10 then
     NewWidth := 10;
 
-  lvToDo.Columns[1].Width := NewWidth;
+  lvToDo.Columns[3].Width := NewWidth;
 end;
 
 procedure TfmToDo.UMResizeCols(var Msg: TMessage);
