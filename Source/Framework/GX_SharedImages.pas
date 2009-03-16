@@ -31,6 +31,7 @@ const
   ImageIndexWindow = 57;
   ImageIndexWindows = 58;
   ImageIndexUnit = 59;
+  ImageIndexToDoPriority = 71;
 
 function GetSharedImageList: TImageList;
 
