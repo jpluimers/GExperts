@@ -518,8 +518,6 @@ begin
         Delete(Info.Display, Pos(' -C', UpperCase(Info.Display)), Length(Info.ToDoClass) + 3);
       if Pos(' -O', UpperCase(Info.Display)) > 0 then
         Delete(Info.Display, Pos(' -O', UpperCase(Info.Display)), Length(Info.Owner) + 3);
-      // Remove "TODO "...
-      //Delete(Info.Display, 1, Pos(' ', Info.Display));
       // Remove excess whitespace
       Info.Display := Trim(CompressWhiteSpace(Info.Display));
       if StrBeginsWith(':', Info.Display) then
