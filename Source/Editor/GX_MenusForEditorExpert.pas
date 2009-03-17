@@ -59,7 +59,7 @@ var
   IsToolButton: Boolean;
 begin
   IsToolButton := Assigned(Sender) and (Sender is TCustomAction) and ((Sender as TCustomAction).ActionComponent is TToolButton);
-  if SupportsSubmenu and (not IsToolButton) then
+  if SupportsSubmenu and (not IsToolButton) and Assigned(Sender) then
   begin
     // The submenu items perform all actions
   end
