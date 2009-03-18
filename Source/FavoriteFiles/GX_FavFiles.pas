@@ -88,6 +88,14 @@ type
     tbnFileNewFolder: TToolButton;
     actFileRename: TAction;
     mitFRename: TMenuItem;
+    mitCSep3: TMenuItem;
+    mitSelectAll: TMenuItem;
+    actFileSelectAll: TAction;
+    actFileMoveUp: TAction;
+    actFileMoveDown: TAction;
+    mitTreeSep2: TMenuItem;
+    mitMoveUp: TMenuItem;
+    mitMoveDown: TMenuItem;
     procedure tvFoldersChange(Sender: TObject; Node: TTreeNode);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure tvFoldersKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -122,6 +130,9 @@ type
     procedure mitFViewClick(Sender: TObject);
     procedure actFileRenameExecute(Sender: TObject);
     procedure ActionsUpdate(Action: TBasicAction; var Handled: Boolean);
+    procedure actFileSelectAllExecute(Sender: TObject);
+    procedure actFileMoveUpExecute(Sender: TObject);
+    procedure actFileMoveDownExecute(Sender: TObject);
   private
     FFileViewer: TFileViewer;
     FEntryFile: string;
@@ -1203,7 +1214,8 @@ begin
           if not GxOtaMakeSourceVisible(ExpandFileName(mFile.FileName)) then
             MessageDlg(Format(SCouldNotOpen, [ExpandFilename(mFile.FileName)]), mtError, [mbOK], 0)
           else begin
-            Self.Hide;
+            if (not IsStandAlone) and FExecHide then
+              Self.Hide;
             Result := True;
           end;
         end;
@@ -1440,6 +1452,28 @@ end;
 function TFilesExpert.HasConfigOptions: Boolean;
 begin
   Result := False;
+end;
+
+procedure TfmFavFiles.actFileSelectAllExecute(Sender: TObject);
+begin
+  ListView.SelectAll;
+end;
+
+procedure TfmFavFiles.actFileMoveUpExecute(Sender: TObject);
+begin
+  if Assigned(tvFolders.Selected) and (tvFolders.Selected.getPrevSibling <> nil) then
+    tvFolders.Selected.MoveTo(tvFolders.Selected.getPrevSibling, naInsert);
+end;
+
+procedure TfmFavFiles.actFileMoveDownExecute(Sender: TObject);
+begin
+  if Assigned(tvFolders.Selected) and (tvFolders.Selected.getNextSibling <> nil) then
+  begin
+    if tvFolders.Selected.getNextSibling.getNextSibling <> nil then
+      tvFolders.Selected.MoveTo(tvFolders.Selected.getNextSibling.getNextSibling, naInsert)
+    else
+      tvFolders.Selected.MoveTo(tvFolders.Selected.Parent, naAddChild);
+  end;
 end;
 
 initialization

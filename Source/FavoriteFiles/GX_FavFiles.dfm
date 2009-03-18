@@ -562,6 +562,15 @@ object fmFavFiles: TfmFavFiles
     object mitTreeSep1: TMenuItem
       Caption = '-'
     end
+    object mitMoveUp: TMenuItem
+      Action = actFileMoveUp
+    end
+    object mitMoveDown: TMenuItem
+      Action = actFileMoveDown
+    end
+    object mitTreeSep2: TMenuItem
+      Caption = '-'
+    end
     object mitTreeProperties: TMenuItem
       Action = actFileProperties
     end
@@ -613,6 +622,12 @@ object fmFavFiles: TfmFavFiles
       end
     end
     object mitCSep2: TMenuItem
+      Caption = '-'
+    end
+    object mitSelectAll: TMenuItem
+      Action = actFileSelectAll
+    end
+    object mitCSep3: TMenuItem
       Caption = '-'
     end
     object mitFProperties: TMenuItem
@@ -764,6 +779,24 @@ object fmFavFiles: TfmFavFiles
       ImageIndex = 38
       ShortCut = 113
       OnExecute = actFileRenameExecute
+    end
+    object actFileSelectAll: TAction
+      Category = 'File'
+      Caption = 'Select All'
+      ShortCut = 16449
+      OnExecute = actFileSelectAllExecute
+    end
+    object actFileMoveUp: TAction
+      Category = 'File'
+      Caption = 'Move Up'
+      ShortCut = 16422
+      OnExecute = actFileMoveUpExecute
+    end
+    object actFileMoveDown: TAction
+      Category = 'File'
+      Caption = 'Move Down'
+      ShortCut = 16424
+      OnExecute = actFileMoveDownExecute
     end
   end
 end
