@@ -76,13 +76,9 @@ begin
   btnRemove.Enabled := IsListItemSelected;
   btnApply.Enabled := HasTokenText and IsListItemSelected and TokenTextInList;
 
-  // #ToDo2 Rewrite this to make it readable!!!
   if TextIsCurrentListItem then
-    with lstTokens do
-    begin
-      if (cboPriority.ItemIndex = Ord(TTokenInfo(Items.Objects[ItemIndex]).Priority)) then
-        btnApply.Enabled := False;
-    end;
+    if (cboPriority.ItemIndex = Ord(TTokenInfo(lstTokens.Items.Objects[lstTokens.ItemIndex]).Priority)) then
+      btnApply.Enabled := False;
 end;
 
 procedure TfmToDoOptions.btnBrowseClick(Sender: TObject);
@@ -202,8 +198,12 @@ begin
 end;
 
 procedure TfmToDoOptions.FormCreate(Sender: TObject);
+var
+  i: TToDoPriority;
 begin
   DirEnable(radScanDir.Checked);
+  for i := Low(PriorityText) to High(PriorityText) do
+    cboPriority.Items.Add(PriorityText[i]);
 end;
 
 procedure TfmToDoOptions.radScanDirClick(Sender: TObject);

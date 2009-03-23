@@ -4,9 +4,6 @@ unit GX_ToDo;
 
 interface
 
-{ TODO 4 -oAnyone -cFeature: Add owner-drawing - tpDone
-  list view entries should be drawn in grey. }
-
 uses Forms, Messages, Classes, ActnList, Menus, ImgList,
   Controls, ComCtrls, ToolWin, ToolsAPI,
   GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo;
@@ -14,9 +11,23 @@ uses Forms, Messages, Classes, ActnList, Menus, ImgList,
 const
   UM_RESIZECOLS = WM_USER + 523;
 
-type
-  TToDoPriority = (tpHigh, tpMed, tpLow, tpDone);
+resourcestring
+  SCritical = 'Critical';
+  SHigh = 'High';
+  SNormal = 'Normal';
+  SLow = 'Low';
+  SLowest = 'Lowest';  
+  SInfo = 'Info';
+  SDone = 'Done';
 
+type
+  TToDoPriority = (tpCritical, tpHigh, tpNormal, tpLow, tpLowest, tpInfo, tpDone);
+
+var
+  PriorityText: array[Low(TToDoPriority)..High(TToDoPriority)] of string =
+    (SCritical, SHigh, SNormal, SLow, SLowest, SInfo, SDone);
+
+type
   TTokenInfo = class(TObject)
   private
     FToken: string;
@@ -42,7 +53,6 @@ type
 
   TToDoInfo = class(TObject)
   private
-    NumericPriority: Cardinal;
     Owner: string;
     ToDoClass: string;
     //
@@ -51,6 +61,7 @@ type
     Display: string;
     FileName: string;
     LineNo: Integer;
+    function NumericPriority: Integer;
   end;
 
   TToDoScanType = (tstProject, tstOpenFiles, tstDirectory, tstProjectGroup);
@@ -100,6 +111,8 @@ type
     procedure actHelpHelpExecute(Sender: TObject);
     procedure actOptionsConfigureExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure lvTodoCustomDrawItem(Sender: TCustomListView; Item: TListItem;
+      State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     FIsFirstActivation: Boolean;
     FDataList: TList;
@@ -121,6 +134,7 @@ type
     procedure SaveSettings;
     procedure LoadSettings;
     function ConfigurationKey: string;
+    function PriorityToImageIndex(Priority: TToDoPriority): Integer;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -224,10 +238,16 @@ begin
     if Count = 0 then
     begin
       // No tokens found, create a default list of tokens
-      AddToken('TODO', tpMed);
+      AddToken('TODO', tpNormal);
       AddToken('#ToDo1', tpHigh);
-      AddToken('#ToDo2', tpMed);
+      AddToken('#ToDo2', tpNormal);
       AddToken('#ToDo3', tpLow);
+      AddToken('TODO 1', tpCritical);
+      AddToken('TODO 2', tpHigh);
+      AddToken('TODO 3', tpNormal);
+      AddToken('TODO 4', tpLow);
+      AddToken('TODO 5', tpLowest);
+      AddToken('DONE', tpDone);
     end;
   finally
     Free;
@@ -306,7 +326,8 @@ begin
   end;
 end;
 
-{#todo1 make sure this works}
+{zTODO INFO Make sure this works}
+{zTODO 1 -oAnyone -cCriticalBug: Priority 1 test}
 
 procedure TfmToDo.ClearDataListAndListView;
 var
@@ -435,13 +456,13 @@ begin
           Break;
         Inc(j);
       end;
-      Info.NumericPriority := StrToIntDef(Copy(ParsingString, 1, j), 0);
       Delete(ParsingString, 1, j);
       ParsingString := TrimLeft(ParsingString);
 
       IsDoneTodoItem := (AnsiCaseInsensitivePos(SDoneTodoDesignation, ParsingString) = 1);
 
       { zTODO -oTestCase: -cIssue <-- test case for colon }
+      { zTODO DONE -oTestCase: -cIssue <-- test case for DONE }
       // Delete everything being with a possible trailing colon:
       j := Pos(':', ParsingString);
       if j > 0 then
@@ -512,7 +533,7 @@ begin
       if k = 0 then k := 999999;
       m := Min(m, Min(j, k));
       // The +1 is necessary to match IDE's line numbering
-      Info.Display := Trim(Copy(TokenString, n, (m - n) + 1));
+      Info.Display := Copy(TokenString, n, (m - n) + 1);
       // Delete -C and -O options from ToDo text
       if Pos(' -C', UpperCase(Info.Display)) > 0 then
         Delete(Info.Display, Pos(' -C', UpperCase(Info.Display)), Length(Info.ToDoClass) + 3);
@@ -536,7 +557,7 @@ begin
       ClistItem.SubItems.Add(ExtractFileName(Info.FileName));
       ClistItem.SubItems.Add(IntToStr(Info.LineNo));
       CListItem.Data := Info;
-      CListItem.ImageIndex := ImageIndexToDoPriority + Ord(Info.Priority);
+      CListItem.ImageIndex := PriorityToImageIndex(Info.Priority);
 
       Assert(Assigned(ToDoExpert));
       if ToDoExpert.FAddMessage then
@@ -618,6 +639,8 @@ begin
             start parsing. Also it would be better to move deleting of the comment
             tokens out of the parser }
           case Parser.TokenID of
+            // These only get the first line of multi-line comments.  We could concatenate multiple
+            // lines, but the go to "search" using the raw text match would need some changes.
             tkBorComment: ParseComment(FileName, '{', '}', Parser.Token, Parser.LineNumber + 1);
             tkAnsiComment: ParseComment(FileName, '(*', '*)', Parser.Token, Parser.LineNumber + 1);
             tkSlashesComment: ParseComment(FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
@@ -634,7 +657,7 @@ begin
   end;
 end;
 
-{#todo1 yet another test}
+{#todo1 DONE yet another test}
 
 {#todo5 and yet another test}
 
@@ -657,6 +680,7 @@ var
 begin
   Cursor := TempHourGlassCursor;
   try
+    ToDoExpert.FTokenList.CustomSort(SortStringListByLength);
     FScannedFiles.Clear;
     ClearDataListAndListView;
     lvToDo.Items.BeginUpdate;
@@ -798,16 +822,6 @@ begin
   if ToDoExpert.FHideOnGoto then
     Self.Hide;
 end;
-
-resourcestring
-  SHigh = 'High';
-  SNormal = 'Normal';
-  SLow = 'Low';
-  SDone = 'Done';
-
-var
-  PriorityText: array[Low(TToDoPriority)..High(TToDoPriority)] of string =
-    (SHigh, SNormal, SLow, SDone);
 
 procedure TfmToDo.actFilePrintExecute(Sender: TObject);
 resourcestring
@@ -1083,7 +1097,7 @@ procedure TfmToDo.lvToDoCompare(Sender: TObject; Item1, Item2: TListItem;
 begin
   case FColumnIndex of
     -1: Compare := 0;
-    0: Compare := Item1.ImageIndex - Item2.ImageIndex; // priority
+    0: Compare := TToDoInfo(Item1.Data).NumericPriority - TToDoInfo(Item2.Data).NumericPriority;
     5: try
         // Odd bug workaround
         if ((Item1.SubItems.Count > 2) and (Item2.SubItems.Count > 2)) then
@@ -1102,6 +1116,17 @@ begin
     Compare := AnsiCompareStr(Item1.SubItems[FColumnIndex - 1], Item2.SubItems[FColumnIndex - 1]);
   end;
   if not FSortAscending then Compare := -Compare;
+end;
+
+procedure TfmToDo.lvTodoCustomDrawItem(Sender: TCustomListView; Item: TListItem;
+  State: TCustomDrawState; var DefaultDraw: Boolean);
+begin
+  if Odd(Item.Index) then
+    lvToDo.Canvas.Brush.Color := clWindow
+  else
+    lvToDo.Canvas.Brush.Color := clWindow or ($0A0A0A);
+  if TToDoInfo(Item.Data).Priority = tpDone then
+    lvToDo.Canvas.Font.Color := clGrayText;
 end;
 
 procedure TfmToDo.SaveSettings;
@@ -1381,6 +1406,23 @@ begin
   finally
     Free;
   end;
+end;
+
+function TfmToDo.PriorityToImageIndex(Priority: TToDoPriority): Integer;
+begin
+  if Priority = tpInfo then
+    Result := ImageIndexInfo
+  else if Priority = tpDone then
+    Result := ImageIndexCheck
+  else
+    Result := ImageIndexToDoPriority + Ord(Priority);
+end;
+
+{ TToDoInfo }
+
+function TToDoInfo.NumericPriority: Integer;
+begin
+  Result := Ord(Priority);
 end;
 
 initialization

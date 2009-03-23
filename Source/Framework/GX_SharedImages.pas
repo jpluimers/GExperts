@@ -17,6 +17,7 @@ const
   ImageIndexNew = 10;
   ImageIndexExpand = 12;
   ImageIndexContract = 13;
+  ImageIndexInfo = 16;
   ImageIndexTrash = 30;
   ImageIndexFunction = 29;
   ImageIndexGear = 28;

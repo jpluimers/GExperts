@@ -104,10 +104,6 @@ object fmToDoOptions: TfmToDoOptions
       ItemHeight = 14
       TabOrder = 5
       OnChange = cboPriorityChange
-      Items.Strings = (
-        'High'
-        'Normal'
-        'Low')
     end
   end
   object btnOK: TButton

@@ -40,11 +40,11 @@ object fmToDo: TfmToDo
     Columns = <
       item
         Caption = '!'
-        Width = 18
+        Width = 20
       end
       item
         Caption = 'Category'
-        Width = 70
+        Width = 80
       end
       item
         Caption = 'Owner'
@@ -71,6 +71,7 @@ object fmToDo: TfmToDo
     OnChange = lvTodoChange
     OnColumnClick = lvTodoColumnClick
     OnCompare = lvTodoCompare
+    OnCustomDrawItem = lvTodoCustomDrawItem
     OnDblClick = actEditGotoExecute
     OnEditing = lvTodoEditing
     OnKeyDown = FormKeyDown
