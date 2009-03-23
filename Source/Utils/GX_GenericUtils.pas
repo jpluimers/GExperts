@@ -209,6 +209,8 @@ procedure FilterStringList(Source, Dest: TStrings; const Filter: string;
 procedure AddStringsPresentInString(Source, Dest: TStrings; const FilterString: string);
 // Return the comma text of a string list with a space after each comma
 function SpacedCommaText(Source: TStrings): string;
+// Sort a string list longest first then by a normal sort
+function SortStringListByLength(List: TStringList; Index1, Index2: Integer): Integer;
 
 // Adds a correct trailing slash to Directory if it is not present yet
 function AddSlash(const Directory: string): string;
@@ -1623,6 +1625,13 @@ function SpacedCommaText(Source: TStrings): string;
 begin
   Assert(Assigned(Source));
   Result := StringReplace(Source.CommaText, ',', ', ', [rfReplaceAll]);
+end;
+
+function SortStringListByLength(List: TStringList; Index1, Index2: Integer): Integer;
+begin
+  Result := Length(List[Index2]) - Length(List[Index1]);
+  if Result = 0 then
+    Result := CompareText(List[Index1], List[Index2]);
 end;
 
 function StrContains(const SubStr, Str: string; CaseSensitive: Boolean): Boolean;
