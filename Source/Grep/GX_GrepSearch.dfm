@@ -3,7 +3,7 @@ object fmGrepSearch: TfmGrepSearch
   Top = 209
   BorderStyle = bsDialog
   Caption = 'Grep Search'
-  ClientHeight = 305
+  ClientHeight = 336
   ClientWidth = 486
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -17,7 +17,7 @@ object fmGrepSearch: TfmGrepSearch
   Scaled = False
   DesignSize = (
     486
-    305)
+    336)
   PixelsPerInch = 96
   TextHeight = 14
   object lblFind: TLabel
@@ -43,21 +43,21 @@ object fmGrepSearch: TfmGrepSearch
     Left = 8
     Top = 40
     Width = 227
-    Height = 121
+    Height = 145
     Caption = 'Options'
     TabOrder = 1
     object cbCaseSensitive: TCheckBox
       Left = 10
-      Top = 16
-      Width = 165
+      Top = 19
+      Width = 200
       Height = 17
       Caption = '&Case sensitive'
       TabOrder = 0
     end
     object cbNoComments: TCheckBox
       Left = 10
-      Top = 98
-      Width = 165
+      Top = 101
+      Width = 200
       Height = 17
       Caption = '&Ignore comments'
       TabOrder = 4
@@ -65,24 +65,24 @@ object fmGrepSearch: TfmGrepSearch
     end
     object cbForms: TCheckBox
       Left = 10
-      Top = 57
-      Width = 165
+      Top = 60
+      Width = 200
       Height = 17
       Caption = 'Search for&m files'
       TabOrder = 2
     end
     object cbWholeWord: TCheckBox
       Left = 10
-      Top = 36
-      Width = 165
+      Top = 39
+      Width = 200
       Height = 17
       Caption = '&Whole word'
       TabOrder = 1
     end
     object cbRegEx: TCheckBox
       Left = 10
-      Top = 77
-      Width = 165
+      Top = 80
+      Width = 200
       Height = 17
       Caption = 'Regular e&xpression'
       TabOrder = 3
@@ -92,14 +92,14 @@ object fmGrepSearch: TfmGrepSearch
     Left = 252
     Top = 40
     Width = 227
-    Height = 121
+    Height = 145
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Where'
     TabOrder = 2
     object rbAllProjFiles: TRadioButton
       Left = 10
-      Top = 57
-      Width = 177
+      Top = 58
+      Width = 200
       Height = 17
       Caption = 'All files in &project'
       Checked = True
@@ -109,8 +109,8 @@ object fmGrepSearch: TfmGrepSearch
     end
     object rbOpenFiles: TRadioButton
       Left = 10
-      Top = 77
-      Width = 177
+      Top = 78
+      Width = 200
       Height = 17
       Caption = '&Open project files'
       TabOrder = 3
@@ -119,34 +119,43 @@ object fmGrepSearch: TfmGrepSearch
     object rbDirectories: TRadioButton
       Left = 10
       Top = 98
-      Width = 177
+      Width = 200
       Height = 17
-      Caption = 'Search in &directories'
+      Caption = '&Directories'
       TabOrder = 4
       OnClick = rbDirectoriesClick
     end
     object rbCurrentOnly: TRadioButton
       Left = 10
-      Top = 16
-      Width = 177
+      Top = 18
+      Width = 200
       Height = 17
-      Caption = 'Current &file only'
+      Caption = 'Current &file'
       TabOrder = 0
       OnClick = rbDirectoriesClick
     end
     object rbAllProjGroupFiles: TRadioButton
       Left = 10
-      Top = 36
-      Width = 177
+      Top = 38
+      Width = 200
       Height = 17
       Caption = 'All files in project &group'
       TabOrder = 1
       OnClick = rbDirectoriesClick
     end
+    object rbResults: TRadioButton
+      Left = 10
+      Top = 119
+      Width = 200
+      Height = 17
+      Caption = 'Previous search &result files'
+      TabOrder = 5
+      OnClick = rbDirectoriesClick
+    end
   end
   object gbxDirectories: TGroupBox
     Left = 8
-    Top = 168
+    Top = 192
     Width = 471
     Height = 99
     Anchors = [akLeft, akTop, akRight]
@@ -220,7 +229,7 @@ object fmGrepSearch: TfmGrepSearch
   end
   object btnOK: TButton
     Left = 244
-    Top = 273
+    Top = 304
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -231,7 +240,7 @@ object fmGrepSearch: TfmGrepSearch
   end
   object btnCancel: TButton
     Left = 324
-    Top = 273
+    Top = 304
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -242,7 +251,7 @@ object fmGrepSearch: TfmGrepSearch
   end
   object btnHelp: TButton
     Left = 404
-    Top = 273
+    Top = 304
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

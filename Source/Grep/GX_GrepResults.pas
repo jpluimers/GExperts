@@ -229,6 +229,8 @@ var
   FilesHit: Cardinal;
   Cursor: IInterface;
   MatchString: string;
+  ResultFiles: TStringList;
+  i: Integer;
 begin
   if FSearchInProgress then
     raise Exception.Create(SGrepActive);
@@ -239,25 +241,34 @@ begin
 
   reContext.Clear;
 
-  SetStatusString('');
-  SetMatchString('');
-  ClearResultsListbox;
-  BringToFront;
-  IdeDockManager.ShowForm(Self);
-  EnsureFormVisible(Self);
-
-  TimeStart := Now;
-  Cursor := TempHourGlassCursor;
-  FSearcher := TGrepSearchRunner.Create(FGrepSettings, lbResults.Items);
+  ResultFiles := TStringList.Create;
   try
-    FSearcher.OnSearchFile := StartFileSearch;
-    FSearchInProgress := True;
-    FSearcher.Execute;
-    FilesSearched := FSearcher.FileSearchCount;
-    MatchesFound := FSearcher.MatchCount;
+    ContractList;
+    for i := 0 to lbResults.Items.Count - 1 do
+      ResultFiles.Add(lbResults.Items[i]);
+    SetStatusString('');
+    SetMatchString('');
+    ClearResultsListbox;
+    BringToFront;
+    IdeDockManager.ShowForm(Self);
+    EnsureFormVisible(Self);
+
+    TimeStart := Now;
+    Cursor := TempHourGlassCursor;
+
+    FSearcher := TGrepSearchRunner.Create(FGrepSettings, lbResults.Items, ResultFiles);
+    try
+      FSearcher.OnSearchFile := StartFileSearch;
+      FSearchInProgress := True;
+      FSearcher.Execute;
+      FilesSearched := FSearcher.FileSearchCount;
+      MatchesFound := FSearcher.MatchCount;
+    finally
+      FreeAndNil(FSearcher);
+      FSearchInProgress := False;
+    end;
   finally
-    FreeAndNil(FSearcher);
-    FSearchInProgress := False;
+    FreeAndNil(ResultFiles);
   end;
 
   FilesHit := lbResults.Items.Count;

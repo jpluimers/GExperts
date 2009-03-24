@@ -1,4 +1,4 @@
-GExperts 1.33
+GExperts 1.33 Beta 3
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -106,21 +106,24 @@ VERSION 1.33 (March, 2009)
   etc. should support UNICODE files just fine.  Also included are some shutdown
   optimizations, removal of all known memory leaks, and other minor tweaks.
   All GExperts forms use the OS default font face/size.  You can also override
-  the UI font in the General tab of the settings. 
+  the UI font in the General tab of the settings.
 - Grep Search: There is a new regular expression engine that supports a large
   subset of the Perl regular expression syntax.  Grep can now search and
   replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.  The stay on
   top feature was removed when running inside the IDE, since it could hide modal
-  dialogs.
+  dialogs.  Allow searching within previously matched files (John Hansen).
 - Hide/Show Non-Visual Components: This new tool allows temporarily hiding
   non-visual components on a form, so you can visualize the form as it will
   appear at runtime.
 - Editor Experts: The main menu contains a submenu item for each editor
   expert now in Delphi 8 or later.
 - Favorite Files: Supports preview of jpg, png, and gif files if the VCL
-  supports it in your IDE version.
+  supports it in your IDE version, supports select all for files and move
+  up/down for folders.
 - Code Proofreader: Should be slightly more accurate with fewer false positive
   corrections made to your code.
+- To Do List: Display the category and owner for to do items, indicate items
+  marked DONE, support more priorities (Pestasoft, Erik).
 
 
 VERSION 1.32 (September 11, 2007)

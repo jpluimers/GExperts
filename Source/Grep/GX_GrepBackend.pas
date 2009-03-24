@@ -10,7 +10,7 @@ uses
   GX_GrepRegExSearch, GX_GenericUtils;
 
 type
-  TGrepAction = (gaProjGrep, gaCurrentOnlyGrep, gaOpenFilesGrep, gaDirGrep, gaProjGroupGrep);
+  TGrepAction = (gaProjGrep, gaCurrentOnlyGrep, gaOpenFilesGrep, gaDirGrep, gaProjGroupGrep, gaResults);
 
   // Saved grep settings (used for refresh)
   TGrepSettings = record
@@ -116,6 +116,7 @@ type
     FFileResult: TFileResult;
     FSearcher: TSearcher;
     FSearchRoot: string;
+    FFilesInResults: TStrings;
     procedure FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
     procedure StartFileSearch(const FileName: string);
     procedure ExecuteSearchOnFile(const FileName: string; FromProject: Boolean = False);
@@ -131,8 +132,9 @@ type
     procedure GrepProject(Project: IOTAProject);
     procedure GrepDirectory(Dir, Mask: string);
     procedure GrepDirectories(const Dir, Mask: string);
+    procedure GrepResults;
   public
-    constructor Create(const Settings: TGrepSettings; StorageTarget: TStrings);
+    constructor Create(const Settings: TGrepSettings; StorageTarget, FilesInResults: TStrings);
     procedure Execute;
     property OnSearchFile: TOnSearchFile read FOnSearchFile write FOnSearchFile;
     property FileSearchCount: Integer read FFileSearchCount;
@@ -264,12 +266,14 @@ begin
   end;
 end;
 
-constructor TGrepSearchRunner.Create(const Settings: TGrepSettings; StorageTarget: TStrings);
+constructor TGrepSearchRunner.Create(const Settings: TGrepSettings; StorageTarget, FilesInResults: TStrings);
 begin
   inherited Create;
 
   Assert(Assigned(StorageTarget));
+  Assert(Assigned(FilesInResults));
   FStorageTarget := StorageTarget;
+  FFilesInResults := FilesInResults;
   FGrepSettings := Settings;
 end;
 
@@ -423,6 +427,20 @@ begin
   end;
 end;
 
+procedure TGrepSearchRunner.GrepResults;
+var
+  i: Integer;
+begin
+  for i := 0 to FFilesInResults.Count - 1 do
+  begin
+    if GxOtaFileOrModuleExists(FFilesInResults[i]) then
+    begin
+      {$IFOPT D+} SendDebug('ResultsGrep on ' + FFilesInResults[i]); {$ENDIF}
+      ExecuteSearchOnFile(FFilesInResults[i]);
+    end;
+  end;
+end;
+
 procedure TGrepSearchRunner.Execute;
 begin
   FFileSearchCount := 0;
@@ -464,6 +482,8 @@ begin
             else
               GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
           end;
+        gaResults:
+          GrepResults;
       end;	// end case
     finally
       FreeAndNil(FDupeFileList);

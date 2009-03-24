@@ -34,6 +34,7 @@ type
     btnBrowse: TButton;
     lblDirectory: TLabel;
     rbAllProjGroupFiles: TRadioButton;
+    rbResults: TRadioButton;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -259,7 +260,9 @@ begin
   else if rbDirectories.Checked then
     FGrepExpert.GrepSearch := 3
   else if rbAllProjGroupFiles.Checked then
-    FGrepExpert.GrepSearch := 4;
+    FGrepExpert.GrepSearch := 4
+  else if rbResults.Checked then
+    FGrepExpert.GrepSearch := 5;
 end;
 
 procedure TfmGrepSearch.LoadFormSettings;
@@ -308,6 +311,7 @@ begin
   cbText.Items.Assign(FGrepExpert.SearchList);
   cbDirectory.Items.Assign(FGrepExpert.DirList);
   cbMasks.Items.Assign(FGrepExpert.MaskList);
+  rbResults.Enabled := fmGrepResults.lbResults.Count > 0;
 
   cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
   //cbNoComments.Checked := not FGrepExpert.GrepIncludeComments;
@@ -321,6 +325,12 @@ begin
     2: rbOpenFiles.Checked := True;
     3: rbDirectories.Checked := True;
     4: rbAllProjGroupFiles.Checked := True;
+    5: begin
+        if rbResults.Enabled then
+          rbResults.Checked := True
+        else
+          rbAllProjFiles.Checked := True;
+      end;
   else
     rbAllProjFiles.Checked := True;
   end;
@@ -387,6 +397,8 @@ begin
     Value.GrepAction := gaOpenFilesGrep
   else if rbAllProjGroupFiles.Checked then
     Value.GrepAction := gaProjGroupGrep
+  else if rbResults.Checked then
+    Value.GrepAction := gaResults
   else
   begin
     Value.GrepAction := gaDirGrep;
