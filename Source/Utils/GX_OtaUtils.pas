@@ -608,7 +608,8 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
-  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode, Math;
+  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode, Math,
+  GX_GetIdeVersion;
 
 const
   EditReaderBufferSize = 1024 * 24;
@@ -4400,13 +4401,13 @@ end;
 
 function HackBadIDEUTF8StringToString(const S: string): string;
 begin
-  {$IFDEF UNICODE}
   // Work around the fact that IOTAEditBlock.Text claims to return a
   // string/UnicodeString but actually returns a corrupt UTF-8 string
-  Result := UTF8ToUnicodeString(PAnsiChar(AnsiString(S)));
-  {$ELSE}
-  Result := S;
-  {$ENDIF UNICODE}
+  // In Delphi 2009, through update 2
+  if GetBorlandIDEVersion in [ideRS2009, ideRS2009U1, ideRS2009U2] then
+    Result := UTF8ToUnicodeString(PAnsiChar(AnsiString(S)))
+  else
+    Result := S;
 end;
 
 function HackBadEditorStringToNativeString(const S: string): string;

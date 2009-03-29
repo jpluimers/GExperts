@@ -9,15 +9,21 @@ interface
 type
   TBorlandIdeVersion =
     (ideUndetected, ideUnknown,
+     // Delphi
      ideD600, ideD601R, ideD601F, ideD602,
      ideD700, ideD71,
      ideD800, ideD801, ideD802,
      ideD900, ideD901, ideD902, ideD903,
+     // BDS
      ideBDS2006,
+     // RAD Studio
      ideDelphi2007,
-     ideRS2009, ideRS2009U1,
+     ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4,
+     // C# Builder
      ideCSB100,
+     // C++Builder
      ideBCB600, ideBCB601, ideBCB602, ideBCB604,
+     // Kylix
      ideKylix100,
      ideKylix200,
      ideKylix300
@@ -437,20 +443,44 @@ end;
   coreide110.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
   bds.exe              12.0.3210.17555 983,552    Wednesday, October 01, 2008, 2:01:00 PM
   dcldb120.bpl         12.0.3210.17555 286,720    Wednesday, October 01, 2008, 2:01:00 PM
+
+  Delphi 2009 Update 2 (database only):
+  File                 File Version    Size       Modified Time
+  delphicoreide110.bpl 12.0.3210.17555 3,099,136  Wednesday, October 01, 2008, 2:01:00 PM
+  coreide110.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
+  bds.exe              12.0.3210.17555 983,552    Wednesday, October 01, 2008, 2:01:00 PM
+  dcldb120.bpl         12.0.3210.17555 286,720    Wednesday, October 01, 2008, 2:01:00 PM
+  dcldbx120.bpl                        154,624    Wednesday, November 12, 2008, 3:02:00 PM
+  DataExplorer120.bpl                  154,624    Wednesday, November 12, 2008, 3:02:00 PM
+
+  Delphi 2009 Update 3:
+  File                 File Version    Size       Modified Time
+
+  Delphi 2009 Update 4 (database only):
+  File                 File Version    Size       Modified Time
 }
 function GetRS2009Version: TBorlandIdeVersion;
 const
   CoreIde1200: TVersionNumber =
     (Minor: 0; Major: 12; Build: 16989; Release: 3170);
+  CoreIde1201: TVersionNumber =
+    (Minor: 0; Major: 12; Build: 17555; Release: 3210);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
+  DbxFile: string;
 begin
   Result := ideRS2009;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide120.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1200);
   if VersionNumber > 0 then begin
     Result := ideRS2009U1;
+    DbxFile := GetIdeRootDirectory + 'Bin\dcldbx120.bpl';
+    if FileExists(DbxFile) and (GetFileSize(DbxFile) = 154624) then // No version info
+      Result := ideRS2009U2;
+    VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1201);
+    if VersionNumber > 0 then
+      Result := ideRS2009U3;
   end;
 end;
 
@@ -505,7 +535,7 @@ begin
 
   {$IFDEF VER200}
     Result := GetRS2009Version;
-    Assert(Result in [ideRS2009, ideRS2009U1]);
+    Assert(Result in [ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4]);
   {$ENDIF VER200}
 
   if Result = ideUnknown then
