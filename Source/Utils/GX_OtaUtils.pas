@@ -89,7 +89,7 @@ procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
 // StartOffset is the start offset of line (zero-based)
 // ColumnNo is the current column number (zero-based, can be > then number of chars in line)
 // LineNo is the current line number
-function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer): string;
+function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; ByteBased: Boolean = False): string;
 function GxOtaGetEditorLine(View: IOTAEditView; LineNo: Integer): UTF8String;
 function GxOtaGetEditorLineAsString(View: IOTAEditView; LineNo: Integer): TGXUnicodeString;
 
@@ -101,7 +101,7 @@ function GxOtaGetEditorLineAsString(View: IOTAEditView; LineNo: Integer): TGXUni
 // - CurrentPos is the current cursor position (line/col)
 // - AfterLen is the length of the part of the identifier that is after cursor
 procedure GxOtaGetCurrentIdentEx(var Ident: string; var IdentOffset: Integer;
-  var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer); overload;
+  var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer; ByteBased: Boolean = False); overload;
 // Get the identifier and starting position only.  Return True on success.
 function GxOtaGetCurrentIdentData(var Ident: string; var StartEditPos: TOTAEditPos): Boolean;
 
@@ -1419,11 +1419,59 @@ begin
   end;
 end;
 
-function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer): string;
+function GxOtaGetActiveEditorTextBytes(Stream: TStream; UseSelection: Boolean): Boolean;
+var
+  ISourceEditor: IOTASourceEditor;
+  IEditView: IOTAEditView;
+  IEditReader: IOTAEditReader;
+  BlockSelText: string;
+begin
+  Assert(Stream <> nil);
+
+  Result := False;
+
+  ISourceEditor := GxOtaGetCurrentSourceEditor;
+  if ISourceEditor = nil then
+    Exit;
+
+  if ISourceEditor.EditViewCount > 0 then
+  begin
+    IEditView := GxOtaGetTopMostEditView(ISourceEditor);
+    Assert(IEditView <> nil);
+
+    if (IEditView.Block.Size > 0) and UseSelection then
+    begin
+      BlockSelText := IDEEditorStringToString(IEditView.Block.Text);
+      Stream.WriteBuffer(PAnsiChar(ConvertToIDEEditorString(BlockSelText))^, Length(BlockSelText) + SizeOf(Byte(0)));
+      Result := True;
+    end
+    else
+    begin
+      IEditReader := ISourceEditor.CreateReader;
+      GxOtaSaveReaderToStream(IEditReader, Stream);
+      Result := False;
+    end;
+  end;
+end;
+
+function GxOtaGetActiveEditorTextAsStringBytes(var Text: string; UseSelection: Boolean): Boolean;
+var
+  StringStream: TStringStream;
+begin
+  StringStream := TStringStream.Create('');
+  try
+    Result := GxOtaGetActiveEditorTextBytes(StringStream, UseSelection);
+    Text := StringStream.DataString;
+  finally
+    FreeAndNil(StringStream);
+  end;
+end;
+
+function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; ByteBased: Boolean): string;
 
   // Returns column, line number, and source of the active editor
   function GetCurrentSourceAndPos(var CursorPosition: Integer;
-    var CursorLine: Integer): string;
+    var CursorLine: Integer; ByteBased: Boolean): string;
   var
     EditView: IOTAEditView;
     EditPos: TOTAEditPos;
@@ -1435,7 +1483,13 @@ function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer): st
     EditView := GxOtaGetTopMostEditView;
     if Assigned(EditView) then
     begin
-      GxOtaGetActiveEditorTextAsString(Result, False);
+      // Hack for macro templates that wants accurate byte counts instead of
+      // accurately preserved characters.  This puts each UTF-8 byte in a
+      // separate character in the result.
+      if ByteBased then
+        GxOtaGetActiveEditorTextAsStringBytes(Result, False)
+      else
+        GxOtaGetActiveEditorTextAsString(Result, False);
       EditPos := EditView.CursorPos;
       EditView.ConvertPos(True, EditPos, CharPos);
       CursorLine := CharPos.Line;
@@ -1449,7 +1503,7 @@ var
   SrcLen, LineLen: Integer;
   CursorPos: Integer;
 begin
-  TotalSrc := GetCurrentSourceAndPos(CursorPos, LineNo);
+  TotalSrc := GetCurrentSourceAndPos(CursorPos, LineNo, ByteBased);
 
   // Find the start of the line
   Index := CursorPos;
@@ -1525,7 +1579,7 @@ end;
 
 // TODO 3 -oAnyone -cCleanup: This claims to return TOTAEditPos values but really returns TOTACharPos values
 procedure GxOtaGetCurrentIdentEx(var Ident: string; var IdentOffset: Integer;
-  var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer);
+  var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer; ByteBased: Boolean);
 
   function IsEndOfWordChar(Char: Char): Boolean;
   begin
@@ -1548,7 +1602,7 @@ var
   TailLen: Integer;
 begin
   Ident := '';
-  CurrentLine := GxOtaGetCurrentLineData(StartOffset, ColumnNo, LineNo);
+  CurrentLine := GxOtaGetCurrentLineData(StartOffset, ColumnNo, LineNo, ByteBased);
 
   CurrentPos.Col := ColumnNo;
   CurrentPos.Line := LineNo;
