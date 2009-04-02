@@ -1483,7 +1483,7 @@ function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; Byt
     EditView := GxOtaGetTopMostEditView;
     if Assigned(EditView) then
     begin
-      // Hack for macro templates that wants accurate byte counts instead of
+      // Hack for macro templates that want accurate byte counts instead of
       // accurately preserved characters.  This puts each UTF-8 byte in a
       // separate character in the result.
       if ByteBased then
