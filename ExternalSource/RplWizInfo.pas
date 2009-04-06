@@ -58,7 +58,7 @@ uses
   GX_ReplaceCompData;
 
 const
-{ Default Hight / Width for non-visible components.
+{ Default Height / Width for non-visible components.
   Can be any value >0, required to correctly specify position on replace.
   (20 is safe also for visible components) }
   NonVisibleDefSize = 20;
@@ -67,7 +67,7 @@ const
   properties. A property has a type and a value. }
 type
   TFriendComponent = class(TComponent);
-  
+
   TCompInfo = class;
   TCompInfoProc = procedure(ACompInfo: TCompInfo; AData: Pointer; var Stop: Boolean) of object;
 
@@ -100,7 +100,7 @@ type
       Mappings: TCompRepMapList); virtual; abstract;
 
     function IsLogValuesForced: Boolean; virtual; abstract;
-    
+
     property SourceClassName: string read FSourceClassName write FSourceClassName;
     property DestClassName: string read FDestClassName write FDestClassName;
     property Root: TCompInfo read FRoot write FRoot;
