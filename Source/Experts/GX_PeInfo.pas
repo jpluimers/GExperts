@@ -42,7 +42,7 @@ type
   end;
 
   PEImgHeader = record
-    Machine: SmallInt;
+    Machine: Word;
     NumberOfSections: SmallInt;
     TimeDateStamp: Integer;
     PointerToSymboltable: Integer;
@@ -547,22 +547,23 @@ resourcestring
   SMIPS_R10000 = 'MIPS R10000';
   SDEC_Alpha_XP = 'DEC Alpha XP';
   SPower_PC = 'Power PC (little endian)';
+  SPower_PC_FP = 'Power PC (floating point)';
   SMotorola_68000 = 'Motorola 68000';
   SPA_RISC = 'HP PA RISC';
   SUnknown_CPU = 'Unknown CPU';
   SHitachiSH3 = 'Hitachi SH3';
-  SHitachiSH3E = 'Hitachi SH3E';
+  SHitachiSH3E = 'Hitachi SH3E DSP';
   SHitachiSH4 = 'Hitachi SH4';
   SHitachiSH5 = 'Hitachi SH5';
-  SARM = 'ARM';
+  SARM = 'ARM (little endian)';
   SThumb = 'Thumb';
-  SIntelIA64 = 'Intel IA64';
+  SIntelIA64 = 'Intel IA64 Itanium';
   SMips16 = 'MIPS 16';
   SAlphaAXP64 = '64-bit Alpha AXP';
   SMipsFPU = 'MIPS with FPU';
   SMips16FPU = 'MIPS 16 with FPU';
-  SMipsWceV2 = 'MIPS WCE v2';
-  SArm33 = 'ARM 33';
+  SMipsWceV2 = 'MIPS WCE v2 (little endian)';
+  SArm33 = 'Matsushita ARM 33';
   SAMD64 = 'AMD K8 (64-bit)';
   SInfineonTricore = 'Infineon Tricore';
   SCEF = 'CEF';
@@ -594,6 +595,7 @@ begin
     $1C2: Result := SThumb;
     $1D3: Result := SArm33;
     $1F0: Result := SPower_PC;
+    $1F1: Result := SPower_PC_FP;
     $200: Result := SIntelIA64;
     $266: Result := SMips16;
     $268: Result := SMotorola_68000;
@@ -604,6 +606,9 @@ begin
     $500: Result := SAMD64;
     $520: Result := SInfineonTricore;
     $CEF: Result := SCEF;
+    $EBC: Result := 'EFI Byte Code';
+    $8664: Result := 'AMD x64';
+    $9041: Result := 'Mitsubishi M32R (little endian)';
   else
     Result := SUnknown_CPU;
   end;
