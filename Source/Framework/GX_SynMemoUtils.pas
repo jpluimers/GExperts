@@ -29,7 +29,7 @@ uses
   SynHighlighterSql, SynHighlighterCS, SynHighlighterXML, SynHighlighterGeneral,
   GX_VerDepConst, Classes,
   {$ENDIF SYNEDIT}
-  SysUtils, ToolsAPI, GX_OtaUtils;
+  SysUtils, ToolsAPI, GX_OtaUtils, Graphics;
 
 {$IFDEF SYNEDIT}
 procedure GxGetIDEHighLigherSettings(Highlighter: TSynCustomHighlighter; Prefer: string);
@@ -51,6 +51,8 @@ begin
 end;
 
 procedure SetSynEditHighlighter(SynEdit: TCustomSynEdit; Highlighter: TGXSyntaxHighlighter);
+var
+  i: Integer;
 begin
   Assert(SynEdit <> nil);
   SynEdit.Highlighter.Free;
@@ -60,9 +62,24 @@ begin
     gxpPAS:  SynEdit.Highlighter := TSynPasSyn.Create(SynEdit);
     gxpCPP:  SynEdit.Highlighter := TSynCppSyn.Create(SynEdit);
     gxpHTML: SynEdit.Highlighter := TSynHtmlSyn.Create(SynEdit);
-    gxpSQL:  SynEdit.Highlighter := TSynSqlSyn.Create(SynEdit);
     gxpCS:   SynEdit.Highlighter := TSynCSSyn.Create(SynEdit);
     gxpXML:  SynEdit.Highlighter := TSynXMLSyn.Create(SynEdit);
+    gxpSQL:
+      begin 
+        SynEdit.Highlighter := TSynSqlSyn.Create(SynEdit);
+        for i := 0 to SynEdit.Highlighter.AttrCount - 1 do
+        begin
+          if SynEdit.Highlighter.Attribute[i].Name = 'Number' then
+            SynEdit.Highlighter.Attribute[i].Foreground := clMaroon
+          else if SynEdit.Highlighter.Attribute[i].Name = 'String' then
+            SynEdit.Highlighter.Attribute[i].Foreground := clTeal
+          else if SynEdit.Highlighter.Attribute[i].Name = 'Comment' then
+          begin
+            SynEdit.Highlighter.Attribute[i].Foreground := clBlue;
+            SynEdit.Highlighter.Attribute[i].Style := SynEdit.Highlighter.Attribute[i].Style - [fsItalic];
+          end;
+        end;
+      end;
   else
     SynEdit.Highlighter := TSynGeneralSyn.Create(SynEdit);
   end;

@@ -35,7 +35,10 @@ object fmCodeLib: TfmCodeLib
     Height = 20
     Panels = <
       item
-        Width = 450
+        Width = 380
+      end
+      item
+        Width = 70
       end
       item
         Width = 70
@@ -349,30 +352,6 @@ object fmCodeLib: TfmCodeLib
     object mitEditorHighlighting: TMenuItem
       Caption = 'Syntax &Highlighting'
       ImageIndex = 18
-      object mitNone: TMenuItem
-        Action = actSyntaxNone
-        RadioItem = True
-      end
-      object mitPascal: TMenuItem
-        Tag = 1
-        Action = actSyntaxPascal
-        RadioItem = True
-      end
-      object mitCPP: TMenuItem
-        Tag = 2
-        Action = actSyntaxCpp
-        RadioItem = True
-      end
-      object mitHTML: TMenuItem
-        Tag = 3
-        Action = actSyntaxHtml
-        RadioItem = True
-      end
-      object mitSQL: TMenuItem
-        Tag = 4
-        Action = actSyntaxSql
-        RadioItem = True
-      end
     end
   end
   object Actions: TActionList
@@ -541,31 +520,6 @@ object fmCodeLib: TfmCodeLib
       ImageIndex = 0
       ShortCut = 112
       OnExecute = HelpExecute
-    end
-    object actSyntaxNone: TAction
-      Category = 'Syntax'
-      Caption = '&None'
-      OnExecute = GenericSyntaxHighlightingExecute
-    end
-    object actSyntaxPascal: TAction
-      Category = 'Syntax'
-      Caption = '&Pascal'
-      OnExecute = GenericSyntaxHighlightingExecute
-    end
-    object actSyntaxCpp: TAction
-      Category = 'Syntax'
-      Caption = '&C++'
-      OnExecute = GenericSyntaxHighlightingExecute
-    end
-    object actSyntaxHtml: TAction
-      Category = 'Syntax'
-      Caption = '&HTML'
-      OnExecute = GenericSyntaxHighlightingExecute
-    end
-    object actSyntaxSql: TAction
-      Category = 'Syntax'
-      Caption = '&SQL'
-      OnExecute = GenericSyntaxHighlightingExecute
     end
     object actEditRename: TAction
       Category = 'Edit'

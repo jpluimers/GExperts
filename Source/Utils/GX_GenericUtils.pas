@@ -50,6 +50,74 @@ type
 
   TGXSyntaxHighlighter = (gxpPlaceHolder, gxpNone, gxpPAS, gxpCPP, gxpHTML, gxpSQL, gxpCS, gxpXML);
 
+  TGXSyntaxData = record
+    Name: string;
+    Identifier: string;
+    Highlighter: TGXSyntaxHighlighter;
+    Visible: Boolean;
+    Extensions: string;
+  end;
+
+const
+  GXSyntaxInfo: array[TGXSyntaxHighlighter] of TGXSyntaxData = (
+    (
+      Name: 'Place Holder';
+      Identifier: '_';
+      Highlighter: gxpPlaceHolder;
+      Visible: False;
+      Extensions: '';
+    ),
+    (
+      Name: 'None';
+      Identifier: 'N';
+      Highlighter: gxpNone;
+      Visible: True;
+      Extensions: '*.txt;*.ini;*.me';
+    ),
+    (
+      Name: 'Delphi';
+      Identifier: 'P';
+      Highlighter: gxpPAS;
+      Visible: True;
+      Extensions: '*.pas;*.dpr;*.inc';
+    ),
+    (
+      Name: 'C++';
+      Identifier: 'C';
+      Highlighter: gxpCPP;
+      Visible: True;
+      Extensions: '*.cpp;*.h;*.c;*.hpp';
+    ),
+    (
+      Name: 'HTML';
+      Identifier: 'H';
+      Highlighter: gxpHTML;
+      Visible: True;
+      Extensions: '*.html;*.htm;*.asp;*.php';
+    ),
+    (
+      Name: 'SQL';
+      Identifier: 'S';
+      Highlighter: gxpSQL;
+      Visible: True;
+      Extensions: '*.sql';
+    ),
+    (
+      Name: 'C#';
+      Identifier: '#';
+      Highlighter: gxpCS;
+      Visible: True;
+      Extensions: '*.cs';
+    ),
+    (
+      Name: 'XML';
+      Identifier: 'X';
+      Highlighter: gxpXML;
+      Visible: True;
+      Extensions: '*.xml;*.dproj;*.bdsproj;*.groupproj;*.local;*.manifest;*.resx';
+    ));
+
+type
   TVersionNumber = packed record
     case Boolean of
       True:  ( dwFileVersionMS: DWORD;    { e.g. $00030075 = "3.75" }
@@ -2687,7 +2755,7 @@ const
   TextFileTypes: array[0..38] of string = ('.TXT', '.ASC', '.ME', '.INI', '.DIZ',
     '.BPG', '.PY', '.BAT', '.RC', '.DOF', '.KOF', '.DSK', '.ISS', '.CFG', '.CONF',
     '.MAP', '.DEBUGLOG', '.LOG', '.DRC', '.DIFF', '.EXTRA', '.FBPINF', '.FBP',
-    '.FBP2', '.FBP3', '.FBP4', '.FBP5', '.FBP6', '.IDL', '.CSV', '.TSV', 'SLN',
+    '.FBP2', '.FBP3', '.FBP4', '.FBP5', '.FBP6', '.IDL', '.CSV', '.TSV', '.SLN',
     '.PHP', '.PHP3', '.USED', '.VB', '.VBE', '.VBS', '.REJ');
 begin
   Result := FileMatchesExtensions(FileName, TextFileTypes);

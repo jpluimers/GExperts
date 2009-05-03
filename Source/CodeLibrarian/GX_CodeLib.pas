@@ -92,8 +92,6 @@ type
     mitEditorPaste: TMenuItem;
     mitEditorSep2: TMenuItem;
     mitEditorHighlighting: TMenuItem;
-    mitPascal: TMenuItem;
-    mitCPP: TMenuItem;
     mitEditSep1: TMenuItem;
     mitEditCopyFromIde: TMenuItem;
     mitEditPasteFromIde: TMenuItem;
@@ -104,7 +102,6 @@ type
     mitEditFind: TMenuItem;
     mitEditFindNext: TMenuItem;
     mitFileSep1: TMenuItem;
-    mitNone: TMenuItem;
     mitFileNewRootFolder: TMenuItem;
     mitFileNewFolder: TMenuItem;
     mitFileNewSnippet: TMenuItem;
@@ -117,8 +114,6 @@ type
     mitEditSep3: TMenuItem;
     mitEditExpandAll: TMenuItem;
     mitEditContractAll: TMenuItem;
-    mitHTML: TMenuItem;
-    mitSQL: TMenuItem;
     tvTopics: TTreeView;
     Actions: TActionList;
     actDelete: TAction;
@@ -159,11 +154,6 @@ type
     actHelpContents: TAction;
     actHelpHelp: TAction;
     tbnFindNext: TToolButton;
-    actSyntaxNone: TAction;
-    actSyntaxPascal: TAction;
-    actSyntaxCpp: TAction;
-    actSyntaxHtml: TAction;
-    actSyntaxSql: TAction;
     actEditRename: TAction;
     mitTreeRename: TMenuItem;
     mitFileSep2: TMenuItem;
@@ -249,6 +239,9 @@ type
     property Modified: Boolean read FModified write SetModified;
     property StoragePath: TGXUnicodeString read FStoragePath write FStoragePath;
     procedure SetNodeAttribute(Node: TTreeNode; const AttrName, AttrValue: TGXUnicodeString);
+    procedure InitializeSyntaxLanguages;
+    function GetIdentifierForCurrentSyntaxMode: string;
+    procedure SetCurrentSyntaxModeFromIdentifier(const LangIdent: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -292,6 +285,7 @@ const
   CodeLibPathSep = '\';
   AttrTopic = 'Topic';
   AttrLanguage = 'Language';
+  SyntaxCategory = 'Syntax';
 
 resourcestring
   SCouldNotCreateStorage = 'Could not create Code Librarian storage file.';
@@ -439,6 +433,7 @@ var
   Node: TTreeNode;
   NewFileName: TGXUnicodeString;
   TopicName: TGXUnicodeString;
+  LangType: string;
 begin
   if not HaveSelectedNode then
     Exit;
@@ -447,10 +442,9 @@ begin
   CodeDB.OpenFile(NewFileName);
   Assert(CodeDB.FileExists(NewFileName));
   CodeDB.SetAttribute(AttrTopic, TopicName);
-  if mitPascal.Checked then
-    CodeDB.SetAttribute(AttrLanguage, 'P')
-  else
-    CodeDB.SetAttribute(AttrLanguage, 'C');
+
+  LangType := GetIdentifierForCurrentSyntaxMode;
+  CodeDB.SetAttribute(AttrLanguage, LangType);
   CodeDB.SaveStorage;
 
   Node := tvTopics.Items.AddChild(tvTopics.Selected, TopicName);
@@ -497,17 +491,7 @@ begin
   else
   begin
     CodeDB.FileText :=  FCodeText.AsUnicodeString;
-
-    if mitPascal.Checked then
-      LangType := 'P'
-    else if mitCPP.Checked then
-      LangType := 'C'
-    else if mitHTML.Checked then
-      LangType := 'H'
-    else if mitSQL.Checked then
-      LangType := 'S'
-    else
-      LangType := 'N';
+    LangType := GetIdentifierForCurrentSyntaxMode;
     CodeDB.SetAttribute(AttrLanguage, LangType);
 
     CodeDB.SaveStorage;
@@ -539,39 +523,7 @@ begin
       FCodeText.BeginUpdate;
       try
         LangType := CodeDB.AttributeAsString(AttrLanguage, 'P');
-        if LangType = 'N' then  // Do not localize.
-        begin
-          // This is raw text
-          mitNone.Checked := True;
-          FCodeText.Highlighter := gxpNone;
-        end
-        else
-        if LangType = 'C' then  // Do not localize.
-        begin
-          // This is CPP source code
-          mitCPP.Checked := True;
-          FCodeText.Highlighter := gxpCPP;
-        end
-        else
-        if LangType = 'H' then  // Do not localize.
-        begin
-          // This is HTML source code
-          mitHTML.Checked := True;
-          FCodeText.Highlighter := gxpHTML;
-        end
-        else
-        if LangType = 'S' then  // Do not localize.
-        begin
-          // This is SQL code
-          mitSQL.Checked := True;
-          FCodeText.Highlighter := gxpSQL;
-        end
-        else
-        begin
-          // This is Object Pascal source code.
-          mitPascal.Checked := True;
-          FCodeText.Highlighter := gxpPAS;
-        end;
+        SetCurrentSyntaxModeFromIdentifier(LangType);
         FCodeText.AsUnicodeString := CodeDB.FileText;
       finally
         FCodeText.EndUpdate;
@@ -970,7 +922,7 @@ end;
 procedure TfmCodeLib.StatusBarResize(Sender: TObject);
 begin
   with StatusBar do
-    Panels[0].Width := Width - Panels[1].Width;
+    Panels[0].Width := Width - Panels[1].Width - Panels[2].Width;
 end;
 
 procedure TfmCodeLib.NewRootFolderExecute(Sender: TObject);
@@ -1110,6 +1062,7 @@ var
   HaveEditorSelection: Boolean;
   HaveSelectedNode: Boolean;
   SnippetIsSelected: Boolean;
+  i: Integer;
 begin
   HaveEditorSelection := Length(FCodeText.SelText) > 0;
   actEditCut.Enabled := HaveEditorSelection;
@@ -1136,13 +1089,13 @@ begin
     actNewFolder.Enabled := not SnippetIsSelected;
   end;
 
-  actSyntaxNone.Checked := (FCurrentSyntaxMode = gxpNone);
-  actSyntaxPascal.Checked := (FCurrentSyntaxMode = gxpPAS);
-  actSyntaxCpp.Checked := (FCurrentSyntaxMode = gxpCPP);
-  actSyntaxHtml.Checked := (FCurrentSyntaxMode = gxpHTML);
-  actSyntaxSql.Checked := (FCurrentSyntaxMode = gxpSQL);
+  for i := 0 to Actions.ActionCount - 1 do begin
+    if SameText(Actions[i].Category, SyntaxCategory) then
+      (Actions[i] as TCustomAction).Checked := Actions[i].Tag = Ord(FCurrentSyntaxMode);
+  end;
   FCodeText.Enabled := SnippetIsSelected;
   FCodeText.ReadOnly := not SnippetIsSelected;
+  StatusBar.Panels[2].Text := GXSyntaxInfo[FCurrentSyntaxMode].Name;
 
   Handled := True;
 end;
@@ -1150,21 +1103,8 @@ end;
 procedure TfmCodeLib.GenericSyntaxHighlightingExecute(Sender: TObject);
 begin
   Modified := True;
-
-  if Sender = actSyntaxNone then
-    FCurrentSyntaxMode := gxpNone
-  else if Sender = actSyntaxPascal then
-    FCurrentSyntaxMode := gxpPAS
-  else if Sender = actSyntaxCpp then
-    FCurrentSyntaxMode := gxpCPP
-  else if Sender = actSyntaxHtml then
-    FCurrentSyntaxMode := gxpHTML
-  else if Sender = actSyntaxSql then
-    FCurrentSyntaxMode := gxpSQL
-  else
-    raise Exception.Create('Internal error selecting language');
-
-  FCodeText.Highlighter := FCurrentSyntaxMode;
+  if (Sender is TCustomAction) and (TCustomAction(Sender).Category = SyntaxCategory) then
+    SetCurrentSyntaxModeFromIdentifier(TCustomAction(Sender).Hint);
 end;
 
 procedure TfmCodeLib.SetupSyntaxHighlightingControl;
@@ -1209,7 +1149,7 @@ begin
     end;
     {$IFOPT D+}SendDebug('Opened storage file');{$ENDIF}
     InitializeTreeView;
-    mitPascal.Checked := True;
+    InitializeSyntaxLanguages;
     FModified := False;
   finally
     Screen.Cursor := crDefault;
@@ -1722,6 +1662,57 @@ end;
 function TGXStorageFile.ObjectExists(const ObjectName: TGXUnicodeString): Boolean;
 begin
   Result := FileExists(ObjectName) or FolderExists(ObjectName);
+end;
+
+procedure TfmCodeLib.InitializeSyntaxLanguages;
+var
+  i: TGXSyntaxHighlighter;
+  Data: TGXSyntaxData;
+  MenuItem: TMenuItem;
+  Action: TAction;
+begin
+  mitEditorHighlighting.Clear;
+  FCurrentSyntaxMode := gxpPAS;
+  for i := Low(GXSyntaxInfo) to High(GXSyntaxInfo) do
+  begin
+    Data := GXSyntaxInfo[i];
+    if Data.Visible then
+    begin
+      Action := TAction.Create(Self);
+      Action.ActionList := Actions;
+      Action.Caption := Data.Name;
+      Action.OnExecute := GenericSyntaxHighlightingExecute;
+      Action.Category := SyntaxCategory;
+      Action.Hint := Data.Identifier; // Hint is the language identifier
+      Action.Tag := Ord(i);
+      MenuItem := TMenuItem.Create(Self);
+      MenuItem.Action := Action;
+      mitEditorHighlighting.Add(MenuItem);
+    end;
+  end;
+end;
+
+function TfmCodeLib.GetIdentifierForCurrentSyntaxMode: string;
+begin
+  Result := GXSyntaxInfo[FCurrentSyntaxMode].Identifier
+end;
+
+procedure TfmCodeLib.SetCurrentSyntaxModeFromIdentifier(const LangIdent: string);
+var
+  Syntax: TGXSyntaxHighlighter;
+begin
+  for Syntax := Low(GXSyntaxInfo) to High(GXSyntaxInfo) do
+  begin
+    if SameText(GXSyntaxInfo[Syntax].Identifier, LangIdent) then
+    begin
+      FCurrentSyntaxMode := Syntax;
+      FCodeText.Highlighter := Syntax;
+      Exit;
+    end;
+  end;
+  // Fallback for unknown
+  FCurrentSyntaxMode := gxpNone;
+  FCodeText.Highlighter := gxpNone;
 end;
 
 initialization
