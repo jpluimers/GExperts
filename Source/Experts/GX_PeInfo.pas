@@ -163,7 +163,7 @@ type
     FStream: TFileStream;
     FFileName: string;
     FIsPE: Boolean;
-    FIsPEPlus: Boolean;
+    FIsPE32: Boolean;
     FIsNE: Boolean;
     FIsLE: Boolean;
     FIsMSDos: Boolean;
@@ -199,7 +199,7 @@ type
     property CPUType: string read GetCPUType;
     property NumberType: TNumberType read FNumberType write FNumberType;
     property IsPE: Boolean read FIsPE;
-    property IsPEPlus: Boolean read FIsPEPlus;
+    property IsPE32: Boolean read FIsPE32;
     property IsNE: Boolean read FIsNE;
     property IsLE: Boolean read FIsLE;
     property IsMSDos: Boolean read FIsMSDos;
@@ -321,16 +321,8 @@ begin
 
     if (PE[0] = 'P') and (PE[1] = 'E') and (PE[2] = #0) and (PE[3] = #0) then
     begin
-      if FPEOptionalHeader.Magic = $20B then
-      begin
-        FIsPEPlus := True;
-        FPEHeaderList.Add(SExecutableFormat + #9 + 'Unsupported PEPlus Format');
-      end
-      else
-      begin
-        FIsPE := True;
-        FPEHeaderList.Add(SExecutableFormat + #9 + 'Standard PE');
-      end;
+      FIsPE := True;
+      FPEHeaderList.Add(SExecutableFormat + #9 + 'PE Format');
     end
     else if (PE[0] = 'N') and (PE[1] = 'E') then
     begin
@@ -358,8 +350,11 @@ begin
       FSectionStart := FStream.Position;
       FillPEHeader;
       FillPEOptionalHeader;
-      ReadImportList;
-      ReadExportList;
+      if IsPE32 then
+      begin
+        ReadImportList;
+        ReadExportList;
+      end;
     end;
   finally
     FreeAndNil(FStream);
@@ -792,8 +787,8 @@ resourcestring
 
   SNumDataEntries = 'Number of entries in data directory';
 
-  SMagicPE = ' (PE format)';
-  SMagicPEPlus = ' (PE+ format)';
+  SMagicPE32 = ' (Standard PE32 format)';
+  SMagicPE32Plus = ' (Unsupported PE32+/64bit format)';
   SMagicROM = ' (ROM image)';
 
 begin
@@ -802,8 +797,12 @@ begin
   begin
     case Magic of
       $107: Add(SMagic + #9 + IntToNum(Magic) + SMagicROM);
-      $10B: Add(SMagic + #9 + IntToNum(Magic) + SMagicPE);
-      $20B: Add(SMagic + #9 + IntToNum(Magic) + SMagicPEPlus);
+      $10B:
+        begin
+          Add(SMagic + #9 + IntToNum(Magic) + SMagicPE32);
+          FIsPE32 := True;
+        end;
+      $20B: Add(SMagic + #9 + IntToNum(Magic) + SMagicPE32Plus);
       else  Add(SMagic + #9 + IntToNum(Magic));
     end;
     Add(SMajorLinker + #9 + IntToNum(MajorLinkerVersion));
@@ -814,60 +813,63 @@ begin
     Add(SAddressEntryPoint + #9 + IntToNum(AddressOfEntryPoint));
     Add(SBaseCode + #9 + IntToNum(BaseOfCode));
     Add(SBaseData + #9 + IntToNum(BaseOfData));
-    Add(SImageBase + #9 + IntToNum(ImageBase));
-    Add(SSectionAlignment + #9 + IntToNum(SectionAlignment));
-    Add(SFileAlignment + #9 + IntToNum(FileAlignment));
-    Add(SMajorOS + #9 + IntToNum(MajorOperatingSystemVersion));
-    Add(SMinorOS + #9 + IntToNum(MinorOperatingSystemVersion));
-    Add(SMajorImage + #9 + IntToNum(MajorImageVersion));
-    Add(SMinorImage + #9 + IntToNum(MinorImageVersion));
-    Add(SMajorSubsystem + #9 + IntToNum(MajorSubsystemVersion));
-    Add(SMinorSubsystem + #9 + IntToNum(MinorSubsystemVersion));
-    Add(SWin32Version + #9 + IntToNum(Win32Version));
-    Add(SSizeImage + #9 + IntToNum(SizeOfImage));
-    Add(SSizeHeaders + #9 + IntToNum(SizeOfHeaders));
-    Add(SCrc + #9 + IntToNum(Checksum));
-    case Subsystem of
-      1: Add(SSub + #9 + SSubNative);
-      2: Add(SSub + #9 + SSubWinGui);
-      3: Add(SSub + #9 + SSubWinConsole);
-      5: Add(SSub + #9 + SSubOS2Console);
-      7: Add(SSub + #9 + SSubPosix);
-      8: Add(SSub + #9 + SSubNative);
-      9: Add(SSub + #9 + SSubCEGui);
-      10: Add(SSub + #9 + SSubEfiApp);
-      11: Add(SSub + #9 + SSubEBSDriver);
-      12: Add(SSub + #9 + SSubERDriver);
-      13: Add(SSub + #9 + SSubERom);
-      14: Add(SSub + #9 + SSubXBox);
-      else Add(SSub + #9 + SSubUnknown);
-    end;
+    if ISPE32 then
+    begin
+      Add(SImageBase + #9 + IntToNum(ImageBase));
+      Add(SSectionAlignment + #9 + IntToNum(SectionAlignment));
+      Add(SFileAlignment + #9 + IntToNum(FileAlignment));
+      Add(SMajorOS + #9 + IntToNum(MajorOperatingSystemVersion));
+      Add(SMinorOS + #9 + IntToNum(MinorOperatingSystemVersion));
+      Add(SMajorImage + #9 + IntToNum(MajorImageVersion));
+      Add(SMinorImage + #9 + IntToNum(MinorImageVersion));
+      Add(SMajorSubsystem + #9 + IntToNum(MajorSubsystemVersion));
+      Add(SMinorSubsystem + #9 + IntToNum(MinorSubsystemVersion));
+      Add(SWin32Version + #9 + IntToNum(Win32Version));
+      Add(SSizeImage + #9 + IntToNum(SizeOfImage));
+      Add(SSizeHeaders + #9 + IntToNum(SizeOfHeaders));
+      Add(SCrc + #9 + IntToNum(Checksum));
+      case Subsystem of
+        1: Add(SSub + #9 + SSubNative);
+        2: Add(SSub + #9 + SSubWinGui);
+        3: Add(SSub + #9 + SSubWinConsole);
+        5: Add(SSub + #9 + SSubOS2Console);
+        7: Add(SSub + #9 + SSubPosix);
+        8: Add(SSub + #9 + SSubNative);
+        9: Add(SSub + #9 + SSubCEGui);
+        10: Add(SSub + #9 + SSubEfiApp);
+        11: Add(SSub + #9 + SSubEBSDriver);
+        12: Add(SSub + #9 + SSubERDriver);
+        13: Add(SSub + #9 + SSubERom);
+        14: Add(SSub + #9 + SSubXBox);
+        else Add(SSub + #9 + SSubUnknown);
+      end;
 
-    if ((DLLCharacteristics and $0001) > 0) then
-      Add(SDll + #9 + SDllPerProcessInit);
-    if ((DLLCharacteristics and $0002) > 0) then
-      Add(SDll + #9 + SDllPerProcessTermination);
-    if ((DLLCharacteristics and $0004) > 0) then
-      Add(SDll + #9 + SDllPerThreadInit);
-    if ((DLLCharacteristics and $0008) > 0) then
-      Add(SDll + #9 + SDllPerThreadTermination);
-    if ((DLLCharacteristics and $0800) > 0) then
-      Add(SDll + #9 + SDllDoNotBindImage);
-    if ((DLLCharacteristics and $2000) > 0) then
-      Add(SDll + #9 + SDllWDMDriver);
-    if ((DLLCharacteristics and $8000) > 0) then
-      Add(SDll + #9 + SDllTerminalServerAware);
-    Add(SStackReserve + #9 + IntToNum(SizeOfStackReserve));
-    Add(SStackCommit + #9 + IntToNum(SizeOfStackCommit));
-    Add(SHeapReserve + #9 + IntToNum(SizeOfHeapReserve));
-    Add(SHeapCommit + #9 + IntToNum(SizeOfHeapCommit));
-    case LoaderFlags of
-      1: Add(SLoaderFlags + #9 + SLoaderFlagsBP);
-      2: Add(SLoaderFlags + #9 + SLoaderFlagsDBG);
-    else
-      Add(SLoaderFlags + #9 + SLoaderFlagsNone);
+      if ((DLLCharacteristics and $0001) > 0) then
+        Add(SDll + #9 + SDllPerProcessInit);
+      if ((DLLCharacteristics and $0002) > 0) then
+        Add(SDll + #9 + SDllPerProcessTermination);
+      if ((DLLCharacteristics and $0004) > 0) then
+        Add(SDll + #9 + SDllPerThreadInit);
+      if ((DLLCharacteristics and $0008) > 0) then
+        Add(SDll + #9 + SDllPerThreadTermination);
+      if ((DLLCharacteristics and $0800) > 0) then
+        Add(SDll + #9 + SDllDoNotBindImage);
+      if ((DLLCharacteristics and $2000) > 0) then
+        Add(SDll + #9 + SDllWDMDriver);
+      if ((DLLCharacteristics and $8000) > 0) then
+        Add(SDll + #9 + SDllTerminalServerAware);
+      Add(SStackReserve + #9 + IntToNum(SizeOfStackReserve));
+      Add(SStackCommit + #9 + IntToNum(SizeOfStackCommit));
+      Add(SHeapReserve + #9 + IntToNum(SizeOfHeapReserve));
+      Add(SHeapCommit + #9 + IntToNum(SizeOfHeapCommit));
+      case LoaderFlags of
+        1: Add(SLoaderFlags + #9 + SLoaderFlagsBP);
+        2: Add(SLoaderFlags + #9 + SLoaderFlagsDBG);
+      else
+        Add(SLoaderFlags + #9 + SLoaderFlagsNone);
+      end;
+      Add(SNumDataEntries + #9 + IntToNum(NumberofRVAandSizes));
     end;
-    Add(SNumDataEntries + #9 + IntToNum(NumberofRVAandSizes));
   end;
 end;
 
