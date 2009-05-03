@@ -3,7 +3,7 @@ inherited fmPeInformation: TfmPeInformation
   Top = 189
   Caption = 'PE Information'
   ClientHeight = 459
-  ClientWidth = 474
+  ClientWidth = 489
   KeyPreview = True
   Menu = MainMenu
   OnActivate = FormActivate
@@ -14,7 +14,7 @@ inherited fmPeInformation: TfmPeInformation
   object pcMain: TPageControl
     Left = 0
     Top = 22
-    Width = 474
+    Width = 489
     Height = 437
     ActivePage = tshMSDOS
     Align = alClient
@@ -28,7 +28,7 @@ inherited fmPeInformation: TfmPeInformation
       object lvMSDOS: TListView
         Left = 0
         Top = 0
-        Width = 466
+        Width = 481
         Height = 408
         Align = alClient
         Columns = <
@@ -56,8 +56,8 @@ inherited fmPeInformation: TfmPeInformation
       object lvPEHeader: TListView
         Left = 0
         Top = 0
-        Width = 466
-        Height = 409
+        Width = 481
+        Height = 408
         Align = alClient
         Columns = <
           item
@@ -82,8 +82,8 @@ inherited fmPeInformation: TfmPeInformation
       object lvPEOptionalHeader: TListView
         Left = 0
         Top = 0
-        Width = 466
-        Height = 409
+        Width = 481
+        Height = 408
         Align = alClient
         Columns = <
           item
@@ -106,17 +106,17 @@ inherited fmPeInformation: TfmPeInformation
     object tshImport: TTabSheet
       Caption = 'Imports'
       object splImport: TSplitter
-        Left = 105
+        Left = 135
         Top = 0
         Width = 3
-        Height = 409
+        Height = 408
         Cursor = crHSplit
       end
       object lvImports: TListView
         Left = 0
         Top = 0
-        Width = 105
-        Height = 409
+        Width = 135
+        Height = 408
         Align = alLeft
         Columns = <
           item
@@ -134,9 +134,9 @@ inherited fmPeInformation: TfmPeInformation
         OnData = lvImportsData
       end
       object lvImportFunctions: TListView
-        Left = 108
+        Left = 138
         Top = 0
-        Width = 358
+        Width = 343
         Height = 408
         Align = alClient
         Columns = <
@@ -162,8 +162,8 @@ inherited fmPeInformation: TfmPeInformation
       object lvExportFunctions: TListView
         Left = 0
         Top = 0
-        Width = 466
-        Height = 409
+        Width = 481
+        Height = 408
         Align = alClient
         Columns = <
           item
@@ -191,7 +191,7 @@ inherited fmPeInformation: TfmPeInformation
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 474
+    Width = 489
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
@@ -242,8 +242,8 @@ inherited fmPeInformation: TfmPeInformation
     Filter = 
       'PE Binary Files (*.exe, *.dll, *.bpl, *.dpl, *.ocx)|*.exe;*.dll;' +
       '*.bpl;*.dpl;*.ocx|EXE Files (*.exe)|*.EXE|DLL Files (*.dll)|*.dl' +
-      'l|CodeGear Packages (*.bpl, *.dpl)|*.dpl;*.bpl|OCX Controls (*.oc' +
-      'x)|*.ocx|All Files (*.*)|*.*'
+      'l|CodeGear Packages (*.bpl, *.dpl)|*.dpl;*.bpl|OCX Controls (*.o' +
+      'cx)|*.ocx|All Files (*.*)|*.*'
     Left = 128
     Top = 76
   end
