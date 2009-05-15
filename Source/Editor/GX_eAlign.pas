@@ -32,7 +32,7 @@ uses
   GX_EditorExpert, GX_eSelectionEditorExpert, GX_eAlignOptions, Math;
 
 const
-  DEFAULT_WHITESPACE = 0;
+  DEFAULT_WHITESPACE = 1;
   DEFAULT_TOKENS: array[0..10] of string =
     (':=', '=', '//', '{', '(*', '''', ':', '+', 'read', 'write', 'in ''');
 

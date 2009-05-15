@@ -104,7 +104,7 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: 'Together';
+      CollapseTreeNodes: 'Together;Modeling';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),

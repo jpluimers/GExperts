@@ -76,6 +76,8 @@
 (* SYN_DELPHI_2007_UP   : Delphi 2007 or higher is being used.                *)
 (* SYN_DELPHI_2009      : Delphi 2009 is being used.                          *)
 (* SYN_DELPHI_2009_UP   : Delphi 2009 or higher is being used.                *)
+(* SYN_DELPHI_2010      : Delphi 2010 is being used.                          *)
+(* SYN_DELPHI_2010_UP   : Delphi 2010 or higher is being used.                *)
 (* SYN_KYLIX            : Kylix 1.0 is being using.                           *)
 (* SYN_CLX              : A CLX application is being created.                 *)
 (******************************************************************************)
@@ -121,6 +123,12 @@
 {------------------------------------------------------------------------------}
 { VERXXX to SYN_COMPILERX, SYN_DELPHIX and SYN_CPPBX mappings                  }
 {------------------------------------------------------------------------------}
+
+{$IFDEF VER210}
+  {$DEFINE SYN_COMPILER_14}
+  {$DEFINE SYN_DELPHI}
+  {$DEFINE SYN_DELPHI_2010}
+{$ENDIF}
 
 {$IFDEF VER200}
   {$DEFINE SYN_COMPILER_12}
@@ -331,6 +339,22 @@
   {$DEFINE SYN_COMPILER_12_UP}
 {$ENDIF}
 
+{$IFDEF SYN_COMPILER_14}
+  {$DEFINE SYN_COMPILER_1_UP}
+  {$DEFINE SYN_COMPILER_2_UP}
+  {$DEFINE SYN_COMPILER_3_UP}
+  {$DEFINE SYN_COMPILER_4_UP}
+  {$DEFINE SYN_COMPILER_5_UP}
+  {$DEFINE SYN_COMPILER_6_UP}
+  {$DEFINE SYN_COMPILER_7_UP}
+  {$DEFINE SYN_COMPILER_8_UP}
+  {$DEFINE SYN_COMPILER_9_UP}
+  {$DEFINE SYN_COMPILER_10_UP}
+  {$DEFINE SYN_COMPILER_11_UP}
+  {$DEFINE SYN_COMPILER_12_UP}
+  {$DEFINE SYN_COMPILER_14_UP}
+{$ENDIF}
+
 {$IFDEF SYN_DELPHI_2}
   {$DEFINE SYN_DELPHI_2_UP}
 {$ENDIF}
@@ -428,6 +452,21 @@
   {$DEFINE SYN_DELPHI_2006_UP}
   {$DEFINE SYN_DELPHI_2007_UP}
   {$DEFINE SYN_DELPHI_2009_UP}
+{$ENDIF}
+
+{$IFDEF SYN_DELPHI_2010}
+  {$DEFINE SYN_DELPHI_2_UP}
+  {$DEFINE SYN_DELPHI_3_UP}
+  {$DEFINE SYN_DELPHI_4_UP}
+  {$DEFINE SYN_DELPHI_5_UP}
+  {$DEFINE SYN_DELPHI_6_UP}
+  {$DEFINE SYN_DELPHI_7_UP}
+  {$DEFINE SYN_DELPHI_8_UP}
+  {$DEFINE SYN_DELPHI_2005_UP}
+  {$DEFINE SYN_DELPHI_2006_UP}
+  {$DEFINE SYN_DELPHI_2007_UP}
+  {$DEFINE SYN_DELPHI_2009_UP}
+  {$DEFINE SYN_DELPHI_20010_UP}
 {$ENDIF}
 
 {$IFDEF SYN_CPPB_6}

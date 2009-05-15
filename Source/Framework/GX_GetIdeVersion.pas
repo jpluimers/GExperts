@@ -19,6 +19,7 @@ type
      // RAD Studio
      ideDelphi2007,
      ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4,
+     ideRS2010,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -375,7 +376,7 @@ end;
   BDS 2006:
 
   File                 File Version   Size       Modified Time
-  delphicoreide100.bpl 
+  delphicoreide100.bpl
   vclide100.bpl
   designide100.bpl
   coreide100.bpl
@@ -484,6 +485,32 @@ begin
   end;
 end;
 
+
+{
+  Delphi 2010:
+  File                 File Version    Size       Modified Time
+  delphicoreide140.bpl
+  coreide140.bpl
+  bds.exe
+  dcldb140.bpl
+}
+function GetRS2010Version: TBorlandIdeVersion;
+const
+  CoreIde1400: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+  CoreIde1401: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRS2010;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide140.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1400);
+  if VersionNumber > 0 then begin
+    //Result := ideRS2010U1;
+  end;
+end;
+
+
 function GetBorlandIdeVersion: TBorlandIdeVersion;
 begin
   // We only actually detect the version once per session.
@@ -531,12 +558,17 @@ begin
     {$ENDIF}
   {$ENDIF VER180}
 
-  // VER190 is Delphi.NET 2007  
+  // VER190 is Delphi.NET 2007
 
   {$IFDEF VER200}
     Result := GetRS2009Version;
     Assert(Result in [ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4]);
   {$ENDIF VER200}
+
+  {$IFDEF VER210}
+    Result := GetRS2010Version;
+    Assert(Result in [ideRS2010]);
+  {$ENDIF VER210}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);
