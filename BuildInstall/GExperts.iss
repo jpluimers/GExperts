@@ -10,7 +10,7 @@
   #endif
 #else
 ; IDE compiler
-  #define RS2009
+  #define RS2010
   #define Version "1.33"
 #endif
 
@@ -75,14 +75,14 @@
   #define IDERegVer    "6"
   #define RegCompany   "CodeGear"
 #endif
-#ifdef BCB6
-  #define BCB
-  #define IDEShortName "BCB"
-  #define IDELongName  "C++Builder"
-  #define IDEVer       "6"
-  #define DLLSuffix    "BCB6"
-  #define IDERegName   "C++Builder"
-  #define IDERegVer    "6"
+#ifdef RS2010
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
+  #define IDEVer       "2010"
+  #define DLLSuffix    "RS2010"
+  #define IDERegName   "BDS"
+  #define IDERegVer    "7"
+  #define RegCompany   "CodeGear"
 #endif
 
 #ifndef IDEShortName
@@ -96,7 +96,7 @@
 
 [Setup]
 AllowNoIcons=true
-AppCopyright=Copyright 1996-2007 by Erik Berry and the {#Product} Development Team
+AppCopyright=Copyright 1996-2009 by Erik Berry and the {#Product} Development Team
 AppName={#Product}
 AppVerName={#FullName}
 AppID={#AppIDValue}
