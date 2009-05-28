@@ -433,32 +433,44 @@ end;
 {
   Delphi 2009:
   File                 File Version    Size       Modified Time
-  delphicoreide110.bpl 12.0.3170.16989 3,099,136  Friday, August 29, 2008, 2:00:00 PM
-  coreide110.bpl       12.0.3170.16989 4,571,136  Friday, August 29, 2008, 2:00:00 PM
+  delphicoreide120.bpl 12.0.3170.16989 3,099,136  Friday, August 29, 2008, 2:00:00 PM
+  coreide120.bpl       12.0.3170.16989 4,571,136  Friday, August 29, 2008, 2:00:00 PM
   bds.exe              12.0.3170.16989 983,552    Friday, August 29, 2008, 2:00:00 PM
   dcldb120.bpl         12.0.3170.16989 286,720    Friday, August 29, 2008, 2:00:00 PM
 
   Delphi 2009 Update 1:
   File                 File Version    Size       Modified Time
-  delphicoreide110.bpl 12.0.3210.17555 3,099,136  Wednesday, October 01, 2008, 2:01:00 PM
-  coreide110.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
+  delphicoreide120.bpl 12.0.3210.17555 3,099,136  Wednesday, October 01, 2008, 2:01:00 PM
+  coreide120.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
   bds.exe              12.0.3210.17555 983,552    Wednesday, October 01, 2008, 2:01:00 PM
   dcldb120.bpl         12.0.3210.17555 286,720    Wednesday, October 01, 2008, 2:01:00 PM
 
   Delphi 2009 Update 2 (database only):
   File                 File Version    Size       Modified Time
-  delphicoreide110.bpl 12.0.3210.17555 3,099,136  Wednesday, October 01, 2008, 2:01:00 PM
-  coreide110.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
+  delphicoreide120.bpl 12.0.3210.17555 3,099,136  Wednesday, October 01, 2008, 2:01:00 PM
+  coreide120.bpl       12.0.3210.17555 4,571,136  Wednesday, October 01, 2008, 2:01:00 PM
   bds.exe              12.0.3210.17555 983,552    Wednesday, October 01, 2008, 2:01:00 PM
   dcldb120.bpl         12.0.3210.17555 286,720    Wednesday, October 01, 2008, 2:01:00 PM
-  dcldbx120.bpl                        154,624    Wednesday, November 12, 2008, 3:02:00 PM
-  DataExplorer120.bpl                  154,624    Wednesday, November 12, 2008, 3:02:00 PM
+  dcldbx120.bpl        12.0.3250.18309 154,624    Wednesday, November 12, 2008, 3:02:00 PM
+  DataExplorer120.bpl  12.0.3250.18309 181,248    Wednesday, November 12, 2008, 3:02:00 PM
 
   Delphi 2009 Update 3:
   File                 File Version    Size       Modified Time
+  delphicoreide120.bpl 12.0.3420.21218 3,102,720  Wednesday, January 14, 2009, 2:03:00 PM
+  coreide120.bpl       12.0.3420.21218 4,727,048  Wednesday, January 14, 2009, 2:03:00 PM
+  bds.exe              12.0.3420.21218 3,704,128  Thursday, May 14, 2009, 2:06:42 AM
+  dcldb120.bpl         12.0.3420.21218 286,720    Wednesday, January 14, 2009, 2:03:00 PM
+  dcldbx120.bpl        12.0.3250.18309 154,624    Wednesday, November 12, 2008, 3:02:00 PM
+  DataExplorer120.bpl  12.0.3250.18309 181,248    Wednesday, November 12, 2008, 3:02:00 PM
 
   Delphi 2009 Update 4 (database only):
   File                 File Version    Size       Modified Time
+  delphicoreide120.bpl 12.0.3420.21218 3,102,720  Wednesday, January 14, 2009, 2:03:00 PM
+  coreide120.bpl       12.0.3420.21218 4,727,048  Wednesday, January 14, 2009, 2:03:00 PM
+  bds.exe              12.0.3420.21218 3,704,128  Thursday, May 14, 2009, 2:06:42 AM
+  dcldb120.bpl         12.0.3420.21218 286,720    Wednesday, January 14, 2009, 2:03:00 PM
+  dcldbx120.bpl        12.0.3420.21218 154,624    Wednesday, January 14, 2009, 3:04:00 PM
+  DataExplorer120.bpl  12.0.3420.21218 181,248    Wednesday, January 14, 2009, 3:04:00 PM
 }
 function GetRS2009Version: TBorlandIdeVersion;
 const
@@ -466,22 +478,38 @@ const
     (Minor: 0; Major: 12; Build: 16989; Release: 3170);
   CoreIde1201: TVersionNumber =
     (Minor: 0; Major: 12; Build: 17555; Release: 3210);
+  DclDbx1200: TVersionNumber =
+    (Minor: 0; Major: 12; Build: 16989; Release: 3170);
+  DclDbx1202: TVersionNumber =
+    (Minor: 0; Major: 12; Build: 18309; Release: 3250);
 var
   CoreIdeFileVersion: TVersionNumber;
+  DclDbxFileVersion: TVersionNumber;
   VersionNumber: Integer;
-  DbxFile: string;
+  DclDbxFile: string;
 begin
   Result := ideRS2009;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide120.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1200);
   if VersionNumber > 0 then begin
     Result := ideRS2009U1;
-    DbxFile := GetIdeRootDirectory + 'Bin\dcldbx120.bpl';
-    if FileExists(DbxFile) and (GetFileSize(DbxFile) = 154624) then // No version info
-      Result := ideRS2009U2;
+    DclDbxFile := GetIdeRootDirectory + 'Bin\dcldbx120.bpl';
+    if FileExists(DclDbxFile) then
+    begin
+      DclDbxFileVersion := GetFileVersionNumber(DclDbxFile);
+      VersionNumber := CompareVersionNumber(DclDbxFileVersion, DclDbx1200);
+      if VersionNumber > 0 then
+        Result := ideRS2009U2;
+    end;
     VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1201);
     if VersionNumber > 0 then
       Result := ideRS2009U3;
+    if FileExists(DclDbxFile) then
+    begin
+      VersionNumber := CompareVersionNumber(DclDbxFileVersion, DclDbx1202);
+      if VersionNumber > 0 then
+        Result := ideRS2009U4;
+    end;
   end;
 end;
 
