@@ -1,4 +1,4 @@
-GExperts 1.33 Beta 3
+GExperts 1.33
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -72,10 +72,10 @@ Vista as a non-administrator, you may need to manually register the GExperts
 DLL with the IDE after installation.  This is most easily done using the
 Expert Manager tool in the GExperts start menu group.  If you prefer, you
 can also manually register the DLL with the IDE using the Windows registry
-editor (RegEdit.exe).  Create the a key key similar to the following (the
+editor (RegEdit.exe).  Create a key similar to the following (the
 version number appearing before "\Experts\" is IDE dependent):
-HKEY_CURRENT_USER\Software\CodeGear\BDS\6.0\Experts\   (Rad Studio 2009)
-HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\    (Rad Studio 2007)
+HKEY_CURRENT_USER\Software\CodeGear\BDS\6.0\Experts\   (RAD Studio 2009)
+HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\    (RAD Studio 2007)
 HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\ (Delphi 7)
 
 Then add a new string value that points to your GExperts DLL (X is the IDE
@@ -124,6 +124,8 @@ VERSION 1.33 (March, 2009)
   corrections made to your code.
 - To Do List: Display the category and owner for to do items, indicate items
   marked DONE, support more priorities (Pestasoft, Erik).
+- Code Librarian: Support C# and XML syntax highlighting.
+- Help File: Updated to reflect the current release. (John Hansen, Erik)
 
 
 VERSION 1.32 (September 11, 2007)
