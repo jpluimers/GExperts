@@ -98,7 +98,7 @@ Add/Remove Programs or Programs [and Features] tool (under Vista).
 
 CHANGE LOG
 ----------------------
-VERSION 1.33 (March, 2009)
+VERSION 1.33 (May, 2009)
 - General: Added support for RAD Studio 2009.  Note that some of the tools that
   require our source code parser (Procedure List, Class Browser, To Do List,
   Delimiter Editor Experts, etc.) do not have full unicode support.
