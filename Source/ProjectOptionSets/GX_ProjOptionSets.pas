@@ -620,45 +620,45 @@ begin
   FPrjOptions := GxOtaGetActiveProjectOptions;
   if Assigned(FPrjOptions) then
   try
-      OptionNames := FPrjOptions.GetOptionNames;
-      for j := Low(OptionNames) to High(OptionNames) do
+    OptionNames := FPrjOptions.GetOptionNames;
+    for j := Low(OptionNames) to High(OptionNames) do
+    begin
+    {$IFDEF CheckProjectOptionMap}
+      i := High(GxOptionsMap);
+      while i >= Low(GxOptionsMap) do
+        begin
+          if SameText(GxOptionsMap[i].Name, OptionNames[j].Name) then
+            Break;
+          Dec(i);
+        end;
+
+      if i < Low(GxOptionsMap) then
       begin
-      {$IFDEF CheckProjectOptionMap}
-        i := High(GxOptionsMap);
-        while i >= Low(GxOptionsMap) do
-          begin
-            if SameText(GxOptionsMap[i].Name, OptionNames[j].Name) then
-              Break;
-            Dec(i);
-          end;
-
-        if i < Low(GxOptionsMap) then
-        begin
-          // Add missing project option to list
-          MissingEntries := MissingEntries + Format(MissingEntryFormat,
-            [OptionNames[j].Name, GetEnumName(TypeInfo(TTypeKind), Integer(OptionNames[j].Kind)), OptionNames[j].Name]);
-        end
-        else
-        begin
-          // Sanity check: do we handle the IDE's option
-          // with the right type ourselves?
-          if GxOptionsMap[i].AssumedTypeKind <> tkUnknown then
-            Assert(GxOptionsMap[i].AssumedTypeKind = OptionNames[j].Kind, 'Wrong type kind for option ' + GxOptionsMap[i].Name);
-        end;
-      {$ENDIF CheckProjectOptionMap}
-
-        // Load options honoring filter selection
-        if ((cbFilter.Text = sAllOptions) or
-            (CategoryTextToCategory(cbFilter.Text) in GetOptionCategories(OptionNames[j].Name))
-           ) and
-           OptionIsAppropriateForIde(GetOptionCategories(OptionNames[j].Name)) then
-        begin
-          tmpObj := TKindObject.Create;
-          tmpObj.OptionKind := OptionNames[j].Kind;
-          lstPrjOptions.Items.AddObject(OptionNames[j].Name, tmpObj);
-        end;
-        // Done loading option list
+        // Add missing project option to list
+        MissingEntries := MissingEntries + Format(MissingEntryFormat,
+          [OptionNames[j].Name, GetEnumName(TypeInfo(TTypeKind), Integer(OptionNames[j].Kind)), OptionNames[j].Name]);
+      end
+      else
+      begin
+        // Sanity check: do we handle the IDE's option
+        // with the right type ourselves?
+        if GxOptionsMap[i].AssumedTypeKind <> tkUnknown then
+          Assert(GxOptionsMap[i].AssumedTypeKind = OptionNames[j].Kind, 'Wrong type kind for option ' + GxOptionsMap[i].Name);
       end;
+    {$ENDIF CheckProjectOptionMap}
+
+      // Load options honoring filter selection
+      if ((cbFilter.Text = sAllOptions) or
+          (CategoryTextToCategory(cbFilter.Text) in GetOptionCategories(OptionNames[j].Name))
+         ) and
+         OptionIsAppropriateForIde(GetOptionCategories(OptionNames[j].Name)) then
+      begin
+        tmpObj := TKindObject.Create;
+        tmpObj.OptionKind := OptionNames[j].Kind;
+        lstPrjOptions.Items.AddObject(OptionNames[j].Name, tmpObj);
+      end;
+      // Done loading option list
+    end;
 
     {$IFDEF CheckProjectOptionMap}
       if MissingEntries <> '' then
