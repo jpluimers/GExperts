@@ -324,7 +324,7 @@ end;
 function TfmExpertManager.ConfirmIfGExperts(const FileName: string): Boolean;
 begin
   Result := True;
-  
+
   if SameFileName(FileName, ThisDllName) then
     Result := (ShowGxMessageBox(TShowDisableCurrentMessage) = mrYes);
 end;
@@ -416,8 +416,10 @@ end;
 
 procedure TfmExpertManager.FormResize(Sender: TObject);
 begin
-  ListView_SetColumnWidth(lvExperts.Handle, 0, ColumnTextWidth);
-  ListView_SetColumnWidth(lvExperts.Handle, 1, ColumnHeaderWidth);
+  if lvExperts.HandleAllocated then begin
+    ListView_SetColumnWidth(lvExperts.Handle, 0, ColumnTextWidth);
+    ListView_SetColumnWidth(lvExperts.Handle, 1, ColumnHeaderWidth);
+  end;
 end;
 
 { TExpertManagerExpert }
