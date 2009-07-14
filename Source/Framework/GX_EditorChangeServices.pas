@@ -56,6 +56,7 @@ type
   end;
 
 function GxEditorChangeServices: IGxEditorChangeServices;
+procedure ReleaseEditorChangeServices;
 
 implementation
 

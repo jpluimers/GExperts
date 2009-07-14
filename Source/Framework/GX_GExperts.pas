@@ -55,7 +55,7 @@ uses
   SysUtils, Dialogs, ExtCtrls,
   GX_GenericUtils, GX_GetIdeVersion, GX_About, GX_MenuActions, GX_MessageBox,
   GX_ConfigurationInfo, GX_Configure, GX_KbdShortCutBroker, GX_SharedImages,
-  GX_IdeUtils, GX_IdeEnhance;
+  GX_IdeUtils, GX_IdeEnhance, GX_EditorChangeServices, GX_ToolbarDropDown;
 
 type
   TInitHelper = class(TObject)
@@ -201,6 +201,8 @@ begin
         {$IFOPT D+} SendDebug('Releasing editor expert manager'); {$ENDIF}
         FreeEditorExperts;
         FreeIdeEnhancements;
+        ReleaseEditorChangeServices;
+        FreeGXToolBarDropDowns;
 
         // Free the action manager and remove any registered keybindings
         {$IFOPT D+} SendDebug('Freeing Action manager'); {$ENDIF}

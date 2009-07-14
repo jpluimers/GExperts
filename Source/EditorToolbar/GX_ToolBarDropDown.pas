@@ -20,6 +20,7 @@ type
   end;
 
   procedure InitializeGXToolBarDropDowns;
+  procedure FreeGXToolBarDropDowns;
 
   { TODO 4 -oAnyone -cFeature: Equip the actions with
     an IPopupMenuAction interface. The (editor) toolbar then
@@ -797,6 +798,11 @@ end;
 
 var
   PrivateToolBarDropDowns: TGxToolBarDropDownActions;
+
+procedure FreeGXToolBarDropDowns;
+begin
+  FreeAndNil(PrivateToolBarDropDowns);
+end;
 
 procedure InitializeGXToolBarDropDowns;
 begin
