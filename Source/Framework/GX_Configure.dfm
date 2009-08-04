@@ -1,13 +1,13 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  Width = 567
-  Height = 533
+  Width = 629
+  Height = 567
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
   Color = clBtnFace
   Constraints.MinHeight = 530
-  Constraints.MinWidth = 520
+  Constraints.MinWidth = 613
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -24,8 +24,8 @@ object fmConfiguration: TfmConfiguration
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 551
-    Height = 463
+    Width = 613
+    Height = 497
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 7
@@ -34,8 +34,8 @@ object fmConfiguration: TfmConfiguration
     object pcConfig: TPageControl
       Left = 7
       Top = 7
-      Width = 537
-      Height = 449
+      Width = 599
+      Height = 483
       ActivePage = tshExperts
       Align = alClient
       HotTrack = True
@@ -48,8 +48,8 @@ object fmConfiguration: TfmConfiguration
         object sbxExperts: TScrollBox
           Left = 0
           Top = 0
-          Width = 529
-          Height = 420
+          Width = 591
+          Height = 454
           VertScrollBar.Increment = 40
           VertScrollBar.Range = 920
           VertScrollBar.Tracking = True
@@ -59,7 +59,7 @@ object fmConfiguration: TfmConfiguration
           object pnlExpertLayout: TPanel
             Left = 0
             Top = 0
-            Width = 507
+            Width = 572
             Height = 40
             TabOrder = 0
             object imgExpert: TImage
@@ -82,7 +82,7 @@ object fmConfiguration: TfmConfiguration
             object edtExpert: THotKey
               Left = 267
               Top = 10
-              Width = 121
+              Width = 171
               Height = 22
               HotKey = 32833
               InvalidKeys = [hcNone, hcShift]
@@ -90,7 +90,7 @@ object fmConfiguration: TfmConfiguration
               TabOrder = 1
             end
             object btnExpert: TButton
-              Left = 399
+              Left = 455
               Top = 8
               Width = 98
               Height = 25
@@ -105,8 +105,8 @@ object fmConfiguration: TfmConfiguration
         object pnlGeneral: TPanel
           Left = 0
           Top = 0
-          Width = 529
-          Height = 420
+          Width = 591
+          Height = 454
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -114,13 +114,13 @@ object fmConfiguration: TfmConfiguration
           object gbxLocations: TGroupBox
             Left = 8
             Top = 8
-            Width = 513
+            Width = 575
             Height = 169
             Align = alTop
             Caption = 'File Locations'
             TabOrder = 0
             DesignSize = (
-              513
+              575
               169)
             object lblVCL: TLabel
               Left = 12
@@ -147,7 +147,7 @@ object fmConfiguration: TfmConfiguration
               FocusControl = edHelpFile
             end
             object sbVCLDir: TButton
-              Left = 480
+              Left = 542
               Top = 40
               Width = 21
               Height = 21
@@ -157,7 +157,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbVCLDirClick
             end
             object sbConfigDir: TButton
-              Left = 480
+              Left = 542
               Top = 88
               Width = 21
               Height = 21
@@ -167,7 +167,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbConfigDirClick
             end
             object sbHelpFile: TButton
-              Left = 480
+              Left = 542
               Top = 136
               Width = 21
               Height = 21
@@ -179,7 +179,7 @@ object fmConfiguration: TfmConfiguration
             object edVCLPath: TEdit
               Left = 12
               Top = 40
-              Width = 468
+              Width = 530
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 0
@@ -187,7 +187,7 @@ object fmConfiguration: TfmConfiguration
             object edConfigPath: TEdit
               Left = 12
               Top = 88
-              Width = 468
+              Width = 530
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 2
@@ -195,7 +195,7 @@ object fmConfiguration: TfmConfiguration
             object edHelpFile: TEdit
               Left = 12
               Top = 136
-              Width = 468
+              Width = 530
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 4
@@ -204,7 +204,7 @@ object fmConfiguration: TfmConfiguration
           object gbxCustomFont: TGroupBox
             Left = 8
             Top = 183
-            Width = 513
+            Width = 575
             Height = 65
             Align = alTop
             Caption = 'User Interface'
@@ -230,7 +230,7 @@ object fmConfiguration: TfmConfiguration
           object pnlGeneralSpacer: TPanel
             Left = 8
             Top = 177
-            Width = 513
+            Width = 575
             Height = 6
             Align = alTop
             BevelOuter = bvNone
@@ -243,8 +243,8 @@ object fmConfiguration: TfmConfiguration
         object pnlExperts: TPanel
           Left = 0
           Top = 0
-          Width = 529
-          Height = 420
+          Width = 591
+          Height = 454
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -252,16 +252,16 @@ object fmConfiguration: TfmConfiguration
           object gbxKeyboard: TGroupBox
             Left = 8
             Top = 8
-            Width = 513
-            Height = 404
+            Width = 575
+            Height = 438
             Align = alClient
             Caption = 'Editor Experts'
             TabOrder = 0
             DesignSize = (
-              513
-              404)
+              575
+              438)
             object btnConfigure: TButton
-              Left = 426
+              Left = 488
               Top = 80
               Width = 77
               Height = 26
@@ -272,7 +272,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = btnConfigureClick
             end
             object btnShortcut: TButton
-              Left = 426
+              Left = 488
               Top = 116
               Width = 77
               Height = 26
@@ -284,8 +284,8 @@ object fmConfiguration: TfmConfiguration
             end
             object meHelp: TMemo
               Left = 10
-              Top = 276
-              Width = 493
+              Top = 310
+              Width = 555
               Height = 118
               TabStop = False
               Anchors = [akLeft, akRight, akBottom]
@@ -295,7 +295,7 @@ object fmConfiguration: TfmConfiguration
               TabOrder = 4
             end
             object chkDisableEditorExperts: TCheckBox
-              Left = 426
+              Left = 488
               Top = 22
               Width = 84
               Height = 21
@@ -307,8 +307,8 @@ object fmConfiguration: TfmConfiguration
             object lvEditorExperts: TListView
               Left = 10
               Top = 22
-              Width = 408
-              Height = 247
+              Width = 470
+              Height = 281
               Anchors = [akLeft, akTop, akRight, akBottom]
               Columns = <
                 item
@@ -742,15 +742,15 @@ object fmConfiguration: TfmConfiguration
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 463
-    Width = 551
+    Top = 497
+    Width = 613
     Height = 34
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 264
+      Left = 326
       Top = 0
       Width = 287
       Height = 34
