@@ -408,8 +408,12 @@ begin
             Assert(FFileResult = nil, 'FFileResult leak');
             FFileResult := nil;
 
-            SearchFile := Dir + Search.Name;
-            ExecuteSearchOnFile(SearchFile);
+            // FindFirst matches *.pas~ with a wildcard of *.pas, so we correct for that here
+            if WildcardCompare(Masks.Strings[i], Search.Name, True) then
+            begin
+              SearchFile := Dir + Search.Name;
+              ExecuteSearchOnFile(SearchFile);
+            end;
             FFileResult := nil;
 
             if FAbortSignalled then
