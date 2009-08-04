@@ -120,7 +120,7 @@ const
       ComboDropDownCount: 15;
     ),
     (
-      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;TLoadProcessDialog;TDotNetOptionForm;TPasEnvironmentDialog;TPasEditorPropertyDialog;TCppProjOptsDlg';
+      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;TLoadProcessDialog;TDotNetOptionForm;TPasEnvironmentDialog;TPasEditorPropertyDialog;TCppProjOptsDlg;TReopenMenuPropertiesDialog';
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;
