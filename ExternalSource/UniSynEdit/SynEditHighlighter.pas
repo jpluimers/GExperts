@@ -129,7 +129,9 @@ type
     fAttrChangeHooks: TSynNotifyEventChain;
     fUpdateCount: Integer;
     fEnabled: Boolean;
+    FExportName: string;
     procedure SetEnabled(const Value: Boolean);
+    function GetExportName: string;
   protected
     fCasedLine: PWideChar;
     fCasedLineStr: UnicodeString;
@@ -233,6 +235,7 @@ type
       index SYN_ATTR_SYMBOL read GetDefaultAttribute;
     property WhitespaceAttribute: TSynHighlighterAttributes
       index SYN_ATTR_WHITESPACE read GetDefaultAttribute;
+    property ExportName: string read GetExportName;
   published
     property DefaultFilter: string read GetDefaultFilter write SetDefaultFilter
       stored IsFilterStored;
@@ -265,6 +268,7 @@ type
 implementation
 
 uses
+  SynEditMiscProcs,
 {$IFDEF UNICODE}
   WideStrUtils,
 {$ENDIF}
@@ -976,6 +980,13 @@ begin
     Result := fTokenPos
   else
     Result := fExpandedTokenPos;
+end;
+
+function TSynCustomHighlighter.GetExportName: string;
+begin
+  if FExportName = '' then
+    FExportName := SynEditMiscProcs.DeleteTypePrefixAndSynSuffix(ClassName);
+  Result := FExportName;
 end;
 
 function TSynCustomHighlighter.GetExpandedToken: UnicodeString;

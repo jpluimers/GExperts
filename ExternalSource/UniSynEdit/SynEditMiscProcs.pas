@@ -173,6 +173,8 @@ function CalcFCS(const ABuf; ABufSize: Cardinal): Word;
 procedure SynDrawGradient(const ACanvas: TCanvas; const AStartColor, AEndColor: TColor;
   ASteps: Integer; const ARect: TRect; const AHorizontal: Boolean);
 
+function DeleteTypePrefixAndSynSuffix(S: string): string;
+
 implementation
 
 uses
@@ -844,7 +846,7 @@ begin
 
       for i := 0 to Schemes.Count - 1 do
       begin
-        UniqueAttriName := DeleteTypePrefixAndSynSuffix(Highlighter.ClassName) +
+        UniqueAttriName := Highlighter.ExportName +
           IntToStr(GetHighlighterIndex(Highlighter, HighlighterList)) + '.' +
           Schemes[i].MarkerAttri.Name + IntToStr(i + 1);
 
@@ -860,7 +862,7 @@ begin
   else if Assigned(Highlighter) then
     for i := 0 to Highlighter.AttrCount - 1 do
     begin
-      UniqueAttriName := DeleteTypePrefixAndSynSuffix(Highlighter.ClassName) +
+      UniqueAttriName := Highlighter.ExportName +
         IntToStr(GetHighlighterIndex(Highlighter, HighlighterList)) + '.' +
         Highlighter.Attribute[i].Name;
 
