@@ -182,6 +182,7 @@ resourcestring
 var
   CurrentIdeDir: string;
   Exporter: TSynCustomExporter;
+  Cursor: IInterface;
 begin
   Assert(Assigned(SourceExportExpert));
 
@@ -195,6 +196,7 @@ begin
   try
     if GetOpenSaveDialogExecute(dlgSave) then
     begin
+      Cursor := TempHourGlassCursor;
       SourceExportExpert.FSaveDir := ExtractFilePath(ExpandFileName(dlgSave.FileName));
       SourceExportExpert.FSaveFilter := dlgSave.FilterIndex;
       if dlgSave.FilterIndex = 1 then
@@ -207,6 +209,7 @@ begin
         Exporter.Highlighter := FEditor.Highlighter;
         Exporter.ExportAsText := True;
         Exporter.Color := SourceExportExpert.FBackgroundColor;
+        Application.ProcessMessages;
         Exporter.ExportAll(FEditor.Lines);
         Exporter.SaveToFile(dlgSave.FileName);
       finally
@@ -465,8 +468,5 @@ end;
 initialization
   RegisterGX_Expert(TSourceExportExpert);
 
-{$ELSE not SYNEDIT}
-interface implementation
-{$ENDIF SYNEDIT}
 end.
 
