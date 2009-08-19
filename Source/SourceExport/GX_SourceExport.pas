@@ -468,5 +468,8 @@ end;
 initialization
   RegisterGX_Expert(TSourceExportExpert);
 
+{$ELSE not SYNEDIT}
+interface implementation
+{$ENDIF SYNEDIT}
 end.
 
