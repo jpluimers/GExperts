@@ -1470,7 +1470,7 @@ begin
   Assert(entryName <> '', 'Trying to access entry with empty name');
   Result := LocateEntry(entryName, attributes);
   if Result < 0 then begin
-    if mode <> fmCreate then
+    if (mode and fmCreate) <> fmCreate then
       Exit
     else begin
       Result := CreateEntry(entryName, attributes, 0, FAT.AllocateBlock);
