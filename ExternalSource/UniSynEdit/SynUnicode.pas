@@ -2567,7 +2567,7 @@ var
   ErrorMessage: UnicodeString;
 {$ENDIF}
 begin
-  if Mode = fmCreate then
+  if ((Mode and fmCreate) = fmCreate) or then
   begin
     inherited Create(WideFileCreate(FileName, Rights));
     if Handle < 0 then
