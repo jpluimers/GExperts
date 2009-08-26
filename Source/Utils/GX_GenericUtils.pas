@@ -4121,7 +4121,11 @@ end;
 
 procedure TFileFindThread.StartFind;
 begin
+  {$IFDEF GX_VER210_up}
+  Start;
+  {$ELSE}
   Resume;
+  {$ENDIF}
 end;
 
 initialization
