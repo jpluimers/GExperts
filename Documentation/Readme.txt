@@ -59,9 +59,9 @@ KNOWN LIMITATIONS/BUGS
      keymapping.  Also, the Macro Library can not always intercept the
      Shift+Ctrl+R keystroke to automatically grab keyboard macros, so you may
      need to create macros using the recording functions in the toolbar.
-  Delphi 2009 Only:
-   - Playing back recorded macros in the Marco Library does not work.  This
-     appears to be an IDE bug handling editor macro streams.
+  Delphi 2009 - 2010 Update 1:
+   - Record and playback in the Marco Library does not work.  This is an IDE
+     bug handling editor macro streams (QC 78289).
 
 
 INSTALLATION
