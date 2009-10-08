@@ -79,6 +79,7 @@ function RunningDelphi2005: Boolean;
 function RunningDelphi2007: Boolean;
 function RunningDelphi2007OrLess: Boolean;
 function RunningDelphi2007OrGreater: Boolean;
+function RunningRS2009: Boolean;
 function RunningRS2009OrGreater: Boolean;
 function RunningBDS2006OrLess: Boolean;
 function RunningBDS2006OrGreater: Boolean;
@@ -454,6 +455,15 @@ end;
 function RunningDelphi2007OrGreater: Boolean;
 begin
   {$IFDEF GX_VER185_up}
+  Result := True;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+function RunningRS2009: Boolean;
+begin
+  {$IFDEF VER200}
   Result := True;
   {$ELSE}
   Result := False;
