@@ -1029,14 +1029,16 @@ function TCppMessageDialogBuilder.GetCode: string;
     i: Integer;
     FunctionText: string;
   begin
+    if MessageType is TMessageBoxType then
+      FunctionResults.Text := UpperCase(FunctionResults.Text);
     if FunctionResults.Count > 1 then // complex compare to set
     begin
       for i := 0 to FunctionResults.Count - 1 do
-        FunctionText := FunctionText + ' << ' + AnsiUpperCase(FunctionResults[i]);
+        FunctionText := FunctionText + ' << ' + Trim(FunctionResults[i]);
       Result := Format('(Set<int, mrNone, mrYesToAll>()%s).Contains(%s)', [FunctionText, Condition]);
     end
     else // simple: use '... == ...'
-      Result := Format('%s == %s', [Condition, AnsiUpperCase(FunctionResults.CommaText)]);
+      Result := Format('%s == %s', [Condition, Trim(FunctionResults.Text)]);
   end;
 
   function BuildSwitchStatement(const Condition: string): string;
