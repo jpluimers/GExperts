@@ -14,7 +14,6 @@ uses
 const
   AllFilesWildCard = '*.*';
   EmptyString = '';
-  // Note these don't handle german/polish/etc. extended ASCII alpha chars that are valid in Delphi 8+
   GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
   MaxSmallInt = 32767;
   MaxEditorCol = {$IFDEF GX_VER160_up} MaxSmallInt {$ELSE} 1023 {$ENDIF};
