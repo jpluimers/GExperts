@@ -175,6 +175,7 @@ type
     procedure Configure; override;
     function HasConfigOptions: Boolean; override;
     property StorageFile: string read GetStorageFile;
+    function IsDefaultActive: Boolean; override;
   end;
 
 var
@@ -189,7 +190,14 @@ uses
   ActiveX,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
-  GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math;
+  GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math, GX_IdeUtils,
+  GX_MessageBox;
+
+type
+  TIDEMacroBugMessage = class(TGxMsgBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
 
 const
   MacroLibraryStorageFileName = 'MacroLibrary.xml';
@@ -795,6 +803,7 @@ begin
   if not Assigned(KS) then
     Exit;
 
+  GxOtaFocusCurrentIDEEditControl;
   if not KS.CurrentPlayback.IsPlaying then
     if KS.CurrentRecord.IsRecording then
     begin
@@ -813,6 +822,7 @@ end;
 procedure TfmMacroLibrary.actPlaybackExecute(Sender: TObject);
 begin
   actEditCopy.Execute;
+  GxOtaFocusCurrentIDEEditControl;
   GxOtaGetKeyboardServices.ResumePlayback;
 end;
 
@@ -930,6 +940,8 @@ begin
   IdeDockManager.ShowForm(fmMacroLibrary);
   fmMacroLibrary.SelectFirstMacro;
   fmMacroLibrary.lvMacros.SetFocus;
+  if RunningRS2009 then
+    ShowGxMessageBox(TIDEMacroBugMessage);
 end;
 
 procedure TMacroLibExpert.InternalLoadSettings(Settings: TGExpertsSettings);
@@ -963,6 +975,18 @@ procedure TMacroLibExpert.Configure;
 begin
   if TfmGxMacroLibraryConfig.Execute(fmMacroLibrary.FPromptForName) then
     fmMacroLibrary.SaveSettings;
+end;
+
+function TMacroLibExpert.IsDefaultActive: Boolean;
+begin
+  Result := not RunningRS2009;
+end;
+
+{ TIDEMacroBugMessage }
+
+function TIDEMacroBugMessage.GetMessage: string;
+begin
+  Result := 'RAD Studio 2009 and RAD Studio 2010 before update 2 have bugs preventing record and playback of macros using this tool.  See QC 78289 for more details: http://qc.embarcadero.com/wc/qcmain.aspx?d=78289';
 end;
 
 initialization
