@@ -341,17 +341,12 @@ function TAbDfInputWindow.FindLongestMatch(aAmpleLength : integer;
                                        var aMatch       : TAbDfMatch;
                                      const aPrevMatch   : TAbDfMatch)
                                                         : boolean;
-{$IFDEF CLR}
-{Note:  Delphi for .NET can't use ASM only the pascal code. }
- {$DEFINE UseGreedyPascal}
-{$ELSE}
 {Note: this routine implements a greedy algorithm and is by far the
        time sink for compression. There are two versions, one written
        in Pascal for understanding, one in assembler for speed.
        Activate one and only one of the following compiler defines.}
 {$DEFINE UseGreedyAsm}
 {.$DEFINE UseGreedyPascal}
-{$ENDIF}
 
 {Check to see that all is correct}
 {$IFDEF UseGreedyAsm}

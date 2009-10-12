@@ -175,28 +175,32 @@ begin
                                           Archive.Password)
   else { just use data stream as-is }
     DestStrm := OutStream;
-
-  { get first bufferful }
-  DataRead := InStream.Read(Buffer, SizeOf(Buffer));
-  { while more data has been read and we're not told to bail }
-  while (DataRead <> 0) and not Abort do begin
-    {report the progress}
-    if Assigned(Archive.OnProgress) then begin
-      Total := Total + DataRead;
-      Percent := Round((100.0 * Total) / InSize);
-      if (LastPercent <> Percent) then
-        Archive.OnProgress(Percent, Abort);
-      LastPercent := Percent;
-    end;
-
-    { update CRC}
-    AbUpdateCRCBuffer(CRC32, Buffer, DataRead);
-
-    { write data (encrypting if needed) }
-    DestStrm.WriteBuffer(Buffer, DataRead);
-
-    { get next bufferful }
+  try
+    { get first bufferful }
     DataRead := InStream.Read(Buffer, SizeOf(Buffer));
+    { while more data has been read and we're not told to bail }
+    while (DataRead <> 0) and not Abort do begin
+      {report the progress}
+      if Assigned(Archive.OnProgress) then begin
+        Total := Total + DataRead;
+        Percent := Round((100.0 * Total) / InSize);
+        if (LastPercent <> Percent) then
+          Archive.OnProgress(Percent, Abort);
+        LastPercent := Percent;
+      end;
+
+      { update CRC}
+      AbUpdateCRCBuffer(CRC32, Buffer, DataRead);
+
+      { write data (encrypting if needed) }
+      DestStrm.WriteBuffer(Buffer, DataRead);
+
+      { get next bufferful }
+      DataRead := InStream.Read(Buffer, SizeOf(Buffer));
+    end;
+  finally
+    if Archive.Password <> '' then
+      DestStrm.Free;
   end;
 
   { finish CRC calculation }
@@ -205,11 +209,6 @@ begin
   { show final progress increment }
   if (Percent < 100) and Assigned(Archive.OnProgress) then
     Archive.OnProgress(100, Abort);
-
-  { DestStrm was created under these conditions it needs to be freed. }
-  //  [ 890888 ] Memory Leak in abZipPrc
-  if Archive.Password <> '' then  { encrypt the stream }
-    DestStrm.Free;
 
   { User wants to bail }
   if Abort then begin
@@ -249,10 +248,6 @@ begin
 {$ENDIF}
 end;
 
-procedure Validate;
-begin
-end;
-
 procedure UpdateItem;
 begin
   if (Item.CompressionMethod = cmDeflated) then
@@ -276,9 +271,6 @@ begin
   try
     { configure Item }
     ConfigureItem;
-
-    { validate }
-    Validate;
 
     if InStream.Size > 0 then begin                                      {!!.01}
 
@@ -314,11 +306,11 @@ begin
             TempOut.SwapFileDirectory := Sender.TempDirectory;           {!!.01}
 
             { store item }
-            DoStore(ZipArchive, Item, TempOut, InStream);          {!!.01}
+            DoStore(ZipArchive, Item, TempOut, InStream);                {!!.01}
           end {if};
-          
-    	 TempOut.Seek(0, soBeginning);                                    {!!.01}
-    	 OutStream.CopyFrom(TempOut, TempOut.Size);        
+
+          TempOut.Seek(0, soBeginning);                                  {!!.01}
+          OutStream.CopyFrom(TempOut, TempOut.Size);
         end;
       end; { case }
 
@@ -332,7 +324,6 @@ begin
 
     { update item }
     UpdateItem;
-                      {!!.01}
 
   finally                                                                {!!.01}
     TempOut.Free;                                                        {!!.01}
@@ -345,92 +336,31 @@ end;
 procedure AbZip( Sender : TAbZipArchive; Item : TAbZipItem;
                  OutStream : TStream );
 var
-  SaveDir : string;
-  DateTime : LongInt;
-  FileAtributes: Integer;
-  ZipArchive : TAbZipArchive;
   UncompressedStream : TStream;
-  Buff : array [0..MAX_PATH] of AnsiChar;
-procedure AddDirectory();
-var
-	sr: TSearchRec;
+  SaveDir : string;
+  AttrEx : TAbAttrExRec;
 begin
-    Item.CRC32 := 0;
-    Item.VersionNeededToExtract := 20;
-    Item.CompressionMethod := cmStored;
-    //itemFileName := AbAddBackSlash(Item.DiskFileName);
-
-
-    //Item.DiskFileName := itemFileName;
-    Item.CompressedSize := 0;
-    Item.VersionMadeBy := (Item.VersionMadeBy and $FF00) + 20;
-    Item.ExternalFileAttributes := AbFileGetAttr(Item.DiskFileName);
-
-
-    FileAtributes := FindFirst(Item.DiskFileName, faAnyFile, sr);
-    try
-        if (FileAtributes <> 0) then begin
-            DateTime := sr.Time;
-            Item.LastModFileTime := Word(DateTime);        // Get the Lo Part
-            Item.LastModFileDate := Word(DateTime shr 16); // Get the Hi Part
-
-        end;
-    finally
-        FindClose(sr);
-    end;
-     //AbFixName(itemFileName);
-     //Item.FileName := itemFileName;
-
-end;begin
-  ZipArchive := TAbZipArchive(Sender);
   GetDir(0, SaveDir);
   try {SaveDir}
-    if (ZipArchive.BaseDirectory <> '') then
-      ChDir(ZipArchive.BaseDirectory);
-    StrPCopy(Buff, AnsiString(Item.DiskFileName));
-{!!OEM - Added }
-{$IFDEF Linux}
- { do nothing to Buff }
-{$ELSE}
-    if (Item.VersionMadeBy and $FF00) = 0 then begin
-      OemToCharA(Buff, Buff);
-    end;
-{$ENDIF}
-{!!OEM - End Added }
-
-	FileAtributes := AbFileGetAttr(string(StrPas(Buff)));
-	if (0 <> (FileAtributes and faDirectory)) then begin
-    	Item.ExternalFileAttributes := FileAtributes;
-        AddDirectory(); Exit;
-    end else begin
-{ Converting file names causing problems on some systems, take hands off approach }
-        {  OEMToAnsi(Buff, Buff);  }
-
-		Item.ExternalFileAttributes := FileAtributes;
-        UncompressedStream := TFileStream.Create(string(StrPas(Buff)), fmOpenRead or fmShareDenyWrite );
-        {Now get the file's attributes}
-
-        Item.UncompressedSize := UncompressedStream.Size;
-    end;
+    if (Sender.BaseDirectory <> '') then
+      ChDir(Sender.BaseDirectory);
+    AbFileGetAttrEx(Item.DiskFileName, AttrEx);
+    if ((AttrEx.Attr and faDirectory) <> 0) then
+      UncompressedStream := TMemoryStream.Create
+    else
+      UncompressedStream :=
+        TFileStream.Create(Item.DiskFileName, fmOpenRead or fmShareDenyWrite);
   finally {SaveDir}
     ChDir( SaveDir );
   end; {SaveDir}
   try {UncompressedStream}
-  {!!.05 [ 808499 ] Wrong file dates in zip archives under Linux }
-  {!!.05 Changed from unsafe LongRec, to shr 16 logic. Done to prep for CLR}
-      DateTime := FileGetDate(TFileStream
-      (UncompressedStream).Handle);
-      {$IFDEF Linux}
-      DateTime := AbDateTimeToDosFileDate
-      (FileDateToDateTime (DateTime));
-      {$ENDIF}
-      Item.LastModFileTime := Word(DateTime);        // Get the Lo Part
-      Item.LastModFileDate := Word(DateTime shr 16); // Get the Hi Part
-      AbZipFromStream(Sender, Item, OutStream,UncompressedStream);
-//    DateTime := FileGetDate(TFileStream(UncompressedStream).Handle);
-//    Item.LastModFileTime := LongRec(DateTime).Lo;
-//    Item.LastModFileDate := LongRec(DateTime).Hi;
-//    AbZipFromStream(Sender, Item, OutStream, UncompressedStream);
+    AbZipFromStream(Sender, Item, OutStream, UncompressedStream);
+    Item.ExternalFileAttributes := AttrEx.Attr;
+    {$IFDEF Linux}
+    AttrEx.Time := AbDateTimeToDosFileDate(FileDateToDateTime(AttrEx.Time));
+    {$ENDIF}
+    Item.LastModFileTime := LongRec(AttrEx.Time).Lo;
+    Item.LastModFileDate := LongRec(AttrEx.Time).Hi;
   finally {UncompressedStream}
     UncompressedStream.Free;
   end; {UncompressedStream}

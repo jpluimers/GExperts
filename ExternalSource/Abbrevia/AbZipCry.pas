@@ -67,7 +67,7 @@ type
     procedure InitKeys;
       {-Initialize Keys}
   public
-    constructor Create(const aPassword : string;
+    constructor Create(const aPassword : AnsiString;
                          var aStream : TStream;
                              aCRC : LongInt; aCheckByte : Boolean );          
     destructor Destroy; override;
@@ -111,12 +111,12 @@ const
   AbZipMagicNumber = 134775813;
 
 { -------------------------------------------------------------------------- }
-constructor TAbZDecoder.Create(const aPassword : string;
+constructor TAbZDecoder.Create(const aPassword : AnsiString;
                                 var aStream : TStream;
                                     aCRC : LongInt; aCheckByte : Boolean );
 begin
   inherited Create;
-  FPassword := AnsiString(aPassword);
+  FPassword := aPassword;
   FStream := aStream;
   FCRC := aCRC;
   FCheckByte := aCheckByte;
