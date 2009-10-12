@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditTextBuffer.pas,v 1.63.2.14 2009/03/17 18:12:14 maelh Exp $
+$Id: SynEditTextBuffer.pas,v 1.63.2.15 2009/06/14 13:41:44 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net

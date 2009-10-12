@@ -528,4 +528,4 @@
 // Turn this off if you don't need complex script support, since it is slower
 {.$DEFINE SYN_UNISCRIBE}
 
-// $Id: SynEdit.inc,v 1.16.2.18 2009/01/06 16:26:01 maelh Exp $
+// $Id: SynEdit.inc,v 1.16.2.19 2009/06/14 13:41:44 maelh Exp $
