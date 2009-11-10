@@ -28,18 +28,18 @@ GExperts contains numerous experts.  See the online help
 
 KNOWN LIMITATIONS/BUGS
 -----------------------------------------------
-- The following features are not supported under Delphi 8 - 2009:
+- The following features are not supported under Delphi 8 - 2010:
   Inner classes, class helpers, anonymous methods, and generics in the
   Class Browser, and some of the old editor tab enhancements, such as
   multiline editor tabs.  Note that the IDE converts some high ANSI and MBCS
   characters to UTF-8 UNICODE when loaded in the code editor, so you may
   experience problems with those files (especially in Delphi 2007 and earlier).
 - The compiler replacement option of the Code Proofreader is only partially
-  working under Delphi 7-2009.  It does not correct when an identifier is
+  working under Delphi 7-2010.  It does not correct when an identifier is
   terminated by pressing a symbol key such as a period or open parenthesis,
   but works fine when the symbol is terminated by a space (IDE limitation).
 - Due to either native Open Tools API limitations or bugs, the following
-  items can not be supported under Delphi 8/2005/2006/2007/2009:
+  items can not be supported under Delphi 8/2005/2006/2007/2010:
   Delphi 8 Only:
    - Rename Components (IDE bug setting the Name property)
    - Jumping to a form search match from Grep Results when the source is open
@@ -52,7 +52,7 @@ KNOWN LIMITATIONS/BUGS
      (no WinForms support for IOTAFormEditor/IOTAComponent)
    - Replace Components for VCL.NET (No direct access to components)
    - Components to Code for VCL.NET (No direct access to components)
-  Delphi 8 - 2009:
+  Delphi 8 - 2010:
    - It is no longer possible for addins to override some built-in IDE
      shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
      Identifier, Procedure List, etc.) to not conflict with your selected
@@ -79,7 +79,7 @@ HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\    (RAD Studio 2007)
 HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\ (Delphi 7)
 
 Then add a new string value that points to your GExperts DLL (X is the IDE
-version such as 6, 7, 8, 2005, 2006, 2007, 2009, etc.):
+version such as 6, 7, 8, 2005, 2006, 2007, 2009, 2010, etc.):
 GExperts=C:\Program Files\GExperts\GExpertsRSX.dll
 GExperts=C:\Program Files\GExperts\GExpertsDelphiX.dll
 GExperts=C:\Program Files\GExperts\GExpertsBDSX.dll or
@@ -99,9 +99,9 @@ Add/Remove Programs or Programs [and Features] tool (under Vista).
 CHANGE LOG
 ----------------------
 VERSION 1.33 (May, 2009)
-- General: Added support for RAD Studio 2009.  Note that some of the tools that
-  require our source code parser (Procedure List, Class Browser, To Do List,
-  Delimiter Editor Experts, etc.) do not have full unicode support.
+- General: Added support for RAD Studio 2009/2010.  Note that some of the tools
+  that require our source code parser (Procedure List, Class Browser, To Do
+  List, Delimiter Editor Experts, etc.) do not have full unicode support.
   Other tools such as the Grep Search/Replace, Source Export, Code Librarian,
   etc. should support UNICODE files just fine.  Also included are some shutdown
   optimizations, removal of all known memory leaks, and other minor tweaks.
@@ -109,9 +109,10 @@ VERSION 1.33 (May, 2009)
   the UI font in the General tab of the settings.
 - Grep Search: There is a new regular expression engine that supports a large
   subset of the Perl regular expression syntax.  Grep can now search and
-  replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009.  The stay on
-  top feature was removed when running inside the IDE, since it could hide modal
-  dialogs.  Allow searching within previously matched files (John Hansen).
+  replace files in ANSI, UTF-8, and UTF-16 formats in Delphi 2009/2010.  The
+  stay on top feature was removed when running inside the IDE, since it could
+  hide modal dialogs.  Allow searching within previously matched files
+  (John Hansen).
 - Hide/Show Non-Visual Components: This new tool allows temporarily hiding
   non-visual components on a form, so you can visualize the form as it will
   appear at runtime.
