@@ -113,16 +113,6 @@ object fmCleanDirectories: TfmCleanDirectories
         Align = alClient
         Caption = 'Clean Dir&ectories'
         TabOrder = 0
-        DesignSize = (
-          541
-          229)
-        object laRecursingNote: TLabel
-          Left = 8
-          Top = 209
-          Width = 4
-          Height = 14
-          Anchors = [akLeft, akBottom]
-        end
         object pnlDirList: TPanel
           Left = 2
           Top = 16

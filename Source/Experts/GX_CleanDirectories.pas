@@ -37,7 +37,6 @@ type
     pnlDirs: TPanel;
     pnlDirectories: TPanel;
     gbxDirectories: TGroupBox;
-    laRecursingNote: TLabel;
     btnHelp: TButton;
     btnClean: TButton;
     btnCancel: TButton;
