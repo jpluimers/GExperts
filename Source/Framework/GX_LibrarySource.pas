@@ -103,7 +103,8 @@ function TGxMultipleInstancesMessage.GetMessage: string;
 resourcestring
   SMultipleGExpertsInstances =
     'Multiple instances of this version of GExperts are currently running.  ' +
-    'Please be aware that the last expert instance to save any settings ' +
+    'This is usually caused by multiple instances of the same IDE running at once (check in the Task Manager if you don't see them all).  ' +
+    'Please be aware that the last IDE instance to save any settings ' +
     'will overwrite any previously saved settings from other instances.';
 begin
   Result := SMultipleGExpertsInstances;
