@@ -141,6 +141,7 @@ uses
   GX_SetComponentProps in 'SetComponentProperties\GX_SetComponentProps.pas',
   GX_SetComponentPropsConfig in 'SetComponentProperties\GX_SetComponentPropsConfig.pas' {fmSetComponentPropsConfig},
   GX_SetComponentPropsStatus in 'SetComponentProperties\GX_SetComponentPropsStatus.pas' {fmSetComponentPropsStatus},
+  GX_SetFocusControl in 'Experts\GX_SetFocusControl.pas',
   GX_SharedImages in 'Framework\GX_SharedImages.pas' {dmSharedImages: TDataModule},
   GX_SourceExport in 'SourceExport\GX_SourceExport.pas' {fmSourceExport},
   GX_SourceExportOptions in 'SourceExport\GX_SourceExportOptions.pas' {fmSourceExportOptions},

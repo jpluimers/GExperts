@@ -307,6 +307,7 @@
 			<DCCReference Include="SetComponentProperties\GX_SetComponentPropsStatus.pas">
 				<Form>fmSetComponentPropsStatus</Form>
 			</DCCReference>
+			<DCCReference Include="Experts\GX_SetFocusControl.pas"/>
 			<DCCReference Include="Framework\GX_SharedImages.pas">
 				<Form>dmSharedImages</Form>
 				<DesignClass>TDataModule</DesignClass>

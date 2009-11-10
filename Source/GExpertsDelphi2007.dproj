@@ -179,6 +179,7 @@
     <DCCReference Include="Experts\GX_PerfectLayout.pas">
       <Form>fmPerfectLayout</Form>
     </DCCReference>
+    <DCCReference Include="Experts\GX_SetFocusControl.pas" />
     <DCCReference Include="Experts\GX_TabOrder.pas">
       <Form>fmTabOrder</Form>
     </DCCReference>
