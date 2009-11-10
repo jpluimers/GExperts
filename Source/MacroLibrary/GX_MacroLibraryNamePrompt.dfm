@@ -23,6 +23,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Width = 59
     Height = 13
     Caption = 'Macro Name'
+    FocusControl = edtMacroName
   end
   object lblMacroDesc: TLabel
     Left = 8
@@ -30,6 +31,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Width = 85
     Height = 13
     Caption = 'Macro Description'
+    FocusControl = mmoMacroDescription
   end
   object edtMacroName: TEdit
     Left = 8

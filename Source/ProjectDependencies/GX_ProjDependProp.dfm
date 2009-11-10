@@ -78,6 +78,7 @@ object fmProjDependProp: TfmProjDependProp
           Width = 47
           Height = 14
           Caption = 'Filename'
+          FocusControl = laFileName
         end
         object lblSource: TLabel
           Left = 7

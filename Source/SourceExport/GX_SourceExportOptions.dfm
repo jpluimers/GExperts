@@ -26,15 +26,16 @@ object fmSourceExportOptions: TfmSourceExportOptions
     BevelOuter = bvNone
     TabOrder = 0
     object lblElement: TLabel
-      Left = 210
+      Left = 218
       Top = 11
       Width = 45
       Height = 14
       Alignment = taRightJustify
       Caption = '&Element'
+      FocusControl = cbxAttributes
     end
     object gbxAttributes: TGroupBox
-      Left = 216
+      Left = 224
       Top = 32
       Width = 221
       Height = 123
@@ -78,7 +79,7 @@ object fmSourceExportOptions: TfmSourceExportOptions
       end
     end
     object cbxAttributes: TComboBox
-      Left = 274
+      Left = 282
       Top = 8
       Width = 164
       Height = 22

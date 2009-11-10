@@ -38,6 +38,7 @@ object fmClassReport: TfmClassReport
       Height = 14
       Alignment = taRightJustify
       Caption = 'Font'
+      FocusControl = cbxFont
     end
     object lblFontSize: TLabel
       Left = 42
@@ -46,6 +47,7 @@ object fmClassReport: TfmClassReport
       Height = 14
       Alignment = taRightJustify
       Caption = 'Font size'
+      FocusControl = spnFontSize
     end
     object lblBoxSize: TLabel
       Left = 47
@@ -54,6 +56,7 @@ object fmClassReport: TfmClassReport
       Height = 14
       Alignment = taRightJustify
       Caption = 'Box size'
+      FocusControl = spnBoxSize
     end
     object lblInCharacters: TLabel
       Left = 158
@@ -69,6 +72,7 @@ object fmClassReport: TfmClassReport
       Height = 14
       Alignment = taRightJustify
       Caption = 'Box spacing'
+      FocusControl = spnBoxSpacing
     end
     object lblInPixels: TLabel
       Left = 158

@@ -45,6 +45,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
       Height = 14
       Alignment = taRightJustify
       Caption = 'Destination'
+      FocusControl = edtDestClassName
     end
     object lblSource: TLabel
       Left = 17
@@ -53,6 +54,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
       Height = 14
       Alignment = taRightJustify
       Caption = 'Source'
+      FocusControl = edtSourceClassName
     end
     object edtDestClassName: TEdit
       Left = 327

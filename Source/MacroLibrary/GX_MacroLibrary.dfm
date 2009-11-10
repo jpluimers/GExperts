@@ -183,6 +183,7 @@ object fmMacroLibrary: TfmMacroLibrary
       Height = 14
       Align = alTop
       Caption = '  Macro Description'
+      FocusControl = mmoMacroDescription
     end
     object mmoMacroDescription: TMemo
       Left = 0

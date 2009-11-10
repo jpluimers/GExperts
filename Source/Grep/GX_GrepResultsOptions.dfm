@@ -75,6 +75,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 132
       Height = 14
       Caption = 'Number of context lines'
+      FocusControl = edtContextLines
     end
     object pnlContextFont: TPanel
       Left = 48

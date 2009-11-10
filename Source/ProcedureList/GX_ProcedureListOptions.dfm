@@ -58,6 +58,7 @@ object fmProcedureListOptions: TfmProcedureListOptions
       Width = 27
       Height = 14
       Caption = 'Dock'
+      FocusControl = cbCVDock
     end
     object cbCVDock: TComboBox
       Left = 64

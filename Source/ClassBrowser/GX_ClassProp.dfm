@@ -42,6 +42,7 @@ object fmClassProp: TfmClassProp
         Height = 14
         Alignment = taRightJustify
         Caption = 'Class name'
+        FocusControl = edtClassName
       end
       object lblDerivedFrom: TLabel
         Left = 15
@@ -50,6 +51,7 @@ object fmClassProp: TfmClassProp
         Height = 14
         Alignment = taRightJustify
         Caption = 'Derived from'
+        FocusControl = edtDerivedFrom
       end
       object lblFileName: TLabel
         Left = 34
@@ -58,6 +60,7 @@ object fmClassProp: TfmClassProp
         Height = 14
         Alignment = taRightJustify
         Caption = 'File name'
+        FocusControl = mmoFileName
       end
       object lblLineNumber: TLabel
         Left = 17
@@ -66,6 +69,7 @@ object fmClassProp: TfmClassProp
         Height = 14
         Alignment = taRightJustify
         Caption = 'Line number'
+        FocusControl = edtLineNo
       end
       object lblUnit: TLabel
         Left = 63
@@ -74,6 +78,7 @@ object fmClassProp: TfmClassProp
         Height = 14
         Alignment = taRightJustify
         Caption = 'Unit'
+        FocusControl = edtUnit
       end
       object edtClassName: TEdit
         Left = 93

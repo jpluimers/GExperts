@@ -37,6 +37,7 @@ object fmReplaceCompMapList: TfmReplaceCompMapList
       Height = 14
       Alignment = taRightJustify
       Caption = 'Group'
+      FocusControl = comGroupName
     end
     object comGroupName: TComboBox
       Left = 56

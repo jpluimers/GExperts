@@ -98,6 +98,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           Height = 14
           Alignment = taRightJustify
           Caption = 'File extensions'
+          FocusControl = edtExtension
         end
         object lblMaxRecentFiles: TLabel
           Left = 171
@@ -106,6 +107,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           Height = 14
           Alignment = taRightJustify
           Caption = 'Max recent files'
+          FocusControl = edtMaxRecentFiles
         end
         object gbxCustomDirectory: TGroupBox
           Left = 173
@@ -264,6 +266,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 97
             Height = 14
             Caption = 'Default File Group'
+            FocusControl = cbxViewUnitType
           end
           object bvlRow: TBevel
             Left = 16
@@ -294,7 +297,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 22
             Style = csDropDownList
-            ItemHeight = 0
+            ItemHeight = 14
             TabOrder = 1
           end
           object cbxViewFormType: TComboBox
@@ -303,7 +306,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 22
             Style = csDropDownList
-            ItemHeight = 0
+            ItemHeight = 14
             TabOrder = 3
           end
           object chkOverrideOpenProject: TCheckBox
@@ -320,7 +323,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 22
             Style = csDropDownList
-            ItemHeight = 0
+            ItemHeight = 14
             TabOrder = 5
           end
         end
@@ -337,6 +340,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 94
             Height = 14
             Caption = 'Default file group'
+            FocusControl = cbxDefaultFileTypes
           end
           object cbxDefaultFileTypes: TComboBox
             Left = 136
@@ -344,7 +348,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Width = 160
             Height = 22
             Style = csDropDownList
-            ItemHeight = 0
+            ItemHeight = 14
             TabOrder = 1
           end
           object chkMatchAnywhere: TCheckBox

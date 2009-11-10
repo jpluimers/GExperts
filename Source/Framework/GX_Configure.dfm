@@ -690,6 +690,7 @@ object fmConfiguration: TfmConfiguration
             Height = 14
             Alignment = taRightJustify
             Caption = 'Every'
+            FocusControl = edtMinutes
           end
           object lblMinutes: TLabel
             Left = 121

@@ -148,6 +148,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
           Width = 64
           Height = 14
           Caption = 'Component'
+          FocusControl = cbxComponents
         end
         object lblProperty: TLabel
           Left = 8
@@ -155,6 +156,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
           Width = 47
           Height = 14
           Caption = 'Property'
+          FocusControl = cbxProperty
         end
         object lblValue: TLabel
           Left = 8
@@ -162,6 +164,7 @@ object fmSetComponentPropsConfig: TfmSetComponentPropsConfig
           Width = 30
           Height = 14
           Caption = 'Value'
+          FocusControl = edtValue
         end
         object cbxComponents: TComboBox
           Left = 80

@@ -59,6 +59,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Width = 33
           Height = 14
           Caption = 'Group'
+          FocusControl = cbxGroupName
         end
         object lblSourceComp: TLabel
           Left = 7
@@ -66,6 +67,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Width = 105
           Height = 14
           Caption = 'Source component'
+          FocusControl = cbxSourceClassName
         end
         object lblDestComp: TLabel
           Left = 7
@@ -73,6 +75,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Width = 128
           Height = 14
           Caption = 'Destination component'
+          FocusControl = cbxDestClassName
         end
         object lblSourceProp: TLabel
           Left = 167
@@ -80,6 +83,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Width = 89
           Height = 14
           Caption = 'Source property'
+          FocusControl = cbxSourcePropName
         end
         object lblDestProp: TLabel
           Left = 167
@@ -87,6 +91,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           Width = 112
           Height = 14
           Caption = 'Destination property'
+          FocusControl = cbxDestPropName
         end
         object cbxGroupName: TComboBox
           Left = 7

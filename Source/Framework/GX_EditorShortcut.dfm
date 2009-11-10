@@ -29,6 +29,7 @@ object fmEditorShortcut: TfmEditorShortcut
       Width = 48
       Height = 14
       Caption = '&Shortcut'
+      FocusControl = hkyShortCut
     end
     object hkyShortCut: THotKey
       Left = 9
