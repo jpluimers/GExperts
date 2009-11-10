@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Classes, Controls, Forms, ActnList, ImgList, Menus, ToolsAPI,
-  GX_GenericUtils;
+  GX_GenericUtils, Contnrs;
 
 // Returns the TObject represented by an IOTAComponent, if possible
 function GxOtaGetNativeObject(const AComponent: IOTAComponent): TObject;
@@ -213,6 +213,8 @@ procedure GxOtaFillUnitInfoListForCurrentProject(const List: TList);
 
 procedure GxOtaSelectComponentOnCurrentForm(const ComponentName: string);
 procedure GxOtaClearSelectionOnCurrentForm;
+procedure GxOtaGetSelectedComponents(Form: IOTAFormEditor; Components: TComponentList; ComponentClass: TComponentClass = nil);
+procedure GxOtaGetComponentList(Form: IOTAFormEditor; Components: TComponentList; ComponentClass: TComponentClass = nil);
 
 // Get a reference to the actual form instance being designed
 function GxOtaGetCurrentDesignForm: TCustomForm;
@@ -857,6 +859,67 @@ begin
       if Assigned(Designer) then
         if Assigned(PersistentForm) then
           Designer.SelectComponent(PersistentForm);
+    end;
+  end;
+end;
+
+procedure GxOtaGetSelectedComponents(Form: IOTAFormEditor; Components: TComponentList; ComponentClass: TComponentClass);
+var
+  i: Integer;
+  Component: IOTAComponent;
+  NativeComponent: TComponent;
+begin
+  Assert(Assigned(Components));
+  Components.Clear;
+  if Form = nil then
+    Form := GxOtaGetCurrentFormEditor;
+  if Assigned(Form) then
+  begin
+    for i := 0 to Form.GetSelCount - 1 do
+    begin
+      Component := Form.GetSelComponent(i);
+      NativeComponent := GxOtaGetNativeComponent(Component);
+      if Assigned(NativeComponent) then
+      begin
+        if (not Assigned(ComponentClass)) or (Assigned(ComponentClass) and (NativeComponent is ComponentClass)) then
+          Components.Add(NativeComponent);
+      end;
+    end;
+  end;
+end;
+
+procedure GxOtaGetComponentList(Form: IOTAFormEditor; Components: TComponentList; ComponentClass: TComponentClass = nil);
+
+  procedure GetControlsForParent(ParentControl: TWinControl);
+  var
+    j: Integer;
+    ChildControl: TControl;
+  begin
+    for j := 0 to ParentControl.ControlCount - 1 do
+    begin
+      ChildControl := ParentControl.Controls[j];
+      if (not Assigned(ComponentClass)) or (Assigned(ComponentClass) and (ChildControl is ComponentClass)) then
+        Components.Add(ChildControl);
+      if ChildControl is TWinControl then
+        GetControlsForParent(ChildControl as TWinControl);
+    end;
+  end;
+
+var
+  Root: TComponent;
+  RootControl: TWinControl;
+begin
+  Assert(Assigned(Components));
+  Components.Clear;
+  if Form = nil then
+    Form := GxOtaGetCurrentFormEditor;
+  if Assigned(Form) then
+  begin
+    Root := GxOtaGetNativeComponent(Form.GetRootComponent);
+    if Assigned(Root) and (Root is TWinControl) then
+    begin
+      RootControl := Root as TWinControl;
+      GetControlsForParent(RootControl);
     end;
   end;
 end;
