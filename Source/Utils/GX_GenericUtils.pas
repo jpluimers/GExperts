@@ -1233,7 +1233,7 @@ begin
   if Assigned(LoadedEncoding) then
     SaveToFile(FileName, LoadedEncoding)
   else
-    SaveToFile(FileName);
+    inherited SaveToFile(FileName);
 end;
 
 {$ELSE not UNICODE}
