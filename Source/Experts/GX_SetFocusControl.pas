@@ -5,9 +5,8 @@ interface
 implementation
 
 uses
-  Classes, ActnList, Menus, ToolsAPI, Controls, StdCtrls,
-  GX_Experts, GX_GExperts, GX_OtaUtils, Contnrs, SysUtils, Types, ExtCtrls,
-  ComCtrls;
+  Classes, ActnList, Menus, Windows, Controls, StdCtrls, Contnrs, Types,
+  Math, ToolsAPI, GX_Experts, GX_GExperts, GX_OtaUtils;
 
 type
   TGxSetFocusControlExpert = class(TGX_Expert)
@@ -22,12 +21,14 @@ type
     procedure Click(Sender: TObject); override;
   end;
 
+  TLabelHack = class(TCustomLabel);
+
 { TGxSetFocusControlExpert }
 
 constructor TGxSetFocusControlExpert.Create;
 begin
   inherited;
-  ShortCut := Menus.ShortCut(Word('A'), [ssCtrl, ssShift]);
+  //ShortCut := Menus.ShortCut(Word('F'), [ssShift, ssCtrl]);
 end;
 
 function TGxSetFocusControlExpert.GetActionCaption: string;
@@ -57,161 +58,126 @@ begin
   Action.Enabled := GxOtaCurrentlyEditingForm;
 end;
 
-type
-  TLabelCracker = class(TCustomLabel);
-
 procedure TGxSetFocusControlExpert.Click(Sender: TObject);
 var
   Form: IOTAFormEditor;
-  FirstSelected: Boolean;
+  FirstControlSelected: Boolean;
 
-  function CheckIntersect(Control: TWinControl; ControlRect: TRect; ALabel: TCustomLabel): Boolean;
+  procedure SetFocusControl(ALabel: TCustomLabel; AControl: TWinControl; Force: Boolean);
   var
-    Intersection: TRect;
-    LabelIntf: IOTAComponent;
+    OTALabel: IOTAComponent;
   begin
-    Result := IntersectRect(Intersection, ControlRect, ALabel.BoundsRect);
-    // Stop once we find the first label, even if it is already assigned
-    if Result and (not Assigned(TLabelCracker(ALabel).FocusControl)) then begin
-      TLabelCracker(ALabel).FocusControl := Control;
-      LabelIntf := Form.FindComponent(ALabel.Name);
-      if Assigned(LabelIntf) then
-      begin
-        if FirstSelected then
-          LabelIntf.Select(False)
-        else
-          LabelIntf.Select(True);
-      end;
-      FirstSelected := False;
+    if Force or (TLabelHack(ALabel).FocusControl = nil) then
+    begin
+      TLabelHack(ALabel).FocusControl := AControl;
+      OTALabel := Form.FindComponent(ALabel.Name);
+      if Assigned(OTALabel) then
+        OTALabel.Select(FirstControlSelected);
+      FirstControlSelected := True;
     end;
   end;
 
-var
-  SelLabel: TCustomLabel;
-  SelCtrl: TWinControl;
-  OTALabel: IOTAComponent;
-  ComponentList: TComponentList;
-  WinControls: TComponentList;
-  Labels: TComponentList;
-  ParentLabels: TComponentList;
-  i, j: Integer;
-  WinControl: TWinControl;
-  ControlLeftRect: TRect;
-  ControlUpRect: TRect;
-  FoundControl: Boolean;
-  SearchCount: Integer;
-label
-  SelWinControls;
-begin
-  FirstSelected := True;
-  Form := GxOtaGetCurrentFormEditor;
-  if Assigned(Form) then
+  function ProcessFixed: Boolean;
+  var
+    Component1, Component2: TComponent;
   begin
-    WinControls := nil;
-    Labels := nil;
-    ParentLabels := nil;
-    ComponentList := TComponentList.Create(False);
+    if Form.GetSelCount = 2 then
+    begin
+      Component1 := GxOtaGetNativeComponent(Form.GetSelComponent(0));
+      Component2 := GxOtaGetNativeComponent(Form.GetSelComponent(1));
+      if (Component1 is TCustomLabel) and (Component2 is TWinControl) then
+        SetFocusControl(TCustomLabel(Component1), TWinControl(Component2), True)
+      else if (Component2 is TCustomLabel) and (Component1 is TWinControl) then
+        SetFocusControl(TCustomLabel(Component2), TWinControl(Component1), True);
+    end;
+    Result := FirstControlSelected;
+  end;
+
+  function LabelDistance(ALabel: TCustomLabel; AControl: TWinControl): Integer;
+  begin
+    if (ALabel.Left > (AControl.Left + AControl.Width)) or (ALabel.Top > (AControl.Top + AControl.Height)) then
+      Result := MaxInt
+    else
+      Result := Max(Abs(AControl.Left - ALabel.Left), Abs(AControl.Top - ALabel.Top));
+  end;
+
+  function LabelInControlRange(ALabel: TCustomLabel; AControl: TWinControl): Boolean;
+  var
+    Intersection: TRect;
+    LeftRect, TopRect: TRect;
+  const
+    LeftDistLimit = 130;
+    TopDistLimit = 30;
+  begin
+    LeftRect := Rect(AControl.Left - LeftDistLimit, AControl.Top, AControl.Left, AControl.Top + AControl.Height);
+    TopRect := Rect(AControl.Left, AControl.Top - TopDistLimit, AControl.Left + AControl.Width, AControl.Top);
+    Result :=
+      IntersectRect(Intersection, ALabel.BoundsRect, LeftRect) or
+      IntersectRect(Intersection, ALabel.BoundsRect, TopRect);
+  end;
+
+  function FindNearestLabel(AControl: TWinControl; Labels: TComponentList;
+    out ResultLabel: TCustomLabel): Boolean;
+  var
+    LeastDistance, Distance: Integer;
+    i: Integer;
+    ALabel: TCustomLabel;
+  begin
+    ResultLabel := nil;
+    Result := False;
+    LeastDistance := MaxInt;
+    for i := 0 to Labels.Count - 1 do
+    begin
+      ALabel := TCustomLabel(Labels[i]);
+      if ALabel.Parent = AControl.Parent then
+      begin
+        Distance := LabelDistance(ALabel, AControl);
+        if LabelInControlRange(ALabel, AControl) and ((Distance < LeastDistance)
+          or ((Distance = LeastDistance) and Assigned(ResultLabel) and (ALabel.Top > ResultLabel.Top))) then
+        begin
+          LeastDistance := Distance;
+          ResultLabel := ALabel;
+          Result := True;
+        end;
+      end;
+    end;
+  end;
+
+  procedure ProcessAutomatic;
+  var
+    Labels, Controls: TComponentList;
+    Force: Boolean;
+    i: Integer;
+    ALabel: TCustomLabel;
+    AControl: TWinControl;
+  begin
+    Labels := TComponentList.Create(False);
+    Controls := TComponentList.Create(False);
     try
-      GxOtaGetSelectedComponents(Form, ComponentList);
-      if (ComponentList.Count < 1) or GxOtaSelectedComponentIsRoot(Form) then
-        raise Exception.Create('Please select either a TLabel and a TWinControl or a group of TWinControls.');
-      if (ComponentList.Count = 2) then
-      begin
-        if (ComponentList[0] is TCustomLabel) and (ComponentList[1] is TWinControl) then
-        begin
-          SelLabel := ComponentList[0] as TCustomLabel;
-          SelCtrl := ComponentList[1] as TWinControl;
-        end
-        else if (ComponentList[1] is TCustomLabel) and (ComponentList[0] is TWinControl) then
-        begin
-          SelLabel := ComponentList[1] as TCustomLabel;
-          SelCtrl := ComponentList[0] as TWinControl;
-        end
-        else 
-          goto SelWinControls;
-        if Assigned(SelLabel) and Assigned(SelCtrl) then
-        begin
-          TLabelCracker(SelLabel).FocusControl := SelCtrl;
-          OTALabel := Form.FindComponent(SelLabel.Name);
-          if Assigned(OTALabel) then
-            OTALabel.Select(False);
-        end;
-        Exit;
-      end;
-      // Assume the user has selected a group of TWinControls, and wants us
-      // to auto-set the FocusControl of the "nearest" label (left or above)
-      SelWinControls:
-      WinControls := TComponentList.Create(False);
-      Labels := TComponentList.Create(False);
-      ParentLabels := TComponentList.Create(False);
       GxOtaGetComponentList(Form, Labels, TCustomLabel);
-      GxOtaGetSelectedComponents(Form, WinControls, TWinControl);
-      for i := WinControls.Count - 1 downto 0 do
+      if (Form.GetSelCount = 0) or GxOtaSelectedComponentIsRoot(Form) then
+        GxOtaGetComponentList(Form, Controls, TWinControl)
+      else
+        GxOtaGetSelectedComponents(Form, Controls, TWinControl);
+      Force := GetKeyState(VK_SHIFT) < 0;
+      for i := 0 to Controls.Count - 1 do
       begin
-        // Ignore certain controls you likely don't want to be focused via a label accelerator
-        if (WinControls[i] is TGroupBox) or (WinControls[i] is TButtonControl) or
-           (WinControls[i] is TPanel) or (WinControls[i] is TProgressBar) or
-           (WinControls[i] is TRadioButton) then
-          WinControls.Delete(i);
-      end;
-      if (WinControls.Count > 0) and (Labels.Count > 0) then
-      begin
-        GxOtaClearSelectionOnCurrentForm;
-        for i := Labels.Count - 1 downto 0 do
-          if Assigned(TLabelCracker((Labels[i] as TCustomLabel)).FocusControl) then
-            Labels.Delete(i);
-        for i := 0 to WinControls.Count - 1 do
-        begin
-          FoundControl := False;
-          WinControl := WinControls[i] as TWinControl;
-          for j :=  0 to Labels.Count - 1 do
-            if (Labels[j] as TCustomLabel).Parent = WinControl.Parent then
-              ParentLabels.Add(Labels[j]);
-          ControlLeftRect := WinControl.BoundsRect;
-          ControlUpRect := WinControl.BoundsRect;
-          SearchCount := 0;
-          while ((ControlLeftRect.Left >= 0) or (ControlUpRect.Top >= 0)) and (SearchCount <= 200) do
-          begin
-            Inc(SearchCount);
-            if (ControlLeftRect.Left >= 0) then begin
-              for j := 0 to ParentLabels.Count - 1 do
-              begin
-                if CheckIntersect(WinControl, ControlLeftRect, ParentLabels[j] as TCustomLabel) then
-                begin
-                  FoundControl := True;
-                  Break; // for
-                end;
-              end;
-            end;
-            if FoundControl then
-              Break; // Next control
-            if (ControlUpRect.Top >= 0) and (SearchCount <= 40) then begin
-              for j := 0 to ParentLabels.Count - 1 do
-              begin
-                if CheckIntersect(WinControl, ControlUpRect, ParentLabels[j] as TCustomLabel) then
-                begin
-                  FoundControl := True;
-                  Break; // for
-                end;
-              end;
-            end;
-            if FoundControl then
-              Break; // Next control
-            ControlLeftRect.Left := ControlLeftRect.Left - 1; // Check BiDiMode here?
-            ControlUpRect.Top := ControlUpRect.Top - 1;
-          end;
-          ParentLabels.Clear;
-        end;
+        AControl := TWinControl(Controls[i]);
+        if AControl.TabStop and (not (AControl is TButtonControl)) then
+          if FindNearestLabel(AControl, Labels, ALabel) then
+            SetFocusControl(ALabel, AControl, Force);
       end;
     finally
-      FreeAndNil(ComponentList);
-      FreeAndNil(WinControls);
-      FreeAndNil(Labels);
-      FreeAndNil(ParentLabels);
+      Labels.Free;
+      Controls.Free;
     end;
-  end
-  else
-    raise Exception.Create('Please select a form designer');
+  end;
+
+begin
+  Form := GxOtaGetCurrentFormEditor;
+  FirstControlSelected := False;
+  if not ProcessFixed then
+    ProcessAutomatic;
 end;
 
 initialization
