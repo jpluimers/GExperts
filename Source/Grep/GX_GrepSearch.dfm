@@ -148,7 +148,7 @@ object fmGrepSearch: TfmGrepSearch
       Top = 119
       Width = 200
       Height = 17
-      Caption = 'Previous search &result files'
+      Caption = 'Pre&vious search result files'
       TabOrder = 5
       OnClick = rbDirectoriesClick
     end
