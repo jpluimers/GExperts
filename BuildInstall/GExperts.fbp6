@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VSXML>
-  <Object Class="TFBProject" XMLID="999999"><Property MultiValue="0" name="EncryptedEditPassword" type="string"></Property>
-    <Property MultiValue="1" name="Name" type="string"><![CDATA[Imported FB1 Project]]>
-      </Property>
+  <Object Class="TFBProject" XMLID="999999">
+    <Property MultiValue="0" name="EncryptedEditPassword" type="string"></Property>
+    <Property MultiValue="1" name="Name" type="string">
+      <![CDATA[Imported FB1 Project]]>
+    </Property>
     <Property MultiValue="0" name="ProjectAuthor" type="string"></Property>
     <Property MultiValue="0" name="ProjectID" type="string"></Property>
     <Property MultiValue="0" name="ProjectNotes" type="string"></Property>
@@ -10,15 +12,19 @@
     <Property MultiValue="0" name="SCCProjectName" type="string"></Property>
     <Property MultiValue="0" name="SCCProviderBinding" type="string"></Property>
     <Property MultiValue="0" name="SCCUserName" type="string"></Property>
-    <Object Class="TFBActionListCollection" XMLID="9999998"><Object Class="TFBActionList" XMLID="999997"><Property name="IsFailure" type="Boolean">False</Property>
+    <Object Class="TFBActionListCollection" XMLID="9999998">
+      <Object Class="TFBActionList" XMLID="999997">
+        <Property name="IsFailure" type="Boolean">False</Property>
         <Property name="IsMain" type="Boolean">True</Property>
         <Property MultiValue="0" name="Name" type="string">Main</Property>
         <Property MultiValue="0" name="UniqueID" type="string">{302BC699-C02F-405E-A0A6-211B5525BBF1}</Property>
-        <Object Class="TFBAction" XMLID="{82F12A4A-1BA5-49FA-8AAD-D64BDD89040D}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
+        <Object Class="TFBAction" XMLID="{82F12A4A-1BA5-49FA-8AAD-D64BDD89040D}">
+          <Property MultiValue="0" name="ActionComment" type="string"></Property>
           <Property MultiValue="0" name="ActionDescription" type="string">Project</Property>
           <Property name="ActionTextColor" type="Cardinal">0</Property>
           <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
           <Property MultiValue="0" name="Description" type="string">Project</Property>
+          <Property name="DoNotValidateAction" type="Boolean">False</Property>
           <Property name="Enabled" type="WordBool">True</Property>
           <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
           <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -29,13 +35,17 @@
           <Property name="PauseInterval" type="Cardinal">0</Property>
           <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
           <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-          <Object Class="TGroupAction" XMLID="{876C51CA-782C-4983-AA68-5FD157A1069C}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Pre-Compile Setup]]>
-              </Property>
+          <Object Class="TGroupAction" XMLID="{876C51CA-782C-4983-AA68-5FD157A1069C}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Pre-Compile Setup]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Pre-Compile Setup]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Pre-Compile Setup]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -46,13 +56,17 @@
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TWindowExistsAction" XMLID="{FE07BF27-0F32-4A49-8426-492E92BDC47B}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Check for Delphi 6]]>
-                </Property>
+            <Object Class="TWindowExistsAction" XMLID="{FE07BF27-0F32-4A49-8426-492E92BDC47B}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Check for Delphi 6]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Check for Delphi 6]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Check for Delphi 6]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExistsCondition" type="TWindowExistsCondition">wecExists</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
@@ -64,17 +78,22 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property MultiValue="1" name="WindowCaption" type="string"><![CDATA[Delphi 6]]>
-                </Property>
+              <Property MultiValue="1" name="WindowCaption" type="string">
+                <![CDATA[Delphi 6]]>
+              </Property>
               <Property MultiValue="0" name="WindowClass" type="string">TApplication</Property>
-              </Object>
-            <Object Class="TWindowExistsAction" XMLID="{B96EF93E-DC8E-4081-A9BB-8E6A0F211D66}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Check for Delphi 7]]>
-                </Property>
+            </Object>
+            <Object Class="TWindowExistsAction" XMLID="{B96EF93E-DC8E-4081-A9BB-8E6A0F211D66}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Check for Delphi 7]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Check for Delphi 7]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Check for Delphi 7]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExistsCondition" type="TWindowExistsCondition">wecExists</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
@@ -86,17 +105,22 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property MultiValue="1" name="WindowCaption" type="string"><![CDATA[Delphi 7]]>
-                </Property>
+              <Property MultiValue="1" name="WindowCaption" type="string">
+                <![CDATA[Delphi 7]]>
+              </Property>
               <Property MultiValue="0" name="WindowClass" type="string">TApplication</Property>
-              </Object>
-            <Object Class="TWindowExistsAction" XMLID="{83A551D7-B8C9-46FD-A744-E3124FBF1180}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Check for Delphi 8]]>
-                </Property>
+            </Object>
+            <Object Class="TWindowExistsAction" XMLID="{83A551D7-B8C9-46FD-A744-E3124FBF1180}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Check for Delphi 8]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Check for Delphi 8]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Check for Delphi 8]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExistsCondition" type="TWindowExistsCondition">wecExists</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
@@ -108,17 +132,22 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property MultiValue="1" name="WindowCaption" type="string"><![CDATA[Borland Delphi 8.0 for the Microsoft .NET Framework]]>
-                </Property>
+              <Property MultiValue="1" name="WindowCaption" type="string">
+                <![CDATA[Borland Delphi 8.0 for the Microsoft .NET Framework]]>
+              </Property>
               <Property MultiValue="0" name="WindowClass" type="string">TApplication</Property>
-              </Object>
-            <Object Class="TWindowExistsAction" XMLID="{F4E46538-1FCF-46C1-89C0-8946D0652683}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Check for BCB 6]]>
-                </Property>
+            </Object>
+            <Object Class="TWindowExistsAction" XMLID="{F4E46538-1FCF-46C1-89C0-8946D0652683}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Check for BCB 6]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Check for BCB 6]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Check for BCB 6]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExistsCondition" type="TWindowExistsCondition">wecExists</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
@@ -130,17 +159,22 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property MultiValue="1" name="WindowCaption" type="string"><![CDATA[C++Builder 6]]>
-                </Property>
+              <Property MultiValue="1" name="WindowCaption" type="string">
+                <![CDATA[C++Builder 6]]>
+              </Property>
               <Property MultiValue="0" name="WindowClass" type="string">TApplication</Property>
-              </Object>
-            <Object Class="TFBFileSetDefineAction" XMLID="{1CB2CAFF-2067-4829-8833-697B6621989A}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Locate All Forms]]>
-                </Property>
+            </Object>
+            <Object Class="TFBFileSetDefineAction" XMLID="{1CB2CAFF-2067-4829-8833-697B6621989A}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Locate All Forms]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Locate All Forms]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Locate All Forms]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFiles" type="Boolean">False</Property>
@@ -155,7 +189,8 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Object Class="TFBFileSetObject" XMLID="{1D77E0FF-F022-47BB-B0B8-9E2EE61C4275}"><Property MultiValue="0" name="BaseDirectory" type="string">%GXSourceDir%</Property>
+              <Object Class="TFBFileSetObject" XMLID="{1D77E0FF-F022-47BB-B0B8-9E2EE61C4275}">
+                <Property MultiValue="0" name="BaseDirectory" type="string">%GXSourceDir%</Property>
                 <Property name="ExcludePatternList" type="IFBFileSetPatternList" XMLID="{462B383B-F5EB-40D6-9B03-355AD1383B57}"/>
                 <Property name="FilterList" type="IFBFileSetFilterList" XMLID="{41C68700-59C7-43D4-8B8E-4B94FBE54629}"/>
                 <Property MultiValue="0" name="Name" type="WideString">AllForms</Property>
@@ -165,28 +200,36 @@
                 <Property name="RecurseHiddenSystem" type="Boolean">False</Property>
                 <Property name="SortAscending" type="Boolean">False</Property>
                 <Property name="SortBy" type="TFileSetSorting">fsNone</Property>
-                <Object Class="TFBFileSetPatternList" XMLID="{10E42B6E-EE01-4075-B805-0C7A266C8567}"><Property MultiValue="0" name="Name" type="string">PATTERNLIST</Property>
-                  <Object Class="TFBFileSetPattern" XMLID="{5247337D-3A06-4E75-A0BC-4630B300ED29}"><Property MultiValue="1" name="Comment" type="string"><![CDATA[VCL Forms]]>
-                      </Property>
+                <Object Class="TFBFileSetPatternList" XMLID="{10E42B6E-EE01-4075-B805-0C7A266C8567}">
+                  <Property MultiValue="0" name="Name" type="string">PATTERNLIST</Property>
+                  <Object Class="TFBFileSetPattern" XMLID="{5247337D-3A06-4E75-A0BC-4630B300ED29}">
+                    <Property MultiValue="1" name="Comment" type="string">
+                      <![CDATA[VCL Forms]]>
+                    </Property>
                     <Property name="DirectoriesOnly" type="Boolean">False</Property>
                     <Property MultiValue="0" name="Item" type="string">*.dfm</Property>
                     <Property name="Recurse" type="Boolean">False</Property>
-                    </Object>
                   </Object>
-                <Object Class="TFBFileSetPatternList" XMLID="{462B383B-F5EB-40D6-9B03-355AD1383B57}"><Property MultiValue="0" name="Name" type="string">EXCLUDEPATTERNLIST</Property>
-                  </Object>
-                <Object Class="TFBFileSetFilterList" XMLID="{41C68700-59C7-43D4-8B8E-4B94FBE54629}"/>
                 </Object>
+                <Object Class="TFBFileSetPatternList" XMLID="{462B383B-F5EB-40D6-9B03-355AD1383B57}">
+                  <Property MultiValue="0" name="Name" type="string">EXCLUDEPATTERNLIST</Property>
+                </Object>
+                <Object Class="TFBFileSetFilterList" XMLID="{41C68700-59C7-43D4-8B8E-4B94FBE54629}"/>
               </Object>
-            <Object Class="TFBTextFindAction" XMLID="{4E66EB20-425A-42AD-843F-CE7D51B589AF}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Verify Delphi 6 Compatibility in All Forms]]>
-                </Property>
+            </Object>
+            <Object Class="TFBTextFindAction" XMLID="{4E66EB20-425A-42AD-843F-CE7D51B589AF}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Verify Delphi 6 Compatibility in All Forms]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaseSensitive" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Verify Delphi 6 Compatibility in All Forms]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Verify Delphi 6 Compatibility in All Forms]]>
+              </Property>
               <Property MultiValue="0" name="DestinationFile" type="string"></Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="ExpandVarsWhenReplacing" type="Boolean">True</Property>
@@ -216,17 +259,21 @@
               <Property name="UseVariable" type="Boolean">False</Property>
               <Property name="WholeLinesOnly" type="Boolean">False</Property>
               <Property name="WholeWords" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDeleteDirectoryAction" XMLID="{EAD5A95F-E6C6-4856-97E8-429EC36CEFBE}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete Output Directory]]>
-                </Property>
+            </Object>
+            <Object Class="TDeleteDirectoryAction" XMLID="{EAD5A95F-E6C6-4856-97E8-429EC36CEFBE}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete Output Directory]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
               <Property name="DeleteTree" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete Output Directory]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete Output Directory]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableDelay" type="Boolean">False</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
@@ -241,14 +288,18 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TCreateDirectoryAction" XMLID="{B1D92CF6-E023-4806-AB2D-E6264D3E8FC8}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Make Output Directory]]>
-                </Property>
+            </Object>
+            <Object Class="TCreateDirectoryAction" XMLID="{B1D92CF6-E023-4806-AB2D-E6264D3E8FC8}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Make Output Directory]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Make Output Directory]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Make Output Directory]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property MultiValue="0" name="FileOrDirectory" type="WideString">%SetupOutput%</Property>
@@ -261,10 +312,12 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="THM3Action" XMLID="{1373F68F-F92D-4CA0-AB7D-0B8CAA7F3C81}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Help File]]>
-                </Property>
+            </Object>
+            <Object Class="THM3Action" XMLID="{1373F68F-F92D-4CA0-AB7D-0B8CAA7F3C81}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Help File]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property MultiValue="0" name="BrowserHelpFile" type="string"></Property>
@@ -276,8 +329,10 @@
               <Property name="CompilePDF" type="Boolean">False</Property>
               <Property name="CompileRTF" type="Boolean">False</Property>
               <Property name="CompileWinHelp" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Help File]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Help File]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="DontClose" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property MultiValue="0" name="ErrorLogFile" type="string"></Property>
@@ -309,15 +364,19 @@
               <Property MultiValue="0" name="VariablesFile" type="string"></Property>
               <Property MultiValue="0" name="WinHelpFile" type="string"></Property>
               <Property name="WinHelpOpt" type="Integer">8</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{C101AECA-1D1D-4641-B561-531415365674}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delphi 6]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{C101AECA-1D1D-4641-B561-531415365674}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 6]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delphi 6]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 6]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -328,15 +387,19 @@
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TDeleteFilesAction" XMLID="{208E4E02-02CB-4E8B-A030-9ED4D3DDADF1}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsD6.dll]]>
-                </Property>
+            <Object Class="TDeleteFilesAction" XMLID="{208E4E02-02CB-4E8B-A030-9ED4D3DDADF1}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsD6.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsD6.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsD6.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -349,10 +412,12 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDelphiCompilerAction" XMLID="{C60792AC-3676-4B74-B58C-088D39FE331D}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Delphi 6]]>
-                </Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{C60792AC-3676-4B74-B58C-088D39FE331D}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Delphi 6]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AllowImplicitImport" type="Boolean">True</Property>
@@ -365,12 +430,15 @@
               <Property name="CompilerVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Delphi 6]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Delphi 6]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property MultiValue="1" name="ExtraCommandline" type="WideString"><![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
-                </Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -408,7 +476,8 @@
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
-              <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 6
 FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 6
@@ -417,40 +486,46 @@ ProductName=GExperts for Delphi 6
 Comments=Open Source
 Compile Date=Saturday, October 06, 2001 3:07 PM
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
               <Property name="WarningsAsError" type="Boolean">True</Property>
               <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
-              <Object Class="TBuildScript" XMLID="{14C05969-E9BC-46ED-B34B-57CB431E5ED2}"><Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+              <Object Class="TBuildScript" XMLID="{14C05969-E9BC-46ED-B34B-57CB431E5ED2}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
                 <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
-                <Property MultiValue="1" name="Script" type="string"><![CDATA[Action.MajorVersion = MajorVersion
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
 Action.MinorVersion = MinorVersion
 Action.ReleaseVersion = ReleaseVersion
 Action.BuildVersion = BuildVersion
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
-                </Object>
-              <Object Class="TDelphiCompilerOptions" XMLID="{B109C4C6-9FCA-4032-B507-E0658741FD77}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{B109C4C6-9FCA-4032-B507-E0658741FD77}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
                 <Property name="AlwaysUseDOFSearchPath" type="WordBool">True</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
                 <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
-                <Property name="CompilerWarnings" type="TStrings"><![CDATA[-w-UNSAFE_TYPE=0
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-UNSAFE_TYPE=0
 -w-UNSAFE_CODE=0
 -w-UNSAFE_CAST=0
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
                 <Property name="ConsoleApp" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
                 <Property name="DebugInfo" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
                 <Property name="DefinitionsOnly" type="WordBool">False</Property>
-                <Property MultiValue="1" name="ExeDescription" type="WideString"><![CDATA[GExperts for Delphi 6]]>
-                  </Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for Delphi 6]]>
+                </Property>
                 <Property name="ExportAllSymbols" type="WordBool">False</Property>
                 <Property name="ExtendedSyntax" type="WordBool">True</Property>
                 <Property name="GenerateDocumentation" type="Boolean">False</Property>
@@ -489,16 +564,20 @@ Action.BuildVersion = BuildVersion
                 <Property name="UseDebugDCU" type="WordBool">False</Property>
                 <Property name="UsePackages" type="WordBool">True</Property>
                 <Property name="VarStringChecks" type="WordBool">True</Property>
-                </Object>
               </Object>
-            <Object Class="TRunProgramAction" XMLID="{56F2AC19-2648-45C7-93CC-C60A93784EA1}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build Delphi 6 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{56F2AC19-2648-45C7-93CC-C60A93784EA1}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build Delphi 6 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build Delphi 6 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build Delphi 6 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -519,8 +598,9 @@ Action.BuildVersion = BuildVersion
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dDelphi6 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dDelphi6 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -535,15 +615,19 @@ Action.BuildVersion = BuildVersion
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{20C77EDF-3B2C-4BB7-A325-039FC9079EC7}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move Delphi 6 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{20C77EDF-3B2C-4BB7-A325-039FC9079EC7}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move Delphi 6 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move Delphi 6 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move Delphi 6 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -563,15 +647,19 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXD6-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{756A7F4F-4978-4312-B2FF-0359964B4FFA}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delphi 7]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{756A7F4F-4978-4312-B2FF-0359964B4FFA}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 7]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delphi 7]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 7]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -582,15 +670,19 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TDeleteFilesAction" XMLID="{F5CCE79E-7F1A-4979-B273-269D9022581E}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsD7.dll]]>
-                </Property>
+            <Object Class="TDeleteFilesAction" XMLID="{F5CCE79E-7F1A-4979-B273-269D9022581E}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsD7.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsD7.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsD7.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -603,10 +695,12 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDelphiCompilerAction" XMLID="{C91FCDE4-7DF9-4167-8416-99FF4779AE56}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Delphi 7]]>
-                </Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{C91FCDE4-7DF9-4167-8416-99FF4779AE56}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Delphi 7]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AllowImplicitImport" type="Boolean">True</Property>
@@ -619,12 +713,15 @@ Action.BuildVersion = BuildVersion
               <Property name="CompilerVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Delphi 7]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Delphi 7]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property MultiValue="1" name="ExtraCommandline" type="WideString"><![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
-                </Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -662,7 +759,8 @@ Action.BuildVersion = BuildVersion
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
-              <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 7
 FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 7
@@ -671,40 +769,46 @@ ProductName=GExperts for Delphi 7
 Comments=Open Source
 Compile Date=Saturday, October 06, 2001 3:07 PM
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
               <Property name="WarningsAsError" type="Boolean">True</Property>
               <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
-              <Object Class="TBuildScript" XMLID="{D2936527-E828-4E5C-AD2D-3E084063AB50}"><Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+              <Object Class="TBuildScript" XMLID="{D2936527-E828-4E5C-AD2D-3E084063AB50}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
                 <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
-                <Property MultiValue="1" name="Script" type="string"><![CDATA[Action.MajorVersion = MajorVersion
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
 Action.MinorVersion = MinorVersion
 Action.ReleaseVersion = ReleaseVersion
 Action.BuildVersion = BuildVersion
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
-                </Object>
-              <Object Class="TDelphiCompilerOptions" XMLID="{B0B46522-A2A0-4CC8-B537-E1D13F22075D}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{B0B46522-A2A0-4CC8-B537-E1D13F22075D}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
                 <Property name="AlwaysUseDOFSearchPath" type="WordBool">True</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
                 <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
-                <Property name="CompilerWarnings" type="TStrings"><![CDATA[-w-UNSAFE_TYPE=0
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-UNSAFE_TYPE=0
 -w-UNSAFE_CODE=0
 -w-UNSAFE_CAST=0
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
                 <Property name="ConsoleApp" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
                 <Property name="DebugInfo" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
                 <Property name="DefinitionsOnly" type="WordBool">False</Property>
-                <Property MultiValue="1" name="ExeDescription" type="WideString"><![CDATA[GExperts for Delphi 7]]>
-                  </Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for Delphi 7]]>
+                </Property>
                 <Property name="ExportAllSymbols" type="WordBool">False</Property>
                 <Property name="ExtendedSyntax" type="WordBool">True</Property>
                 <Property name="GenerateDocumentation" type="Boolean">False</Property>
@@ -743,16 +847,20 @@ Action.BuildVersion = BuildVersion
                 <Property name="UseDebugDCU" type="WordBool">False</Property>
                 <Property name="UsePackages" type="WordBool">True</Property>
                 <Property name="VarStringChecks" type="WordBool">True</Property>
-                </Object>
               </Object>
-            <Object Class="TRunProgramAction" XMLID="{ED2EE2EA-C1C1-49E5-BEBD-9C2B63521518}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build Delphi 7 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{ED2EE2EA-C1C1-49E5-BEBD-9C2B63521518}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build Delphi 7 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build Delphi 7 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build Delphi 7 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -773,8 +881,9 @@ Action.BuildVersion = BuildVersion
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dDelphi7 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dDelphi7 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -789,15 +898,19 @@ Action.BuildVersion = BuildVersion
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{F0125A6F-9138-4FC1-96F1-A2404244CFEE}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move Delphi 7 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{F0125A6F-9138-4FC1-96F1-A2404244CFEE}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move Delphi 7 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move Delphi 7 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move Delphi 7 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -817,15 +930,19 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXD7-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{58572BFF-6592-4133-8772-1F0269FEB60D}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delphi 8]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{58572BFF-6592-4133-8772-1F0269FEB60D}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 8]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delphi 8]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 8]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -836,14 +953,18 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TFBPropertySetDefineAction" XMLID="{5AAB89A6-838F-4166-B380-0C09D5C4B7A4}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[PropertySet define [ GExpertsVersion ]]]>
-                </Property>
+            <Object Class="TFBPropertySetDefineAction" XMLID="{5AAB89A6-838F-4166-B380-0C09D5C4B7A4}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[PropertySet define [ GExpertsVersion ]]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
-              <Property name="ExcludedProperties" type="TStrings"><![CDATA[]]>
-                </Property>
+              <Property name="ExcludedProperties" type="TStrings">
+                <![CDATA[]]>
+              </Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
@@ -854,7 +975,8 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="0" name="PropertySetName" type="string">GExpertsVersion</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Object Class="TFBWin32VersionInfoPropertySet" XMLID="{FA6B2A29-EC3F-45D2-AA8F-D37EA4B1AC05}"><Property name="BuildVersion" type="Integer">0</Property>
+              <Object Class="TFBWin32VersionInfoPropertySet" XMLID="{FA6B2A29-EC3F-45D2-AA8F-D37EA4B1AC05}">
+                <Property name="BuildVersion" type="Integer">0</Property>
                 <Property MultiValue="0" name="CompanyName" type="string"></Property>
                 <Property MultiValue="0" name="CompileDate" type="string"></Property>
                 <Property name="DebugBuild" type="Boolean">False</Property>
@@ -875,13 +997,16 @@ Action.BuildVersion = BuildVersion
                 <Property name="ReleaseVersion" type="Integer">0</Property>
                 <Property name="SpecialBuild" type="Boolean">False</Property>
                 <Property MultiValue="0" name="SpecialBuildDetails" type="string"></Property>
-                </Object>
               </Object>
-            <Object Class="TFBPropertySetSetValuesAction" XMLID="{AE16505D-192E-492D-80A1-03C650639ABD}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[PropertySet assign properties [ GExpertsVersion ]]]>
-                </Property>
+            </Object>
+            <Object Class="TFBPropertySetSetValuesAction" XMLID="{AE16505D-192E-492D-80A1-03C650639ABD}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[PropertySet assign properties [ GExpertsVersion ]]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -892,7 +1017,8 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="PropertySetName" type="string">GExpertsVersion</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
-              <Property name="SetValuesTo" type="TStrings"><![CDATA[%BuildVersion%
+              <Property name="SetValuesTo" type="TStrings">
+                <![CDATA[%BuildVersion%
 Erik Berry and the GExperts Development Team
 
 
@@ -913,9 +1039,10 @@ GExperts IDE Addin
 
 
 ]]>
-                </Property>
+              </Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              <Property name="ValuesToSet" type="TStrings"><![CDATA[BuildVersion=-1
+              <Property name="ValuesToSet" type="TStrings">
+                <![CDATA[BuildVersion=-1
 CompanyName=-1
 CompileDate=0
 DebugBuild=0
@@ -936,14 +1063,17 @@ ReleaseVersion=-1
 SpecialBuild=0
 SpecialBuildDetails=0
 ]]>
-                </Property>
-              </Object>
-            <Object Class="TFBVersionInfoUpdaterAction" XMLID="{1B1BCDD6-0F46-4E9F-A796-432F8C926CA6}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Win32 Version Info Updater]]>
-                </Property>
+              </Property>
+            </Object>
+            <Object Class="TFBVersionInfoUpdaterAction" XMLID="{1B1BCDD6-0F46-4E9F-A796-432F8C926CA6}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Win32 Version Info Updater]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AutoUpdateFileVersion" type="Boolean">False</Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -953,7 +1083,8 @@ SpecialBuildDetails=0
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
-              <Property name="PropertiesToUpdate" type="TStrings"><![CDATA[BuildVersion=-1
+              <Property name="PropertiesToUpdate" type="TStrings">
+                <![CDATA[BuildVersion=-1
 CompanyName=-1
 CompileDate=0
 DebugBuild=0
@@ -974,22 +1105,26 @@ ReleaseVersion=-1
 SpecialBuild=0
 SpecialBuildDetails=0
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="PropertySetName" type="string">GExpertsVersion</Property>
               <Property MultiValue="0" name="ResourceFile" type="string">%GXSourceDir%\GExpertsD8.rc</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateProductVersion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TDeleteFilesAction" XMLID="{CA804840-2E94-440E-8F8C-E7831E713B3E}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsD8.dll]]>
-                </Property>
+            </Object>
+            <Object Class="TDeleteFilesAction" XMLID="{CA804840-2E94-440E-8F8C-E7831E713B3E}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsD8.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsD8.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsD8.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -1002,15 +1137,19 @@ SpecialBuildDetails=0
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TBorlandResourceCompilerAction" XMLID="{A86F5B79-9BDC-42EF-A3F3-063DB598FEF1}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Resource (GExpertsD8.rc)]]>
-                </Property>
+            </Object>
+            <Object Class="TBorlandResourceCompilerAction" XMLID="{A86F5B79-9BDC-42EF-A3F3-063DB598FEF1}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Resource (GExpertsD8.rc)]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CompilerVersion" type="Integer">4</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Resource (GExpertsD8.rc)]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Resource (GExpertsD8.rc)]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableMBCS" type="WordBool">False</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
@@ -1027,16 +1166,20 @@ SpecialBuildDetails=0
               <Property MultiValue="0" name="ScriptFile" type="WideString">%GXSourceDir%\GExpertsD8.rc</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="VerboseOutput" type="WordBool">False</Property>
-              </Object>
-            <Object Class="TRunDosCMDAction" XMLID="{E7C9ACB6-357B-4111-A349-B6BFC9C58329}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Delphi 8 (BuiildDelphi8.bat)]]>
-                </Property>
+            </Object>
+            <Object Class="TRunDosCMDAction" XMLID="{E7C9ACB6-357B-4111-A349-B6BFC9C58329}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Delphi 8 (BuiildDelphi8.bat)]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
               <Property MultiValue="0" name="Command" type="WideString">%GXInstallDir%\CompileDelphi8.bat</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Delphi 8 (BuiildDelphi8.bat)]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Delphi 8 (BuiildDelphi8.bat)]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">False</Property>
@@ -1071,15 +1214,19 @@ SpecialBuildDetails=0
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TRunProgramAction" XMLID="{B3A3D0F4-759B-48FB-BD1E-7DEDF83DDA2B}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build Delphi 8 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{B3A3D0F4-759B-48FB-BD1E-7DEDF83DDA2B}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build Delphi 8 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build Delphi 8 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build Delphi 8 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -1100,8 +1247,9 @@ SpecialBuildDetails=0
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dDelphi8 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dDelphi8 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -1116,15 +1264,19 @@ SpecialBuildDetails=0
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{9E32B1BA-E09D-4656-A595-F3FFE244FA6F}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move Delphi 8 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{9E32B1BA-E09D-4656-A595-F3FFE244FA6F}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move Delphi 8 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move Delphi 8 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move Delphi 8 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -1144,15 +1296,19 @@ SpecialBuildDetails=0
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXD8-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{4A2A8B11-2250-483A-A285-1AA2D70D0F4E}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delphi 2005]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{4A2A8B11-2250-483A-A285-1AA2D70D0F4E}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 2005]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delphi 2005]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 2005]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -1163,15 +1319,19 @@ SpecialBuildDetails=0
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TDeleteFilesAction" XMLID="{3D8234CB-5859-4073-B6C0-A681F537CAF5}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsDelphi2005.dll]]>
-                </Property>
+            <Object Class="TDeleteFilesAction" XMLID="{3D8234CB-5859-4073-B6C0-A681F537CAF5}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsDelphi2005.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsDelphi2005.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsDelphi2005.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -1184,10 +1344,12 @@ SpecialBuildDetails=0
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDelphiCompilerAction" XMLID="{EC6CACC0-5FC4-4343-8B0C-2A8A5C877974}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Delphi 2005]]>
-                </Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{EC6CACC0-5FC4-4343-8B0C-2A8A5C877974}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Delphi 2005]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AllowImplicitImport" type="Boolean">True</Property>
@@ -1200,12 +1362,15 @@ SpecialBuildDetails=0
               <Property name="CompilerVersion" type="Integer">10</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Delphi 2005]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Delphi 2005]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property MultiValue="1" name="ExtraCommandline" type="WideString"><![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
-                </Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -1243,7 +1408,8 @@ SpecialBuildDetails=0
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
-              <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 9
 FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 9
@@ -1252,40 +1418,46 @@ ProductName=GExperts for Delphi 9
 Comments=Open Source
 Compile Date=Saturday, October 06, 2001 3:07 PM
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
               <Property name="WarningsAsError" type="Boolean">True</Property>
               <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
-              <Object Class="TBuildScript" XMLID="{EA3A1130-EF3F-47CB-BB11-D5254EB662A9}"><Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+              <Object Class="TBuildScript" XMLID="{EA3A1130-EF3F-47CB-BB11-D5254EB662A9}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
                 <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
-                <Property MultiValue="1" name="Script" type="string"><![CDATA[Action.MajorVersion = MajorVersion
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
 Action.MinorVersion = MinorVersion
 Action.ReleaseVersion = ReleaseVersion
 Action.BuildVersion = BuildVersion
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
-                </Object>
-              <Object Class="TDelphiCompilerOptions" XMLID="{BCDF2166-31E5-48D8-B01D-EBCC1C9112F3}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{BCDF2166-31E5-48D8-B01D-EBCC1C9112F3}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
                 <Property name="AlwaysUseDOFSearchPath" type="WordBool">True</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
                 <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
-                <Property name="CompilerWarnings" type="TStrings"><![CDATA[-w-UNSAFE_TYPE=0
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-UNSAFE_TYPE=0
 -w-UNSAFE_CODE=0
 -w-UNSAFE_CAST=0
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
                 <Property name="ConsoleApp" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
                 <Property name="DebugInfo" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
                 <Property name="DefinitionsOnly" type="WordBool">False</Property>
-                <Property MultiValue="1" name="ExeDescription" type="WideString"><![CDATA[GExperts for Delphi 9]]>
-                  </Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for Delphi 9]]>
+                </Property>
                 <Property name="ExportAllSymbols" type="WordBool">False</Property>
                 <Property name="ExtendedSyntax" type="WordBool">True</Property>
                 <Property name="GenerateDocumentation" type="Boolean">False</Property>
@@ -1324,16 +1496,20 @@ Action.BuildVersion = BuildVersion
                 <Property name="UseDebugDCU" type="WordBool">False</Property>
                 <Property name="UsePackages" type="WordBool">True</Property>
                 <Property name="VarStringChecks" type="WordBool">True</Property>
-                </Object>
               </Object>
-            <Object Class="TRunProgramAction" XMLID="{B342B142-0220-44AC-BC6B-4347FD33A7EF}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build Delphi 2005 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{B342B142-0220-44AC-BC6B-4347FD33A7EF}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build Delphi 2005 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build Delphi 2005 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build Delphi 2005 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -1354,8 +1530,9 @@ Action.BuildVersion = BuildVersion
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dDelphi2005 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dDelphi2005 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -1370,15 +1547,19 @@ Action.BuildVersion = BuildVersion
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{4B236A7D-6F22-4504-ABDC-1A4FB4DA3866}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move Delphi 2005 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{4B236A7D-6F22-4504-ABDC-1A4FB4DA3866}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move Delphi 2005 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move Delphi 2005 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move Delphi 2005 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -1398,15 +1579,19 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXDelphi2005-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{5C6D0818-33A1-473C-A3CE-62DE2CF4BA28}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[BDS 2006]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{5C6D0818-33A1-473C-A3CE-62DE2CF4BA28}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[BDS 2006]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[BDS 2006]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[BDS 2006]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -1417,15 +1602,19 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TDeleteFilesAction" XMLID="{34525DB1-74ED-41AD-A44E-99925B5FA3F4}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsBDS2006.dll]]>
-                </Property>
+            <Object Class="TDeleteFilesAction" XMLID="{34525DB1-74ED-41AD-A44E-99925B5FA3F4}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsBDS2006.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsBDS2006.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsBDS2006.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -1438,10 +1627,12 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDelphiCompilerAction" XMLID="{10D001CD-9F47-4B87-8AF9-60A92A5553D0}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile BDS 2006]]>
-                </Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{10D001CD-9F47-4B87-8AF9-60A92A5553D0}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile BDS 2006]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AllowImplicitImport" type="Boolean">True</Property>
@@ -1454,12 +1645,15 @@ Action.BuildVersion = BuildVersion
               <Property name="CompilerVersion" type="Integer">11</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile BDS 2006]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile BDS 2006]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property MultiValue="1" name="ExtraCommandline" type="WideString"><![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
-                </Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -1497,7 +1691,8 @@ Action.BuildVersion = BuildVersion
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
-              <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for BDS 2006
 FileVersion=1.3.3.0
 InternalName=GExperts for BDS 2006
@@ -1506,40 +1701,46 @@ ProductName=GExperts for BDS 2006
 Comments=Open Source
 Compile Date=Saturday, October 06, 2001 3:07 PM
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
               <Property name="WarningsAsError" type="Boolean">True</Property>
               <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
-              <Object Class="TBuildScript" XMLID="{F573B76B-6107-4028-B3A5-58C99C2CEFDB}"><Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+              <Object Class="TBuildScript" XMLID="{F573B76B-6107-4028-B3A5-58C99C2CEFDB}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
                 <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
-                <Property MultiValue="1" name="Script" type="string"><![CDATA[Action.MajorVersion = MajorVersion
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
 Action.MinorVersion = MinorVersion
 Action.ReleaseVersion = ReleaseVersion
 Action.BuildVersion = BuildVersion
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
-                </Object>
-              <Object Class="TDelphiCompilerOptions" XMLID="{4B87E0D2-5272-4659-A28E-30F09A585365}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{4B87E0D2-5272-4659-A28E-30F09A585365}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
                 <Property name="AlwaysUseDOFSearchPath" type="WordBool">True</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
                 <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
-                <Property name="CompilerWarnings" type="TStrings"><![CDATA[-w-UNSAFE_TYPE=0
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-UNSAFE_TYPE=0
 -w-UNSAFE_CODE=0
 -w-UNSAFE_CAST=0
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
                 <Property name="ConsoleApp" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
                 <Property name="DebugInfo" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
                 <Property name="DefinitionsOnly" type="WordBool">False</Property>
-                <Property MultiValue="1" name="ExeDescription" type="WideString"><![CDATA[GExperts for BDS 2006]]>
-                  </Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for BDS 2006]]>
+                </Property>
                 <Property name="ExportAllSymbols" type="WordBool">False</Property>
                 <Property name="ExtendedSyntax" type="WordBool">True</Property>
                 <Property name="GenerateDocumentation" type="Boolean">False</Property>
@@ -1578,16 +1779,20 @@ Action.BuildVersion = BuildVersion
                 <Property name="UseDebugDCU" type="WordBool">False</Property>
                 <Property name="UsePackages" type="WordBool">True</Property>
                 <Property name="VarStringChecks" type="WordBool">True</Property>
-                </Object>
               </Object>
-            <Object Class="TRunProgramAction" XMLID="{C2A9D905-EC34-4FDB-9B25-2DB7F40C5160}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build BDS 2006 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{C2A9D905-EC34-4FDB-9B25-2DB7F40C5160}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build BDS 2006 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build BDS 2006 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build BDS 2006 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -1608,8 +1813,9 @@ Action.BuildVersion = BuildVersion
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dBDS2006 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dBDS2006 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -1624,15 +1830,19 @@ Action.BuildVersion = BuildVersion
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{7B2B9D81-74E5-48DC-B9C2-ADA02DBF1758}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move BDS 2006 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{7B2B9D81-74E5-48DC-B9C2-ADA02DBF1758}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move BDS 2006 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move BDS 2006 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move BDS 2006 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -1652,15 +1862,19 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXBDS2006-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{0E29E48C-0790-4E38-981C-DF7AE378806D}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delphi 2007]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{0E29E48C-0790-4E38-981C-DF7AE378806D}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 2007]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delphi 2007]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 2007]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -1671,15 +1885,19 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TDeleteFilesAction" XMLID="{748F1D85-791B-4EC0-9F61-D66B49AF4832}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsDelphi2007.dll]]>
-                </Property>
+            <Object Class="TDeleteFilesAction" XMLID="{748F1D85-791B-4EC0-9F61-D66B49AF4832}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsDelphi2007.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsDelphi2007.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsDelphi2007.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -1692,10 +1910,12 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDelphiCompilerAction" XMLID="{8BA1F165-AD84-4B41-97C8-53837433651C}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile Delphi 2007]]>
-                </Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{8BA1F165-AD84-4B41-97C8-53837433651C}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile Delphi 2007]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AllowImplicitImport" type="Boolean">True</Property>
@@ -1706,15 +1926,19 @@ Action.BuildVersion = BuildVersion
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
               <Property name="CompilerVersion" type="Integer">12</Property>
-              <Property MultiValue="1" name="ConfigName" type="string"><![CDATA[GExperts Release]]>
-                </Property>
+              <Property MultiValue="1" name="ConfigName" type="string">
+                <![CDATA[GExperts Release]]>
+              </Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile Delphi 2007]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile Delphi 2007]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property MultiValue="1" name="ExtraCommandline" type="WideString"><![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
-                </Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -1752,7 +1976,8 @@ Action.BuildVersion = BuildVersion
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
-              <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=GExperts, Inc. and Erik Berry
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=GExperts, Inc. and Erik Berry
 FileDescription=GExperts for Delphi 2007
 FileVersion=1.3.3.0
 InternalName=GExperts for Delphi 2007
@@ -1761,40 +1986,46 @@ ProductName=GExperts for Delphi 2007
 Comments=Open Source
 Compile Date=Saturday, October 06, 2001 3:07 PM
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
               <Property name="WarningsAsError" type="Boolean">True</Property>
               <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
-              <Object Class="TBuildScript" XMLID="{AC1669E4-24B7-4852-8DEC-349BE30209BC}"><Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+              <Object Class="TBuildScript" XMLID="{AC1669E4-24B7-4852-8DEC-349BE30209BC}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
                 <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
-                <Property MultiValue="1" name="Script" type="string"><![CDATA[Action.MajorVersion = MajorVersion
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
 Action.MinorVersion = MinorVersion
 Action.ReleaseVersion = ReleaseVersion
 Action.BuildVersion = BuildVersion
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
-                </Object>
-              <Object Class="TDelphiCompilerOptions" XMLID="{7955C9BC-A185-415E-8C49-D5BF1D863779}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{7955C9BC-A185-415E-8C49-D5BF1D863779}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
                 <Property name="AlwaysUseDOFSearchPath" type="WordBool">False</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
                 <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
-                <Property name="CompilerWarnings" type="TStrings"><![CDATA[-w-UNSAFE_TYPE=0
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-UNSAFE_TYPE=0
 -w-UNSAFE_CODE=0
 -w-UNSAFE_CAST=0
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
                 <Property name="ConsoleApp" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
                 <Property name="DebugInfo" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
                 <Property name="DefinitionsOnly" type="WordBool">False</Property>
-                <Property MultiValue="1" name="ExeDescription" type="WideString"><![CDATA[GExperts for Delphi 2007]]>
-                  </Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for Delphi 2007]]>
+                </Property>
                 <Property name="ExportAllSymbols" type="WordBool">False</Property>
                 <Property name="ExtendedSyntax" type="WordBool">True</Property>
                 <Property name="GenerateDocumentation" type="Boolean">False</Property>
@@ -1817,7 +2048,7 @@ Action.BuildVersion = BuildVersion
                 <Property name="Optimisation" type="WordBool">True</Property>
                 <Property MultiValue="0" name="OutputDir" type="WideString"></Property>
                 <Property name="OverflowChecking" type="WordBool">True</Property>
-                <Property MultiValue="0" name="Packages" type="WideString">rtl;vcl;vclx;designide;vclimg</Property>
+                <Property MultiValue="0" name="Packages" type="WideString">rtl;vcl;vclx;designide</Property>
                 <Property name="RangeChecking" type="WordBool">True</Property>
                 <Property name="RecordFieldAlign" type="TFieldAlign">fa8</Property>
                 <Property name="ReferenceInfo" type="WordBool">False</Property>
@@ -1833,16 +2064,20 @@ Action.BuildVersion = BuildVersion
                 <Property name="UseDebugDCU" type="WordBool">False</Property>
                 <Property name="UsePackages" type="WordBool">True</Property>
                 <Property name="VarStringChecks" type="WordBool">True</Property>
-                </Object>
               </Object>
-            <Object Class="TRunProgramAction" XMLID="{BF8C552C-4B91-4335-8CB9-7E375AD15498}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build Delphi 2007 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{BF8C552C-4B91-4335-8CB9-7E375AD15498}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build Delphi 2007 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build Delphi 2007 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build Delphi 2007 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -1863,8 +2098,9 @@ Action.BuildVersion = BuildVersion
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dDelphi2007 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dDelphi2007 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -1879,15 +2115,19 @@ Action.BuildVersion = BuildVersion
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{3FE34AF5-9D51-444C-8D85-7F9839CA03EB}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move Delphi 2007 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{3FE34AF5-9D51-444C-8D85-7F9839CA03EB}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move Delphi 2007 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move Delphi 2007 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move Delphi 2007 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -1907,15 +2147,19 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXDelphi2007-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
-              </Object>
             </Object>
-          <Object Class="TGroupAction" XMLID="{0EC8BEC7-D1A8-49E3-962E-3E5A0A36B83E}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delphi 2009]]>
-              </Property>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{0EC8BEC7-D1A8-49E3-962E-3E5A0A36B83E}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 2009]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delphi 2009]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 2009]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -1926,15 +2170,19 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            <Object Class="TDeleteFilesAction" XMLID="{AA9BD715-5491-445B-8C27-FE77F2211722}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete GExpertsRS2009.dll]]>
-                </Property>
+            <Object Class="TDeleteFilesAction" XMLID="{AA9BD715-5491-445B-8C27-FE77F2211722}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsRS2009.dll]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="DeleteHidden" type="WordBool">True</Property>
               <Property name="DeleteReadOnly" type="WordBool">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete GExpertsRS2009.dll]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsRS2009.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -1947,10 +2195,12 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-              </Object>
-            <Object Class="TDelphiCompilerAction" XMLID="{07439DBE-1997-4668-BD6E-F2583D28FC3D}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Compile RAD Studio 2009]]>
-                </Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{07439DBE-1997-4668-BD6E-F2583D28FC3D}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile RAD Studio 2009]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="AllowImplicitImport" type="Boolean">True</Property>
@@ -1963,12 +2213,15 @@ Action.BuildVersion = BuildVersion
               <Property name="CompilerVersion" type="Integer">13</Property>
               <Property MultiValue="0" name="ConfigName" type="string">Release</Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Compile RAD Studio 2009]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile RAD Studio 2009]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property MultiValue="1" name="ExtraCommandline" type="WideString"><![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
-                </Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -2006,7 +2259,8 @@ Action.BuildVersion = BuildVersion
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
               <Property name="UseVersionFromDOF" type="Boolean">False</Property>
-              <Property MultiValue="1" name="VersionInfoKeys" type="WideString"><![CDATA[CompanyName=Erik Berry and the GExperts Development Team
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=Erik Berry and the GExperts Development Team
 FileDescription=GExperts for RAD Studio 2009
 FileVersion=1.3.3.0
 InternalName=GExperts for RAD Studio 2009
@@ -2015,39 +2269,45 @@ ProductName=GExperts for RAD Studio 2009
 Comments=Open Source
 Compile Date=
 ]]>
-                </Property>
+              </Property>
               <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
               <Property name="WarningsAsError" type="Boolean">True</Property>
               <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
-              <Object Class="TBuildScript" XMLID="{CA635564-35B1-4194-8F61-8D6B0E82E3C3}"><Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+              <Object Class="TBuildScript" XMLID="{CA635564-35B1-4194-8F61-8D6B0E82E3C3}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
                 <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
-                <Property MultiValue="1" name="Script" type="string"><![CDATA[Action.MajorVersion = MajorVersion
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
 Action.MinorVersion = MinorVersion
 Action.ReleaseVersion = ReleaseVersion
 Action.BuildVersion = BuildVersion
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
-                </Object>
-              <Object Class="TDelphiCompilerOptions" XMLID="{4B4C7ACC-0351-4561-94F9-FE8069427EFF}"><Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{4B4C7ACC-0351-4561-94F9-FE8069427EFF}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
                 <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">False</Property>
                 <Property name="AlwaysUseDOFSearchPath" type="WordBool">True</Property>
                 <Property name="Assertions" type="WordBool">True</Property>
                 <Property name="AssignableConst" type="WordBool">False</Property>
                 <Property name="BoolEval" type="WordBool">False</Property>
                 <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
-                <Property name="CompilerWarnings" type="TStrings"><![CDATA[-w-IMPLICIT_STRING_CAST=0
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-IMPLICIT_STRING_CAST=0
 -w-IMPLICIT_STRING_CAST_LOSS=0
 ]]>
-                  </Property>
+                </Property>
                 <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
                 <Property name="ConsoleApp" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
                 <Property name="DebugInfo" type="WordBool">False</Property>
                 <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
                 <Property name="DefinitionsOnly" type="WordBool">False</Property>
-                <Property MultiValue="1" name="ExeDescription" type="WideString"><![CDATA[GExperts for RAD Studio 2009]]>
-                  </Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for RAD Studio 2009]]>
+                </Property>
                 <Property name="ExportAllSymbols" type="WordBool">False</Property>
                 <Property name="ExtendedSyntax" type="WordBool">True</Property>
                 <Property name="GenerateDocumentation" type="Boolean">False</Property>
@@ -2070,7 +2330,7 @@ Action.BuildVersion = BuildVersion
                 <Property name="Optimisation" type="WordBool">True</Property>
                 <Property MultiValue="0" name="OutputDir" type="WideString"></Property>
                 <Property name="OverflowChecking" type="WordBool">True</Property>
-                <Property MultiValue="0" name="Packages" type="WideString">rtl;vcl;vclx;designide;vclimg</Property>
+                <Property MultiValue="0" name="Packages" type="WideString">rtl;vcl;vclx;designide</Property>
                 <Property name="RangeChecking" type="WordBool">True</Property>
                 <Property name="RecordFieldAlign" type="TFieldAlign">fa8</Property>
                 <Property name="ReferenceInfo" type="WordBool">False</Property>
@@ -2086,16 +2346,20 @@ Action.BuildVersion = BuildVersion
                 <Property name="UseDebugDCU" type="WordBool">False</Property>
                 <Property name="UsePackages" type="WordBool">True</Property>
                 <Property name="VarStringChecks" type="WordBool">True</Property>
-                </Object>
               </Object>
-            <Object Class="TRunProgramAction" XMLID="{C8075E19-A703-4464-8853-45A01CED2E97}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Build RAD Studio 2009 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TRunProgramAction" XMLID="{C8075E19-A703-4464-8853-45A01CED2E97}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build RAD Studio 2009 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="CaptureOutput" type="Boolean">True</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Build RAD Studio 2009 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build RAD Studio 2009 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="EnableLiveCapture" type="Boolean">True</Property>
               <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
@@ -2116,8 +2380,9 @@ Action.BuildVersion = BuildVersion
               <Property name="LogProcessParameters" type="Boolean">True</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
-              <Property MultiValue="1" name="Params" type="WideString"><![CDATA[GExperts.iss /dRS2009 /dVersion=%ProductVersion%]]>
-                </Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dRS2009 /dVersion=%ProductVersion%]]>
+              </Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property name="ProcessorAffinity" type="Cardinal">0</Property>
               <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
@@ -2132,15 +2397,19 @@ Action.BuildVersion = BuildVersion
               <Property name="TimeoutLength" type="Cardinal">1</Property>
               <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
               <Property name="WaitForCompletion" type="Boolean">True</Property>
-              </Object>
-            <Object Class="TMoveFilesAction" XMLID="{0522630E-AD10-4060-B22E-9B1EF1D419C0}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-              <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Move RAD Studio 2009 Install]]>
-                </Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{0522630E-AD10-4060-B22E-9B1EF1D419C0}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move RAD Studio 2009 Install]]>
+              </Property>
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property name="ClearAttributes" type="WordBool">False</Property>
-              <Property MultiValue="1" name="Description" type="string"><![CDATA[Move RAD Studio 2009 Install]]>
-                </Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move RAD Studio 2009 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
               <Property name="Enabled" type="WordBool">True</Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailIfExists" type="WordBool">False</Property>
@@ -2160,17 +2429,303 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXRS2009-%SetupVersion%%SetupPostfix%.exe</Property>
               <Property name="TargetIsDir" type="WordBool">False</Property>
+            </Object>
+          </Object>
+          <Object Class="TGroupAction" XMLID="{4BF79F2E-86EA-448E-A9CA-C709AC2E6948}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delphi 2010]]>
+            </Property>
+            <Property name="ActionTextColor" type="Cardinal">0</Property>
+            <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delphi 2010]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
+            <Property name="Enabled" type="WordBool">True</Property>
+            <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
+            <Property name="HideActionFromLog" type="Boolean">False</Property>
+            <Property name="IgnoreFailure" type="WordBool">False</Property>
+            <Property name="LogActionProperties" type="Boolean">False</Property>
+            <Property MultiValue="0" name="LogToVariable" type="string"></Property>
+            <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
+            <Property name="PauseInterval" type="Cardinal">0</Property>
+            <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
+            <Property name="SuppressStatusMessages" type="Boolean">False</Property>
+            <Object Class="TDeleteFilesAction" XMLID="{2A08692B-61BE-4BCE-A28C-6B993922D18C}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Delete GExpertsRS2010.dll]]>
+              </Property>
+              <Property name="ActionTextColor" type="Cardinal">0</Property>
+              <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+              <Property name="DeleteHidden" type="WordBool">True</Property>
+              <Property name="DeleteReadOnly" type="WordBool">True</Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Delete GExpertsRS2010.dll]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
+              <Property name="Enabled" type="WordBool">True</Property>
+              <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
+              <Property name="FailIfNoFile" type="WordBool">False</Property>
+              <Property MultiValue="0" name="FileSpec" type="string">%GXSourceDir%\GExpertsRS2010.dll</Property>
+              <Property name="HideActionFromLog" type="Boolean">False</Property>
+              <Property name="IgnoreFailure" type="WordBool">False</Property>
+              <Property name="LogActionProperties" type="Boolean">False</Property>
+              <Property MultiValue="0" name="LogToVariable" type="string"></Property>
+              <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
+              <Property name="PauseInterval" type="Cardinal">0</Property>
+              <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
+              <Property name="SuppressStatusMessages" type="Boolean">False</Property>
+            </Object>
+            <Object Class="TDelphiCompilerAction" XMLID="{D39CD920-EDCF-49A9-A8A4-2465DF13CBBB}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Compile RAD Studio 2010]]>
+              </Property>
+              <Property name="ActionTextColor" type="Cardinal">0</Property>
+              <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+              <Property name="AllowImplicitImport" type="Boolean">True</Property>
+              <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+              <Property name="AutoIncBuild" type="WordBool">False</Property>
+              <Property name="AutoUpdateFileVersion" type="Boolean">True</Property>
+              <Property name="BuildAll" type="WordBool">True</Property>
+              <Property name="BuildVersion" type="Integer">0</Property>
+              <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompilerVersion" type="Integer">14</Property>
+              <Property MultiValue="0" name="ConfigName" type="string">Release</Property>
+              <Property name="DebugVersionNumbers" type="Boolean">False</Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Compile RAD Studio 2010]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
+              <Property name="Enabled" type="WordBool">True</Property>
+              <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
+              <Property MultiValue="1" name="ExtraCommandline" type="WideString">
+                <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
+              </Property>
+              <Property name="HideActionFromLog" type="Boolean">False</Property>
+              <Property name="HintsAsError" type="Boolean">True</Property>
+              <Property MultiValue="0" name="IconFile" type="WideString"></Property>
+              <Property name="IgnoreFailure" type="WordBool">False</Property>
+              <Property name="IncludeCompileDate" type="WordBool">True</Property>
+              <Property name="IncludeManifest" type="Boolean">False</Property>
+              <Property name="IncludeVerInfo" type="WordBool">True</Property>
+              <Property name="IsDebug" type="WordBool">False</Property>
+              <Property name="IsDLL" type="WordBool">True</Property>
+              <Property name="IsPreRelease" type="WordBool">False</Property>
+              <Property name="IsPrivate" type="WordBool">False</Property>
+              <Property name="IsSpecial" type="WordBool">False</Property>
+              <Property name="KeepCFG" type="Boolean">False</Property>
+              <Property name="LinkProductVersionToFileVersion" type="Boolean">False</Property>
+              <Property name="Locale" type="Integer">1033</Property>
+              <Property name="LogActionProperties" type="Boolean">False</Property>
+              <Property MultiValue="0" name="LogToVariable" type="string"></Property>
+              <Property name="MajorVersion" type="Integer">1</Property>
+              <Property MultiValue="0" name="ManifestFile" type="string"></Property>
+              <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
+              <Property name="MinorVersion" type="Integer">3</Property>
+              <Property name="PauseInterval" type="Cardinal">0</Property>
+              <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsRS2010.dpr</Property>
+              <Property name="RegenerateResource" type="WordBool">True</Property>
+              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
+              <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
+              <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
+              <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
+              <Property MultiValue="0" name="StartingDir" type="WideString">%GXSourceDir%</Property>
+              <Property name="SuppressStatusMessages" type="Boolean">False</Property>
+              <Property name="UpdateDofFile" type="Boolean">False</Property>
+              <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
+              <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
+              <Property name="UsePropertySet" type="Boolean">False</Property>
+              <Property name="UseVersionFromDOF" type="Boolean">False</Property>
+              <Property MultiValue="1" name="VersionInfoKeys" type="WideString">
+                <![CDATA[CompanyName=Erik Berry and the GExperts Development Team
+FileDescription=GExperts for RAD Studio 2010
+FileVersion=1.3.3.0
+InternalName=GExperts for RAD Studio 2010
+OriginalFilename=GExpertsRS2010.dll
+ProductName=GExperts for RAD Studio 2010
+Comments=Open Source
+Compile Date=
+]]>
+              </Property>
+              <Property MultiValue="0" name="VersionInfoPropertySetName" type="string"></Property>
+              <Property name="WarningsAsError" type="Boolean">True</Property>
+              <Property name="WorkAroundD5Bug" type="WordBool">False</Property>
+              <Object Class="TBuildScript" XMLID="{33994CFA-5946-4D0C-A440-46D7F0D2B602}">
+                <Property MultiValue="0" name="BreakPointsStore" type="string"></Property>
+                <Property MultiValue="0" name="Name" type="string">BeforeAction</Property>
+                <Property MultiValue="1" name="Script" type="string">
+                  <![CDATA[Action.MajorVersion = MajorVersion
+Action.MinorVersion = MinorVersion
+Action.ReleaseVersion = ReleaseVersion
+Action.BuildVersion = BuildVersion
+]]>
+                </Property>
+                <Property MultiValue="0" name="ScriptLanguage" type="string">JavaScript</Property>
+              </Object>
+              <Object Class="TDelphiCompilerOptions" XMLID="{566541AF-EB33-434B-949C-283BB15E35FA}">
+                <Property name="AlwaysUseConditionalsFromDOF" type="WordBool">False</Property>
+                <Property name="AlwaysUseDelphiLibraryPath" type="WordBool">True</Property>
+                <Property name="AlwaysUseDOFSearchPath" type="WordBool">False</Property>
+                <Property name="Assertions" type="WordBool">True</Property>
+                <Property name="AssignableConst" type="WordBool">False</Property>
+                <Property name="BoolEval" type="WordBool">False</Property>
+                <Property MultiValue="0" name="BPLOutputDir" type="WideString"></Property>
+                <Property name="CompilerWarnings" type="TStrings">
+                  <![CDATA[-w-IMPLICIT_STRING_CAST=0
+-w-IMPLICIT_STRING_CAST_LOSS=0
+]]>
+                </Property>
+                <Property MultiValue="0" name="Conditionals" type="WideString">GX_AutomatedBuild;SYNEDIT</Property>
+                <Property name="ConsoleApp" type="WordBool">False</Property>
+                <Property MultiValue="0" name="DCPOutputDir" type="WideString"></Property>
+                <Property name="DebugInfo" type="WordBool">False</Property>
+                <Property MultiValue="0" name="DefaultNamespace" type="string"></Property>
+                <Property name="DefinitionsOnly" type="WordBool">False</Property>
+                <Property name="EmitRuntimeTypeInformation" type="Boolean">False</Property>
+                <Property MultiValue="1" name="ExeDescription" type="WideString">
+                  <![CDATA[GExperts for RAD Studio 2009]]>
+                </Property>
+                <Property name="ExportAllSymbols" type="WordBool">False</Property>
+                <Property name="ExtendedSyntax" type="WordBool">True</Property>
+                <Property name="GenerateDocumentation" type="Boolean">False</Property>
+                <Property name="GenerateHPP" type="WordBool">False</Property>
+                <Property name="HugeStrings" type="WordBool">True</Property>
+                <Property name="ImageBase" type="Cardinal">4194304</Property>
+                <Property name="IncludeNamespaces" type="WordBool">False</Property>
+                <Property name="IncludeRemoteSymbols" type="WordBool">False</Property>
+                <Property name="IncludeTD32" type="WordBool">False</Property>
+                <Property name="Inlining" type="TFBInlining">inOn</Property>
+                <Property name="IOChecking" type="WordBool">True</Property>
+                <Property MultiValue="0" name="LibraryPath" type="WideString">$(BDS)\lib;$(BDSUSERDIR)\Imports;$(BDS)\Imports;$(BDS)\Lib\Indy10;$(BDSCOMMONDIR)\Dcp;$(BDS)\include</Property>
+                <Property name="LinkerOutput" type="Integer">0</Property>
+                <Property name="LocalSymbols" type="WordBool">False</Property>
+                <Property name="Mapfile" type="Integer">0</Property>
+                <Property name="MaxStackSize" type="Cardinal">1048576</Property>
+                <Property name="MinStackSize" type="Cardinal">16384</Property>
+                <Property MultiValue="0" name="NamespacePrefixes" type="string"></Property>
+                <Property name="OpenStrings" type="WordBool">True</Property>
+                <Property name="Optimisation" type="WordBool">True</Property>
+                <Property MultiValue="0" name="OutputDir" type="WideString"></Property>
+                <Property name="OverflowChecking" type="WordBool">True</Property>
+                <Property MultiValue="0" name="Packages" type="WideString">rtl;vcl;vclx;designide</Property>
+                <Property name="RangeChecking" type="WordBool">True</Property>
+                <Property name="RecordFieldAlign" type="TFieldAlign">fa8</Property>
+                <Property name="ReferenceInfo" type="WordBool">False</Property>
+                <Property name="SafeDivide" type="WordBool">False</Property>
+                <Property MultiValue="0" name="SearchPath" type="WideString">Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</Property>
+                <Property name="ShowHints" type="WordBool">True</Property>
+                <Property name="ShowWarnings" type="WordBool">True</Property>
+                <Property name="StackFrames" type="WordBool">False</Property>
+                <Property name="StringChecks" type="WordBool">True</Property>
+                <Property name="TypedPointers" type="WordBool">False</Property>
+                <Property MultiValue="0" name="UnitAliases" type="WideString"></Property>
+                <Property MultiValue="0" name="UnitOutputDir" type="WideString"></Property>
+                <Property name="UseDebugDCU" type="WordBool">False</Property>
+                <Property name="UsePackages" type="WordBool">True</Property>
+                <Property name="VarStringChecks" type="WordBool">True</Property>
               </Object>
             </Object>
-          <Object Class="TDeleteFilesAction" XMLID="{3BE6A231-CE97-4AE2-AEE9-F1D425657DAC}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete FB Temp Files]]>
+            <Object Class="TRunProgramAction" XMLID="{010AF371-0EAC-4217-8E24-FB151568F3F2}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Build RAD Studio 2010 Install]]>
               </Property>
+              <Property name="ActionTextColor" type="Cardinal">0</Property>
+              <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+              <Property name="CaptureOutput" type="Boolean">True</Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Build RAD Studio 2010 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
+              <Property name="Enabled" type="WordBool">True</Property>
+              <Property name="EnableLiveCapture" type="Boolean">True</Property>
+              <Property name="EnableReturnCodeCheck" type="Boolean">True</Property>
+              <Property name="EnableTimeout" type="Boolean">False</Property>
+              <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
+              <Property name="ExpandImpersonationToken" type="Boolean">False</Property>
+              <Property MultiValue="0" name="ExtraCmdLineParamsAtEnd" type="string"></Property>
+              <Property MultiValue="0" name="ExtraCmdLineParamsAtStart" type="string"></Property>
+              <Property name="HideActionFromLog" type="Boolean">False</Property>
+              <Property name="HideWindow" type="Boolean">True</Property>
+              <Property name="IgnoreFailure" type="WordBool">False</Property>
+              <Property MultiValue="0" name="ImpersonateToken" type="string"></Property>
+              <Property name="ImpersonateUser" type="Boolean">False</Property>
+              <Property MultiValue="0" name="ImpersonateUserName" type="string"></Property>
+              <Property MultiValue="0" name="InputFile" type="string"></Property>
+              <Property name="LogActionProperties" type="Boolean">False</Property>
+              <Property name="LogOutput" type="WordBool">True</Property>
+              <Property name="LogProcessParameters" type="Boolean">True</Property>
+              <Property MultiValue="0" name="LogToVariable" type="string"></Property>
+              <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
+              <Property MultiValue="1" name="Params" type="WideString">
+                <![CDATA[GExperts.iss /dRS2010 /dVersion=%ProductVersion%]]>
+              </Property>
+              <Property name="PauseInterval" type="Cardinal">0</Property>
+              <Property name="ProcessorAffinity" type="Cardinal">0</Property>
+              <Property name="ProcessPriority" type="TFBExecuteThreadPriority">tpNormal</Property>
+              <Property MultiValue="0" name="ProgramName" type="WideString">%ISPPCC%</Property>
+              <Property name="RedirectStdErr" type="Boolean">True</Property>
+              <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
+              <Property name="ReturnCodeComparator" type="TFBRunReturnCodeComparator">rcLessThanEqualTo</Property>
+              <Property name="ReturnCodeToCheck" type="Integer">0</Property>
+              <Property MultiValue="0" name="StartInDir" type="WideString">%GXInstallDir%</Property>
+              <Property name="SuppressStatusMessages" type="Boolean">False</Property>
+              <Property name="TerminateOnTimeout" type="Boolean">True</Property>
+              <Property name="TimeoutLength" type="Cardinal">1</Property>
+              <Property name="UseErrorDialogMonitor" type="Boolean">False</Property>
+              <Property name="WaitForCompletion" type="Boolean">True</Property>
+            </Object>
+            <Object Class="TMoveFilesAction" XMLID="{36ACE3B0-2C19-47DD-9C47-1BE16BFAFE29}">
+              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+              <Property MultiValue="1" name="ActionDescription" type="string">
+                <![CDATA[Move RAD Studio 2010 Install]]>
+              </Property>
+              <Property name="ActionTextColor" type="Cardinal">0</Property>
+              <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
+              <Property name="ClearAttributes" type="WordBool">False</Property>
+              <Property MultiValue="1" name="Description" type="string">
+                <![CDATA[Move RAD Studio 2010 Install]]>
+              </Property>
+              <Property name="DoNotValidateAction" type="Boolean">False</Property>
+              <Property name="Enabled" type="WordBool">True</Property>
+              <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
+              <Property name="FailIfExists" type="WordBool">False</Property>
+              <Property name="FailIfZeroFiles" type="WordBool">False</Property>
+              <Property MultiValue="0" name="FileSpec" type="WideString">%GXInstallDir%\Output\Setup.exe</Property>
+              <Property name="Force" type="WordBool">False</Property>
+              <Property name="HideActionFromLog" type="Boolean">False</Property>
+              <Property name="IgnoreFailure" type="WordBool">False</Property>
+              <Property name="LogActionProperties" type="Boolean">False</Property>
+              <Property name="LogFilesAffected" type="Boolean">True</Property>
+              <Property MultiValue="0" name="LogToVariable" type="string"></Property>
+              <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
+              <Property name="Overwrite" type="Boolean">True</Property>
+              <Property name="OverwriteReadOnly" type="WordBool">True</Property>
+              <Property name="PauseInterval" type="Cardinal">0</Property>
+              <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
+              <Property name="SuppressStatusMessages" type="Boolean">False</Property>
+              <Property MultiValue="0" name="Target" type="WideString">%SetupOutput%\GXRS2010-%SetupVersion%%SetupPostfix%.exe</Property>
+              <Property name="TargetIsDir" type="WordBool">False</Property>
+            </Object>
+          </Object>
+          <Object Class="TDeleteFilesAction" XMLID="{3BE6A231-CE97-4AE2-AEE9-F1D425657DAC}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delete FB Temp Files]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
             <Property name="DeleteHidden" type="WordBool">False</Property>
             <Property name="DeleteReadOnly" type="WordBool">False</Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete FB Temp Files]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delete FB Temp Files]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -2183,16 +2738,20 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            </Object>
-          <Object Class="TDeleteFilesAction" XMLID="{29D4DD50-A733-4593-ACE7-2B37D3312D33}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Delete FB .used Files]]>
-              </Property>
+          </Object>
+          <Object Class="TDeleteFilesAction" XMLID="{29D4DD50-A733-4593-ACE7-2B37D3312D33}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Delete FB .used Files]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
             <Property name="DeleteHidden" type="WordBool">False</Property>
             <Property name="DeleteReadOnly" type="WordBool">False</Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Delete FB .used Files]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Delete FB .used Files]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property name="FailIfNoFile" type="WordBool">False</Property>
@@ -2205,16 +2764,20 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            </Object>
-          <Object Class="TBeepAction" XMLID="{1EA794E4-45E3-46C4-9C37-7A7FA073518E}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
-            <Property MultiValue="1" name="ActionDescription" type="string"><![CDATA[Signal Complete]]>
-              </Property>
+          </Object>
+          <Object Class="TBeepAction" XMLID="{1EA794E4-45E3-46C4-9C37-7A7FA073518E}">
+            <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Property MultiValue="1" name="ActionDescription" type="string">
+              <![CDATA[Signal Complete]]>
+            </Property>
             <Property name="ActionTextColor" type="Cardinal">0</Property>
             <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
             <Property name="Asynchronous" type="Boolean">True</Property>
             <Property name="BeepType" type="TBeepTypes">btDefault</Property>
-            <Property MultiValue="1" name="Description" type="string"><![CDATA[Signal Complete]]>
-              </Property>
+            <Property MultiValue="1" name="Description" type="string">
+              <![CDATA[Signal Complete]]>
+            </Property>
+            <Property name="DoNotValidateAction" type="Boolean">False</Property>
             <Property name="Enabled" type="WordBool">True</Property>
             <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
             <Property MultiValue="0" name="Filename" type="string">.Default</Property>
@@ -2226,19 +2789,22 @@ Action.BuildVersion = BuildVersion
             <Property name="PauseInterval" type="Cardinal">0</Property>
             <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
             <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-            </Object>
           </Object>
-        <Object Class="TFBActionListParametersCollection" XMLID="{073EFD18-3984-4057-AFB4-0A105C96D3CC}"/>
         </Object>
-      <Object Class="TFBActionList" XMLID="999996"><Property name="IsFailure" type="Boolean">True</Property>
+        <Object Class="TFBActionListParametersCollection" XMLID="{073EFD18-3984-4057-AFB4-0A105C96D3CC}"/>
+      </Object>
+      <Object Class="TFBActionList" XMLID="999996">
+        <Property name="IsFailure" type="Boolean">True</Property>
         <Property name="IsMain" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">OnFailure</Property>
         <Property MultiValue="0" name="UniqueID" type="string">{17D65FD4-1A3B-4B5C-A925-9D897C1A6729}</Property>
-        <Object Class="TFBAction" XMLID="{E795F721-7A82-48B7-9C3F-981EB7AAFF45}"><Property MultiValue="0" name="ActionComment" type="string"></Property>
+        <Object Class="TFBAction" XMLID="{E795F721-7A82-48B7-9C3F-981EB7AAFF45}">
+          <Property MultiValue="0" name="ActionComment" type="string"></Property>
           <Property MultiValue="0" name="ActionDescription" type="string">OnError</Property>
           <Property name="ActionTextColor" type="Cardinal">0</Property>
           <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
           <Property MultiValue="0" name="Description" type="string">OnError</Property>
+          <Property name="DoNotValidateAction" type="Boolean">False</Property>
           <Property name="Enabled" type="WordBool">True</Property>
           <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
           <Property name="HideActionFromLog" type="Boolean">False</Property>
@@ -2249,12 +2815,14 @@ Action.BuildVersion = BuildVersion
           <Property name="PauseInterval" type="Cardinal">0</Property>
           <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
           <Property name="SuppressStatusMessages" type="Boolean">False</Property>
-          </Object>
-        <Object Class="TFBActionListParametersCollection" XMLID="{9CFC9D32-6B53-4D68-B303-5E34030167B4}"/>
         </Object>
+        <Object Class="TFBActionListParametersCollection" XMLID="{9CFC9D32-6B53-4D68-B303-5E34030167B4}"/>
       </Object>
-    <Object Class="TFBVariablesCollection" XMLID="999995"><Property MultiValue="0" name="Name" type="string"></Property>
-      <Object Class="TFBVariable" XMLID="{6C587782-7CFE-4E43-AEF8-6D9709A4298A}"><Property MultiValue="0" name="Comment" type="string"></Property>
+    </Object>
+    <Object Class="TFBVariablesCollection" XMLID="999995">
+      <Property MultiValue="0" name="Name" type="string"></Property>
+      <Object Class="TFBVariable" XMLID="{6C587782-7CFE-4E43-AEF8-6D9709A4298A}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string"></Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2262,18 +2830,21 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">SetupPostfix</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{EE033A11-3573-4496-96E5-B25A22952A74}"><Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="1" name="DefaultValue" type="string"><![CDATA[C:\Program Files (x86)\Development\Inno Setup\iscc.exe]]>
-          </Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{EE033A11-3573-4496-96E5-B25A22952A74}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
+        <Property MultiValue="1" name="DefaultValue" type="string">
+          <![CDATA[C:\Program Files (x86)\Development\Inno Setup\iscc.exe]]>
+        </Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">ISPPCC</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{55F09ED1-BE0B-4ED6-B681-1ACC70B14C75}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{55F09ED1-BE0B-4ED6-B681-1ACC70B14C75}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">1.33</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2281,8 +2852,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">ProductVersion</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{EDF763E4-AAAB-4116-951F-AB12B1241BA6}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{EDF763E4-AAAB-4116-951F-AB12B1241BA6}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">133</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2290,8 +2862,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">SetupVersion</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{D33A8AB7-CD8E-4021-A772-EB17D1DFCE27}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{D33A8AB7-CD8E-4021-A772-EB17D1DFCE27}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">3</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2299,8 +2872,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">ReleaseVersion</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{A239712A-8637-4727-B7FD-363A1E8F367D}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{A239712A-8637-4727-B7FD-363A1E8F367D}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">3</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2308,8 +2882,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">MinorVersion</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{7ABF6855-D3A4-471C-90D3-412130B60BBF}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{7ABF6855-D3A4-471C-90D3-412130B60BBF}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">D:\Borland</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2317,8 +2892,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">BorlandDir</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{7F36A9E1-2472-4FD8-87EC-970237E9315E}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{7F36A9E1-2472-4FD8-87EC-970237E9315E}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">D:\Projects\GExperts</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2326,8 +2902,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">GXProjectDir</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{97CC3243-452F-4859-A608-E1243467F763}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{97CC3243-452F-4859-A608-E1243467F763}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">%USERPROFILE%\Desktop\Setup</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">True</Property>
@@ -2335,8 +2912,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">SetupOutput</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{05D48920-59BA-4CFB-AAF1-F060A78A884B}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{05D48920-59BA-4CFB-AAF1-F060A78A884B}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">0</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2344,8 +2922,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">BuildVersion</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{AF9194D4-F3B7-4B3B-ADA0-EBFA427303BB}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{AF9194D4-F3B7-4B3B-ADA0-EBFA427303BB}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">1</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2353,8 +2932,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">MajorVersion</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{642691B2-3948-4154-85BC-BE206082D5ED}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{642691B2-3948-4154-85BC-BE206082D5ED}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">%GXProjectDir%\Source</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">True</Property>
@@ -2362,8 +2942,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">GXSourceDir</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{B90A4729-9FC8-431F-B906-79C6D78BE83E}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{B90A4729-9FC8-431F-B906-79C6D78BE83E}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">%GXProjectDir%\Documentation</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">True</Property>
@@ -2371,8 +2952,9 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">GXDocDir</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
-      <Object Class="TFBVariable" XMLID="{8068BD57-9A07-41C1-9A53-94ECDFEE0E20}"><Property MultiValue="0" name="Comment" type="string"></Property>
+      </Object>
+      <Object Class="TFBVariable" XMLID="{8068BD57-9A07-41C1-9A53-94ECDFEE0E20}">
+        <Property MultiValue="0" name="Comment" type="string"></Property>
         <Property MultiValue="0" name="DefaultValue" type="string">%GXProjectDir%\BuildInstall</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
@@ -2380,7 +2962,7 @@ Action.BuildVersion = BuildVersion
         <Property name="MakeEnv" type="Boolean">False</Property>
         <Property MultiValue="0" name="Name" type="string">GXInstallDir</Property>
         <Property name="VariableType" type="TFBVariableType">vtProject</Property>
-        </Object>
       </Object>
     </Object>
-  </VSXML>
+  </Object>
+</VSXML>

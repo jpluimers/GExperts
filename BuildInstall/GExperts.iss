@@ -84,6 +84,16 @@
   #define IDERegVer    "7"
   #define RegCompany   "CodeGear"
 #endif
+#ifdef RS2011
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
+  #define IDEVer       "2011"
+  #define DLLSuffix    "RS2011"
+  #define IDERegName   "BDS"
+  #define IDERegVer    "8"
+  #define RegCompany   "Embarcadero"
+#endif
+
 
 #ifndef IDEShortName
   #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.33"
@@ -93,10 +103,11 @@
 #define BinaryDir   IDEShortName + IDEVer
 #define DLLName     "GExperts" + DLLSuffix + ".dll"
 #define AppIDValue  Product + IDEShortName + IDEVer
+#define ThisYear    GetDateTimeString('yyyy', '', '');
 
 [Setup]
 AllowNoIcons=true
-AppCopyright=Copyright 1996-2009 by Erik Berry and the {#Product} Development Team
+AppCopyright=Copyright 1996-{#ThisYear} by Erik Berry and the {#Product} Development Team
 AppName={#Product}
 AppVerName={#FullName}
 AppID={#AppIDValue}
