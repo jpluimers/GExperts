@@ -19,7 +19,8 @@ type
      // RAD Studio
      ideDelphi2007,
      ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4,
-     ideRS2010,
+     ideRS2010, // TODO: Add update 1/2/3/4/5
+	 ideRS2011, // ??
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -538,6 +539,29 @@ begin
   end;
 end;
 
+{
+  Delphi 2011:
+  File                 File Version    Size       Modified Time
+  delphicoreide150.bpl
+  coreide150.bpl
+  bds.exe
+  dcldb150.bpl
+}
+function GetRS2011Version: TBorlandIdeVersion;
+const
+  CoreIde1500: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+  CoreIde1501: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRS2011;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide150.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1500);
+  if VersionNumber > 0 then begin
+    //Result := ideRS2011U1;
+  end;
+end;
 
 function GetBorlandIdeVersion: TBorlandIdeVersion;
 begin
@@ -596,6 +620,11 @@ begin
   {$IFDEF VER210}
     Result := GetRS2010Version;
     Assert(Result in [ideRS2010]);
+  {$ENDIF VER210}
+  
+  {$IFDEF VER210}
+    Result := GetRS2011Version;
+    Assert(Result in [ideRS2011]);
   {$ENDIF VER210}
 
   if Result = ideUnknown then

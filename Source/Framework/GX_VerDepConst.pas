@@ -11,10 +11,14 @@ const
   RequiredPackageText = '  vcl, vclx, and designide';
   TTabDockHostFormName = 'TTabDockHostForm';
 
-  {$IFDEF GX_VER200_up}
-  CompanyRegPrefix = 'CodeGear\';
+  {$IFDEF GX_VER220_up} 
+  CompanyRegPrefix = 'Embarcadero\';
   {$ELSE}
-  CompanyRegPrefix = 'Borland\';
+    {$IFDEF GX_VER200_up}
+    CompanyRegPrefix = 'CodeGear\';
+    {$ELSE}
+    CompanyRegPrefix = 'Borland\';
+    {$ENDIF}
   {$ENDIF}
 
   {$IFDEF GX_BCB}
@@ -101,7 +105,16 @@ const
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\7.0';
     ClassBrowserStorageFolder = 'Classes.RADStudio2010';
   {$ENDIF VER210}
-
+  
+  {$IFDEF VER220} // Delphi/RAD Studio 2011?
+    GExpertsDll = 'GExpertsRS2011.dll';
+    TTabDockHostFormClassContainer = 'designide150.bpl';
+    MajorVersionNumberChar = '15';
+    IDEEnglishName = 'RAD Studio 2011';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\8.0';
+    ClassBrowserStorageFolder = 'Classes.RADStudio2011';
+  {$ENDIF VER220}
+  
 implementation
 
 end.

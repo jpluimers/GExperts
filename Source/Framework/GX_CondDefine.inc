@@ -54,6 +54,9 @@
                 {$DEFINE GX_VER200_up}  // RAD Studio 2009
                 {$IF CompilerVersion >= 21}
                   {$DEFINE GX_VER210_up}  // RAD Studio 2010
+                  {$IF CompilerVersion >= 22}
+                    {$DEFINE GX_VER220_up}  // RAD Studio 2011?
+                  {$IFEND}
                 {$IFEND}
               {$IFEND}
             {$IFEND}
