@@ -640,7 +640,7 @@ begin
     FProgressForm.Progress.Max := 100;
     FZipComponent.IncludePath := FBackupExpert.DoIncludeDirInfoInZip;
     if FZipEncrypted then
-      FZipComponent.Password := FZipPassword;
+      FZipComponent.Password := AnsiString(FZipPassword);
     FZipComponent.OnProcessItemFailure := FileFailure;
     FZipComponent.OnArchiveProgress := AbbreviaProgress;
     FZipComponent.AddFiles(lbFiles.Items);
