@@ -19,8 +19,8 @@ type
      // RAD Studio
      ideDelphi2007,
      ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4,
-     ideRS2010, // TODO: Add update 1/2/3/4/5
-	 ideRS2011, // ??
+     ideRS2010, ideRS2010U1, ideRS2010U4, ideRS2010U5, // Updates 2/3 were recalled
+     ideRS2011, // ??
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -518,24 +518,61 @@ end;
 {
   Delphi 2010:
   File                 File Version    Size       Modified Time
-  delphicoreide140.bpl
-  coreide140.bpl
-  bds.exe
-  dcldb140.bpl
+  delphicoreide140.bpl 14.0.3513.24210 3,162,112  Wednesday, August 19, 2009, 3:00:00 PM
+  coreide140.bpl       14.0.3513.24210 6,801,936  Wednesday, August 19, 2009, 3:00:00 PM
+  bds.exe              14.0.3513.24210 4,267,312  Wednesday, August 19, 2009, 3:00:00 PM
+  dcldb140.bpl         14.0.3513.24210   312,320  Wednesday, August 19, 2009, 3:00:00 PM
+  sanctuarylib.dll     8.1.10.0        2,034,096  Wednesday, August 19, 2009, 3:00:00 PM
+  DCC140.dll           14.0.3513.24210 1,456,128  Wednesday, August 19, 2009, 3:00:00 PM
+
+  Delphi 2010 U1 (updated files only, licensing changes only):
+  bds.exe              14.0.3539.24502 5,051,184  Wednesday, September 09, 2009, 3:01:00 PM
+  coreide140.bpl       14.0.3539.24502 6,801,936  Wednesday, September 09, 2009, 3:01:00 PM
+  sanctuarylib.dll     8.1.16.1        2,040,592  Wednesday, September 09, 2009, 3:01:00 PM
+
+  Delphi 2010 U2 and U3 were recalled soon after release
+
+  Delphi 2010 Update 4:
+  delphicoreide140.bpl 14.0.3593.25826 3,165,696  Monday, November 02, 2009, 4:02:00 PM
+  coreide140.bpl       14.0.3615.26342 6,888,544  Monday, November 23, 2009, 4:04:00 PM
+  bds.exe              14.0.3615.26342 6,019,888  Monday, November 23, 2009, 2:04:00 PM
+  dcldb140.bpl         14.0.3593.25826   312,320  Monday, November 02, 2009, 4:02:00 PM
+  sanctuarylib.dll     8.2.15.0        2,347,480  Monday, November 23, 2009, 2:04:00 PM
+  DCC140.dll           14.0.3593.25826 1,437,696  Monday, November 02, 2009, 4:02:00 PM
+  dbx140.bpl           14.0.3593.25826   742,400  Monday, November 02, 2009, 4:02:00 PM
+  dcldbx140.bpl        14.0.3513.24210   201,728  Saturday, August 01, 2009, 3:00:00 PM
+
+  Delphi 2010 Update 5 (updated files only):
+  dcldbx140.bpl        14.0.3615.26342   201,728  Wednesday, November 18, 2009, 4:05:00 PM
 }
 function GetRS2010Version: TBorlandIdeVersion;
 const
-  CoreIde1400: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
-  CoreIde1401: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+  CoreIde1400: TVersionNumber = (Minor: 0; Major: 14; Build: 24210; Release: 3513);
+  CoreIde1401: TVersionNumber = (Minor: 0; Major: 14; Build: 24502; Release: 3539);
+  CoreIde1404: TVersionNumber = (Minor: 0; Major: 14; Build: 26342; Release: 3615);
+  CoreIde1405: TVersionNumber = (Minor: 0; Major: 14; Build: 26342; Release: 3615);
+  DclDbx1404 : TVersionNumber = (Minor: 0; Major: 14; Build: 24210; Release: 3513);
 var
   CoreIdeFileVersion: TVersionNumber;
+  DclDbxFileVersion: TVersionNumber;
   VersionNumber: Integer;
 begin
   Result := ideRS2010;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide140.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1400);
   if VersionNumber > 0 then begin
-    //Result := ideRS2010U1;
+    Result := ideRS2010U1;
+    VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1401);
+    if VersionNumber > 0 then begin
+      Result := ideRS2010U4;
+      if FileExists(GetIdeRootDirectory + 'Bin\dcldbx140.bpl') then begin
+        DclDbxFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide140.bpl');
+        VersionNumber := CompareVersionNumber(DclDbxFileVersion, DclDbx1404);
+        if VersionNumber > 0 then begin
+          Result := ideRS2010U5;
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -619,13 +656,13 @@ begin
 
   {$IFDEF VER210}
     Result := GetRS2010Version;
-    Assert(Result in [ideRS2010]);
+    Assert(Result in [ideRS2010, ideRS2010U1, ideRS2010U4, ideRS2010U5]);
   {$ENDIF VER210}
   
-  {$IFDEF VER210}
+  {$IFDEF VER220}
     Result := GetRS2011Version;
     Assert(Result in [ideRS2011]);
-  {$ENDIF VER210}
+  {$ENDIF VER220}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);

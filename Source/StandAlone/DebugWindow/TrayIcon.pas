@@ -269,7 +269,7 @@ end;
 procedure TTrayIcon.FillDataStructure;
 begin
   with IconData do begin
-    cbSize := SizeOf(TNOTIFYICONDATA);
+    cbSize := System.SizeOf(TNOTIFYICONDATA);
     wnd := FWindowHandle;
     uID := 0; // is not passed in with message so make it 0
     uFlags := NIF_MESSAGE + NIF_ICON + NIF_TIP;

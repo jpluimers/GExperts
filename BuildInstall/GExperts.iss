@@ -10,7 +10,7 @@
   #endif
 #else
 ; IDE compiler
-  #define RS2010
+  #define RS2011
   #define Version "1.33"
 #endif
 

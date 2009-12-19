@@ -313,7 +313,7 @@
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
             </Object>
-            <Object Class="THM3Action" XMLID="{1373F68F-F92D-4CA0-AB7D-0B8CAA7F3C81}">
+            <Object Class="TFBHM4Action" XMLID="{9C8F7588-A86E-4E93-B607-EB134E475200}">
               <Property MultiValue="0" name="ActionComment" type="string"></Property>
               <Property MultiValue="1" name="ActionDescription" type="string">
                 <![CDATA[Compile Help File]]>
@@ -321,7 +321,7 @@
               <Property name="ActionTextColor" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ActionTypeID" type="string"></Property>
               <Property MultiValue="0" name="BrowserHelpFile" type="string"></Property>
-              <Property name="BrowserhlpOpt" type="Integer">16</Property>
+              <Property MultiValue="0" name="BrowserhlpOpt" type="string">HTML</Property>
               <Property name="CompileBrowserhlp" type="Boolean">False</Property>
               <Property name="CompileHTMLHelp" type="Boolean">True</Property>
               <Property name="CompileMMH" type="Boolean">False</Property>
@@ -339,31 +339,31 @@
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
               <Property name="FailOnWarnings" type="Boolean">False</Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
-              <Property name="HMVersion" type="THelpAndManualVersion">hm3</Property>
+              <Property name="HMVersion" type="THelpAndManualVersion">hm53</Property>
               <Property MultiValue="0" name="HTMLHelpFile" type="string">GExperts.chm</Property>
-              <Property name="HTMLHelpOpt" type="Integer">4</Property>
+              <Property MultiValue="0" name="HTMLHelpOpt" type="string">CHM</Property>
               <Property name="IgnoreFailure" type="WordBool">False</Property>
               <Property name="KeepTemp" type="Boolean">False</Property>
               <Property name="LogActionProperties" type="Boolean">False</Property>
               <Property MultiValue="0" name="LogToVariable" type="string"></Property>
               <Property name="MaxRetryAttempts" type="Cardinal">0</Property>
               <Property MultiValue="0" name="MMHFile" type="string"></Property>
-              <Property name="MMHOpt" type="Integer">128</Property>
+              <Property MultiValue="0" name="MMHOpt" type="string">EBOOK</Property>
               <Property MultiValue="0" name="MSHelp2File" type="string"></Property>
-              <Property name="MSHelp2Opt" type="Integer">2</Property>
+              <Property MultiValue="0" name="MSHelp2Opt" type="string">HXS</Property>
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="PDFFile" type="string"></Property>
-              <Property name="PDFOpt" type="Integer">64</Property>
+              <Property MultiValue="0" name="PDFOpt" type="string">PDF</Property>
               <Property MultiValue="0" name="PDFTemplateFile" type="string"></Property>
-              <Property MultiValue="0" name="ProjectFile" type="string">%GXDocDir%\GExperts.hm3</Property>
+              <Property MultiValue="0" name="ProjectFile" type="string">%GXDocDir%\GExperts.hmxz</Property>
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property MultiValue="0" name="RTFFile" type="string"></Property>
-              <Property name="RTFOpt" type="Integer">32</Property>
+              <Property MultiValue="0" name="RTFOpt" type="string">RTF</Property>
               <Property MultiValue="0" name="SkinFileName" type="string"></Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="VariablesFile" type="string"></Property>
               <Property MultiValue="0" name="WinHelpFile" type="string"></Property>
-              <Property name="WinHelpOpt" type="Integer">8</Property>
+              <Property MultiValue="0" name="WinHelpOpt" type="string">HLP</Property>
             </Object>
           </Object>
           <Object Class="TGroupAction" XMLID="{C101AECA-1D1D-4641-B561-531415365674}">
@@ -439,6 +439,7 @@
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -722,6 +723,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -1371,6 +1373,7 @@ SpecialBuildDetails=0
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -1654,6 +1657,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -1939,6 +1943,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -2222,6 +2227,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
@@ -2504,6 +2510,7 @@ Action.BuildVersion = BuildVersion
               <Property MultiValue="1" name="ExtraCommandline" type="WideString">
                 <![CDATA[-w-SYMBOL_PLATFORM -w-UNIT_PLATFORM]]>
               </Property>
+              <Property MultiValue="0" name="GenTLBOptions" type="string"></Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HintsAsError" type="Boolean">True</Property>
               <Property MultiValue="0" name="IconFile" type="WideString"></Property>
