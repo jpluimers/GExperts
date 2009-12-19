@@ -370,7 +370,8 @@ begin
   Result := (GetBorlandIdeVersion in [
       // List IDEs here that have OTA/IDE bugs that bother GExperts
       ideD600, ideD601R, ideD601F,
-      ideD800, ideD801
+      ideD800, ideD801,
+      ideRS2010, ideRS2010U1 // Keyboard macro streaming broken
     ]);
 end;
 
