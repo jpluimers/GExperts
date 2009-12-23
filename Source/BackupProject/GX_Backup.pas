@@ -182,7 +182,7 @@ procedure ScanForIncludesAndAdd(const FileName: string;
 
   procedure GetCppPragmaBackupLines(FileLines: TStrings; IncludeLines: TStrings);
   var
-    i, j : Integer;
+    i, j: Integer;
     Line: string;
     ParsedLine: string;
     PragmaBackup: string;
@@ -438,17 +438,14 @@ procedure TfmBackup.LocateFileOnPathAndAdd(FilesNotFound: TStrings);
     SeparatorPos: Integer;
   begin
     SeparatorPos := Pos(ItemSeparatorChar, Entry);
+    IncludedFile := Entry;
     if SeparatorPos > 0 then
     begin
-      IncludedFile := Entry;
       Delete(IncludedFile, SeparatorPos, Length(Entry));
       RefererFile := Copy(Entry, SeparatorPos + 1, MaxInt);
     end
     else
-    begin
-      IncludedFile := Entry;
       RefererFile := '';
-    end;
   end;
 
 var
