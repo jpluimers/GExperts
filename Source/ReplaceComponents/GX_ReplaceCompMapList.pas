@@ -377,15 +377,10 @@ begin
   try
     Dlg.Icon := Self.Icon;
     if Dlg.ShowModal = mrOK then
-    begin
-      FConfigData.SaveData;
-      RefreshAll;
-    end
+      FConfigData.SaveData
     else
-    begin
       FConfigData.ReloadData;
-      RefreshAll;
-    end;  
+    RefreshAll;
   finally
     FreeAndNil(Dlg);
   end;

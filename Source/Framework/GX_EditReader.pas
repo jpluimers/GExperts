@@ -385,7 +385,6 @@ begin
 
     SFile.Position := 0;
     Stream.CopyFrom(SFile, SFile.Size);
-    Stream.Write(TheEnd, 1);
   end
   else
   begin
@@ -413,8 +412,8 @@ begin
       end;
       Stream.Write(Buf^, Size);
     end;
-    Stream.Write(TheEnd, 1);
   end;
+  Stream.Write(TheEnd, 1);
 end;
 
 function TEditReader.GetCurrentBufferPos: Integer;

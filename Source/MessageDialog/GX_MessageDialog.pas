@@ -1089,17 +1089,15 @@ begin
     // MessageDlg('Test', 'inforamton', TMsgDlgButtons() << MBYESNO, 0)
     FMessageType.ButtonSeparator := '<<';
     FMessageType.ParameterFormat := '(%s, %s, TMsgDlgButtons() << %s, %d)';
-    FUsesUnit := 'Windows';
-    FUsesUnitCLX := 'Windows';
   end
   else
   begin
     // MessageBox(0, ErrorMessage, "Error", MB_ICONERROR | MB_OK);
     FMessageType.ButtonSeparator := '|';
     FMessageType.ParameterFormat := '(0, %s, %s, %s)';
-    FUsesUnit := 'Windows';
-    FUsesUnitCLX := 'Windows';
   end;
+  FUsesUnit := 'Windows';
+  FUsesUnitCLX := 'Windows';
   FMessageType.Message := Result;
   Result := FMessageType.GetCode;
 

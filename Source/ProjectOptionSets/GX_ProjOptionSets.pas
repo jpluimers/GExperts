@@ -844,16 +844,15 @@ begin
   FSetChanged := True;
   Assert(TheItemIndex > -1, 'Check event with no selected item');
   ItemString := Listbox.Items[TheItemIndex];
+  Index := Options.IndexOfName(ItemString);
   if Listbox.Checked[TheItemIndex] then
   begin // Add a new checked item to the stored list
-    Index := Options.IndexOfName(ItemString);
     Assert(Index = -1, 'Check event for item in Options');
     ItemString := ItemString + '=['+SValUnknown+']';
     Options.Add(ItemString);
   end
   else
   begin // Remove an item from the stored list
-    Index := Options.IndexOfName(ItemString);
     Assert(Index > -1, 'Uncheck event for item not in Options');
     Options.Delete(Index);
   end;
