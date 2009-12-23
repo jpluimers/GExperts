@@ -3590,15 +3590,10 @@ begin
     IEditView := GxOtaGetTopMostEditView(ISourceEditor);
 
     if UseSelection and Assigned(IEditView) and Assigned(IEditView.Block) and (IEditView.Block.Size > 0) then
-    begin
-      Lines.Text := GxOtaGetCurrentSelection(False);
-      Result := True;
-    end
+      Lines.Text := GxOtaGetCurrentSelection(False)
     else
-    begin
       GxOtaLoadSourceEditorToUnicodeStrings(ISourceEditor, Lines);
-      Result := True;
-    end;
+    Result := True;
   end;
 end;
 
