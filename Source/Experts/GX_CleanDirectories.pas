@@ -264,7 +264,7 @@ begin
       // will only find faDirectory if we are recursing.
       if (SearchRec.Name <> '.') and (SearchRec.Name <> '..') then
       begin
-        if (SearchRec.Attr and faDirectory <> 0) then
+        if ((SearchRec.Attr and faDirectory) <> 0) then
         begin
           // Recurse into sub-directories.
           SearchRec.Name := AddSlash(SearchRec.Name);

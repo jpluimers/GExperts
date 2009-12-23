@@ -805,6 +805,7 @@ begin
 
   GxOtaFocusCurrentIDEEditControl;
   if not KS.CurrentPlayback.IsPlaying then
+  begin
     if KS.CurrentRecord.IsRecording then
     begin
       // Stop recording
@@ -817,6 +818,7 @@ begin
       KS.ResumeRecord;
       GxOtaShowCurrentSourceEditor;
     end;
+  end;
 end;
 
 procedure TfmMacroLibrary.actPlaybackExecute(Sender: TObject);

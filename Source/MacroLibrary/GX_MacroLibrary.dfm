@@ -40,13 +40,13 @@ object fmMacroLibrary: TfmMacroLibrary
         Caption = 'Macro Name'
         MaxWidth = 1000
         MinWidth = 120
-        Width = 180
+        Width = 165
       end
       item
         Caption = 'Recorded'
-        MaxWidth = 130
-        MinWidth = 130
-        Width = 130
+        MaxWidth = 145
+        MinWidth = 145
+        Width = 145
       end>
     ColumnClick = False
     HideSelection = False
