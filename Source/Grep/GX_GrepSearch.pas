@@ -35,17 +35,22 @@ type
     lblDirectory: TLabel;
     rbAllProjGroupFiles: TRadioButton;
     rbResults: TRadioButton;
+    cbExcludedDirs: TComboBox;
+    lblExcludeDirs: TLabel;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
     procedure cbDirectoryDropDown(Sender: TObject);
+    procedure cbExcludedDirsDropDown(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FGrepExpert: TGrepExpert;
     procedure EnableDirectoryControls(New: Boolean);
     procedure LoadFormSettings;
     procedure SaveFormSettings;
+    procedure UpdateMRUs;
   public
     constructor Create(AOwner: TComponent); override;
     procedure RetrieveSettings(var Value: TGrepSettings);
@@ -86,16 +91,19 @@ procedure TfmGrepSearch.EnableDirectoryControls(New: Boolean);
 begin
   cbDirectory.Enabled := New;
   cbMasks.Enabled := New;
+  cbExcludedDirs.Enabled := New;
   cbInclude.Enabled := New;
   btnBrowse.Enabled := New;
   if not New then
   begin
     cbDirectory.Color := clBtnface;
+    cbExcludedDirs.Color := clBtnface;
     cbMasks.Color := clBtnface;
   end
   else
   begin
     cbDirectory.Color := clWindow;
+    cbExcludedDirs.Color := clWindow;
     cbMasks.Color := clWindow;
   end
 end;
@@ -111,27 +119,13 @@ begin
 end;
 
 procedure TfmGrepSearch.cbDirectoryDropDown(Sender: TObject);
-var
-  i: Integer;
-  MaxWidth: Integer;
-  Bitmap: Graphics.TBitmap;
 begin
-  MaxWidth := cbDirectory.Width;
-  Bitmap := Graphics.TBitmap.Create;
-  try
-    Bitmap.Canvas.Font.Assign(cbDirectory.Font);
-    for i := 0 to cbDirectory.Items.Count - 1 do
-      MaxWidth := Max(MaxWidth, Bitmap.Canvas.TextWidth(cbDirectory.Items[i]) + 10);
-  finally;
-    FreeAndNil(Bitmap);
-  end;
-  if cbDirectory.Items.Count > cbDirectory.DropDownCount then
-    Inc(MaxWidth, GetScrollbarWidth);
-  MaxWidth := Min(400, MaxWidth);
-  if MaxWidth > cbDirectory.Width then
-    SendMessage(cbDirectory.Handle, CB_SETDROPPEDWIDTH, MaxWidth, 0)
-  else
-    SendMessage(cbDirectory.Handle, CB_SETDROPPEDWIDTH, 0, 0)
+  SizeComboDropdownToItems(cbDirectory);
+end;
+
+procedure TfmGrepSearch.cbExcludedDirsDropDown(Sender: TObject);
+begin
+  SizeComboDropdownToItems(cbExcludedDirs);
 end;
 
 { TGrepDlgExpert }
@@ -213,6 +207,9 @@ begin
       FreeAndNil(Dirs);
     end;
   end;
+  while StrBeginsWith(';', cbExcludedDirs.Text) do
+    cbExcludedDirs.Text := Copy(cbExcludedDirs.Text, 2, MaxInt);
+  cbExcludedDirs.Text := StringReplace(cbExcludedDirs.Text, ';;', ';', [rfReplaceAll]);
 
   SaveFormSettings;
 
@@ -243,6 +240,7 @@ begin
   AddMRUString(cbText.Text, FGrepExpert.SearchList, False);
   AddMRUString(cbDirectory.Text, FGrepExpert.DirList, True);
   AddMRUString(cbMasks.Text, FGrepExpert.MaskList, False);
+  AddMRUString(cbExcludedDirs.Text, FGrepExpert.ExcludedDirsList, False, True);
 
   FGrepExpert.GrepCaseSensitive := cbCaseSensitive.Checked;
   //FGrepExpert.IncludeComments := not cbNoComments.Checked;
@@ -310,6 +308,7 @@ begin
   cbText.Items.Assign(FGrepExpert.SearchList);
   cbDirectory.Items.Assign(FGrepExpert.DirList);
   cbMasks.Items.Assign(FGrepExpert.MaskList);
+  cbExcludedDirs.Items.Assign(FGrepExpert.ExcludedDirsList);
   rbResults.Enabled := fmGrepResults.lbResults.Count > 0;
 
   cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
@@ -340,6 +339,8 @@ begin
     cbDirectory.Text := cbDirectory.Items[0];
   if cbMasks.Items.Count > 0 then
     cbMasks.Text := cbMasks.Items[0];
+  if cbExcludedDirs.Items.Count > 0 then
+    cbExcludedDirs.Text := cbExcludedDirs.Items[0];
 
   if not IsStandAlone then
   begin
@@ -386,6 +387,7 @@ begin
   Value.IncludeSubdirs := cbInclude.Checked;
   Value.Mask := '';
   Value.Directories := '';
+  Value.ExcludedDirs := cbExcludedDirs.Text;
   Value.IncludeForms := cbForms.Checked;
 
   if rbAllProjFiles.Checked then
@@ -411,6 +413,33 @@ begin
   Constraints.MaxHeight := Height;
   Constraints.MinHeight := Height;
   Constraints.MinWidth := Width;
+end;
+
+procedure TfmGrepSearch.ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  SelectedIndex: Integer;
+  Combo: TCustomComboBox;
+begin
+  if (Key = VK_DELETE) and (ssCtrl in Shift) then
+  begin
+    Combo := (Sender as TCustomComboBox);
+    if Combo.DroppedDown then
+    begin
+      SelectedIndex := Combo.ItemIndex;
+      if SelectedIndex > -1 then begin
+        Combo.Items.Delete(SelectedIndex);
+        UpdateMRUs;
+      end;
+    end;
+  end;
+end;
+
+procedure TfmGrepSearch.UpdateMRUs;
+begin
+  FGrepExpert.SearchList.Assign(cbText.Items);
+  FGrepExpert.DirList.Assign(cbDirectory.Items);
+  FGrepExpert.MaskList.Assign(cbMasks.Items);
+  FGrepExpert.ExcludedDirsList.Assign(cbExcludedDirs.Items);
 end;
 
 initialization

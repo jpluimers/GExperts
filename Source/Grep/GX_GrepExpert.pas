@@ -15,6 +15,7 @@ type
     FReplaceList: TStrings;
     FMaskList: TStrings;
     FDirList: TStrings;
+    FExcludedDirsList: TStrings;
     FGrepCaseSensitive: Boolean;
     FGrepCode: Boolean;
     FGrepStrings: Boolean;
@@ -37,6 +38,7 @@ type
     procedure SetReplaceList(New: TStrings);
     procedure SetMaskList(New: TStrings);
     procedure SetDirList(New: TStrings);
+    procedure SetExcludedDirsList(const Value: TStrings);
   protected
     procedure SetActive(New: Boolean); override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
@@ -75,6 +77,7 @@ type
     property ReplaceList: TStrings read FReplaceList write SetReplaceList;
     property MaskList: TStrings read FMaskList write SetMaskList;
     property DirList: TStrings read FDirList write SetDirList;
+    property ExcludedDirsList: TStrings read FExcludedDirsList write SetExcludedDirsList;
   end;
 
 var
@@ -100,6 +103,7 @@ begin
   FReplaceList := TStringList.Create;
   FMaskList := TStringList.Create;
   FDirList := TStringList.Create;
+  FExcludedDirsList := TStringList.Create;
   FListFont := TFont.Create;
   FContextFont := TFont.Create;
   FContextMatchColor := clHighlight;
@@ -126,6 +130,7 @@ begin
   FreeAndNil(FReplaceList);
   FreeAndNil(FMaskList);
   FreeAndNil(FDirList);
+  FreeAndNil(FExcludedDirsList);
   FreeAndNil(FListFont);
   FreeAndNil(FContextFont);
 
@@ -214,6 +219,7 @@ begin
   RegWriteStrings(Settings, SearchList, ConfigurationKey + PathDelim + 'SearchList', 'GrepSearch');
   RegWriteStrings(Settings, ReplaceList, ConfigurationKey + PathDelim + 'ReplaceList', 'GrepReplace');
   RegWriteStrings(Settings, MaskList, ConfigurationKey + PathDelim + 'MaskList', 'GrepMask');
+  RegWriteStrings(Settings, ExcludedDirsList, ConfigurationKey + PathDelim + 'ExcludedDirsList', 'GrepExcludedDirs');
 end;
 
 procedure TGrepExpert.InternalLoadSettings(Settings: TGExpertsSettings);
@@ -280,6 +286,8 @@ begin
   RegReadStrings(Settings, SearchList, ConfigurationKey + PathDelim + 'SearchList', 'GrepSearch');
   RegReadStrings(Settings, ReplaceList, ConfigurationKey + PathDelim + 'ReplaceList', 'GrepReplace');
   RegReadStrings(Settings, MaskList, ConfigurationKey + PathDelim + 'MaskList', 'GrepMask');
+  RegReadStrings(Settings, ExcludedDirsList, ConfigurationKey + PathDelim + 'ExcludedDirsList', 'GrepExcludedDirs');
+
   if MaskList.Count = 0 then
   begin
     MaskList.Add('*.pas;*.dpr;*.inc');
@@ -318,6 +326,11 @@ end;
 procedure TGrepExpert.SetDirList(New: TStrings);
 begin
   FDirList.Assign(New);
+end;
+
+procedure TGrepExpert.SetExcludedDirsList(const Value: TStrings);
+begin
+  FExcludedDirsList.Assign(Value);
 end;
 
 procedure TGrepExpert.SetActive(New: Boolean);

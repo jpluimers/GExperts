@@ -7,6 +7,7 @@ interface
 uses
   Classes,
   ToolsAPI,
+  RegExpr,
   GX_GrepRegExSearch, GX_GenericUtils;
 
 type
@@ -20,6 +21,7 @@ type
     RegEx: Boolean;
     IncludeSubdirs: Boolean;
     Directories: string;
+    ExcludedDirs: string;
     Mask: string;
     Pattern: string;
     Replace: string;
@@ -113,6 +115,7 @@ type
     FAbortSignalled: Boolean;
     FFileSearchCount: Integer;
     FMatchCount: Integer;
+    FExcludedDirsRegEx: TRegExpr;
     FFileResult: TFileResult;
     FSearcher: TSearcher;
     FSearchRoot: string;
@@ -381,7 +384,10 @@ begin
           if (Search.Attr and faDirectory) <> 0 then
           begin
             if (Search.Name <> '.') and (Search.Name <> '..') then
-              GrepDirectory(Dir + Search.Name, Mask);
+            begin
+              if IsEmpty(FGrepSettings.ExcludedDirs) or (not FExcludedDirsRegEx.Exec(Dir + Search.Name)) then
+                GrepDirectory(Dir + Search.Name, Mask);
+            end;
           end;
           if FAbortSignalled then
             Exit;
@@ -412,7 +418,8 @@ begin
             if WildcardCompare(Masks.Strings[i], Search.Name, True) then
             begin
               SearchFile := Dir + Search.Name;
-              ExecuteSearchOnFile(SearchFile);
+              if IsEmpty(FGrepSettings.ExcludedDirs) or (not FExcludedDirsRegEx.Exec(SearchFile)) then
+                ExecuteSearchOnFile(SearchFile);
             end;
             FFileResult := nil;
 
@@ -446,55 +453,83 @@ begin
 end;
 
 procedure TGrepSearchRunner.Execute;
+var
+  i: Integer;
+  lExcludedDirs: string;
 begin
   FFileSearchCount := 0;
   FMatchCount := 0;
 
-  FSearcher := TSearcher.Create;
+  FExcludedDirsRegEx := TRegExpr.Create;
   try
-    FSearcher.OnFound := FoundIt;
-    //FSearcher.NoComments := FGrepSettings.NoComments;
-    //FSearcher.IncludeForms := FGrepSettings.IncludeForms;
-    FSearcher.CaseSensitive := FGrepSettings.CaseSensitive;
-    FSearcher.WholeWord := FGrepSettings.WholeWord;
-    FSearcher.RegularExpression := FGrepSettings.RegEx;
-    FSearcher.Pattern := FGrepSettings.Pattern;
-
-    FDupeFileList := TStringList.Create;
-    try
-      FDupeFileList.Sorted := True;
-      case FGrepSettings.GrepAction of
-        gaProjGrep:
-          GrepProject(GxOtaGetCurrentProject);
-        gaProjGroupGrep:
-          GrepProjectGroup;
-        gaCurrentOnlyGrep:
-          GrepCurrentSourceEditor;
-        gaOpenFilesGrep:
-          GrepProject(GxOtaGetCurrentProject);
-        gaDirGrep:
-          begin
-            if Length(Trim(FGrepSettings.Mask)) = 0 then
-            begin
-              if GxOtaCurrentProjectIsNativeCpp then
-                GrepDirectories(FGrepSettings.Directories, '*.cpp;*.hpp;*.h;*.pas;*.inc')
-              else if GxOtaCurrentProjectIsCSharp then
-                GrepDirectories(FGrepSettings.Directories, '*.cs')
-              else
-                GrepDirectories(FGrepSettings.Directories, '*.pas;*.dpr;*.inc')
-            end
-            else
-              GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
-          end;
-        gaResults:
-          GrepResults;
-      end;	// end case
-    finally
-      FreeAndNil(FDupeFileList);
+    if NotEmpty(FGrepSettings.ExcludedDirs) then
+    begin
+      lExcludedDirs := Trim(FGrepSettings.ExcludedDirs);
+      i := Length(lExcludedDirs);
+      while (i > 0) and (lExcludedDirs[i] = ';') do
+        Dec(i);
+      SetLength(lExcludedDirs, i);
+      lExcludedDirs := QuoteRegExprMetaChars(lExcludedDirs);
+      FExcludedDirsRegEx.Expression := StringReplace(lExcludedDirs, ';', '|', [rfReplaceAll]);
+      try
+        FExcludedDirsRegEx.Compile;
+      except
+        on E: Exception do
+        begin
+          E.Message := 'Invalid or empty item in directory exclusion list: ' + E.Message;
+          raise;
+        end;
+      end;
     end;
 
+    FSearcher := TSearcher.Create;
+    try
+      FSearcher.OnFound := FoundIt;
+      //FSearcher.NoComments := FGrepSettings.NoComments;
+      //FSearcher.IncludeForms := FGrepSettings.IncludeForms;
+      FSearcher.CaseSensitive := FGrepSettings.CaseSensitive;
+      FSearcher.WholeWord := FGrepSettings.WholeWord;
+      FSearcher.RegularExpression := FGrepSettings.RegEx;
+      FSearcher.Pattern := FGrepSettings.Pattern;
+
+      FDupeFileList := TStringList.Create;
+      try
+        FDupeFileList.Sorted := True;
+        case FGrepSettings.GrepAction of
+          gaProjGrep:
+            GrepProject(GxOtaGetCurrentProject);
+          gaProjGroupGrep:
+            GrepProjectGroup;
+          gaCurrentOnlyGrep:
+            GrepCurrentSourceEditor;
+          gaOpenFilesGrep:
+            GrepProject(GxOtaGetCurrentProject);
+          gaDirGrep:
+            begin
+              if Length(Trim(FGrepSettings.Mask)) = 0 then
+              begin
+                if GxOtaCurrentProjectIsNativeCpp then
+                  GrepDirectories(FGrepSettings.Directories, '*.cpp;*.hpp;*.h;*.pas;*.inc')
+                else if GxOtaCurrentProjectIsCSharp then
+                  GrepDirectories(FGrepSettings.Directories, '*.cs')
+                else
+                  GrepDirectories(FGrepSettings.Directories, '*.pas;*.dpr;*.inc')
+              end
+              else
+                GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
+            end;
+          gaResults:
+            GrepResults;
+        end;	// end case
+      finally
+        FreeAndNil(FDupeFileList);
+      end;
+
+    finally
+      FreeAndNil(FSearcher);
+    end;
   finally
-    FreeAndNil(FSearcher);
+    FreeAndNil(FExcludedDirsRegEx);
   end;
 end;
 

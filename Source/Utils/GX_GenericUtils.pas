@@ -265,7 +265,7 @@ function GetMethodName(S: string): string;
 
 // Add an item to the top of a MRU string list.  Can optionally strip
 // off a trailing path delimiter.
-procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean);
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean = False);
 // Delete a string from a string list
 procedure DeleteStringFromList(List: TStrings; const Item: string);
 // Ensure a string is in a list
@@ -358,6 +358,8 @@ function ComponentOwnsClass(Component: TComponent; const ClassName: string): Boo
 procedure ListboxHorizontalScrollbar(Listbox: TCustomListBox);
 // Get the width of a default scrollbar
 function GetScrollbarWidth: Integer;
+
+procedure SizeComboDropdownToItems(Combo: TCustomComboBox; AMax: Integer = 450);
 
 // Make a Button/CheckBox multiline (WordWrap).  D6 does not have this property.
 procedure MakeMultiline(Control: TButtonControl);
@@ -1614,10 +1616,12 @@ begin
   end;
 end;
 
-procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean);
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean);
 begin
-  if Trim(Text) = '' then Exit;
-  if Length(Text) > 300 then Exit;
+  if (Trim(Text) = '') and (not AllowBlank) then
+    Exit;
+  if Length(Text) > 300 then
+    Exit;
 
   if DeleteTrailingDelimiter then
     Text := RemoveSlash(Text);
@@ -2090,6 +2094,33 @@ end;
 function GetScrollbarWidth: Integer;
 begin
   Result := GetSystemMetrics(SM_CXVSCROLL);
+end;
+
+type
+  TComboCracker = class(TCustomComboBox);
+
+procedure SizeComboDropdownToItems(Combo: TCustomComboBox; AMax: Integer);
+var
+  i: Integer;
+  MaxWidth: Integer;
+  Bitmap: Graphics.TBitmap;
+begin
+  MaxWidth := Combo.Width;
+  Bitmap := Graphics.TBitmap.Create;
+  try
+    Bitmap.Canvas.Font.Assign(TComboCracker(Combo).Font);
+    for i := 0 to Combo.Items.Count - 1 do
+      MaxWidth := Max(MaxWidth, Bitmap.Canvas.TextWidth(Combo.Items[i]) + 10);
+  finally;
+    FreeAndNil(Bitmap);
+  end;
+  if Combo.Items.Count > TComboCracker(Combo).DropDownCount then
+    Inc(MaxWidth, GetSystemMetrics(SM_CXVSCROLL));
+  MaxWidth := Min(AMax, MaxWidth);
+  if MaxWidth > Combo.Width then
+    SendMessage(Combo.Handle, CB_SETDROPPEDWIDTH, MaxWidth, 0)
+  else
+    SendMessage(Combo.Handle, CB_SETDROPPEDWIDTH, 0, 0)
 end;
 
 procedure MakeMultiline(Control: TButtonControl);
