@@ -1226,16 +1226,59 @@ begin
 end;
 
 function GxOtaGetProjectFileName(Project: IOTAProject; NormalizeBdsProj: Boolean = False): string;
+
+  function SearchProjectSourceViaModule(var AProjectFileName: string): Boolean;
+  var
+    i: Integer;
+    Module: IOTAModule;
+    Editor: IOTAEditor;
+  begin
+    Result := False;
+    Module := Project as IOTAModule;
+    for i := 0 to Module.ModuleFileCount - 1 do
+    begin
+      Editor := Module.ModuleFileEditors[i];
+      if IsProjectSource(Editor.FileName) then
+      begin
+        Result := True;
+        AProjectFileName := Editor.FileName;
+        Exit;
+      end;
+    end;
+  end;
+
+  function SearchProjectSourceViaFileExt(var AProjectFileName: string): Boolean;
+  var
+    PackageFileName: string;
+  begin
+    Result := GxOtaProjectIsEitherDelphi(Project);
+    if Result then
+    begin
+      AProjectFileName := ChangeFileExt(AProjectFileName, '.dpr');
+      if not GxOtaFileOrModuleExists(AProjectFileName) then
+      begin
+        PackageFileName := ChangeFileExt(AProjectFileName, '.dpk');
+        if GxOtaFileOrModuleExists(PackageFileName) then
+          AProjectFileName := PackageFileName
+        else
+          Result := False;
+      end;
+    end;
+  end;
+
 begin
   Result := '';
   if Assigned(Project) then begin
     Result := Project.FileName;
     if NormalizeBdsProj and IsBdsprojOrDproj(Result) then begin
-      if GxOtaProjectIsEitherDelphi(Project) then begin
-        Result := ChangeFileExt(Result, '.dpr');
-        if (not FileExists(Result)) and FileExists(ChangeFileExt(Result, '.dpk')) then
-          Result := ChangeFileExt(Result, '.dpk');
-      end;
+      // Use a two-step search to get the right dpr/dpk/... file.
+      // First search the IOTAProject's module list for a file with the correct
+      // extension.  If this doesn't work, replace the bdsproj/dproj file
+      // extension with dpr or dpk.  The second search can give wrong results
+      // if the *proj file and the project source file don't have the same base
+      // name (e.g. Demo.dpr and DemoD11.dproj).
+      if not SearchProjectSourceViaModule(Result) then
+        SearchProjectSourceViaFileExt(Result);
     end;
   end;
 end;
