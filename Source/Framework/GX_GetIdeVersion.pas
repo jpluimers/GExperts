@@ -566,7 +566,7 @@ begin
     if VersionNumber > 0 then begin
       Result := ideRS2010U4;
       if FileExists(GetIdeRootDirectory + 'Bin\dcldbx140.bpl') then begin
-        DclDbxFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide140.bpl');
+        DclDbxFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\dcldbx140.bpl');
         VersionNumber := CompareVersionNumber(DclDbxFileVersion, DclDbx1404);
         if VersionNumber > 0 then begin
           Result := ideRS2010U5;
