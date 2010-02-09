@@ -2,6 +2,8 @@ unit GX_eDate;
 
 interface
 
+{$I GX_CondDefine.inc}
+
 uses
   Classes, Controls, Forms, StdCtrls,
   GX_EditorExpert, GX_ConfigurationInfo, GX_BaseForm;
@@ -56,7 +58,7 @@ constructor TDateExpert.Create;
 begin
   inherited Create;
   ShortCut := scCtrl + scAlt + Ord('A');
-  FDateFormat := ShortDateFormat;
+  FDateFormat := {$IFDEF GX_VER220_up}FormatSettings.{$ENDIF}ShortDateFormat;
 end;
 
 procedure TDateExpert.Execute(Sender: TObject);
