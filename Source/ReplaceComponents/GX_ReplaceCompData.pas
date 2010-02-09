@@ -178,7 +178,7 @@ type
   end;
 
 const
-  DefaultMaps: packed array[0..5] of TDefaultMap = (
+  DefaultMaps: packed array[0..6] of TDefaultMap = (
     (
       SourceClass: 'TEdit';
       DestClass: 'TMemo';
@@ -238,6 +238,16 @@ const
       BiDi: False;
       UseConst: True;
       ConstValue: 'False';
+    ),
+    (
+      SourceClass: 'TButton';
+      DestClass: 'TBitBtn';
+      SourceProp: 'Style';
+      DestProp: 'Style';
+      Disabled: True;
+      BiDi: True;
+      UseConst: False;
+      ConstValue: '';
     )
   );
 
