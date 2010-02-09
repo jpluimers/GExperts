@@ -19,7 +19,6 @@ function GetClassReference(const ClassName: string; const ImplementationModule: 
 type
   PPointer = ^Pointer;
 
-  PImageDosHeader = ^TImageDosHeader;
   TImageDosHeader = packed record
     e_magic: Word;
     e_cblp: Word;
@@ -41,6 +40,7 @@ type
     e_res2: array[0..9] of Word;
     e_lfanew: Longint;
   end;
+  PImageDosHeader = ^TImageDosHeader;
 
 var
   NtHeader: PImageNtHeaders;
