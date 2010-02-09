@@ -438,6 +438,7 @@ procedure AssertIsPasOrInc(const FileName: string);
 function IsDprOrPas(const FileName: string): Boolean;
 function IsPascalSourceFile(const FileName: string): Boolean;
 function IsBdsProjectFile(const FileName: string): Boolean;
+function IsProjectSource(const FileName: string): Boolean;
 function IsBdsSourceFile(const FileName: string): Boolean;
 function IsDpr(const FileName: string): Boolean;
 function IsBpr(const FileName: string): Boolean;
@@ -2607,6 +2608,11 @@ begin
     or IsDproj(FileName)
     or IsPackage(FileName)
     or IsCsproj(FileName);
+end;
+
+function IsProjectSource(const FileName: string): Boolean;
+begin
+  Result := IsDpr(FileName) or IsBpr(FileName) or IsPackage(FileName);
 end;
 
 function IsBdsSourceFile(const FileName: string): Boolean;
