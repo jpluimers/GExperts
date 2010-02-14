@@ -94,6 +94,12 @@ type
   DWORD = LongWord;
 {$ENDIF LINUX}
 
+{$IFNDEF UNICODE}
+type
+  RawByteString = AnsiString;
+  UnicodeString = WideString;
+{$ENDIF}
+
 const
   AbCrc32Table : array[0..255] of DWord = (
   $00000000, $77073096, $ee0e612c, $990951ba,
@@ -166,26 +172,9 @@ const
 type
   TAbPathType = ( ptNone, ptRelative, ptAbsolute );
 
-  {===Multithread lock===}
-  TAbPadLock = class
-  protected {public}
-    FCount  : integer;
-    plCritSect : TRTLCriticalSection;
-  protected
-    function GetLocked : boolean;
-    procedure SetLocked(L : boolean);
-  public
-    constructor Create;
-      {-Create a multithread padlock}
-    destructor Destroy; override;
-      {-Free a multithread padlock}
-    property Locked : boolean
-             read GetLocked
-             write SetLocked;
-      {-Lock/unlock a multithread padlock}
-  end;
-
   {===Helper functions===}
+  function AbCopyFile(const Source, Destination: string; FailIfExists: Boolean): Boolean;
+
   procedure AbCreateDirectory( const Path : string );
     {creates the requested directory tree.  CreateDir is insufficient,
      because if you have a path x:\dir, and request x:\dir\sub1\sub2,
@@ -197,12 +186,6 @@ type
     {-Return the system temp directory}
 
   function AbGetTempFile(const Dir : string; CreateIt : Boolean) : string;
-
-  function AbdMax(Var1, Var2: Longint): Longint;
-    {-Return the maximum of two values}
-
-  function AbdMin(Var1, Var2: DWord): DWord;
-    {-Return the minimum of two values}
 
   function AbDirectoryExists( const Path : string ) : Boolean;
     {Returns true if Path is an existing directory
@@ -268,11 +251,12 @@ type
   procedure AbUnfixName( var FName : string );
     {-changes forward slashes to backslashes}
 
-  procedure AbUpdateCRC( var CRC : LongInt; var Buffer; Len : Word );
+  procedure AbUpdateCRC( var CRC : LongInt; const Buffer; Len : Word );
 
   function AbUpdateCRC32(CurByte : Byte; CurCrc : LongInt) : LongInt;
     {-Returns an updated crc32}
 
+  function AbCRC32Of( const aValue : RawByteString ) : LongInt;
 
 
   function AbWriteVolumeLabel(const VolName : string;
@@ -362,7 +346,19 @@ const
     AB_FPERMISSION_GROUPREAD or
     AB_FPERMISSION_OTHERREAD;
 
+type
+  TAbCharSet = (csASCII, csANSI, csUTF8);
 
+function AbDetectCharSet(const aValue: RawByteString): TAbCharSet;
+{$IFDEF LINUX}
+function AbSysCharSetIsUTF8: Boolean;
+{$ENDIF}
+
+{ Unicode backwards compatibility functions }
+{$IFNDEF UNICODE}
+function CharInSet(C: AnsiChar; CharSet: TSysCharSet): Boolean;
+function UTF8ToString(const S: RawByteString): string;
+{$ENDIF}
 
 implementation
 
@@ -413,43 +409,38 @@ end;
 {====================================================================}
 
 
-{ TAbPadLock implementation ================================================ }
-constructor TAbPadLock.Create;
-begin
-  inherited Create;
-  InitializeCriticalSection(plCritSect);
-end;
-{ -------------------------------------------------------------------------- }
-destructor TAbPadLock.Destroy;
-begin
-  DeleteCriticalSection(plCritSect);
-  inherited Destroy;
-end;
-{ -------------------------------------------------------------------------- }
-function TAbPadLock.GetLocked : boolean;
-begin
-  Result := FCount > 0;
-end;
-{ -------------------------------------------------------------------------- }
-procedure TAbPadLock.SetLocked(L : boolean);
-begin
-  if L {locking} then begin
-    if IsMultiThread then begin
-      EnterCriticalSection(plCritSect);
-      inc(FCount);
-    end;
-  end
-  else {unlocking} begin
-    if (FCount > 0) then begin
-      dec(FCount);
-      LeaveCriticalSection(plCritSect);
-    end;
-  end;
-end;
 { ========================================================================== }
-
-
-{ ========================================================================== }
+function AbCopyFile(const Source, Destination: string; FailIfExists: Boolean): Boolean;
+{$IFDEF LINUX}
+var
+  DesStream, SrcStream: TFileStream;
+{$ENDIF}
+begin
+{$IFDEF LINUX}
+  Result := False;
+  if not FailIfExists or not FileExists(Destination) then
+    try
+      SrcStream := TFileStream.Create(Source, fmOpenRead or fmShareDenyWrite);
+      try
+        DesStream := TFileStream.Create(Destination, fmCreate);
+        try
+          DesStream.CopyFrom(SrcStream, 0);
+          Result := True;
+        finally
+          DesStream.Free;
+        end;
+      finally
+        SrcStream.Free;
+      end;
+    except
+      // Ignore errors and just return false
+    end;
+{$ENDIF LINUX}
+{$IFDEF MSWINDOWS}
+  Result := CopyFile(PChar(Source), PChar(Destination), FailIfExists);
+{$ENDIF MSWINDOWS}
+end;
+{ -------------------------------------------------------------------------- }
 procedure AbCreateDirectory( const Path : string );
   {creates the requested directory tree.  CreateDir is insufficient,
    because if you have a path x:\dir, and request x:\dir\sub1\sub2,
@@ -524,24 +515,6 @@ begin
       FileClose(hFile);
   end;
 {$ENDIF}
-end;
-{ -------------------------------------------------------------------------- }
-function AbdMax(Var1, Var2: Longint): Longint;
-  {-Return the maximum of two values}
-begin
-  if (Var2 > Var1) then
-    Result := Var2
-  else
-    Result := Var1;
-end;
-{ -------------------------------------------------------------------------- }
-function AbdMin(Var1, Var2: DWord): DWord;
-  {-Return the minimum of two values}
-begin
-  if (Var2 < Var1) then
-    Result := Var2
-  else
-    Result := Var1;
 end;
 { -------------------------------------------------------------------------- }
 function AbDrive(const ArchiveName : string) : Char;
@@ -841,11 +814,7 @@ begin
   Result := DirName;
   if Length(DirName) = 0 then
     Exit;
-{$IFDEF UNICODE}
-  if not SysUtils.CharInSet(DirName[Length(DirName)], AbDelimSet) then
-{$ELSE}
-  if not (DirName[Length(DirName)] in AbDelimSet) then
-{$ENDIF}
+  if not CharInSet(DirName[Length(DirName)], AbDelimSet) then
     Result := DirName + AbPathDelim;
 end;
 { -------------------------------------------------------------------------- }
@@ -1131,7 +1100,7 @@ begin
       FName[i] := AbPathDelim;
 end;
 { -------------------------------------------------------------------------- }
-procedure AbUpdateCRC( var CRC : LongInt; var Buffer; Len : Word );
+procedure AbUpdateCRC( var CRC : LongInt; const Buffer; Len : Word );
 type
   TByteArray = array[0..65520] of Byte;
 var
@@ -1153,6 +1122,13 @@ function AbUpdateCRC32(CurByte : Byte; CurCrc : LongInt) : LongInt;
 begin
   Result := DWORD(AbCrc32Table[ Byte(CurCrc xor LongInt( CurByte ) ) ] xor
             ((CurCrc shr 8) and DWORD($00FFFFFF)));
+end;
+{ -------------------------------------------------------------------------- }
+function AbCRC32Of( const aValue : RawByteString ) : LongInt;
+begin
+  Result := -1;
+  AbUpdateCRC(Result, aValue[1], Length(aValue));
+  Result := not Result;
 end;
 { -------------------------------------------------------------------------- }
 function AbWriteVolumeLabel(const VolName : string;
@@ -1323,11 +1299,7 @@ procedure AbFlushOsBuffers(Handle : Integer);
 begin
 {$IFDEF MSWINDOWS}
   if not FlushFileBuffers(Handle) then
-    {$IFDEF Version6}
     RaiseLastOSError;
-    {$ELSE}
-    RaiseLastWin32Error;
-    {$ENDIF}
 {$ENDIF}
 end;
 
@@ -1527,5 +1499,51 @@ begin
 end;
 {!!.04 - Added End }
 
+function AbDetectCharSet(const aValue: RawByteString): TAbCharSet;
+var
+  i, TrailCnt: Integer;
+begin
+  Result := csASCII;
+  TrailCnt := 0;
+  for i := 1 to Length(aValue) do begin
+    if Byte(aValue[i]) >= $80 then
+      Result := csANSI;
+    if TrailCnt > 0 then
+      if Byte(aValue[i]) in [$80..$BF] then
+        Dec(TrailCnt)
+      else Exit
+    else if Byte(aValue[i]) in [$80..$BF] then
+      Exit
+    else
+      case Byte(aValue[i]) of
+        $C0..$C1, $F5..$FF: Exit;
+        $C2..$DF: TrailCnt := 1;
+        $E0..$EF: TrailCnt := 2;
+        $F0..$F4: TrailCnt := 3;
+      end;
+  end;
+  if (TrailCnt = 0) and (Result = csANSI) then
+    Result := csUTF8;
+end;
+
+{$IFDEF LINUX}
+function AbSysCharSetIsUTF8: Boolean;
+begin
+  Result := StrComp(nl_langinfo(_NL_CTYPE_CODESET_NAME), 'UTF-8') = 0;
+end;
+{$ENDIF}
+
+{ Unicode backwards compatibility functions }
+{$IFNDEF UNICODE}
+function CharInSet(C: AnsiChar; CharSet: TSysCharSet): Boolean;
+begin
+Result := C in CharSet;
+end;
+
+function UTF8ToString(const S: RawByteString): string;
+begin
+  Result := UTf8ToAnsi(S);
+end;
+{$ENDIF}
 
 end.

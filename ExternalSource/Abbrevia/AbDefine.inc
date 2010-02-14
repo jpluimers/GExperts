@@ -210,8 +210,8 @@ all older PKZip compatible methods (Shrink, Reduce, Implode}
   The winzip tests require Systools stSpawn.pas
   It can be downloaded at http://sf.net/projects/tpsystools }
 
-{$IFNDEF LINUX}
-{$DEFINE WINZIPTESTS}
+{$IFDEF MSWINDOWS}
+  {.$DEFINE WINZIPTESTS}
 {$ENDIF}
 
 { This a temporary Define for Abbrevia 3.05 Hopefully it's need will be removed
@@ -267,12 +267,6 @@ all older PKZip compatible methods (Shrink, Reduce, Implode}
 
 
 {-------- !! DO NOT CHANGE DEFINES BELOW THIS LINE !! --------}
-
-{$UNDEF AB_DEBUG}
-
-{.$IFOPT D+}
-{$DEFINE AB_DEBUG}
-{.$ENDIF}
 
 {$IFDEF UnzipBackwardSupport}
   {$DEFINE UnzipShrinkSupport}
