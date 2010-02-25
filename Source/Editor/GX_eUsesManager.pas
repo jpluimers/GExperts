@@ -781,17 +781,28 @@ end;
 
 procedure TfmUsesManager.SelectFirstItemInLists;
 
-  procedure SelectFirstItem(ListBox: TListBox);
+  procedure SelectBestItem(ListBox: TListBox);
+  var
+    Filter: string;
+    MatchIndex: Integer;
   begin
     if ListBox.Items.Count > 0 then
-      ListBox.Selected[0] := True;
+    begin
+      Filter := Trim(edtFilter.Text);
+      MatchIndex := ListBox.Items.IndexOf(Filter);
+      if MatchIndex = -1 then
+        MatchIndex := 0;
+
+      ListBox.Selected[MatchIndex] := True;
+    end;
   end;
 
+
 begin
-  SelectFirstItem(lbxCommon);
-  SelectFirstItem(lbxFavorite);
-  SelectFirstItem(lbxSearchPath);
-  SelectFirstItem(lbxProject);
+  SelectBestItem(lbxCommon);
+  SelectBestItem(lbxFavorite);
+  SelectBestItem(lbxSearchPath);
+  SelectBestItem(lbxProject);
 end;
 
 procedure TfmUsesManager.btnOKClick(Sender: TObject);
