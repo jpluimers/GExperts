@@ -252,7 +252,7 @@ http://www.helpandmanual.com/
 GEXPERTS LICENSE
 ----------------------
 
-GExperts is copyright 1996-2009 by GExperts, Inc, Erik Berry, and several
+GExperts is copyright 1996-2010 by GExperts, Inc, Erik Berry, and several
 other authors who have submitted their code for inclusion. This license
 agreement only covers code written by GExperts, Inc. and Erik Berry. You
 should contact the other authors concerning their respective copyrights
