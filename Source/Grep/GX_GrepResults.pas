@@ -1011,6 +1011,7 @@ begin
   actReplaceSelected.Enabled := not Processing and HaveItems;
   actReplaceAll.Enabled := not Processing and HaveItems;
   actViewStayOnTop.Visible := IsStandAlone;
+  tbnSep6.Visible := actViewStayOnTop.Visible;
 end;
 
 function TfmGrepResults.ShowModalForm(Dlg: TCustomForm): TModalResult;
