@@ -808,7 +808,7 @@ end;
 
 procedure TfmGrepResults.actFileCopyExecute(Sender: TObject);
 begin
-  if (ActiveControl = reContext) and (reContext.SelLength > 0) then
+  if reContext.Focused and (reContext.SelLength > 0) then
     reContext.CopyToClipboard
   else
     PrintGrepResults(Self, lbResults.Items, grCopy);
