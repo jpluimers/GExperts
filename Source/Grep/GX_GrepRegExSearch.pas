@@ -143,7 +143,7 @@ begin
     StartCol := FRegEx.MatchPos[0];
     EndCol := StartCol + FRegEx.MatchLen[0] - 1;
     Assert(StartCol > 0);
-    Assert(EndCol > 0);
+    Assert(EndCol > 0, 'Invalid regular expression match, try escaping any special characters using ''\''');
     if WholeWord then
       if not CheckWholeWord(Line, StartCol, EndCol) then
         Continue;
