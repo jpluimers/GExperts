@@ -485,6 +485,7 @@ begin
           FreeAndNil(FileLines);
         end;
         HighlightMemo(TFileResult(CurrentLine.Collection), BeginLineNo, REMatchLineNo);
+        CenterLineInEdit(reContext, REMatchLineNo)        
       end;
     end;
   finally

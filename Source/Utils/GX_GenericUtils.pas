@@ -350,6 +350,8 @@ function FindChild(const WindowContainer: TWinControl; const ControlName: string
 procedure IterateOverControls(Control: TControl; ActionProc: TForEachControlProc);
 function TryFocusControl(Control: TWinControl): Boolean;
 
+procedure CenterLineInEdit(RichEdit: TRichEdit; LineNum: Integer);
+
 // See is this component owns an object of the specified class name
 function ComponentOwnsClass(Component: TComponent; const ClassName: string): Boolean;
 
@@ -2053,6 +2055,35 @@ begin
         // Ignore focus errors
       end;
     end;
+  end;
+end;
+
+procedure CenterLineInEdit(RichEdit: TRichEdit; LineNum: Integer);
+// I don't know the reason, but the RichEdit 2 control in VCL does not
+// respond to the EM_SCROLLCARET in Richedit.h but it does so to the
+// constant in WinUser.h
+const
+  EM_SCROLLCARET  = $00B7;
+var
+  TextPos: lResult;
+  Pos: TSmallPoint;
+begin
+  TextPos := SendMessage(RichEdit.Handle, EM_LINEINDEX, LineNum, 0);
+
+  if TextPos <> -1 then begin
+    // Go to top
+    SendMessage(RichEdit.Handle, EM_SETSEL, 0, 0);
+    SendMessage(RichEdit.Handle, EM_SCROLLCARET, 0, 0);
+
+    // Get the coordinates for the beginning of the line
+    Longint(Pos) := SendMessage(RichEdit.Handle, EM_POSFROMCHAR, TextPos, 0);
+
+    // Scroll from the top
+    SendMessage(RichEdit.Handle, WM_VSCROLL,
+        MakeWParam(SB_THUMBPOSITION, Max(0, Pos.y - (RichEdit.ClientHeight div 2))), 0);
+
+    // Optionally set the caret to the beginning of the line
+    SendMessage(RichEdit.Handle, EM_SETSEL, TextPos, TextPos);
   end;
 end;
 
