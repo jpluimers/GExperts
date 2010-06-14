@@ -7,7 +7,7 @@
 
 This software is distributed under the BSD license.
 
-Copyright (c) 2008, Primoz Gabrijelcic
+Copyright (c) 2010, Primoz Gabrijelcic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -33,10 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author            : Primoz Gabrijelcic
    Creation date     : 2003-11-10
-   Last modification : 2006-11-23
-   Version           : 2.0
+   Last modification : 2010-05-16
+   Version           : 2.0b
 </pre>*)(*
    History:
+     2.0b: 2010-05-16
+       - Bug fixed: When the folder was deleted, it was not removed from the folder cache.
+         Because of that, subsequent FolderExists call succeeded instead of failed, which
+         could cause all sorts of weird problems.
+     2.0a: 2009-09-01
+       - [Erik Berry] Definition of fmCreate in Delphi 2010 has changed and code had to 
+         be adjusted.
      2.0: 2008-05-31
        - Added Unicode support to the underlying storage. File and folder names are stored
          in UTF-16, as are attribute names and values. API is still based on Delphi's
@@ -224,7 +231,7 @@ type
 function CreateStructuredStorage: IGpStructuredStorage;
 
 implementation
-
+                 
 uses
   Contnrs,
   Math,
@@ -456,6 +463,7 @@ type
   end; { TGpStructuredFileInfo }
 
   TGpStructuredFolderProxy = class;
+  TGpStructuredFolderCache = class;
 
   {:A folder inside the structured storage. Actually a file with a known
     internal structure.
@@ -463,10 +471,11 @@ type
   }
   TGpStructuredFolder = class(TGpStructuredFile)
   private
-    sfAccessCount : integer;
-    sfEntries     : TObjectList {of TGpStructuredFolderEntry};
-    sfNumOpenFiles: integer;
-    sfProxy       : TGpStructuredFolderProxy;
+    sfAccessCount    : integer;
+    sfEntries        : TObjectList {of TGpStructuredFolderEntry};
+    sfFolderCache_ref: TGpStructuredFolderCache;
+    sfNumOpenFiles   : integer;
+    sfProxy          : TGpStructuredFolderProxy;
   protected
     function  AccessEntry(const entryName: string; mode: word;
       attributes: TGpStructuredFileAttributes; raiseException: boolean = true): integer;
@@ -486,7 +495,8 @@ type
     property Proxy: TGpStructuredFolderProxy read sfProxy write sfProxy;
   public
     constructor Create(owner: TGpStructuredStorage; parentFolder: TGpStructuredFolder;
-      const folderName: string; firstBlock, folderSize: cardinal);
+      folderCache: TGpStructuredFolderCache; const folderName: string; firstBlock,
+      folderSize: cardinal);
     destructor  Destroy; override;
     procedure Access;
     procedure AttachEntry(entry: TGpStructuredFolderEntry);
@@ -594,8 +604,8 @@ type
     procedure Flush;
     function  GetSubFolder(parentFolder: TGpStructuredFolder;
       subFolder: string): TGpStructuredFolder;
-    function  Remove(markInactive: boolean; parentFolder: TGpStructuredFolder; subFolder:
-      string): boolean;
+    function InternalRemove(markInactive, destroyFolder: boolean; parentFolder:
+      TGpStructuredFolder; subFolder: string): boolean;
     procedure SetSubFolder(parentFolder: TGpStructuredFolder;
       subFolder: string; const value: TGpStructuredFolder);
     procedure TrimMRUList;
@@ -603,6 +613,7 @@ type
     constructor Create;
     destructor  Destroy; override;
     function  MarkInactive(parentFolder: TGpStructuredFolder; subFolder: string): boolean;
+    function Remove(parentFolder: TGpStructuredFolder; subFolder: string): boolean;
     procedure Rename(parentFolder: TGpStructuredFolder; const oldName, newName: string);
     procedure Reparent(parentFolder: TGpStructuredFolder; const folderName: string;
       newParentFolder: TGpStructuredFolder);
@@ -941,7 +952,7 @@ var
   iPointer: integer;
 begin
   header := TStringStream.Create(CSignature +
-    AnsiString(StringOfChar(' ', CBlockSize - Length(CSignature) - Length(shPointers)*4)));
+    StringOfChar(AnsiChar(' '), CBlockSize - Length(CSignature) - Length(shPointers)*4));
   try
     header.Position := header.Size;
     for iPointer := Low(shPointers) to High(shPointers) do begin
@@ -972,7 +983,7 @@ begin
   try
     shStorage.Position := 0;
     if (shStorage.ReadStream(header, Length(CSignature)) <> Length(CSignature)) or
-       (header.DataString <> string(CSignature))
+       (AnsiString(header.DataString) <> CSignature)
     then
       Exit;
   finally FreeAndNil(header); end;
@@ -1108,7 +1119,7 @@ procedure TGpStructuredFile.SetSize(newSize: integer);
 var
   currBlocks     : cardinal;
   iBlock         : integer;
-  lastBlock      : cardinal;
+  lastBlock      : cardinal;      
   lastBlockOffset: cardinal;
   newBlocks      : cardinal;
 begin
@@ -1497,14 +1508,15 @@ begin
   Result := sfEntries.Count;
 end; { TGpStructuredFolder.CountEntries }
 
-constructor TGpStructuredFolder.Create(owner: TGpStructuredStorage;
-  parentFolder: TGpStructuredFolder; const folderName: string; firstBlock,
-  folderSize: cardinal);
+constructor TGpStructuredFolder.Create(owner: TGpStructuredStorage; parentFolder:
+  TGpStructuredFolder; folderCache: TGpStructuredFolderCache; const folderName: string;
+  firstBlock, folderSize: cardinal);
 begin
   inherited Create(owner, parentFolder, folderName, firstBlock, folderSize,
     [sfAttrIsFolder]);
   sfEntries := TObjectList.Create;
   sfAccessCount := 1;
+  sfFolderCache_ref := folderCache;
 end; { TGpStructuredFolder.Create }
 
 function TGpStructuredFolder.CreateEntry(const entryName: string;
@@ -1534,6 +1546,7 @@ function TGpStructuredFolder.DeleteEntry(const entryName: string): boolean;
 var
   idxAttrEntry: integer;
   idxEntry    : integer;
+  isFolder    : boolean;
   subFolder   : TGpStructuredFolder;
 begin
   if entryName = '' then begin
@@ -1545,7 +1558,8 @@ begin
     if idxEntry < 0 then
       Result := false
     else begin
-      if sfAttrIsFolder in Entry[idxEntry].Attributes then begin
+      isFolder := (sfAttrIsFolder in Entry[idxEntry].Attributes);
+      if isFolder then begin
         subFolder := Owner.AccessFolder(self, Entry[idxEntry].FileName);
         try
           if subFolder.NumOpenFiles > 0 then
@@ -1564,6 +1578,8 @@ begin
       FAT.ReleaseChain(Entry[idxEntry].FirstFatEntry);
       sfEntries.Delete(idxEntry);
       Flush;
+      if isFolder then
+        sfFolderCache_ref.Remove(Self, entryName);
       Result := true;
     end;
   end;
@@ -1837,7 +1853,7 @@ begin
   if idxEntry < 0 then
     Result := nil
   else begin
-    Result := TGpStructuredFolder.Create(Owner, self, folderName,
+    Result := TGpStructuredFolder.Create(Owner, self, sfFolderCache_ref, folderName,
       Entry[idxEntry].FirstFatEntry, Entry[idxEntry].FileLength);
     Result.OnSizeChanged := FileSizeChanged;
     Result.Initialize(Entry[idxEntry].FileLength);
@@ -1869,12 +1885,9 @@ end; { TGpStructuredFolder.ReadEntries }
 
 function TGpStructuredFolder.Release: boolean;
 begin
-  Dec(sfAccessCount);
+  if sfAccessCount > 0 then
+    Dec(sfAccessCount);
   Result := (sfAccessCount = 0);
-  if sfAccessCount < 0 then
-    raise Exception.CreateFmt(
-      'TGpStructuredStorage: Trying do decrement access count for folder %s below 0.',
-      [FileName]);
 end; { TGpStructuredFolder.Release }
 
 constructor TGpStructuredFolderProxy.Create(aFolder: TGpStructuredFolder);
@@ -2347,15 +2360,15 @@ end; { TGpStructuredFolderCache.GetSubFolder }
 function TGpStructuredFolderCache.MarkInactive(parentFolder: TGpStructuredFolder;
   subFolder: string): boolean;
 begin
-  Result := Remove(true, parentFolder, subFolder);
+  Result := InternalRemove(true, false, parentFolder, subFolder);
 end; { TGpStructuredFolderCache.MarkInactive }
 
-function TGpStructuredFolderCache.Remove(markInactive: boolean; parentFolder:
-  TGpStructuredFolder; subFolder: string): boolean;
+function TGpStructuredFolderCache.InternalRemove(markInactive, destroyFolder: boolean;
+  parentFolder: TGpStructuredFolder; subFolder: string): boolean;
 var
   fldSubFolder: TGpStructuredFolder;
   idxSubFolder: integer;
-  parentList: TStringList;
+  parentList  : TStringList;
 begin
   Result := false;
   parentList := TStringList(sfcParentFolders[parentFolder]);
@@ -2384,6 +2397,12 @@ begin
       sfcParentFolders[parentFolder] := nil;
   end;
   Result := true;
+end; { TGpStructuredFolderCache.InternalRemove }
+
+function TGpStructuredFolderCache.Remove(parentFolder: TGpStructuredFolder;
+  subFolder: string): boolean;
+begin
+  Result := InternalRemove(false, false, parentFolder, subFolder);
 end; { TGpStructuredFolderCache.Remove }
 
 procedure TGpStructuredFolderCache.Rename(parentFolder: TGpStructuredFolder;
@@ -2455,9 +2474,8 @@ var
   folderProxy: TGpStructuredFolderProxy;
 begin
   while sfcMRUFolders.Count > CMaxMRULength do begin
-// TODO 1 -oPrimoz Gabrijelcic : Test!
     folderProxy := TGpStructuredFolderProxy(sfcMRUFolders.RemoveFromTail);
-    Remove(false, folderProxy.Folder.Folder, folderProxy.Folder.FileName);
+    InternalRemove(false, true, folderProxy.Folder.Folder, folderProxy.Folder.FileName);
   end;
 end; { TGpStructuredFolderCache.TrimMRUList }
 
@@ -2641,7 +2659,7 @@ begin
       [DataFile]);
   gssHeader.Version := CVersion;
   gssFAT.Initialize;
-  gssRootFolder := TGpStructuredFolder.Create(self, nil, '', gssFAT.AllocateBlock, 0);
+  gssRootFolder := TGpStructuredFolder.Create(self, nil, gssFolderCache, '', gssFAT.AllocateBlock, 0);
   gssRootFolder.OnSizeChanged := RootFolderSizeChanged;
   gssRootFolder.Initialize(0);
   gssHeader.FirstRootFolderBlock := gssRootFolder.FirstBlock;
@@ -2970,7 +2988,7 @@ begin
   if (gssHeader.Version <> CVersion) and (gsmStorageMode <> fmOpenRead) then
     gssHeader.Version := CVersion;
   gssFAT.Load;
-  gssRootFolder := TGpStructuredFolder.Create(self, nil, '',
+  gssRootFolder := TGpStructuredFolder.Create(self, nil, gssFolderCache, '',
     gssHeader.FirstRootFolderBlock, gssHeader.RootFolderSize);
   gssRootFolder.OnSizeChanged := RootFolderSizeChanged;
   gssRootFolder.Initialize(gssHeader.RootFolderSize);
