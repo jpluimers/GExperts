@@ -3,8 +3,8 @@ object fmCompsToCode: TfmCompsToCode
   Top = 212
   BorderStyle = bsDialog
   Caption = 'Components to Code'
-  ClientHeight = 271
-  ClientWidth = 288
+  ClientHeight = 278
+  ClientWidth = 298
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -16,13 +16,13 @@ object fmCompsToCode: TfmCompsToCode
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    288
-    271)
+    298
+    278)
   PixelsPerInch = 96
   TextHeight = 14
   object btnOK: TButton
-    Left = 21
-    Top = 239
+    Left = 53
+    Top = 245
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -32,8 +32,8 @@ object fmCompsToCode: TfmCompsToCode
     TabOrder = 3
   end
   object btnCancel: TButton
-    Left = 107
-    Top = 239
+    Left = 134
+    Top = 245
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -43,26 +43,27 @@ object fmCompsToCode: TfmCompsToCode
     TabOrder = 4
   end
   object rgpBinProps: TRadioGroup
-    Left = 7
+    Left = 8
     Top = 8
-    Width = 274
+    Width = 282
     Height = 81
     Anchors = [akLeft, akTop, akRight]
     Caption = ' Binary Properties '
     ItemIndex = 1
     Items.Strings = (
       '&Skip'
-      'Generate &commented code'
+      'Generate c&ommented code'
       'Generate &uncommented code')
     TabOrder = 0
   end
   object rgpLanguage: TRadioGroup
-    Left = 7
-    Top = 168
-    Width = 274
-    Height = 61
-    Anchors = [akLeft, akTop, akRight]
+    Left = 8
+    Top = 184
+    Width = 282
+    Height = 54
+    Anchors = [akLeft, akRight, akBottom]
     Caption = ' Language '
+    Columns = 2
     ItemIndex = 0
     Items.Strings = (
       '&Delphi'
@@ -70,18 +71,22 @@ object fmCompsToCode: TfmCompsToCode
     TabOrder = 2
   end
   object gbxGenerated: TGroupBox
-    Left = 7
-    Top = 96
-    Width = 274
-    Height = 63
-    Anchors = [akLeft, akTop, akRight]
+    Left = 8
+    Top = 95
+    Width = 282
+    Height = 84
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = ' Generated Source '
     TabOrder = 1
+    DesignSize = (
+      282
+      84)
     object chkPrepend: TCheckBox
       Left = 11
       Top = 18
-      Width = 259
+      Width = 262
       Height = 17
+      Anchors = [akLeft, akTop, akRight]
       Caption = '&Prepend original component source'
       Checked = True
       State = cbChecked
@@ -90,17 +95,27 @@ object fmCompsToCode: TfmCompsToCode
     object chkUseDelphiWith: TCheckBox
       Left = 11
       Top = 38
-      Width = 261
+      Width = 262
       Height = 17
-      Caption = 'Use Delphi '#39'&with'#39' statement'
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Use Delphi &with statement'
       Checked = True
       State = cbChecked
       TabOrder = 1
     end
+    object chkCreateFreeCode: TCheckBox
+      Left = 11
+      Top = 58
+      Width = 262
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Generate code to &Free components'
+      TabOrder = 2
+    end
   end
   object btnHelp: TButton
-    Left = 193
-    Top = 238
+    Left = 215
+    Top = 245
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

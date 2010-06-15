@@ -33,6 +33,7 @@ type
     chkPrepend: TCheckBox;
     btnHelp: TButton;
     chkUseDelphiWith: TCheckBox;
+    chkCreateFreeCode: TCheckBox;
     procedure btnHelpClick(Sender: TObject);
   end;
 
@@ -48,6 +49,7 @@ type
     ccBinProps: TBinProps;
     ccPrepend: Boolean;
     ccUseDelphiWith: Boolean;
+    ccCreateFreeCode: Boolean;
     ccLanguage: TCToCLanguage;
     function DoCopyCreationCode: Boolean;
   public
@@ -69,7 +71,7 @@ uses
 
 type
   TCCOptions = (ccBinaryRemove, ccBinaryComment, ccBinaryUncomment,
-    ccIncludeObjectText, ccUseWith);
+    ccIncludeObjectText, ccUseWith, ccUseFree);
   TCCOptionSet = set of TCCOptions;
 
   TComponentCreate = class(TObject)
@@ -77,6 +79,7 @@ type
     ccObj: TStringList;
     ccDecl: TStringList;
     ccCrea: TStringList;
+    ccDele: TStringList;
     ccImpl: TStringList;
     ccDumped: TStringList;
     ccCompDef: TStringList;
@@ -89,9 +92,9 @@ type
     FHaveFormSelected: Boolean;
     function EOF: Boolean;
     procedure Readln;
-    procedure DumpComponent(Comp: TComponent; const Obj, Decl, Crea, Impl: TStrings);
-    procedure StreamAndParse(Comp: TComponent; const Obj, Decl, Crea, Impl, Sub: TStrings);
-    procedure ParseComponent(Comp: TComponent; const Decl, Crea, Impl, Sub: TStrings);
+    procedure DumpComponent(Comp: TComponent; const Obj, Decl, Crea, Dele, Impl: TStrings);
+    procedure StreamAndParse(Comp: TComponent; const Obj, Decl, Crea, Dele, Impl, Sub: TStrings);
+    procedure ParseComponent(Comp: TComponent; const Decl, Crea, Dele, Impl, Sub: TStrings);
     function GetDumped: TStrings;
   public
     constructor Create;
@@ -116,6 +119,7 @@ const
   CFmtCPPVar = '';
   CFmtCPPDeclaration = '    %1:s *%0:s;';
   CFmtCPPCreation = '    %s = new %s(%s);';
+  CFmtCPPDeletion = '    delete[] %s;';
   CFmtCPPWith = '';
   CFmtCPPParent = 'Parent = %s;';
   CFmtCPPName = 'Name = "%s";';
@@ -135,6 +139,7 @@ const
   CFmtPasVar = 'var';
   CFmtPasDeclaration = '  %s: %s;';
   CFmtPasCreation = '  %s := %s.Create(%s);';
+  CFmtPasDeletion = '  %s.Free;';
   CFmtPasWith = '  with %s do' + sLineBreak + '  begin';
   CFmtPasParent = '    Parent := %s;';
   CFmtPasName = '    Name := ''%s'';';
@@ -154,6 +159,7 @@ var
   CFmtVar: string;
   CFmtDeclaration: string;
   CFmtCreation: string;
+  CFmtDeletion: string;
   CFmtWith: string;
   CFmtParent: string;
   CFmtName: string;
@@ -167,6 +173,7 @@ var
   CFmtWithAdd: string;
   CFmtPointerDeclaration: string;
   CFmtSelf: string;
+  CFmtOwner: string;
   CFmtPropertyAccess: string;
   CFmtIndent: string;
 
@@ -209,6 +216,7 @@ begin
   ccBinProps := TBinProps(Settings.ReadEnumerated(ConfigurationKey, 'BinaryProperties', TypeInfo(TBinProps), Ord(bpComment)));
   ccPrepend := Settings.ReadBool(ConfigurationKey, 'PrependWithComponent', False);
   ccUseDelphiWith := Settings.ReadBool(ConfigurationKey, 'UseDelphiWith', True);
+  ccCreateFreeCode := Settings.ReadBool(ConfigurationKey, 'CreateFreeCode', False);
   ccLanguage := TCToCLanguage(Settings.ReadEnumerated(ConfigurationKey, 'Language', TypeInfo(TCToCLanguage), Ord(ccLanguage)));
 end;
 
@@ -219,6 +227,7 @@ begin
   Settings.WriteEnumerated(ConfigurationKey, 'BinaryProperties', TypeInfo(TBinProps), Ord(ccBinProps));
   Settings.WriteBool(ConfigurationKey, 'PrependWithComponent', ccPrepend);
   Settings.WriteBool(ConfigurationKey, 'UseDelphiWith', ccUseDelphiWith);
+  Settings.WriteBool(ConfigurationKey, 'CreateFreeCode', ccCreateFreeCode);
   Settings.WriteEnumerated(ConfigurationKey, 'Language', TypeInfo(TCToCLanguage), Ord(ccLanguage));
 end;
 
@@ -231,6 +240,7 @@ begin
     Dlg.rgpBinProps.ItemIndex := Ord(ccBinProps);
     Dlg.chkPrepend.Checked := ccPrepend;
     Dlg.chkUseDelphiWith.Checked := ccUseDelphiWith;
+    Dlg.chkCreateFreeCode.Checked := ccCreateFreeCode;
     Dlg.rgpLanguage.ItemIndex := Ord(ccLanguage);
     if Dlg.ShowModal = mrOk then
     begin
@@ -238,6 +248,7 @@ begin
       Assert(ccBinProps in [Low(TBinProps)..High(TBinProps)]);
       ccPrepend := Dlg.chkPrepend.Checked;
       ccUseDelphiWith := Dlg.chkUseDelphiWith.Checked;
+      ccCreateFreeCode := Dlg.chkCreateFreeCode.Checked;
       ccLanguage := TCToCLanguage(Dlg.rgpLanguage.ItemIndex);
       Assert(ccLanguage in [Low(TCToCLanguage)..High(TCToCLanguage)]);
 
@@ -322,11 +333,15 @@ begin
   if ccUseDelphiWith then
     Include(dumpOptions, ccUseWith);
 
+  if ccCreateFreeCode then
+    Include(dumpOptions, ccUseFree);
+
   case ccLanguage of
     lPascal: begin
       CFmtVar := CFmtPasVar;
       CFmtDeclaration  := CFmtPasDeclaration;
       CFmtCreation := CFmtPasCreation;
+      CFmtDeletion := CFmtPasDeletion;
       if ccUseDelphiWith then
         CFmtWith := CFmtPasWith
       else
@@ -343,6 +358,10 @@ begin
       CFmtWithAdd := CFmtPasWithAdd;
       CFmtPointerDeclaration := CFmtPasPointerDeclaration;
       CFmtSelf := CFmtPasSelf;
+      if (ccUseFree in dumpOptions) then
+        CFmtOwner := 'nil'
+      else
+        CFmtOwner := CFmtPasSelf;
       CFmtPropertyAccess := CFmtPasPropertyAccess;
       CFmtIndent := CFmtPasIndent
     end;
@@ -350,6 +369,7 @@ begin
       CFmtVar := CFmtCPPVar;
       CFmtDeclaration  := CFmtCPPDeclaration;
       CFmtCreation := CFmtCPPCreation;
+      CFmtDeletion := CFmtCPPDeletion;
       CFmtWith := CFmtCPPWith;
       CFmtParent := CFmtCPPParent;
       CFmtName := CFmtCPPName;
@@ -363,6 +383,10 @@ begin
       CFmtWithAdd := CFmtCPPWithAdd;
       CFmtPointerDeclaration := CFmtCPPPointerDeclaration;
       CFmtSelf := CFmtCPPSelf;
+      if (ccUseFree in dumpOptions) then
+        CFmtOwner := '(TComponent *)NULL'
+      else
+        CFmtOwner := CFmtCPPSelf;
       CFmtPropertyAccess := CFmtCPPPropertyAccess;
       CFmtIndent := CFmtCPPIndent
     end;
@@ -408,6 +432,7 @@ begin
   ccObj := TStringList.Create;
   ccDecl := TStringList.Create;
   ccCrea := TStringList.Create;
+  ccDele := TStringList.Create;
   ccImpl := TStringList.Create;
   FHaveFormSelected := False;
 end;
@@ -417,6 +442,7 @@ begin
   FreeAndNil(ccDumped);
   FreeAndNil(ccObj);
   FreeAndNil(ccDecl);
+  FreeAndNil(ccDele);
   FreeAndNil(ccCrea);
   FreeAndNil(ccImpl);
 
@@ -426,27 +452,27 @@ end;
 procedure TComponentCreate.Dump(Comp: TComponent; Options: TCCOptionSet);
 begin
   ccOptions := Options;
-  DumpComponent(Comp, ccObj, ccDecl, ccCrea, ccImpl);
+  DumpComponent(Comp, ccObj, ccDecl, ccCrea, ccDele, ccImpl);
   ccIsDirty := True;
 end; { TComponentCreate.Dump }
 
 procedure TComponentCreate.DumpComponent(Comp: TComponent;
-  const Obj, Decl, Crea, Impl: TStrings);
+  const Obj, Decl, Crea, Dele, Impl: TStrings);
 
-  procedure InternalDumpComponent(Comp: TComponent; const Obj, Decl, Crea, Impl: TStrings);
+  procedure InternalDumpComponent(Comp: TComponent; const Obj, Decl, Crea, Dele, Impl: TStrings);
   var
     i: Integer;
     Sub: TStringList;
   begin
     Sub := TStringList.Create;
     try
-      StreamAndParse(Comp, Obj, Decl, Crea, Impl, Sub);
+      StreamAndParse(Comp, Obj, Decl, Crea, Dele, Impl, Sub);
       if Comp is TWinControl then
         with Comp as TWinControl do
         begin
           for i := 0 to ControlCount - 1 do
             if Sub.IndexOf(Controls[i].Name) < 0 then
-              InternalDumpComponent(Controls[i], Obj, Decl, Crea, Impl);
+              InternalDumpComponent(Controls[i], Obj, Decl, Crea, Dele, Impl);
         end;
     finally
       FreeAndNil(Sub);
@@ -461,7 +487,7 @@ begin
     ccForm := Comp.Name;
   end;
 
-  InternalDumpComponent(Comp, Obj, Decl, Crea, Impl);
+  InternalDumpComponent(Comp, Obj, Decl, Crea, Dele, Impl);
 end;
 
 function TComponentCreate.EOF: Boolean;
@@ -480,7 +506,16 @@ begin
     AppendStrings(ccDumped, ccDecl);
     ccDumped.Add('');
     AppendStrings(ccDumped, ccCrea);
+
+    ccDumped.Add('');
     AppendStrings(ccDumped, ccImpl);
+
+    if ccUseFree in ccOptions then
+    begin
+      ccDumped.Add('');
+      AppendStrings(ccDumped, ccDele);
+    end;
+
     ccIsDirty := False;
   end;
   Result := ccDumped;
@@ -488,7 +523,7 @@ end;
 
 // This is one huge method - 180 lines!
 procedure TComponentCreate.ParseComponent(Comp: TComponent;
-  const Decl, Crea, Impl, Sub: TStrings);
+  const Decl, Crea, Dele, Impl, Sub: TStrings);
 var
   p: Integer;
   compSub: TStringList;
@@ -552,6 +587,14 @@ var
   procedure Log(List: TStrings; const Fmt: string; const Values: array of const);
   begin
     List.Add(Format(Fmt, Values));
+  end;
+
+  // Performs the same function as Log, but inserts the given strings to the top
+  // of the specified List. Used when building "Component.Free" code, which must be
+  // the reverse order of the "Component.Create()" code that is generated..
+  procedure LogInsert(List: TStrings; const Fmt: string; const Values: array of const);
+  begin
+    List.Insert(0, Format(Fmt, Values));
   end;
 
   function WithoutS(pType: string): string;
@@ -769,9 +812,15 @@ begin
       compClass := TrimLeft(Copy(ccLn, p + 1, Length(ccLn) - p));
       Log(decl, CFmtDeclaration, [compName, compClass]);
       if FHaveFormSelected and (not SameText(Comp.Name, ccForm)) then
+      begin
+        LogInsert(Dele, CFmtDeletion, [compName]);
         Log(crea, CFmtCreation, [compName, compClass, ccForm])
+      end
       else
-        Log(crea, CFmtCreation, [compName, compClass, CFmtSelf]);
+      begin
+        LogInsert(Dele, CFmtDeletion, [compName]);
+        Log(crea, CFmtCreation, [compName, compClass, CFmtOwner]);
+      end;
 
       if CFmtWith <> '' then
         Log(impl, CFmtWith, [compName]);
@@ -823,7 +872,7 @@ begin
               if not Assigned(childComp) then
                 childComp := Comp;
             end;
-            ParseComponent(childComp, decl, crea, compSub, sub);
+            ParseComponent(childComp, decl, crea, Dele, compSub, sub);
           end;
         end
         else
@@ -895,7 +944,7 @@ begin
 end;
 
 procedure TComponentCreate.StreamAndParse(Comp: TComponent;
-  const obj, decl, crea, impl, sub: TStrings);
+  const obj, decl, crea, Dele, impl, sub: TStrings);
 var
   i: Integer;
   TempWriter: TWriter;
@@ -937,7 +986,7 @@ begin
     begin
       Readln;
       if StrBeginsWith('object', ccULn, False) then
-        ParseComponent(Comp, decl, crea, impl, sub);
+        ParseComponent(Comp, decl, crea, Dele, impl, sub);
     end;
   finally
     FreeAndNil(ccCompDef);
