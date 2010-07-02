@@ -466,18 +466,21 @@ begin
 end;
 
 procedure TfmUsesManager.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
+var
+  ActiveLBHasSelection: Boolean;
 begin
+  ActiveLBHasSelection := HaveSelectedItem(GetAvailableSourceListBox);
   actUsesDelete.Enabled := HaveSelectedItem(GetUsesSourceListBox);
   actUsesAddToFavorites.Enabled := actUsesDelete.Enabled;
   actIntfMoveToImpl.Enabled := HaveSelectedItem(lbxInterface) and (pcUses.ActivePage = tabInterface);
-  actImplMoveToIntf.Enabled := HaveSelectedItem(lbxImplementation)and (pcUses.ActivePage = tabImplementation);
+  actImplMoveToIntf.Enabled := HaveSelectedItem(lbxImplementation) and (pcUses.ActivePage = tabImplementation);
   actUsesOpenUnit.Enabled := HaveSelectedItem(GetUsesSourceListBox);
-  actAvailAddToImpl.Enabled := HaveSelectedItem(GetAvailableSourceListBox);
-  actAvailAddToIntf.Enabled := actAvailAddToImpl.Enabled;
-  actAvailOpenUnit.Enabled := actAvailAddToImpl.Enabled;
+  actAvailAddToImpl.Enabled := ActiveLBHasSelection;
+  actAvailAddToIntf.Enabled := ActiveLBHasSelection;
+  actFavAdd.Enabled := ActiveLBHasSelection or (pcUnits.ActivePage = tabFavorite);
+  actAvailOpenUnit.Enabled := ActiveLBHasSelection;
   actFavDelete.Enabled := HaveSelectedItem(lbxFavorite);
   actFavDelete.Visible := GetAvailableSourceListBox = lbxFavorite;
-  actFavAdd.Visible := actFavDelete.Visible;
   if (ActiveControl = lbxInterface) or (ActiveControl = lbxImplementation) then
     actUsesDelete.ShortCut := VK_DELETE
   else
@@ -566,15 +569,33 @@ procedure TfmUsesManager.actFavAddExecute(Sender: TObject);
 var
   i: Integer;
   FileName: string;
+  Src: TListBox;
 begin
-  dlgOpen.InitialDir := ExtractFilePath(GetIdeRootDirectory);
-  if dlgOpen.Execute then
+  if pcUnits.ActivePage = tabFavorite then
   begin
-    for i := 0 to dlgOpen.Files.Count - 1 do
+    dlgOpen.InitialDir := ExtractFilePath(GetIdeRootDirectory);
+    if dlgOpen.Execute then
     begin
-      FileName := ExtractPureFileName(dlgOpen.Files[i]);
-      AddToFavorites(FileName);
+      for i := 0 to dlgOpen.Files.Count - 1 do
+      begin
+        FileName := ExtractPureFileName(dlgOpen.Files[i]);
+        AddToFavorites(FileName);
+      end;
+    end
+  end
+  else begin
+    FileName := '';
+    Src := GetAvailableSourceListBox;
+    for i := Src.Items.Count - 1 downto 0 do
+    begin
+      if Src.Selected[i] then
+      begin
+        FileName := Src.Items[i];
+        AddToFavorites(FileName);
+      end;
     end;
+    edtFilter.Text := '';
+    pcUnits.ActivePage := tabFavorite;
   end;
 end;
 
@@ -767,15 +788,24 @@ end;
 procedure TfmUsesManager.edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   ListBox: TListBox;
+  i: Integer;
 begin
-  if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
+  if (Key = VK_TAB) and (Shift = [ssCtrl]) then
   begin
-    ListBox := GetAvailableSourceListBox;
-    if ListBox.Items.Count > 1 then
-      ListBox.Perform(WM_KEYDOWN, Key, 0)
-    else if ListBox.Items.Count = 1 then
-      ListBox.Selected[0] := True;
-    Key := 0;
+    i := pcUnits.ActivePageIndex + 1;
+    if i = pcUnits.PageCount then i := 0;
+      pcUnits.ActivePageIndex := i;
+  end
+  else begin
+    if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
+    begin
+      ListBox := GetAvailableSourceListBox;
+      if ListBox.Items.Count > 1 then
+        ListBox.Perform(WM_KEYDOWN, Key, 0)
+      else if ListBox.Items.Count = 1 then
+        ListBox.Selected[0] := True;
+      Key := 0;
+    end;
   end;
 end;
 

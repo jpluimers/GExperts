@@ -6,7 +6,7 @@ object fmUsesManager: TfmUsesManager
   BorderIcons = [biSystemMenu]
   Caption = 'Uses Clause Manager'
   ClientHeight = 478
-  ClientWidth = 570
+  ClientWidth = 595
   Color = clBtnFace
   Constraints.MinHeight = 240
   Constraints.MinWidth = 560
@@ -33,7 +33,7 @@ object fmUsesManager: TfmUsesManager
   object pnlUnits: TPanel
     Left = 269
     Top = 0
-    Width = 301
+    Width = 326
     Height = 441
     Align = alClient
     BevelOuter = bvNone
@@ -43,7 +43,7 @@ object fmUsesManager: TfmUsesManager
     object pcUnits: TPageControl
       Left = 6
       Top = 47
-      Width = 289
+      Width = 314
       Height = 388
       ActivePage = tabSearchPath
       Align = alClient
@@ -55,7 +55,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPathFooter: TPanel
           Left = 0
           Top = 325
-          Width = 281
+          Width = 306
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -63,15 +63,15 @@ object fmUsesManager: TfmUsesManager
           object btnSearchPathAddToIntf: TButton
             Left = 4
             Top = 4
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 0
           end
           object btnSearchPathAddToImpl: TButton
-            Left = 136
+            Left = 152
             Top = 4
-            Width = 140
+            Width = 150
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
@@ -80,7 +80,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 281
+          Width = 306
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -90,7 +90,7 @@ object fmUsesManager: TfmUsesManager
           object lbxSearchPath: TListBox
             Left = 3
             Top = 3
-            Width = 275
+            Width = 300
             Height = 319
             Align = alClient
             Color = clBtnFace
@@ -112,7 +112,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 281
+          Width = 306
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -122,7 +122,7 @@ object fmUsesManager: TfmUsesManager
           object lbxProject: TListBox
             Left = 3
             Top = 3
-            Width = 275
+            Width = 300
             Height = 319
             Align = alClient
             DragMode = dmAutomatic
@@ -139,7 +139,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProjFooter: TPanel
           Left = 0
           Top = 325
-          Width = 281
+          Width = 306
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -147,15 +147,15 @@ object fmUsesManager: TfmUsesManager
           object btnProjectAddToInterface: TButton
             Left = 4
             Top = 4
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 0
           end
           object btnProjectAddToImplementation: TButton
-            Left = 136
+            Left = 152
             Top = 4
-            Width = 140
+            Width = 150
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
@@ -168,7 +168,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 281
+          Width = 306
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -178,7 +178,7 @@ object fmUsesManager: TfmUsesManager
           object lbxCommon: TListBox
             Left = 3
             Top = 3
-            Width = 275
+            Width = 300
             Height = 319
             Align = alClient
             DragMode = dmAutomatic
@@ -195,7 +195,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommonFooter: TPanel
           Left = 0
           Top = 325
-          Width = 281
+          Width = 306
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -203,15 +203,15 @@ object fmUsesManager: TfmUsesManager
           object btnCommonAddToInterface: TButton
             Left = 4
             Top = 4
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 0
           end
           object btnCommonAddToImplementation: TButton
-            Left = 136
+            Left = 152
             Top = 4
-            Width = 140
+            Width = 150
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
@@ -224,7 +224,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 281
+          Width = 306
           Height = 296
           Align = alClient
           BevelOuter = bvNone
@@ -234,7 +234,7 @@ object fmUsesManager: TfmUsesManager
           object lbxFavorite: TListBox
             Left = 3
             Top = 3
-            Width = 275
+            Width = 300
             Height = 290
             Align = alClient
             DragMode = dmAutomatic
@@ -251,7 +251,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavFooter: TPanel
           Left = 0
           Top = 296
-          Width = 281
+          Width = 306
           Height = 63
           Align = alBottom
           BevelOuter = bvNone
@@ -259,23 +259,23 @@ object fmUsesManager: TfmUsesManager
           object btnFavoriteAddToInterface: TButton
             Left = 4
             Top = 33
-            Width = 125
+            Width = 140
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 2
           end
           object btnFavoriteAddToImplementation: TButton
-            Left = 136
+            Left = 152
             Top = 33
-            Width = 140
+            Width = 150
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 3
           end
           object btnFavoriteAddToFavorites: TButton
-            Left = 136
+            Left = 152
             Top = 3
-            Width = 140
+            Width = 150
             Height = 25
             Action = actFavAdd
             TabOrder = 1
@@ -283,7 +283,7 @@ object fmUsesManager: TfmUsesManager
           object btnFavoriteDeleteFromFavorites: TButton
             Left = 4
             Top = 3
-            Width = 125
+            Width = 140
             Height = 25
             Action = actFavDelete
             TabOrder = 0
@@ -294,14 +294,14 @@ object fmUsesManager: TfmUsesManager
     object pnlAvailableHeader: TPanel
       Left = 6
       Top = 6
-      Width = 289
+      Width = 314
       Height = 41
       Align = alTop
       BevelOuter = bvNone
       FullRepaint = False
       TabOrder = 0
       DesignSize = (
-        289
+        314
         41)
       object lblFilter: TLabel
         Left = 17
@@ -314,7 +314,7 @@ object fmUsesManager: TfmUsesManager
       object edtFilter: TEdit
         Left = 48
         Top = 16
-        Width = 225
+        Width = 250
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 1
@@ -324,7 +324,7 @@ object fmUsesManager: TfmUsesManager
       object lblUnits: TPanel
         Left = 0
         Top = 0
-        Width = 289
+        Width = 314
         Height = 15
         Align = alTop
         AutoSize = True
@@ -482,26 +482,26 @@ object fmUsesManager: TfmUsesManager
   object pnlFooter: TPanel
     Left = 0
     Top = 441
-    Width = 570
+    Width = 595
     Height = 37
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 2
     DesignSize = (
-      570
+      595
       37)
     object chkSingleActionMode: TCheckBox
       Left = 8
       Top = 9
-      Width = 293
+      Width = 318
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Single action/quic&k add mode'
       TabOrder = 0
     end
     object pnlButtonsRight: TPanel
-      Left = 384
+      Left = 409
       Top = 0
       Width = 186
       Height = 37
