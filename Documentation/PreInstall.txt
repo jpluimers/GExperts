@@ -1,3 +1,3 @@
   Please backup and uninstall any earlier versions of GExperts before installing this version (you will not lose your saved preferences from any compatible version).  You can uninstall GExperts from the Control Panel's "Add/Remove Programs" or "Programs and Features" applet.
 
-  NOTE: GExperts runs best and is tested only with the latest patch versions of Delphi and C++Builder.  For best results, please install the latest IDE patches from: http://www.embarcadero.com/.
+  NOTE: GExperts runs best and is tested only with the latest patch versions of Delphi and C++Builder.  For best results, please install the latest IDE updates from: http://www.embarcadero.com/.
