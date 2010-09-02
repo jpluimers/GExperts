@@ -313,8 +313,10 @@
               <Property name="RetryPauseInterval" type="Cardinal">1000</Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
             </Object>
-            <Object Class="TFBHM4Action" XMLID="{9C8F7588-A86E-4E93-B607-EB134E475200}">
-              <Property MultiValue="0" name="ActionComment" type="string"></Property>
+            <Object Class="TFBHM4Action" XMLID="{7A97AA45-A1A7-4A86-8C7B-322BCD5D8568}">
+              <Property MultiValue="1" name="ActionComment" type="string">
+                <![CDATA[The custom template only removes the navigation header text in the HTML output]]>
+              </Property>
               <Property MultiValue="1" name="ActionDescription" type="string">
                 <![CDATA[Compile Help File]]>
               </Property>
@@ -337,7 +339,7 @@
               <Property name="Enabled" type="WordBool">True</Property>
               <Property MultiValue="0" name="ErrorLogFile" type="string"></Property>
               <Property name="ExpandActionLogTitle" type="Boolean">True</Property>
-              <Property name="FailOnWarnings" type="Boolean">False</Property>
+              <Property name="FailOnWarnings" type="Boolean">True</Property>
               <Property name="HideActionFromLog" type="Boolean">False</Property>
               <Property name="HMVersion" type="THelpAndManualVersion">hm53</Property>
               <Property MultiValue="0" name="HTMLHelpFile" type="string">GExperts.chm</Property>
@@ -362,6 +364,8 @@
               <Property MultiValue="0" name="SkinFileName" type="string"></Property>
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property MultiValue="0" name="VariablesFile" type="string"></Property>
+              <Property MultiValue="0" name="VSSkinFileName" type="string"></Property>
+              <Property MultiValue="0" name="WebSkinFileName" type="string"></Property>
               <Property MultiValue="0" name="WinHelpFile" type="string"></Property>
               <Property MultiValue="0" name="WinHelpOpt" type="string">HLP</Property>
             </Object>
@@ -427,6 +431,7 @@
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">3</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
@@ -473,6 +478,7 @@
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
@@ -711,6 +717,7 @@ Action.BuildVersion = BuildVersion
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
@@ -757,6 +764,7 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
@@ -1361,6 +1369,7 @@ SpecialBuildDetails=0
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">10</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
@@ -1407,6 +1416,7 @@ SpecialBuildDetails=0
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
@@ -1645,6 +1655,7 @@ Action.BuildVersion = BuildVersion
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">11</Property>
               <Property MultiValue="0" name="ConfigName" type="string"></Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
@@ -1691,6 +1702,7 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
@@ -1929,6 +1941,7 @@ Action.BuildVersion = BuildVersion
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">12</Property>
               <Property MultiValue="1" name="ConfigName" type="string">
                 <![CDATA[GExperts Release]]>
@@ -1977,6 +1990,7 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
@@ -2215,6 +2229,7 @@ Action.BuildVersion = BuildVersion
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">13</Property>
               <Property MultiValue="0" name="ConfigName" type="string">Release</Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
@@ -2261,6 +2276,7 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
@@ -2498,6 +2514,7 @@ Action.BuildVersion = BuildVersion
               <Property name="BuildAll" type="WordBool">True</Property>
               <Property name="BuildVersion" type="Integer">0</Property>
               <Property name="CodePage" type="Integer">1252</Property>
+              <Property name="CompileRIDL" type="Boolean">True</Property>
               <Property name="CompilerVersion" type="Integer">14</Property>
               <Property MultiValue="0" name="ConfigName" type="string">Release</Property>
               <Property name="DebugVersionNumbers" type="Boolean">False</Property>
@@ -2544,6 +2561,7 @@ Action.BuildVersion = BuildVersion
               <Property name="SuppressStatusMessages" type="Boolean">False</Property>
               <Property name="UpdateDofFile" type="Boolean">False</Property>
               <Property name="UpdatePackageSource" type="Boolean">False</Property>
+              <Property name="UpdateVersionInfoKeys" type="Boolean">False</Property>
               <Property name="UseEurekaLogCompiler" type="Boolean">False</Property>
               <Property name="UseProjectSettings" type="TFBUseProjectSettings">[]</Property>
               <Property name="UsePropertySet" type="Boolean">False</Property>
