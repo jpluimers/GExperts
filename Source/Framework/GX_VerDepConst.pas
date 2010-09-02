@@ -106,13 +106,13 @@ const
     ClassBrowserStorageFolder = 'Classes.RADStudio2010';
   {$ENDIF VER210}
   
-  {$IFDEF VER220} // Delphi/RAD Studio 2011?
-    GExpertsDll = 'GExpertsRS2011.dll';
+  {$IFDEF VER220} // Delphi/RAD Studio XE 1
+    GExpertsDll = 'GExpertsRSXE1.dll';
     TTabDockHostFormClassContainer = 'designide150.bpl';
     MajorVersionNumberChar = '15';
-    IDEEnglishName = 'RAD Studio 2011';
+    IDEEnglishName = 'RAD Studio XE';
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\8.0';
-    ClassBrowserStorageFolder = 'Classes.RADStudio2011';
+    ClassBrowserStorageFolder = 'Classes.RADStudioXE1';
   {$ENDIF VER220}
   
 implementation

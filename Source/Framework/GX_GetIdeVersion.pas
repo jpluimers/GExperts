@@ -20,7 +20,7 @@ type
      ideDelphi2007,
      ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4,
      ideRS2010, ideRS2010U1, ideRS2010U4, ideRS2010U5, // Updates 2/3 were recalled
-     ideRS2011, // ??
+     ideRSXE1,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -577,26 +577,26 @@ begin
 end;
 
 {
-  Delphi 2011:
+  Delphi XE 1:
   File                 File Version    Size       Modified Time
-  delphicoreide150.bpl
-  coreide150.bpl
-  bds.exe
-  dcldb150.bpl
+  delphicoreide150.bpl 15.0.3890.34076 3,312,640 ? Friday, ?August ?27, ?2010, ??2:55:00 PM
+  coreide150.bpl       15.0.3890.34076 9,258,888  ?Friday, ?August ?27, ?2010, ??2:55:00 PM
+  bds.exe              15.0.3890.34076 7,089,048  ?Friday, ?August ?27, ?2010, ??2:55:00 PM
+  dcldb150.bpl         15.0.3890.34076   311,808  ?Friday, ?August ?27, ?2010, ??2:55:00 PM
 }
-function GetRS2011Version: TBorlandIdeVersion;
+function GetRSXE1Version: TBorlandIdeVersion;
 const
-  CoreIde1500: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
-  CoreIde1501: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+  CoreIde1500: TVersionNumber = (Minor: 0; Major: 15; Build: 34076; Release: 3890);
+  CoreIde1501: TVersionNumber = (Minor: 0; Major: 15; Build: 34076; Release: 3890);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
 begin
-  Result := ideRS2011;
+  Result := ideRSXE1;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide150.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1500);
   if VersionNumber > 0 then begin
-    //Result := ideRS2011U1;
+    //Result := ideRSXE1U1;
   end;
 end;
 
@@ -660,8 +660,8 @@ begin
   {$ENDIF VER210}
   
   {$IFDEF VER220}
-    Result := GetRS2011Version;
-    Assert(Result in [ideRS2011]);
+    Result := GetRSXE1Version;
+    Assert(Result in [ideRSXE1]);
   {$ENDIF VER220}
 
   if Result = ideUnknown then

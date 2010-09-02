@@ -351,7 +351,7 @@ var
         begin
           if IsPathAbsolute(Directory) then
           begin
-            if not DirectoryExists(Directory) then
+            if not SysUtils.DirectoryExists(Directory) then
               Exit;
           end
           else
@@ -360,7 +360,7 @@ var
             if ProjectDir <> '' then
             begin
               Directory := AddSlash(ProjectDir) + Directory;
-              if not DirectoryExists(Directory) then
+              if not SysUtils.DirectoryExists(Directory) then
                 Exit;
             end
             else
