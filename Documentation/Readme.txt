@@ -1,4 +1,4 @@
-GExperts 1.33
+GExperts 1.34
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -79,7 +79,7 @@ HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\    (RAD Studio 2007)
 HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\ (Delphi 7)
 
 Then add a new string value that points to your GExperts DLL (X is the IDE
-version such as 6, 7, 8, 2005, 2006, 2007, 2009, 2010, etc.):
+version such as 6, 7, 8, 2005, 2006, 2007, 2009, 2010, XE, etc.):
 GExperts=C:\Program Files\GExperts\GExpertsRSX.dll
 GExperts=C:\Program Files\GExperts\GExpertsDelphiX.dll
 GExperts=C:\Program Files\GExperts\GExpertsBDSX.dll or
@@ -98,7 +98,19 @@ Add/Remove Programs or Programs [and Features] tool (under Vista).
 
 CHANGE LOG
 ----------------------
-VERSION 1.33 (May, 2009)
+VERSION 1.34 (September, 2010)
+- General: Added support for RAD Studio XE.  Minor bugfixes and updates to
+  the help files. (Erik)
+- Set FocusControl: Add tool to assign focus control of labels by selecting
+  the related label and wincontrol or a group of wincontrols, and the tool
+  tries to guess the label to associate with each control.  (Daniel
+  Maltarollo and Erik)
+- Grep: Allow excluding any number of directories from a search.
+  Always center the match line in the Grep Result context pane.
+- Components to Code: Optionally generate code to free all created
+  components (Peter Dzomlija).
+
+VERSION 1.33 (May 31, 2009)
 - General: Added support for RAD Studio 2009/2010.  Note that some of the tools
   that require our source code parser (Procedure List, Class Browser, To Do
   List, Delimiter Editor Experts, etc.) do not have full unicode support.
@@ -211,9 +223,6 @@ FUTURE ENHANCEMENTS?
 - [Unassigned] Allow adding some common editor and object inspector
   actions to the editor toolbar?
 - [Unassigned] Add support for hiding the toolbar on all dockable experts
-- [Unassigned] Modify To Do expert so that it can display Borland style
-  to do items. The basic parsing code exists, but needs to be surfaced
-  in the user interface.
 - [Unassigned] Add word wrapped printing to the To Do List, etc.
 
 

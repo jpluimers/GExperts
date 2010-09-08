@@ -469,7 +469,7 @@
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsD6.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -755,7 +755,7 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsD7.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -1407,7 +1407,7 @@ SpecialBuildDetails=0
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsDelphi2005.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -1693,7 +1693,7 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsBDS2006.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -1981,7 +1981,7 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsDelphi2007.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -2267,7 +2267,7 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsRS2009.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -2552,7 +2552,7 @@ Action.BuildVersion = BuildVersion
               <Property name="PauseInterval" type="Cardinal">0</Property>
               <Property MultiValue="0" name="ProjectFile" type="WideString">%GXSourceDir%\GExpertsRS2010.dpr</Property>
               <Property name="RegenerateResource" type="WordBool">True</Property>
-              <Property name="ReleaseVersion" type="Integer">3</Property>
+              <Property name="ReleaseVersion" type="Integer">4</Property>
               <Property MultiValue="0" name="ResourceCompilerOptions" type="string"></Property>
               <Property MultiValue="0" name="ResourceCompilerPath" type="string"></Property>
               <Property name="ResourceCompilerType" type="TFBDelphiResourceCompiler">rcBorland</Property>
@@ -2870,7 +2870,7 @@ Action.BuildVersion = BuildVersion
       </Object>
       <Object Class="TFBVariable" XMLID="{55F09ED1-BE0B-4ED6-B681-1ACC70B14C75}">
         <Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">1.33</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">1.34</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
@@ -2880,7 +2880,7 @@ Action.BuildVersion = BuildVersion
       </Object>
       <Object Class="TFBVariable" XMLID="{EDF763E4-AAAB-4116-951F-AB12B1241BA6}">
         <Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">133</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">134</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>
@@ -2890,7 +2890,7 @@ Action.BuildVersion = BuildVersion
       </Object>
       <Object Class="TFBVariable" XMLID="{D33A8AB7-CD8E-4021-A772-EB17D1DFCE27}">
         <Property MultiValue="0" name="Comment" type="string"></Property>
-        <Property MultiValue="0" name="DefaultValue" type="string">3</Property>
+        <Property MultiValue="0" name="DefaultValue" type="string">4</Property>
         <Property MultiValue="0" name="GroupName" type="string"></Property>
         <Property name="IsMacro" type="Boolean">False</Property>
         <Property name="IsPersistent" type="Boolean">False</Property>

@@ -399,7 +399,7 @@
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">3</VersionInfo>
-						<VersionInfo Name="Release">3</VersionInfo>
+						<VersionInfo Name="Release">4</VersionInfo>
 						<VersionInfo Name="Build">0</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
@@ -412,13 +412,13 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName">Erik Berry and the GExperts Development Team</VersionInfoKeys>
 						<VersionInfoKeys Name="FileDescription">GExperts for RAD Studio 2009</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">1.3.3.0</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.3.4.0</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName">GExperts for RAD Studio 2009</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>
 						<VersionInfoKeys Name="OriginalFilename">GExpertsRS2009.dll</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductName">GExperts for RAD Studio 2009</VersionInfoKeys>
-						<VersionInfoKeys Name="ProductVersion">1.33</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">1.34</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
 						<VersionInfoKeys Name="CompileDate">Wednesday, September 24, 2008 4:46 PM</VersionInfoKeys>
 					</VersionInfoKeys>
