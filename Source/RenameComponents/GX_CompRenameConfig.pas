@@ -199,6 +199,7 @@ begin
     if SavedRow < Grid.RowCount then
       Grid.Row := SavedRow;
   end;
+  FormResize(Self);
 end;
 
 procedure TfmCompRenameConfig.CopyGridToValues;
