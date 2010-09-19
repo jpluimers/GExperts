@@ -119,7 +119,7 @@ type
     function GetBugDetailsString: string;
     function GetSystemConfigurationString: string;
   public
-    class procedure Execute(_Owner:TComponent; const _BugEmail, _FeatureEmail: string);
+    class procedure Execute(AOwner: TComponent; const ABugEmail, AFeatureEmail: string);
   end;
 
 implementation
@@ -149,19 +149,14 @@ end;
 
 { TfmFeedbackWizard }
 
-class procedure TfmFeedbackWizard.Execute(_Owner: TComponent;
-  const _BugEmail,  _FeatureEmail: string);
+class procedure TfmFeedbackWizard.Execute(AOwner: TComponent; const ABugEmail, AFeatureEmail: string);
 var
-  frm: TfmFeedbackWizard;
+  Form: TfmFeedbackWizard;
 begin
-  frm := TfmFeedbackWizard.Create(_Owner);
-  try
-    frm.FBugEmail := _BugEmail;
-    frm.FFeatureEmail := _FeatureEmail;
-    frm.ShowModal;
-  finally
-    frm.Free;
-  end;
+  Form := TfmFeedbackWizard.Create(AOwner);
+  Form.FBugEmail := ABugEmail;
+  Form.FFeatureEmail := AFeatureEmail;
+  Form.Show; // Non-modal, this frees itself using caFree Action
 end;
 
 procedure TfmFeedbackWizard.SetDescriptionCaption;
@@ -879,8 +874,7 @@ begin
     Result := Result + GetLocaleKeyboardString;
 end;
 
-procedure TfmFeedbackWizard.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+procedure TfmFeedbackWizard.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
 end;

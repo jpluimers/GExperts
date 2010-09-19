@@ -33,7 +33,7 @@ type
     // call SetCustomBuildDetails and SetCustomBuildEmails to
     // describe your build and provide feedback email adresses.
     class procedure SetCustomBuildDetails(const Details: string);
-    class procedure SetCustomBuildEmails(const _BugEmail, _SuggestionEmail: string);
+    class procedure SetCustomBuildEmails(const ABugEmail, ASuggestionEmail: string);
   end;
 
 type
@@ -52,29 +52,29 @@ uses
   GX_GenericUtils, GX_FeedbackWizard;
 
 const
-  BUG_EMAIL = 'bugs@gexperts.org';  // Do not localize.
-  SUGGESTION_EMAIL = 'suggestions@gexperts.org'; // Do not localize.
+  DefaultBugEmail = 'bugs@gexperts.org';  // Do not localize.
+  DefaultSuggestionEmail = 'suggestions@gexperts.org'; // Do not localize.
 var
   BuildDetails: string = '';
-  BugEmail: string = BUG_EMAIL;
-  SuggestionEmail: string = SUGGESTION_EMAIL;
+  BugEmail: string = DefaultBugEmail;
+  SuggestionEmail: string = DefaultSuggestionEmail;
 
 procedure TfmAbout.btnEmailClick(Sender: TObject);
 begin
-  TfmFeedbackWizard.Execute(self, BugEmail, SuggestionEmail);
+  TfmFeedbackWizard.Execute(Self, BugEmail, SuggestionEmail);
   Close;
 end;
 
 procedure TfmAbout.lblWebPageClick(Sender: TObject);
 var
-  lbl: TLabel;
-  url: string;
+  Lbl: TLabel;
+  URL: string;
 begin
-  lbl := Sender as TLabel;
-  url := lbl.Hint;
-  if url = '' then
-    url := lbl.Caption;
-  GXShellExecute(url, '', True);
+  Lbl := Sender as TLabel;
+  URL := Lbl.Hint;
+  if URL = '' then
+    URL := Lbl.Caption;
+  GXShellExecute(URL, '', True);
 end;
 
 constructor TfmAbout.Create(AOwner: TComponent);
@@ -100,7 +100,7 @@ begin
 
   if NotEmpty(BuildDetails) then
   begin
-    if (BugEmail = BUG_EMAIL) or (SuggestionEmail = SUGGESTION_EMAIL) then
+    if (BugEmail = DefaultBugEmail) or (SuggestionEmail = DefaultSuggestionEmail) then
       btnEmail.Visible := False;
     mmoBuildDetails.Visible := True;
     mmoBuildDetails.Lines.Text := BuildDetails;
@@ -135,10 +135,10 @@ begin
   BuildDetails := Details;
 end;
 
-class procedure TfmAbout.SetCustomBuildEmails(const _BugEmail, _SuggestionEmail: string);
+class procedure TfmAbout.SetCustomBuildEmails(const ABugEmail, ASuggestionEmail: string);
 begin
-  BugEmail := _BugEmail;
-  SuggestionEmail := _SuggestionEmail;
+  BugEmail := ABugEmail;
+  SuggestionEmail := ASuggestionEmail;
 end;
 
 initialization
