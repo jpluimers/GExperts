@@ -100,7 +100,7 @@ object fmAbout: TfmAbout
   object mmoBuildDetails: TMemo
     Left = 224
     Top = 241
-    Width = 385
+    Width = 241
     Height = 39
     Alignment = taCenter
     BorderStyle = bsNone

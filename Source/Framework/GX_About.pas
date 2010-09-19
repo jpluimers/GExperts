@@ -28,7 +28,12 @@ type
     procedure InitVersionInfoControls;
   public
     constructor Create(AOwner: TComponent); override;
+    // If you release an experimental GExperts, either
+    // set gblAboutFormClass to your own descentant of this form or
+    // call SetCustomBuildDetails and SetCustomBuildEmails to
+    // describe your build and provide feedback email adresses.
     class procedure SetCustomBuildDetails(const Details: string);
+    class procedure SetCustomBuildEmails(const _BugEmail, _SuggestionEmail: string);
   end;
 
 type
@@ -46,19 +51,30 @@ uses
   SysUtils, Graphics,
   GX_GenericUtils, GX_FeedbackWizard;
 
+const
+  BUG_EMAIL = 'bugs@gexperts.org';  // Do not localize.
+  SUGGESTION_EMAIL = 'suggestions@gexperts.org'; // Do not localize.
 var
   BuildDetails: string = '';
+  BugEmail: string = BUG_EMAIL;
+  SuggestionEmail: string = SUGGESTION_EMAIL;
 
 procedure TfmAbout.btnEmailClick(Sender: TObject);
 begin
-  with TfmFeedbackWizard.Create(Application) do
-    Show; // This form frees itself by setting caFree
+  TfmFeedbackWizard.Execute(self, BugEmail, SuggestionEmail);
   Close;
 end;
 
 procedure TfmAbout.lblWebPageClick(Sender: TObject);
+var
+  lbl: TLabel;
+  url: string;
 begin
-  GXShellExecute((Sender as TLabel).Caption, '', True);
+  lbl := Sender as TLabel;
+  url := lbl.Hint;
+  if url = '' then
+    url := lbl.Caption;
+  GXShellExecute(url, '', True);
 end;
 
 constructor TfmAbout.Create(AOwner: TComponent);
@@ -84,7 +100,8 @@ begin
 
   if NotEmpty(BuildDetails) then
   begin
-    btnEmail.Visible := False;
+    if (BugEmail = BUG_EMAIL) or (SuggestionEmail = SUGGESTION_EMAIL) then
+      btnEmail.Visible := False;
     mmoBuildDetails.Visible := True;
     mmoBuildDetails.Lines.Text := BuildDetails;
   end
@@ -116,6 +133,12 @@ end;
 class procedure TfmAbout.SetCustomBuildDetails(const Details: string);
 begin
   BuildDetails := Details;
+end;
+
+class procedure TfmAbout.SetCustomBuildEmails(const _BugEmail, _SuggestionEmail: string);
+begin
+  BugEmail := _BugEmail;
+  SuggestionEmail := _SuggestionEmail;
 end;
 
 initialization

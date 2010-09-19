@@ -91,6 +91,8 @@ type
     TabsNotForBugs: TList;
     TabsNotForFeatures: TList;
     FIDEName: string;
+    FBugEmail: string;
+    FFeatureEmail: string;
     procedure SetDescriptionCaption;
     function GetFeedbackType: TFeedbackType;
     procedure SetDescriptionInfo;
@@ -116,6 +118,8 @@ type
     function GetTabReportText(Tab: TTabSheet): string;
     function GetBugDetailsString: string;
     function GetSystemConfigurationString: string;
+  public
+    class procedure Execute(_Owner:TComponent; const _BugEmail, _FeatureEmail: string);
   end;
 
 implementation
@@ -144,6 +148,21 @@ begin
 end;
 
 { TfmFeedbackWizard }
+
+class procedure TfmFeedbackWizard.Execute(_Owner: TComponent;
+  const _BugEmail,  _FeatureEmail: string);
+var
+  frm: TfmFeedbackWizard;
+begin
+  frm := TfmFeedbackWizard.Create(_Owner);
+  try
+    frm.FBugEmail := _BugEmail;
+    frm.FFeatureEmail := _FeatureEmail;
+    frm.ShowModal;
+  finally
+    frm.Free;
+  end;
+end;
 
 procedure TfmFeedbackWizard.SetDescriptionCaption;
 begin
@@ -595,9 +614,9 @@ end;
 function TfmFeedbackWizard.GetDestinationEmail: string;
 begin
   if FeedbackType = fbBug then
-    Result := 'bugs@gexperts.org' // Do not localize.
+    Result := FBugEmail
   else
-    Result := 'suggestions@gexperts.org'; // Do not localize.
+    Result := FFeatureEmail;
 end;
 
 function TfmFeedbackWizard.GetTabReportText(Tab: TTabSheet): string;
