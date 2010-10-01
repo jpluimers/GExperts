@@ -165,8 +165,8 @@ begin
   if not Assigned(fmGrepResults) then
     raise Exception.Create(SGrepResultsNotActive);
 
-   GrepExpert := fmGrepResults.GrepExpert;
-   Assert(Assigned(GrepExpert));
+  GrepExpert := fmGrepResults.GrepExpert;
+  Assert(Assigned(GrepExpert));
 
   Dialog := TfmGrepOptions.Create(nil);
   try

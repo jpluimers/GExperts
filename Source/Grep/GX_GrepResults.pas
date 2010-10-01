@@ -976,12 +976,14 @@ end;
 
 destructor TfmGrepResults.Destroy;
 begin
+  // XE used to crash here with a "Component already destroyed" error due to the listbox handle being 0 and then recreated in a destructor
+  if lbResults.HandleAllocated then
+    ClearResultsListbox;
+
   Self.Abort;
   SaveSettings;
 
   FreeAndNil(FDragSource);
-
-  ClearResultsListbox;
 
   inherited Destroy;
 
