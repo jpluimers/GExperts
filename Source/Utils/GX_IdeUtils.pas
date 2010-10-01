@@ -80,6 +80,7 @@ function RunningDelphi2007: Boolean;
 function RunningDelphi2007OrLess: Boolean;
 function RunningDelphi2007OrGreater: Boolean;
 function RunningRS2009: Boolean;
+function RunningRSXE: Boolean;
 function RunningRS2009OrGreater: Boolean;
 function RunningBDS2006OrLess: Boolean;
 function RunningBDS2006OrGreater: Boolean;
@@ -464,6 +465,15 @@ end;
 function RunningRS2009: Boolean;
 begin
   {$IFDEF VER200}
+  Result := True;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+function RunningRSXE: Boolean;
+begin
+  {$IFDEF VER220}
   Result := True;
   {$ELSE}
   Result := False;
