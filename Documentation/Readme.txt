@@ -109,6 +109,7 @@ VERSION 1.34 (September, 2010)
   Always center the match line in the Grep Result context pane.
 - Components to Code: Optionally generate code to free all created
   components (Peter Dzomlija).
+- Hide/Show Non-Visual Components: Added support for TFrame designers (Erik).
 
 VERSION 1.33 (May 31, 2009)
 - General: Added support for RAD Studio 2009/2010.  Note that some of the tools

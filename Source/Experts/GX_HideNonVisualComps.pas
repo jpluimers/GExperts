@@ -8,7 +8,7 @@ uses
 implementation
 
 uses
-  GX_OtaUtils, Forms, SysUtils, Windows, GX_GenericUtils;
+  GX_OtaUtils, Forms, SysUtils, Windows, GX_GenericUtils, Controls, Classes;
 
 type
   THideNonVisualComps = class(TGX_Expert)
@@ -73,11 +73,31 @@ var
   CompHandle: THandle;
   WindowClass: string;
   FirstCompFound: Boolean;
+  WinControl: TWinControl;
+  ChildControl: TWinControl;
+  i: Integer;
 begin
   Assert(Assigned(Form));
   Assert(Form.Handle > 0);
   FirstCompFound := False;
-  FormHandle  := GetWindow(Form.Handle, GW_CHILD);
+  WinControl := Form;
+  if InheritsFromClass(WinControl.ClassType, 'TWinControlForm') then
+  begin
+    for i := WinControl.ComponentCount - 1 downto 0 do
+    begin
+      if WinControl.Controls[i] is TWinControl then
+      begin
+        ChildControl := WinControl.Controls[i] as TWinControl;
+        if InheritsFromClass(ChildControl.ClassType, 'TCustomFrame') then
+        begin
+          WinControl := ChildControl;
+          Break;
+        end;
+      end;
+    end;
+  end;
+
+  FormHandle := GetWindow(WinControl.Handle, GW_CHILD);
   CompHandle := GetWindow(FormHandle, GW_HWNDLAST);
   VisibleState := False;
   GxOtaClearSelectionOnCurrentForm;
