@@ -109,7 +109,7 @@ uses
   DebugOptions, GX_GenericUtils;
 
 type
-  TDebugType = (dtAnsiMessage, dtUnicodeMessage, dtSQL);
+  TDebugType = (dtAnsiMessage, dtUnicodeMessage, dtSQL, dtCommand);
 
   TDebugMessage = record
     DebugType: TDebugType;
@@ -159,6 +159,7 @@ var
     MessageContent := CData.lpData; // TODO: Make this use the passed-in byte count for the payload length
     if MessageContent[0] = chrClearCommand then
     begin
+      NewMsg.DebugType := dtCommand;
       actEditClearWindow.Execute;
       Exit;
     end;
@@ -207,7 +208,14 @@ begin
   if not Visible then
     FTaskIcon.Icon := imgMessage.Picture.Icon;
   if ConfigInfo.OnMessage then
+  begin
+    if IsIconic(Application.Handle) then
+    begin
+      ShowWindow(Application.Handle, SW_RESTORE);
+      SetForegroundWindow(Application.Handle);
+    end;
     Show;
+  end;
 end;
 
 procedure TfmDebug.TrayIconDblClick(Sender: TObject);
@@ -426,6 +434,7 @@ begin
   Application.OnMessage := ApplicationMsgHandler;
   FStayOnTop := False;
   Application.ShowHint := True;
+  Caption := Application.Title;
 
   FTaskIcon := TTrayIcon.Create(Self);
   FTaskIcon.Icon := Icon;

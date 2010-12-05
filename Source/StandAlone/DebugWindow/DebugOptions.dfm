@@ -8,7 +8,7 @@ object fmDebugOptions: TfmDebugOptions
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
@@ -18,7 +18,7 @@ object fmDebugOptions: TfmDebugOptions
     312
     177)
   PixelsPerInch = 96
-  TextHeight = 14
+  TextHeight = 13
   object gbxView: TGroupBox
     Left = 8
     Top = 8
