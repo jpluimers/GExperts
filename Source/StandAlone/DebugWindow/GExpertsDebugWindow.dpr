@@ -12,6 +12,7 @@ var
   PrvHWND: HWND;
 
 begin
+  // Project Relative Search Path:  ..\..\Utils\;..\..\Framework\;..\..\..\ExternalSource\UniSynEdit
   Application.Initialize;
   Application.Title := '';
   PrvHWND := FindWindow('TApplication', 'GExperts Debug Window');
