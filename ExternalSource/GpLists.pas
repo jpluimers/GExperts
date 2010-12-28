@@ -210,7 +210,7 @@ interface
   {$IF (CompilerVersion >= 16) and (CompilerVersion < 17)} // Delphi 8 IDE Integration compiler
     {$DEFINE GpLists_RequiresD6CompilerHack}
   {$IFEND}
-  {$IF (CompilerVersion >= 17)} //Delphi 2005 or newer
+  {$IF (CompilerVersion >= 18)} // Delphi 2006 or newer (D2005 does not support record methods, and fails to compile this unit with inlining enabled)
     {$DEFINE GpLists_Inline}
     {$DEFINE GpLists_TStringsHelper}
     {$DEFINE GpLists_Enumerators}
@@ -285,7 +285,7 @@ type
     property Value: TObject read kvValue write kvValue;
   end; { TGpKeyValue }
 
-  {$IFDEF GpLists_TStringsHelper}
+  {$IFDEF GpLists_Enumerators} // Or GpLists_TStringsHelper?
   {:Key-value pair as returned form the TStrings helper's WalkKV enumerator.
     @since   2010-10-19
   }
