@@ -8,10 +8,12 @@ Compiling the Source Code
 ------------------------------------------------------------------------------
 
 - Open one of the the following projects from the Source directory:
+    GExpertsRSXE1.dproj       RAD Studio XE
+    GExpertsRS2010.dproj      RAD Studio 2010
     GExpertsRS2009.dproj      RAD Studio 2009
     GExpertsDelphi2007.dproj  Delphi 2007
     GExpertsBDS2006.dpr       BDS 2006
-    GExpertsDelphi2005.dpr    Delphi 2005 (Delphi 9)
+    GExpertsDelphi2005.dpr    Delphi 2005
     GExpertsD8.dpr            Delphi 8 (See: http://cc.codegear.com/Item/21448)
     GExpertsD7.dpr            Delphi 7
     GExpertsD6.dpr            Delphi 6

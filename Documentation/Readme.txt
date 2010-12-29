@@ -28,18 +28,18 @@ GExperts contains numerous experts.  See the online help
 
 KNOWN LIMITATIONS/BUGS
 -----------------------------------------------
-- The following features are not supported under Delphi 8 - 2010:
+- The following features are not supported under Delphi 8 - XE:
   Inner classes, class helpers, anonymous methods, and generics in the
   Class Browser, and some of the old editor tab enhancements, such as
   multiline editor tabs.  Note that the IDE converts some high ANSI and MBCS
   characters to UTF-8 UNICODE when loaded in the code editor, so you may
   experience problems with those files (especially in Delphi 2007 and earlier).
 - The compiler replacement option of the Code Proofreader is only partially
-  working under Delphi 7-2010.  It does not correct when an identifier is
+  working under Delphi 7-XE.  It does not correct when an identifier is
   terminated by pressing a symbol key such as a period or open parenthesis,
   but works fine when the symbol is terminated by a space (IDE limitation).
 - Due to either native Open Tools API limitations or bugs, the following
-  items can not be supported under Delphi 8/2005/2006/2007/2010:
+  items can not be supported under Delphi 8/2005/2006/2007/2010/XE:
   Delphi 8 Only:
    - Rename Components (IDE bug setting the Name property)
    - Jumping to a form search match from Grep Results when the source is open
@@ -52,7 +52,7 @@ KNOWN LIMITATIONS/BUGS
      (no WinForms support for IOTAFormEditor/IOTAComponent)
    - Replace Components for VCL.NET (No direct access to components)
    - Components to Code for VCL.NET (No direct access to components)
-  Delphi 8 - 2010:
+  Delphi 8 - XE:
    - It is no longer possible for addins to override some built-in IDE
      shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
      Identifier, Procedure List, etc.) to not conflict with your selected
@@ -93,7 +93,7 @@ the latest updates and patches for your IDE available from:
 UNINSTALLATION
 ----------------------
 Uninstallation of GExperts can be done from the Control Panel's
-Add/Remove Programs or Programs [and Features] tool (under Vista).
+Add/Remove Programs or Programs [and Features] tool.
 
 
 CHANGE LOG
@@ -110,6 +110,7 @@ VERSION 1.34 (September, 2010)
 - Components to Code: Optionally generate code to free all created
   components (Peter Dzomlija).
 - Hide/Show Non-Visual Components: Added support for TFrame designers (Erik).
+
 
 VERSION 1.33 (May 31, 2009)
 - General: Added support for RAD Studio 2009/2010.  Note that some of the tools
@@ -248,15 +249,6 @@ MISCELLANEOUS NOTES
 - Nothing in GExperts is aware of or takes into account conditional
   defines, so code that is defined out will still be parsed by GExperts.
 - Source Export only supports background colors when exporting to HTML.
-
-
-THANKS
-----------------------
-Vincent Parrett donated a copy of FinalBuilder 6
-http://www.atozedsoftware.com/
-
-Alexander Halser donated a copy of Help and Manual 3
-http://www.helpandmanual.com/
 
 
 GEXPERTS LICENSE
