@@ -97,6 +97,7 @@ type
     function ClipInfoFromPointer(Ptr: Pointer): TClipInfo;
     function HaveSelectedItem: Boolean;
     procedure RemoveDataListItem(Index: Integer);
+    function GetSelectedItemsText: string;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -175,7 +176,7 @@ begin
   Name := 'ClipboardChainHelperWindow';
   // The clipboard chaining only works properly if this window is
   // not parented by the the clip form.  The desktop window may not
-  // be the best window to choose but it works.
+  // be the best window to hook but it works.
   ParentWindow := GetDesktopWindow;
   Visible := False;
   {$IFOPT D+} SendDebug('In THelperWinControl Create'); {$ENDIF}
@@ -442,10 +443,10 @@ end;
 
 procedure TfmClipboardHistory.lvClipChange(Sender: TObject; Item: TListItem; Change: TItemChange);
 begin
-  if FLoading then
+  if FLoading or (csDestroying in ComponentState) then
     Exit;
   if lvClip.Selected <> nil then
-    mmoClipText.Lines.Text := ClipInfoForItem(lvClip.Selected).ClipString
+    mmoClipText.Lines.Text := GetSelectedItemsText
   else
     mmoClipText.Clear;
 end;
@@ -502,9 +503,7 @@ end;
 
 procedure TfmClipboardHistory.actEditCopyExecute(Sender: TObject);
 var
-  i: Integer;
   ClipItem: TListItem;
-  ClipInfo: TClipInfo;
   Info: TClipInfo;
   idx: Integer;
   Buffer: string;
@@ -541,22 +540,7 @@ begin
         end;
       end
       else
-      begin
-        Buffer := '';
-        for i := lvClip.Items.Count - 1 downto 0 do
-        begin
-          ClipItem := lvClip.Items[i];
-          ClipInfo := ClipInfoFromPointer(ClipItem.Data);
-
-          if ClipItem.Selected then
-          begin
-            Buffer := Buffer + ClipInfo.ClipString;
-            if not HasTrailingEOL(Buffer) then
-              Buffer := Buffer + sLineBreak;
-          end;
-        end;
-        Clipboard.AsText := Buffer;
-      end
+        Clipboard.AsText := GetSelectedItemsText;
     end
     else
       mmoClipText.CopyToClipBoard;
@@ -718,6 +702,24 @@ begin
     end;
   end;
   mmoClipText.Clear;
+end;
+
+function TfmClipboardHistory.GetSelectedItemsText: string;
+var
+  i: Integer;
+  ClipItem: TListItem;
+begin
+  Result := '';
+  for i := lvClip.Items.Count - 1 downto 0 do
+  begin
+    ClipItem := lvClip.Items[i];
+    if ClipItem.Selected then
+    begin
+      Result := Result + ClipInfoForItem(ClipItem).ClipString;
+      if not HasTrailingEOL(Result) then
+        Result := Result + sLineBreak;
+    end;
+  end;
 end;
 
 { TClipExpert }

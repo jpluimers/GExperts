@@ -61,7 +61,7 @@ var
 
 procedure TfmAbout.btnEmailClick(Sender: TObject);
 begin
-  TfmFeedbackWizard.Execute(Self, BugEmail, SuggestionEmail);
+  TfmFeedbackWizard.Execute(Application, BugEmail, SuggestionEmail);
   Close;
 end;
 

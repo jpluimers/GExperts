@@ -395,7 +395,8 @@ var
 
 begin
   AItem := FindMenuByName(MainMenu.Items, edtMenuItemName.Text);
-  Assert(Assigned(AItem));
+  if not Assigned(AItem) then
+    raise Exception.Create('Menu item not found: ' + edtMenuItemName.Text);
   if ShortCutsAreEqual then
   begin
     AItem.ShortCut := TShortCut(AItem.Tag);
