@@ -97,6 +97,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
       Top = 84
       Width = 157
       Height = 22
+      Enabled = False
       HotKey = 0
       InvalidKeys = []
       Modifiers = []
