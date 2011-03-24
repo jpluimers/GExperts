@@ -115,6 +115,15 @@ const
     ClassBrowserStorageFolder = 'Classes.RADStudioXE1';
   {$ENDIF VER220}
   
+  {$IFDEF VER230} // Delphi/RAD Studio XE 2
+    GExpertsDll = 'GExpertsRSXE2.dll';
+    TTabDockHostFormClassContainer = 'designide160.bpl';
+    MajorVersionNumberChar = '16';
+    IDEEnglishName = 'RAD Studio XE 2';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\9.0';
+    ClassBrowserStorageFolder = 'Classes.RADStudioXE2';
+  {$ENDIF VER220}
+
 implementation
 
 end.

@@ -90,7 +90,7 @@ const
   StringType = tkLString;
   {$ENDIF}
 
-  GxOptionsMap: array[0..309] of TGxOptionsMap = (
+  GxOptionsMap: array[0..310] of TGxOptionsMap = (
     ( // 0
       Name: 'HostApplication';
       AssumedTypeKind: StringType;
@@ -2271,6 +2271,13 @@ const
       Name: 'WarnCvtWideningStringLost';
       AssumedTypeKind: tkInteger;
       Description: 'WarnCvtWideningStringLost';
+      Categories: [ocWarnings];
+      Translator: GxBoolOptionTranslator;
+    ),
+    (
+      Name: 'WarnNonPortableTypecast';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnNonPortableTypecast';
       Categories: [ocWarnings];
       Translator: GxBoolOptionTranslator;
     )

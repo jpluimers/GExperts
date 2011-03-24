@@ -104,7 +104,7 @@ begin
   EndOfLine := Settings.ReadString('Quote', 'EndOfLine', cDefaultEndOfLine);
 end;
 
-function ConfigureQuote:boolean;
+function ConfigureQuote: Boolean;
 var
   Dlg: TfmQuoteConfig;
 begin

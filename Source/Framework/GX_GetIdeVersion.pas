@@ -20,7 +20,8 @@ type
      ideDelphi2007,
      ideRS2009, ideRS2009U1, ideRS2009U2, ideRS2009U3, ideRS2009U4,
      ideRS2010, ideRS2010U1, ideRS2010U4, ideRS2010U5, // Updates 2/3 were recalled
-     ideRSXE1,
+     ideRSXE1, ideRSXE1U1,
+     ideRSXE2,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -579,15 +580,22 @@ end;
 {
   Delphi XE 1:
   File                 File Version    Size       Modified Time
-  delphicoreide150.bpl 15.0.3890.34076 3,312,640 ? Friday, ?August ?27, ?2010, ??2:55:00 PM
-  coreide150.bpl       15.0.3890.34076 9,258,888  ?Friday, ?August ?27, ?2010, ??2:55:00 PM
-  bds.exe              15.0.3890.34076 7,089,048  ?Friday, ?August ?27, ?2010, ??2:55:00 PM
-  dcldb150.bpl         15.0.3890.34076   311,808  ?Friday, ?August ?27, ?2010, ??2:55:00 PM
+  delphicoreide150.bpl 15.0.3890.34076 3,312,640  Friday, August 27, 2010, 2:55:00 PM
+  coreide150.bpl       15.0.3890.34076 9,258,888  Friday, August 27, 2010, 2:55:00 PM
+  bds.exe              15.0.3890.34076 7,089,048  Friday, August 27, 2010, 2:55:00 PM
+  dcldb150.bpl         15.0.3890.34076   311,808  Friday, August 27, 2010, 2:55:00 PM
+
+  Delphi XE 1 Update 1:
+  File                 File Version      Size       Modified Time
+  delphicoreide150.bpl 15.0.3953.35171  3,304,960  Wednesday, November 03, 2010, 4:55:00 PM
+  coreide150.bpl       15.0.3953.35171  9,265,152  Wednesday, November 03, 2010, 4:55:00 PM
+  bds.exe              15.0.3953.35171 10,436,504  Wednesday, November 03, 2010, 4:55:00 PM
+  dcldb150.bpl         15.0.3953.35171    311,808  Wednesday, November 03, 2010, 4:55:00 PM
 }
 function GetRSXE1Version: TBorlandIdeVersion;
 const
   CoreIde1500: TVersionNumber = (Minor: 0; Major: 15; Build: 34076; Release: 3890);
-  CoreIde1501: TVersionNumber = (Minor: 0; Major: 15; Build: 34076; Release: 3890);
+  CoreIde1501: TVersionNumber = (Minor: 0; Major: 15; Build: 35171; Release: 3953);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
@@ -596,9 +604,34 @@ begin
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide150.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1500);
   if VersionNumber > 0 then begin
-    //Result := ideRSXE1U1;
+    Result := ideRSXE1U1;
   end;
 end;
+
+{
+  Delphi XE 2:
+  File                 File Version    Size       Modified Time
+  delphicoreide160.bpl 
+  coreide160.bpl       
+  bds.exe              
+  dcldb160.bpl         
+}
+function GetRSXE2Version: TBorlandIdeVersion;
+const
+  CoreIde1600: TVersionNumber = (Minor: 0; Major: 16; Build: 0; Release: 0);
+  CoreIde1601: TVersionNumber = (Minor: 0; Major: 16; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRSXE2;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide160.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1600);
+  if VersionNumber > 0 then begin
+    //Result := ideRSXE2U1;
+  end;
+end;
+
 
 function GetBorlandIdeVersion: TBorlandIdeVersion;
 begin
@@ -661,8 +694,13 @@ begin
   
   {$IFDEF VER220}
     Result := GetRSXE1Version;
-    Assert(Result in [ideRSXE1]);
+    Assert(Result in [ideRSXE1, ideRSXE1U1]);
   {$ENDIF VER220}
+
+  {$IFDEF VER230}
+    Result := GetRSXE2Version;
+    Assert(Result in [ideRSXE2]);
+  {$ENDIF VER230}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);
