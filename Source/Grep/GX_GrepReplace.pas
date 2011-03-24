@@ -17,6 +17,7 @@ type
     lblInString: TLabel;
     lblReplace: TLabel;
     lblReplaceString: TLabel;
+    chkUseRegEx: TCheckBox;
     procedure btnHelpClick(Sender: TObject);
   private
     FGrepExpert: TGrepExpert;
@@ -66,6 +67,7 @@ begin
 
   FGrepExpert := fmGrepResults.GrepExpert;
   cbReplace.Items.Assign(FGrepExpert.ReplaceList);
+  chkUseRegEx.Checked := FGrepExpert.GrepRegEx;
 
   if cbReplace.Items.Count > 0 then
   begin
@@ -77,11 +79,12 @@ end;
 procedure TfmGrepReplace.RetrieveSettings(var Value: TGrepSettings);
 begin
   Value.Replace := cbReplace.Text;
+  Value.RegEx := chkUseRegEx.Checked;
 end;
 
 procedure TfmGrepReplace.btnHelpClick(Sender: TObject);
 begin
-  GxContextHelp(Self, 1);
+  GxContextHelp(Self, 3);
 end;
 
 procedure TfmGrepReplace.SetSearchString(const Value: string);

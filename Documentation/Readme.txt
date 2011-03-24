@@ -1,4 +1,4 @@
-GExperts 1.34
+GExperts 1.35
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -98,6 +98,11 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
+VERSION 1.35 (March, 2011)
+- General: Fix problems with the bug reporting tool and about box disappearing.
+- Grep: Search and replace supports regular expression subgroubs (Egon Elbre).
+
+
 VERSION 1.34 (September, 2010)
 - General: Added support for RAD Studio XE.  Minor bugfixes and updates to
   the help files. (Erik)

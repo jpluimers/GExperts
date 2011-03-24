@@ -29,16 +29,16 @@ object fmGrepReplace: TfmGrepReplace
   end
   object lblIn: TLabel
     Left = 9
-    Top = 57
+    Top = 73
     Width = 11
     Height = 14
     Caption = 'In'
   end
   object lblInString: TLabel
     Left = 61
-    Top = 57
+    Top = 80
     Width = 364
-    Height = 58
+    Height = 27
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoSize = False
     ShowAccelChar = False
@@ -76,7 +76,7 @@ object fmGrepReplace: TfmGrepReplace
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 2
   end
   object btnCancel: TButton
     Left = 270
@@ -87,7 +87,7 @@ object fmGrepReplace: TfmGrepReplace
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 3
   end
   object btnHelp: TButton
     Left = 349
@@ -96,7 +96,15 @@ object fmGrepReplace: TfmGrepReplace
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = '&Help'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = btnHelpClick
+  end
+  object chkUseRegEx: TCheckBox
+    Left = 61
+    Top = 56
+    Width = 364
+    Height = 17
+    Caption = 'Regular e&xpression'
+    TabOrder = 1
   end
 end

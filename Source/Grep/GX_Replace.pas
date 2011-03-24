@@ -13,7 +13,7 @@ function ReplaceLine(LineResult: TLineResult; GrepSettings: TGrepSettings): Inte
 
 implementation
 
-uses SysUtils, Controls, Dialogs, ToolsAPI, GX_OtaUtils, GX_GenericUtils;
+uses SysUtils, Controls, Dialogs, ToolsAPI, GX_OtaUtils, GX_GenericUtils, RegExpr;
 
 type
   ESkipFileReplaceException = class(Exception);
@@ -45,6 +45,15 @@ begin
   end;
 end;
 
+function ReplacePatternInStringWithRegEx(CurrentLine: TLineResult; GrepSettings: TGrepSettings; RegEx: TRegExpr): string;
+var
+  i: Integer;
+begin
+  Result := RegEx.Replace(CurrentLine.Line, GrepSettings.Replace, True);
+  for i := CurrentLine.Matches.Count - 1 downto 0 do
+    CurrentLine.Matches[i].ShowBold := False;
+end;
+
 function ReplaceAll(ResultList: TStrings; GrepSettings: TGrepSettings): Integer;
 var
   i: Integer;
@@ -71,6 +80,7 @@ var
   Module: IOTAModule;
   EditWriter: IOTAEditWriter;
   SourceEditor: IOTASourceEditor;
+  RegEx: TRegExpr;
   WasBinary: Boolean;
 
   procedure GetFileLines;
@@ -104,7 +114,10 @@ var
       if LineResult.Line <> FileLine then
         raise Exception.CreateFmt(SFileChangedAbort, [MatchFile, LineResult.Line, FileLine]);
 
-      TempString := ReplacePatternInString(LineResult, GrepSettings);
+      if GrepSettings.RegEx then
+        TempString := ReplacePatternInStringWithRegEx(LineResult, GrepSettings, RegEx)
+      else
+        TempString := ReplacePatternInString(LineResult, GrepSettings);
       TempFile.Strings[i -1] := TempString;
       Inc(Result, LineResult.Matches.Count);
     end
@@ -119,6 +132,9 @@ var
         if LineResult.Line <> FileLine then
           raise Exception.CreateFmt(SFileChangedAbort, [MatchFile, LineResult.Line, FileLine]);
 
+      if GrepSettings.RegEx then
+        TempString := ReplacePatternInStringWithRegEx(LineResult, GrepSettings, RegEx)
+      else
         TempString := ReplacePatternInString(LineResult, GrepSettings);
         TempFile.Strings[LineResult.LineNo - 1] := TempString;
       end;
@@ -173,8 +189,18 @@ begin
   else
     MatchFile := AFileResult.FileName;
 
+  RegEx := nil;
   TempFile := TGXUnicodeStringList.Create;
   try
+    if GrepSettings.RegEx then
+    begin
+      RegEx := TRegExpr.Create;
+      RegEx.Expression := GrepSettings.Pattern;
+      RegEx.ModifierG := True;
+      RegEx.ModifierI := not GrepSettings.CaseSensitive;
+      RegEx.Compile;
+    end;
+
     InMemory := GxOtaIsFileOpen(MatchFile, True);
     try
       GetFileLines;
@@ -190,6 +216,7 @@ begin
     DoReplacement;
     WriteResults;
   finally
+    FreeAndNil(RegEx);
     FreeAndNil(TempFile);
   end;
 end;
