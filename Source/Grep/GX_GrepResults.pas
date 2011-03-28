@@ -1177,7 +1177,7 @@ begin
   if IsEmpty(MatchStr) then
     StatusBar.Panels.Items[1].Width := 0
   else
-    StatusBar.Panels.Items[1].Width := StatusBar.Canvas.TextWidth(MatchStr) + 45;
+    StatusBar.Panels.Items[1].Width := StatusBar.Canvas.TextWidth(MatchStr) + 50;
   ResizeStatusBar;
 end;
 
