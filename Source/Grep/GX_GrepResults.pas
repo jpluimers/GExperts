@@ -149,6 +149,7 @@ type
     function DoingSearchOrReplace: Boolean;
     procedure ExpandOrContractList(Expand: Boolean);
     function GetStayOnTop: Boolean;
+    procedure ResizeStatusBar;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
@@ -371,7 +372,7 @@ end;
 
 procedure TfmGrepResults.FormResize(Sender: TObject);
 begin
-  StatusBar.Panels.Items[0].Width := StatusBar.Width - 175;
+  ResizeStatusBar;
   lbResults.Refresh;
 end;
 
@@ -970,6 +971,7 @@ begin
   CenterForm(Self);
   LoadSettings;
   ResizeListBox;
+  SetMatchString('');
 
   FDragSource := TDropFileSource.Create(nil);
 end;
@@ -1172,6 +1174,11 @@ end;
 procedure TfmGrepResults.SetMatchString(const MatchStr: string);
 begin
   StatusBar.Panels.Items[1].Text := MatchStr;
+  if IsEmpty(MatchStr) then
+    StatusBar.Panels.Items[1].Width := 0
+  else
+    StatusBar.Panels.Items[1].Width := StatusBar.Canvas.TextWidth(MatchStr) + 45;
+  ResizeStatusBar;
 end;
 
 function TfmGrepResults.QueryUserForGrepOptions: Boolean;
@@ -1217,6 +1224,11 @@ end;
 function TfmGrepResults.ConfigurationKey: string;
 begin
   Result := TGrepExpert.ConfigurationKey;
+end;
+
+procedure TfmGrepResults.ResizeStatusBar;
+begin
+  StatusBar.Panels.Items[0].Width := StatusBar.ClientWidth - StatusBar.Panels.Items[1].Width;
 end;
 
 { TShowUnicodeReplaceMessage }
