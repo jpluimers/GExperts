@@ -1799,9 +1799,9 @@ end;
 function GXPathCombine(out ADest: string; const ADir, AFile: string): Boolean;
 begin
   SetLength(ADest, MAX_PATH);
-  Result := PathCombine(@ADest[1], PChar(ADir), PChar(AFile)) <> nil;
+  Result := PathCombine(PChar(ADest), PChar(ADir), PChar(AFile)) <> nil;
   if Result then
-    SetLength(ADest, StrLen(@ADest[1]))
+    SetLength(ADest, StrLen(PChar(ADest)))
   else
     ADest := '';
 end;
@@ -1820,10 +1820,10 @@ begin
   else
     dwAttrTo := 0;
   SetLength(APath, MAX_PATH);
-  Result := PathRelativePathTo(@APath[1], PChar(ExtractFilePath(AFrom)), dwAttrFrom, PChar(ExpandFileName(ATo)), dwAttrTo);
+  Result := PathRelativePathTo(PChar(APath), PChar(ExtractFilePath(AFrom)), dwAttrFrom, PChar(ExpandFileName(ATo)), dwAttrTo);
   if Result then
   begin
-    SetLength(APath, StrLen(@APath[1]));
+    SetLength(APath, StrLen(PChar(APath)));
     if (proOnlyInSubDir in AOptions) and StrBeginsWith('..' + PathDelim, APath) then
       APath := ATo; // Return unchanged ATo if not in subdirectory
   end
