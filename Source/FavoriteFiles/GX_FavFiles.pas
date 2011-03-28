@@ -96,6 +96,16 @@ type
     mitTreeSep2: TMenuItem;
     mitMoveUp: TMenuItem;
     mitMoveDown: TMenuItem;
+    actOptionsCollectionOpenDefault: TAction;
+    actOptionsCollectionOpen: TAction;
+    actOptionsCollectionSaveAs: TAction;
+    mitOptionsCollectionOpenDefault: TMenuItem;
+    mitOptionsCollectionOpen: TMenuItem;
+    mitOptionsCollectionReopen: TMenuItem;
+    mitOptionsCollectionSaveAs: TMenuItem;
+    mitFileSep3: TMenuItem;
+    mitFileCollections: TMenuItem;
+    mitCollectionsSep1: TMenuItem;
     procedure tvFoldersChange(Sender: TObject; Node: TTreeNode);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure tvFoldersKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -114,6 +124,10 @@ type
     procedure actFileNewFileExecute(Sender: TObject);
     procedure actNavLevelUpExecute(Sender: TObject);
     procedure actOptionsOptionsExecute(Sender: TObject);
+    procedure actOptionsCollectionOpenDefaultExecute(Sender: TObject);
+    procedure actOptionsCollectionOpenExecute(Sender: TObject);
+    procedure mitOptionsCollectionOpenMRUExecute(Sender: TObject);
+    procedure actOptionsCollectionSaveAsExecute(Sender: TObject);
     procedure actNavContractExecute(Sender: TObject);
     procedure actNavExpandExecute(Sender: TObject);
     procedure actHelpHelpExecute(Sender: TObject);
@@ -133,9 +147,11 @@ type
     procedure actFileSelectAllExecute(Sender: TObject);
     procedure actFileMoveUpExecute(Sender: TObject);
     procedure actFileMoveDownExecute(Sender: TObject);
+    procedure mitFileCollectionsClick(Sender: TObject);
   private
     FFileViewer: TFileViewer;
     FEntryFile: string;
+    FMRUEntryFiles: TStrings;
     FFolderDelete: Boolean;
     FExpandAll: Boolean;
     FExecHide: Boolean;
@@ -149,6 +165,7 @@ type
     procedure DeleteSelectedFiles;
     procedure DeleteCurrentFolder;
     procedure LogAndShowLoadError(const E: Exception);
+    procedure SwitchEntryFile(const AFileName: string; AUpdateMRU: Boolean = True);
     procedure SaveEntries;
     procedure LoadEntries;
     procedure LoadSettings;
@@ -162,6 +179,10 @@ type
     procedure ExecuteSelectedFiles;
     procedure EditFolder;
     procedure EditFile;
+    function GetDefaultEntryFileName: string;
+    procedure SetEntryFile(const Value: string);
+    property EntryFile: string read FEntryFile write SetEntryFile;
+    property MRUEntryFiles: TStrings read FMRUEntryFiles;
     function GetShowPreview: Boolean;
     procedure SetShowPreview(Value: Boolean);
     property ShowPreview: Boolean read GetShowPreview write SetShowPreview;
@@ -173,6 +194,8 @@ type
     destructor Destroy; override;
     procedure AssignIconImage(Image: TImage; const ContainerFileName: string);
     procedure SetFilter;
+    function MakeFileNameAbsolute(const FileName: string): string;
+    function MakeFileNameRelative(const FileName: string): string;
   end;
 
 implementation
@@ -180,7 +203,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Messages, ShellAPI, DropSource,
+  Messages, ShellAPI, StrUtils, DropSource,
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   ToolsAPI,
   GX_FavNewFolder, GX_FavFolderProp, GX_FavFileProp, GX_FavOptions,
@@ -372,7 +395,7 @@ procedure TfmFavFiles.SaveEntries;
   procedure SetFileAttributes(const AFile: TGXFile; const FileNode: IXMLElement);
   begin
     FileNode.SetAttribute(XmlAttributeFileName, AFile.DName);
-    FileNode.SetAttribute(XmlAttributeFileFileName, AFile.FileName);
+    FileNode.SetAttribute(XmlAttributeFileFileName, MakeFileNameRelative(AFile.FileName));
     if AFile.Description <> '' then
       FileNode.SetAttribute(XmlAttributeFileDescription, AFile.Description);
     FileNode.SetAttribute(XmlAttributeFileExecType, XmlExecTypeNames[AFile.ExecType]);
@@ -452,6 +475,18 @@ resourcestring
   SLoadError = 'Error while loading %s' + sLineBreak;
 begin
   GxLogAndShowException(E, Format(SLoadError, [FEntryFile]));
+end;
+
+function TfmFavFiles.MakeFileNameAbsolute(const FileName: string): string;
+begin
+  if not GXPathCombine(Result, ExtractFilePath(EntryFile), FileName) then
+    Result := FileName; // Return unchanged FileName as fallback
+end;
+
+function TfmFavFiles.MakeFileNameRelative(const FileName: string): string;
+begin
+  if not GXPathRelativePathTo(Result, ExtractFilePath(EntryFile), ExpandFileName(FileName)) then
+    Result := FileName; // Return unchanged FileName as fallback
 end;
 
 function GetStringAttribute(const Node: IXMLNode; const AttributeName: string): string;
@@ -552,6 +587,7 @@ var
   ErrorMsg: string;
 begin
   FModified := False;
+  tvFolders.Items.Clear;
   Node := nil;
   if not FileExists(FEntryFile) then
   begin
@@ -576,6 +612,7 @@ begin
         Abort;
     end
     else begin
+      Root.Clear;
       LoadFolder(Root, RootFolderNode);
       Node := tvFolders.Items.AddObject(nil, Root.FolderName, Root);
     end;
@@ -585,6 +622,18 @@ begin
   Node.SelectedIndex := 1;
   CreateFolders(Root, Node);
   Node.Expand(FExpandAll);
+  if (tvFolders.Selected = nil) and (tvFolders.Items.Count > 0) then
+    tvFolders.Selected := tvFolders.Items[0];
+end;
+
+procedure TfmFavFiles.SwitchEntryFile(const AFileName: string; AUpdateMRU: Boolean = True);
+begin
+  SaveEntries;
+  EntryFile := AFileName;
+  SaveSettings;
+  LoadEntries;
+  if AUpdateMRU then
+    AddMRUString(EntryFile, MRUEntryFiles, False);
 end;
 
 procedure TfmFavFiles.EditFolder;
@@ -634,7 +683,7 @@ begin
       edtDescription.Text := mFile.Description;
       cbxExecuteType.ItemIndex := Ord(mFile.ExecType);
       edtExecuteUsing.Text := mFile.ExecProg;
-      AssignIconImage(imgFileIcon, mFile.FileName);
+      AssignIconImage(imgFileIcon, MakeFileNameAbsolute(mFile.FileName));
       if ShowModal = mrOk then
       begin
         FModified := True;
@@ -705,11 +754,16 @@ begin
     Settings.WriteInteger(ConfigurationKey, 'Height', Height);
     Settings.WriteInteger(ConfigurationKey, 'Splitter', Max(tvFolders.Width, 30));
     Settings.WriteInteger(ConfigurationKey, 'Splitter2', Max(FFileViewer.Height, 30));
+    if FEntryFile = GetDefaultEntryFileName then
+      Settings.DeleteKey(ConfigurationKey, 'EntryFile')
+    else
+      Settings.WriteString(ConfigurationKey, 'EntryFile', FEntryFile);
     Settings.WriteBool(ConfigurationKey, 'FolderDelete', FFolderDelete);
     Settings.WriteBool(ConfigurationKey, 'ExpandAll', FExpandAll);
     Settings.WriteBool(ConfigurationKey, 'ExecHide', FExecHide);
     Settings.WriteBool(ConfigurationKey, 'ShowPreview', ShowPreview);
     Settings.WriteInteger(ConfigurationKey, 'ListView', Ord(ListView.ViewStyle));
+    Settings.WriteStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
   finally
     FreeAndNil(Settings);
   end;
@@ -732,12 +786,14 @@ begin
     Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
     tvFolders.Width := Settings.ReadInteger(ConfigurationKey, 'Splitter', tvFolders.Width);
     FFileViewer.Height := Settings.ReadInteger(ConfigurationKey, 'Splitter2', FFileViewer.Height);
+    EntryFile := Settings.ReadString(ConfigurationKey, 'EntryFile', GetDefaultEntryFileName);
     FFolderDelete := Settings.ReadBool(ConfigurationKey, 'FolderDelete', FFolderDelete);
     FExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', FExpandAll);
     FExecHide := Settings.ReadBool(ConfigurationKey, 'ExecHide', FExecHide);
     ShowPreview := Settings.ReadBool(ConfigurationKey, 'ShowPreview', ShowPreview);
     ListView.ViewStyle := TViewStyle(Settings.ReadInteger(ConfigurationKey, 'ListView', Ord(ListView.ViewStyle)));
-    Assert(ListView.ViewStyle in [Low(TViewStyle)..High(TViewStyle)])
+    Assert(ListView.ViewStyle in [Low(TViewStyle)..High(TViewStyle)]);
+    Settings.ReadStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
   finally
     FreeAndNil(Settings);
   end;
@@ -781,8 +837,8 @@ begin
     ftNormal: dlgGetFiles.FilterIndex := 10;
     ftSource: dlgGetFiles.FilterIndex := 1;
     ftBitmap: dlgGetFiles.FilterIndex := 5;
-    ftGlyph:  dlgGetFiles.FilterIndex := 5;
-    ftDocs:   dlgGetFiles.FilterIndex := 4;
+    ftGlyph: dlgGetFiles.FilterIndex := 5;
+    ftDocs: dlgGetFiles.FilterIndex := 4;
     else      dlgGetFiles.FilterIndex := 10;
   end;
 end;
@@ -800,12 +856,12 @@ begin
   begin
     if ListView.SelCount = 1 then
     begin
-      LoadFile := GetFile(ListView.Selected).FileName;
+      LoadFile := MakeFileNameAbsolute(GetFile(ListView.Selected).FileName);
       if FileExists(LoadFile) or DirectoryExists(LoadFile) then
       begin
         StatusBar.SimpleText := LoadFile;
 
-        if not (FFileViewer.LoadedFile = LoadFile) then
+        if FFileViewer.LoadedFile <> LoadFile then
           FFileViewer.LoadFromFile(LoadFile);
       end
       else
@@ -888,21 +944,21 @@ begin
       end;
     end
     else if Source = ListView then
-    begin
-      i := 0;
-      while i <= ListView.Items.Count - 1 do
       begin
-        if ListView.Items[i].Selected then
+        i := 0;
+        while i <= ListView.Items.Count - 1 do
         begin
-          mFile := GetFile(ListView.Items[i]);
-          mFile.Owner := GetFolder(Node);
-          ListView.Items[i].Delete;
-          FModified := True;
-        end
-        else
-          Inc(i);
+          if ListView.Items[i].Selected then
+          begin
+            mFile := GetFile(ListView.Items[i]);
+            mFile.Owner := GetFolder(Node);
+            ListView.Items[i].Delete;
+            FModified := True;
+          end
+          else
+            Inc(i);
+        end;
       end;
-    end;
   except
     on E: Exception do
     begin
@@ -943,9 +999,9 @@ begin
   if IsBdsProjectFile(FileExt) then
     Result := etProject
   else if IsBdsSourceFile(FileExt) or IsTextFile(FileExt) then
-    Result := etLoadInIDE
-  else
-    Result := etShell;
+      Result := etLoadInIDE
+    else
+      Result := etShell;
 end;
 
 procedure TfmFavFiles.AddFilesToCurrentFolder(Files: TStrings);
@@ -968,8 +1024,8 @@ begin
     begin
       mFile := TGXFile.Create(Folder);
       try
-        mFile.FileName := Files[i];
-        mFile.Description := mFile.FileName;
+        mFile.FileName := MakeFileNameRelative(Files[i]);
+        mFile.Description := MakeFileNameAbsolute(mFile.FileName);
         mFile.DName := ExtractFileName(mFile.FileName);
         mFile.ExecType := UpperFileExtToExecType(ExtractUpperFileExt(mFile.FileName));
         mFile.ExecProg := '';
@@ -994,6 +1050,26 @@ begin
     ListView.ItemFocused := LItem;
     ListView.Selected.MakeVisible(False);
   end;
+end;
+
+function TfmFavFiles.GetDefaultEntryFileName: string;
+const
+  FaveFavFile = 'FavoriteFiles.xml'; // Do not localize.
+begin
+  // Do not localize.
+  if IsStandAlone then
+    Result := ConfigInfo.ConfigPath + FaveFavFile
+  else
+    Result := ExpandFileName(AddSlash(ConfigInfo.ConfigPath) + FaveFavFile);
+end;
+
+procedure TfmFavFiles.SetEntryFile(const Value: string);
+begin
+  FEntryFile := Value;
+  if FEntryFile = GetDefaultEntryFileName then
+    Caption := 'Favorite Files'
+  else
+    Caption := 'Favorite Files - ' + FEntryFile;
 end;
 
 procedure TfmFavFiles.SetShowPreview(Value: Boolean);
@@ -1051,6 +1127,58 @@ begin
       FExpandAll := Dlg.chkExpandAllOnLoad.Checked;
       FExecHide := Dlg.chkHideOnExecute.Checked;
       ShowPreview := Dlg.chkShowPreview.Checked;
+    end;
+  finally
+    FreeAndNil(Dlg);
+  end;
+end;
+
+procedure TfmFavFiles.actOptionsCollectionOpenDefaultExecute(Sender: TObject);
+begin
+  SwitchEntryFile(GetDefaultEntryFileName, False);
+end;
+
+procedure TfmFavFiles.actOptionsCollectionOpenExecute(Sender: TObject);
+var
+  Dlg: TOpenDialog;
+begin
+  Dlg := TOpenDialog.Create(nil);
+  try
+    Dlg.FileName := FEntryFile;
+    Dlg.DefaultExt := 'xml';
+    Dlg.Filter := MakeDialogExtensionString('xml');
+    Dlg.Options := Dlg.Options + [ofPathMustExist, ofFileMustExist];
+    Dlg.Title := 'Load Collection';
+    if Dlg.Execute then
+      SwitchEntryFile(ExpandFileName(Dlg.FileName));
+  finally
+    FreeAndNil(Dlg);
+  end;
+end;
+
+procedure TfmFavFiles.mitOptionsCollectionOpenMRUExecute(Sender: TObject);
+begin
+  Assert(Sender is TMenuItem);
+  SwitchEntryFile(MRUEntryFiles[TMenuItem(Sender).Tag]);
+end;
+
+procedure TfmFavFiles.actOptionsCollectionSaveAsExecute(Sender: TObject);
+var
+  Dlg: TSaveDialog;
+begin
+  Dlg := TSaveDialog.Create(nil);
+  try
+    Dlg.FileName := FEntryFile;
+    Dlg.DefaultExt := 'xml';
+    Dlg.Filter := MakeDialogExtensionString('xml');
+    Dlg.Title := 'Save Collection';
+    if Dlg.Execute then
+    begin
+      EntryFile := ExpandFileName(Dlg.FileName);
+      SaveSettings;
+      FModified := True;
+      SaveEntries;
+      AddMRUString(EntryFile, MRUEntryFiles, False);
     end;
   finally
     FreeAndNil(Dlg);
@@ -1125,20 +1253,21 @@ end;
 procedure TfmFavFiles.CreateNewFolder;
 begin
   with TfmFavNewFolder.Create(nil) do
-  try
-    FavoriteFilesForm := Self;
-    if ShowModal = mrOk then
-      tvFolders.Selected := AddFolder(edtFolderName.Text, TFolderType(cbxFolderType.ItemIndex));
-  finally
-    Free;
-  end;
+    try
+      FavoriteFilesForm := Self;
+      if ShowModal = mrOk then
+        tvFolders.Selected := AddFolder(edtFolderName.Text, TFolderType(cbxFolderType.ItemIndex));
+    finally
+      Free;
+    end;
 end;
 
 procedure TfmFavFiles.CreateNewFile;
 var
   CurrentIdeFolder: string;
 begin
-  if tvFolders.Selected = nil then Exit;
+  if tvFolders.Selected = nil then
+    Exit;
 
   SetFilter;
   CurrentIdeFolder := GetCurrentDir;
@@ -1155,7 +1284,7 @@ begin
   if ActiveControl = tvFolders then
     EditFolder
   else if ActiveControl = ListView then
-    EditFile;
+      EditFile;
 end;
 
 procedure TfmFavFiles.actFileExecuteExecute(Sender: TObject);
@@ -1192,6 +1321,7 @@ end;
 function TfmFavFiles.ExecuteFile(AListItem: TListItem): Boolean;
 var
   mFile: TGXFile;
+  LoadFile: string;
   Ext: string;
 resourcestring
   SFileDoesNotExist = 'Could not find the file %s to execute it.';
@@ -1202,17 +1332,18 @@ begin
   if mFile = nil then
     Exit;
 
-  if not (FileExists(mFile.FileName) or DirectoryExists (mFile.FileName)) then
+  LoadFile := MakeFileNameAbsolute(mFile.FileName);
+  if not (FileExists(LoadFile) or DirectoryExists(LoadFile)) then
   begin
-    MessageDlg(Format(SFileDoesNotExist, [mFile.FileName]), mtError, [mbOK], 0);
+    MessageDlg(Format(SFileDoesNotExist, [LoadFile]), mtError, [mbOK], 0);
     Exit;
   end
   else
     case mFile.ExecType of
       etLoadInIDE:
         begin
-          if not GxOtaMakeSourceVisible(ExpandFileName(mFile.FileName)) then
-            MessageDlg(Format(SCouldNotOpen, [ExpandFilename(mFile.FileName)]), mtError, [mbOK], 0)
+          if not GxOtaMakeSourceVisible(LoadFile) then
+            MessageDlg(Format(SCouldNotOpen, [LoadFile]), mtError, [mbOK], 0)
           else begin
             if (not IsStandAlone) and FExecHide then
               Self.Hide;
@@ -1221,24 +1352,24 @@ begin
         end;
       etShell:
         begin
-          GXShellExecute(mFile.FileName, '', True);
+          GXShellExecute(LoadFile, '', True);
           Result := True;
         end;
       etCustom:
         begin
-          GXShellExecute(mFile.ExecProg, mFile.FileName, True);
+          GXShellExecute(mFile.ExecProg, LoadFile, True);
           Result := True;
         end;
       etProject:
         begin
-          Ext := ExtractUpperFileExt(mFile.FileName);
+          Ext := ExtractUpperFileExt(LoadFile);
           if (BorlandIdeServices as IOTAModuleServices).CloseAll then
           begin
             // D6 gives an AV calling OpenProject on these file types
             if IsBpg(Ext) or IsBpk(Ext) then
-              (BorlandIdeServices as IOTAActionServices).OpenFile(mFile.FileName)
+              (BorlandIdeServices as IOTAActionServices).OpenFile(LoadFile)
             else
-              (BorlandIdeServices as IOTAActionServices).OpenProject(mFile.FileName, True);
+              (BorlandIdeServices as IOTAActionServices).OpenProject(LoadFile, True);
             if (not IsStandAlone) and FExecHide then
               Self.Hide;
           end;
@@ -1272,13 +1403,12 @@ resourcestring
     '|Pascal Files (*.pas;*.inc)|*.pas;*.inc' +
     '|Help Files (*.chm;*.hlp)|*.chm;*.hlp' +
     '|Graphics Files (*.bmp;*.wmf)|*.bmp;*.wmf' +
-    '|Text Files (*.txt;*.me;*.asc)|*.txt;*.me;*.asc' +
+    '|Text Files (*.txt;*.me;*.asc;*.xml)|*.txt;*.me;*.asc;*.xml' +
+    '|HTML Files (*.html;*.htm)|*.html;*.htm' +
     '|Executable Files (*.exe)|*.exe' +
     '|SQL Scripts (*.sql)|*.sql' +
     '|C/C++ (*.c;*.cpp;*.h;*.hpp)|*.c;*.cpp;*.h;*.hpp' +
     '|All Files (' + AllFilesWildCard + ')|' + AllFilesWildCard;
-const
-  FaveFavFile = 'FavoriteFiles.xml'; // Do not localize.
 begin
   inherited;
 
@@ -1297,6 +1427,7 @@ begin
   FFolderDelete := True;
   FExecHide := True;
   ShowPreview := True;
+  FMRUEntryFiles := TStringList.Create;
 
   SetupSystemImageLists;
   FFileDrop := TDropFileTarget.Create(nil);
@@ -1305,19 +1436,9 @@ begin
   FFileDrop.ShowImage := True;
   FFileDrop.Register(ListView);
 
-  // Assign a default entry file location.  Do not localize.
-  if IsStandAlone then
-  begin
-    FEntryFile := 'C:\' + FaveFavFile;
-  end
-  else
-    FEntryFile := AddSlash(ConfigInfo.ConfigPath) + FaveFavFile;
-
   CenterForm(Self);
   LoadSettings;
   LoadEntries;
-  if (tvFolders.Selected = nil) and (tvFolders.Items.Count > 0) then
-    tvFolders.Selected := tvFolders.Items[0];
   ListView.Columns[0].Width := ColumnTextWidth;
   ListView.Columns[1].Width := ColumnTextWidth;
   ListView.Columns[2].Width := ColumnTextWidth;
@@ -1326,6 +1447,8 @@ end;
 
 destructor TfmFavFiles.Destroy;
 begin
+  FreeAndNil(FMRUEntryFiles);
+
   FreeAndNil(FFileViewer);
 
   FFileDrop.Unregister;
@@ -1402,7 +1525,7 @@ begin
   else
     AListItem.SubItems.Add(ExecTypeNames[AFile.ExecType]);
   AListItem.Data := AFile;
-  AListItem.ImageIndex := GetSystemImageIndexForFile(AFile.FileName);
+  AListItem.ImageIndex := GetSystemImageIndexForFile(MakeFileNameAbsolute(AFile.FileName));
 end;
 
 { TFilesExpert }
@@ -1473,6 +1596,26 @@ begin
       tvFolders.Selected.MoveTo(tvFolders.Selected.getNextSibling.getNextSibling, naInsert)
     else
       tvFolders.Selected.MoveTo(tvFolders.Selected.Parent, naAddChild);
+  end;
+end;
+
+procedure TfmFavFiles.mitFileCollectionsClick(Sender: TObject);
+var
+  i: Integer;
+  MenuItem: TMenuItem;
+begin
+  mitOptionsCollectionReopen.Enabled := MRUEntryFiles.Count > 0;
+  // Destroy old menu items
+  for i := mitOptionsCollectionReopen.Count - 1 downto 0 do
+    mitOptionsCollectionReopen[i].Free;
+  mitOptionsCollectionReopen.Clear;
+  for i := 0 to MRUEntryFiles.Count - 1 do
+  begin
+    MenuItem := TMenuItem.Create(Self);
+    MenuItem.Caption := cHotkeyPrefix + IntToStr(i) + ' ' + MRUEntryFiles[i];
+    MenuItem.Tag := i;
+    MenuItem.OnClick := mitOptionsCollectionOpenMRUExecute;
+    mitOptionsCollectionReopen.Add(MenuItem);
   end;
 end;
 

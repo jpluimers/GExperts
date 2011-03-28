@@ -2498,7 +2498,7 @@ procedure GxOtaGetAllPossiblePaths(Paths: TStrings);
     BasePath := AddSlash(GetIdeRootDirectory) + 'Source' + PathDelim;
     DirFinder := TFileFindThread.Create;
     try
-      DirFinder.FileMasks.Add('*.*');
+      DirFinder.FileMasks.Add(AllFilesWildCard);
       DirFinder.RecursiveSearchDirs.Add(BasePath);
       DirFinder.DirectoriesOnly := True;
       // TODO: Cache the IDE source dir list between calls

@@ -47,23 +47,33 @@ uses
 procedure TfmFavFileProp.sbnFileClick(Sender: TObject);
 var
   TheForm: TfmFavFiles;
+  FileName: string;
 begin
   TheForm := (FFavoriteFilesForm as TfmFavFiles);
   TheForm.SetFilter;
 
-  if FileExists(edtFileName.Text) then
-    TheForm.dlgGetFiles.FileName := edtFileName.Text;
+  FileName := TheForm.MakeFileNameAbsolute(edtFileName.Text);
+  if FileExists(FileName) then
+  begin
+    TheForm.dlgGetFiles.FileName := ExtractFileName(FileName);
+    TheForm.dlgGetFiles.InitialDir := ExtractFilePath(FileName);
+  end
+  else
+    TheForm.dlgGetFiles.FileName := '';
 
   if TheForm.dlgGetFiles.Execute then
   begin
-    edtFilename.Text := TheForm.dlgGetFiles.FileName;
-    TheForm.AssignIconImage(imgFileIcon, edtFileName.Text);
+    edtFilename.Text := TheForm.MakeFileNameRelative(TheForm.dlgGetFiles.FileName);
+    TheForm.AssignIconImage(imgFileIcon, TheForm.dlgGetFiles.FileName);
   end;
 end;
 
 procedure TfmFavFileProp.edtFilenameExit(Sender: TObject);
+var
+  TheForm: TfmFavFiles;
 begin
-  (FFavoriteFilesForm as TfmFavFiles).AssignIconImage(imgFileIcon, edtFileName.Text);
+  TheForm := (FFavoriteFilesForm as TfmFavFiles);
+  TheForm.AssignIconImage(imgFileIcon, TheForm.MakeFileNameAbsolute(edtFileName.Text));
 end;
 
 procedure TfmFavFileProp.sbnExecuteClick(Sender: TObject);

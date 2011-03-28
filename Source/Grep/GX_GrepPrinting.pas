@@ -27,7 +27,7 @@ begin
   SaveDlg := TSaveDialog.Create(nil);
   try
     SaveDlg.DefaultExt := 'txt';
-    SaveDlg.Filter := 'Text Files (*.txt, *.log)|*.txt;*.log|All Files (*.*)|*.*';
+    SaveDlg.Filter := 'Text Files (*.txt, *.log)|*.txt;*.log|All Files (' +AllFilesWildCard+ ')|' + AllFilesWildCard;
     SaveDlg.Options := SaveDlg.Options + [ofOverwritePrompt];
     if GetOpenSaveDialogExecute(SaveDlg) then
       RichEdit.Lines.SaveToFile(SaveDlg.FileName);

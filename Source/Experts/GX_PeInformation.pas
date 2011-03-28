@@ -549,7 +549,6 @@ begin
       end;
 
       RichEdit.Print(SPeInfoFor + ExtractFileName(dlgOpen.FileName));
-      //RichEdit.Lines.SaveToFile('c:\temp\ExeExplr.rtf');
     finally
       Screen.Cursor := crDefault;
       FreeAndNil(RichEdit);

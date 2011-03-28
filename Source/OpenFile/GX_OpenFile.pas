@@ -928,7 +928,7 @@ begin
       FType := FileType(i);
       Dlg.Filter := Dlg.Filter + FType.FileTypeName + ' (' + FType.Extensions + ')|' + FType.Extensions + '|';
     end;
-    Dlg.Filter := Dlg.Filter + 'All Files(*.*)|*.*';
+    Dlg.Filter := Dlg.Filter + 'All Files(' +AllFilesWildCard+ ')|' + AllFilesWildCard;
     Dlg.FilterIndex := cbxType.ItemIndex + 1;
     if Dlg.Execute then
       DoOpenFile(Dlg.FileName);

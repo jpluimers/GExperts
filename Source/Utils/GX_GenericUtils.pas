@@ -291,6 +291,15 @@ function PrepareDirectoryForWriting(const Dir: string): Boolean;
 // Determine if a passed in path/file is absolute or relative
 function IsPathAbsolute(const FileName: string): Boolean;
 
+function GXPathCombine(out ADest: string; const ADir, AFile: string): Boolean;
+
+type
+  TGXPathRelativePathToOption = (proOnlyInSubDir, proFromIsDirectory, proToIsDirectory);
+  TGXPathRelativePathToOptions = set of TGXPathRelativePathToOption;
+
+function GXPathRelativePathTo(out APath: string; const AFrom, ATo: string;
+  AOptions: TGXPathRelativePathToOptions = [proOnlyInSubDir, proFromIsDirectory]): Boolean;
+
 // Change to a directory.  Returns True on success.
 function SafeChangeDirectory(const NewDir: string): Boolean;
 
@@ -573,6 +582,8 @@ function GetDirectory(var Dir: string; Owner: TCustomForm = nil): Boolean;
 // Under Kylix, locking across threads is performed.
 function GetOpenSaveDialogExecute(Dialog: TOpenDialog): Boolean;
 
+function MakeDialogExtensionString(const Ext: string): string;
+
 // Returns True if FileWildcard matches FileName, False otherwise.
 // If no file extension is given in FileWildcard, ".*" is assumed
 // to be the (wildcard) extension.
@@ -672,12 +683,32 @@ type
 
 implementation
 
+{$IFDEF GX_VER160_up}
+  {$DEFINE HAS_SHLWAPI}
+{$ELSE}
+  {$UNDEF HAS_SHLWAPI}
+{$ENDIF}
+
 uses
   Windows, Messages,
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   {$IFDEF GX_DEBUGLOG} GX_Debug, {$ENDIF}
   {$IFDEF UNICODE} Character, {$ENDIF}
+  {$IFDEF HAS_SHLWAPI} ShLwApi, {$ENDIF}
   ShellAPI, ShlObj, ActiveX, StrUtils, Math;
+
+{$IFNDEF HAS_SHLWAPI}
+const
+  shlwapi32 = 'shlwapi.dll';
+
+// Manually import ShLwApi routines in Delphi 7 and earlier (supported in W2K or later)
+function PathCombine(szDest: PChar; lpszDir, lpszFile: PChar): PChar; stdcall;
+  external shlwapi32 name 'PathCombineA';
+
+function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
+  pszTo: PChar; dwAttrTo: DWORD): BOOL; stdcall;
+  external shlwapi32 name 'PathRelativePathToA';
+{$ENDIF}
 
 type
   TTempHourClassCursor = class(TInterfacedObject, IInterface)
@@ -1763,6 +1794,41 @@ end;
 function IsPathAbsolute(const FileName: string): Boolean;
 begin
   Result := ExtractFileDrive(FileName) <> '';
+end;
+
+function GXPathCombine(out ADest: string; const ADir, AFile: string): Boolean;
+begin
+  SetLength(ADest, MAX_PATH);
+  Result := PathCombine(@ADest[1], PChar(ADir), PChar(AFile)) <> nil;
+  if Result then
+    SetLength(ADest, StrLen(@ADest[1]))
+  else
+    ADest := '';
+end;
+
+function GXPathRelativePathTo(out APath: string; const AFrom, ATo: string;
+  AOptions: TGXPathRelativePathToOptions = [proOnlyInSubDir, proFromIsDirectory]): Boolean;
+var
+  dwAttrFrom, dwAttrTo: DWORD;
+begin
+  if proFromIsDirectory in AOptions then
+    dwAttrFrom := FILE_ATTRIBUTE_DIRECTORY
+  else
+    dwAttrFrom := 0;
+  if proToIsDirectory in AOptions then
+    dwAttrTo := FILE_ATTRIBUTE_DIRECTORY
+  else
+    dwAttrTo := 0;
+  SetLength(APath, MAX_PATH);
+  Result := PathRelativePathTo(@APath[1], PChar(ExtractFilePath(AFrom)), dwAttrFrom, PChar(ExpandFileName(ATo)), dwAttrTo);
+  if Result then
+  begin
+    SetLength(APath, StrLen(@APath[1]));
+    if (proOnlyInSubDir in AOptions) and StrBeginsWith('..' + PathDelim, APath) then
+      APath := ATo; // Return unchanged ATo if not in subdirectory
+  end
+  else
+    APath := '';
 end;
 
 {$UNDEF IPlusOn}
@@ -3463,6 +3529,11 @@ begin
   Result := Dialog.Execute;
 end;
 
+function MakeDialogExtensionString(const Ext: string): string;
+begin
+  Result := Format('%s Files (*.%s)|*.%s|All Files (%s)|%s', [AnsiUpperCase(Ext), Ext, Ext, AllFilesWildCard, AllFilesWildCard]);
+end;
+
 function WildcardCompare(const FileWildcard, FileName: string; const IgnoreCase: Boolean): Boolean;
 
   function WildCompare(var WildS, IstS: string): Boolean;
@@ -4040,12 +4111,12 @@ begin
   // YYYY-MM-DDTHH:NN:SS.ZZZ, YYYY-MM-DD HH:NN:SS.ZZZ
   if (Length(ISODateTime) <> ISOShortLen) and (Length(ISODateTime) <> ISOFullLen) then
     raise EConvertError.Create('Invalid ISO date time string: ' + ISODateTime);
-  y := StrToInt(Copy(ISODateTime,  1, 4));
-  m := StrToInt(Copy(ISODateTime,  6, 2));
-  d := StrToInt(Copy(ISODateTime,  9, 2));
-  h := StrToInt(Copy(ISODateTime, 12, 2));
-  n := StrToInt(Copy(ISODateTime, 15, 2));
-  s := StrToInt(Copy(ISODateTime, 18, 2));
+  y := SysUtils.StrToInt(Copy(ISODateTime,  1, 4));
+  m := SysUtils.StrToInt(Copy(ISODateTime,  6, 2));
+  d := SysUtils.StrToInt(Copy(ISODateTime,  9, 2));
+  h := SysUtils.StrToInt(Copy(ISODateTime, 12, 2));
+  n := SysUtils.StrToInt(Copy(ISODateTime, 15, 2));
+  s := SysUtils.StrToInt(Copy(ISODateTime, 18, 2));
   z := StrToIntDef(Copy(ISODateTime, 21, 3),  0); // Optional
   Result := EncodeDate(y, m, d) + EncodeTime(h, n, s, z);
 end;

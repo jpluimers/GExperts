@@ -227,6 +227,29 @@ object fmFavFiles: TfmFavFiles
       object mitFileSep1: TMenuItem
         Caption = '-'
       end
+      object mitFileCollections: TMenuItem
+        Caption = 'Favorite File Collections'
+        OnClick = mitFileCollectionsClick
+        object mitOptionsCollectionOpen: TMenuItem
+          Action = actOptionsCollectionOpen
+        end
+        object mitOptionsCollectionReopen: TMenuItem
+          Caption = '&Recently Used Collections'
+          Hint = 'Recently Used Collections'
+        end
+        object mitOptionsCollectionOpenDefault: TMenuItem
+          Action = actOptionsCollectionOpenDefault
+        end
+        object mitCollectionsSep1: TMenuItem
+          Caption = '-'
+        end
+        object mitOptionsCollectionSaveAs: TMenuItem
+          Action = actOptionsCollectionSaveAs
+        end
+      end
+      object mitFileSep3: TMenuItem
+        Caption = '-'
+      end
       object mitFileProperties: TMenuItem
         Action = actFileProperties
       end
@@ -658,6 +681,24 @@ object fmFavFiles: TfmFavFiles
       ImageIndex = 17
       ShortCut = 16463
       OnExecute = actOptionsOptionsExecute
+    end
+    object actOptionsCollectionOpenDefault: TAction
+      Category = 'Options'
+      Caption = '&Open Default Collection'
+      Hint = 'Open Default Collection'
+      OnExecute = actOptionsCollectionOpenDefaultExecute
+    end
+    object actOptionsCollectionOpen: TAction
+      Category = 'Options'
+      Caption = '&Open Collection...'
+      Hint = 'Open Collection...'
+      OnExecute = actOptionsCollectionOpenExecute
+    end
+    object actOptionsCollectionSaveAs: TAction
+      Category = 'Options'
+      Caption = '&Save Collection as...'
+      Hint = 'Save Collection as...'
+      OnExecute = actOptionsCollectionSaveAsExecute
     end
     object actFileExit: TAction
       Category = 'File'

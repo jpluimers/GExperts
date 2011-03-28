@@ -50,6 +50,8 @@ type
     property Folders[Index: Integer]: TGXFolder read GetFolder;
     property FileCount: Integer read GetFileCount;
     property Files[Index: Integer]: TGXFile read GetFile;
+
+    procedure Clear;
   end;
 
   TGXFile = class(TGXFavItem)
@@ -130,12 +132,16 @@ end;
 
 destructor TGXFolder.Destroy;
 begin
-  ClearList(FFileList);
+  Clear;
   FreeAndNil(FFileList);
-  ClearList(FFolderList);
   FreeAndNil(FFolderList);
-
   inherited Destroy;
+end;
+
+procedure TGXFolder.Clear;
+begin
+  ClearList(FFileList);
+  ClearList(FFolderList);
 end;
 
 procedure TGXFolder.ClearList(AList: TList);

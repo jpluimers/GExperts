@@ -349,7 +349,7 @@ begin
       FileType := TFileType.Create(FileTypes);
       FileType.FileTypeName := TypeName;
       FileType.Paths.Text := Settings.ReadString(FileTypeKey, 'Paths' + KeyString, '');
-      FileType.Extensions := Settings.ReadString(FileTypeKey, 'Extensions' + KeyString, '*.*');
+      FileType.Extensions := Settings.ReadString(FileTypeKey, 'Extensions' + KeyString, AllFilesWildCard);
       FileType.CustomDirectories := Settings.ReadBool(FileTypeKey, 'CustomDirectory' + KeyString, False);
       FileType.Recursive := Settings.ReadBool(FileTypeKey, 'RecursiveDirectory' + KeyString, False);
       FileType.RecentFiles.Text := Settings.ReadString(FileTypeKey, 'RecentFiles' + KeyString, '');
