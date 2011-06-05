@@ -255,11 +255,8 @@ begin
   end;
 
   { draw the character of that number on screen }
-  with Canvas.Font do
-  begin
-    Name := FFontName;
-    Size := FDisplayFontSize;
-  end;
+  Canvas.Font.Name := FFontName;
+  Canvas.Font.Size := FDisplayFontSize;
 
   for i := Start to 127 do
     DrawCharacter(i, Chr(FStartCharacter + i), HorizMult, VertMult);
