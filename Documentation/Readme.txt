@@ -98,9 +98,13 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
-VERSION 1.35 (March, 2011)
+VERSION 1.35 (June, 2011)
 - General: Fix problems with the bug reporting tool and about box disappearing.
 - Grep: Search and replace supports regular expression subgroubs (Egon Elbre).
+- Favorite Files: Support relative filenames in saved files lists, support
+  multiple groups of favorite files.  These changes may be useful for
+  project-specific favorite files lists. (Ulrich Gerhardt, Erik)
+- Clipboard History: Show combined text for multi-selected history entries.
 
 
 VERSION 1.34 (September, 2010)
@@ -259,7 +263,7 @@ MISCELLANEOUS NOTES
 GEXPERTS LICENSE
 ----------------------
 
-GExperts is copyright 1996-2010 by GExperts, Inc, Erik Berry, and several
+GExperts is copyright 1996-2011 by GExperts, Inc, Erik Berry, and several
 other authors who have submitted their code for inclusion. This license
 agreement only covers code written by GExperts, Inc. and Erik Berry. You
 should contact the other authors concerning their respective copyrights
