@@ -121,7 +121,7 @@ type
 
 implementation
 
-uses SysUtils, Contnrs, GX_GenericUtils, Math;
+uses SysUtils, Contnrs, GX_GenericUtils, Math, GX_IdeUtils, GX_OtaUtils;
 
 resourcestring
   SUnknown = 'Unknown';
@@ -141,9 +141,20 @@ begin
 end;
 
 function TProcedure.GetBody: string;
+var
+  Stream: TMemoryStream;
+  Data: UTF8String;
 begin
-  Result := Copy(PAnsiChar(TProcedures(Collection).MemStream.Memory), FBeginIndex +
-    1, (FEndIndex - FBeginIndex));
+  Stream := TProcedures(Collection).MemStream;
+  if IDEEditorEncodingIsUTF8 then
+  begin
+    SetLength(Data, FEndIndex - FBeginIndex);
+    Stream.Position := FBeginIndex;
+    Stream.ReadBuffer(Data[1], FEndIndex - FBeginIndex);
+    Result := WideString(Data);
+  end
+  else
+    Result := Copy(PAnsiChar(Stream.Memory), FBeginIndex + 1, (FEndIndex - FBeginIndex));
 end;
 
 function TProcedure.GetProcClass: string;
