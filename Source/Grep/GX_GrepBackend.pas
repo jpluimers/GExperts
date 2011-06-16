@@ -381,7 +381,7 @@ begin
       try
         while Result = 0 do
         begin
-          if (Search.Attr and faDirectory) <> 0 then
+          if ((Search.Attr and faDirectory) <> 0) {$IFDEF GX_VER150_up} and ((Search.Attr and faSymLink) = 0) {$ENDIF} then
           begin
             if (Search.Name <> '.') and (Search.Name <> '..') then
             begin
