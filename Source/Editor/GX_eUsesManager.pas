@@ -314,7 +314,7 @@ var
 begin
   // Read all dcu files from the $(DELPHI)\lib directory
   Found := SysUtils.FindFirst(AddSlash(ExtractFilePath(GetIdeRootDirectory)) +
-    'lib' + PathDelim + '*.dcu', $3F, SearchRec);
+    AddSlash('lib') {$IFDEF GX_VER230_up} + AddSlash('Win32') + AddSlash('Release') {$ENDIF} + '*.dcu', $3F, SearchRec);
   try
     while Found = 0 do
     begin

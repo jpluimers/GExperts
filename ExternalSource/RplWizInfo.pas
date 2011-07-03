@@ -1521,7 +1521,7 @@ begin
 
     for i := 0 to PropNames.Count-1 do
     begin
-      if PropIsType(PropOwner, PropNames[i], tkClass) then
+      if IsPublishedProp(PropOwner, PropNames[i]) and PropIsType(PropOwner, PropNames[i], tkClass) then
       begin
         ObjPtr := GetObjectProp(PropOwner, PropNames[i]);
         if ObjPtr = OldObject then

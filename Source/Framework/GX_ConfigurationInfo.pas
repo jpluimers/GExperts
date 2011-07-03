@@ -391,7 +391,7 @@ begin
   FIdeRootRegistryKey := GxOtaGetIdeBaseRegistryKey;
   FVclPath := AddSlash(GetIdeRootDirectory) +
               AddSlash('Source') +
-              {$IFDEF GX_VER170_up} AddSlash('Win32') + {$ENDIF}
+              {$IFNDEF GX_VER230_up} {$IFDEF GX_VER170_up} AddSlash('Win32') + {$ENDIF} {$ENDIF}
               AddSlash('VCL'); // Do not localize.
 
   FGExpertsPath := AddSlash(ExtractFilePath(ThisDllName));

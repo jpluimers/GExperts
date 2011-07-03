@@ -697,7 +697,7 @@ end;
 
 procedure TCompRepControllerReal.HandleException(E: Exception; const Context: string);
 resourcestring
-  SErrorPfx = 'Error occured: ';
+  SErrorPfx = 'Error occurred: ';
   SErrorSuff = #10+#10+'Ignore this error and continue?';
 var
   Event: TCompRepEvent;
@@ -987,7 +987,7 @@ end;
 function TCompRepControllerReal.FormatEventForMessage(AEvent: TCompRepEvent): string;
 resourcestring
 SLayout =
-'Error occured during replace:'+#10+
+'Error occurred during replace:'+#10+
 #10+
 'Message: %Text%'+#10+
 #10+
