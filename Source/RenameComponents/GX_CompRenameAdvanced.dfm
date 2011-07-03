@@ -4,8 +4,8 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
   AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Additional Properties'
-  ClientHeight = 265
-  ClientWidth = 268
+  ClientHeight = 319
+  ClientWidth = 313
   Color = clBtnFace
   Constraints.MinHeight = 240
   Constraints.MinWidth = 240
@@ -18,8 +18,8 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
   Position = poOwnerFormCenter
   Scaled = False
   DesignSize = (
-    268
-    265)
+    313
+    319)
   PixelsPerInch = 96
   TextHeight = 13
   object lblComponentClass: TLabel
@@ -32,8 +32,8 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
   object lblProperties: TLabel
     Left = 8
     Top = 24
-    Width = 249
-    Height = 31
+    Width = 297
+    Height = 33
     AutoSize = False
     Caption = 
       'Other Properties to Edit with Optional Default Value Examples: C' +
@@ -41,8 +41,8 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
     WordWrap = True
   end
   object btnOk: TButton
-    Left = 101
-    Top = 232
+    Left = 146
+    Top = 286
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -52,8 +52,8 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 185
-    Top = 232
+    Left = 230
+    Top = 286
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -64,9 +64,9 @@ object fmCompRenameAdvanced: TfmCompRenameAdvanced
   end
   object mmoPropertyNames: TMemo
     Left = 8
-    Top = 52
-    Width = 252
-    Height = 171
+    Top = 57
+    Width = 297
+    Height = 221
     Anchors = [akLeft, akTop, akRight, akBottom]
     ScrollBars = ssBoth
     TabOrder = 0
