@@ -588,7 +588,10 @@ begin
     if ProcInfo <> nil then
     begin
       Assert(FEditReader <> nil);
-      FEditReader.GotoLine(ProcInfo.LineNo);
+      if FOptions.CodeViewVisible and (FCodeText.LineCount > 1) then
+        FEditReader.GotoLine(ProcInfo.LineNo + FCodeText.TopLine - 1)
+      else
+        FEditReader.GotoLine(ProcInfo.LineNo);
       FEditReader.ShowSource;
       FEditReader.FreeFileData;
       ModalResult := mrOk;
