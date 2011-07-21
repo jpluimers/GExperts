@@ -919,6 +919,7 @@ begin
   Src := GetAvailableSourceListBox;
   if Src.ItemIndex > -1 then
     OpenUnit(Src.Items[Src.ItemIndex]);
+  ModalResult := mrCancel;
 end;
 
 procedure TfmUsesManager.actUsesAddToFavoritesExecute(Sender: TObject);

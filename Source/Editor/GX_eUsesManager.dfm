@@ -569,6 +569,7 @@ object fmUsesManager: TfmUsesManager
     end
     object mitAvailOpenUnit: TMenuItem
       Action = actAvailOpenUnit
+      ShortCut = 16463
     end
     object mitAvailSep2: TMenuItem
       Caption = '-'
