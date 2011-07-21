@@ -352,6 +352,8 @@ begin
   end;
 end;
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 procedure TGrepSearchRunner.GrepDirectory(Dir, Mask: string);
 resourcestring
   SSpecifiedDirectoryDoesNotExist = 'The search directory %s does not exist';
