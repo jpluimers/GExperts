@@ -241,6 +241,7 @@ function GxOtaGetActiveDesignerType: string;
 function GxOtaActiveDesignerIsVCL: Boolean;
 function GxOtaActiveDesignerIsCLX: Boolean;
 function GxOtaActiveDesignerIsNFM: Boolean;
+function GxOtaActiveDesignerIsFMX: Boolean;
 
 // Get the personality identifier string for the project, or blank for none
 function GxOtaGetProjectPersonality(Project: IOTAProject): string;
@@ -1042,6 +1043,15 @@ end;
 function GxOtaActiveDesignerIsNFM: Boolean;
 begin
   Result := (GxOtaGetActiveDesignerType = dNFM);
+end;
+
+function GxOtaActiveDesignerIsFMX: Boolean;
+begin
+  {$IFDEF GX_VER230_up}
+  Result := (GxOtaGetActiveDesignerType = dFMX);
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
 end;
 
 function GxOtaGetProjectPersonality(Project: IOTAProject): string;
@@ -3244,7 +3254,7 @@ var
   CompHandle: TOTAHandle;
 begin
   Result := nil;
-  if (AComponent = nil) or ((GxOtaCurrentlyEditingForm) and (not GxOtaActiveDesignerIsVCL)) then
+  if (AComponent = nil) or ((GxOtaCurrentlyEditingForm) and (not (GxOtaActiveDesignerIsVCL or GxOtaActiveDesignerIsFMX))) then
     Exit;
   CompHandle := AComponent.GetComponentHandle;
   if Assigned(CompHandle) then

@@ -400,6 +400,8 @@ begin
       Assert(Assigned(AComponent));
 
       Comp := GxOtaGetNativeComponent(AComponent);
+      if not Assigned(Comp) then
+        raise Exception.Create('Native component casting not allowed for this component');
       if ShouldDumpComponent(FormEditor, Comp, i) then
         CompConv.Dump(Comp, DumpOptions);
     end;

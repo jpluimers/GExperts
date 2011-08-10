@@ -458,10 +458,17 @@ begin
   FOwner := AllocMem(SizeOf(TLockMap));
 end;
 
+type
+  {$IF CompilerVersion >= 23}
+  PAMType = NativeUInt;
+  {$ELSE}
+  PAMType = Cardinal;
+  {$IFEND}
+
 procedure TSpinLock.InitNoSleepCount(const NoSleepCount: Cardinal);
 var
-  LPAM: Cardinal;
-  LSAM: Cardinal;
+  LPAM: PAMType;
+  LSAM: PAMType;
   LCPUCount: Cardinal;
   I: Integer;
 begin
@@ -563,8 +570,8 @@ end;
 
 procedure TSharedSpinLock.InitNoSleepCount(const NoSleepCount: Cardinal);
 var
-  LPAM: Cardinal;
-  LSAM: Cardinal;
+  LPAM: PAMType;
+  LSAM: PAMType;
   LCPUCount: Cardinal;
   I: Integer;
 begin

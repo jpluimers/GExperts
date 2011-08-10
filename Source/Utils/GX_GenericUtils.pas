@@ -2760,7 +2760,7 @@ end;
 
 function IsForm(const FileName: string): Boolean;
 begin
-  Result := FileMatchesExtensions(FileName, ['.dfm', '.xfm', '.nfm']);
+  Result := FileMatchesExtensions(FileName, ['.dfm', '.xfm', '.nfm', '.fmx']);
 end;
 
 function IsXfm(const FileName: string): Boolean;
