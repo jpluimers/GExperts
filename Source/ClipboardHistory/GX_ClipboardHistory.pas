@@ -201,7 +201,7 @@ end;
 procedure THelperWinControl.WMChangeCBChain(var Msg: TMessage);
 begin
   {$IFOPT D+} SendDebug('In THelperWinControl WMChangeCBChain'); {$ENDIF}
-  if Msg.WParam = Longint(FPrevWindow) then
+  if Msg.WParam = WPARAM(FPrevWindow) then
     FPrevWindow := Msg.lParam
   else if (FPrevWindow <> 0) then
     SendMessage(FPrevWindow, WM_CHANGECBCHAIN, Msg.WParam, Msg.LParam);
