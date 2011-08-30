@@ -340,8 +340,10 @@ begin
               if Assigned(FormEditor) then
               begin
                 RootComponent := FormEditor.GetRootComponent;
-                if Assigned(RootComponent) then
+                if Assigned(RootComponent) then begin
+                  CheckAndSetComponent(ModuleInfo.FileName, RootComponent);
                   CheckChildComponents(RootComponent, ModuleInfo.FileName);
+                end;
               end;
             end;
           except
