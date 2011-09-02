@@ -1,17 +1,27 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
 			<ProjectGuid>{84D8A48D-40DE-46E2-B5D2-562447ADAEB5}</ProjectGuid>
-			<MainSource>GExpertsRSXE1.dpr</MainSource>
-			<Config Condition="'$(Config)'==''">Debug</Config>
-			<Platform Condition="'$(Platform)'==''">Win32</Platform>
+			<MainSource>GExpertsRSXE2.dpr</MainSource>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>12.3</ProjectVersion>
+			<ProjectVersion>13.4</ProjectVersion>
 			<Base>True</Base>
 			<AppType>Library</AppType>
-			<FrameworkType>None</FrameworkType>
-			<Platform>Win32</Platform>
+			<FrameworkType>VCL</FrameworkType>
+			<Platform Condition="'$(Platform)'==''">Win32</Platform>
+			<TargetedPlatforms>1</TargetedPlatforms>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+			<Base_Win64>true</Base_Win64>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+			<Base_Win32>true</Base_Win32>
+			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
@@ -19,19 +29,37 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+			<Cfg_1_Win32>true</Cfg_1_Win32>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
 			<Cfg_2>true</Cfg_2>
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+			<Cfg_2_Win32>true</Cfg_2_Win32>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+			<VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE2;FileVersion=1.3.4.0;InternalName=GExperts for RAD Studio XE2;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE2.dll;ProductName=GExperts for RAD Studio XE2;ProductVersion=1.0.0.0;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<VerInfo_MinorVer>3</VerInfo_MinorVer>
+			<VerInfo_DLL>true</VerInfo_DLL>
+			<VerInfo_Release>5</VerInfo_Release>
 			<DCC_UnitSearchPath>Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-			<DCC_DependencyCheckOutputName>GExpertsRSXE1.dll</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>GExpertsRSXE2.dll</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<UsePackages>true</UsePackages>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide</DCC_UsePackage>
+			<DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;$(DCC_UsePackage)</DCC_UsePackage>
 			<DCC_N>false</DCC_N>
 			<DCC_S>false</DCC_S>
 			<GenDll>true</GenDll>
@@ -39,19 +67,38 @@
 			<DCC_F>false</DCC_F>
 			<DCC_K>false</DCC_K>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_Win64)'!=''">
+			<Icon_MainIcon>Z:\Projects\GExperts\Source\GExpertsRSXE2_Icon.ico</Icon_MainIcon>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_Win32)'!=''">
+			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+			<Icon_MainIcon>Z:\Projects\GExperts\Source\GExpertsRSXE2_Icon.ico</Icon_MainIcon>
+			<Debugger_RunParams>-ns</Debugger_RunParams>
+			<Debugger_HostApplication>D:\IDE\Delphi XE2\bin\bds.exe</Debugger_HostApplication>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<VerInfo_Build>1</VerInfo_Build>
+			<Manifest_File>None</Manifest_File>
+			<VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE2;FileVersion=1.3.5.1;InternalName=GExperts for RAD Studio XE2;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE2.dll;ProductName=GExperts for RAD Studio XE2;ProductVersion=1.35;Comments=Open Source;CompileDate=</VerInfo_Keys>
+			<VerInfo_Release>5</VerInfo_Release>
+			<Debugger_HostApplication>C:\Program Files (x86)\Embarcadero\RAD Studio\9.0\bin\bds.exe</Debugger_HostApplication>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<Debugger_HostApplication>C:\Program Files (x86)\Embarcadero\RAD Studio\9.0\bin\bds.exe</Debugger_HostApplication>
+		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="GExpertsRSXE1.dpr">
+			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<RcCompile Include="..\Images\GXIcons.rc">
@@ -390,11 +437,11 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">GExpertsRSXE1.dpr</Source>
+						<Source Name="MainSource">GExpertsRSXE2.dpr</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="RunParams">-ns</Parameters>
-						<Parameters Name="HostApplication">D:\IDE\Delphi XE\bin\bds.exe</Parameters>
+						<Parameters Name="HostApplication">D:\IDE\Delphi XE2\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
 						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
@@ -413,23 +460,23 @@
 					</VersionInfo>
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName">Erik Berry and the GExperts Development Team</VersionInfoKeys>
-						<VersionInfoKeys Name="FileDescription">GExperts for RAD Studio XE</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">GExperts for RAD Studio XE2</VersionInfoKeys>
 						<VersionInfoKeys Name="FileVersion">1.3.5.0</VersionInfoKeys>
-						<VersionInfoKeys Name="InternalName">GExperts for RAD Studio XE</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">GExperts for RAD Studio XE2</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>
-						<VersionInfoKeys Name="OriginalFilename">GExpertsRSXE1.dll</VersionInfoKeys>
-						<VersionInfoKeys Name="ProductName">GExperts for RAD Studio XE</VersionInfoKeys>
+						<VersionInfoKeys Name="OriginalFilename">GExpertsRSXE2.dll</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductName">GExperts for RAD Studio XE2</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductVersion">1.35</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
 					</VersionInfoKeys>
-					<Excluded_Packages>
-						<Excluded_Packages Name="$(BDSBIN)\dclDataSnapServer150.bpl">Embarcadero DBExpress DataSnap Server Components</Excluded_Packages>
-					</Excluded_Packages>
+					<Excluded_Packages/>
 				</Delphi.Personality>
 				<Platforms>
+					<Platform value="Win64">False</Platform>
 					<Platform value="Win32">True</Platform>
 				</Platforms>
+				<ModelSupport>False</ModelSupport>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
