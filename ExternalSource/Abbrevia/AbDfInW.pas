@@ -24,7 +24,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{* ABBREVIA: AbDfInW.pas 3.05                            *}
+{* ABBREVIA: AbDfInW.pas                                 *}
 {*********************************************************}
 {* Deflate input sliding window unit                     *}
 {*********************************************************}
@@ -36,7 +36,6 @@ unit AbDfInW;
 interface
 
 uses
-  SysUtils,
   Classes,
   AbDfBase;
 
@@ -113,6 +112,9 @@ type
   end;
 
 implementation
+
+uses
+  SysUtils;
 
 {Notes:
         Meaning of the internal pointers:
@@ -345,8 +347,11 @@ function TAbDfInputWindow.FindLongestMatch(aAmpleLength : integer;
        time sink for compression. There are two versions, one written
        in Pascal for understanding, one in assembler for speed.
        Activate one and only one of the following compiler defines.}
-{$DEFINE UseGreedyAsm}
-{.$DEFINE UseGreedyPascal}
+{$IFDEF CPU386}
+  {$DEFINE UseGreedyAsm}
+{$ELSE}
+  {$DEFINE UseGreedyPascal}
+{$ENDIF}
 
 {Check to see that all is correct}
 {$IFDEF UseGreedyAsm}
@@ -376,8 +381,8 @@ var
   Len        : longint;
   MatchStr   : PAnsiChar;
   CurrentCh  : PAnsiChar;
-  CurCh : char;
-  MaxCh : char;
+  CurCh      : AnsiChar;
+  MaxCh      : AnsiChar;
   {$ENDIF}
 begin
   {calculate the hash index for the current position; using the

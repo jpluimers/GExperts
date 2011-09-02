@@ -24,24 +24,20 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{* ABBREVIA: AbZipPrc.pas 3.05                           *}
+{* ABBREVIA: AbZipPrc.pas                                *}
 {*********************************************************}
 {* ABBREVIA: TABZipHelper class                          *}
 {*********************************************************}
 
-{$I AbDefine.inc}
-
 unit AbZipPrc;
+
+{$I AbDefine.inc}
 
 interface
 
 uses
   Classes,
-  AbArcTyp,
-  AbZipTyp,
-  AbDfBase,
-  AbDfEnc,
-  AbSpanSt;
+  AbZipTyp;
 
   procedure AbZip( Sender : TAbZipArchive; Item : TAbZipItem;
     OutStream : TStream );
@@ -60,16 +56,18 @@ uses
 {$IFDEF MSWINDOWS}
   Windows,
 {$ENDIF}
-{$IFDEF LINUX}
+{$IFDEF LibcAPI}
   Libc,
 {$ENDIF}
-  AbConst,
+  SysUtils,
+  AbArcTyp,
   AbExcept,
   AbUtils,
   AbDfCryS,
-  AbZipCry,                                                              {!!.01}
   AbVMStrm,                                                              {!!.01}
-  SysUtils;
+  AbDfBase,
+  AbDfEnc,
+  AbSpanSt;
 
 
 { ========================================================================== }
@@ -87,10 +85,6 @@ begin
   Item.CompressionMethod := cmDeflated;
 
   Hlpr := TAbDeflateHelper.Create;
-
-  if (Archive.Password <> '') then begin
-    Hlpr.Passphrase := Archive.Password;
-  end;
 
   {anything dealing with store options, etc. should already be done.}
 
@@ -140,7 +134,6 @@ begin
     Hlpr.OnProgressStep := Archive.DoInflateProgress;
 
     { provide encryption check value }
-    Hlpr.CheckValue := Item.LastModFileTime shl $10;
     Item.CRC32 := Deflate(InStream, OutStream, Hlpr);
 
   finally {Hlpr}
@@ -158,7 +151,6 @@ var
   Total       : Int64;
   Abort       : Boolean;
   Buffer      : array [0..8191] of byte;
-  DestStrm    : TStream;  { place holder for Output, either direct or encrypted }
 begin
   { setup }
   Item.CompressionMethod := cmStored;
@@ -169,38 +161,27 @@ begin
   LastPercent := 0;
   InSize := InStream.Size;
 
-  if Archive.Password <> '' then  { encrypt the stream }
-    DestStrm := TAbDfEncryptStream.Create(OutStream,
-                                          LongInt(Item.LastModFileTime shl $10),
-                                          Archive.Password)
-  else { just use data stream as-is }
-    DestStrm := OutStream;
-  try
-    { get first bufferful }
-    DataRead := InStream.Read(Buffer, SizeOf(Buffer));
-    { while more data has been read and we're not told to bail }
-    while (DataRead <> 0) and not Abort do begin
-      {report the progress}
-      if Assigned(Archive.OnProgress) then begin
-        Total := Total + DataRead;
-        Percent := Round((100.0 * Total) / InSize);
-        if (LastPercent <> Percent) then
-          Archive.OnProgress(Percent, Abort);
-        LastPercent := Percent;
-      end;
-
-      { update CRC}
-      AbUpdateCRCBuffer(CRC32, Buffer, DataRead);
-
-      { write data (encrypting if needed) }
-      DestStrm.WriteBuffer(Buffer, DataRead);
-
-      { get next bufferful }
-      DataRead := InStream.Read(Buffer, SizeOf(Buffer));
+  { get first bufferful }
+  DataRead := InStream.Read(Buffer, SizeOf(Buffer));
+  { while more data has been read and we're not told to bail }
+  while (DataRead <> 0) and not Abort do begin
+    {report the progress}
+    if Assigned(Archive.OnProgress) then begin
+      Total := Total + DataRead;
+      Percent := Round((100.0 * Total) / InSize);
+      if (LastPercent <> Percent) then
+        Archive.OnProgress(Percent, Abort);
+      LastPercent := Percent;
     end;
-  finally
-    if Archive.Password <> '' then
-      DestStrm.Free;
+
+    { update CRC}
+    AbUpdateCRCBuffer(CRC32, Buffer, DataRead);
+
+    { write data (encrypting if needed) }
+    OutStream.WriteBuffer(Buffer, DataRead);
+
+    { get next bufferful }
+    DataRead := InStream.Read(Buffer, SizeOf(Buffer));
   end;
 
   { finish CRC calculation }
@@ -217,61 +198,27 @@ begin
 
 end;
 { ========================================================================== }
-procedure AbZipFromStream(Sender : TAbZipArchive; Item : TAbZipItem;
+procedure DoZipFromStream(Sender : TAbZipArchive; Item : TAbZipItem;
   OutStream, InStream : TStream);
 var
   ZipArchive : TAbZipArchive;
-  FileTimeStamp   : LongInt;
   InStartPos{, OutStartPos} : LongInt;                                   {!!.01}
   TempOut : TAbVirtualMemoryStream;                                      {!!.01}
-
-procedure ConfigureItem;
-begin
-  Item.UncompressedSize := InStream.Size;
-  Item.GeneralPurposeBitFlag := Item.GeneralPurposeBitFlag and AbLanguageEncodingFlag;
-  Item.CompressedSize := 0;
-
-  { if not reading from a file, then set defaults for storing the item }
-  if not (InStream is TFileStream) or (InStream is TAbSpanStream) then begin
-    FileTimeStamp := DateTimeToFileDate(SysUtils.Now);
-    Item.ExternalFileAttributes := 0;
-    Item.UncompressedSize := InStream.Size;
-    Item.LastModFileTime := LongRec(FileTimeStamp).Lo;
-    Item.LastModFileDate := LongRec(FileTimeStamp).Hi;
-  end;
-
-{$IFDEF MSWINDOWS}
-  Item.VersionMadeBy := (Item.VersionMadeBy and $FF00) + 20;
-{$ENDIF}
-{$IFDEF LINUX}
-  Item.VersionMadeBy := 20;
-{$ENDIF}
-end;
-
-procedure UpdateItem;
-begin
-  if (Item.CompressionMethod = cmDeflated) then
-    Item.VersionNeededToExtract := 20
-  else
-    Item.VersionNeededToExtract := 10;
-
-  if (ZipArchive.Password <> '') then begin
-    Item.GeneralPurposeBitFlag := Item.GeneralPurposeBitFlag
-      or AbFileIsEncryptedFlag or AbHasDataDescriptorFlag;
-  end;
-
-end;
-
+  DestStrm : TStream;
 begin
   ZipArchive := TAbZipArchive(Sender);
 
-  TempOut := TAbVirtualMemoryStream.Create;                              {!!.01}
-  TempOut.SwapFileDirectory := Sender.TempDirectory;                     {!!.01}
+  { configure Item }
+  Item.UncompressedSize := InStream.Size;
+  Item.GeneralPurposeBitFlag := Item.GeneralPurposeBitFlag and AbLanguageEncodingFlag;
 
+  if ZipArchive.Password <> '' then  { encrypt the stream }
+    DestStrm := TAbDfEncryptStream.Create(OutStream,
+                                          LongInt(Item.LastModFileTime shl $10),
+                                          ZipArchive.Password)
+  else
+    DestStrm := OutStream;
   try
-    { configure Item }
-    ConfigureItem;
-
     if InStream.Size > 0 then begin                                      {!!.01}
 
       { determine how to store Item based on specified CompressionMethodToUse }
@@ -279,35 +226,45 @@ begin
         smDeflated : begin
         { Item is to be deflated regarless }
           { deflate item }
-          DoDeflate(ZipArchive, Item, TempOut, InStream);                {!!.01}
+          DoDeflate(ZipArchive, Item, DestStrm, InStream);               {!!.01}
         end;
 
         smStored : begin
         { Item is to be stored regardless }
           { store item }
-          DoStore(ZipArchive, Item, TempOut, InStream);                  {!!.01}
+          DoStore(ZipArchive, Item, DestStrm, InStream);                 {!!.01}
         end;
 
         smBestMethod : begin
         { Item is to be archived using method producing best compression }
-          { save starting points }
-          InStartPos  := InStream.Position;
-
-          { try deflating item }
-          DoDeflate(ZipArchive, Item, TempOut, InStream);                {!!.01}
-          { if deflated size > input size then got negative compression }
-          { so storing the item is more efficient }
-
-          if TempOut.Size > InStream.Size then begin { store item instead }
-            { reset streams to original positions }
-            InStream.Position  := InStartPos;
-            TempOut.Free;                                                {!!.01}
-            TempOut := TAbVirtualMemoryStream.Create;                    {!!.01}
+          TempOut := TAbVirtualMemoryStream.Create;                      {!!.01}
+          try
             TempOut.SwapFileDirectory := Sender.TempDirectory;           {!!.01}
 
-            { store item }
-            DoStore(ZipArchive, Item, TempOut, InStream);                {!!.01}
-          end {if};
+            { save starting points }
+            InStartPos  := InStream.Position;
+
+            { try deflating item }
+            DoDeflate(ZipArchive, Item, TempOut, InStream);              {!!.01}
+            { if deflated size > input size then got negative compression }
+            { so storing the item is more efficient }
+
+            if TempOut.Size > InStream.Size then begin { store item instead }
+              { reset streams to original positions }
+              InStream.Position  := InStartPos;
+              TempOut.Free;                                              {!!.01}
+              TempOut := TAbVirtualMemoryStream.Create;                  {!!.01}
+              TempOut.SwapFileDirectory := Sender.TempDirectory;         {!!.01}
+
+              { store item }
+              DoStore(ZipArchive, Item, TempOut, InStream);              {!!.01}
+            end {if};
+
+            TempOut.Seek(0, soBeginning);                                {!!.01}
+            DestStrm.CopyFrom(TempOut, TempOut.Size);
+          finally
+            TempOut.Free;                                                {!!.01}
+          end;
         end;
       end; { case }
 
@@ -316,21 +273,33 @@ begin
       { InStream is zero length}                                         {!!.01}
       Item.CRC32 := 0;                                                   {!!.01}
       { ignore any storage indicator and treat as stored }               {!!.01}
-      DoStore(ZipArchive, Item, TempOut, InStream);                      {!!.01}
+      DoStore(ZipArchive, Item, DestStrm, InStream);                     {!!.01}
     end;                                                                 {!!.01}
-
-    { update item }
-    UpdateItem;
-
-    TempOut.Seek(0, soFromBeginning);                                    {!!.01}
-    OutStream.CopyFrom(TempOut, TempOut.Size);                           {!!.01}
-
   finally                                                                {!!.01}
-    TempOut.Free;                                                        {!!.01}
+    if DestStrm <> OutStream then
+      DestStrm.Free;
   end;                                                                   {!!.01}
 
+  { update item }
   Item.CompressedSize := OutStream.Size;
   Item.InternalFileAttributes := 0; { don't care }
+  if (ZipArchive.Password <> '') then
+    Item.GeneralPurposeBitFlag := Item.GeneralPurposeBitFlag
+      or AbFileIsEncryptedFlag or AbHasDataDescriptorFlag;
+end;
+{ -------------------------------------------------------------------------- }
+procedure AbZipFromStream(Sender : TAbZipArchive; Item : TAbZipItem;
+  OutStream, InStream : TStream);
+var
+  FileTimeStamp : LongInt;
+begin
+  // Set item properties for non-file streams
+  Item.ExternalFileAttributes := 0;
+  FileTimeStamp := DateTimeToFileDate(SysUtils.Now);
+  Item.LastModFileTime := LongRec(FileTimeStamp).Lo;
+  Item.LastModFileDate := LongRec(FileTimeStamp).Hi;
+
+  DoZipFromStream(Sender, Item, OutStream, InStream);
 end;
 { -------------------------------------------------------------------------- }
 procedure AbZip( Sender : TAbZipArchive; Item : TAbZipItem;
@@ -354,13 +323,13 @@ begin
     ChDir( SaveDir );
   end; {SaveDir}
   try {UncompressedStream}
+    {$IFDEF UNIX}
+    Item.ExternalFileAttributes := LongWord(AttrEx.Mode) shl 16 + LongWord(AttrEx.Attr);
+    {$ELSE}
     Item.ExternalFileAttributes := AttrEx.Attr;
-    {$IFDEF Linux}
-    AttrEx.Time := AbDateTimeToDosFileDate(FileDateToDateTime(AttrEx.Time));
     {$ENDIF}
-    Item.LastModFileTime := LongRec(AttrEx.Time).Lo;
-    Item.LastModFileDate := LongRec(AttrEx.Time).Hi;
-    AbZipFromStream(Sender, Item, OutStream, UncompressedStream);
+    Item.LastModTimeAsDateTime := AttrEx.Time;
+    DoZipFromStream(Sender, Item, OutStream, UncompressedStream);
   finally {UncompressedStream}
     UncompressedStream.Free;
   end; {UncompressedStream}

@@ -24,7 +24,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{* ABBREVIA: AbDefine.inc 3.05                           *}
+{* ABBREVIA: AbDefine.inc                                *}
 {*********************************************************}
 {* ABBREVIA: Compiler options/directives include file    *}
 {*********************************************************}
@@ -77,76 +77,67 @@
   {$ENDIF}
 {$ENDIF}
 
-{$IFNDEF VER80}
- {$IFNDEF VER90}
-  {$IFNDEF VER93}
-    {$DEFINE VERSION3} { Delphi 3.0 or BCB 3.0 or higher }
+{====Platform defines================================================}
+
+{ map Delphi platform defines to FreePascal's (MSWINDOWS/UNIX/LINUX/DARWIN) }
+{$IFNDEF FPC}
+  {$IF DEFINED(LINUX) AND (CompilerVersion < 15)}
+    {$DEFINE KYLIX}
+    {$DEFINE UNIX}
+  {$IFEND}
+  {$IFDEF MACOS}
+    {$DEFINE DARWIN}
   {$ENDIF}
- {$ENDIF}
-{$ENDIF}
-
-{$IFDEF VERSION3}
- {$IFNDEF VER100}     {Delphi 3}
-  {$IFNDEF VER110}    {BCB 3}
-   {$DEFINE VERSION4} {Delphi 4.0 or higher}
-  {$ENDIF}
- {$ENDIF}
-{$ENDIF}
-
-{$IFDEF VERSION4}
- {$IFNDEF VER120}             { Delphi 4 }
-  {$IFNDEF VER125}            { BCB 4 }
-   {$DEFINE VERSION5}         { Delphi 5.0 or higher }
-  {$ENDIF}
- {$ENDIF}
-{$ENDIF}
-
-{$IFDEF VERSION5}
- {$IFNDEF VER130}             { Delphi 5 }
-  {$IFNDEF VER135}            { BCB 5 }
-    {$IFNDEF LINUX }
-      {$DEFINE VERSION6}      { Delphi 6.0 or higher }
-    {$ENDIF}
-  {$ENDIF}
- {$ENDIF}
-{$ENDIF}
-
-{$IFDEF VERSION6}
- {$IFNDEF VER140}             { Delphi 6 }
-  {$IFNDEF LINUX }
-    {$DEFINE VERSION7}      { Delphi 7.0 or higher }
-  {$ENDIF}
- {$ENDIF}
-{$ENDIF}
-
-{$IFDEF VERSION4}
-  {$DEFINE HasLongWord}       { D4 and above have a true LongWord type }
-  {$DEFINE HasInt64 }         { D4 and above have a 64-bit Integer }
-{$ENDIF}
-{$IFDEF LINUX}
-  {$DEFINE HasLongWord}       { Kylix has a true LongWord type }
-  {$DEFINE HasInt64 }         { Kylix has a 64-bit Integer }
-{$ENDIF}
-
-{$IFNDEF MSWINDOWS}
-{$IFDEF VERSION3}
-  {$IFNDEF LINUX}
-    {$DEFINE MSWINDOWS}
+  {$IFDEF POSIX}
+    {$DEFINE UNIX}
   {$ENDIF}
 {$ENDIF}
-{$ENDIF MSWINDOWS}
 
-{$IFDEF Win32}
-  {$DEFINE NeedMouseWheel}
-  {$IFDEF Version4}          {version 4+ has built-in mousewheel support}
-    {$UNDEF NeedMouseWheel}
-  {$ENDIF}
+{ Unix API (Kylix/Delphi/FreePascal) }
+{$IFDEF UNIX}
+  {$IF DEFINED(FPC)}
+    {$DEFINE FPCUnixAPI}
+  {$ELSEIF DEFINED(KYLIX)}
+    {$DEFINE LibcAPI}
+  {$ELSE}
+    {$DEFINE PosixAPI}
+  {$IFEND}
+{$ENDIF}
+
+{$IFDEF FPC}
+  {$MODE DELPHI}
+  {$DEFINE UsingLCL}
 {$ENDIF}
 
 { determine whether CLX is used, should always be on Linux }
-{$IFDEF LINUX}
-{$DEFINE UsingCLX }
-{$ENDIF LINUX}
+{$IFDEF KYLIX}
+  {$DEFINE UsingCLX }
+{$ENDIF KYLIX}
+
+{====Widgetset defines===============================================}
+
+{ VCL version specific defines }
+{$IFNDEF FPC}
+  {$IF RTLVersion >= 17} // Delphi 2005
+    {$DEFINE HasOnMouseActivate}
+  {$IFEND}
+  {$IF RTLVersion >= 18} // Delphi 2006
+    {$DEFINE HasOnMouseEnter}
+  {$IFEND}
+  {$IF RTLVersion >= 20} // Delphi 2009
+    {$DEFINE HasListViewGroups}
+    {$DEFINE HasListViewOnItemChecked}
+    {$DEFINE HasParentDoubleBuffered}
+    {$DEFINE HasTreeViewExpandedImageIndex}
+  {$IFEND}
+  {$IF RTLVersion >= 21} // Delphi 2010
+    {$DEFINE HasGridDrawingStyle}
+    {$DEFINE HasTouch}
+  {$IFEND}
+  {$IF (CompilerVersion > 15) AND NOT DEFINED(BCB)}
+    {$DEFINE HasCRTL}
+  {$IFEND}
+{$ENDIF}
 
 {====General defines=================================================}
 
@@ -156,6 +147,37 @@
  fooled and report things like variables being used before
  initialisation and so on when in reality the problem does not exist.}
 {$DEFINE DefeatWarnings} {!!.03 -- on by default }
+
+{ Disable warnings for explicit string casts }
+{$IFDEF UNICODE}
+  {$WARN EXPLICIT_STRING_CAST OFF}
+  {$WARN EXPLICIT_STRING_CAST_LOSS OFF}
+{$ENDIF}
+
+{====Bzip2 defines===================================================}
+
+{Activate this define to statically link bzip2 .obj files into the application.
+ Curerntly only supported by Delphi/Win32.}
+{.$DEFINE Bzip2Static}
+
+{Activate this define to dynamically link to a libbz2.dll/libbbz2.so.1}
+{.$DEFINE Bzip2Dynamic}
+
+{Activate this define to load libbz2.dll/libbz2.so.1 at runtime using LoadLibrary}
+{.$DEFINE Bzip2Runtime}
+
+{Pick an appropriate linking method if none of the above are activate}
+{$IF NOT DEFINED(Bzip2Static) AND NOT DEFINED(Bzip2Dynamic) AND NOT DEFINED(Bzip2Runtime)}
+  {$IFDEF MSWINDOWS}
+     {$IF DEFINED(WIN32) AND NOT DEFINED(FPC)}
+       {$DEFINE Bzip2Static}
+     {$ELSE}
+       {$DEFINE Bzip2Runtime}
+     {$IFEND}
+  {$ELSE}
+    {$DEFINE Bzip2Dynamic}
+  {$ENDIF}
+{$IFEND}
 
 {====Zip defines=====================================================}
 
@@ -183,6 +205,33 @@ using PKZip compatible unImplode.}
 all older PKZip compatible methods (Shrink, Reduce, Implode}
 
 {$DEFINE UnzipBackwardSupport}
+
+{Activate the following to include support for extracting files using
+BZIP2 compression.  Added in AppNote.txt v4.6. }
+
+{.$DEFINE UnzipBzip2Support}
+
+{Activate the following to include support for extracting files using
+7-zip compatible Lzma compression.  Added in AppNote.txt v6.3.}
+
+{.$DEFINE UnzipLzmaSupport}
+
+{Activate the following to include support for extracting files using
+zipx PPMd I compression.  Added in AppNote.txt v6.3.}
+
+{.$DEFINE UnzipPPMdSupport}
+
+{Activate the following to include support for extracting .wav files
+using zipx WavPack compression.  Requires copyright notice in your
+documentation.  Check "WavPack License.txt" for details.
+Added in AppNote.txt v6.3.  }
+
+{.$DEFINE UnzipWavPackSupport}
+
+{Activate the following to include support for extracting files using
+all newer (zipx) compatible methods (Bzip2, Lzma, PPMd, WavPack)}
+
+{$DEFINE UnzipZipxSupport}
 
 {Activate the following to include logging support in the deflate/
  inflate code. Since this logging support is a by-product of assertion
@@ -214,57 +263,6 @@ all older PKZip compatible methods (Shrink, Reduce, Implode}
   {.$DEFINE WINZIPTESTS}
 {$ENDIF}
 
-{ This a temporary Define for Abbrevia 3.05 Hopefully it's need will be removed
-  when Abbrevia 4.0 is released. With something that can be defined at runtime.
-  Which would be much easier to unit test!
-  
-  This only effects Procedure AbUnZip in AbUnzPrc.Pas.
-
-  When extracting files, we have three options.
-  1.  Clobber - Write in Place (Side Effect if Password or ZIP File is invalid and a version of the file you where
-                                extracting was on the disk, the original GONE!!!!)
-  2.  Memory - File is extracted to Memory, if succesful then it is written to disk
-  3.  TempFile - File is extract to the Temp Directory, if sucessful then it is moved to correct location.
-
-  In testing, the memory option is the fastest as long as you don't end up using the Page File.
-  Once you start to page, this option is usually (Not always) slower than TempFile method.
-  Clobber was not tested for performance, it was the original method, I would assume it is faster
-  than the TempFile method (If extracting to the same machine) but if extract to a network I suspect
-  it could be slower.
-
-  After much thought, I have decided to make TempFile the default method, I need comments if you
-  think this should be different. }
-
-{.$DEFINE AbUnZipClobber}
-{.$DEFINE AbUnZipMemory}
-{$DEFINE AbUnZipTempFile}
-
-{$IFDEF AbUnZipClobber}
-  {$IFDEF AbUnZipMemory}
-    Only one method can be used.
-  {$ENDIF}
-  {$IFDEF AbUnZipTempFile}
-    Only one method can be used.
-  {$ENDIF}
-{$ENDIF}
-{$IFDEF AbUnZipMemory}
-  {$IFDEF AbUnZipTempFile}
-    Only one method can be used.
-  {$ENDIF}
-{$ENDIF}
-
-{$IFNDEF AbUnzipClobber}
-  {$IFNDEF AbUnzipMemory}
-    {$IFNDEF AbUnzipTempFile}
-       Need to select on of the above methods.
-    {$ENDIF}
-  {$ENDIF}
-{$ENDIF}
-
-
-
-
-
 
 {-------- !! DO NOT CHANGE DEFINES BELOW THIS LINE !! --------}
 
@@ -273,3 +271,18 @@ all older PKZip compatible methods (Shrink, Reduce, Implode}
   {$DEFINE UnzipReduceSupport}
   {$DEFINE UnzipImplodeSupport}
 {$ENDIF}
+
+{$IFDEF UnzipZipxSupport}
+  {$DEFINE UnzipBzip2Support}
+  {$DEFINE UnzipLzmaSupport}
+  {$DEFINE UnzipPPMdSupport}
+  {$DEFINE UnzipWavPackSupport}
+{$ENDIF}
+
+{ Linking .obj files isn't currently supported in Kylix or FPC }
+{$IF DEFINED(FPC) OR NOT DEFINED(WIN32)}
+  {$UNDEF UnzipLzmaSupport}
+  {$UNDEF UnzipPPMdSupport}
+  {$UNDEF UnzipWavPackSupport}
+{$IFEND}
+
