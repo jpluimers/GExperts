@@ -42,6 +42,10 @@
 (* SYN_COMPILER_11_UP   : Delphi 2007 or higher is the compiler.              *)
 (* SYN_COMPILER_12      : Delphi 2009 is the compiler.                        *)
 (* SYN_COMPILER_12_UP   : Delphi 2009 or higher is the compiler.              *)
+(* SYN_COMPILER_14      : Delphi 2010 is the compiler.                        *)
+(* SYN_COMPILER_14_UP   : Delphi 2010 or higher is the compiler.              *)
+(* SYN_COMPILER_15      : Delphi XE   is the compiler.                        *)
+(* SYN_COMPILER_15_UP   : Delphi XE   or higher is the compiler.              *)
 (* SYN_CPPB             : Any version of C++Builder is being used.            *)
 (* SYN_CPPB_1           : C++B v1.0x is being used.                           *)
 (* SYN_CPPB_3           : C++B v3.0x is being used.                           *)
@@ -78,6 +82,10 @@
 (* SYN_DELPHI_2009_UP   : Delphi 2009 or higher is being used.                *)
 (* SYN_DELPHI_2010      : Delphi 2010 is being used.                          *)
 (* SYN_DELPHI_2010_UP   : Delphi 2010 or higher is being used.                *)
+(* SYN_DELPHI_XE        : Delphi XE   is being used.                          *)
+(* SYN_DELPHI_XE_UP     : Delphi XE   or higher is being used.                *)
+(* SYN_DELPHI_XE2       : Delphi XE   is being used.                          *)
+(* SYN_DELPHI_XE2_UP    : Delphi XE   or higher is being used.                *)
 (* SYN_KYLIX            : Kylix 1.0 is being using.                           *)
 (* SYN_CLX              : A CLX application is being created.                 *)
 (******************************************************************************)
@@ -126,13 +134,13 @@
 {$IFDEF VER230}  // XE 2
   {$DEFINE SYN_COMPILER_16}
   {$DEFINE SYN_DELPHI}
-  {$DEFINE SYN_DELPHI_2012}
+  {$DEFINE SYN_DELPHI_XE2}
 {$ENDIF}
 
 {$IFDEF VER220} // XE 1
   {$DEFINE SYN_COMPILER_15}
   {$DEFINE SYN_DELPHI}
-  {$DEFINE SYN_DELPHI_2011}
+  {$DEFINE SYN_DELPHI_XE}
 {$ENDIF}
 
 {$IFDEF VER210}
@@ -401,7 +409,6 @@
   {$DEFINE SYN_COMPILER_16_UP}
 {$ENDIF}
 
-
 {$IFDEF SYN_DELPHI_2}
   {$DEFINE SYN_DELPHI_2_UP}
 {$ENDIF}
@@ -516,7 +523,7 @@
   {$DEFINE SYN_DELPHI_2010_UP}
 {$ENDIF}
 
-{$IFDEF SYN_DELPHI_2011}
+{$IFDEF SYN_DELPHI_XE}
   {$DEFINE SYN_DELPHI_2_UP}
   {$DEFINE SYN_DELPHI_3_UP}
   {$DEFINE SYN_DELPHI_4_UP}
@@ -529,10 +536,10 @@
   {$DEFINE SYN_DELPHI_2007_UP}
   {$DEFINE SYN_DELPHI_2009_UP}
   {$DEFINE SYN_DELPHI_2010_UP}
-  {$DEFINE SYN_DELPHI_2011_UP}
+  {$DEFINE SYN_DELPHI_XE_UP}
 {$ENDIF}
 
-{$IFDEF SYN_DELPHI_2012}
+{$IFDEF SYN_DELPHI_XE2}
   {$DEFINE SYN_DELPHI_2_UP}
   {$DEFINE SYN_DELPHI_3_UP}
   {$DEFINE SYN_DELPHI_4_UP}
@@ -545,8 +552,8 @@
   {$DEFINE SYN_DELPHI_2007_UP}
   {$DEFINE SYN_DELPHI_2009_UP}
   {$DEFINE SYN_DELPHI_2010_UP}
-  {$DEFINE SYN_DELPHI_2011_UP}
-  {$DEFINE SYN_DELPHI_2012_UP}
+  {$DEFINE SYN_DELPHI_XE_UP}
+  {$DEFINE SYN_DELPHI_XE2_UP}
 {$ENDIF}
 
 {$IFDEF SYN_CPPB_6}

@@ -783,7 +783,8 @@ type
     procedure EndUndoBlock;
     procedure EndUpdate;
     procedure EnsureCursorPosVisible;
-    procedure EnsureCursorPosVisibleEx(ForceToMiddle: Boolean);
+    procedure EnsureCursorPosVisibleEx(ForceToMiddle: Boolean;
+      EvenIfVisible: Boolean = False);
     procedure FindMatchingBracket; virtual;
     function GetMatchingBracket: TBufferCoord; virtual;
     function GetMatchingBracketEx(const APoint: TBufferCoord): TBufferCoord; virtual;
@@ -1143,6 +1144,15 @@ uses
 const
   FrameWidth = 2; { the border width when BoderStyle = bsSingle (until we support TWidgetStyle...)  }
 {$ENDIF}
+
+function CeilOfIntDiv(Dividend: Cardinal; Divisor: Word): Word;
+Var
+  Remainder: Word;
+begin
+  DivMod(Dividend,  Divisor, Result, Remainder);
+  if Remainder > 0 then
+    Inc(Result);
+end;
 
 function TrimTrailingSpaces(const S: UnicodeString): UnicodeString;
 var
@@ -2827,7 +2837,7 @@ begin
   for i := 1 to Length(S) do
   begin
     inc(j);
-    CountOfAvgGlyphs := Ceil(fTextDrawer.TextWidth(S[i]) / fCharWidth);
+    CountOfAvgGlyphs := CeilOfIntDiv(fTextDrawer.TextWidth(S[i]), fCharWidth);
 
     if j + CountOfAvgGlyphs > Length(Result) then
       SetLength(Result, Length(Result) + 128);
@@ -3063,7 +3073,7 @@ var
           inc(NonFillerPos);
         end;
 
-        CountOfAvgGlyphs := Ceil(fTextDrawer.TextWidth(Token[NonFillerPos]) / fCharWidth);
+        CountOfAvgGlyphs := CeilOfIntDiv(fTextDrawer.TextWidth(Token[NonFillerPos]) , fCharWidth);
 
         // first visible part of the glyph (1-based)
         // (the glyph is visually sectioned in parts of size fCharWidth)
@@ -4513,6 +4523,13 @@ var
           fCaretX := 1 + Length(Str);
         end
         else begin
+          //--------- KV from SynEditStudio
+          if (CaretY = Lines.Count) or InsertMode then
+          begin
+            Lines.Insert(CaretY -1, '');
+            Inc(Result);
+          end;
+          //---------
           ProperSetLine(CaretY - 1, Str);
           Inc(fCaretY);
           Include(fStatusChanges, scCaretY);
@@ -4929,7 +4946,14 @@ var
   iWheelClicks: Integer;
   iLinesToScroll: Integer;
 begin
-  if GetKeyState(VK_CONTROL) < 0 then
+  Result := inherited DoMouseWheel(Shift, WheelDelta, MousePos);
+  if Result then
+    Exit;  
+{$IFDEF SYN_CLX}
+  if ssCtrl in Application.KeyState then
+{$ELSE}
+  if GetKeyState(SYNEDIT_CONTROL) < 0 then
+{$ENDIF}
     iLinesToScroll := LinesInWindow shr Ord(eoHalfPageScroll in fOptions)
   else
     iLinesToScroll := 3;
@@ -6780,7 +6804,8 @@ begin
   EnsureCursorPosVisibleEx(False);
 end;
 
-procedure TCustomSynEdit.EnsureCursorPosVisibleEx(ForceToMiddle: Boolean);
+procedure TCustomSynEdit.EnsureCursorPosVisibleEx(ForceToMiddle: Boolean;
+  EvenIfVisible: Boolean = False);
 var
   TmpMiddle: Integer;
   VisibleX: Integer;
@@ -6814,6 +6839,12 @@ begin
       begin
         TmpMiddle := LinesInWindow div 2;
         TopLine := vCaretRow - (LinesInWindow - 1) + TmpMiddle;
+      end
+     { Forces to middle even if visible in viewport }
+      else if EvenIfVisible then
+      begin
+        TmpMiddle := fLinesInWindow div 2;
+        TopLine := vCaretRow - TmpMiddle + 1;
       end;
     end
     else begin
@@ -7199,11 +7230,20 @@ begin
                     end;
                     SpaceCount2 := 0;
                   end;
-                  ProperSetLine(CaretY - 1, Temp);
                   fCaretX := fCaretX - (SpaceCount1 - SpaceCount2);
                   UpdateLastCaretX;
+                  // Stores the previous "expanded" CaretX if the line contains tabs.
+                  if (eoTrimTrailingSpaces in Options) and (Len <> Length(TabBuffer)) then
+                    vTabTrim := CharIndex2CaretPos(CaretX, TabWidth, Temp);
+                  ProperSetLine(CaretY - 1, Temp);
                   fStateFlags := fStateFlags + [sfCaretChanged];
                   StatusChanged([scCaretX]);
+                  // Calculates a delta to CaretX to compensate for trimmed tabs.
+                  if vTabTrim <> 0 then
+                    if Length(Temp) <> Length(LineText) then
+                      Dec(vTabTrim, CharIndex2CaretPos(CaretX, TabWidth, LineText))
+                    else
+                      vTabTrim := 0;
                 end
                 else begin
                   // delete char
@@ -7428,12 +7468,14 @@ begin
               end;
               Lines.Insert(CaretY, '');
               Caret := CaretXY;
+
+              fUndoList.AddChange(crLineBreak, Caret, Caret, '', smNormal);   //KV
               if Command = ecLineBreak then
               begin
+                InternalCaretXY := BufferCoord(1, CaretY +1);
                 if SpaceCount2 > 0 then
                 begin
                   SpaceBuffer := Copy(Lines[BackCounter], 1, SpaceCount2);
-                  InternalCaretXY := BufferCoord(1, CaretY +1);
                   for i := 1 to Length(SpaceBuffer) do
                     if SpaceBuffer[i] = #9 then
                       CommandProcessor(ecTab, #0, nil)
@@ -7441,7 +7483,6 @@ begin
                       CommandProcessor(ecChar, SpaceBuffer[i], nil);
                 end;
               end;
-              fUndoList.AddChange(crLineBreak, Caret, Caret, '', smNormal);
             end;
           end
           else begin
@@ -8471,6 +8512,7 @@ procedure TCustomSynEdit.SetFocus;
 begin
   if (fFocusList.Count > 0) then
   begin
+    if TWinControl (fFocusList.Last).CanFocus then  
     TWinControl (fFocusList.Last).SetFocus;
     exit;
   end;
@@ -9121,6 +9163,7 @@ var
   PrevLine, OldSelText: UnicodeString;
   p: PWideChar;
   OldCaretXY: TBufferCoord;
+  ChangeScroll: Boolean;
 begin
   // Provide Visual Studio like block indenting
   if (eoTabIndent in Options) and ((SelTabBlock) or (SelTabLine)) then
@@ -9194,7 +9237,15 @@ begin
     fUndoList.AddChange(crSilentDelete, BufferCoord(NewX, CaretY),
       OldCaretXY, OldSelText, smNormal);
 
+    // KV
+    ChangeScroll := not(eoScrollPastEol in fOptions);
+    try
+      Include(fOptions, eoScrollPastEol);
     InternalCaretX := NewX;
+    finally
+      if ChangeScroll then
+        Exclude(fOptions, eoScrollPastEol);
+    end;
   end;
 end;
 
@@ -9616,11 +9667,11 @@ begin
     if Result then
     begin
       if Action is TEditCut then
-        CutToClipboard
+        CommandProcessor(ecCut, ' ', nil)
       else if Action is TEditCopy then
         CopyToClipboard
       else if Action is TEditPaste then
-        PasteFromClipboard
+        CommandProcessor(ecPaste, ' ', nil)
 {$IFDEF SYN_COMPILER_5_UP}
       else if Action is TEditDelete then
       begin
@@ -9654,8 +9705,8 @@ begin
   begin
     Result := Focused;
     DoSearchFindNextExecute(TSearchFindNext(Action))
-{$ENDIF}
   end
+{$ENDIF}
   else
     Result := inherited ExecuteAction(Action);
 end;
@@ -10164,7 +10215,7 @@ begin
         inc(x, TabWidth - (x mod TabWidth))
       else if i <= l then
       begin
-        CountOfAvgGlyphs := Ceil(fTextDrawer.TextWidth(s[i]) / fCharWidth);
+        CountOfAvgGlyphs := CeilOfIntDiv(fTextDrawer.TextWidth(s[i]) , fCharWidth);
         inc(x, CountOfAvgGlyphs);
       end
       else
@@ -10204,7 +10255,7 @@ begin
         inc(x, TabWidth - (x mod TabWidth))
       else if i <= l then
       begin
-        CountOfAvgGlyphs := Ceil(fTextDrawer.TextWidth(s[i]) / fCharWidth);
+        CountOfAvgGlyphs := CeilOfIntDiv(fTextDrawer.TextWidth(s[i]) , fCharWidth);
         inc(x, CountOfAvgGlyphs);
       end
       else

@@ -56,16 +56,16 @@ uses
   SynEdit,
 {$ENDIF}
   SysUtils,
-  Classes;
+  Classes, SynEditMiscProcs;
 
 var
   // Accumulate/hide whitespace at EOL (at end of wrapped rows, actually)
   OldWhitespaceBehaviour: Boolean = False;
 
 type
-  TLineIndex = 0..MaxListSize;
-  TRowIndex = 0..MaxListSize;
-  TRowLength = byte;
+  TLineIndex = 0..MaxRowCol;
+  TRowIndex = 0..MaxRowCol;
+  TRowLength = word;
 
   TRowIndexArray = array [TLineIndex] of TRowIndex;
   PRowIndexArray = ^TRowIndexArray;
@@ -141,7 +141,6 @@ uses
   {$ENDIF}
 {$ENDIF}
 {$IFNDEF SYN_COMPILER_4_UP}
-  SynEditMiscProcs,
 {$ENDIF}
   Math;
 
@@ -426,7 +425,7 @@ begin
   vLine := Editor.ExpandAtWideGlyphs(vLine);
   // Pre-allocate a buffer for rowlengths
   vMaxNewRows := ((Length(vLine) - 1) div fMinRowLength) + 1;
-  vTempRowLengths := AllocMem(vMaxNewRows);
+  vTempRowLengths := AllocMem(vMaxNewRows * SizeOf(TRowLength));
   try
     vLineRowCount := 0;
     vRowBegin := PWideChar(vLine);

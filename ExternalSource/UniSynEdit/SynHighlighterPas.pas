@@ -1184,7 +1184,7 @@ function TSynPasSyn.UseUserSettings(VersionIndex: Integer): Boolean;
         begin
           VersionStr := Copy(settingTag, Length(BDSVersionPrefix) + 1, 999);
           Version := 0;
-          if not TryStrToCurr(StringReplace(VersionStr, '.', {$IFDEF SYN_DELPHI_2011_UP}FormatSettings.{$ENDIF}DecimalSeparator, []), Version) then
+          if not TryStrToCurr(StringReplace(VersionStr, '.', {$IFDEF SYN_COMPILER_15_UP}FormatSettings.{$ENDIF}DecimalSeparator, []), Version) then
           begin
             Result := False;
             Exit;
