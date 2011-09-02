@@ -68,11 +68,9 @@
 			<DCC_K>false</DCC_K>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win64)'!=''">
-			<Icon_MainIcon>Z:\Projects\GExperts\Source\GExpertsRSXE2_Icon.ico</Icon_MainIcon>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
 			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-			<Icon_MainIcon>Z:\Projects\GExperts\Source\GExpertsRSXE2_Icon.ico</Icon_MainIcon>
 			<Debugger_RunParams>-ns</Debugger_RunParams>
 			<Debugger_HostApplication>D:\IDE\Delphi XE2\bin\bds.exe</Debugger_HostApplication>
 		</PropertyGroup>
