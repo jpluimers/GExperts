@@ -46,6 +46,15 @@ uses
   baseunix,
   unix,
 {$ENDIF}
+{$IFDEF PosixAPI}
+  Posix.SysStatvfs,
+  Posix.SysStat,
+  Posix.Utime,
+  Posix.Base,
+  Posix.Unistd,
+  Posix.Fcntl,
+  Posix.SysTypes,
+{$ENDIF}
 {$IFDEF UNIX}
   DateUtils,
 {$ENDIF}
@@ -106,6 +115,9 @@ type
   RawByteString = AnsiString;
   UnicodeString = WideString;
 {$ENDIF}
+
+{ System-encoded SBCS string (formerly AnsiString) }
+  AbSysString = {$IFDEF Posix}UTF8String{$ELSE}AnsiString{$ENDIF};
 
 const
   AbCrc32Table : array[0..255] of DWord = (
@@ -366,10 +378,13 @@ uses
   AbConst,
   AbExcept;
 
-{$IFDEF FPCUnixAPI}
+{$IF DEFINED(FPCUnixAPI)}
 function mktemp(template: PAnsiChar): PAnsiChar; cdecl;
   external clib name 'mktemp';
-{$ENDIF}
+{$ELSEIF DEFINED(PosixAPI)}
+function mktemp(template: PAnsiChar): PAnsiChar; cdecl;
+  external libc name _PU + 'mktemp';
+{$IFEND}
 
 {===platform independent routines for platform dependent stuff=======}
 function ExtractShortName(const SR : TSearchRec) : string;
@@ -476,6 +491,7 @@ var
 {$ENDIF}
 {$IFDEF UNIX}
   hFile: Integer;
+  FileName: AbSysString;
 {$ENDIF}
 begin
   if DirectoryExists(Dir) then
@@ -487,8 +503,9 @@ begin
   Result := string(FileNameZ);
 {$ENDIF}
 {$IFDEF UNIX}
-  Result := TempPath + 'VMSXXXXXX';
-  mktemp(PChar(Result));
+  FileName := AbSysString(TempPath) + 'VMSXXXXXX';
+  mktemp(PAnsiChar(AbSysString(Result)));
+  Result := string(FileName);
   if CreateIt then begin
     hFile := FileCreate(Result);
     if hFile <> -1 then
@@ -558,7 +575,7 @@ begin
 {$ENDIF}
 {$IFDEF UNIX}
 var
-  FStats : TStatFs;
+  FStats : {$IFDEF PosixAPI}_statvfs{$ELSE}TStatFs{$ENDIF};
 begin
   {$IF DEFINED(LibcAPI)}
   if statfs(PAnsiChar(ExtractFilePath(ArchiveName)), FStats) = 0 then
@@ -566,6 +583,9 @@ begin
   {$ELSEIF DEFINED(FPCUnixAPI)}
   if fpStatFS(PAnsiChar(ExtractFilePath(ArchiveName)), @FStats) = 0 then
     Result := Int64(FStats.bAvail) * Int64(FStats.bsize)
+  {$ELSEIF DEFINED(PosixAPI)}
+  if statvfs(PAnsiChar(AbSysString(ExtractFilePath(ArchiveName))), FStats) = 0 then
+    Result := Int64(FStats.f_bavail) * Int64(FStats.f_bsize)
   {$IFEND}
   else
     Result := -1;
@@ -1239,8 +1259,8 @@ begin
   {$IFDEF MSWINDOWS}
   FileSetAttr(aFileName, aAttr);
   {$ENDIF}
-  {$IF DEFINED(LibcAPI)}
-  chmod(PAnsiChar(aFileName), aAttr);
+  {$IF DEFINED(LibcAPI) OR DEFINED(PosixAPI)}
+  chmod(PAnsiChar(AbSysString(aFileName)), aAttr);
   {$ELSEIF DEFINED(FPCUnixAPI)}
   fpchmod(aFileName, aAttr);
   {$IFEND}
@@ -1272,6 +1292,9 @@ var
 {$IFDEF LibcAPI}
   StatBuf: TStatBuf64;
 {$ENDIF}
+{$IFDEF PosixAPI}
+  StatBuf: _stat;
+{$ENDIF}
 begin
   aAttr.Time := 0;
   aAttr.Size := -1;
@@ -1296,6 +1319,9 @@ begin
   {$IFDEF LibcAPI}
   // Work around Kylix QC#2761: Stat64, et al., are defined incorrectly
   Result := (__lxstat64(_STAT_VER, PAnsiChar(aFileName), StatBuf) = 0);
+  {$ENDIF}
+  {$IFDEF PosixAPI}
+  Result := (stat(PAnsiChar(AbSysString(aFileName)), StatBuf) = 0);
   {$ENDIF}
   if Result then begin
     aAttr.Time := FileDateToDateTime(StatBuf.st_mtime);

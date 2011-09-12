@@ -54,6 +54,9 @@ type
   end;
 
 type
+  PAbPointerList = ^TAbPointerList;
+  TAbPointerList = array[0..MaxInt div SizeOf(Pointer) - 1] of Pointer;
+
   TAbDfInputWindow = class
     private
       FAdvanceStart : boolean;
@@ -61,8 +64,8 @@ type
       FBufferEnd    : PAnsiChar;
       FBytesUsed    : longint;
       FChainLen     : integer;
-      FHashChains   : PPointerList;
-      FHashHeads    : PPointerList;
+      FHashChains   : PAbPointerList;
+      FHashHeads    : PAbPointerList;
       FHashIndex    : integer;
       FChecksum     : longint;
       FCurrent      : PAnsiChar;
@@ -228,8 +231,8 @@ var
   i : integer;
   ByteCount : integer;
   Percent   : integer;
-  HashChains: PPointerList;
-  HashHeads : PPointerList;
+  HashChains: PAbPointerList;
+  HashHeads : PAbPointerList;
   HashInx   : integer;
   CurPos    : PAnsiChar;
 begin

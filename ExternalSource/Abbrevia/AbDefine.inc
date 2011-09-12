@@ -134,9 +134,6 @@
     {$DEFINE HasGridDrawingStyle}
     {$DEFINE HasTouch}
   {$IFEND}
-  {$IF (CompilerVersion > 15) AND NOT DEFINED(BCB)}
-    {$DEFINE HasCRTL}
-  {$IFEND}
 {$ENDIF}
 
 {====General defines=================================================}
@@ -154,6 +151,11 @@
   {$WARN EXPLICIT_STRING_CAST_LOSS OFF}
 {$ENDIF}
 
+{ Disable hints on Delphi XE2/Mac to prevent unexpanded inline messages }
+{$IFDEF POSIX}
+  {$HINTS OFF}
+{$ENDIF}
+
 {====Bzip2 defines===================================================}
 
 {Activate this define to statically link bzip2 .obj files into the application.
@@ -169,11 +171,11 @@
 {Pick an appropriate linking method if none of the above are activate}
 {$IF NOT DEFINED(Bzip2Static) AND NOT DEFINED(Bzip2Dynamic) AND NOT DEFINED(Bzip2Runtime)}
   {$IFDEF MSWINDOWS}
-     {$IF DEFINED(WIN32) AND NOT DEFINED(FPC)}
-       {$DEFINE Bzip2Static}
-     {$ELSE}
+     {$IFDEF FPC}
        {$DEFINE Bzip2Runtime}
-     {$IFEND}
+     {$ELSE}
+       {$DEFINE Bzip2Static}
+     {$ENDIF}
   {$ELSE}
     {$DEFINE Bzip2Dynamic}
   {$ENDIF}
@@ -280,7 +282,7 @@ all newer (zipx) compatible methods (Bzip2, Lzma, PPMd, WavPack)}
 {$ENDIF}
 
 { Linking .obj files isn't currently supported in Kylix or FPC }
-{$IF DEFINED(FPC) OR NOT DEFINED(WIN32)}
+{$IF DEFINED(FPC) OR NOT DEFINED(MSWINDOWS)}
   {$UNDEF UnzipLzmaSupport}
   {$UNDEF UnzipPPMdSupport}
   {$UNDEF UnzipWavPackSupport}

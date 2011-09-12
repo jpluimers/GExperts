@@ -1770,7 +1770,7 @@ begin
   else
     FItemInfo.FileName := AnsiName;
   {$ENDIF}
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   FItemInfo.FileName := AnsiString(Value);
   FItemInfo.IsUTF8 := AbSysCharSetIsUTF8;
   {$ENDIF}
