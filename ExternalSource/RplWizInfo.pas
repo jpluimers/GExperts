@@ -813,7 +813,12 @@ begin
             (DestObj as TStrings).Text := (SourceObj as TWideStrings).Text
           else
           {$ENDIF GX_VER170_up}
+          begin
+            // TTouchManager assignments cause the new component to be corrupt when the old component is deleted in 2010/XE
+            if (SourceInfo.Name = 'Touch') and (SourceInfo.PropType^.Name = 'TTouchManager') then
+              Exit;
             SetObjectProp(DestObject, string(DestInfo.Name), GetObjectProp(SourceObject, string(SourceInfo.Name)));
+          end;
         end;
       end; // tkClass
       tkMethod:
