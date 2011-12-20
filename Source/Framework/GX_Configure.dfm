@@ -1,10 +1,12 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  Width = 629
-  Height = 567
+  ActiveControl = edtFilter
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
+  ClientHeight = 531
+  ClientWidth = 613
   Color = clBtnFace
   Constraints.MinHeight = 530
   Constraints.MinWidth = 613
@@ -45,17 +47,47 @@ object fmConfiguration: TfmConfiguration
       OnChange = pcConfigChange
       object tshExperts: TTabSheet
         Caption = 'Experts'
-        object sbxExperts: TScrollBox
+        object pnlExpertsFilter: TPanel
           Left = 0
           Top = 0
           Width = 591
-          Height = 454
+          Height = 41
+          Align = alTop
+          BevelOuter = bvNone
+          TabOrder = 0
+          DesignSize = (
+            591
+            41)
+          object lblFilter: TLabel
+            Left = 17
+            Top = 12
+            Width = 26
+            Height = 14
+            Alignment = taRightJustify
+            Caption = '&Filter'
+            FocusControl = edtFilter
+          end
+          object edtFilter: TEdit
+            Left = 50
+            Top = 8
+            Width = 390
+            Height = 22
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 0
+            OnChange = edtFilterChange
+          end
+        end
+        object sbxExperts: TScrollBox
+          Left = 0
+          Top = 41
+          Width = 591
+          Height = 413
           VertScrollBar.Increment = 40
           VertScrollBar.Range = 920
           VertScrollBar.Tracking = True
           Align = alClient
           AutoScroll = False
-          TabOrder = 0
+          TabOrder = 1
           object pnlExpertLayout: TPanel
             Left = 0
             Top = 0
@@ -827,5 +859,12 @@ object fmConfiguration: TfmConfiguration
     Options = []
     Left = 420
     Top = 364
+  end
+  object tmrFilter: TTimer
+    Enabled = False
+    Interval = 10
+    OnTimer = tmrFilterTimer
+    Left = 16
+    Top = 176
   end
 end

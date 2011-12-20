@@ -99,6 +99,10 @@ type
     chkExpert: TCheckBox;
     edtExpert: THotKey;
     btnExpert: TButton;
+    pnlExpertsFilter: TPanel;
+    tmrFilter: TTimer;
+    lblFilter: TLabel;
+    edtFilter: TEdit;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -136,6 +140,8 @@ type
     procedure btnAppBuilderClick(Sender: TObject);
     procedure btnEditViewClick(Sender: TObject);
     procedure btnCustomFontClick(Sender: TObject);
+    procedure tmrFilterTimer(Sender: TObject);
+    procedure edtFilterChange(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -158,6 +164,8 @@ type
     // Editor experts save themselves automatically
     // hence there is no SaveEditorExperts method
     procedure LoadEditorExperts;
+
+    procedure FilterVisibleExperts;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -855,8 +863,8 @@ end;
 
 function TShowOldComCtrlVersionMessage.GetMessage: string;
 resourcestring
-  SOldComCtrlVersion = 'Your system has an old version of the Windows comctl32.dll.  '+
-    'The GExperts editor toolbar might not work correctly without upgrading to version 5 here: '+
+  SOldComCtrlVersion = 'Your system has an old version of the Windows comctl32.dll.  ' +
+    'The GExperts editor toolbar might not work correctly without upgrading to version 5 here: ' +
     'http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp';
 begin
   Result := SOldComCtrlVersion;
@@ -914,6 +922,55 @@ begin
   end;
 end;
 
+procedure TfmConfiguration.edtFilterChange(Sender: TObject);
+begin
+  tmrFilter.Enabled := False;
+  tmrFilter.Enabled := True;
+end;
+
+procedure TfmConfiguration.tmrFilterTimer(Sender: TObject);
+begin
+  FilterVisibleExperts;
+  tmrFilter.Enabled := False;
+end;
+
+procedure TfmConfiguration.FilterVisibleExperts;
+var
+  Panel: TPanel;
+  CheckBox: TCheckBox;
+  i, CurrTop: Integer;
+  SubText: string;
+begin
+  sbxExperts.VertScrollBar.Position := 0;
+  SubText := Trim(edtFilter.Text);
+  if SubText = '' then
+    for i := 0 to sbxExperts.ControlCount - 1 do
+    begin
+      Panel := sbxExperts.Controls[i] as TPanel;
+      if Panel <> pnlExpertLayout then
+        Panel.Visible := True;
+    end
+  else
+    for i := 0 to sbxExperts.ControlCount - 1 do
+    begin
+      Panel := sbxExperts.Controls[i] as TPanel;
+      CheckBox := Panel.Controls[1] as TCheckBox;
+      Panel.Visible := StrContains(SubText, CheckBox.Caption, False) and (Panel <> pnlExpertLayout);
+    end;
+
+  CurrTop := 0;
+  for i := 0 to sbxExperts.ControlCount - 1 do
+  begin
+    Panel := sbxExperts.Controls[i] as TPanel;
+    if Panel.Visible then
+    begin
+      Panel.Top := CurrTop;
+      Inc(CurrTop, Panel.Height);
+    end;
+  end;
+  sbxExperts.VertScrollBar.Range := CurrTop;
+end;
+
 procedure TfmConfiguration.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if ActiveControl is THotKey then
@@ -933,7 +990,7 @@ var
   procedure AddControl(Control: TControl);
   begin
     if Assigned(Control) then
-      Fonts := Fonts + Control.Name +': ' + TControlCracker(Control).Font.Name + ' ' + IntToStr(TControlCracker(COntrol).Font.Size) + sLineBreak;
+      Fonts := Fonts + Control.Name + ': ' + TControlCracker(Control).Font.Name + ' ' + IntToStr(TControlCracker(COntrol).Font.Size) + sLineBreak;
   end;
 
 begin
