@@ -852,7 +852,7 @@ end;
 constructor TMsgExpExpert.Create;
 begin
   inherited;
-  ShortCut := Menus.ShortCut(Ord('D'), [ssCtrl]);
+  ShortCut := Menus.ShortCut(Ord('D'), [ssCtrl, ssShift]);
   FSettings := TMessageDialogSettings.Create;
 end;
 
