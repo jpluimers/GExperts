@@ -347,9 +347,9 @@ end;
 
 procedure TfmReplaceCompMapDets.ShowRequiredError(const FieldName: string);
 resourcestring
-  SNoFieldValue = 'have to be filled-in!';
+  SNoFieldValue = 'is required.';
 begin
-  ShowError(FieldName+' '+SNoFieldValue);
+  ShowError(FieldName +' '+ SNoFieldValue);
 end;
 
 procedure TfmReplaceCompMapDets.ValidateItem;
