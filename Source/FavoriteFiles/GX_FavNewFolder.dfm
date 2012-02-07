@@ -1,6 +1,6 @@
 object fmFavNewFolder: TfmFavNewFolder
-  Left = 266
-  Top = 185
+  Left = 315
+  Top = 223
   BorderStyle = bsDialog
   Caption = 'New Folder'
   ClientHeight = 127

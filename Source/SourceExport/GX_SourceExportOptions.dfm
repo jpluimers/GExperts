@@ -1,6 +1,6 @@
 object fmSourceExportOptions: TfmSourceExportOptions
-  Left = 241
-  Top = 144
+  Left = 299
+  Top = 189
   BorderStyle = bsDialog
   Caption = 'Source Export Configuration'
   ClientHeight = 456

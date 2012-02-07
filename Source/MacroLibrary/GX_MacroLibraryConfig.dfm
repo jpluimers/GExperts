@@ -1,6 +1,6 @@
 object fmGxMacroLibraryConfig: TfmGxMacroLibraryConfig
-  Left = 257
-  Top = 200
+  Left = 315
+  Top = 227
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Configure Macro Library'

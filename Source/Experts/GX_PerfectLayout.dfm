@@ -1,6 +1,6 @@
 object fmPerfectLayout: TfmPerfectLayout
-  Left = 275
-  Top = 163
+  Left = 292
+  Top = 194
   BorderStyle = bsDialog
   Caption = 'Perfect Layout Options'
   ClientHeight = 228

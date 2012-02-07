@@ -1,6 +1,6 @@
 object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
-  Left = 235
-  Top = 272
+  Left = 320
+  Top = 249
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Macro Library'
