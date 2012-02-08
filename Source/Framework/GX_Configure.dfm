@@ -55,9 +55,6 @@ object fmConfiguration: TfmConfiguration
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 0
-          DesignSize = (
-            591
-            41)
           object lblFilter: TLabel
             Left = 17
             Top = 12
@@ -72,7 +69,6 @@ object fmConfiguration: TfmConfiguration
             Top = 8
             Width = 390
             Height = 22
-            Anchors = [akLeft, akTop, akRight]
             TabOrder = 0
             OnChange = edtFilterChange
           end

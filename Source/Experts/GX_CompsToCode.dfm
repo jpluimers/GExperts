@@ -1,11 +1,12 @@
 object fmCompsToCode: TfmCompsToCode
   Left = 298
   Top = 212
-  BorderStyle = bsDialog
+  Width = 694
+  Height = 611
   Caption = 'Components to Code'
-  ClientHeight = 278
-  ClientWidth = 298
   Color = clBtnFace
+  Constraints.MinHeight = 350
+  Constraints.MinWidth = 450
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -15,112 +16,184 @@ object fmCompsToCode: TfmCompsToCode
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
-  DesignSize = (
-    298
-    278)
   PixelsPerInch = 96
   TextHeight = 14
-  object btnOK: TButton
-    Left = 53
-    Top = 245
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 3
-  end
-  object btnCancel: TButton
-    Left = 134
-    Top = 245
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 4
-  end
-  object rgpBinProps: TRadioGroup
-    Left = 8
-    Top = 8
-    Width = 282
-    Height = 81
-    Anchors = [akLeft, akTop, akRight]
-    Caption = ' Binary Properties '
-    ItemIndex = 1
-    Items.Strings = (
-      '&Skip'
-      'Generate c&ommented code'
-      'Generate &uncommented code')
-    TabOrder = 0
-  end
-  object rgpLanguage: TRadioGroup
-    Left = 8
-    Top = 184
-    Width = 282
-    Height = 54
-    Anchors = [akLeft, akRight, akBottom]
-    Caption = ' Language '
-    Columns = 2
-    ItemIndex = 0
-    Items.Strings = (
-      '&Delphi'
-      '&C++')
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 535
+    Width = 678
+    Height = 38
+    Align = alBottom
+    BevelOuter = bvNone
     TabOrder = 2
-  end
-  object gbxGenerated: TGroupBox
-    Left = 8
-    Top = 95
-    Width = 282
-    Height = 84
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = ' Generated Source '
-    TabOrder = 1
     DesignSize = (
-      282
-      84)
-    object chkPrepend: TCheckBox
-      Left = 11
-      Top = 18
-      Width = 262
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = '&Prepend original component source'
-      Checked = True
-      State = cbChecked
+      678
+      38)
+    object pnlCenterButtons: TPanel
+      Left = 162
+      Top = 2
+      Width = 353
+      Height = 33
+      Anchors = [akTop]
+      BevelOuter = bvNone
       TabOrder = 0
+      object btnHelp: TButton
+        Left = 228
+        Top = 5
+        Width = 75
+        Height = 25
+        Caption = 'Help'
+        TabOrder = 0
+        OnClick = btnHelpClick
+      end
+      object btnCancel: TButton
+        Left = 141
+        Top = 5
+        Width = 75
+        Height = 25
+        Cancel = True
+        Caption = 'Cancel'
+        ModalResult = 2
+        TabOrder = 1
+      end
+      object btnOK: TButton
+        Left = 55
+        Top = 5
+        Width = 75
+        Height = 25
+        Caption = 'OK'
+        Default = True
+        ModalResult = 1
+        TabOrder = 2
+      end
     end
-    object chkUseDelphiWith: TCheckBox
-      Left = 11
-      Top = 38
-      Width = 262
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Use Delphi &with statement'
-      Checked = True
-      State = cbChecked
+  end
+  object pnlMain: TPanel
+    Left = 0
+    Top = 0
+    Width = 678
+    Height = 535
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 0
+    object pnlSettings: TPanel
+      Left = 0
+      Top = 0
+      Width = 298
+      Height = 535
+      Align = alLeft
+      BevelOuter = bvNone
+      TabOrder = 0
+      object gbxGenerated: TGroupBox
+        Left = 8
+        Top = 95
+        Width = 282
+        Height = 84
+        Caption = ' Generated Source '
+        TabOrder = 1
+        object chkPrepend: TCheckBox
+          Left = 11
+          Top = 18
+          Width = 262
+          Height = 17
+          Caption = '&Prepend original component source'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+          OnClick = SettingsChanged
+        end
+        object chkUseDelphiWith: TCheckBox
+          Left = 11
+          Top = 38
+          Width = 262
+          Height = 17
+          Caption = 'Use Delphi &with statement'
+          Checked = True
+          State = cbChecked
+          TabOrder = 1
+          OnClick = SettingsChanged
+        end
+        object chkCreateFreeCode: TCheckBox
+          Left = 11
+          Top = 58
+          Width = 262
+          Height = 17
+          Caption = 'Generate code to &Free components'
+          TabOrder = 2
+          OnClick = SettingsChanged
+        end
+      end
+      object rgpBinProps: TRadioGroup
+        Left = 8
+        Top = 8
+        Width = 282
+        Height = 81
+        Caption = ' Binary Properties '
+        ItemIndex = 1
+        Items.Strings = (
+          '&Skip'
+          'Generate c&ommented code'
+          'Generate &uncommented code')
+        TabOrder = 0
+        OnClick = SettingsChanged
+      end
+      object rgpLanguage: TRadioGroup
+        Left = 8
+        Top = 184
+        Width = 282
+        Height = 54
+        Caption = ' Language '
+        Columns = 2
+        ItemIndex = 0
+        Items.Strings = (
+          '&Delphi'
+          '&C++')
+        TabOrder = 2
+        OnClick = SettingsChanged
+      end
+    end
+    object pnlView: TPanel
+      Left = 298
+      Top = 0
+      Width = 380
+      Height = 535
+      Align = alClient
+      BevelOuter = bvNone
+      Caption = 'This editor is created at runtime'
+      FullRepaint = False
       TabOrder = 1
     end
-    object chkCreateFreeCode: TCheckBox
-      Left = 11
-      Top = 58
-      Width = 262
-      Height = 17
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Generate code to &Free components'
-      TabOrder = 2
-    end
   end
-  object btnHelp: TButton
-    Left = 215
-    Top = 245
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'Help'
-    TabOrder = 5
-    OnClick = btnHelpClick
+  object ParentPanel: TPanel
+    Left = 325
+    Top = 24
+    Width = 276
+    Height = 89
+    Caption = 'Sample components - invisible at runtime'
+    TabOrder = 1
+    Visible = False
+    object SpeedButton1: TSpeedButton
+      Left = 183
+      Top = 8
+      Width = 23
+      Height = 22
+      Glyph.Data = {
+        F6000000424DF600000000000000760000002800000010000000100000000100
+        0400000000008000000000000000000000001000000000000000000000000000
+        8000008000000080800080000000800080008080000080808000C0C0C0000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00F66666666666
+        6666666666666666666666666666666666666666666666666666666666666666
+        6666666666666666666666666666666666666666666666666666666666666666
+        6666666666666666666666666666666666666666666666666666666666666666
+        6666666666666666666666666666666666666666666666666666}
+    end
+    object Edit1: TEdit
+      Left = 56
+      Top = 8
+      Width = 121
+      Height = 22
+      TabOrder = 0
+      Text = 'Edit1'
+    end
   end
 end

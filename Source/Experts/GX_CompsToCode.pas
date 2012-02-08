@@ -11,7 +11,6 @@ unit GX_CompsToCode;
   * Config option: Remove component (default: no). Make a backup copy.
     Store it somewhere in memory, make a button on config
     "Restore component".
-  * Config option: paste (commented) object binary.
   * Special child component support works for TTabSheet and descendants, not
     other TabSheet equivalents (TTab95Sheet for example) or other strange
     components like TTeeChart
@@ -20,25 +19,22 @@ unit GX_CompsToCode;
 interface
 
 uses
-  GX_Experts, GX_ConfigurationInfo,
-  Classes, Controls, Forms, StdCtrls, ExtCtrls, ActnList, GX_BaseForm;
+  GX_Experts, GX_EnhancedEditor, GX_ConfigurationInfo,
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, ActnList, Buttons, GX_BaseForm;
 
 type
-  TfmCompsToCode = class(TfmBaseForm)
-    btnOK: TButton;
-    btnCancel: TButton;
-    rgpBinProps: TRadioGroup;
-    rgpLanguage: TRadioGroup;
-    gbxGenerated: TGroupBox;
-    chkPrepend: TCheckBox;
-    btnHelp: TButton;
-    chkUseDelphiWith: TCheckBox;
-    chkCreateFreeCode: TCheckBox;
-    procedure btnHelpClick(Sender: TObject);
-  end;
+  TComponentArray = array of TComponent;
 
   TBinProps = (bpSkip, bpComment, bpUncomment);
   TCToCLanguage = (lPascal, lCpp);
+
+  TCToCSettings = record
+    BinProps: TBinProps;
+    Prepend: Boolean;
+    UseDelphiWith: Boolean;
+    CreateFreeCode: Boolean;
+    Language: TCToCLanguage;
+  end;
 
   TCompsToCodeExpert = class(TGX_Expert)
   protected
@@ -46,12 +42,8 @@ type
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   private
-    ccBinProps: TBinProps;
-    ccPrepend: Boolean;
-    ccUseDelphiWith: Boolean;
-    ccCreateFreeCode: Boolean;
-    ccLanguage: TCToCLanguage;
-    function DoCopyCreationCode: Boolean;
+    FSettings: TCToCSettings;
+    function GetDesignerComps: TComponentArray;
   public
     constructor Create; override;
     function GetActionCaption: string; override;
@@ -59,6 +51,36 @@ type
     procedure Configure; override;
     procedure Click(Sender: TObject); override;
     function HasDesignerMenuItem: Boolean; override;
+  end;
+
+  TfmCompsToCode = class(TfmBaseForm)
+    rgpBinProps: TRadioGroup;
+    rgpLanguage: TRadioGroup;
+    gbxGenerated: TGroupBox;
+    chkPrepend: TCheckBox;
+    chkUseDelphiWith: TCheckBox;
+    chkCreateFreeCode: TCheckBox;
+    pnlMain: TPanel;
+    pnlSettings: TPanel;
+    pnlView: TPanel;
+    ParentPanel: TPanel;
+    Edit1: TEdit;
+    SpeedButton1: TSpeedButton;
+    pnlButtons: TPanel;
+    pnlCenterButtons: TPanel;
+    btnHelp: TButton;
+    btnCancel: TButton;
+    btnOK: TButton;
+    procedure btnHelpClick(Sender: TObject);
+    procedure SettingsChanged(Sender: TObject);
+  private
+    FSettings: TCToCSettings;
+    FCodeText: TGxEnhancedEditor;
+    procedure ShowSampleCode;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property Settings: TCToCSettings read FSettings;
+    procedure InitSettings(const ASettings: TCToCSettings);
   end;
 
 implementation
@@ -108,13 +130,6 @@ type
     function GetMessage: string; override;
   end;
 
-{ TfmCompsToCode }
-
-procedure TfmCompsToCode.btnHelpClick(Sender: TObject);
-begin
-  GxContextHelp(Self, 33);
-end;
-
 const
   CFmtCPPVar = '';
   CFmtCPPDeclaration = '    %1:s *%0:s;';
@@ -144,8 +159,8 @@ const
   CFmtPasParent = '    Parent := %s;';
   CFmtPasName = '    Name := ''%s'';';
   CFmtPasPageControl = '    PageControl := %s;';
-  CFmtPasBinaryCmt = '//  %s := // please assign';
-  CFmtPasBinaryUncmt = '    %s := // please assign';
+  CFmtPasBinaryCmt = '// %s := // please assign';
+  CFmtPasBinaryUncmt = '%s := // please assign';
   CFmtPasClear = '    %s.Clear;';
   CFmtPasAdd = '    %s.Add(%s);';
   CFmtPasAssign = '    %s := %s;';
@@ -177,15 +192,165 @@ var
   CFmtPropertyAccess: string;
   CFmtIndent: string;
 
+{ Global }
+
+function DoGetCreationCode(const ASettings: TCToCSettings; const AComponents: array of TComponent): string;
+var
+  i: Integer;
+  CompConv: TComponentCreate;
+  DumpOptions: TCCOptionSet;
+begin
+  DumpOptions := [];
+  case ASettings.BinProps of
+    bpSkip: Include(DumpOptions, ccBinaryRemove);
+    bpComment: Include(DumpOptions, ccBinaryComment);
+    bpUncomment: Include(DumpOptions, ccBinaryUncomment);
+  end;
+
+  if ASettings.Prepend then
+    Include(DumpOptions, ccIncludeObjectText);
+
+  if ASettings.UseDelphiWith then
+    Include(DumpOptions, ccUseWith);
+
+  if ASettings.CreateFreeCode then
+    Include(DumpOptions, ccUseFree);
+
+  case ASettings.Language of
+    lPascal: begin
+        CFmtVar := CFmtPasVar;
+        CFmtDeclaration := CFmtPasDeclaration;
+        CFmtCreation := CFmtPasCreation;
+        CFmtDeletion := CFmtPasDeletion;
+        if ASettings.UseDelphiWith then
+          CFmtWith := CFmtPasWith
+        else
+          CFmtWith := '';
+        CFmtParent := CFmtPasParent;
+        CFmtName := CFmtPasName;
+        CFmtPageControl := CFmtPasPageControl;
+        CFmtBinaryCmt := CFmtPasBinaryCmt;
+        CFmtBinaryUncmt := CFmtPasBinaryUncmt;
+        CFmtAdd := CFmtPasAdd;
+        CFmtClear := CFmtPasClear;
+        CFmtAssign := CFmtPasAssign;
+        CFmtEnd := CFmtPasEnd;
+        CFmtWithAdd := CFmtPasWithAdd;
+        CFmtPointerDeclaration := CFmtPasPointerDeclaration;
+        CFmtSelf := CFmtPasSelf;
+        if (ccUseFree in DumpOptions) then
+          CFmtOwner := 'nil'
+        else
+          CFmtOwner := CFmtPasSelf;
+        CFmtPropertyAccess := CFmtPasPropertyAccess;
+        CFmtIndent := CFmtPasIndent
+      end;
+    lCpp: begin
+        CFmtVar := CFmtCPPVar;
+        CFmtDeclaration := CFmtCPPDeclaration;
+        CFmtCreation := CFmtCPPCreation;
+        CFmtDeletion := CFmtCPPDeletion;
+        CFmtWith := CFmtCPPWith;
+        CFmtParent := CFmtCPPParent;
+        CFmtName := CFmtCPPName;
+        CFmtPageControl := CFmtCPPPageControl;
+        CFmtBinaryCmt := CFmtCPPBinaryCmt;
+        CFmtBinaryUncmt := CFmtCPPBinaryUncmt;
+        CFmtAdd := CFmtCPPAdd;
+        CFmtClear := CFmtCPPClear;
+        CFmtAssign := CFmtCPPAssign;
+        CFmtEnd := CFmtCPPEnd;
+        CFmtWithAdd := CFmtCPPWithAdd;
+        CFmtPointerDeclaration := CFmtCPPPointerDeclaration;
+        CFmtSelf := CFmtCPPSelf;
+        if (ccUseFree in DumpOptions) then
+          CFmtOwner := '(TComponent *)NULL'
+        else
+          CFmtOwner := CFmtCPPSelf;
+        CFmtPropertyAccess := CFmtCPPPropertyAccess;
+        CFmtIndent := CFmtCPPIndent
+      end;
+  end;
+
+  CompConv := TComponentCreate.Create;
+  try
+    for i := Low(AComponents) to High(AComponents) do
+      CompConv.Dump(AComponents[i], DumpOptions);
+
+    Result := CompConv.Dumped.Text;
+  finally
+    FreeAndNil(compConv);
+  end;
+end;
+
+{ TfmCompsToCode }
+
+constructor TfmCompsToCode.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  FCodeText := TGXEnhancedEditor.Create(Self);
+  FCodeText.Highlighter := gxpNone;
+  FCodeText.Align := alClient;
+  FCodeText.Parent := pnlView;
+  FCodeText.ReadOnly := True;
+  FCodeText.WantTabs := True;
+  FCodeText.TabWidth := GxOtaGetTabWidth;
+end;
+
+procedure TfmCompsToCode.btnHelpClick(Sender: TObject);
+begin
+  GxContextHelp(Self, 33);
+end;
+
+procedure TfmCompsToCode.InitSettings(const ASettings: TCToCSettings);
+begin
+  FSettings := ASettings;
+
+  rgpBinProps.ItemIndex := Ord(ASettings.BinProps);
+  chkPrepend.Checked := ASettings.Prepend;
+  chkUseDelphiWith.Checked := ASettings.UseDelphiWith;
+  chkCreateFreeCode.Checked := ASettings.CreateFreeCode;
+  rgpLanguage.ItemIndex := Ord(ASettings.Language);
+
+  ShowSampleCode;
+end;
+
+procedure TfmCompsToCode.SettingsChanged(Sender: TObject);
+begin
+  FSettings.BinProps := TBinProps(rgpBinProps.ItemIndex);
+  Assert(FSettings.BinProps in [Low(TBinProps)..High(TBinProps)]);
+  FSettings.Prepend := chkPrepend.Checked;
+  FSettings.UseDelphiWith := chkUseDelphiWith.Checked;
+  FSettings.CreateFreeCode := chkCreateFreeCode.Checked;
+  FSettings.Language := TCToCLanguage(rgpLanguage.ItemIndex);
+  Assert(FSettings.Language in [Low(TCToCLanguage)..High(TCToCLanguage)]);
+
+  ShowSampleCode;
+end;
+
+procedure TfmCompsToCode.ShowSampleCode;
+begin
+  case FSettings.Language of
+    lPascal:
+      FCodeText.Highlighter := gxpPAS;
+    lCpp:
+      FCodeText.Highlighter := gxpCPP;
+    else
+      FCodeText.Highlighter := gxpNone;
+  end;
+  FCodeText.Text := DoGetCreationCode(FSettings, [Edit1, SpeedButton1]);
+end;
+
 { TCompsToCodeExpert }
 
 constructor TCompsToCodeExpert.Create;
 begin
   inherited;
   if RunningCPPBuilder then
-    ccLanguage := lCpp
+    FSettings.Language := lCpp
   else
-    ccLanguage := lPascal; // This is only a default and is configurable in the dialog
+    FSettings.Language := lPascal; // This is only a default and is configurable in the dialog
 end;
 
 function TCompsToCodeExpert.GetActionCaption: string;
@@ -201,34 +366,39 @@ begin
 end;
 
 procedure TCompsToCodeExpert.Click(Sender: TObject);
+var
+  Comps: TComponentArray;
 begin
   // No way to get a "native" component for VCL.NET components
   if GxOtaActiveDesignerIsNFM then
     raise Exception.Create('Components to Code does not support VCL.NET forms.');
-  if DoCopyCreationCode then
+  Comps := GetDesignerComps;
+  if Length(Comps) > 0 then begin
+    Clipboard.AsText := DoGetCreationCode(FSettings, Comps);
     ShowGxMessageBox(TShowCodeOnClipboardMessage);
+  end;
 end;
 
 procedure TCompsToCodeExpert.InternalLoadSettings(Settings: TGExpertsSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the below items.
-  ccBinProps := TBinProps(Settings.ReadEnumerated(ConfigurationKey, 'BinaryProperties', TypeInfo(TBinProps), Ord(bpComment)));
-  ccPrepend := Settings.ReadBool(ConfigurationKey, 'PrependWithComponent', False);
-  ccUseDelphiWith := Settings.ReadBool(ConfigurationKey, 'UseDelphiWith', True);
-  ccCreateFreeCode := Settings.ReadBool(ConfigurationKey, 'CreateFreeCode', False);
-  ccLanguage := TCToCLanguage(Settings.ReadEnumerated(ConfigurationKey, 'Language', TypeInfo(TCToCLanguage), Ord(ccLanguage)));
+  FSettings.BinProps := TBinProps(Settings.ReadEnumerated(ConfigurationKey, 'BinaryProperties', TypeInfo(TBinProps), Ord(bpComment)));
+  FSettings.Prepend := Settings.ReadBool(ConfigurationKey, 'PrependWithComponent', False);
+  FSettings.UseDelphiWith := Settings.ReadBool(ConfigurationKey, 'UseDelphiWith', True);
+  FSettings.CreateFreeCode := Settings.ReadBool(ConfigurationKey, 'CreateFreeCode', False);
+  FSettings.Language := TCToCLanguage(Settings.ReadEnumerated(ConfigurationKey, 'Language', TypeInfo(TCToCLanguage), Ord(FSettings.Language)));
 end;
 
 procedure TCompsToCodeExpert.InternalSaveSettings(Settings: TGExpertsSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize any of the below items.
-  Settings.WriteEnumerated(ConfigurationKey, 'BinaryProperties', TypeInfo(TBinProps), Ord(ccBinProps));
-  Settings.WriteBool(ConfigurationKey, 'PrependWithComponent', ccPrepend);
-  Settings.WriteBool(ConfigurationKey, 'UseDelphiWith', ccUseDelphiWith);
-  Settings.WriteBool(ConfigurationKey, 'CreateFreeCode', ccCreateFreeCode);
-  Settings.WriteEnumerated(ConfigurationKey, 'Language', TypeInfo(TCToCLanguage), Ord(ccLanguage));
+  Settings.WriteEnumerated(ConfigurationKey, 'BinaryProperties', TypeInfo(TBinProps), Ord(FSettings.BinProps));
+  Settings.WriteBool(ConfigurationKey, 'PrependWithComponent', FSettings.Prepend);
+  Settings.WriteBool(ConfigurationKey, 'UseDelphiWith', FSettings.UseDelphiWith);
+  Settings.WriteBool(ConfigurationKey, 'CreateFreeCode', FSettings.CreateFreeCode);
+  Settings.WriteEnumerated(ConfigurationKey, 'Language', TypeInfo(TCToCLanguage), Ord(FSettings.Language));
 end;
 
 procedure TCompsToCodeExpert.Configure;
@@ -237,21 +407,10 @@ var
 begin
   Dlg := TfmCompsToCode.Create(nil);
   try
-    Dlg.rgpBinProps.ItemIndex := Ord(ccBinProps);
-    Dlg.chkPrepend.Checked := ccPrepend;
-    Dlg.chkUseDelphiWith.Checked := ccUseDelphiWith;
-    Dlg.chkCreateFreeCode.Checked := ccCreateFreeCode;
-    Dlg.rgpLanguage.ItemIndex := Ord(ccLanguage);
+    Dlg.InitSettings(FSettings);
     if Dlg.ShowModal = mrOk then
     begin
-      ccBinProps := TBinProps(Dlg.rgpBinProps.ItemIndex);
-      Assert(ccBinProps in [Low(TBinProps)..High(TBinProps)]);
-      ccPrepend := Dlg.chkPrepend.Checked;
-      ccUseDelphiWith := Dlg.chkUseDelphiWith.Checked;
-      ccCreateFreeCode := Dlg.chkCreateFreeCode.Checked;
-      ccLanguage := TCToCLanguage(Dlg.rgpLanguage.ItemIndex);
-      Assert(ccLanguage in [Low(TCToCLanguage)..High(TCToCLanguage)]);
-
+      FSettings := Dlg.Settings;
       SaveSettings;
     end;
   finally
@@ -280,7 +439,7 @@ begin
     else
       compParent := (AComponent as TGraphicControl).Parent;
 
-    for j := 0 to AFormEditor.GetSelCount-1 do
+    for j := 0 to AFormEditor.GetSelCount - 1 do
     begin
       if SelIndex = j then
         Continue;
@@ -297,18 +456,15 @@ begin
   end;
 end;
 
-function TCompsToCodeExpert.DoCopyCreationCode: Boolean;
+function TCompsToCodeExpert.GetDesignerComps: TComponentArray;
 var
   Module: IOTAModule;
   FormEditor: IOTAFormEditor;
   AComponent: IOTAComponent;
-  i: Integer;
-
-  CompConv: TComponentCreate;
+  i, Count: Integer;
   Comp: TComponent;
-  DumpOptions: TCCOptionSet;
 begin
-  Result := False;
+  Result := nil;
 
   Module := GxOtaGetCurrentModule;
   Assert(Assigned(Module));
@@ -317,101 +473,26 @@ begin
   if not Assigned(FormEditor) then
     Exit;
 
-  if not (FormEditor.GetSelCount > 0) then
+  SetLength(Result, FormEditor.GetSelCount);
+  if Length(Result) = 0 then
     Exit;
 
-  dumpOptions := [];
-  case ccBinProps of
-    bpSkip:      Include(dumpOptions, ccBinaryRemove);
-    bpComment:   Include(dumpOptions, ccBinaryComment);
-    bpUncomment: Include(dumpOptions, ccBinaryUncomment);
-  end;
+  Count := 0;
+  for i := 0 to Length(Result) - 1 do
+  begin
+    AComponent := FormEditor.GetSelComponent(i);
+    Assert(Assigned(AComponent));
 
-  if ccPrepend then
-    Include(dumpOptions, ccIncludeObjectText);
-
-  if ccUseDelphiWith then
-    Include(dumpOptions, ccUseWith);
-
-  if ccCreateFreeCode then
-    Include(dumpOptions, ccUseFree);
-
-  case ccLanguage of
-    lPascal: begin
-      CFmtVar := CFmtPasVar;
-      CFmtDeclaration  := CFmtPasDeclaration;
-      CFmtCreation := CFmtPasCreation;
-      CFmtDeletion := CFmtPasDeletion;
-      if ccUseDelphiWith then
-        CFmtWith := CFmtPasWith
-      else
-        CFmtWith := '';
-      CFmtParent := CFmtPasParent;
-      CFmtName := CFmtPasName;
-      CFmtPageControl := CFmtPasPageControl;
-      CFmtBinaryCmt := CFmtPasBinaryCmt;
-      CFmtBinaryUncmt := CFmtPasBinaryUncmt;
-      CFmtAdd := CFmtPasAdd;
-      CFmtClear := CFmtPasClear;
-      CFmtAssign := CFmtPasAssign;
-      CFmtEnd := CFmtPasEnd;
-      CFmtWithAdd := CFmtPasWithAdd;
-      CFmtPointerDeclaration := CFmtPasPointerDeclaration;
-      CFmtSelf := CFmtPasSelf;
-      if (ccUseFree in dumpOptions) then
-        CFmtOwner := 'nil'
-      else
-        CFmtOwner := CFmtPasSelf;
-      CFmtPropertyAccess := CFmtPasPropertyAccess;
-      CFmtIndent := CFmtPasIndent
-    end;
-    lCpp: begin
-      CFmtVar := CFmtCPPVar;
-      CFmtDeclaration  := CFmtCPPDeclaration;
-      CFmtCreation := CFmtCPPCreation;
-      CFmtDeletion := CFmtCPPDeletion;
-      CFmtWith := CFmtCPPWith;
-      CFmtParent := CFmtCPPParent;
-      CFmtName := CFmtCPPName;
-      CFmtPageControl := CFmtCPPPageControl;
-      CFmtBinaryCmt := CFmtCPPBinaryCmt;
-      CFmtBinaryUncmt := CFmtCPPBinaryUncmt;
-      CFmtAdd := CFmtCPPAdd;
-      CFmtClear := CFmtCPPClear;
-      CFmtAssign := CFmtCPPAssign;
-      CFmtEnd := CFmtCPPEnd;
-      CFmtWithAdd := CFmtCPPWithAdd;
-      CFmtPointerDeclaration := CFmtCPPPointerDeclaration;
-      CFmtSelf := CFmtCPPSelf;
-      if (ccUseFree in dumpOptions) then
-        CFmtOwner := '(TComponent *)NULL'
-      else
-        CFmtOwner := CFmtCPPSelf;
-      CFmtPropertyAccess := CFmtCPPPropertyAccess;
-      CFmtIndent := CFmtCPPIndent
-    end;
-  end;
-
-  CompConv := TComponentCreate.Create;
-  try
-    for i := 0 to FormEditor.GetSelCount-1 do
+    Comp := GxOtaGetNativeComponent(AComponent);
+    if not Assigned(Comp) then
+      raise Exception.Create('Native component casting not allowed for this component: ' + GxOtaGetComponentName(AComponent));
+    if ShouldDumpComponent(FormEditor, Comp, i) then
     begin
-      AComponent := FormEditor.GetSelComponent(i);
-      Assert(Assigned(AComponent));
-
-      Comp := GxOtaGetNativeComponent(AComponent);
-      if not Assigned(Comp) then
-        raise Exception.Create('Native component casting not allowed for this component');
-      if ShouldDumpComponent(FormEditor, Comp, i) then
-        CompConv.Dump(Comp, DumpOptions);
+      Result[Count] := Comp;
+      Inc(Count);
     end;
-
-    Clipboard.AsText := CompConv.Dumped.Text;
-  finally
-    FreeAndNil(compConv);
   end;
-
-  Result := True;
+  SetLength(Result, Count);
 end;
 
 procedure TCompsToCodeExpert.UpdateAction(Action: TCustomAction);
@@ -551,10 +632,10 @@ var
       propName2: string;
     begin
       // Get string properties
-      Count := GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray {$IFDEF GX_VER200_up}, tkUString {$ENDIF}], nil);
+      Count := GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray{$IFDEF GX_VER200_up}, tkUString{$ENDIF}], nil);
       Size := Count * SizeOf(Pointer);
       GetMem(PropList, Size);
-      GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray {$IFDEF GX_VER200_up}, tkUString {$ENDIF}], PropList);
+      GetPropList(TypeInfo, [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod, tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray{$IFDEF GX_VER200_up}, tkUString{$ENDIF}], PropList);
 
       p := Pos('.', propName);
       if p <> 0 then
@@ -619,7 +700,7 @@ var
         Result := 'true'
       else
         if (Length(propVal) >= 2) or StrBeginsWith(propVal, '#39''') then
-          if StrBeginsWith(propVal,'#39''') or (propVal[1] = Chr(39)) and (propVal[Length(propVal)] = Chr(39)) then
+          if StrBeginsWith(propVal, '#39''') or (propVal[1] = Chr(39)) and (propVal[Length(propVal)] = Chr(39)) then
           begin
             propVal := StringReplace(propVal, '#39''', '''', [rfReplaceAll]);
             propVal := Copy(propVal, 2, Length(propVal) - 2);
@@ -631,13 +712,13 @@ var
           else if (propVal[1] = '[') and (propVal[Length(propVal)] = ']') then
           begin
             if propVal = '[]' then
-              propVal := PropType(propName)+'()'
+              propVal := PropType(propName) + '()'
             else
             begin
-              propVal := StringReplace(propVal, '[',PropType(propName)+'() << ', []);
-              propVal := StringReplace(propVal, ', ',' << ', [rfReplaceAll]);
-              propVal := StringReplace(propVal, ',',' << ', [rfReplaceAll]);
-              propVal := StringReplace(propVal, ']','', []);
+              propVal := StringReplace(propVal, '[', PropType(propName) + '() << ', []);
+              propVal := StringReplace(propVal, ', ', ' << ', [rfReplaceAll]);
+              propVal := StringReplace(propVal, ',', ' << ', [rfReplaceAll]);
+              propVal := StringReplace(propVal, ']', '', []);
             end;
             Result := propVal;
           end
@@ -648,16 +729,23 @@ var
   end;
 
   procedure ProcGlyph(propName: string; compName: string);
+  var
+    Indent: string;
   begin
     if ([ccBinaryComment, ccBinaryUncomment] * ccOptions) <> [] then
     begin
       p := LastDelimiter('.', propName);
       if p > 0 then
         propName := Copy(propName, 1, p - 1);
-      if ccBinaryComment in ccOptions then
-        Log(impl, CFmtBinaryCmt, [propName])
+      if CFmtWith = '' then
+        Indent := CFmtIndent
       else
-        Log(impl, CFmtBinaryUncmt, [propName]);
+        Indent := CFmtIndent + CFmtIndent;
+
+      if ccBinaryComment in ccOptions then
+        Log(impl, Indent + CFmtBinaryCmt, [propName])
+      else
+        Log(impl, Indent + CFmtBinaryUncmt, [propName]);
     end;
     while not EOF do
     begin
@@ -735,7 +823,7 @@ var
           if CFmtPropertyAccess = '.' then
             Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAdd), [propName, ccLn])
           else
-            Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAdd), [propName, propC(ccLn,propName)]);
+            Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAdd), [propName, propC(ccLn, propName)]);
       end; //while
     end;
   end;
@@ -795,7 +883,7 @@ var
                   else
                     Log(impl, CFmtAssign, [pName, pVal])
                 else
-                  Log(impl, CFmtIndent + CFmtIndent + WithoutS(propName) + CFmtPropertyAccess + CFmtAssign, [pName, propC(pVal,propName)]);
+                  Log(impl, CFmtIndent + CFmtIndent + WithoutS(propName) + CFmtPropertyAccess + CFmtAssign, [pName, propC(pVal, propName)]);
             end;
           end;
         end; //while
@@ -836,7 +924,7 @@ begin
           Parent := (Comp as TControl).Parent.Name;
       end;
 
-      if CFmtWith='' then
+      if CFmtWith = '' then
       begin
         Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtName), [compName]);
         if (Comp is TControl) and (Parent <> '') then
@@ -896,7 +984,7 @@ begin
               ProcessStringList(propName, compName)
             else if propVal = '<' then // ListView columns etc
               ProcessCollectionItems(propName, compName)
-            else if propVal = '' then  // Multi-line strings where the value starts on the next line (TADOConnection.ConnectionString, a long TLabel.Caption, etc.)
+            else if propVal = '' then // Multi-line strings where the value starts on the next line (TADOConnection.ConnectionString, a long TLabel.Caption, etc.)
               ProcessMultilineString(propName, compName)
             else if (propName = 'Top') or (propName = 'Left') then
             begin
@@ -907,7 +995,7 @@ begin
                   if CFmtPropertyAccess = '.' then
                     Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [propName, propVal])
                   else
-                    Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [StringReplace(propName,'.',CFmtPropertyAccess,[rfReplaceAll]), PropC(propVal,propName)]);
+                    Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [StringReplace(propName, '.', CFmtPropertyAccess, [rfReplaceAll]), PropC(propVal, propName)]);
             end
             else if (Comp is TCustomForm) and (propName = 'TextHeight') then
             begin
@@ -925,7 +1013,7 @@ begin
                   else
                     Log(impl, CFmtIndent + compName + CFmtPropertyAccess + TrimLeft(CFmtAssign), [StringReplace(propName, '.', CFmtPropertyAccess, [rfReplaceAll]), PropC(propVal, propName)]);
               end;
-            end;      
+            end;
           end; //if p > 0
         end; //else if not skip
       end; //while not EOF
