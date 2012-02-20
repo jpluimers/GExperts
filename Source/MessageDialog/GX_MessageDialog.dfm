@@ -1,6 +1,7 @@
 object fmMessageDialog: TfmMessageDialog
   Left = 339
   Top = 215
+  ActiveControl = mmoMessage
   Anchors = [akLeft, akBottom]
   AutoScroll = False
   BorderIcons = [biSystemMenu]
@@ -1271,7 +1272,7 @@ object fmMessageDialog: TfmMessageDialog
         Left = 462
         Top = 5
         Width = 16
-        Height = 21
+        Height = 22
         Associate = edtHelpContext
         Min = 0
         Max = 32767

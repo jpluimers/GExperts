@@ -901,7 +901,11 @@ begin
       Dlg.mmoMessage.Text := DefaultMsg;
     if Dlg.ShowModal = mrOk then
     begin
-      GxOtaInsertTextIntoEditor(Dlg.GeneratedCode);
+      if StrContains(#10, Dlg.GeneratedCode) then
+        GxOtaInsertTextIntoEditor(Dlg.GeneratedCode)
+      else
+        GxOtaInsertLineIntoEditor(Dlg.GeneratedCode);
+
       if FSettings.FSourceType = stPascal then
       begin
         if not IsDpr(GxOtaGetCurrentSourceFile) then
@@ -914,6 +918,7 @@ begin
       end;
       if Dlg.chkDefaults.Checked then
         Dlg.SaveSettings;
+      GxOtaFocusCurrentIDEEditControl;
     end;
   finally
     FreeAndNil(Dlg);
