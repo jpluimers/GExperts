@@ -15,8 +15,8 @@ type
   private
     FOutputMessages: TStringList;
     procedure AddMessageToList(const sModuleFileName, sFormat: string; const Args: array of const);
-    procedure CheckAndSetComponent(const ModuleFileName: string; Component: IOTAComponent);
-    procedure CheckChildComponents(RootComponent: IOTAComponent; const ModuleFileName: string);
+    function CheckAndSetComponent(const ModuleFileName: string; Component: IOTAComponent): Boolean;
+    function CheckChildComponents(RootComponent: IOTAComponent; const ModuleFileName: string): Boolean;
   protected
     procedure AfterCompile(Succeeded: Boolean; IsCodeInsight: Boolean); reintroduce; overload;
     procedure BeforeCompile(const Project: IOTAProject; IsCodeInsight: Boolean; var Cancel: Boolean); reintroduce; overload;
@@ -307,6 +307,8 @@ var
   CurrentEditor: IOTAEditor;
   Settings: TSetComponentPropsSettings;
   FileName: string;
+  FileChanged: Boolean;
+  FileWasOpen: Boolean;
 begin
   FOutputMessages.Clear;
 
@@ -323,13 +325,15 @@ begin
       begin
         ModuleInfo := Project.GetModule(IndexProjectModules);
         FileName := ModuleInfo.FileName;
+        FileChanged := False;
         if Settings.Verbose then
           TfmSetComponentPropsStatus.GetInstance.ProcessedFile := FileName;
         if (not IsDcp(FileName)) and (FileName <> '') then
         begin
+          FileWasOpen := GxOtaIsFileOpen(FileName);
           if Settings.OnlyOpenFiles then
           begin
-            if not GxOtaIsFileOpen(FileName) then
+            if not FileWasOpen then
               Continue;
           end;
           try
@@ -341,8 +345,12 @@ begin
               begin
                 RootComponent := FormEditor.GetRootComponent;
                 if Assigned(RootComponent) then begin
-                  CheckAndSetComponent(ModuleInfo.FileName, RootComponent);
-                  CheckChildComponents(RootComponent, ModuleInfo.FileName);
+                  FileChanged := FileChanged or CheckAndSetComponent(ModuleInfo.FileName, RootComponent);
+                  FileChanged := FileChanged or CheckChildComponents(RootComponent, ModuleInfo.FileName);
+                  if (not FileChanged) and (not FileWasOpen) then
+                    Module.CloseModule(True)
+                  else if FileChanged and (not FileWasOpen) then
+                    GxOtaOpenFile(FileName);
                 end;
               end;
             end;
@@ -368,8 +376,8 @@ begin
 end;
 
 // Check a given component for properties to be set
-procedure TSetComponentPropsNotifier.CheckAndSetComponent(const
-  ModuleFileName: string; Component: IOTAComponent);
+function TSetComponentPropsNotifier.CheckAndSetComponent(const
+  ModuleFileName: string; Component: IOTAComponent): Boolean;
 var
   NativeComponent: TComponent;
   IndexComponents: Integer;
@@ -379,6 +387,7 @@ var
   CurrentValue: string;
   NormalizedValue: string;
 begin
+  Result := False;
   NativeComponent := GxOtaGetNativeComponent(Component);
   Settings := TSetComponentPropsSettings.GetInstance;
   if Assigned(NativeComponent) then
@@ -406,6 +415,7 @@ begin
             NormalizedValue := GxOtaNormalizePropertyValue(Component, cProperty, cValue);
             if CurrentValue <> NormalizedValue then
             begin
+              Result := True;
               if Settings.Verbose then
                 AddMessageToList(ModuleFileName, '%s %s: Setting %s to %s', [cClass, cName, cProperty, cValue]);
 
@@ -425,12 +435,13 @@ begin
 end;
 
 // Iterate all child components of a given RootComponent
-procedure TSetComponentPropsNotifier.CheckChildComponents(
-  RootComponent: IOTAComponent; const ModuleFileName: string);
+function TSetComponentPropsNotifier.CheckChildComponents(
+  RootComponent: IOTAComponent; const ModuleFileName: string): Boolean;
 var
   IndexComponents: Integer;
   Component: IOTAComponent;
 begin
+  Result := False;
   if Assigned(RootComponent) then
   begin
     // Iterate over the immediate child components
@@ -438,7 +449,7 @@ begin
     begin
       Component := RootComponent.GetComponent(IndexComponents);
       if Assigned(Component) then
-        CheckAndSetComponent(ModuleFileName, Component);
+        Result := Result or CheckAndSetComponent(ModuleFileName, Component);
     end;
   end;
 end;
