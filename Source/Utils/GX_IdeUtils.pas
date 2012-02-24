@@ -15,7 +15,7 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Graphics, Forms, Menus, ComCtrls, Controls;
+  Graphics, Forms, Menus, ComCtrls, Controls, Classes;
 
 type
   {$IFDEF GX_VER160_up}
@@ -63,6 +63,7 @@ function GetIdeEdition: string;
 
 // Get the IDE's editor background color
 function GetIdeEditorBackgroundColor: TColor;
+function GetIdeEnvironmentOverrides(Overrides: TStrings): Boolean;
 
 // Set the PopupMode property in Delphi 8+ to get the z-order/layering right
 procedure SetNonModalFormPopupMode(Form: TCustomForm);
@@ -94,7 +95,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Windows, Classes, Registry,
+  SysUtils, Windows, Registry,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, StrUtils;
 
 function GetIdeMainForm: TCustomForm;
@@ -353,6 +354,34 @@ begin
     FreeAndNil(Reg);
   end;
   {$IFOPT D+}SendDebug('IDE Background Color is: ' + ColorToString(Result) + '  '); {$ENDIF}
+end;
+
+function GetIdeEnvironmentOverrides(Overrides: TStrings): Boolean;
+var
+  Reg: TRegistry;
+  Names: TStringList;
+  i: Integer;
+  Value: string;
+begin
+  Assert(Assigned(Overrides));
+  Overrides.Clear;
+  Result := True;
+  Names := nil;
+  Reg := TRegistry.Create;
+  try
+    Names := TStringList.Create;
+    if Reg.OpenKey(GxOtaGetIdeBaseRegistryKey + '\Environment Variables', False) then
+    begin
+      Reg.GetValueNames(Names);
+      for i := 0 to Names.Count - 1 do begin
+        Value := Reg.ReadString(Names[i]);
+        Overrides.Add(Names[i] + '=' + Value);
+      end;
+    end;
+  finally
+    FreeAndNil(Reg);
+    FreeAndNil(Names);
+  end;
 end;
 
 procedure SetNonModalFormPopupMode(Form: TCustomForm);
