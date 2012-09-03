@@ -6,6 +6,9 @@ interface
 
 uses
   SysUtils, Classes, Controls, Forms, ActnList, ImgList, Menus, ToolsAPI,
+{$ifdef GX_VER240_up}
+  System.Actions,
+{$endif GX_VER240_up}
   GX_GenericUtils, Contnrs;
 
 // Returns the TObject represented by an IOTAComponent, if possible

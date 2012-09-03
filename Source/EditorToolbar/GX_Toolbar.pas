@@ -5,7 +5,11 @@ unit GX_Toolbar;
 interface
 
 uses
-  Classes, ComCtrls, ExtCtrls, Controls;
+  Classes, ComCtrls, ExtCtrls,
+{$ifdef GX_VER240_up}
+  System.Actions,
+{$endif GX_VER240_up}
+  Controls;
 
 const // Do not localize.
   EditorToolBarRegKey = 'EditorToolBar';

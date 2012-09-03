@@ -122,7 +122,16 @@ const
     IDEEnglishName = 'RAD Studio XE 2';
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\9.0';
     ClassBrowserStorageFolder = 'Classes.RADStudioXE2';
-  {$ENDIF VER220}
+  {$ENDIF VER230}
+
+  {$IFDEF VER240} // Delphi/RAD Studio XE 3
+    GExpertsDll = 'GExpertsRSXE3.dll';
+    TTabDockHostFormClassContainer = 'designide170.bpl';
+    MajorVersionNumberChar = '17';
+    IDEEnglishName = 'RAD Studio XE 3';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\10.0';
+    ClassBrowserStorageFolder = 'Classes.RADStudioXE3';
+  {$ENDIF VER240}
 
 implementation
 
