@@ -1,13 +1,15 @@
 unit GX_ToolbarConfig;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
   Classes, Windows, Controls, Forms,
   StdCtrls, ExtCtrls, ComCtrls, ActnList, Buttons,
-{$ifdef GX_VER240_up}
+  {$IFDEF GX_VER240_up}
   System.Actions,
-{$endif GX_VER240_up}
+  {$ENDIF GX_VER240_up}
   GX_BaseForm;
 
 type

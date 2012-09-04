@@ -6,12 +6,11 @@ interface
 
 uses
   Classes, Controls, Forms, ActnList, Dialogs, StdCtrls,
-  ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, GX_OpenFileConfig,
-  Messages,
-{$ifdef GX_VER240_up}
+  ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, Messages,
+  {$IFDEF GX_VER240_up}
   System.Actions,
-{$endif GX_VER240_up}
-  GX_BaseForm;
+  {$ENDIF GX_VER240_up}
+  GX_OpenFileConfig, GX_BaseForm;
 
 const
   UM_REFRESHLIST = WM_USER + 746;

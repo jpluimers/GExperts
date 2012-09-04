@@ -59,7 +59,7 @@
                     {$IF CompilerVersion >= 23}
                       {$DEFINE GX_VER230_up}  // RAD Studio XE 2
                       {$IF CompilerVersion >= 24}
-                        {$DEFINE GX_VER240_up}  // RAD Studio XE 3?
+                        {$DEFINE GX_VER240_up}  // RAD Studio XE 3
                       {$IFEND}
                     {$IFEND}
                   {$IFEND}

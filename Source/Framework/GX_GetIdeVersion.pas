@@ -22,6 +22,7 @@ type
      ideRS2010, ideRS2010U1, ideRS2010U4, ideRS2010U5, // Updates 2/3 were recalled
      ideRSXE1, ideRSXE1U1,
      ideRSXE2,
+     ideRSXE3,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -611,10 +612,10 @@ end;
 {
   Delphi XE 2:
   File                 File Version    Size       Modified Time
-  delphicoreide160.bpl 
-  coreide160.bpl       
-  bds.exe              
-  dcldb160.bpl         
+  delphicoreide160.bpl
+  coreide160.bpl
+  bds.exe
+  dcldb160.bpl
 }
 function GetRSXE2Version: TBorlandIdeVersion;
 const
@@ -629,6 +630,29 @@ begin
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1600);
   if VersionNumber > 0 then begin
     //Result := ideRSXE2U1;
+  end;
+end;
+
+{
+  Delphi XE 3:
+  File                 File Version    Size       Modified Time
+  delphicoreide170.bpl
+  coreide170.bpl
+  bds.exe
+  dcldb170.bpl
+}
+function GetRSXE3Version: TBorlandIdeVersion;
+const
+  CoreIde1700: TVersionNumber = (Minor: 0; Major: 17; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRSXE3;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide170.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1700);
+  if VersionNumber > 0 then begin
+    //Result := ideRSXE3U1;
   end;
 end;
 
@@ -701,6 +725,11 @@ begin
     Result := GetRSXE2Version;
     Assert(Result in [ideRSXE2]);
   {$ENDIF VER230}
+
+  {$IFDEF VER240}
+    Result := GetRSXE3Version;
+    Assert(Result in [ideRSXE3]);
+  {$ENDIF VER240}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);

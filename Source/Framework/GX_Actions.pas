@@ -1,10 +1,15 @@
 unit GX_Actions;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
   Classes, ActnList,
   Menus, ImgList,
+  {$IFDEF GX_VER240_up}
+  System.UITypes,
+  {$ENDIF GX_VER240_up}
   GX_KbdShortCutBroker;
 
 type

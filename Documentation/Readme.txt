@@ -1,4 +1,4 @@
-GExperts 1.36
+GExperts 1.37
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -99,6 +99,15 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
+VERSION 1.37 (September, 2012?)
+- General: Added support for RAD Studio XE3.
+- Grep: Ignore comments feature?
+- Components to Code: Preview the generated code as you change the options.
+- Message Dialog: Support leading spaces better for inserted code.
+  Force focus to editor after code insertion.
+- Set Component Properties: Close opened but not modified files to save
+  resources.  Force show modified files, to show changes without saving.
+
 VERSION 1.36 (December, 2011)
 - General: Add official support for RAD Studio XE2, Allow filtering
   expert list in configuration dialog (Ulrich Gerhardt), Update SynEdit

@@ -14,9 +14,9 @@ interface
 
 uses
   Classes, ActnList, Graphics,
-{$ifdef GX_VER240_up}
+  {$IFDEF GX_VER240_up}
   System.Actions,
-{$endif GX_VER240_up}
+  {$ENDIF GX_VER240_up}
   GX_Actions;
 
 type

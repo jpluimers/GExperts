@@ -82,6 +82,9 @@ uses
   {$IFDEF SYN_COMPILER_7}
   Themes,
   {$ENDIF}
+  {$IFDEF SYN_COMPILER_17_UP}
+  UITypes,
+  {$ENDIF SYN_COMPILER_17_UP}
   SynUnicode,
 {$ENDIF}
 {$IFDEF SYN_CLX}

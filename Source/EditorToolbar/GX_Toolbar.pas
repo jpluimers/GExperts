@@ -6,9 +6,6 @@ interface
 
 uses
   Classes, ComCtrls, ExtCtrls,
-{$ifdef GX_VER240_up}
-  System.Actions,
-{$endif GX_VER240_up}
   Controls;
 
 const // Do not localize.
@@ -63,6 +60,9 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Menus, ToolWin, ActnList, Graphics, ToolsAPI,
+  {$IFDEF GX_VER240_up}
+  System.Actions,
+  {$ENDIF GX_VER240_up}
   GX_OtaUtils, GX_EditorEnhancements, GX_GxUtils, GX_IdeUtils, GX_GenericUtils;
 
 const
