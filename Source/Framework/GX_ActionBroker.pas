@@ -87,7 +87,7 @@ type
   TGxMenuAction = class(TGxCustomAction, IUnknown, IGxAction, IGxMenuAction)
   private
     FAssociatedMenuItem: TMenuItem;
-    procedure SetShortCut(const Value: TShortCut);
+    procedure SetShortCut(Value: TShortCut); {$ifdef GX_VER240_up} override; {$endif}
   protected
     function GetAssociatedMenuItem: TMenuItem;
   end;
@@ -95,7 +95,7 @@ type
 type
   TGxToolsAction = class(TGxCustomAction, IUnknown, IGxAction)
   private
-    procedure SetShortCut(const Value: TShortCut);
+    procedure SetShortCut(Value: TShortCut); {$ifdef GX_VER240_up} override; {$endif}
   end;
 
 type
@@ -355,7 +355,7 @@ begin
   Result := FAssociatedMenuItem;
 end;
 
-procedure TGxMenuAction.SetShortCut(const Value: TShortCut);
+procedure TGxMenuAction.SetShortCut(Value: TShortCut);
 begin
   if Assigned(IdeShortCut) and (IdeShortCut.ShortCut <> Value) then
     IdeShortCut := nil;  // Unregisters the shortcut with the IDE
@@ -373,7 +373,7 @@ end;
 
 { TGxToolsAction }
 
-procedure TGxToolsAction.SetShortCut(const Value: TShortCut);
+procedure TGxToolsAction.SetShortCut(Value: TShortCut);
 begin
   // Not necessary under Delphi 5/6 since the callbacks never happen anyway
   if RunningDelphi7OrGreater then

@@ -32,14 +32,14 @@ type
     function GetVisible: Boolean;
     procedure SetCaption(const Value: string);
     procedure SetCategory(const Value: string);
-    procedure SetChecked(const Value: Boolean);
-    procedure SetEnabled(const Value: Boolean);
+    procedure SetChecked(Value: Boolean);
+    procedure SetEnabled(Value: Boolean);
     procedure SetHint(const Value: string);
-    procedure SetImageIndex(const Value: TImageIndex);
+    procedure SetImageIndex(Value: TImageIndex);
     procedure SetOnExecute(Value: TNotifyEvent);
     procedure SetOnUpdate(Value: TNotifyEvent);
-    procedure SetShortCut(const Value: TShortCut);
-    procedure SetVisible(const Value: Boolean);
+    procedure SetShortCut(Value: TShortCut);
+    procedure SetVisible(Value: Boolean);
     function GetAction: TCustomAction;
 
     property Caption: string read GetCaption write SetCaption;
@@ -87,16 +87,16 @@ type
     function GetOnUpdate: TNotifyEvent;
     function GetShortCut: TShortCut;
     function GetVisible: Boolean;
-    procedure SetCaption(const Value: string);
+    procedure SetCaption(const Value: string); {$ifdef GX_VER240_up} override; {$endif}
     procedure SetCategory(const Value: string);
-    procedure SetChecked(const Value: Boolean);
-    procedure SetEnabled(const Value: Boolean);
-    procedure SetHint(const Value: string);
-    procedure SetImageIndex(const Value: TImageIndex);
+    procedure SetChecked(Value: Boolean); {$ifdef GX_VER240_up} override; {$endif}
+    procedure SetEnabled(Value: Boolean);{$ifdef GX_VER240_up} override; {$endif}
+    procedure SetHint(const Value: string); {$ifdef GX_VER240_up} override; {$endif}
+    procedure SetImageIndex(Value: TImageIndex); {$ifdef GX_VER240_up} override; {$endif}
     procedure SetOnExecute(Value: TNotifyEvent); override;
     procedure SetOnUpdate(Value: TNotifyEvent);
-    procedure SetShortCut(const Value: TShortCut);
-    procedure SetVisible(const Value: Boolean);
+    procedure SetShortCut(Value: TShortCut); {$ifdef GX_VER240_up} override; {$endif}
+    procedure SetVisible(Value: Boolean); {$ifdef GX_VER240_up} override; {$endif}
   public
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
     function GetAction: TCustomAction;
@@ -177,12 +177,12 @@ begin
   inherited Category := Value;
 end;
 
-procedure TGxCustomAction.SetChecked(const Value: Boolean);
+procedure TGxCustomAction.SetChecked(Value: Boolean);
 begin
   inherited Checked := Value;
 end;
 
-procedure TGxCustomAction.SetEnabled(const Value: Boolean);
+procedure TGxCustomAction.SetEnabled(Value: Boolean);
 begin
   inherited Checked := Value;
 end;
@@ -192,7 +192,7 @@ begin
   inherited Hint := Value;
 end;
 
-procedure TGxCustomAction.SetImageIndex(const Value: TImageIndex);
+procedure TGxCustomAction.SetImageIndex(Value: TImageIndex);
 begin
   inherited ImageIndex := Value;
 end;
@@ -207,12 +207,12 @@ begin
   inherited OnUpdate := Value;
 end;
 
-procedure TGxCustomAction.SetShortCut(const Value: TShortCut);
+procedure TGxCustomAction.SetShortCut(Value: TShortCut);
 begin
   inherited ShortCut := Value;
 end;
 
-procedure TGxCustomAction.SetVisible(const Value: Boolean);
+procedure TGxCustomAction.SetVisible(Value: Boolean);
 begin
   inherited Visible := Value;
 end;
