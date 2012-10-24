@@ -250,6 +250,9 @@ inherited fmGrepResults: TfmGrepResults
         Left = 764
         Top = 422
       end
+      object GotoSelectedandClose1: TMenuItem
+        Action = actListGotoSelectedAndClose
+      end
       object mitListSep1: TMenuItem
         Caption = '-'
       end
@@ -471,6 +474,14 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 61
       ShortCut = 24641
       OnExecute = actReplaceAllExecute
+    end
+    object actListGotoSelectedAndClose: TAction
+      Category = 'List'
+      Caption = 'Goto Selected and Close'
+      Hint = 'Goto match'
+      ImageIndex = 27
+      ShortCut = 16397
+      OnExecute = actListGotoSelectedAndCloseExecute
     end
   end
 end

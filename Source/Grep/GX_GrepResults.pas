@@ -88,6 +88,8 @@ type
     mitReplaceSelected: TMenuItem;
     mitListSep2: TMenuItem;
     pnlMain: TPanel;
+    actListGotoSelectedAndClose: TAction;
+    GotoSelectedandClose1: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);
@@ -118,6 +120,7 @@ type
     procedure actReplaceAllExecute(Sender: TObject);
     procedure actReplaceSelectedExecute(Sender: TObject);
     procedure lbResultsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure actListGotoSelectedAndCloseExecute(Sender: TObject);
   private
     FSearchInProgress: Boolean;
     FReplaceInProgress: Boolean;
@@ -1007,6 +1010,7 @@ begin
   actFileSave.Enabled := not Processing and HaveItems;
   actFileCopy.Enabled := not Processing and HaveItems;
   actListGotoSelected.Enabled := not Processing and HaveItems;
+  actListGotoSelectedAndClose.Enabled := not Processing and HaveItems;
   actListContract.Enabled := not Processing and HaveItems;
   actListExpand.Enabled := not Processing and HaveItems;
   actFileAbort.Enabled := Processing;
@@ -1244,6 +1248,12 @@ end;
 function TShowUnicodeReplaceMessage.ShouldShow: Boolean;
 begin
   Result := RunningDelphi8OrGreater;
+end;
+
+procedure TfmGrepResults.actListGotoSelectedAndCloseExecute(Sender: TObject);
+begin
+  GotoHighlightedListEntry;
+  Close;
 end;
 
 end.
