@@ -345,6 +345,7 @@ type
   private
     FKeyboardBindingIndex: Integer;
     FUpdateCount: Integer;
+    FInstallingKeyboardBinding: Boolean;
   private
     procedure InstallKeyboardBindings;
     procedure RemoveKeyboardBindings;
@@ -458,8 +459,19 @@ begin
 
     Assert(Assigned(IKeyboardServices));
     try
-      if ConfigInfo.EnableKeyboardShortcuts then
-        FKeyboardBindingIndex := IKeyboardServices.AddKeyboardBinding(IKeyboardBinding);
+      // Starting with Delphi XE3 apparently this gets called again from within
+      // the call to IKeyboardServices.AddKeyboardBinding, so FKeyboardBindingIndex
+      // isn't set. Therefore this workaround: It prevents the second call
+      // and the resulting exception(s)
+      if not FInstallingKeyboardBinding then begin
+        try
+          FInstallingKeyboardBinding := true;
+          if ConfigInfo.EnableKeyboardShortcuts then
+            FKeyboardBindingIndex := IKeyboardServices.AddKeyboardBinding(IKeyboardBinding);
+        finally
+          FInstallingKeyboardBinding := false;
+        end;
+      end;
     except
       on E: Exception do
       begin
