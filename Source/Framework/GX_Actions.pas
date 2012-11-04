@@ -166,7 +166,11 @@ end;
 
 procedure TGxCustomAction.SetCaption(const Value: string);
 begin
+{$ifdef GX_VER240_up}
   inherited SetCaption(Value);
+{$else}
+  inherited Caption := Value;
+{$endif}
 
   if Hint = '' then
     Hint := StripHotkey(Value);
@@ -179,22 +183,38 @@ end;
 
 procedure TGxCustomAction.SetChecked(Value: Boolean);
 begin
+{$ifdef GX_VER240_up}
   inherited SetChecked(Value);
+{$else}
+  inherited Checked := Value;
+{$endif}
 end;
 
 procedure TGxCustomAction.SetEnabled(Value: Boolean);
 begin
+{$ifdef GX_VER240_up}
   inherited SetEnabled(Value);
+{$else}
+  inherited Enabled := Value;
+{$endif}
 end;
 
 procedure TGxCustomAction.SetHint(const Value: string);
 begin
+{$ifdef GX_VER240_up}
   inherited SetHint(Value);
+{$else}
+  inherited Hint := Value;
+{$endif}
 end;
 
 procedure TGxCustomAction.SetImageIndex(Value: TImageIndex);
 begin
+{$ifdef GX_VER240_up}
   inherited SetImageIndex(Value);
+{$else}
+  inherited ImageIndex := Value;
+{$endif}
 end;
 
 procedure TGxCustomAction.SetOnExecute(Value: TNotifyEvent);
@@ -209,12 +229,20 @@ end;
 
 procedure TGxCustomAction.SetShortCut(Value: TShortCut);
 begin
+{$ifdef GX_VER240_up}
   inherited SetShortCut(Value);
+{$else}
+  inherited ShortCut := Value;
+{$endif}
 end;
 
 procedure TGxCustomAction.SetVisible(Value: Boolean);
 begin
+{$ifdef GX_VER240_up}
   inherited SetVisible(Value);
+{$else}
+  inherited Visible := Value;
+{$endif}
 end;
 
 function TGxCustomAction._AddRef: Integer;
