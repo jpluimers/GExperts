@@ -166,7 +166,7 @@ end;
 
 procedure TGxCustomAction.SetCaption(const Value: string);
 begin
-  inherited Caption := Value;
+  inherited SetCaption(Value);
 
   if Hint = '' then
     Hint := StripHotkey(Value);
@@ -174,27 +174,27 @@ end;
 
 procedure TGxCustomAction.SetCategory(const Value: string);
 begin
-  inherited Category := Value;
+  TCustomAction(Self).Category := Value;
 end;
 
 procedure TGxCustomAction.SetChecked(Value: Boolean);
 begin
-  inherited Checked := Value;
+  inherited SetChecked(Value);
 end;
 
 procedure TGxCustomAction.SetEnabled(Value: Boolean);
 begin
-  inherited Checked := Value;
+  inherited SetEnabled(Value);
 end;
 
 procedure TGxCustomAction.SetHint(const Value: string);
 begin
-  inherited Hint := Value;
+  inherited SetHint(Value);
 end;
 
 procedure TGxCustomAction.SetImageIndex(Value: TImageIndex);
 begin
-  inherited ImageIndex := Value;
+  inherited SetImageIndex(Value);
 end;
 
 procedure TGxCustomAction.SetOnExecute(Value: TNotifyEvent);
@@ -209,12 +209,12 @@ end;
 
 procedure TGxCustomAction.SetShortCut(Value: TShortCut);
 begin
-  inherited ShortCut := Value;
+  inherited SetShortCut(Value);
 end;
 
 procedure TGxCustomAction.SetVisible(Value: Boolean);
 begin
-  inherited Visible := Value;
+  inherited SetVisible(Value);
 end;
 
 function TGxCustomAction._AddRef: Integer;
