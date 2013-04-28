@@ -1131,6 +1131,9 @@ uses
 {$IFDEF SYN_COMPILER_6_UP}
   Consts,
 {$ENDIF}
+{$IFDEF SYN_COMPILER_18_UP}
+  AnsiStrings,
+{$ENDIF SYN_COMPILER_18_UP}
 {$IFDEF SYN_CLX}
   QStdActns,
   QClipbrd,
@@ -4773,7 +4776,7 @@ begin
         ScrollInfo.fMask := ScrollInfo.fMask or SIF_DISABLENOSCROLL;
       end;
 
-      if (fScrollBars in [ssBoth, ssHorizontal]) and not WordWrap then
+      if (fScrollBars in [{$IFDEF SYN_COMPILER_17_UP}TScrollStyle.{$ENDIF}ssBoth, {$IFDEF SYN_COMPILER_17_UP}TScrollStyle.{$ENDIF}ssHorizontal]) and not WordWrap then
       begin
         if eoScrollPastEol in Options then
           nMaxScroll := MaxScrollWidth
@@ -5093,8 +5096,8 @@ begin
   end
   else
   begin
-    StrLCopy(PAnsiChar(Msg.Text), PAnsiChar(AnsiString(Text)), Msg.TextMax - 1);
-    Msg.Result := StrLen(PAnsiChar(Msg.Text));
+   {$IFDEF SYN_COMPILER_18_UP}AnsiStrings.{$ENDIF}StrLCopy(PAnsiChar(Msg.Text), PAnsiChar(AnsiString(Text)), Msg.TextMax - 1);
+    Msg.Result := {$IFDEF SYN_COMPILER_18_UP}AnsiStrings.{$ENDIF}StrLen(PAnsiChar(Msg.Text));
   end;
 end;
 
