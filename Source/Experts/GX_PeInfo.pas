@@ -226,7 +226,11 @@ const
 implementation
 
 uses
-  SysUtils, DateUtils, Windows;
+  SysUtils,
+{$IFDEF GX_VER250_up}
+  AnsiStrings,
+{$ENDIF GX_VER250_up}
+  DateUtils, Windows;
 
 function TImportExport.GetItem(Index: Integer): TImportExportItem;
 begin
@@ -371,7 +375,7 @@ procedure TPEFileInfo.ReadImportList;
     SPos := FStream.Position;
     FStream.Position := L;
     FStream.Read(Buf, 1024);
-    Result := string(StrPas(Buf));
+    Result := string({$IFDEF GX_VER250_up}AnsiStrings.{$ENDIF}StrPas(Buf));
     FStream.Position := SPos;
   end;
 
@@ -439,7 +443,7 @@ begin
         with ImpExp.Add do
         begin
           Ordinal := ImpF.Ordinal;
-          FunctionName := string(StrPas(ImpF.Name));
+          FunctionName := string({$IFDEF GX_VER250_up}AnsiStrings.{$ENDIF}StrPas(ImpF.Name));
         end;
       end;
       FStream.Position := i;
@@ -515,7 +519,7 @@ begin
       FStream.ReadBuffer(NameAddress, SizeOf(NameAddress));
       FStream.Position := NameAddress - Delta;
       FStream.Read(Buffer, SizeOf(Buffer));
-      FExportList[j] := string(StrPas(Buffer)) + FExportList[j];
+      FExportList[j] := string({$IFDEF GX_VER250_up}AnsiStrings.{$ENDIF}StrPas(Buffer)) + FExportList[j];
     end;
     // And finally read the function associated with each export
     FStream.Position := Longint(ExportInfo.AddressOfFunctions) - Delta;

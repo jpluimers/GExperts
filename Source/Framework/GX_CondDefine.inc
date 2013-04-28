@@ -60,6 +60,9 @@
                       {$DEFINE GX_VER230_up}  // RAD Studio XE 2
                       {$IF CompilerVersion >= 24}
                         {$DEFINE GX_VER240_up}  // RAD Studio XE 3
+                        {$IF CompilerVersion >= 25}
+                          {$DEFINE GX_VER250_up}  // RAD Studio XE 4
+                        {$IFEND}
                       {$IFEND}
                     {$IFEND}
                   {$IFEND}

@@ -23,6 +23,7 @@ type
      ideRSXE1, ideRSXE1U1,
      ideRSXE2,
      ideRSXE3,
+     ideRSXE4,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -641,6 +642,22 @@ end;
   bds.exe
   dcldb170.bpl
 }
+function GetRSXE4Version: TBorlandIdeVersion;
+const
+  CoreIde1800: TVersionNumber = (Minor: 0; Major: 18; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRSXE4;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide180.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1800);
+  if VersionNumber > 0 then begin
+    //Result := ideRSXE3U1;
+  end;
+end;
+
+
 function GetRSXE3Version: TBorlandIdeVersion;
 const
   CoreIde1700: TVersionNumber = (Minor: 0; Major: 17; Build: 0; Release: 0);
@@ -729,6 +746,11 @@ begin
   {$IFDEF VER240}
     Result := GetRSXE3Version;
     Assert(Result in [ideRSXE3]);
+  {$ENDIF VER240}
+
+  {$IFDEF VER250}
+    Result := GetRSXE4Version;
+    Assert(Result in [ideRSXE4]);
   {$ENDIF VER240}
 
   if Result = ideUnknown then

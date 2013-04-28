@@ -57,7 +57,11 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, GX_GenericUtils, GX_OtaUtils, GX_IdeUtils, Math;
+  SysUtils,
+{$IFDEF GX_VER250_up}
+  AnsiStrings,
+{$ENDIF GX_VER250_up}
+  GX_GenericUtils, GX_OtaUtils, GX_IdeUtils, Math;
 
 type
   TModuleFreeNotifier = class(TNotifierObject, IOTAModuleNotifier)
@@ -137,7 +141,7 @@ destructor TEditReader.Destroy;
 begin
   FreeFileData;
 
-  StrDispose(Buf);
+{$IFDEF GX_VER250_up}AnsiStrings.{$ENDIF}StrDispose(Buf);
   Buf := nil;
 
   inherited Destroy;
