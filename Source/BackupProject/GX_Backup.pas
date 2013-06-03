@@ -382,7 +382,7 @@ begin
 
   // Do not backup DCP/BPI/DLL files
   TempFileName := ExtractUpperFileExt(FileName);
-  if (TempFileName = '.DCP') or (TempFileName = '.BPI') or (TempFileName = '.DLL') then
+  if (TempFileName = '.DCP') or (TempFileName = '.BPI') or (TempFileName = '.DLL') or (TempFileName = '.AQT') then
     Exit;
 
   AddBackupFile(FileName);
@@ -918,13 +918,26 @@ end;
 
 procedure TfmBackup.FileFailure(Sender: TObject; Item: TAbArchiveItem;
   ProcessType: TAbProcessType; ErrorClass: TAbErrorClass; ErrorCode: Integer);
+var
+  Msg: string;
 begin
-  if ErrorClass = ecAbbrevia then begin
-    if ErrorCode <> AbDuplicateName then
-      MessageDlg(AbStrRes(ErrorCode), mtError, [mbOK], 0)
-  end
-  else
-    MessageDlg('Error processing file: ' + Item.FileName, mtError, [mbOK], 0);
+  Msg := '';
+  if ExceptObject is Exception then
+    Msg := Exception(ExceptObject).Message;
+  case ErrorClass of
+    ecAbbrevia: begin
+      if ErrorCode = AbDuplicateName then
+        Exit
+      else
+        Msg := AbStrRes(ErrorCode) + ' ' + Msg;
+    end;
+    ecInOutError: Msg := Format('EInOutError (%d)', [ErrorCode]) + ' ' + Msg;
+    ecFilerError: Msg := 'EFilerError' + ' ' + Msg;
+    ecFileCreateError: Msg := 'EFCreateError' + ' ' + Msg;
+    ecFileOpenError: Msg := 'EFOpenError' + ' ' + Msg;
+  end;
+  Msg := Trim(Msg);
+  MessageDlg('Error processing file: ' + Item.FileName + '  ' + Msg, mtError, [mbOK], 0);
 end;
 
 procedure TfmBackup.AbbreviaProgress(Sender: TObject; Progress: Byte; var Abort: Boolean);
