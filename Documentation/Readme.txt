@@ -99,8 +99,8 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
-VERSION 1.37 (September, 2012?)
-- General: Added support for RAD Studio XE3.
+VERSION 1.37 (August 2013?)
+- General: Added support for RAD Studio XE3 and XE4.
 - Grep: Ignore comments feature?
 - Components to Code: Preview the generated code as you change the options.
 - Message Dialog: Support leading spaces better for inserted code.

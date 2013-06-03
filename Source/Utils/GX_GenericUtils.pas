@@ -1301,7 +1301,11 @@ end;
 function IsCharWhiteSpace(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsWhiteSpace(C);
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsWhiteSpace;
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsWhiteSpace(C);
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := C in [#9, #10, #11, #12, #13, #32];
   {$ENDIF}
@@ -1330,7 +1334,11 @@ end;
 function IsCharAlphaNumeric(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsLetterOrDigit(C);
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsLetterOrDigit;
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsLetterOrDigit(C);
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := Windows.IsCharAlphaNumeric(C);
   {$ENDIF}
@@ -1339,7 +1347,11 @@ end;
 function IsCharNumeric(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsDigit(C);
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsDigit;
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsDigit(C);
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := CharInSet(C, ['0'..'9']);
   {$ENDIF}
@@ -1358,7 +1370,11 @@ end;
 function IsCharSymbol(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsSymbol or C.IsPunctuation;
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
   {$ENDIF}
@@ -1367,7 +1383,11 @@ end;
 function IsCharControl(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsControl(C);
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsControl;
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsControl(C);
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := C in [#0..#8, #14..#31];
   {$ENDIF}
@@ -1376,7 +1396,11 @@ end;
 function IsCharIdentifierStart(C: Char): Boolean; overload;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsLetter(C) or (C = '_');
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsLetter or (C = '_');
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsLetter(C) or (C = '_');
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := (C in LocaleIdentifierChars) and not (C in ['0'..'9']);
   {$ENDIF}
@@ -1385,7 +1409,11 @@ end;
 function IsCharIdentifier(C: Char): Boolean;
 begin
   {$IFDEF UNICODE}
-  Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
+    {$IFDEF GX_VER250_up} // XE4+
+    Result := C.IsLetterOrDigit or (C = '_');
+    {$ELSE} // 2009 - XE3
+    Result := TCharacter.IsLetterOrDigit(C) or (C = '_');
+    {$ENDIF}
   {$ELSE not UNICODE}
   Result := C in LocaleIdentifierChars; // Includes '_'
   {$ENDIF}

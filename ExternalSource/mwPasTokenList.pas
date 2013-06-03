@@ -202,7 +202,7 @@ Const
 implementation
 
 uses
-  SysUtils, GX_GenericUtils;
+  SysUtils, {$IF CompilerVersion >= 25} AnsiStrings,{$IFEND} GX_GenericUtils;
 
 constructor TmSearcher.Create(Value: TPasTokenList);
 begin
@@ -625,7 +625,7 @@ begin
           raise exception.Create('unable to reallocate PChar');
         end;
       end;
-      StrECopy((FOrigin + InsPos), PAnsiChar(aString));
+      {$IF CompilerVersion >= 25} AnsiStrings.{$IFEND}StrECopy((FOrigin + InsPos), PAnsiChar(aString));
       FPCharSize := NewSize;
       FOrigin[FPCharSize] := #0;
       aString := '';

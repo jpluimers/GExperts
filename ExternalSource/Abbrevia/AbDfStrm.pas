@@ -250,7 +250,7 @@ begin
                  FFakeCount -
                  (FBufEnd - FBuffer) +
                  (FBufPos - FBuffer) -
-                 (FBitsLeft div 8), soFromBeginning);
+                 (FBitsLeft div 8), {$IF CompilerVersion >= 25} soBeginning {$ELSE} soFromBeginning {$IFEND});
 
     {free the buffer}
     FreeMem(FBuffer);
