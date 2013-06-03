@@ -58,9 +58,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils,
-{$IFDEF GX_VER250_up}
-  AnsiStrings,
-{$ENDIF GX_VER250_up}
+  {$IFDEF GX_VER250_up} AnsiStrings, {$ENDIF GX_VER250_up}
   GX_GenericUtils, GX_OtaUtils, GX_IdeUtils, Math;
 
 type

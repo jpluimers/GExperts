@@ -715,9 +715,9 @@ begin
     ClipItem := lvClip.Items[i];
     if ClipItem.Selected then
     begin
-      Result := Result + ClipInfoForItem(ClipItem).ClipString;
-      if not HasTrailingEOL(Result) then
+      if NotEmpty(Result) and (not HasTrailingEOL(Result)) then
         Result := Result + sLineBreak;
+      Result := Result + ClipInfoForItem(ClipItem).ClipString;
     end;
   end;
 end;

@@ -642,22 +642,6 @@ end;
   bds.exe
   dcldb170.bpl
 }
-function GetRSXE4Version: TBorlandIdeVersion;
-const
-  CoreIde1800: TVersionNumber = (Minor: 0; Major: 18; Build: 0; Release: 0);
-var
-  CoreIdeFileVersion: TVersionNumber;
-  VersionNumber: Integer;
-begin
-  Result := ideRSXE4;
-  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide180.bpl');
-  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1800);
-  if VersionNumber > 0 then begin
-    //Result := ideRSXE3U1;
-  end;
-end;
-
-
 function GetRSXE3Version: TBorlandIdeVersion;
 const
   CoreIde1700: TVersionNumber = (Minor: 0; Major: 17; Build: 0; Release: 0);
@@ -673,6 +657,28 @@ begin
   end;
 end;
 
+{
+  Delphi XE 4:
+  File                 File Version    Size       Modified Time
+  delphicoreide180.bpl
+  coreide180.bpl
+  bds.exe
+  dcldb180.bpl
+}
+function GetRSXE4Version: TBorlandIdeVersion;
+const
+  CoreIde1800: TVersionNumber = (Minor: 0; Major: 18; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRSXE4;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide180.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1800);
+  if VersionNumber > 0 then begin
+    //Result := ideRSXE4U1;
+  end;
+end;
 
 function GetBorlandIdeVersion: TBorlandIdeVersion;
 begin
