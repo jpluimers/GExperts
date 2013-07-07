@@ -800,17 +800,19 @@ end;
 procedure TfmConfiguration.sbxExpertsMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-  with sbxExperts.VertScrollBar do
-    Position := Position + FThumbSize;
-  Handled := True;
+  if pcConfig.ActivePage = tshExperts then begin
+    sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize;
+    Handled := True;
+  end;
 end;
 
 procedure TfmConfiguration.sbxExpertsMouseWheelUp(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-  with sbxExperts.VertScrollBar do
-    Position := Position - FThumbSize;
-  Handled := True;
+  if pcConfig.ActivePage = tshExperts then begin
+    sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position - FThumbSize;
+    Handled := True;
+  end;
 end;
 
 procedure TfmConfiguration.btnConfigureToolBarClick(Sender: TObject);
