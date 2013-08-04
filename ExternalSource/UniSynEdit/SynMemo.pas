@@ -326,11 +326,7 @@ var
   DestAnsi, SourceAnsi: PAnsiChar;
   DestWide, SourceWide: PWideChar;
 begin
-  {$IFDEF SYN_COMPILER_16_UP}
-  if (Message.WParam <  NativeUInt(Lines.Count)) then
-  {$ELSE}
-  if (Message.WParam >= 0) and (Message.WParam < Lines.Count) then
-  {$ENDIF}
+  if {$IFNDEF SYN_COMPILER_16_UP}(Message.WParam >= 0) and {$ENDIF}(Integer(Message.WParam) < Lines.Count) then
   begin
     if IsWindowUnicode(Handle) then
     begin

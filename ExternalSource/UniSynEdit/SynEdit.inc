@@ -141,24 +141,26 @@
 {------------------------------------------------------------------------------}
 { VERXXX to SYN_COMPILERX, SYN_DELPHIX and SYN_CPPBX mappings                  }
 {------------------------------------------------------------------------------}
-{$IFDEF VER250}  // XE 4
+
+{$IFDEF VER250}
   {$DEFINE SYN_COMPILER_18}
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_XE4}
 {$ENDIF}
 
-{$IFDEF VER240}  // XE 3
+{$IFDEF VER240}
   {$DEFINE SYN_COMPILER_17}
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_XE3}
 {$ENDIF}
 
-{$IFDEF VER230}  // XE 2
+{$IFDEF VER230}
   {$DEFINE SYN_COMPILER_16}
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_XE2}
 {$ENDIF}
-{$IFDEF VER220} // XE 1
+
+{$IFDEF VER220}
   {$DEFINE SYN_COMPILER_15}
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_XE}

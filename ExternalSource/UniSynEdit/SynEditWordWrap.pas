@@ -56,15 +56,18 @@ uses
   SynEdit,
 {$ENDIF}
   SysUtils,
-  Classes, SynEditMiscProcs;
+  Classes;
 
 var
   // Accumulate/hide whitespace at EOL (at end of wrapped rows, actually)
   OldWhitespaceBehaviour: Boolean = False;
 
+const
+  MaxIndex = MaxInt div 16;
+
 type
-  TLineIndex = 0..MaxRowCol;
-  TRowIndex = 0..MaxRowCol;
+  TLineIndex = 0..MaxIndex;
+  TRowIndex = 0..MaxIndex;
   TRowLength = word;
 
   TRowIndexArray = array [TLineIndex] of TRowIndex;
@@ -141,6 +144,7 @@ uses
   {$ENDIF}
 {$ENDIF}
 {$IFNDEF SYN_COMPILER_4_UP}
+  SynEditMiscProcs,
 {$ENDIF}
   Math;
 
@@ -419,6 +423,8 @@ var
   vStartRow: Integer; // first row of the line
   vOldNextRow: Integer; // first row of the next line, before the change
   cLine: Integer;
+
+  p : PRowIndexArray;
 begin
   // ****** First parse the new string using an auxiliar array *****
   vLine := TSynEditStringList(Editor.Lines).ExpandedStrings[aIndex];
@@ -498,8 +504,19 @@ begin
       begin
         // ...if growing, update offsets (and thus RowCount) before rowlengths
         GrowRows(RowCount + Result);
-        for cLine := aIndex to LineCount - 1 do
-          Inc(fLineOffsets[cLine], Result);
+        if Result = 1 then begin
+          // EG: this makes Schlemiel run twice as fast, but doesn't solve
+          // the algorithmic issue if someone can spend some time looking
+          // at the big picture... there are huge speedups to be made by
+          // eliminating this loop
+          p:=fLineOffsets;
+          for cLine := aIndex to LineCount - 1 do
+             Inc(p[cLine])
+        end else begin
+          p:=fLineOffsets;
+          for cLine := aIndex to LineCount - 1 do
+            Inc(p[cLine], Result);
+        end;
         if vOldNextRow < RowCount - Result then
           MoveRows(vOldNextRow, Result);
       end

@@ -65,15 +65,11 @@ uses
   Classes;
 
 const
-  {$IFDEF SYN_COMPILER_16_UP}
-  MaxRowCol = Trunc(2147483647 / 16);
-  {$ELSE}
-  MaxRowCol = MaxListSize;
-  {$ENDIF}
+  MaxIntArraySize = MaxInt div 16;
 
 type
   PIntArray = ^TIntArray;
-  TIntArray = array[0..MaxRowCol - 1] of Integer;
+  TIntArray = array[0..MaxIntArraySize - 1] of Integer;
 
 {$IFNDEF SYN_COMPILER_4_UP}
 function Max(x, y: Integer): Integer;

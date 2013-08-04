@@ -1125,6 +1125,7 @@ begin
   LoadKeyVersions('\SOFTWARE\Borland\BDS', BDSVersionPrefix);
   LoadKeyVersions('\SOFTWARE\CodeGear\BDS', BDSVersionPrefix);
   LoadKeyVersions('\SOFTWARE\Embarcadero\BDS', BDSVersionPrefix);
+
 {$ENDIF}
 end;
 
@@ -1191,10 +1192,11 @@ function TSynPasSyn.UseUserSettings(VersionIndex: Integer): Boolean;
           end;
           if Version >= 8 then
             Result := ReadDelphiXEOrMore(VersionStr, attri, key)
-          else if Version >= 6 then
-            Result := ReadDelphi2009OrMore(VersionStr, attri, key)
           else
-            Result := ReadDelphi8To2007(VersionStr, attri, key);
+            if Version >= 6 then
+              Result := ReadDelphi2009OrMore(VersionStr, attri, key)
+            else
+              Result := ReadDelphi8To2007(VersionStr, attri, key);
         end
         else begin // Borland Delphi 7 or earlier
           if (settingTag[1] = '2') or (settingTag[1] = '3')
