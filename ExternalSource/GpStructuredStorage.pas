@@ -1,4 +1,4 @@
-(*:Structured storage (compound file; file system inside a file) implementation.
+(*:Strucured storage (compound file; file system inside a file) implementation.
    Inspired by the Compound File implementation written by Julian M Bucknall
    (http://www.boyet.com/).
    Not threadsafe.
@@ -7,7 +7,7 @@
 
 This software is distributed under the BSD license.
 
-Copyright (c) 2011, Primoz Gabrijelcic
+Copyright (c) 2010, Primoz Gabrijelcic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -33,18 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author            : Primoz Gabrijelcic
    Creation date     : 2003-11-10
-   Last modification : 2011-01-01
-   Version           : 2.0c
+   Last modification : 2010-05-16
+   Version           : 2.0b
 </pre>*)(*
    History:
-     2.0c: 2011-01-01
-       - Uses GpStreams instead of GpMemStr.
      2.0b: 2010-05-16
        - Bug fixed: When the folder was deleted, it was not removed from the folder cache.
          Because of that, subsequent FolderExists call succeeded instead of failed, which
          could cause all sorts of weird problems.
      2.0a: 2009-09-01
-       - [Erik Berry] Definition of fmCreate in Delphi 2010 has changed and code had to 
+       - [Erik Berry] Definition of fmCreate in Delphi 2010 has changed and code had to
          be adjusted.
      2.0: 2008-05-31
        - Added Unicode support to the underlying storage. File and folder names are stored
@@ -68,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          (FileInfo['/'] is equivalent to FileInfo[''].)
        - Backslashes in parameter were not converted to slashes in FileInfo. Fixed.
      1.10b: 2006-07-20
-       - Memory leak fixed: Internal objects representing folders were never freed. 
+       - Memory leak fixed: Internal objects representing folders were never freed.
      1.10a: 2006-01-30
        - Fixed TGpStructuredStorage.Delete to not unnecessary auto-create parent folders.
        - Fixed TGpStructuredStorage.IsFolderEmpty to work when unexistent path is passed
@@ -233,12 +231,12 @@ type
 function CreateStructuredStorage: IGpStructuredStorage;
 
 implementation
-                 
+
 uses
   Contnrs,
   Math,
-  SyncObjs,
-  GpStreams;
+//  GpLogger,
+  GpMemStr;
 
 const
   CLowestSupported: cardinal = $01000200; // 1.0.2.0
@@ -839,7 +837,7 @@ end; { TGpStructuredStream.Create }
 
 {:Returns offset inside the current block.
   @since   2004-01-08
-}        
+}
 function TGpStructuredStream.GetOffset: integer;
 begin
   Result := ssStorage.Position mod CBlockSize;
@@ -858,13 +856,13 @@ end; { TGpStructuredStream.GetPosition }
 }
 function TGpStructuredStream.GetSize: integer;
 begin
-  Result := ssStorage.Size div CBlockSize;  
+  Result := ssStorage.Size div CBlockSize;
 end; { TGpStructuredStream.GetSize }
 
 {:Copies 'numBytes' from the storage stream into the 'buffer' and returns number
   of bytes read.
   @since   2004-01-08
-}        
+}
 function TGpStructuredStream.ReadBuffer(var buffer;
   numBytes: integer): integer;
 begin
@@ -886,7 +884,7 @@ end; { TGpStructuredStream.ReadStream }
 
 {:Sets position inside the current block.
   @since   2004-01-08
-}        
+}
 procedure TGpStructuredStream.SetOffset(const value: integer);
 begin
   ssStorage.Position := Position * CBlockSize + value;
@@ -894,7 +892,7 @@ end; { TGpStructuredStream.SetOffset }
 
 {:Sets current block.
   @since   2004-01-08
-}        
+}
 procedure TGpStructuredStream.SetPosition(const value : integer);
 begin
   ssStorage.Position := value * CBlockSize;
@@ -910,7 +908,7 @@ end; { TGpStructuredStream.SetSize }
 
 {:Truncates storage at specified block.
   @since   2004-01-08
-}        
+}
 procedure TGpStructuredStream.Truncate(atBlock: integer);
 begin
   Size := atBlock;
@@ -919,7 +917,7 @@ end; { TGpStructuredStream.Truncate }
 
 {:Copies 'numBytes' from the 'buffer' into the storage stream.
   @since   2004-01-08
-}        
+}
 procedure TGpStructuredStream.WriteBuffer(const buffer; numBytes: integer);
 begin
   ssStorage.Write(buffer, numBytes);
@@ -1055,7 +1053,7 @@ end; { TGpStructuredFile.NotifySizeChange }
 
 {:Reads up to 'count' bytes into the 'buffer'. Follows FAT chain.
   @since   2004-02-14
-}        
+}
 function TGpStructuredFile.Read(var buffer; count: longint): longint;
 var
   bytesToRead: integer;
@@ -1110,7 +1108,7 @@ end; { TGpStructuredFile.Seek }
 
 {:Sets new file size and truncates/extends FAT chain when required.
   @since   2004-02-14
-}        
+}
 procedure TGpStructuredFile.SetParent(newParentFolder: TGpStructuredFolder);
 begin
   sfFolder := newParentFolder;
@@ -1121,7 +1119,7 @@ procedure TGpStructuredFile.SetSize(newSize: integer);
 var
   currBlocks     : cardinal;
   iBlock         : integer;
-  lastBlock      : cardinal;      
+  lastBlock      : cardinal;
   lastBlockOffset: cardinal;
   newBlocks      : cardinal;
 begin
@@ -1303,10 +1301,10 @@ end; { TGpStructuredFileInfo.AttributeNames }
 procedure TGpStructuredFileInfo.ClearOwner;
 begin
   if assigned(sfiFolder) then
-    sfiOwner.ReleaseFolder(sfiFolder);  
+    sfiOwner.ReleaseFolder(sfiFolder);
   sfiOwner := nil;
 end; { TGpStructuredFileInfo.ClearOwner }
-              
+
 constructor TGpStructuredFileInfo.Create(owner: TGpStructuredStorage;
   folder: TGpStructuredFolder; const fileName: string);
 begin
@@ -1328,7 +1326,7 @@ end; { TGpStructuredFileInfo.Destroy }
 
 {:Retrieves attribute from the attribute file.
   @since   2004-02-18
-}        
+}
 function TGpStructuredFileInfo.GetAttribute(const attributeName: string): string;
 var
   strAttr: TGpStructuredFile;
@@ -1357,7 +1355,7 @@ end; { TGpStructuredFileInfo.GetSize }
 
 {:Lists all attributes in the stream.
   @since   2004-02-22
-}        
+}
 procedure TGpStructuredFileInfo.ListAttributes(attrStream: TStream; attributes: TStrings);
 var
   attrName: string;
@@ -1395,7 +1393,7 @@ end; { TGpStructuredFileInfo.RetrieveAttribute }
 
 {:Updates attribute in the attribute file.
   @since   2004-02-18
-}        
+}
 procedure TGpStructuredFileInfo.SetAttribute(const attributeName: string; const value:
   string);
 var
@@ -1617,7 +1615,7 @@ var
   iEntry   : integer;
   subFolder: TGpStructuredFolder;
 begin
-  System.Writeln(dumpFile, foldersSoFar, FileName);
+  Writeln(dumpFile, foldersSoFar, FileName);
   for iEntry := 0 to CountEntries-1 do begin
     if sfAttrIsFolder in Entry[iEntry].Attributes  then
       System.Write(dumpFile, 'D ')
@@ -1625,14 +1623,14 @@ begin
       System.Write(dumpFile, 'A ')
     else
       System.Write(dumpFile, 'F ');
-    System.Writeln(dumpFile, Entry[iEntry].FirstFatEntry, ' ', Entry[iEntry].FileName, ' ', Entry[iEntry].FileLength);
+    Writeln(dumpFile, Entry[iEntry].FirstFatEntry, ' ', Entry[iEntry].FileName, ' ', Entry[iEntry].FileLength);
   end; //for
   foldersSoFar := foldersSoFar + FileName + CFolderDelim;
   for iEntry := 0 to CountEntries-1 do
     if sfAttrIsFolder in Entry[iEntry].Attributes then begin
       subFolder := Owner.AccessFolder(self, Entry[iEntry].FileName);
       try
-        System.Writeln(dumpFile);
+        Writeln(dumpFile);
         subFolder.Dump(dumpFile, foldersSoFar);
       finally Owner.ReleaseFolder(subFolder); end;
     end;
@@ -1758,7 +1756,7 @@ end; { TGpStructuredFolder.LocateObject }
 
 {:Moves entry from another folder to self.
   @since   2004-03-02
-}        
+}
 procedure TGpStructuredFolder.MoveFrom(srcFolder: TGpStructuredFolder; const sourceName,
   newName: string);
 var
@@ -1864,7 +1862,7 @@ end; { TGpStructuredFolder.OpenFolder }
 
 {:Read folder from the disk.
   @since   2004-02-14
-}        
+}
 procedure TGpStructuredFolder.ReadEntries;
 var
   entry    : TGpStructuredFolderEntry;
@@ -2001,7 +1999,7 @@ begin
   Result := sfHeader.FirstEmptyBlock;
   sfHeader.FirstEmptyBlock := Entry[Result];
   Entry[Result] := 0; // return unconnected block
-  Flush; 
+  Flush;
 end; { TGpStructuredFAT.AllocateBlock }
 
 {:Allocates FAT block that is stored at the end of the storage and manages next
@@ -2023,7 +2021,7 @@ begin
   if Entry[block] <> 0 then
     raise Exception.CreateFmt(
       'TGpStructuredStorage: Block %d is not last in a FAT chain.', [block]);
-  if sfHeader.FirstEmptyBlock = 0 then 
+  if sfHeader.FirstEmptyBlock = 0 then
     AllocateFATBlock;
   Result := sfHeader.FirstEmptyBlock;
   sfHeader.FirstEmptyBlock := Next(sfHeader.FirstEmptyBlock);
@@ -2099,7 +2097,7 @@ procedure TGpStructuredFAT.Flush;
 var
   block : cardinal;
   iBlock: integer;
-begin 
+begin
   block := 1;
   for iBlock := 0 to sfBlocks.Count-1 do begin
     TGpStructuredFATBlock(sfBlocks[iBlock]).Save(block);
@@ -2187,7 +2185,7 @@ end; { TGpStructuredFAT.ReleaseChain }
   @since   2004-02-14
 }
 procedure TGpStructuredFAT.Resolve(firstBlock: cardinal; offset: integer;
-  var block, blockOffset: cardinal);                    
+  var block, blockOffset: cardinal);
 begin
   block := firstBlock;
   blockOffset := offset;
@@ -2213,7 +2211,7 @@ end; { TGpStructuredFAT.SetEntry }
 
 {:Truncates all empty trailing FAT blocks.
   @since   2004-02-16
-}        
+}
 procedure TGpStructuredFAT.Truncate;
 var
   block    : cardinal;
@@ -2483,7 +2481,7 @@ end; { TGpStructuredFolderCache.TrimMRUList }
 
 { TGpStructuredStorage }
 
-{:Locates folder in the cache and increments its access count. 
+{:Locates folder in the cache and increments its access count.
   @since   2004-02-18
 }
 procedure TGpStructuredStorage.AccessFolder(folder: TGpStructuredFolder);
@@ -2727,7 +2725,7 @@ function TGpStructuredStorage.DescendTree(folderName: string;
 var
   parent: TGpStructuredFolder;
   pDelim: integer;
-begin 
+begin
   if (folderName = '') or (folderName[1] <> CFolderDelim) then
     raise Exception.CreateFmt('TGpStructuredStorage: Invalid folder name %s', [folderName]);
   System.Delete(folderName, 1, 1);
@@ -2744,7 +2742,7 @@ begin
   if autoCreate and (not assigned(Result)) then
     raise Exception.Create('TGpStructuredStorage: Result is not assigned');
 end; { TGpStructuredStorage.DescendTree }
-  
+
 {:Flushes cached data to the data file and destroyes the structure storate
   object.
   @since   2003-11-10
@@ -2808,7 +2806,7 @@ end; { TGpStructuredStorage.FileExists }
 
 {:Returns list of files in folder 'folderName'.
   @since   2004-02-16
-}        
+}
 procedure TGpStructuredStorage.FileNames(const folderName: string; {out} files: TStrings);
 var
   stgFolder: TGpStructuredFolder;
@@ -2846,7 +2844,7 @@ begin
     stgFolder.FolderNames(folders);
   finally ReleaseFolder(stgFolder); end;
 end; { TGpStructuredStorage.FolderNames }
-  
+
 function TGpStructuredStorage.GetDataFile: string;
 begin
   Result := gssFileName;
@@ -2920,10 +2918,10 @@ begin
   gssOwnsStream := false;
   InitializeStorage;
 end; { TGpStructuredStorage.Initialize }
-  
+
 {:Checks if a file contains structured storage.
   @since   2004-12-16
-}        
+}
 function TGpStructuredStorage.IsStructuredStorage(const storageDataFile: string): boolean;
 begin
   if assigned(gssStorage) then
@@ -2974,7 +2972,7 @@ begin
   else
     LoadStorageMetadata;
 end; { TGpStructuredStorage.InitializeStorage }
-  
+
 {:Loads metadata from the storage.
   @since   2004-01-06
 }
@@ -2998,7 +2996,7 @@ end; { TGpStructuredStorage.LoadStorageMetadata }
 
 {:Moves file or folder to another location.
   @since   2004-03-02
-}        
+}
 procedure TGpStructuredStorage.Move(const objectName, newName: string);
 var
   destFolder     : string;
@@ -3050,7 +3048,7 @@ end; { TGpStructuredStorage.NormalizeFileName }
 
 {:Opens/creates an attribute storage file.
   @since   2004-03-02
-}        
+}
 function TGpStructuredStorage.OpenAttributeFile(const fileName: string;
   mode: word): TStream;
 var
@@ -3096,7 +3094,7 @@ end; { TGpStructuredStorage.OpenFile }
 
 {:Opens storage-global attribute file.
   @since   2004-03-02
-}        
+}
 function TGpStructuredStorage.OpenStorageAttributeFile: TGpStructuredFile;
 begin
   Result := TGpStructuredFile.Create(self, gssRootFolder, '',
@@ -3126,7 +3124,7 @@ end; { TGpStructuredStorage.ReleaseFolder }
 
 {:Renames folder in the folder cache.
   @since   2004-03-02
-}          
+}
 procedure TGpStructuredStorage.RenameFolder(owner: TGpStructuredFolder;
   const oldName, newName: string);
 begin
@@ -3135,7 +3133,7 @@ end; { TGpStructuredStorage.RenameFolder }
 
 {:Reparents folder in the folder cache.
   @since   2004-03-02
-}        
+}
 procedure TGpStructuredStorage.ReparentFolder(oldOwner: TGpStructuredFolder;
   const folderName: string; newOwner: TGpStructuredFolder);
 begin
@@ -3146,7 +3144,7 @@ procedure TGpStructuredStorage.RootFolderSizeChanged(sender: TObject);
 begin
   gssHeader.RootFolderSize := gssRootFolder.Size;
 end; { TGpStructuredStorage.RootFolderSizeChanged }
-  
+
 {:Splits file name into the folder and file parts.
   @since   2003-11-10
 }
