@@ -1,4 +1,4 @@
-(*:Strucured storage (compound file; file system inside a file) implementation.
+(*:Structured storage (compound file; file system inside a file) implementation.
    Inspired by the Compound File implementation written by Julian M Bucknall
    (http://www.boyet.com/).
    Not threadsafe.
@@ -7,7 +7,7 @@
 
 This software is distributed under the BSD license.
 
-Copyright (c) 2010, Primoz Gabrijelcic
+Copyright (c) 2011, Primoz Gabrijelcic
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -33,10 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Author            : Primoz Gabrijelcic
    Creation date     : 2003-11-10
-   Last modification : 2010-05-16
-   Version           : 2.0b
+   Last modification : 2011-01-01
+   Version           : 2.0c
 </pre>*)(*
    History:
+     2.0c: 2011-01-01
+       - Uses GpStreams instead of GpMemStr.
      2.0b: 2010-05-16
        - Bug fixed: When the folder was deleted, it was not removed from the folder cache.
          Because of that, subsequent FolderExists call succeeded instead of failed, which
@@ -235,8 +237,8 @@ implementation
 uses
   Contnrs,
   Math,
-//  GpLogger,
-  GpMemStr;
+  SyncObjs,
+  GpStreams;
 
 const
   CLowestSupported: cardinal = $01000200; // 1.0.2.0
@@ -1615,7 +1617,7 @@ var
   iEntry   : integer;
   subFolder: TGpStructuredFolder;
 begin
-  Writeln(dumpFile, foldersSoFar, FileName);
+  System.Writeln(dumpFile, foldersSoFar, FileName);
   for iEntry := 0 to CountEntries-1 do begin
     if sfAttrIsFolder in Entry[iEntry].Attributes  then
       System.Write(dumpFile, 'D ')
@@ -1623,14 +1625,14 @@ begin
       System.Write(dumpFile, 'A ')
     else
       System.Write(dumpFile, 'F ');
-    Writeln(dumpFile, Entry[iEntry].FirstFatEntry, ' ', Entry[iEntry].FileName, ' ', Entry[iEntry].FileLength);
+    System.Writeln(dumpFile, Entry[iEntry].FirstFatEntry, ' ', Entry[iEntry].FileName, ' ', Entry[iEntry].FileLength);
   end; //for
   foldersSoFar := foldersSoFar + FileName + CFolderDelim;
   for iEntry := 0 to CountEntries-1 do
     if sfAttrIsFolder in Entry[iEntry].Attributes then begin
       subFolder := Owner.AccessFolder(self, Entry[iEntry].FileName);
       try
-        Writeln(dumpFile);
+        System.Writeln(dumpFile);
         subFolder.Dump(dumpFile, foldersSoFar);
       finally Owner.ReleaseFolder(subFolder); end;
     end;

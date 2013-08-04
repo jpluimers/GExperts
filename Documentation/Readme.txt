@@ -28,18 +28,18 @@ GExperts contains numerous experts.  See the online help
 
 KNOWN LIMITATIONS/BUGS
 -----------------------------------------------
-- The following features are not supported under Delphi 8 - XE2:
+- The following features are not supported under Delphi 8 - XE4:
   Inner classes, class helpers, anonymous methods, and generics in the
   Class Browser, and some of the old editor tab enhancements, such as
   multiline editor tabs.  Note that the IDE converts some high ANSI and MBCS
   characters to UTF-8 UNICODE when loaded in the code editor, so you may
   experience problems with those files (especially in Delphi 2007 and earlier).
 - The compiler replacement option of the Code Proofreader is only partially
-  working under Delphi 7-XE2.  It does not correct when an identifier is
+  working under Delphi 7-XE4.  It does not correct when an identifier is
   terminated by pressing a symbol key such as a period or open parenthesis,
   but works fine when the symbol is terminated by a space (IDE limitation).
 - Due to either native Open Tools API limitations or bugs, the following
-  items can not be supported under Delphi 8/2005/2006/2007/2010/XE1/XE2:
+  items can not be supported:
   Delphi 8 Only:
    - Rename Components (IDE bug setting the Name property)
    - Jumping to a form search match from Grep Results when the source is open
@@ -52,7 +52,7 @@ KNOWN LIMITATIONS/BUGS
      (no WinForms support for IOTAFormEditor/IOTAComponent)
    - Replace Components for VCL.NET (No direct access to components)
    - Components to Code for VCL.NET (No direct access to components)
-  Delphi 8 - XE2:
+  Delphi 8 - XE4:
    - It is no longer possible for addins to override some built-in IDE
      shortcuts.  You may need to configure your GExperts shortcuts (Prev/Next
      Identifier, Procedure List, etc.) to not conflict with your selected
@@ -74,13 +74,14 @@ Expert Manager tool in the GExperts start menu group.  If you prefer, you
 can also manually register the DLL with the IDE using the Windows registry
 editor (RegEdit.exe).  Create a key similar to the following (the
 version number appearing before "\Experts\" is IDE dependent):
-HKEY_CURRENT_USER\Software\Embarcadero\BDS\9.0\Experts\ (RAD Studio XE2)
-HKEY_CURRENT_USER\Software\CodeGear\BDS\6.0\Experts\    (RAD Studio 2009)
-HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\     (RAD Studio 2007)
-HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\  (Delphi 7)
+HKEY_CURRENT_USER\Software\Embarcadero\BDS\11.0\Experts\ (RAD Studio XE4)
+HKEY_CURRENT_USER\Software\Embarcadero\BDS\9.0\Experts\  (RAD Studio XE2)
+HKEY_CURRENT_USER\Software\CodeGear\BDS\6.0\Experts\     (RAD Studio 2009)
+HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\      (RAD Studio 2007)
+HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\   (Delphi 7)
 
 Then add a new string value that points to your GExperts DLL (X is the IDE
-version such as 6, 7, 8, 2005, 2006, 2007, 2009, 2010, XE, XE2, etc.):
+version such as 6, 7, 8, 2005, 2006, 2007, 2009, 2010, XE1, XE4, etc.):
 GExperts=C:\Program Files\GExperts\GExpertsRSX.dll
 GExperts=C:\Program Files\GExperts\GExpertsDelphiX.dll
 GExperts=C:\Program Files\GExperts\GExpertsBDSX.dll or
@@ -99,14 +100,15 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
-VERSION 1.37 (August 2013?)
+VERSION 1.37 (September 2012, August 2013)
 - General: Added support for RAD Studio XE3 and XE4.
-- Grep: Ignore comments feature?
+- Grep: Add Ignore Delphi comments feature (via Paul Gardner)
 - Components to Code: Preview the generated code as you change the options.
 - Message Dialog: Support leading spaces better for inserted code.
   Force focus to editor after code insertion.
 - Set Component Properties: Close opened but not modified files to save
   resources.  Force show modified files, to show changes without saving.
+
 
 VERSION 1.36 (December, 2011)
 - General: Add official support for RAD Studio XE2, Allow filtering
@@ -288,7 +290,7 @@ MISCELLANEOUS NOTES
 GEXPERTS LICENSE
 ----------------------
 
-GExperts is copyright 1996-2012 by GExperts, Inc, Erik Berry, and several
+GExperts is copyright 1996-2013 by GExperts, Inc, Erik Berry, and several
 other authors who have submitted their code for inclusion. This license
 agreement only covers code written by GExperts, Inc. and Erik Berry. You
 should contact the other authors concerning their respective copyrights

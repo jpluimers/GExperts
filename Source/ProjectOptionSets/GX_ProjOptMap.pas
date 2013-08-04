@@ -90,7 +90,7 @@ const
   StringType = tkLString;
   {$ENDIF}
 
-  GxOptionsMap: array[0..310] of TGxOptionsMap = (
+  GxOptionsMap: array[0..311] of TGxOptionsMap = (
     ( // 0
       Name: 'HostApplication';
       AssumedTypeKind: StringType;
@@ -2280,6 +2280,13 @@ const
       Description: 'WarnNonPortableTypecast';
       Categories: [ocWarnings];
       Translator: GxBoolOptionTranslator;
+    ),
+    (
+      Name: 'WarnImmutableStrings';
+      AssumedTypeKind: tkInteger;
+      Description: 'WarnImmutableStrings';
+      Categories: [ocWarnings];
+      Translator: GxStringOptionTranslator;
     )
   );
 

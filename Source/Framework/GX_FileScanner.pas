@@ -806,6 +806,12 @@ begin
   else
     BraceCount := 0;
 
+  if (BraceCount = 0) and (FCParser.RunID = ctkbracepair) then
+  begin
+    FCParser.Next;
+    Exit;
+  end;
+
   repeat
     FCParser.NextNonComment;
     case FCParser.RunID of

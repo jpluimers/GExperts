@@ -60,9 +60,8 @@ object fmGrepSearch: TfmGrepSearch
       Top = 101
       Width = 200
       Height = 17
-      Caption = '&Ignore comments'
+      Caption = '&Ignore Delphi comments'
       TabOrder = 4
-      Visible = False
     end
     object cbForms: TCheckBox
       Left = 10

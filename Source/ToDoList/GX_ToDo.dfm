@@ -61,8 +61,10 @@ object fmToDo: TfmToDo
       item
         Caption = 'Line'
       end>
+    DoubleBuffered = True
     ReadOnly = True
     RowSelect = True
+    ParentDoubleBuffered = False
     PopupMenu = Popup
     SmallImages = dmSharedImages.Images
     SortType = stData

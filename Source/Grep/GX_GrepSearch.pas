@@ -243,7 +243,7 @@ begin
   AddMRUString(cbExcludedDirs.Text, FGrepExpert.ExcludedDirsList, False, True);
 
   FGrepExpert.GrepCaseSensitive := cbCaseSensitive.Checked;
-  //FGrepExpert.IncludeComments := not cbNoComments.Checked;
+  FGrepExpert.GrepComments := not cbNoComments.Checked;
   FGrepExpert.GrepForms := cbForms.Checked;
   FGrepExpert.GrepSub := cbInclude.Checked;
   FGrepExpert.GrepWholeWord := cbWholeWord.Checked;
@@ -312,7 +312,7 @@ begin
   rbResults.Enabled := fmGrepResults.lbResults.Count > 0;
 
   cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
-  //cbNoComments.Checked := not FGrepExpert.GrepIncludeComments;
+  cbNoComments.Checked := not FGrepExpert.GrepComments;
   cbForms.Checked := FGrepExpert.GrepForms;
   cbInclude.Checked := FGrepExpert.GrepSub;
   cbWholeWord.Checked := FGrepExpert.GrepWholeWord;

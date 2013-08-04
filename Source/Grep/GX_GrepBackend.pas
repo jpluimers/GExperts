@@ -487,8 +487,7 @@ begin
     FSearcher := TSearcher.Create;
     try
       FSearcher.OnFound := FoundIt;
-      //FSearcher.NoComments := FGrepSettings.NoComments;
-      //FSearcher.IncludeForms := FGrepSettings.IncludeForms;
+      FSearcher.NoComments := not FGrepSettings.IncludeComments;
       FSearcher.CaseSensitive := FGrepSettings.CaseSensitive;
       FSearcher.WholeWord := FGrepSettings.WholeWord;
       FSearcher.RegularExpression := FGrepSettings.RegEx;
@@ -562,6 +561,8 @@ begin
 end;
 
 procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string; FromProject: Boolean);
+var
+  TmpNoComments: Boolean;
 begin
   Assert(Assigned(FDupeFileList));
   if FDupeFileList.IndexOf(FileName) = -1 then
@@ -570,7 +571,16 @@ begin
     try
       FSearcher.FileName := FileName;
       FDupeFileList.Add(FileName);
+
+      // Because we can search directories and multiple extensions, and because the
+      // ignore comments option is ignored with anything non Delphi, we may need to
+      // turn it off temporarily, depending on what is searched for.
+      TmpNoComments := FSearcher.NoComments;
+      FSearcher.NoComments := ((FSearcher.NoComments) and (IsPascalSourceFile(FileName)));
+
       FSearcher.Execute;
+
+      FSearcher.NoComments := TmpNoComments;
     except
       on E: Exception do
       begin

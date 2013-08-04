@@ -834,7 +834,7 @@ begin
 
   Folder := GetFolder(tvFolders.Selected);
   case Folder.FolderType of
-    ftNormal: dlgGetFiles.FilterIndex := 10;
+    ftNormal: dlgGetFiles.FilterIndex := 11;
     ftSource: dlgGetFiles.FilterIndex := 1;
     ftBitmap: dlgGetFiles.FilterIndex := 5;
     ftGlyph: dlgGetFiles.FilterIndex := 5;
@@ -1402,13 +1402,14 @@ resourcestring
     '|Project Files (*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.bdsproj;*.bdsgroup;*.dproj)|*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.bdsproj;*.bdsgroup;*.dproj' +
     '|Pascal Files (*.pas;*.inc)|*.pas;*.inc' +
     '|Help Files (*.chm;*.hlp)|*.chm;*.hlp' +
-    '|Graphics Files (*.bmp;*.wmf)|*.bmp;*.wmf' +
-    '|Text Files (*.txt;*.me;*.asc;*.xml)|*.txt;*.me;*.asc;*.xml' +
+    '|Graphics Files (*.bmp;*.wmf;*.jpg;*.png;*.gif;*.ico)|*.bmp;*.wmf;*.jpg;*.png;*.gif;*.ico' +
+    '|Text Files (*.txt;*.me;*.asc;*.xml;*.iss)|*.txt;*.me;*.asc;*.xml;*.iss' +
     '|HTML Files (*.html;*.htm)|*.html;*.htm' +
     '|Executable Files (*.exe)|*.exe' +
     '|SQL Scripts (*.sql)|*.sql' +
     '|C/C++ (*.c;*.cpp;*.h;*.hpp)|*.c;*.cpp;*.h;*.hpp' +
     '|All Files (' + AllFilesWildCard + ')|' + AllFilesWildCard;
+    // Update SetFilter when you change these
 begin
   inherited;
 
