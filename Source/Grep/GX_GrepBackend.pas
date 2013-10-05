@@ -616,8 +616,6 @@ procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string; Context:
 var
   TmpNoComments: Boolean;
   ContextString: string;
-var
-  TmpNoComments: Boolean;
 begin
   Assert(Assigned(FDupeFileList));
   if FDupeFileList.IndexOf(FileName) = -1 then
