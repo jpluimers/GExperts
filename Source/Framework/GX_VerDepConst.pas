@@ -140,7 +140,16 @@ const
     IDEEnglishName = 'RAD Studio XE 4';
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\11.0';
     ClassBrowserStorageFolder = 'Classes.RADStudioXE4';
-  {$ENDIF VER240}
+  {$ENDIF VER250}
+
+  {$IFDEF VER260} // Delphi/RAD Studio XE 5
+    GExpertsDll = 'GExpertsRSXE5.dll';
+    TTabDockHostFormClassContainer = 'designide190.bpl';
+    MajorVersionNumberChar = '19';
+    IDEEnglishName = 'RAD Studio XE 5';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\12.0';
+    ClassBrowserStorageFolder = 'Classes.RADStudioXE5';
+  {$ENDIF VER260}
 
 implementation
 

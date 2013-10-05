@@ -24,6 +24,7 @@ type
      ideRSXE2,
      ideRSXE3,
      ideRSXE4,
+     ideRSXE5,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -680,6 +681,29 @@ begin
   end;
 end;
 
+{
+  Delphi XE 5:
+  File                 File Version    Size       Modified Time
+  delphicoreide190.bpl
+  coreide190.bpl
+  bds.exe
+  dcldb190.bpl
+}
+function GetRSXE5Version: TBorlandIdeVersion;
+const
+  CoreIde1900: TVersionNumber = (Minor: 0; Major: 19; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRSXE5;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide190.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde1900);
+  if VersionNumber > 0 then begin
+    //Result := ideRSXE5U1;
+  end;
+end;
+
 function GetBorlandIdeVersion: TBorlandIdeVersion;
 begin
   // We only actually detect the version once per session.
@@ -757,7 +781,12 @@ begin
   {$IFDEF VER250}
     Result := GetRSXE4Version;
     Assert(Result in [ideRSXE4]);
-  {$ENDIF VER240}
+  {$ENDIF VER250}
+
+  {$IFDEF VER260}
+    Result := GetRSXE5Version;
+    Assert(Result in [ideRSXE5]);
+  {$ENDIF VER260}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);

@@ -189,6 +189,12 @@ function ExpandTabsInLine(AText: string; ATabSize: Integer): string;
 // Note: This does not expand tabs, so the lines must be pre-expanded.
 procedure FindMinIndent(ALines: TStrings; var LineIndex, SpaceCount: Integer);
 
+const
+  CR = #13;
+  LF = #10;
+  CRLF = CR + LF;
+  CRLFLength = Length(CRLF);
+
 // Determine if a character represents white space
 function IsCharWhiteSpace(C: Char): Boolean;
 function IsCharWhiteSpaceOrNull(C: Char): Boolean; {$IFDEF SupportsInline} inline; {$ENDIF}
@@ -319,6 +325,12 @@ function StrCharAt(S: string; Pos: Integer): Char;
 
 // Returns the size of any EOL character(s) at a given position (0 if none)
 function EOLSizeAtPos(const S: string; Pos: Integer): Integer;
+
+// this checks for the case that either the formatter or the IDE
+// removed or added a CRLF at the end of the file
+// checking the length first prevents costly multiple
+// comparisons of potentially large strings
+function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: string): Boolean;
 
 // Returns True if S string contains an EOL on the end
 function HasTrailingEOL(S: string): Boolean;
@@ -1953,6 +1965,27 @@ begin
   end
   else
     Result := 0;
+end;
+
+function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: string): Boolean;
+var
+  NewLen: Integer;
+  OrigLen: Integer;
+begin
+  // this checks for the case that either the formatter or the IDE
+  // removed or added a CRLF at the end of the file
+  // checking the length first prevents costly multiple
+  // comparisons of potentially large strings
+  OrigLen := Length(OrigSource);
+  NewLen := Length(NewSource);
+  if OrigLen = NewLen then
+    Result := (OrigSource <> NewSource)
+  else if OrigLen = NewLen + CRLFLength then
+    Result := (OrigSource <> NewSource + CRLF)
+  else if OrigLen + CRLFLength = NewLen then
+    Result := (OrigSource + CRLF <> NewSource)
+  else
+    Result := True;
 end;
 
 function HasTrailingEOL(S: string): Boolean;

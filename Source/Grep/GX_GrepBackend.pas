@@ -106,12 +106,19 @@ type
       SPos, EPos: Integer) of object;
   TOnSearchFile = procedure(Sender: TObject; const FileName: string) of object;
 
+  TGrepSearchContext = class(TObject)
+  public
+    Project: string;
+    function ToString: string; {$ifdef GX_VER200_up} override {$else} virtual {$endif GX_VER200_up};
+  end;
+
   TGrepSearchRunner = class(TObject)
   private
     FOnHitMatch: TOnHitMatch;
     FOnSearchFile: TOnSearchFile;
     FStorageTarget: TStrings;
     FDupeFileList: TStringList;
+    FExceptionList: TStrings;
     FAbortSignalled: Boolean;
     FFileSearchCount: Integer;
     FMatchCount: Integer;
@@ -122,11 +129,11 @@ type
     FFilesInResults: TStrings;
     procedure FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
     procedure StartFileSearch(const FileName: string);
-    procedure ExecuteSearchOnFile(const FileName: string; FromProject: Boolean = False);
-    procedure SearchFormForFile(const FileName: string);
+    procedure ExecuteSearchOnFile(const FileName: string; Context: TGrepSearchContext; FromProject: Boolean = False);
+    procedure SearchFormForFile(const FileName: string; Context: TGrepSearchContext);
   private
     FGrepSettings: TGrepSettings;
-    procedure GrepProjectFile(const FileName: string);
+    procedure GrepProjectFile(const FileName: string; Context: TGrepSearchContext);
   protected
     procedure DoHitMatch(LineNo: Integer; const Line: string;
       SPos, EPos: Integer); virtual;
@@ -245,7 +252,7 @@ end;
 
 { TGrepSearchRunner }
 
-procedure TGrepSearchRunner.GrepProjectFile(const FileName: string);
+procedure TGrepSearchRunner.GrepProjectFile(const FileName: string; Context: TGrepSearchContext);
 begin
   try
     Application.ProcessMessages;
@@ -257,10 +264,10 @@ begin
 
       if (FGrepSettings.GrepAction = gaOpenFilesGrep) and (not GxOtaIsFileOpen(FileName)) then
         Exit;
-      ExecuteSearchOnFile(FileName, True);
+      ExecuteSearchOnFile(FileName, Context, True);
       if IsCpp(FileName) and (FGrepSettings.GrepAction in [gaProjGrep, gaOpenFilesGrep, gaProjGroupGrep]) then
         if GxOtaFileOrModuleExists(ChangeFileExt(FileName, '.h')) then
-          ExecuteSearchOnFile(ChangeFileExt(FileName, '.h'), True);
+          ExecuteSearchOnFile(ChangeFileExt(FileName, '.h'), Context, True);
       FFileResult := nil;
     end;
   except
@@ -284,12 +291,18 @@ procedure TGrepSearchRunner.GrepProjectGroup;
 var
   i: Integer;
   ProjectGroup: IOTAProjectGroup;
+  Context: TGrepSearchContext;
 begin
   ProjectGroup := GxOtaGetProjectGroup;
   if ProjectGroup = nil then
     Exit;
   FSearchRoot := ExtractFilePath(ProjectGroup.FileName);
-  GrepProjectFile(ProjectGroup.FileName);
+  Context := TGrepSearchContext.Create();
+  try
+    GrepProjectFile(ProjectGroup.FileName, Context);
+  finally
+    FreeAndNil(Context);
+  end;
   for i := 0 to ProjectGroup.ProjectCount - 1 do
     GrepProject(ProjectGroup.Projects[i]);
 end;
@@ -297,18 +310,25 @@ end;
 procedure TGrepSearchRunner.GrepProject(Project: IOTAProject);
 var
   i: Integer;
+  Context: TGrepSearchContext;
 begin
   if Project = nil then
     Exit;
 
   FSearchRoot := ExtractFilePath(Project.FileName);
-  GrepProjectFile(GxOtaGetProjectFileName(Project, True));
+  Context := TGrepSearchContext.Create();
+  try
+    Context.Project := GxOtaGetProjectFileName(Project, True);
+    GrepProjectFile(Context.Project, Context);
 
-  for i := 0 to Project.GetModuleCount - 1 do
-  begin
-    GrepProjectFile(Project.GetModule(i).GetFileName);
-    if FAbortSignalled then
-      Break;
+    for i := 0 to Project.GetModuleCount - 1 do
+    begin
+      GrepProjectFile(Project.GetModule(i).GetFileName, Context);
+      if FAbortSignalled then
+        Break;
+    end;
+  finally
+    FreeAndNil(Context);
   end;
 end;
 
@@ -317,6 +337,7 @@ resourcestring
   SNoFileOpen = 'No file is currently open';
 var
   CurrentFile: string;
+  Context: TGrepSearchContext;
 begin
   if IsStandAlone then Exit;
 
@@ -327,7 +348,14 @@ begin
 
   FSearchRoot := ExtractFilePath(CurrentFile);
   if NotEmpty(CurrentFile) and (not FileIsWelcomePage(CurrentFile)) then
-    ExecuteSearchOnFile(CurrentFile)
+  begin
+    Context := TGrepSearchContext.Create();
+    try
+      ExecuteSearchOnFile(CurrentFile, Context)
+    finally
+      FreeAndNil(Context);
+    end;
+  end
   else
     raise Exception.Create(SNoFileOpen);
 end;
@@ -363,6 +391,7 @@ var
   Masks: TStrings;
   i: Integer;
   SearchFile: string;
+  Context: TGrepSearchContext;
 begin
   {$IFOPT D+} SendDebug('DirGrep on: ' +Dir+'; Mask: '+Mask); {$ENDIF}
   Dir := AddSlash(Dir);
@@ -407,51 +436,62 @@ begin
 
       Result := FindFirst(Dir + Trim(Masks.Strings[i]), faAnyFile, Search);
       try
-        while Result = 0 do
-        begin
-          if (Search.Attr and faDirectory) <> 0 then
-            Result := FindNext(Search)
-          else
+        Context := TGrepSearchContext.Create();
+        try
+          while Result = 0 do
           begin
-            Assert(FFileResult = nil, 'FFileResult leak');
-            FFileResult := nil;
-
-            // FindFirst matches *.pas~ with a wildcard of *.pas, so we correct for that here
-            if WildcardCompare(Masks.Strings[i], Search.Name, True) then
+            if (Search.Attr and faDirectory) <> 0 then
+              Result := FindNext(Search)
+            else
             begin
-              SearchFile := Dir + Search.Name;
-              if IsEmpty(FGrepSettings.ExcludedDirs) or (not FExcludedDirsRegEx.Exec(SearchFile)) then
-                ExecuteSearchOnFile(SearchFile);
+              Assert(FFileResult = nil, 'FFileResult leak');
+              FFileResult := nil;
+
+              // FindFirst matches *.pas~ with a wildcard of *.pas, so we correct for that here
+              if WildcardCompare(Masks.Strings[i], Search.Name, True) then
+              begin
+                SearchFile := Dir + Search.Name;
+                if IsEmpty(FGrepSettings.ExcludedDirs) or (not FExcludedDirsRegEx.Exec(SearchFile)) then
+                  ExecuteSearchOnFile(SearchFile, Context);
+              end;
+              FFileResult := nil;
+
+              if FAbortSignalled then
+                Break;
+
+              Result := FindNext(Search);
             end;
-            FFileResult := nil;
-
-            if FAbortSignalled then
-              Break;
-
-            Result := FindNext(Search);
-          end;
-        end;
+          end; // while
+        finally
+          FreeAndNil(Context);
+        end; // finally
       finally
         FindClose(Search);
-      end;
+      end; // finally
     end;
   finally
     FreeAndNil(Masks);
-  end;
+  end; // finally
 end;
 
 procedure TGrepSearchRunner.GrepResults;
 var
   i: Integer;
+  Context: TGrepSearchContext;
 begin
-  for i := 0 to FFilesInResults.Count - 1 do
-  begin
-    if GxOtaFileOrModuleExists(FFilesInResults[i]) then
+  Context := TGrepSearchContext.Create();
+  try
+    for i := 0 to FFilesInResults.Count - 1 do
     begin
-      {$IFOPT D+} SendDebug('ResultsGrep on ' + FFilesInResults[i]); {$ENDIF}
-      ExecuteSearchOnFile(FFilesInResults[i]);
+      if GxOtaFileOrModuleExists(FFilesInResults[i]) then
+      begin
+        {$IFOPT D+} SendDebug('ResultsGrep on ' + FFilesInResults[i]); {$ENDIF}
+        ExecuteSearchOnFile(FFilesInResults[i], Context);
+      end;
     end;
-  end;
+  finally
+    FreeAndNil(Context);
+  end; // finally
 end;
 
 procedure TGrepSearchRunner.Execute;
@@ -496,32 +536,43 @@ begin
       FDupeFileList := TStringList.Create;
       try
         FDupeFileList.Sorted := True;
-        case FGrepSettings.GrepAction of
-          gaProjGrep:
-            GrepProject(GxOtaGetCurrentProject);
-          gaProjGroupGrep:
-            GrepProjectGroup;
-          gaCurrentOnlyGrep:
-            GrepCurrentSourceEditor;
-          gaOpenFilesGrep:
-            GrepProject(GxOtaGetCurrentProject);
-          gaDirGrep:
-            begin
-              if Length(Trim(FGrepSettings.Mask)) = 0 then
+        FExceptionList := TStringList.Create();
+        try
+          case FGrepSettings.GrepAction of
+            gaProjGrep:
+              GrepProject(GxOtaGetCurrentProject);
+            gaProjGroupGrep:
+              GrepProjectGroup;
+            gaCurrentOnlyGrep:
+              GrepCurrentSourceEditor;
+            gaOpenFilesGrep:
+              GrepProject(GxOtaGetCurrentProject);
+            gaDirGrep:
               begin
-                if GxOtaCurrentProjectIsNativeCpp then
-                  GrepDirectories(FGrepSettings.Directories, '*.cpp;*.hpp;*.h;*.pas;*.inc')
-                else if GxOtaCurrentProjectIsCSharp then
-                  GrepDirectories(FGrepSettings.Directories, '*.cs')
+                if Length(Trim(FGrepSettings.Mask)) = 0 then
+                begin
+                  if GxOtaCurrentProjectIsNativeCpp then
+                    GrepDirectories(FGrepSettings.Directories, '*.cpp;*.hpp;*.h;*.pas;*.inc')
+                  else if GxOtaCurrentProjectIsCSharp then
+                    GrepDirectories(FGrepSettings.Directories, '*.cs')
+                  else
+                    GrepDirectories(FGrepSettings.Directories, '*.pas;*.dpr;*.inc')
+                end
                 else
-                  GrepDirectories(FGrepSettings.Directories, '*.pas;*.dpr;*.inc')
-              end
-              else
-                GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
-            end;
-          gaResults:
-            GrepResults;
-        end;	// end case
+                  GrepDirectories(FGrepSettings.Directories, AnsiUpperCase(FGrepSettings.Mask));
+              end;
+            gaResults:
+              GrepResults;
+          end;	// end case
+          if FExceptionList.Count > 0 then
+          begin
+            if MessageDlg(FExceptionList.Text, mtError, [mbOK, mbCancel], 0) = mrCancel then
+              Abort;
+          end;
+        finally
+          FExceptionList.Free();
+          FExceptionList := nil;
+        end;
       finally
         FreeAndNil(FDupeFileList);
       end;
@@ -534,7 +585,7 @@ begin
   end;
 end;
 
-procedure TGrepSearchRunner.SearchFormForFile(const FileName: string);
+procedure TGrepSearchRunner.SearchFormForFile(const FileName: string; Context: TGrepSearchContext);
 var
   Module: IOTAModule;
   FormEditor: IOTAFormEditor;
@@ -547,20 +598,24 @@ begin
     FormEditor := GxOtaGetFormEditorFromModule(Module);
   end;
   if Assigned(FormEditor) then
-    ExecuteSearchOnFile(FormEditor.FileName)
+    ExecuteSearchOnFile(FormEditor.FileName, Context)
   else
   begin
+    {TODO -o##jwp -cFix : When project has multiple forms using IFDEF, search them all}
     FormFile := ChangeFileExt(FileName, '.dfm');
     if not FileExists(FormFile) then
       FormFile := ChangeFileExt(FormFile, '.nfm');
     if not FileExists(FormFile) then
       FormFile := ChangeFileExt(FormFile, '.xfm');
     if FileExists(FormFile) then
-      ExecuteSearchOnFile(FormFile);
+      ExecuteSearchOnFile(FormFile, Context);
   end;
 end;
 
-procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string; FromProject: Boolean);
+procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string; Context: TGrepSearchContext; FromProject: Boolean);
+var
+  TmpNoComments: Boolean;
+  ContextString: string;
 var
   TmpNoComments: Boolean;
 begin
@@ -586,13 +641,19 @@ begin
       begin
         if FromProject and (E is EGXFileNotFound) then
           E.Message := E.Message + '  Please check your dpr/dproj files and correct the path/filename referenced there.';
-        if MessageDlg(E.Message, mtError, [mbOK, mbCancel], 0) = mrCancel then
-          Abort;
+        ContextString := Context.ToString();
+        if ContextString = '' then
+          FExceptionList.Add(Format('Exception %s while searching "%s"; Message %s', [E.ClassName, FileName, E.Message]))
+        else
+          FExceptionList.Add(Format('Exception %s while searching "%s" in context "%s"; Message %s', [E.ClassName, FileName, ContextString, E.Message]));
+        if not (E is EGXFileNotFound) then
+          if MessageDlg(E.Message, mtError, [mbOK, mbCancel], 0) = mrCancel then
+            Abort;
       end;
     end;
 
     if FGrepSettings.IncludeForms and (IsPas(FileName) or IsCpp(FileName)) then
-      SearchFormForFile(FileName);
+      SearchFormForFile(FileName, Context);
   end;
 end;
 
@@ -664,6 +725,27 @@ end;
 function TMatchResult.Length: Integer;
 begin
   Result := EPos - SPos + 1;
+end;
+
+{ TGrepSearchContext }
+
+function TGrepSearchContext.ToString: string;
+begin
+  if Project <> '' then
+    Result := Format('Project: %s', [Project]);
+{
+For now, handle the Project.
+In the future, try to handle these:
+
+- GrepProjectGroup
+- GrepProject
+- GrepDirectories
+- GrepProjectFile
+- GrepCurrentSourceEditor
+- GrepDirectory
+- GrepResults
+- SearchFormForFile
+}
 end;
 
 end.
