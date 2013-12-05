@@ -408,6 +408,9 @@ begin
     // If the property is write only, we should not try to get the value
     if Assigned(PropInfo) and (Assigned(PropInfo.GetProc)) then
     try
+      // These two properties result in "Not implemented" type errors in several IDE releases (recently tested in XE4)
+      if (CompIntf.GetComponentType = 'TWebBrowser') and (StringInArray(string(PropInfo.Name), ['StatusText', 'Resizable'])) then
+        Continue;
       Add(TPropInfo.Create(FController, i, CompIntf));
     except on E: EGetPropException do
       // Ignore EGetPropException, since it is non-fatal
