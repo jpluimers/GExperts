@@ -93,16 +93,16 @@ type
     FInitialExperts: TStrings;
     FInitialDisabledExperts: TStrings;
 
-    function GetExpertsRegKeyName(IsEnabled: Boolean; var Section: string): string;
-    procedure GetExperts(Experts: TStrings; IsEnabled: Boolean);
+    class function GetExpertsRegKeyName(IsEnabled: Boolean; var Section: string): string;
+    class procedure GetExperts(Experts: TStrings; IsEnabled: Boolean);
 
-    procedure MoveExpertRegistryKey(const ExpertName, FromBase, FromSection: string;
+    class procedure MoveExpertRegistryKey(const ExpertName, FromBase, FromSection: string;
       const ToBase, ToSection: string);
 
-    function AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
-    procedure EnableExpertInRegistry(const ExpertName: string);
-    procedure DisableExpertInRegistry(const ExpertName: string);
-    procedure RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
+    class function AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
+    class procedure EnableExpertInRegistry(const ExpertName: string);
+    class procedure DisableExpertInRegistry(const ExpertName: string);
+    class procedure RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
 
     procedure Execute;
   public
@@ -119,6 +119,7 @@ type
   end;
 
 procedure ShowExpertManager; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+procedure InstallGExperts(_Handle: HWND; _InstHandle: HINST; _CmdLine: PAnsiChar; _CmdShow: integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 
 implementation
 
@@ -128,7 +129,8 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, CommCtrl,
   GX_GExperts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
-  GX_ConfigurationInfo, GX_MessageBox, GX_SharedImages, GX_IdeUtils;
+  GX_ConfigurationInfo, GX_MessageBox, GX_SharedImages, GX_IdeUtils,
+  GX_VerDepConst;
 
 type
   TGxExpertState = (gesCurrentlyEnabled, gesNextTimeEnabled,
@@ -480,7 +482,7 @@ begin
   end;
 end;
 
-procedure TExpertManagerExpert.RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
+class procedure TExpertManagerExpert.RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
 var
   SectionName: string;
   ExpertSetting: TGExpertsSettings;
@@ -493,7 +495,7 @@ begin
   end;
 end;
 
-function TExpertManagerExpert.AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
+class function TExpertManagerExpert.AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
 var
   RegIni: TGExpertsSettings;
   ExpertList: TStringList;
@@ -534,7 +536,7 @@ begin
 end;
 
 // Function to move a value from one registry key to another
-procedure TExpertManagerExpert.MoveExpertRegistryKey(const ExpertName,
+class procedure TExpertManagerExpert.MoveExpertRegistryKey(const ExpertName,
   FromBase, FromSection: string; const ToBase, ToSection: string);
 var
   SettingFrom: TGExpertsSettings;
@@ -558,7 +560,7 @@ begin
   end;
 end;
 
-procedure TExpertManagerExpert.EnableExpertInRegistry(const ExpertName: string);
+class procedure TExpertManagerExpert.EnableExpertInRegistry(const ExpertName: string);
 var
   BasePathEnabled: string;
   BasePathDisabled: string;
@@ -573,7 +575,7 @@ begin
     BasePathEnabled, SectionNameEnabled);
 end;
 
-procedure TExpertManagerExpert.DisableExpertInRegistry(const ExpertName: string);
+class procedure TExpertManagerExpert.DisableExpertInRegistry(const ExpertName: string);
 var
   BasePathEnabled: string;
   BasePathDisabled: string;
@@ -588,7 +590,7 @@ begin
     BasePathDisabled, SectionNameDisabled);
 end;
 
-function TExpertManagerExpert.GetExpertsRegKeyName(IsEnabled: Boolean; var Section: string): string;
+class function TExpertManagerExpert.GetExpertsRegKeyName(IsEnabled: Boolean; var Section: string): string;
 const
   // Do not localize.
   EnabledExpertRegistryLocation = 'Experts';
@@ -606,7 +608,7 @@ begin
   end;
 end;
 
-procedure TExpertManagerExpert.GetExperts(Experts: TStrings; IsEnabled: Boolean);
+class procedure TExpertManagerExpert.GetExperts(Experts: TStrings; IsEnabled: Boolean);
 var
   SectionName: string;
 begin
@@ -615,6 +617,36 @@ begin
     ReadSectionValues(SectionName, Experts);
   finally
     Free;
+  end;
+end;
+
+function GetModuleFilename(const _Module: Cardinal): string; overload;
+var
+  Buffer: array[0..260] of Char;
+begin
+  SetString(Result, Buffer, Windows.GetModuleFilename(_Module, Buffer, SizeOf(Buffer)))
+end;
+
+function GetModuleFilename: string; overload;
+begin
+  Result := GetModuleFilename(HInstance);
+end;
+
+procedure InstallGExperts(_Handle: HWND; _InstHandle: HINST; _CmdLine: PAnsiChar; _CmdShow: integer);
+var
+  Succeeded: boolean;
+begin
+  try
+    Succeeded := TExpertManagerExpert.AddExpertToRegistry('GExperts', GetModuleFilename);
+  except
+    Succeeded:= false;
+  end;
+  if Succeeded then
+    ShowMessage(Format('GExperts has been registered for use in %s', [IDEEnglishName]))
+  else begin
+    ShowMessage(Format('GExperts could not be registered for use in %s.'#13#10
+      + 'Will now start the ExpertManager.', [IDEEnglishName]));
+    ShowExpertManager;
   end;
 end;
 

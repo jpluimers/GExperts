@@ -85,6 +85,7 @@ exports
 {$ELSE}
   InitWizard name WizardEntryPoint,
   ShowExpertManager,
+  InstallGExperts,
   ShowCodeLib,
   ShowGrep;
 {$ENDIF GX_BCB}
