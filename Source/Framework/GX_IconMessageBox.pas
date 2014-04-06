@@ -23,7 +23,7 @@ resourcestring
   SBadIconFile =
     'Some of the default GExperts icons are missing.  Make sure that the icons ' +
     'exist in a directory called "Icons" underneath the main GExperts ' +
-    'installation directory.  The file missing is: %s';
+    'installation directory and is included in "GXIcons.rc".  The file missing is: %s';
 begin
   Result := Format(SBadIconFile, [FData]);
 end;
