@@ -806,7 +806,7 @@ begin
     begin
       FAutoStart := Dlg.chkAutoStart.Checked;
       FAutoClose := Dlg.chkAutoClose.Checked;
-      FMaxClip := Min(StrToIntDef(Dlg.edtMaxClip.Text, 20), 100);
+      FMaxClip := Min(StrToIntDef(Dlg.edtMaxClip.Text, 20), 1000);
       SaveSettings;
     end;
   finally
