@@ -734,6 +734,11 @@ type
 var
   ASCIICharTable: array [#0..#255] of Byte;
   LocaleIdentifierChars: set of AnsiChar;
+  RichEditVersion: Integer;
+
+const
+  RichEdit10ModuleName = 'RICHED32.DLL';
+  RichEdit20ModuleName = 'RICHED20.DLL';
 
 function SelectDirCB(Wnd: HWND; uMsg: UINT; lParam, lpData: LPARAM): Integer stdcall;
 begin
@@ -2185,6 +2190,25 @@ begin
   end;
 end;
 
+// Based on function TJvCustomRichEdit.GetCharPos(CharIndex: Integer): TPoint;
+function GetCharPos(RichEdit: TRichEdit; CharIndex: Integer): TPoint;
+var
+  Res: Longint;
+begin
+  FillChar(Result, SizeOf(Result), 0);
+  if RichEdit.HandleAllocated then
+  begin
+    if RichEditVersion = 2 then
+    begin
+      Res := SendMessage(RichEdit.Handle, Messages.EM_POSFROMCHAR, CharIndex, 0);
+      Result.X := LoWord(Res);
+      Result.Y := HiWord(Res);
+    end
+    else { RichEdit 1.0 and 3.0 }
+      SendMessage(RichEdit.Handle, Messages.EM_POSFROMCHAR, WPARAM(@Result), CharIndex);
+  end;
+end;
+
 procedure CenterLineInEdit(RichEdit: TRichEdit; LineNum: Integer);
 // I don't know the reason, but the RichEdit 2 control in VCL does not
 // respond to the EM_SCROLLCARET in Richedit.h but it does so to the
@@ -2193,7 +2217,7 @@ const
   EM_SCROLLCARET  = $00B7;
 var
   TextPos: lResult;
-  Pos: TSmallPoint;
+  Pos: TPoint;
 begin
   TextPos := SendMessage(RichEdit.Handle, EM_LINEINDEX, LineNum, 0);
 
@@ -2203,7 +2227,7 @@ begin
     SendMessage(RichEdit.Handle, EM_SCROLLCARET, 0, 0);
 
     // Get the coordinates for the beginning of the line
-    Longint(Pos) := SendMessage(RichEdit.Handle, EM_POSFROMCHAR, TextPos, 0);
+    Pos := GetCharPos(RichEdit, TextPos);
 
     // Scroll from the top
     SendMessage(RichEdit.Handle, WM_VSCROLL,
@@ -4327,7 +4351,40 @@ begin
   {$ENDIF}
 end;
 
+// Initialization variables
+var
+  OldError: Longint;
+  FLibHandle: THandle;
+  Ver: TOsVersionInfo;
+
 initialization
   Initialize;
+
+  // Get the RichEditVersion.  Code modified from JvRichEd.
+  RichEditVersion := 1;
+  OldError := SetErrorMode(SEM_NOOPENFILEERRORBOX);
+  try
+    FLibHandle := LoadLibrary(RichEdit20ModuleName);
+    if (FLibHandle > 0) and (FLibHandle < HINSTANCE_ERROR) then FLibHandle := 0;
+    if FLibHandle = 0 then begin
+      FLibHandle := LoadLibrary(RichEdit10ModuleName);
+      if (FLibHandle > 0) and (FLibHandle < HINSTANCE_ERROR) then FLibHandle := 0;
+    end
+    else begin
+      RichEditVersion := 2;
+      Ver.dwOSVersionInfoSize := SizeOf(Ver);
+      GetVersionEx(Ver);
+      with Ver do begin
+        if (dwPlatformId = VER_PLATFORM_WIN32_NT) and
+          (dwMajorVersion >= 5) then
+          RichEditVersion := 3;
+      end;
+    end;
+  finally
+    SetErrorMode(OldError);
+  end;
+
+finalization
+  if FLibHandle <> 0 then FreeLibrary(FLibHandle);
 
 end.
