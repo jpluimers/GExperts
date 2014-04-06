@@ -56,7 +56,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   ToolsAPI,
-  Contnrs, GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo;
+  Contnrs, GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo, Forms;
 
 // First of all we have shared code; in
 // particular, we share a large chunk
@@ -450,6 +450,12 @@ var
   IKeyboardBinding: IOTAKeyboardBinding;
 begin
   Assert(FKeyboardBindingIndex = InvalidIndex);
+
+  // XE5, and probably older versions, will AV when you add a keyboard binding
+  // (IKeyboardServices.AddKeyboardBinding), when Delphi is shutting down.
+  // The AV is in a TMenuItem which is nil.
+  if Assigned(Application) and (csDestroying in Application.ComponentState) then
+    Exit;
 
   if FShortCutList.Count > 0 then
   begin
