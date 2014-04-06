@@ -119,7 +119,7 @@ type
   end;
 
 procedure ShowExpertManager; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
-procedure InstallGExperts(_Handle: HWND; _InstHandle: HINST; _CmdLine: PAnsiChar; _CmdShow: integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 
 implementation
 
@@ -620,32 +620,20 @@ begin
   end;
 end;
 
-function GetModuleFilename(const _Module: Cardinal): string; overload;
+procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: integer);
 var
-  Buffer: array[0..260] of Char;
-begin
-  SetString(Result, Buffer, Windows.GetModuleFilename(_Module, Buffer, SizeOf(Buffer)))
-end;
-
-function GetModuleFilename: string; overload;
-begin
-  Result := GetModuleFilename(HInstance);
-end;
-
-procedure InstallGExperts(_Handle: HWND; _InstHandle: HINST; _CmdLine: PAnsiChar; _CmdShow: integer);
-var
-  Succeeded: boolean;
+  Succeeded: Boolean;
 begin
   try
-    Succeeded := TExpertManagerExpert.AddExpertToRegistry('GExperts', GetModuleFilename);
+    Succeeded := TExpertManagerExpert.AddExpertToRegistry('GExperts', ThisDllName);
   except
-    Succeeded:= false;
+    Succeeded := False;
   end;
   if Succeeded then
     ShowMessage(Format('GExperts has been registered for use in %s', [IDEEnglishName]))
   else begin
     ShowMessage(Format('GExperts could not be registered for use in %s.'#13#10
-      + 'Will now start the ExpertManager.', [IDEEnglishName]));
+      + 'Starting the GExperts Expert Manager.', [IDEEnglishName]));
     ShowExpertManager;
   end;
 end;
