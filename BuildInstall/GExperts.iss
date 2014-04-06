@@ -10,7 +10,7 @@
   #endif
 #else
 ; IDE compiler
-  #define RSXE4
+  #define RSXE5
   #define Version "1.37"
 #endif
 
@@ -120,6 +120,16 @@
   #define IDERegVer    "11"
   #define RegCompany   "Embarcadero"
 #endif
+#ifdef RSXE5
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
+  #define IDEVer       "XE5"
+  #define DLLSuffix    "RSXE5"
+  #define IDERegName   "BDS"
+  #define IDERegVer    "12"
+  #define RegCompany   "Embarcadero"
+#endif
+
 
 #ifndef IDEShortName
   #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.37"
