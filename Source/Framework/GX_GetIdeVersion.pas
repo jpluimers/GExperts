@@ -682,10 +682,10 @@ begin
 end;
 
 {
-  Delphi XE 5:
+  Delphi XE 5 Update 2:
   File                 File Version    Size       Modified Time
   delphicoreide190.bpl
-  coreide190.bpl
+  coreide190.bpl       19.0.14356.6604 13,070,712 Saturday, December 07, 2013, 5:55:00 PM
   bds.exe
   dcldb190.bpl
 }
