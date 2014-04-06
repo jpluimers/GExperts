@@ -297,7 +297,7 @@ begin
   if ProjectGroup = nil then
     Exit;
   FSearchRoot := ExtractFilePath(ProjectGroup.FileName);
-  Context := TGrepSearchContext.Create();
+  Context := TGrepSearchContext.Create;
   try
     GrepProjectFile(ProjectGroup.FileName, Context);
   finally
@@ -316,7 +316,7 @@ begin
     Exit;
 
   FSearchRoot := ExtractFilePath(Project.FileName);
-  Context := TGrepSearchContext.Create();
+  Context := TGrepSearchContext.Create;
   try
     Context.Project := GxOtaGetProjectFileName(Project, True);
     GrepProjectFile(Context.Project, Context);
@@ -349,7 +349,7 @@ begin
   FSearchRoot := ExtractFilePath(CurrentFile);
   if NotEmpty(CurrentFile) and (not FileIsWelcomePage(CurrentFile)) then
   begin
-    Context := TGrepSearchContext.Create();
+    Context := TGrepSearchContext.Create;
     try
       ExecuteSearchOnFile(CurrentFile, Context)
     finally
@@ -436,7 +436,7 @@ begin
 
       Result := FindFirst(Dir + Trim(Masks.Strings[i]), faAnyFile, Search);
       try
-        Context := TGrepSearchContext.Create();
+        Context := TGrepSearchContext.Create;
         try
           while Result = 0 do
           begin
@@ -479,7 +479,7 @@ var
   i: Integer;
   Context: TGrepSearchContext;
 begin
-  Context := TGrepSearchContext.Create();
+  Context := TGrepSearchContext.Create;
   try
     for i := 0 to FFilesInResults.Count - 1 do
     begin
@@ -536,7 +536,7 @@ begin
       FDupeFileList := TStringList.Create;
       try
         FDupeFileList.Sorted := True;
-        FExceptionList := TStringList.Create();
+        FExceptionList := TStringList.Create;
         try
           case FGrepSettings.GrepAction of
             gaProjGrep:
@@ -570,8 +570,7 @@ begin
               Abort;
           end;
         finally
-          FExceptionList.Free();
-          FExceptionList := nil;
+          FreeAndNil(FExceptionList);
         end;
       finally
         FreeAndNil(FDupeFileList);
@@ -639,7 +638,7 @@ begin
       begin
         if FromProject and (E is EGXFileNotFound) then
           E.Message := E.Message + '  Please check your dpr/dproj files and correct the path/filename referenced there.';
-        ContextString := Context.ToString();
+        ContextString := Context.ToString;
         if ContextString = '' then
           FExceptionList.Add(Format('Exception %s while searching "%s"; Message %s', [E.ClassName, FileName, E.Message]))
         else

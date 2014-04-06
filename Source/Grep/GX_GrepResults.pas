@@ -122,6 +122,7 @@ type
     procedure lbResultsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure actListGotoSelectedAndCloseExecute(Sender: TObject);
   private
+    FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
     FReplaceInProgress: Boolean;
     FDragSource: TDropFileSource;
@@ -212,10 +213,16 @@ resourcestring
   SProcessing = 'Processing %s';
 var
   Dummy: Boolean;
+  CurrentGetTickCount: DWORD;
 begin
   SetStatusString(Format(SProcessing, [FileName]));
   ActionsUpdate(nil, Dummy);
-  Application.ProcessMessages;
+  CurrentGetTickCount := GetTickCount;
+  if CurrentGetTickCount <> FLastRepaintTick then
+  begin
+    Application.ProcessMessages;
+    FLastRepaintTick := CurrentGetTickCount;
+  end;
 end;
 
 procedure TfmGrepResults.Execute(DoRefresh: Boolean);
@@ -243,6 +250,7 @@ begin
     if not QueryUserForGrepOptions then
       Exit;
 
+  FLastRepaintTick := GetTickCount;
   reContext.Clear;
 
   ResultFiles := TStringList.Create;
