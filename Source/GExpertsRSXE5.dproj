@@ -4,7 +4,7 @@
         <MainSource>GExpertsRSXE5.dpr</MainSource>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-        <ProjectVersion>15.1</ProjectVersion>
+        <ProjectVersion>15.3</ProjectVersion>
         <Base>True</Base>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>
