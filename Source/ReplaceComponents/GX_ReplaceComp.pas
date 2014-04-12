@@ -242,8 +242,10 @@ begin
 
   ReplaceComponent := Trim(cbReplace.Text);
   if ReplaceComponent = '' then
-    raise Exception.Create(SComponentNotSelectedForReplace)
-  else if GetClass(ReplaceComponent) = nil then
+    raise Exception.Create(SComponentNotSelectedForReplace);
+  if GetClass(ReplaceComponent) = nil then
+    ActivateClassGroup(TControl); // This isn't actually right, but probably saves some errors for the most common VCL projects
+  if GetClass(ReplaceComponent) = nil then
     raise Exception.CreateFmt(SUnknComponentNameForRep, [ReplaceComponent]);
 
   SaveFormSettings;
