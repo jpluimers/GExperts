@@ -274,6 +274,9 @@ begin
   FActualPropertyNames.Clear;
   FActualPropertyTypes.Clear;
 
+  if not Assigned(GetClass(FActualComponent)) then
+    ActivateClassGroup(TControl);
+
   if GetClass(FActualComponent) <> nil then
     GetPropertyNames(GetClass(FActualComponent), FActualPropertyNames, FActualPropertyTypes, lbxPropertyTypes.Items);
 
