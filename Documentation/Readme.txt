@@ -104,7 +104,7 @@ VERSION 1.37 (April 2014)
 - General: Added support for RAD Studio XE3, XE4, and XE5 (with help from
   Jeroen Pluimers).  Various minor big fixes.
 - Grep: Add Ignore Delphi comments feature (via Paul Gardner).  Significantly
-  speed up searches by updating the search status details  less often.
+  speed up searches by updating the search status details less often.
 - Components to Code: Preview the generated code as you change the options.
 - Message Dialog: Support leading spaces better for inserted code.
   Force focus to editor after code insertion.
