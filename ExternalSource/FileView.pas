@@ -164,7 +164,7 @@ begin
         or IsCppSourceModule(FileName)
         or IsSQL(FileName)
         or IsCS(FileName)
-        of IsXMLFormat(FileName)
+        or IsXMLFormat(FileName)
         or IsForm(FileName)
     {$ENDIF GX_ENHANCED_EDITOR}
     then
