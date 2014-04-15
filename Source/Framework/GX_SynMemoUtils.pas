@@ -14,13 +14,6 @@ function GetGXHighlighterForCurrentSourceEditor: TGXSyntaxHighlighter;
   procedure SetSynEditHighlighter(SynEdit: TCustomSynEdit; Highlighter: TGXSyntaxHighlighter);
 {$ENDIF SYNEDIT}
 
-const
-  {$IFDEF GX_VER160_up}
-  IDEEditorEncoding = seUTF8;
-  {$ELSE}
-  IDEEditorEncoding = seAnsi;
-  {$ENDIF}
-
 implementation
 
 uses
