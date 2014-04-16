@@ -10,7 +10,7 @@
   #endif
 #else
 ; IDE compiler
-  #define RSXE5
+  #define RSXE6
   #define Version "1.37"
 #endif
 
@@ -127,6 +127,15 @@
   #define DLLSuffix    "RSXE5"
   #define IDERegName   "BDS"
   #define IDERegVer    "12"
+  #define RegCompany   "Embarcadero"
+#endif
+#ifdef RSXE6
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
+  #define IDEVer       "XE6"
+  #define DLLSuffix    "RSXE6"
+  #define IDERegName   "BDS"
+  #define IDERegVer    "14" ; Not 13
   #define RegCompany   "Embarcadero"
 #endif
 

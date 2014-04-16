@@ -156,7 +156,7 @@ const
     TTabDockHostFormClassContainer = 'designide200.bpl';
     MajorVersionNumberChar = '20';
     IDEEnglishName = 'RAD Studio XE 6';
-    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\14.0';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\14.0'; // Not 13.0
     ClassBrowserStorageFolder = 'Classes.RADStudioXE6';
   {$ENDIF VER270}
 
