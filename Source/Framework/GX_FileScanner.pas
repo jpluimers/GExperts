@@ -154,7 +154,7 @@ begin
     Result := WideString(Data);
   end
   else
-    Result := Copy(PAnsiChar(Stream.Memory), FBeginIndex + 1, (FEndIndex - FBeginIndex));
+    Result := Copy(String(PAnsiChar(Stream.Memory)), FBeginIndex + 1, (FEndIndex - FBeginIndex));
 end;
 
 function TProcedure.GetProcClass: string;
