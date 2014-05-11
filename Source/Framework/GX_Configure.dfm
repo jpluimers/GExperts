@@ -312,9 +312,9 @@ object fmConfiguration: TfmConfiguration
             end
             object meHelp: TMemo
               Left = 10
-              Top = 310
+              Top = 328
               Width = 555
-              Height = 118
+              Height = 100
               TabStop = False
               Anchors = [akLeft, akRight, akBottom]
               Color = clInfoBk
@@ -336,7 +336,7 @@ object fmConfiguration: TfmConfiguration
               Left = 10
               Top = 22
               Width = 470
-              Height = 281
+              Height = 300
               Anchors = [akLeft, akTop, akRight, akBottom]
               Columns = <
                 item
