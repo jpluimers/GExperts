@@ -609,7 +609,7 @@ var
   StringCount, NewSize: Longint;
   aString: AnsiString;
 begin
-  aString := Item + (FOrigin + DelPos);
+  aString := AnsiString(Item + string(FOrigin + DelPos));
   StringCount := Length(aString);
   if (InsPos >= 0) and (StringCount >= 0) then
   begin
@@ -783,7 +783,7 @@ begin
   Result := TempHelper.Count;
   StartPos := FTokenPositionsList[StartIndex];
   ResetLines(StartIndex, ItemLen);
-  WriteTo(StartPos, StartPos, ToInsert);
+  WriteTo(StartPos, StartPos, String(ToInsert));
   ResetPositionsFrom(StartIndex + 1, ItemLen);
   for I := 0 to TempHelper.Count -1 do
   begin
@@ -824,7 +824,7 @@ begin
     EndPos := FTokenPositionsList[OldStartIndex + GroupCount];
     TempStringLen := EndPos - StartPos;
     SetString(TempString, (FOrigin + StartPos), TempStringLen);
-    InsertString(NewStartIndex, TempString);
+    InsertString(NewStartIndex, AnsiString(TempString));
     OldStartIndex := OldStartIndex + GroupCount;
     DeleteGroup(OldStartIndex, GroupCount);
     TempString := '';
@@ -837,7 +837,7 @@ begin
     EndPos := FTokenPositionsList[OldStartIndex + GroupCount];
     TempStringLen := EndPos - StartPos;
     SetString(TempString, (FOrigin + StartPos), TempStringLen);
-    InsertString(NewStartIndex, TempString);
+    InsertString(NewStartIndex, AnsiString(TempString));
     DeleteGroup(OldStartIndex, GroupCount);
     TempString := '';
   end;

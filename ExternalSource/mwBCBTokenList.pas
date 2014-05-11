@@ -247,7 +247,7 @@ begin
   FFoundList.Clear;
   SearchLen := FBCBTokenList.PCharSize;
   FSearchOrigin := FBCBTokenList.Origin;
-  Pat := NewPattern;
+  Pat := AnsiString(NewPattern);
   PatLen := Length(Pat);
   PatLenPlus := PatLen + 1;
   HalfLen := PatLen div 2;
@@ -403,7 +403,7 @@ var
   StringCount, NewSize: Longint;
   aString: string;
 begin
-  aString := Item + (FOrigin + DelPos);
+  aString := Item + string(FOrigin + DelPos);
   StringCount := Length(aString);
   if (InsPos >= 0) and (StringCount >= 0) then
   begin
