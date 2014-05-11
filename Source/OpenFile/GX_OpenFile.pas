@@ -14,6 +14,7 @@ uses
 
 const
   UM_REFRESHLIST = WM_USER + 746;
+  UM_NEXTFILTERBLOCK = WM_USER + 747;
 
 type
   TOpenType = (otOpenMenu, otViewUnit, otViewForm, otOpenProject);
@@ -148,8 +149,11 @@ type
     FCurrentListView: TListView;
     FCurrentFilePaths: TStringList;
     FFileColumnWidth: Integer;
+    FCurrentFilterIndex: Integer;
     procedure SearchPathReady;
     procedure FilterVisibleUnits;
+    procedure FilterVisibleUnitsBlockwise(const TimeoutMS: Cardinal);
+    procedure UMFilterNextBlock(var Msg: TMessage); message UM_NEXTFILTERBLOCK;
     procedure SelectMatchingItemInList;
     procedure DeleteFromFavorites(Item: TListItem);
     function GetActivePageIndex: Integer;
@@ -658,7 +662,12 @@ begin
 end;
 
 procedure TfmOpenFile.FilterVisibleUnits;
+begin
+  FCurrentFilterIndex := 0; // Restart Filtering
+  FilterVisibleUnitsBlockwise(250); // Do Filtering in 250ms Chunks to keep form useable
+end;
 
+procedure TfmOpenFile.FilterVisibleUnitsBlockwise(const TimeoutMS: Cardinal);
   procedure AddListItem(FileListView: TListView; UnitFileName: string);
   var
     ListItem: TListItem;
@@ -669,37 +678,62 @@ procedure TfmOpenFile.FilterVisibleUnits;
     ListItem.SubItems.Add(LowerCase(ExtractFileExt(UnitFileName)));
   end;
 
+  function IsTimedOut(const StartTime: Cardinal): Boolean;
+  begin
+    Result := Cardinal(GetTickCount - StartTime) >= TimeoutMS;
+  end;
+
 var
   SearchValue: string;
-  i: Integer;
+  StartTime: Cardinal;
+  ListComplete: Boolean;
 begin
-  pcUnits.ActivePage.OnShow(pcUnits.ActivePage);
+  StartTime := GetTickCount;
+
+  if FCurrentFilterIndex = 0 then
+  begin // start of filtering
+    pcUnits.ActivePage.OnShow(pcUnits.ActivePage);
+  end;
+
   CurrentListView.Items.BeginUpdate;
   try
     CurrentListView.Items.Clear;
     CurrentListView.SortType := stNone;
-    for i := 0 to FCurrentFilePaths.Count - 1 do
+    while (FCurrentFilterIndex <= FCurrentFilePaths.Count - 1) and not IsTimedOut(StartTime) do
     begin
-      SearchValue := ExtractPureFileName(FCurrentFilePaths[i]);
+      SearchValue := ExtractPureFileName(FCurrentFilePaths[FCurrentFilterIndex]);
 
       if Length(edtFilter.Text) = 0 then
-        AddListItem(CurrentListView, FCurrentFilePaths[i])
+        AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex])
       else
         if tbnMatchAnywhere.Down then
         begin
           if StrContains(edtFilter.Text, SearchValue, False) then
-            AddListItem(CurrentListView, FCurrentFilePaths[i]);
+            AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex]);
         end
         else
           if StrBeginsWith(edtFilter.Text, SearchValue, False) then
-            AddListItem(CurrentListView, FCurrentFilePaths[i]);
+            AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex]);
+
+      Inc(FCurrentFilterIndex);
     end;
-    CurrentListView.SortType := stText;
-    SelectMatchingItemInList;
+
+    ListComplete := FCurrentFilterIndex >= FCurrentFilePaths.Count - 1;
+    if ListComplete then
+    begin // Filtering complete
+      CurrentListView.SortType := stText;
+      SelectMatchingItemInList;
+    end;
   finally
     CurrentListView.Items.EndUpdate;
   end;
-  ResizeListViewColumns;
+
+  if not ListComplete then
+  begin
+    Application.ProcessMessages;
+    PostMessage(Self.Handle, UM_NEXTFILTERBLOCK, 0, 0); // Queue next block for filtering
+  end else
+    ResizeListViewColumns;
 end;
 
 procedure TfmOpenFile.SelectMatchingItemInList;
@@ -972,6 +1006,11 @@ begin
   Result := nil;
   if cbxType.ItemIndex >= 0 then
     Result := FileType(cbxType.ItemIndex);
+end;
+
+procedure TfmOpenFile.UMFilterNextBlock(var Msg: TMessage);
+begin
+  FilterVisibleUnitsBlockwise(250);
 end;
 
 // This is a hack to force the column 0 headers on hidden tabs to repaint
