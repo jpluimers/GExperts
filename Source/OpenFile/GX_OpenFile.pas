@@ -664,7 +664,7 @@ end;
 procedure TfmOpenFile.FilterVisibleUnits;
 begin
   FCurrentFilterIndex := 0; // Restart Filtering
-  FilterVisibleUnitsBlockwise(250); // Do Filtering in 250ms Chunks to keep form useable
+  PostMessage(Self.Handle, UM_NEXTFILTERBLOCK, 0, 0); // Queue first block for filtering
 end;
 
 procedure TfmOpenFile.FilterVisibleUnitsBlockwise(const TimeoutMS: Cardinal);
@@ -688,8 +688,6 @@ var
   StartTime: Cardinal;
   ListComplete: Boolean;
 begin
-  StartTime := GetTickCount;
-
   if FCurrentFilterIndex = 0 then
   begin // start of filtering
     pcUnits.ActivePage.OnShow(pcUnits.ActivePage);
@@ -699,6 +697,7 @@ begin
   try
     CurrentListView.Items.Clear;
     CurrentListView.SortType := stNone;
+    StartTime := GetTickCount;
     while (FCurrentFilterIndex <= FCurrentFilePaths.Count - 1) and not IsTimedOut(StartTime) do
     begin
       SearchValue := ExtractPureFileName(FCurrentFilePaths[FCurrentFilterIndex]);
@@ -731,7 +730,11 @@ begin
   if not ListComplete then
   begin
     Application.ProcessMessages;
-    PostMessage(Self.Handle, UM_NEXTFILTERBLOCK, 0, 0); // Queue next block for filtering
+
+    // Application.ProcessMessages may have initiiated new filtering. Only
+    // continue our current run if FCurrentFilterIndex was not touched.
+    if FCurrentFilterIndex > 0 then
+      PostMessage(Self.Handle, UM_NEXTFILTERBLOCK, 0, 0); // Queue next block for filtering
   end else
     ResizeListViewColumns;
 end;
@@ -1010,7 +1013,7 @@ end;
 
 procedure TfmOpenFile.UMFilterNextBlock(var Msg: TMessage);
 begin
-  FilterVisibleUnitsBlockwise(250);
+  FilterVisibleUnitsBlockwise(250); // Do Filtering in 250ms Chunks to keep form useable
 end;
 
 // This is a hack to force the column 0 headers on hidden tabs to repaint
