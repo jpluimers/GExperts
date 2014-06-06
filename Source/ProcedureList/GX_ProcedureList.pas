@@ -7,7 +7,7 @@ interface
 uses
   SysUtils, Classes, ActnList, Dialogs, ComCtrls, ToolWin, StdCtrls,
   Controls, ExtCtrls, Messages, Forms, GX_EnhancedEditor,
-  GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm;
+  GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm, System.Actions;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
@@ -806,9 +806,14 @@ begin
       Exit;
     if ProcInfo.Body <> '' then
       FCodeText.AsString := ProcInfo.Body
-    else
-      FCodeText.AsString := Copy(String(PAnsiChar(FMemStream.Memory)),
+    else begin
+      // This unicode warning is left here as a reminder that unicode support has not
+      // been fully tested. Once tested, the following line can be replaced by
+      // FCodeText.AsString := Copy(String(PAnsiChar(FMemStream.Memory)),
+      //  ProcInfo.BeginIndex + 1, (ProcInfo.EndIndex - ProcInfo.BeginIndex));
+      FCodeText.AsString := Copy(PAnsiChar(FMemStream.Memory),
         ProcInfo.BeginIndex + 1, (ProcInfo.EndIndex - ProcInfo.BeginIndex));
+    end;
     FLastProcLineNo := ProcInfo.LineNo;
   finally
     FCodeText.EndUpdate;

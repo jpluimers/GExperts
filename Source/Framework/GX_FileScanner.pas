@@ -153,8 +153,12 @@ begin
     Stream.ReadBuffer(Data[1], FEndIndex - FBeginIndex);
     Result := WideString(Data);
   end
-  else
-    Result := Copy(String(PAnsiChar(Stream.Memory)), FBeginIndex + 1, (FEndIndex - FBeginIndex));
+  else begin
+    // This unicode warning is left here as a reminder that unicode support has not
+    // been fully tested. Once tested, the following line can be replaced by
+    // Result := Copy(String(PAnsiChar(Stream.Memory)), FBeginIndex + 1, (FEndIndex - FBeginIndex));
+    Result := Copy(PAnsiChar(Stream.Memory), FBeginIndex + 1, (FEndIndex - FBeginIndex));
+  end;
 end;
 
 function TProcedure.GetProcClass: string;
