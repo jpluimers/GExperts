@@ -7,7 +7,7 @@ interface
 uses
   SysUtils, Classes, ActnList, Dialogs, ComCtrls, ToolWin, StdCtrls,
   Controls, ExtCtrls, Messages, Forms, GX_EnhancedEditor,
-  GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm, System.Actions;
+  GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
