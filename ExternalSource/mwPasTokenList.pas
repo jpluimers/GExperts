@@ -609,7 +609,11 @@ var
   StringCount, NewSize: Longint;
   aString: AnsiString;
 begin
-  aString := AnsiString(Item + string(FOrigin + DelPos));
+  // This unicode warning is left here as a reminder that this typecast has not
+  // been fully tested. Once tested, the following line can potentially be
+  // replaced by this to remove the warning:
+  // aString := AnsiString(Item + string(FOrigin + DelPos));
+  aString := Item + (FOrigin + DelPos);
   StringCount := Length(aString);
   if (InsPos >= 0) and (StringCount >= 0) then
   begin
@@ -783,7 +787,11 @@ begin
   Result := TempHelper.Count;
   StartPos := FTokenPositionsList[StartIndex];
   ResetLines(StartIndex, ItemLen);
-  WriteTo(StartPos, StartPos, String(ToInsert));
+  // This unicode warning is left here as a reminder that this typecast has not
+  // been fully tested. Once tested, the following line can potentially be
+  // replaced by this to remove the warning:
+  // WriteTo(StartPos, StartPos, String(ToInsert));
+  WriteTo(StartPos, StartPos, ToInsert);
   ResetPositionsFrom(StartIndex + 1, ItemLen);
   for I := 0 to TempHelper.Count -1 do
   begin
@@ -824,7 +832,11 @@ begin
     EndPos := FTokenPositionsList[OldStartIndex + GroupCount];
     TempStringLen := EndPos - StartPos;
     SetString(TempString, (FOrigin + StartPos), TempStringLen);
-    InsertString(NewStartIndex, AnsiString(TempString));
+    // This unicode warning is left here as a reminder that this typecast has not
+    // been fully tested. Once tested, the following line can potentially be
+    // replaced by this to remove the warning:
+    // InsertString(NewStartIndex, AnsiString(TempString));
+    InsertString(NewStartIndex, TempString);
     OldStartIndex := OldStartIndex + GroupCount;
     DeleteGroup(OldStartIndex, GroupCount);
     TempString := '';
@@ -837,7 +849,11 @@ begin
     EndPos := FTokenPositionsList[OldStartIndex + GroupCount];
     TempStringLen := EndPos - StartPos;
     SetString(TempString, (FOrigin + StartPos), TempStringLen);
-    InsertString(NewStartIndex, AnsiString(TempString));
+    // This unicode warning is left here as a reminder that this typecast has not
+    // been fully tested. Once tested, the following line can potentially be
+    // replaced by this to remove the warning:
+    // InsertString(NewStartIndex, AnsiString(TempString));
+    InsertString(NewStartIndex, TempString);
     DeleteGroup(OldStartIndex, GroupCount);
     TempString := '';
   end;

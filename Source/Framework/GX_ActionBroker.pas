@@ -285,10 +285,9 @@ begin
     ReadyBitmap := CreateScaledBitmap(Bitmap);
     try
       BitmapName := AAction.Name + GxBitmapSuffix;
-{$ifdef GX_VER170_up}
-      // Workaround by Achim Kalwa
-      ReadyBitmap.Transparent := False;  // prevent invisible icons on XE6
-{$endif}
+      {$IFDEF GX_VER170_up}
+      ReadyBitmap.Transparent := False; // Prevent invisible enabled icons in XE6 (disabled ones might still be invisible/ghosted)
+      {$ENDIF}
       if ReadyBitmap.Transparent then
         AAction.ImageIndex := NTAServices.AddMasked(ReadyBitmap, ReadyBitmap.TransparentColor, BitmapName)
       else

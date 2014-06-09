@@ -513,6 +513,7 @@ begin
       SetLength(lExcludedDirs, i);
       lExcludedDirs := QuoteRegExprMetaChars(lExcludedDirs);
       FExcludedDirsRegEx.Expression := StringReplace(lExcludedDirs, ';', '|', [rfReplaceAll]);
+      FExcludedDirsRegEx.ModifierI := True;
       try
         FExcludedDirsRegEx.Compile;
       except

@@ -247,7 +247,11 @@ begin
   FFoundList.Clear;
   SearchLen := FBCBTokenList.PCharSize;
   FSearchOrigin := FBCBTokenList.Origin;
-  Pat := AnsiString(NewPattern);
+  // This unicode warning is left here as a reminder that this typecast has not
+  // been fully tested. Once tested, the following line can potentially be
+  // replaced by this to remove the warning:
+  // Pat := AnsiString(NewPattern);
+  Pat := NewPattern;
   PatLen := Length(Pat);
   PatLenPlus := PatLen + 1;
   HalfLen := PatLen div 2;
@@ -403,7 +407,11 @@ var
   StringCount, NewSize: Longint;
   aString: string;
 begin
-  aString := Item + string(FOrigin + DelPos);
+  // This unicode warning is left here as a reminder that this typecast has not
+  // been fully tested. Once tested, the following line can potentially be
+  // replaced by this to remove the warning:
+  // aString := Item + string(FOrigin + DelPos);
+  aString := Item + (FOrigin + DelPos);
   StringCount := Length(aString);
   if (InsPos >= 0) and (StringCount >= 0) then
   begin
