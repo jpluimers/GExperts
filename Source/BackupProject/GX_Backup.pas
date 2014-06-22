@@ -395,10 +395,11 @@ begin
     AddBackupFile(ChangeFileExt(FileName, '.bpk')); // Do not localize.
   end;
 
-  // Include both the DFM and XFM if they exist, just to be safe
+  // Include all form files, if they exist, just to be safe
   AddBackupFile(ChangeFileExt(FileName, '.dfm')); // Do not localize.
   AddBackupFile(ChangeFileExt(FileName, '.xfm')); // Do not localize.
   AddBackupFile(ChangeFileExt(FileName, '.nfm')); // Do not localize.
+  AddBackupFile(ChangeFileExt(FileName, '.fmx')); // Do not localize.
   AddBackupFile(ChangeFileExt(FileName, '.todo'));
 
   if FBackupExpert.DoBackupIncludedFiles and (IsDprOrPas(FileName) or IsCpp(FileName)) then
