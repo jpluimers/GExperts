@@ -40,6 +40,8 @@ type
 
 implementation
 
+{ TODO : The space replacement for comments needs to use a different, more obscure character such as ÷©®¡™‡|~‰±°•? so that we don't match as many false-positives when searcing for spaces }
+
 { TSearcher }
 
 function TSearcher.CheckWholeWord(Line: TGXUnicodeString; StartCol, EndCol: Integer): Boolean;
