@@ -106,6 +106,8 @@
 (* SYN_DELPHI_XE5_UP    : Delphi XE5  or higher is being used.                *)
 (* SYN_DELPHI_XE6       : Delphi XE6  is being used.                          *)
 (* SYN_DELPHI_XE6_UP    : Delphi XE6  or higher is being used.                *)
+(* SYN_DELPHI_XE7       : Delphi XE7  is being used.                          *)
+(* SYN_DELPHI_XE7_UP    : Delphi XE7  or higher is being used.                *)
 (* SYN_KYLIX            : Kylix 1.0 is being using.                           *)
 (* SYN_CLX              : A CLX application is being created.                 *)
 (******************************************************************************)
