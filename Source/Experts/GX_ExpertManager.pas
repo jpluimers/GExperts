@@ -239,7 +239,7 @@ end;
 
 constructor TfmExpertManager.Create(AOwner: TComponent);
 begin
-  raise Exception.Create('Call constructor CreateWithManger');
+  raise Exception.Create('Call constructor CreateWithManager');
   inherited;
 end;
 
