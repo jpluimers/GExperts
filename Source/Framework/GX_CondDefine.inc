@@ -68,6 +68,9 @@
                               {$DEFINE GX_VER270_up}  // RAD Studio XE 6 (21; BDS 13)
                               {$IF CompilerVersion >= 28}
                                 {$DEFINE GX_VER280_up}  // RAD Studio XE 7 (22; BDS 14)
+                                {$IF CompilerVersion >= 29}
+                                  {$DEFINE GX_VER290_up}  // RAD Studio XE 8 (23; BDS 14)
+                            {$IFEND}
                             {$IFEND}
                             {$IFEND}
                           {$IFEND}
