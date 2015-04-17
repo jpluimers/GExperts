@@ -58,6 +58,8 @@ inherited fmGrepResults: TfmGrepResults
       Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
+      EdgeBorders = []
+      Flat = True
       Images = dmSharedImages.Images
       ParentShowHint = False
       ShowHint = True
@@ -178,7 +180,6 @@ inherited fmGrepResults: TfmGrepResults
       ScrollBars = ssBoth
       TabOrder = 1
       WordWrap = False
-      Zoom = 100
     end
   end
   object StatusBar: TStatusBar
@@ -194,6 +195,7 @@ inherited fmGrepResults: TfmGrepResults
         Width = 60
       end>
     ParentFont = True
+    SimplePanel = False
     UseSystemFont = False
   end
   object MainMenu: TMainMenu
