@@ -143,7 +143,7 @@ end;
 constructor TFindCompRefWizard.Create;
 begin
   inherited;
-  //ShortCut := scCtrl + scShift + Ord('F'); // Disabled: Conflicts with Find in Files
+  ShortCut := scCtrl + scShift + Ord('F');
 end;
 
 function TFindCompRefWizard.GetActionCaption: string;
