@@ -65,13 +65,13 @@
                           {$IF CompilerVersion >= 26}
                             {$DEFINE GX_VER260_up}  // RAD Studio XE 5 (20; BDS 12)
                             {$IF CompilerVersion >= 27}
-                              {$DEFINE GX_VER270_up}  // RAD Studio XE 6 (21; BDS 13)
+                              {$DEFINE GX_VER270_up}  // RAD Studio XE 6 (21; BDS 14)
                               {$IF CompilerVersion >= 28}
-                                {$DEFINE GX_VER280_up}  // RAD Studio XE 7 (22; BDS 14)
+                                {$DEFINE GX_VER280_up}  // RAD Studio XE 7 (22; BDS 15)
                                 {$IF CompilerVersion >= 29}
-                                  {$DEFINE GX_VER290_up}  // RAD Studio XE 8 (23; BDS 14)
-                            {$IFEND}
-                            {$IFEND}
+                                  {$DEFINE GX_VER290_up}  // RAD Studio XE 8 (23; BDS 16)
+                                {$IFEND}
+                              {$IFEND}
                             {$IFEND}
                           {$IFEND}
                         {$IFEND}

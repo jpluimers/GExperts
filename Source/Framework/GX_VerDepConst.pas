@@ -170,13 +170,13 @@ const
   {$ENDIF VER280}
 
   {$IFDEF VER290} // Delphi/RAD Studio XE 8
-    GExpertsDll = 'GExpertsRSXE9.dll';
+    GExpertsDll = 'GExpertsRSXE8.dll';
     TTabDockHostFormClassContainer = 'designide220.bpl';
     MajorVersionNumberChar = '22';
     IDEEnglishName = 'RAD Studio XE 8';
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\16.0';
     ClassBrowserStorageFolder = 'Classes.RADStudioXE8';
-  {$ENDIF VER280}
+  {$ENDIF VER290}
 
 implementation
 

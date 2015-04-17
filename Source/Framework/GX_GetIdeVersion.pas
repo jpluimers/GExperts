@@ -27,6 +27,7 @@ type
      ideRSXE5,
      ideRSXE6,
      ideRSXE7,
+     ideRSXE8,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -735,7 +736,7 @@ end;
   delphicoreide210.bpl
   coreide210.bpl
   bds.exe
-  dcldb220.bpl
+  dcldb210.bpl
 }
 function GetRSXE7Version: TBorlandIdeVersion;
 const
@@ -749,6 +750,29 @@ begin
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde2100);
   if VersionNumber > 0 then begin
     //Result := ideRSXE7U1;
+  end;
+end;
+
+{
+  Delphi XE 8:
+  File                 File Version    Size       Modified Time
+  delphicoreide220.bpl
+  coreide220.bpl
+  bds.exe
+  dcldb220.bpl
+}
+function GetRSXE8Version: TBorlandIdeVersion;
+const
+  CoreIde2200: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+var
+  CoreIdeFileVersion: TVersionNumber;
+  VersionNumber: Integer;
+begin
+  Result := ideRSXE8;
+  CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide220.bpl');
+  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde2200);
+  if VersionNumber > 0 then begin
+    //Result := ideRSXE8U1;
   end;
 end;
 
@@ -845,6 +869,11 @@ begin
     Result := GetRSXE7Version;
     Assert(Result in [ideRSXE7]);
   {$ENDIF VER280}
+
+  {$IFDEF VER290}
+    Result := GetRSXE8Version;
+    Assert(Result in [ideRSXE8]);
+  {$ENDIF VER290}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);
