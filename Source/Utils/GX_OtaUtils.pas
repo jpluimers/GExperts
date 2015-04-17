@@ -766,7 +766,7 @@ begin
     Editor := GxOtaGetFileEditorForModule(Module, i);
     if Supports(Editor, IOTAFormEditor, FormEditor) then
     begin
-      Assert(not Assigned(Result), Format('Two form editors detected in %s: %s, %s', [Module.FileName, Result.FileName, Editor.FileName]));
+      Assert(not Assigned(Result));
       Result := FormEditor;
       // In order to assert our assumptions that only one form
       // is ever associated with a module, do not call Break; here.
@@ -2247,8 +2247,6 @@ begin
   EditView.TopPos := CurPos;
 
   Application.ProcessMessages;
-
-  
 
   GxOtaFocusCurrentIDEEditControl;
 
