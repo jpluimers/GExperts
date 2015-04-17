@@ -473,7 +473,15 @@ begin
 
         FileLines := TGXUnicodeStringList.Create;
         try
-          GxOtaLoadFileToUnicodeStrings(FileName, FileLines);
+          try
+            GxOtaLoadFileToUnicodeStrings(FileName, FileLines);
+          except
+            on E: EGXFileNotFound do
+            begin
+              reContext.Lines.Text := E.Message;
+              Exit;
+            end;
+          end;
           if FileLines.Count < 1 then
           begin
             reContext.Lines.Text := SMatchContextNotAvail;
@@ -958,9 +966,8 @@ begin
 
   GoToMatchLine(CurrentLine, GrepExpert.GrepMiddle);
 
-  (*
   // Hide the results window if the window is not configured to stay on top in D8+ and we are floating
-  if RunningDelphi8OrGreater then begin
+  if GrepExpert.AutoHide and RunningDelphi8OrGreater then begin
     if (not StayOnTop) and (not Assigned(Self.Parent)) then
     begin
       if IsStandAlone then
@@ -969,7 +976,6 @@ begin
         Hide;
     end;
   end;
-  *)
 end;
 
 constructor TfmGrepResults.Create(AOwner: TComponent);

@@ -4,7 +4,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Grep Results Options'
-  ClientHeight = 295
+  ClientHeight = 317
   ClientWidth = 317
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -17,34 +17,34 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
   Scaled = False
   DesignSize = (
     317
-    295)
+    317)
   PixelsPerInch = 96
   TextHeight = 14
   object gbxMatchList: TGroupBox
     Left = 9
     Top = 8
     Width = 298
-    Height = 106
+    Height = 129
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Match Results List'
     TabOrder = 0
     DesignSize = (
       298
-      106)
+      129)
     object pnlListFont: TPanel
       Left = 48
-      Top = 62
+      Top = 84
       Width = 197
       Height = 33
       BevelWidth = 2
       Caption = 'Match List Font...'
       Color = clWindow
-      TabOrder = 2
+      TabOrder = 3
       OnClick = pnlListFontClick
     end
     object chkGrepMiddle: TCheckBox
       Left = 12
-      Top = 39
+      Top = 40
       Width = 277
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -60,10 +60,19 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Caption = '&Expand all matches after searching'
       TabOrder = 0
     end
+    object chkGrepAutoHide: TCheckBox
+      Left = 12
+      Top = 60
+      Width = 277
+      Height = 17
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Hide results when jumping to match'
+      TabOrder = 2
+    end
   end
   object gbxMatchContext: TGroupBox
     Left = 9
-    Top = 124
+    Top = 144
     Width = 298
     Height = 132
     Anchors = [akLeft, akTop, akRight]
@@ -121,7 +130,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
   end
   object btnOK: TButton
     Left = 147
-    Top = 262
+    Top = 284
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -132,7 +141,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
   end
   object btnCancel: TButton
     Left = 232
-    Top = 262
+    Top = 284
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]

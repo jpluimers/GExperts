@@ -22,6 +22,7 @@ type
     chkGrepExpandAll: TCheckBox;
     edtContextLines: TEdit;
     udContextLines: TUpDown;
+    chkGrepAutoHide: TCheckBox;
     procedure pnlContextFontClick(Sender: TObject);
     procedure pnlMatchLineColorClick(Sender: TObject);
     procedure pnlListFontClick(Sender: TObject);

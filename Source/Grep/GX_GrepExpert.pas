@@ -34,6 +34,7 @@ type
     FListFont: TFont;
     FContextFont: TFont;
     FContextMatchColor: TColor;
+    FAutoHide: Boolean;
     procedure SetSearchList(New: TStrings);
     procedure SetReplaceList(New: TStrings);
     procedure SetMaskList(New: TStrings);
@@ -72,6 +73,7 @@ type
     property ListFont: TFont read FListFont write FListFont;
     property ContextFont: TFont read FContextFont write FContextFont;
     property ContextMatchColor: TColor read FContextMatchColor write FContextMatchColor;
+    property AutoHide: Boolean read FAutoHide write FAutoHide;
 
     property SearchList: TStrings read FSearchList write SetSearchList;
     property ReplaceList: TStrings read FReplaceList write SetReplaceList;
@@ -108,6 +110,7 @@ begin
   FContextFont := TFont.Create;
   FContextMatchColor := clHighlight;
   FNumContextLines := 2;
+  FAutoHide := False;
   
   FGrepExpandAll := False;
   FGrepUseCurrentIdent := False;
@@ -174,6 +177,7 @@ begin
     Dialog.pnlMatchLineColor.Font.Assign(ContextFont);
     Dialog.pnlMatchLineColor.Font.Color := ContextMatchColor;
     Dialog.udContextLines.Position := NumContextLines;
+    Dialog.chkGrepAutoHide.Checked := AutoHide;
         
     if Dialog.ShowModal = mrOk then
     begin
@@ -183,6 +187,7 @@ begin
       FContextFont.Assign(Dialog.pnlContextFont.Font);
       ContextMatchColor := Dialog.pnlMatchLineColor.Font.Color;
       NumContextLines := Dialog.udContextLines.Position;
+      AutoHide := DIalog.chkGrepAutoHide.Checked;
       SaveSettings;
     end;
   finally
@@ -208,6 +213,7 @@ begin
   Settings.WriteBool(ConfigurationKey, 'ExpandAll', GrepExpandAll);
   Settings.WriteBool(ConfigurationKey, 'Whole Word', GrepWholeWord);
   Settings.WriteBool(ConfigurationKey, 'Middle', GrepMiddle);
+  Settings.WriteBool(ConfigurationKey, 'AutoHide', AutoHide);
   Settings.WriteBool(ConfigurationKey, 'RegEx', GrepRegEx);
   Settings.WriteBool(ConfigurationKey, 'UseCurrentIdent', GrepUseCurrentIdent);
   Settings.SaveFont(AddSlash(ConfigurationKey) + 'ListFont', ListFont);
@@ -274,6 +280,7 @@ begin
   FGrepExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', False);
   FGrepWholeWord := Settings.ReadBool(ConfigurationKey, 'Whole Word', False);
   FGrepMiddle := Settings.ReadBool(ConfigurationKey, 'Middle', True);
+  FAutoHide := Settings.ReadBool(ConfigurationKey, 'AutoHide', False);
   FGrepRegEx := Settings.ReadBool(ConfigurationKey, 'RegEx', False);
   FGrepUseCurrentIdent := Settings.ReadBool(ConfigurationKey, 'UseCurrentIdent', False);
 
