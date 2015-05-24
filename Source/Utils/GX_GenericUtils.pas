@@ -9,6 +9,7 @@ interface
 uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
+  {$IFDEF GX_VER290_up} System.UITypes, {$ENDIF GX_VER290_up}
   Types, CheckLst, TypInfo, ExtCtrls, ComCtrls;
 
 const
