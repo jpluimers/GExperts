@@ -151,7 +151,7 @@ const
     'Record Separator', 'Unit Separator');
 
   MinimumDisplayFontSize = 4;
-  MaximumDisplayFontSize = 26;
+  MaximumDisplayFontSize = 35;
   DefaultDisplayFontSize = 10;
   DefaultFontName = 'Tahoma';
 
@@ -255,11 +255,11 @@ begin
   end;
 
   { draw the character of that number on screen }
-  Canvas.Font.Name := FFontName;
   Canvas.Font.Size := FDisplayFontSize;
+  Canvas.Font.Name := FFontName;
 
   for i := Start to 127 do
-    DrawCharacter(i, Chr(FStartCharacter + i), HorizMult, VertMult);
+    DrawCharacter(i, Char(FStartCharacter + i), HorizMult, VertMult);
 
   { Draw the boxes on the screen }
   { Only two colour assignments to canvas speeds things up }
@@ -342,7 +342,7 @@ begin
   else
   begin
     if (CharPos > -1) and (CharPos < 256) then
-      eChars.Text := eChars.Text + Chr(CharPos);
+      eChars.Text := eChars.Text + Char(CharPos);
   end;
 end;
 
@@ -440,7 +440,7 @@ begin
     end
     else
     begin
-      HintText := Chr(CharPos);
+      HintText := Char(CharPos);
       with FHint.Canvas.Font do
       begin
         Charset := DEFAULT_CHARSET;
@@ -531,7 +531,7 @@ end;
 
 procedure TfmAsciiChart.cbxFontNameEnter(Sender: TObject);
 begin
-  cbxFontName.Perform(CB_SETDROPPEDWIDTH, 175, 0);
+  cbxFontName.Perform(CB_SETDROPPEDWIDTH, 220, 0);
 end;
 
 { TASCIIExpert }

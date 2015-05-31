@@ -101,7 +101,7 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
-VERSION 1.37 (April 2015)
+VERSION 1.37 (Sept 2012 - May 2015)
 - General: Added support for RAD Studio XE3, XE4, XE5, XE6, XE7, and XE8 (with help
   from Jeroen Pluimers).  Various minor big fixes.
 - Grep: Add Ignore Delphi comments feature (via Paul Gardner).  Significantly

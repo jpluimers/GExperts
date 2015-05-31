@@ -6,7 +6,7 @@ object fmAsciiChart: TfmAsciiChart
   ClientHeight = 395
   ClientWidth = 542
   Color = clBtnFace
-  Font.Charset = ANSI_CHARSET
+  Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Tahoma'
@@ -85,7 +85,7 @@ object fmAsciiChart: TfmAsciiChart
     object cbxFontName: TComboBox
       Left = 140
       Top = 0
-      Width = 116
+      Width = 175
       Height = 22
       Hint = 'Character Font'
       Style = csDropDownList
@@ -98,7 +98,7 @@ object fmAsciiChart: TfmAsciiChart
       OnEnter = cbxFontNameEnter
     end
     object edFontSize: TEdit
-      Left = 256
+      Left = 315
       Top = 0
       Width = 25
       Height = 22
@@ -108,7 +108,7 @@ object fmAsciiChart: TfmAsciiChart
       OnChange = edFontSizeChange
     end
     object updFontSize: TUpDown
-      Left = 281
+      Left = 340
       Top = 0
       Width = 15
       Height = 22
@@ -121,7 +121,7 @@ object fmAsciiChart: TfmAsciiChart
       OnClick = updFontSizeClick
     end
     object eChars: TEdit
-      Left = 296
+      Left = 355
       Top = 0
       Width = 157
       Height = 22
