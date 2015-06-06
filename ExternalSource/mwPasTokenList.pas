@@ -51,7 +51,7 @@ type
   TmSearcher = class(TObject)
   private
     FPasTokenList: TPasTokenList;
-    FSearchOrigin: PAnsiChar;
+    FSearchOrigin: PChar;
     Pat: string;
     fPos: Integer;
     HalfLen: Integer;
@@ -95,7 +95,7 @@ type
   TPasTokenList = class(TObject)
   private
     FTokenPositionsList: TLongintList;
-    fOrigin: PAnsiChar;
+    fOrigin: PChar;
     fPCharSize: Longint;
     fPCharCapacity: Longint;
     FComment: TCommentState;
@@ -131,7 +131,7 @@ type
     Searcher: TmSearcher;
     constructor Create;
     destructor Destroy; override;
-    procedure SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
+    procedure SetOrigin(NewOrigin: PChar; NewSize: Longint);
     procedure Clear;
     procedure Delete(Index: Integer);
     procedure Exchange(Index1, Index2: Integer);
@@ -145,7 +145,7 @@ type
     property Count: Integer read GetCount write SetCount;
     property Token[Index: Integer]: string read GetToken write SetToken; default;
     property TokenPositionsList: TLongintList read FTokenPositionsList;
-    property Origin: PAnsiChar read fOrigin;
+    property Origin: PChar read fOrigin;
     property PCharSize: Longint read fPCharSize;
     property PCharCapacity: Longint read fPCharCapacity;
     function GetSubString(StartPos, EndPos: Longint): string;
@@ -166,7 +166,7 @@ type
     function IndexAtLine(anIndex: Longint): Longint;
     function PositionToIndex(aPosition: Longint): Longint;
     procedure DeleteGroup(StartIndex: Longint; GroupCount: Longint);
-    function InsertString(StartIndex: Longint; ToInsert: AnsiString): Longint;
+    function InsertString(StartIndex: Longint; ToInsert: String): Longint;
     function MoveGroup(OldStartIndex: Longint; NewStartIndex: Longint; GroupCount: Longint): Boolean;
     property Comments: TCommentState read FComment write FComment;
     property EndCount: Integer read FEndCount write FEndCount;
@@ -202,7 +202,7 @@ Const
 implementation
 
 uses
-  SysUtils, {$IF CompilerVersion >= 25} AnsiStrings,{$IFEND} GX_GenericUtils;
+  SysUtils, GX_GenericUtils;
 
 constructor TmSearcher.Create(Value: TPasTokenList);
 begin
@@ -591,7 +591,7 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TPasTokenList.SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
+procedure TPasTokenList.SetOrigin(NewOrigin: PChar; NewSize: Longint);
 begin
   FOrigin := NewOrigin;
   Run := 0;
@@ -607,12 +607,8 @@ procedure TPasTokenList.WriteTo(InsPos, DelPos: Longint;
   const Item: string);
 var
   StringCount, NewSize: Longint;
-  aString: AnsiString;
+  aString: String;
 begin
-  // This unicode warning is left here as a reminder that this typecast has not
-  // been fully tested. Once tested, the following line can potentially be
-  // replaced by this to remove the warning:
-  // aString := AnsiString(Item + string(FOrigin + DelPos));
   aString := Item + (FOrigin + DelPos);
   StringCount := Length(aString);
   if (InsPos >= 0) and (StringCount >= 0) then
@@ -629,7 +625,7 @@ begin
           raise exception.Create('unable to reallocate PChar');
         end;
       end;
-      {$IF CompilerVersion >= 25} AnsiStrings.{$IFEND}StrECopy((FOrigin + InsPos), PAnsiChar(aString));
+      StrECopy((FOrigin + InsPos), PChar(aString));
       FPCharSize := NewSize;
       FOrigin[FPCharSize] := #0;
       aString := '';
@@ -776,21 +772,17 @@ begin
   FTokenPositionsList.Insert(Index + 1, EndPos);
 end; { Insert }
 
-function TPasTokenList.InsertString(StartIndex: Longint; ToInsert: AnsiString): Longint;
+function TPasTokenList.InsertString(StartIndex: Longint; ToInsert: String): Longint;
 var
   I, StartPos, EndPos, ItemLen: Longint;
   TempHelper: TPasTokenList;
 begin
   TempHelper := TPasTokenList.Create;
   ItemLen := Length(ToInsert);
-  TempHelper.SetOrigin(PAnsiChar(ToInsert), ItemLen);
+  TempHelper.SetOrigin(PChar(ToInsert), ItemLen);
   Result := TempHelper.Count;
   StartPos := FTokenPositionsList[StartIndex];
   ResetLines(StartIndex, ItemLen);
-  // This unicode warning is left here as a reminder that this typecast has not
-  // been fully tested. Once tested, the following line can potentially be
-  // replaced by this to remove the warning:
-  // WriteTo(StartPos, StartPos, String(ToInsert));
   WriteTo(StartPos, StartPos, ToInsert);
   ResetPositionsFrom(StartIndex + 1, ItemLen);
   for I := 0 to TempHelper.Count -1 do
@@ -832,10 +824,6 @@ begin
     EndPos := FTokenPositionsList[OldStartIndex + GroupCount];
     TempStringLen := EndPos - StartPos;
     SetString(TempString, (FOrigin + StartPos), TempStringLen);
-    // This unicode warning is left here as a reminder that this typecast has not
-    // been fully tested. Once tested, the following line can potentially be
-    // replaced by this to remove the warning:
-    // InsertString(NewStartIndex, AnsiString(TempString));
     InsertString(NewStartIndex, TempString);
     OldStartIndex := OldStartIndex + GroupCount;
     DeleteGroup(OldStartIndex, GroupCount);
@@ -849,10 +837,6 @@ begin
     EndPos := FTokenPositionsList[OldStartIndex + GroupCount];
     TempStringLen := EndPos - StartPos;
     SetString(TempString, (FOrigin + StartPos), TempStringLen);
-    // This unicode warning is left here as a reminder that this typecast has not
-    // been fully tested. Once tested, the following line can potentially be
-    // replaced by this to remove the warning:
-    // InsertString(NewStartIndex, AnsiString(TempString));
     InsertString(NewStartIndex, TempString);
     DeleteGroup(OldStartIndex, GroupCount);
     TempString := '';

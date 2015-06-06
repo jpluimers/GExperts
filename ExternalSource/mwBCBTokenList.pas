@@ -50,7 +50,7 @@ type
     ctkexcbitor, ctkincbitor, ctkinline, ctkint, ctkInteger, ctklogicand,
     ctklogicor, ctklong, ctklower, ctklowerequal, ctkminus, ctkminusminus,
     ctkmodulus, ctkmutable, ctknamespace, ctknegation, ctknew, ctknotequal,
-    ctknull, tknumber, ctkoperator, ctkpascal, ctkplus, ctkplusplus, ctkpoint,
+    ctknull, ctknumber, ctkoperator, ctkpascal, ctkplus, ctkplusplus, ctkpoint,
     ctkpointpoint, ctkprivate, ctkprotected, ctkpublic, ctkregister,
     ctkreinterpret_cast, ctkreturn, ctkroundclose, ctkroundopen, ctkroundpair,
     ctkselectelement, ctksemicolon, ctkshiftleft, ctkshiftright, ctkshort,
@@ -70,8 +70,8 @@ type
   TmsSearcher = class(TObject)
   private
     FBCBTokenList: TBCBTokenList;
-    FSearchOrigin: PAnsiChar;
-    Pat: AnsiString;
+    FSearchOrigin: PChar;
+    Pat: String;
     fPos: Integer;
     HalfLen: Integer;
     PatLenPlus: Integer;
@@ -112,7 +112,7 @@ type
   TBCBTokenList = class(TObject)
   private
     FTokenPositionsList: TLongintList;
-    fOrigin: PAnsiChar;
+    fOrigin: PChar;
     fPCharSize: Longint;
     fPCharCapacity: Longint;
     FComment: TCommentState;
@@ -146,7 +146,7 @@ type
     Searcher: TmsSearcher;
     constructor Create;
     destructor Destroy; override;
-    procedure SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
+    procedure SetOrigin(NewOrigin: PChar; NewSize: Longint);
     function Add(const Item: string): Integer;
     procedure Clear;
     procedure Delete(Index: Integer);
@@ -161,7 +161,7 @@ type
     property Count: Integer read GetCount write SetCount;
     property Token[Index: Integer]: string read GetToken write SetToken; default;
     property TokenPositionsList: TLongintList read FTokenPositionsList;
-    property Origin: PAnsiChar read fOrigin;
+    property Origin: PChar read fOrigin;
     property PCharSize: Longint read fPCharSize;
     property PCharCapacity: Longint read fPCharCapacity;
     function GetSubString(StartPos, EndPos: Longint): string;
@@ -203,7 +203,7 @@ const
 
 implementation
 
-uses SysUtils, {$IF CompilerVersion >= 25} AnsiStrings,{$IFEND} GX_GenericUtils, GX_OtaUtils; //TODO: Remove dependency
+uses SysUtils, GX_GenericUtils, GX_OtaUtils; //TODO: Remove dependency
 
 constructor TmsSearcher.Create(Value: TBCBTokenList);
 begin
@@ -247,10 +247,6 @@ begin
   FFoundList.Clear;
   SearchLen := FBCBTokenList.PCharSize;
   FSearchOrigin := FBCBTokenList.Origin;
-  // This unicode warning is left here as a reminder that this typecast has not
-  // been fully tested. Once tested, the following line can potentially be
-  // replaced by this to remove the warning:
-  // Pat := AnsiString(NewPattern);
   Pat := NewPattern;
   PatLen := Length(Pat);
   PatLenPlus := PatLen + 1;
@@ -388,7 +384,7 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TBCBTokenList.SetOrigin(NewOrigin: PAnsiChar; NewSize: Longint);
+procedure TBCBTokenList.SetOrigin(NewOrigin: PChar; NewSize: Longint);
 begin
   FOrigin := NewOrigin;
   Run := 0;
@@ -407,10 +403,6 @@ var
   StringCount, NewSize: Longint;
   aString: string;
 begin
-  // This unicode warning is left here as a reminder that this typecast has not
-  // been fully tested. Once tested, the following line can potentially be
-  // replaced by this to remove the warning:
-  // aString := Item + string(FOrigin + DelPos);
   aString := Item + (FOrigin + DelPos);
   StringCount := Length(aString);
   if (InsPos >= 0) and (StringCount >= 0) then
@@ -424,10 +416,10 @@ begin
           FPCharCapacity := FPCharCapacity + 16384;
           ReAllocMem(FOrigin, PCharCapacity);
         except
-          raise Exception.Create('unable to reallocate PAnsiChar');
+          raise Exception.Create('unable to reallocate PChar');
         end;
       end;
-      {$IF CompilerVersion >= 25} AnsiStrings.{$IFEND}StrECopy((FOrigin + InsPos), PAnsiChar(ConvertToIDEEditorString(AString))); // ?? Safe? It can change the size of the editor buffer
+      StrECopy((FOrigin + InsPos), PChar(AString)); // ?? Safe? It can change the size of the editor buffer
       FPCharSize := NewSize;
       FOrigin[FPCharSize] := #0;
       aString := '';
@@ -1109,7 +1101,7 @@ begin
     '0'..'9':
       begin
         Inc(Running);
-        Result := tknumber;
+        Result := ctknumber;
         while CharInSet(FOrigin[Running], ['0'..'9', '.']) do
         begin
           case FOrigin[Running] of

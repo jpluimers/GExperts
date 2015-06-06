@@ -112,14 +112,14 @@ type
   TmwPasLex = class(TObject)
   private
     fComment: TCommentState;
-    fOrigin: PAnsiChar;
+    fOrigin: PChar;
     fProcTable: array[#0..#255] of procedure of object;
     Run: Longint;
-    Temp: PAnsiChar;
+    Temp: PChar;
     FRoundCount: Integer;
     FSquareCount: Integer;
     fStringLen: Integer;
-    fToIdent: PAnsiChar;
+    fToIdent: PChar;
     fIdentFuncTable: array[0..191] of function: TTokenKind of object;
     fTokenPos: Integer;
     fLineNumber: Integer;
@@ -130,7 +130,7 @@ type
     fLinePos: Integer;
     fIsInterface: Boolean;
     fIsClass: Boolean;
-    function KeyHash(ToHash: PAnsiChar): Integer;
+    function KeyHash(ToHash: PChar): Integer;
     function KeyComp(const aKey: string): Boolean;
     function Func15: TTokenKind;
     function Func19: TTokenKind;
@@ -204,8 +204,8 @@ type
     function Func191: TTokenKind;
     function AltFunc: TTokenKind;
     procedure InitIdent;
-    function IdentKind(MayBe: PAnsiChar): TTokenKind;
-    procedure SetOrigin(NewValue: PAnsiChar);
+    function IdentKind(MayBe: PChar): TTokenKind;
+    procedure SetOrigin(NewValue: PChar);
     procedure SetRunPos(Value: Integer);
     procedure MakeMethodTables;
     procedure AddressOpProc;
@@ -241,12 +241,12 @@ type
     procedure SymbolProc;
     procedure UnknownProc;
     function GetToken: string;
-    function InSymbols(aChar: AnsiChar): Boolean;
+    function InSymbols(aChar: Char): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
-    function CharAhead(Count: Integer): AnsiChar;
-    function NextChar: AnsiChar;
+    function CharAhead(Count: Integer): Char;
+    function NextChar: Char;
     procedure Next;
     procedure NextID(ID: TTokenKind);
     procedure NextNoJunk;
@@ -258,7 +258,7 @@ type
     property LastNoSpacePos: Integer read fLastNoSpacePos;
     property LineNumber: Integer read fLineNumber;
     property LinePos: Integer read fLinePos;
-    property Origin: PAnsiChar read fOrigin write SetOrigin;
+    property Origin: PChar read fOrigin write SetOrigin;
     property RunPos: Integer read Run write SetRunPos;
     property TokenPos: Integer read fTokenPos;
     property Token: string read GetToken;
@@ -402,7 +402,7 @@ begin
     end;
 end;
 
-function TmwPasLex.KeyHash(ToHash: PAnsiChar): Integer;
+function TmwPasLex.KeyHash(ToHash: PChar): Integer;
 begin
   Result := 0;
   while CharInSet(ToHash^, ['a'..'z', 'A'..'Z']) do
@@ -884,7 +884,7 @@ begin
   Result := tkIdentifier
 end;
 
-function TmwPasLex.IdentKind(MayBe: PAnsiChar): TTokenKind;
+function TmwPasLex.IdentKind(MayBe: PChar): TTokenKind;
 var
   HashKey: Integer;
 begin
@@ -951,7 +951,7 @@ begin
   inherited Destroy;
 end; { Destroy }
 
-procedure TmwPasLex.SetOrigin(NewValue: PAnsiChar);
+procedure TmwPasLex.SetOrigin(NewValue: PChar);
 begin
   fOrigin := NewValue;
   fComment := csNo;
@@ -1120,7 +1120,7 @@ begin
   end;
 end;
 
-function TmwPasLex.InSymbols(aChar: AnsiChar): Boolean;
+function TmwPasLex.InSymbols(aChar: Char): Boolean;
 begin
   if IsCharSymbol(aChar) then
     Result := True
@@ -1128,7 +1128,7 @@ begin
     Result := False;
 end;
 
-function TmwPasLex.CharAhead(Count: Integer): AnsiChar;
+function TmwPasLex.CharAhead(Count: Integer): Char;
 begin
   Temp := fOrigin + Run + Count;
   while CharInSet(Temp^, [#1..#9, #11, #12, #14..#32]) do
@@ -1136,7 +1136,7 @@ begin
   Result := Temp^;
 end;
 
-function TmwPasLex.NextChar: AnsiChar;
+function TmwPasLex.NextChar: Char;
 begin
   Temp := fOrigin + Run;
   Result := Temp^;
