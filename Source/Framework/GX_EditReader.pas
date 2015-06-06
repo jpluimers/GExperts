@@ -45,6 +45,7 @@ type
     procedure SaveToStream(Stream: TStream);
     procedure SaveToStreamFromPos(Stream: TStream);
     procedure SaveToStreamToPos(Stream: TStream);
+    function GetText: string;
     function GetCurrentBufferPos: Integer;
     property BufSize: Integer read FBufSize write SetBufSize;
     property FileName: string read FFileName write SetFileName;
@@ -355,6 +356,34 @@ begin
   end
   else
     Result := -1;
+end;
+
+function TEditReader.GetText: string;
+var
+  Stream: TMemoryStream;
+  UTF8Data: UTF8String;
+  AnsiData: string;
+begin
+  Stream := TMemoryStream.Create;
+  try
+    SaveToStream(Stream);
+    if IDEEditorEncodingIsUTF8 then
+    begin
+      SetLength(UTF8Data, Stream.Size);
+      Stream.Position := 0;
+      Stream.ReadBuffer(UTF8Data[1], Stream.Size);
+      Result := IDEEditorStringToString(UTF8Data);
+    end
+  else
+  begin
+    SetLength(AnsiData, Stream.Size);
+    Stream.Position := 0;
+    Stream.ReadBuffer(AnsiData[1], Stream.Size);
+    Result := AnsiData;
+  end;
+  finally
+    Stream.Free;
+  end;
 end;
 
 procedure TEditReader.Reset;
