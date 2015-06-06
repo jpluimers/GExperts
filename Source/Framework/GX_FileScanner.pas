@@ -54,17 +54,17 @@ type
 
   TProcedures = class(TCollection)
   private
-    FMemStream: TMemoryStream;
+    FUnitText: string;
     function GetItem(Index: Integer): TProcedure;
   public
-    property MemStream: TMemoryStream read FMemStream write FMemStream;
+    property UnitText: string read FUnitText write FUnitText;
     property Items[Index: Integer]: TProcedure read GetItem; default;
   end;
 
   TLanguage = class(TObject)
   private
-    FOrigin: PAnsiChar;
-    FFileStream: TMemoryStream;
+    FOrigin: PChar;
+    FUnitText: string;
   protected
     FProcedures: TProcedures;
     FFileName: string;
@@ -72,16 +72,16 @@ type
     constructor Create(const FileName: string);
     procedure Execute; virtual; abstract;
     property Procedures: TProcedures read FProcedures write FProcedures;
-    property Origin: PAnsiChar read fOrigin write FOrigin;
-    property FileStream: TMemoryStream read FFileStream write FFileStream;
+    property Origin: PChar read fOrigin write FOrigin;
+    property UnitText: string read FUnitText write FUnitText;
     property FileName: string read FFileName write FFileName;
   end;
 
   TFileScanner = class(TComponent)
   private
-    FMemStream: TMemoryStream;
     FLanguage: TSourceLanguage;
     FLanguageParser: TLanguage;
+    FUnitText: string;
     FProcedures: TProcedures;
     FFileName: string;
   public
@@ -89,7 +89,7 @@ type
     constructor CreateWithFileName(AOwner: TComponent; const FileName: string); overload;
     destructor Destroy; override;
     property Language: TSourceLanguage read FLanguage write FLanguage;
-    property MemStream: TMemoryStream read FMemStream write FMemStream;
+    property UnitText: string read FUnitText write FUnitText;
     property Procedures: TProcedures read FProcedures write FProcedures;
   end;
 
@@ -141,24 +141,8 @@ begin
 end;
 
 function TProcedure.GetBody: string;
-var
-  Stream: TMemoryStream;
-  Data: UTF8String;
 begin
-  Stream := TProcedures(Collection).MemStream;
-  if IDEEditorEncodingIsUTF8 then
-  begin
-    SetLength(Data, FEndIndex - FBeginIndex);
-    Stream.Position := FBeginIndex;
-    Stream.ReadBuffer(Data[1], FEndIndex - FBeginIndex);
-    Result := WideString(Data);
-  end
-  else begin
-    // This unicode warning is left here as a reminder that unicode support has not
-    // been fully tested. Once tested, the following line can be replaced by
-    // Result := Copy(String(PAnsiChar(Stream.Memory)), FBeginIndex + 1, (FEndIndex - FBeginIndex));
-    Result := Copy(PAnsiChar(Stream.Memory), FBeginIndex + 1, (FEndIndex - FBeginIndex));
-  end;
+  Result := Copy(TProcedures(Collection).UnitText, FBeginIndex + 1, FEndIndex - FBeginIndex);
 end;
 
 function TProcedure.GetProcClass: string;
@@ -203,25 +187,15 @@ end;
 { TFileScanner }
 
 procedure TFileScanner.Execute;
-var
-  IsSelfMemoryStream: Boolean;
 begin
   case Language of
     ltPas: FLanguageParser := TPascal.Create(FFileName);
     ltCpp: FLanguageParser := TCpp.Create(FFileName);
   end;
   try
-    IsSelfMemoryStream := not Assigned(FMemStream);
-    if IsSelfMemoryStream then
-      FMemStream := TMemoryStream.Create;
-    FLanguageParser.FileStream := FMemStream;
-    try
-      FLanguageParser.Procedures := FProcedures;
-      FLanguageParser.Execute;
-    finally
-      if IsSelfMemoryStream then
-        FreeAndNil(FMemStream);
-    end;
+    FLanguageParser.UnitText := UnitText;
+    FLanguageParser.Procedures := FProcedures;
+    FLanguageParser.Execute;
   finally
     FreeAndNil(FLanguageParser);
   end;
@@ -230,10 +204,9 @@ end;
 constructor TFileScanner.CreateWithFileName(AOwner: TComponent; const FileName: string);
 begin
   inherited Create(AOwner);
-  FMemStream := nil;
   FFileName := FileName;
   FProcedures := TProcedures.Create(TProcedure);
-  FProcedures.MemStream := FMemStream;
+  FProcedures.UnitText := UnitText;
 
   if IsCppSourceModule(FileName) then
     Language := ltCpp
@@ -264,8 +237,8 @@ var
   ProcLineLength: Integer;
 begin
   FParser := TmwPasLex.Create;
-  FParser.Origin := FFileStream.Memory;
-  FProcedures.MemStream := FFileStream;
+  FParser.Origin := @UnitText[1];
+  FProcedures.UnitText := UnitText;
   ProcedureStack := TStack.Create;
   FProcedures.BeginUpdate;
   ProcedureItem := nil;
@@ -503,9 +476,9 @@ var
   ProcedureItem: TProcedure;
   BeginIndex: Integer;
 begin
-  FProcedures.MemStream := FFileStream;
+  FProcedures.UnitText := UnitText;
   FCParser := TBCBTokenList.Create;
-  FCParser.SetOrigin(FFileStream.Memory, FFileStream.Size);
+  FCParser.SetOrigin(@UnitText[1], Length(UnitText));
   try
     FNameList := TStringList.Create;
     try

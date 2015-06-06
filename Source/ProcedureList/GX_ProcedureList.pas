@@ -84,7 +84,7 @@ type
     FFileName: string;
     FObjectStrings: TStringList;
     FLanguage: TSourceLanguage;
-    FMemStream: TMemoryStream;
+    FUnitText: string;
     FCodeText: TGXEnhancedEditor;
     FOptions: TProcedureListOptions;
     FLastProcLineNo: Integer;
@@ -158,15 +158,17 @@ begin
 end;
 
 procedure TfmProcedureList.LoadProcs;
+var
+  edt: TEditReader;
 begin
   // Since this edit reader is destroyed almost
   // immediately, do not call FreeFileData
-  with TEditReader.Create(FFileName) do
+  edt := TEditReader.Create(FFileName);
   try
-    SaveToStream(FMemStream);
-    FFileScanner.MemStream := FMemStream;
+    FUnitText := edt.GetText;
+    FFileScanner.UnitText := FUnitText;
   finally
-    Free;
+    edt.Free;
   end;
   Caption := Caption + ' - ' + ExtractFileName(FFileName);
 
@@ -613,7 +615,6 @@ begin
   FreeAndNil(FObjectStrings);
   FreeAndNil(FOptions);
   FreeAndNil(FEditReader);
-  FreeAndNil(FMemStream);
   inherited;
 end;
 
@@ -631,8 +632,6 @@ begin
 
   FEditReader := TEditReader.Create(FFileName);
   FEditReader.FreeFileData;
-
-  FMemStream := TMemoryStream.Create;
 
   CenterForm(Self);
 
@@ -807,12 +806,7 @@ begin
     if ProcInfo.Body <> '' then
       FCodeText.AsString := ProcInfo.Body
     else begin
-      // This unicode warning is left here as a reminder that unicode support has not
-      // been fully tested. Once tested, the following line can be replaced by
-      // FCodeText.AsString := Copy(String(PAnsiChar(FMemStream.Memory)),
-      //  ProcInfo.BeginIndex + 1, (ProcInfo.EndIndex - ProcInfo.BeginIndex));
-      FCodeText.AsString := Copy(PAnsiChar(FMemStream.Memory),
-        ProcInfo.BeginIndex + 1, (ProcInfo.EndIndex - ProcInfo.BeginIndex));
+      FCodeText.AsString := Copy(FUnitText, ProcInfo.BeginIndex + 1, ProcInfo.EndIndex + ProcInfo.BeginIndex);
     end;
     FLastProcLineNo := ProcInfo.LineNo;
   finally
