@@ -6,7 +6,7 @@ interface
 
 uses Forms, Messages, Classes, ActnList, Menus, ImgList,
   Controls, ComCtrls, ToolWin, ToolsAPI,
-  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo;
+  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, System.Actions;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
@@ -572,7 +572,7 @@ procedure TfmToDo.LoadFile(const FileName: string);
 var
   Parser: TmwPasLex;
   CParser: TBCBTokenList;
-  EStream: TMemoryStream;
+  FileContent: String;
   IsCPPModule: Boolean;
   InternalEditReader: TEditReader;
   HeaderFile: string;
@@ -588,24 +588,21 @@ begin
     Exit;
   IsCPPModule := IsCppSourceModule(FileName);
 
-  EStream := TMemoryStream.Create;
   try
     // Since this edit reader is destroyed almost
     // immediately, do not call FreeFileData
     InternalEditReader := TEditReader.Create(FileName);
     try
-      InternalEditReader.SaveToStream(EStream);
+      FileContent := InternalEditReader.GetText;
     finally
       FreeAndNil(InternalEditReader);
     end;
-
-    EStream.Position := 0;
 
     if IsCPPModule then
     begin
       CParser := TBCBTokenList.Create;
       try
-        CParser.SetOrigin(EStream.Memory, EStream.Size);
+        CParser.SetOrigin(@FileContent[1], Length(FileContent));
         while CParser.RunID <> ctknull do
         begin
           case CParser.RunID of
@@ -631,7 +628,7 @@ begin
     begin
       Parser := TmwPasLex.Create;
       try
-        Parser.Origin := EStream.Memory;
+        Parser.Origin := @FileContent[1];
         while Parser.TokenID <> tkNull do
         begin
           { TODO 4 -oAnyone -cIssue: This needs to be fixed for multiline comments;
@@ -652,7 +649,6 @@ begin
       end;
     end;
   finally
-    FreeAndNil(EStream);
     Self.Update;
   end;
 end;
