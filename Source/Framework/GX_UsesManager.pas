@@ -34,7 +34,7 @@ type
   TUsesManager = class(TObject)
   private
     FParser: TmwPasLex;
-    FMemStream: TMemoryStream;
+    FFileContent: string;
     FInterfUses: TUsesList;
     FImplemUses: TUsesList;
     FImplPosition: Integer;  // Position of the last char of the "implementation" keyword
@@ -47,7 +47,7 @@ type
     procedure BuildUsesList;
     function GetCurrentUnitName: string;
     function UsesLineWouldBeTooLong(InsertPos, InsertLength: Integer): Boolean;
-    procedure InternalInitFromStream(Stream: TMemoryStream);
+    procedure InternalInit;
   public
     constructor Create(const SourceEditor: IOTASourceEditor); overload;
     constructor Create(const FileName: string); overload;
@@ -167,35 +167,40 @@ begin
 
   Assert(Assigned(SourceEditor));
   FFileName := SourceEditor.FileName;
-  FMemStream := TMemoryStream.Create;
-  GxOtaSaveReaderToStream(SourceEditor.CreateReader, FMemStream);
-  InternalInitFromStream(FMemStream);
+  FFileContent := GxOtaReadEditorTextToString(SourceEditor.CreateReader);
+  InternalInit;
 end;
 
 constructor TUsesManager.Create(const FileName: string);
+var
+  sl: TStringList;
 begin
   inherited Create;
 
   FFileName := FileName;
-  FMemStream := TMemoryStream.Create;
-  FMemStream.LoadFromFile(FFileName);
-  InternalInitFromStream(FMemStream);
+  sl := TStringList.Create;
+  try
+    sl.LoadFromFile(FFileName);
+    FFileContent := sl.Text;
+  finally
+    FreeAndNil(sl);
+  end;
+  InternalInit;
 end;
 
-procedure TUsesManager.InternalInitFromStream(Stream: TMemoryStream);
+procedure TUsesManager.InternalInit;
 begin
   FInterfUses := TUsesList.Create;
   FImplemUses := TUsesList.Create;
 
   FParser := TmwPasLex.Create;
-  FParser.Origin := Stream.Memory;
+  FParser.Origin := @FFileContent[1];
   BuildUsesList;
 end;
 
 destructor TUsesManager.Destroy;
 begin
   FreeAndNil(FParser);
-  FreeAndNil(FMemStream);
   FreeAndNil(FInterfUses);
   FreeAndNil(FImplemUses);
 

@@ -72,6 +72,9 @@ const
 // Save an edit reader to a stream
 procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream; TrailingNull: Boolean = True);
 
+// Like above, but return a string
+function GxOtaReadEditorTextToString(EditReader: IOTAEditReader): string;
+
 // If UseSelection is True, get the selected text in the current edit view
 // (if any) and return True or get all of the editor's text (if no selection)
 // and return False
@@ -3681,6 +3684,23 @@ begin
   SetLength(AString, LineLength);
   EditReader.GetText(Max(LineStartPos, 0), PAnsiChar(AString), LineLength);
   Result := IDEEditorStringToString(AString);
+end;
+
+function GxOtaReadEditorTextToString(EditReader: IOTAEditReader): string;
+var
+  Stream: TMemoryStream;
+  Buffer: IDEEditBufferString;
+begin
+  Stream := TMemoryStream.Create;
+  try
+    GxOtaSaveReaderToStream(EditReader, Stream);
+      SetLength(Buffer, Stream.Size);
+      Stream.Position := 0;
+      Stream.ReadBuffer(Buffer[1], Stream.Size);
+  finally
+    Stream.Free;
+  end;
+  Result := IDEEditorStringToString(Buffer);
 end;
 
 function GxOtaGetPreceedingCharactersInLine(View: IOTAEditView): string;

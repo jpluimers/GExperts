@@ -57,7 +57,7 @@ type
   TBasicSourceParser = class
   private
     FLexer: TmwPasLex;
-    FMemStream: TMemoryStream;
+    FFileContent: string;
     FScope: TSourceScope;
   protected
     function GetFileName: string; virtual;
@@ -195,12 +195,10 @@ constructor TBasicSourceParser.Create;
 begin
   inherited;
   FLexer := TmwPasLex.Create;
-  FMemStream := TMemoryStream.Create;
 end;
 
 destructor TBasicSourceParser.Destroy;
 begin
-  FreeAndNil(FMemStream);
   inherited;
 end;
 
@@ -215,20 +213,20 @@ var
 begin
   FScope := AScope;
 
-  FMemStream.Clear;
+  FFileContent := '';
 
   EditRead := TEditReader.Create(GetFileName);
   try
     if AScope = ssEntire then
-      EditRead.SaveToStream(FMemStream)
+      FFileContent := EditRead.GetText
     else if AScope = ssAfter then
-      EditRead.SaveToStreamFromPos(FMemStream)
+      FFileContent := EditRead.GetTextFromPos
     else
-      EditRead.SaveToStreamToPos(FMemStream);
+      FFileContent := EditRead.GetTextToPos;
   finally
     FreeAndNil(EditRead);
   end;
-  FLexer.Origin := FMemStream.Memory;
+  FLexer.Origin := @FFileContent[1];
 end;
 
 function TBasicSourceParser.GetToken: string;

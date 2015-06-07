@@ -46,6 +46,8 @@ type
     procedure SaveToStreamFromPos(Stream: TStream);
     procedure SaveToStreamToPos(Stream: TStream);
     function GetText: string;
+    function GetTextFromPos: string;
+    function GetTextToPos: string;
     function GetCurrentBufferPos: Integer;
     property BufSize: Integer read FBufSize write SetBufSize;
     property FileName: string read FFileName write SetFileName;
@@ -361,12 +363,57 @@ end;
 function TEditReader.GetText: string;
 var
   Stream: TMemoryStream;
+  Buffer: UTF8String;
+begin
+  Stream := TMemoryStream.Create;
+  try
+    SaveToStream(Stream);
+      SetLength(Buffer, Stream.Size);
+      Stream.Position := 0;
+      Stream.ReadBuffer(Buffer[1], Stream.Size);
+  finally
+    Stream.Free;
+  end;
+  Result := IDEEditorStringToString(Buffer);
+end;
+
+function TEditReader.GetTextFromPos: string;
+var
+  Stream: TMemoryStream;
   UTF8Data: UTF8String;
   AnsiData: string;
 begin
   Stream := TMemoryStream.Create;
   try
-    SaveToStream(Stream);
+    SaveToStreamFromPos(Stream);
+    if IDEEditorEncodingIsUTF8 then
+    begin
+      SetLength(UTF8Data, Stream.Size);
+      Stream.Position := 0;
+      Stream.ReadBuffer(UTF8Data[1], Stream.Size);
+      Result := IDEEditorStringToString(UTF8Data);
+    end
+  else
+  begin
+    SetLength(AnsiData, Stream.Size);
+    Stream.Position := 0;
+    Stream.ReadBuffer(AnsiData[1], Stream.Size);
+    Result := AnsiData;
+  end;
+  finally
+    Stream.Free;
+  end;
+end;
+
+function TEditReader.GetTextToPos: string;
+var
+  Stream: TMemoryStream;
+  UTF8Data: UTF8String;
+  AnsiData: string;
+begin
+  Stream := TMemoryStream.Create;
+  try
+    SaveToStreamToPos(Stream);
     if IDEEditorEncodingIsUTF8 then
     begin
       SetLength(UTF8Data, Stream.Size);
