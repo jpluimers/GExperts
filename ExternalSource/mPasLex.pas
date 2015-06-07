@@ -72,6 +72,8 @@
  |  Martin.Waldenburg@T-Online.de
  +--------------------------------------------------------------------------+}
 
+{$I GX_CondDefine.inc}
+
 unit mPasLex;
 
 interface
@@ -299,7 +301,9 @@ var // May include tkOperator after initialization
 implementation
 
 uses
-  SysUtils, GX_GenericUtils;
+  SysUtils,
+  {$IFDEF GX_VER200_up} Character, {$ENDIF}
+  GX_GenericUtils;
 
 const
   SpaceChars = [#1..#9, #11, #12, #14..#32];
