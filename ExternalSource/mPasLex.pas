@@ -72,9 +72,9 @@
  |  Martin.Waldenburg@T-Online.de
  +--------------------------------------------------------------------------+}
 
-{$I GX_CondDefine.inc}
-
 unit mPasLex;
+
+{$I GX_CondDefine.inc}
 
 interface
 
