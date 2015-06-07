@@ -52,7 +52,7 @@ type
     LinePos: Integer;
     Position: Integer;
     Length: Integer;
-    Origin: PAnsiChar;
+    Origin: PChar;
     constructor Create;
     property Data: string read GetData;
   end;
@@ -62,24 +62,24 @@ type
     FToken: TmPasToken;
     FComment: TCommentState;
     FEndCount: Integer;
-    FImplementationsPos: Longint;
-    FLastComment: Longint;
-    FLastIdentPos: Longint;
-    FLastSemiColon: Longint;
-    fOrigin: PAnsiChar;
-    Run: Longint;
+    FImplementationsPos: Integer;
+    FLastComment: Integer;
+    FLastIdentPos: Integer;
+    FLastSemiColon: Integer;
+    fOrigin: PChar;
+    Run: Integer;
     FRoundCount: ShortInt;
     FSquareCount: ShortInt;
     FVisibility: TTokenKind;
     function GetIsJunk: Boolean;
     function IdentKind: TTokenKind;
-    procedure SetOrigin(Value: PAnsiChar);
-    procedure SetRunPos(NewPos: Longint);
+    procedure SetOrigin(Value: PChar);
+    procedure SetRunPos(NewPos: Integer);
     procedure HandleComments;
   public
     constructor Create;
     destructor Destroy; override;
-    function GetSubString(StartPos, EndPos: Longint): string;
+    function GetSubString(StartPos, EndPos: Integer): string;
     procedure NextClassLine;
     procedure NextObjectLine;
     procedure NextID(ID: TTokenKind);
@@ -88,16 +88,16 @@ type
     procedure NextNonSpace;
     procedure NextToken;
     procedure ToLineStart;
-    function GetMethodImpLine(const ClassName, MethodName: string): Longint;
+    function GetMethodImpLine(const ClassName, MethodName: string): Integer;
     property Comments: TCommentState read FComment write FComment;
     property EndCount: Integer read FEndCount write FEndCount;
-    property ImplementationsPos: Longint read FImplementationsPos;
+    property ImplementationsPos: Integer read FImplementationsPos;
     property IsJunk: Boolean read GetIsJunk;
-    property LastComment: Longint read FLastComment;
-    property LastIdentPos: Longint read FLastIdentPos;
-    property LastSemiColon: Longint read FLastSemiColon;
-    property Origin: PAnsiChar read fOrigin write SetOrigin;
-    property RunPos: Longint read Run write SetRunPos;
+    property LastComment: Integer read FLastComment;
+    property LastIdentPos: Integer read FLastIdentPos;
+    property LastSemiColon: Integer read FLastSemiColon;
+    property Origin: PChar read fOrigin write SetOrigin;
+    property RunPos: Integer read Run write SetRunPos;
     property RoundCount: ShortInt read FRoundCount write FRoundCount;
     property SquareCount: ShortInt read FSquareCount write FSquareCount;
     property Token: TmPasToken read FToken;
@@ -158,7 +158,7 @@ begin
   Visibility := tkUnknown;
 end; { Create }
 
-function TmPasParser.GetSubString(StartPos, EndPos: Longint): string;
+function TmPasParser.GetSubString(StartPos, EndPos: Integer): string;
 var
   SubLen: Integer;
 begin
@@ -167,14 +167,14 @@ begin
   SetString(Result, (FOrigin + StartPos), SubLen);
 end; { GetSubString }
 
-procedure TmPasParser.SetOrigin(Value: PAnsiChar);
+procedure TmPasParser.SetOrigin(Value: PChar);
 begin
   FOrigin := Value;
   Run := 0;
   FToken.Origin := Value;
 end; { SetOrigin }
 
-procedure TmPasParser.SetRunPos(NewPos: Longint);
+procedure TmPasParser.SetRunPos(NewPos: Integer);
 begin
   Run := NewPos;
   NextToken;
@@ -807,7 +807,7 @@ begin
   end;
 end; { NextObjectLine }
 
-function TmPasParser.GetMethodImpLine(const ClassName, MethodName: string): Longint;
+function TmPasParser.GetMethodImpLine(const ClassName, MethodName: string): Integer;
 begin
   Result := -1;
   while FToken.ID <> tkNull do
