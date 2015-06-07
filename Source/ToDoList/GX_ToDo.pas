@@ -6,7 +6,7 @@ interface
 
 uses Forms, Messages, Classes, ActnList, Menus, ImgList,
   Controls, ComCtrls, ToolWin, ToolsAPI,
-  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, System.Actions;
+  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
