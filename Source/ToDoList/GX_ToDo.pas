@@ -724,7 +724,7 @@ procedure TfmToDo.actEditGotoExecute(Sender: TObject);
 var
   Parser: TmwPasLex;
   CParser: TBCBTokenList;
-  MemStream: TMemoryStream;
+  FileContent: string;
   SelectedItem: TToDoInfo;
   InternalEditReader: TEditReader;
   ClosestLineMatch: Integer;
@@ -750,67 +750,62 @@ begin
   // immediately, do not call FreeFileData
   InternalEditReader := TEditReader.Create(SelectedItem.FileName);
   try
-    MemStream := TMemoryStream.Create;
-    try
-      InternalEditReader.SaveToStream(MemStream);
-      if IsCppModule then
-      begin
-        CParser := TBCBTokenList.Create;
-        try
-          CParser.SetOrigin(MemStream.Memory, MemStream.Size);
-          while CParser.RunID <> ctknull do
-          begin
-            if CParser.RunID in [ctkansicomment, ctkslashescomment] then
-              if SameText(CParser.RunToken, SelectedItem.Raw) then
+    FileContent := InternalEditReader.GetText;
+    if IsCppModule then
+    begin
+      CParser := TBCBTokenList.Create;
+      try
+        CParser.SetOrigin(@FileContent[1], Length(FileContent));
+        while CParser.RunID <> ctknull do
+        begin
+          if CParser.RunID in [ctkansicomment, ctkslashescomment] then
+            if SameText(CParser.RunToken, SelectedItem.Raw) then
+            begin
+              // Look for a matching todo comment with the smallest absolute distance
+              // from the line where we found the original comment when last scanning
+              if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - CParser.PositionAtLine(CParser.RunPosition)) <= LineMatchDifference) then
               begin
-                // Look for a matching todo comment with the smallest absolute distance
-                // from the line where we found the original comment when last scanning
-                if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - CParser.PositionAtLine(CParser.RunPosition)) <= LineMatchDifference) then
-                begin
-                  ClosestLineMatch := CParser.PositionAtLine(CParser.RunPosition) - 1;
-                  LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
-                end;
+                ClosestLineMatch := CParser.PositionAtLine(CParser.RunPosition) - 1;
+                LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
               end;
-            if CParser.RunIndex = CParser.Count - 1 then
-              Break;
-            CParser.Next;
-            Application.ProcessMessages;
-          end;
-        finally
-          if LineMatchDifference > -1 then
-            InternalEditReader.GotoLine(ClosestLineMatch + 1);
-          FreeAndNil(CParser);
+            end;
+          if CParser.RunIndex = CParser.Count - 1 then
+            Break;
+          CParser.Next;
+          Application.ProcessMessages;
         end;
-      end
-      else
-      begin
-        Parser := TmwPasLex.Create;
-        try
-          Parser.Origin := MemStream.Memory;
-          while Parser.TokenID <> tkNull do
-          begin
-            if Parser.TokenID in [tkBorComment, tkAnsiComment, tkSlashesComment] then
-              if SameText(Parser.Token, SelectedItem.Raw) then
-              begin
-                // Look for a matching todo comment with the smallest absolute distance
-                // from the line where we found the original comment when last scanning
-                if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - Parser.LineNumber + 1) <= LineMatchDifference) then
-                begin
-                  ClosestLineMatch := Parser.LineNumber;
-                  LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
-                end;
-              end;
-            Parser.Next;
-            Application.ProcessMessages;
-          end;
-        finally
-          if LineMatchDifference > -1 then
-            InternalEditReader.GotoLine(ClosestLineMatch + 1);
-          FreeAndNil(Parser);
-        end;
+      finally
+        if LineMatchDifference > -1 then
+          InternalEditReader.GotoLine(ClosestLineMatch + 1);
+        FreeAndNil(CParser);
       end;
-    finally
-      FreeAndNil(MemStream);
+    end
+    else
+    begin
+      Parser := TmwPasLex.Create;
+      try
+        Parser.Origin := @FileContent[1];
+        while Parser.TokenID <> tkNull do
+        begin
+          if Parser.TokenID in [tkBorComment, tkAnsiComment, tkSlashesComment] then
+            if SameText(Parser.Token, SelectedItem.Raw) then
+            begin
+              // Look for a matching todo comment with the smallest absolute distance
+              // from the line where we found the original comment when last scanning
+              if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - Parser.LineNumber + 1) <= LineMatchDifference) then
+              begin
+                ClosestLineMatch := Parser.LineNumber;
+                LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
+              end;
+            end;
+          Parser.Next;
+          Application.ProcessMessages;
+        end;
+      finally
+        if LineMatchDifference > -1 then
+          InternalEditReader.GotoLine(ClosestLineMatch + 1);
+        FreeAndNil(Parser);
+      end;
     end;
   finally
     FreeAndNil(InternalEditReader);
