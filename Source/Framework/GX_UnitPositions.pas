@@ -14,7 +14,7 @@ type
   TUnitPositions = class(TObject)
   private
     FParser: TmwPasLex;
-    FMemStream: TMemoryStream;
+    FFileContent: string;
     FPosList: TStringList;
     procedure GetPositions;
     function GetCount: Integer;
@@ -53,10 +53,9 @@ begin
   Assert(Assigned(SourceEditor));
   FParser := nil;
   FPosList := TStringList.Create;
-  FMemStream := TMemoryStream.Create;
-  GxOtaSaveReaderToStream(SourceEditor.CreateReader, FMemStream);
+  FFileContent := GxOtaReadEditorTextToString(SourceEditor.CreateReader);
   FParser := TmwPasLex.Create;
-  FParser.Origin := FMemStream.Memory;
+  FParser.Origin := @FFileContent[1];
   GetPositions;
 end;
 
@@ -64,7 +63,6 @@ destructor TUnitPositions.Destroy;
 begin
   FreeAndNil(FPosList);
   FreeAndNil(FParser);
-  FreeAndNil(FMemStream);
   inherited Destroy;
 end;
 
