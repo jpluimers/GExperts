@@ -54,17 +54,17 @@ type
 
   TProcedures = class(TCollection)
   private
-    FUnitText: string;
+    FFileContent: string;
     function GetItem(Index: Integer): TProcedure;
   public
-    property UnitText: string read FUnitText write FUnitText;
+    property FileContent: string read FFileContent write FFileContent;
     property Items[Index: Integer]: TProcedure read GetItem; default;
   end;
 
   TLanguage = class(TObject)
   private
     FOrigin: PChar;
-    FUnitText: string;
+    FFileContent: string;
   protected
     FProcedures: TProcedures;
     FFileName: string;
@@ -72,8 +72,8 @@ type
     constructor Create(const FileName: string);
     procedure Execute; virtual; abstract;
     property Procedures: TProcedures read FProcedures write FProcedures;
-    property Origin: PChar read fOrigin write FOrigin;
-    property UnitText: string read FUnitText write FUnitText;
+    property Origin: PChar read FOrigin write FOrigin;
+    property FileContent: string read FFileContent write FFileContent;
     property FileName: string read FFileName write FFileName;
   end;
 
@@ -142,7 +142,7 @@ end;
 
 function TProcedure.GetBody: string;
 begin
-  Result := Copy(TProcedures(Collection).UnitText, FBeginIndex + 1, FEndIndex - FBeginIndex);
+  Result := Copy(TProcedures(Collection).FileContent, FBeginIndex + 1, FEndIndex - FBeginIndex);
 end;
 
 function TProcedure.GetProcClass: string;
@@ -193,7 +193,7 @@ begin
     ltCpp: FLanguageParser := TCpp.Create(FFileName);
   end;
   try
-    FLanguageParser.UnitText := UnitText;
+    FLanguageParser.FileContent := UnitText;
     FLanguageParser.Procedures := FProcedures;
     FLanguageParser.Execute;
   finally
@@ -206,7 +206,7 @@ begin
   inherited Create(AOwner);
   FFileName := FileName;
   FProcedures := TProcedures.Create(TProcedure);
-  FProcedures.UnitText := UnitText;
+  FProcedures.FileContent := UnitText;
 
   if IsCppSourceModule(FileName) then
     Language := ltCpp
@@ -237,8 +237,8 @@ var
   ProcLineLength: Integer;
 begin
   FParser := TmwPasLex.Create;
-  FParser.Origin := @UnitText[1];
-  FProcedures.UnitText := UnitText;
+  FParser.Origin := @FileContent[1];
+  FProcedures.FileContent := FileContent;
   ProcedureStack := TStack.Create;
   FProcedures.BeginUpdate;
   ProcedureItem := nil;
@@ -476,9 +476,9 @@ var
   ProcedureItem: TProcedure;
   BeginIndex: Integer;
 begin
-  FProcedures.UnitText := UnitText;
+  FProcedures.FileContent := FileContent;
   FCParser := TBCBTokenList.Create;
-  FCParser.SetOrigin(@UnitText[1], Length(UnitText));
+  FCParser.SetOrigin(@FileContent[1], Length(FileContent));
   try
     FNameList := TStringList.Create;
     try
