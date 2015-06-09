@@ -189,7 +189,7 @@ begin
   FModIntf := GxOtaGetModule(FFileName);
   if FModIntf = nil then
   begin
-    {$IFOPT D+} SendDebug('EditReader: Module not open in the IDE - opening from disk'); {$ENDIF}
+    {$IFOPT D+} SendDebug('EditReader: Module not open in the IDE - opening "' + FFilename + '" from disk'); {$ENDIF}
     AllocateFromDisk;
   end
   else
@@ -368,7 +368,18 @@ begin
   SetLength(Buffer, Stream.Size);
   Stream.Position := 0;
   Stream.ReadBuffer(Buffer[1], Stream.Size);
-  Result := IDEEditorStringToString(Buffer);
+  Result := HackBadEditorStringToNativeString(Buffer);
+  if (Result = '') and (Buffer <> '') then begin
+    // sometimes converting the buffer from UTF8 to string returns an empty string
+    // This happens when
+    // * The file is read from disk rather than from the IDE
+    // * the file contains high ASCII characters
+    // the reason is probably that the file is stored as ANSI rather than UTF8
+    // which causes converting it from UTF8 to string to fail.
+    // In that case we just assign the buffer and hope for the best.
+    // -- 2015-06-09 twm
+    Result := Buffer;
+  end;
 end;
 
 function TEditReader.GetText: string;
