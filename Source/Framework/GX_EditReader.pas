@@ -30,6 +30,7 @@ type
     function GetLineCount: Integer;
     procedure SetBufSize(New: Integer);
     procedure InternalGotoLine(Line: Integer; Offset: Boolean);
+    function ReadTextFromStream(Stream: TMemoryStream): string;
   protected
     procedure SetFileName(const Value: string);
     procedure ReleaseModuleNotifier;
@@ -360,46 +361,37 @@ begin
     Result := -1;
 end;
 
+function TEditReader.ReadTextFromStream(Stream: TMemoryStream): string;
+var
+  Buffer: IDEEditBufferString;
+begin
+  SetLength(Buffer, Stream.Size);
+  Stream.Position := 0;
+  Stream.ReadBuffer(Buffer[1], Stream.Size);
+  Result := IDEEditorStringToString(Buffer);
+end;
+
 function TEditReader.GetText: string;
 var
   Stream: TMemoryStream;
-  Buffer: UTF8String;
 begin
   Stream := TMemoryStream.Create;
   try
     SaveToStream(Stream);
-      SetLength(Buffer, Stream.Size);
-      Stream.Position := 0;
-      Stream.ReadBuffer(Buffer[1], Stream.Size);
+    Result := ReadTextFromStream(Stream);
   finally
     Stream.Free;
   end;
-  Result := IDEEditorStringToString(Buffer);
 end;
 
 function TEditReader.GetTextFromPos: string;
 var
   Stream: TMemoryStream;
-  UTF8Data: UTF8String;
-  AnsiData: string;
 begin
   Stream := TMemoryStream.Create;
   try
     SaveToStreamFromPos(Stream);
-    if IDEEditorEncodingIsUTF8 then
-    begin
-      SetLength(UTF8Data, Stream.Size);
-      Stream.Position := 0;
-      Stream.ReadBuffer(UTF8Data[1], Stream.Size);
-      Result := IDEEditorStringToString(UTF8Data);
-    end
-  else
-  begin
-    SetLength(AnsiData, Stream.Size);
-    Stream.Position := 0;
-    Stream.ReadBuffer(AnsiData[1], Stream.Size);
-    Result := AnsiData;
-  end;
+    Result := ReadTextFromStream(Stream);
   finally
     Stream.Free;
   end;
@@ -408,26 +400,11 @@ end;
 function TEditReader.GetTextToPos: string;
 var
   Stream: TMemoryStream;
-  UTF8Data: UTF8String;
-  AnsiData: string;
 begin
   Stream := TMemoryStream.Create;
   try
     SaveToStreamToPos(Stream);
-    if IDEEditorEncodingIsUTF8 then
-    begin
-      SetLength(UTF8Data, Stream.Size);
-      Stream.Position := 0;
-      Stream.ReadBuffer(UTF8Data[1], Stream.Size);
-      Result := IDEEditorStringToString(UTF8Data);
-    end
-  else
-  begin
-    SetLength(AnsiData, Stream.Size);
-    Stream.Position := 0;
-    Stream.ReadBuffer(AnsiData[1], Stream.Size);
-    Result := AnsiData;
-  end;
+    Result := ReadTextFromStream(Stream);
   finally
     Stream.Free;
   end;
