@@ -214,7 +214,7 @@ end;
 function TfmProjDepend.LoadFileDepend(const FileName, UnitName, FormName: string): Boolean;
 var
   EditRead: TEditReader;
-  MS: TMemoryStream;
+  FileContent: string;
   Parser: TmwPasLex;
   nUses: Integer;
   Index: Integer;
@@ -255,76 +255,71 @@ begin
   UInfo.FileName := FileName;
   FFileList.AddObject(UnitName, UInfo);
 
-  MS := TMemoryStream.Create;
+  // Since this edit reader is destroyed almost
+  // immediately, do not call FreeFileData
   try
-    // Since this edit reader is destroyed almost
-    // immediately, do not call FreeFileData
+    EditRead := TEditReader.Create(FileName);
     try
-      EditRead := TEditReader.Create(FileName);
-      try
-        EditRead.SaveToStream(MS);
-      finally
-        FreeAndNil(EditRead);
-      end;
-    except
-      on E: Exception do
+      FileContent := EditRead.GetText;
+    finally
+      FreeAndNil(EditRead);
+    end;
+  except
+    on E: Exception do
+    begin
+      // Warn, but skip project files that don't exist (dcu only, etc.?)
+      MessageDlg(E.Message, mtWarning, [mbOK], 0);
+      Exit;
+    end;
+  end;
+  Parser := TmwPasLex.Create;
+  try
+    Parser.Origin := @FileContent[1];
+    while not (Parser.TokenID in [tkUnit, tkNull, tkLibrary, tkProgram]) do
+    begin
+      Parser.NextNoJunk;
+    end;
+    if Parser.TokenID in [tkUnit, tkLibrary, tkProgram] then
+    begin
+      Parser.NextNoJunk;
+      if Parser.TokenID = tkIdentifier then
       begin
-        // Warn, but skip project files that don't exist (dcu only, etc.?)
-        MessageDlg(E.Message, mtWarning, [mbOK], 0);
-        Exit;
+        UnitIdentifier := Parser.GetDottedIdentifierAtPos(True);
+        Node := tvUnits.Items.AddChild(RootNode, UnitIdentifier);
+        Node.HasChildren := True;
+        Node.ImageIndex := Index;
+        Node.SelectedIndex := Index;
+        UList := TStringList.Create;
+        FUnitList.AddObject(UnitIdentifier, UList);
       end;
     end;
-    Parser := TmwPasLex.Create;
-    try
-      Parser.Origin := MS.Memory;
-      while not (Parser.TokenID in [tkUnit, tkNull, tkLibrary, tkProgram]) do
+    if UList = nil then
+      Exit;
+    while Parser.TokenID <> tkNull do
+    begin
+      if Parser.TokenID = tkUses then
       begin
+        Inc(nUses);
         Parser.NextNoJunk;
-      end;
-      if Parser.TokenID in [tkUnit, tkLibrary, tkProgram] then
-      begin
-        Parser.NextNoJunk;
-        if Parser.TokenID = tkIdentifier then
+        while not (Parser.TokenID in [tkSemiColon, tkNull]) do
         begin
-          UnitIdentifier := Parser.GetDottedIdentifierAtPos(True);
-          Node := tvUnits.Items.AddChild(RootNode, UnitIdentifier);
-          Node.HasChildren := True;
-          Node.ImageIndex := Index;
-          Node.SelectedIndex := Index;
-          UList := TStringList.Create;
-          FUnitList.AddObject(UnitIdentifier, UList);
-        end;
-      end;
-      if UList = nil then
-        Exit;
-      while Parser.TokenID <> tkNull do
-      begin
-        if Parser.TokenID = tkUses then
-        begin
-          Inc(nUses);
+          if Parser.TokenID = tkIdentifier then
+            UList.Add(Parser.GetDottedIdentifierAtPos(True));
           Parser.NextNoJunk;
-          while not (Parser.TokenID in [tkSemiColon, tkNull]) do
-          begin
-            if Parser.TokenID = tkIdentifier then
-              UList.Add(Parser.GetDottedIdentifierAtPos(True));
-            Parser.NextNoJunk;
-            if Parser.TokenID = tkIn then
-              while not (Parser.TokenID in [tkSemiColon, tkComma, tkNull]) do
-                Parser.NextNoJunk;
-          end;
+          if Parser.TokenID = tkIn then
+            while not (Parser.TokenID in [tkSemiColon, tkComma, tkNull]) do
+              Parser.NextNoJunk;
         end;
-        if (DependExpert <> nil) and (not DependExpert.FScanEntireUnit) and
-           (nUses >= 2) then
-        begin
-          Break;
-        end;
-        Parser.NextNoJunk;
       end;
-    finally
-      FreeAndNil(Parser);
+      if (DependExpert <> nil) and (not DependExpert.FScanEntireUnit) and
+         (nUses >= 2) then
+      begin
+        Break;
+      end;
+      Parser.NextNoJunk;
     end;
   finally
-    FreeAndNil(MS);
+    FreeAndNil(Parser);
   end;
 end;
 
