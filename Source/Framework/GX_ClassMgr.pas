@@ -435,9 +435,8 @@ end;
 
 procedure TClassItem.LoadClass(const FileName: string);
 var
-  EditorStream: TMemoryStream;
+  FileContent: string;
   Parser: TmEPTokenList;
-  Buf: array[0..30] of Char;
   p1, i, j: Integer;
   ObjectInfo: TBrowseClassInfoCollection;
   LocalEditReader: TEditReader;
@@ -449,56 +448,47 @@ begin
   LocalEditReader.FileName := FileName;
   LocalEditReader.Reset;
 
-  EditorStream := TMemoryStream.Create;
+  FileContent := LocalEditReader.GetText;
+  LocalEditReader.FreeFileData;
+  Parser := TmEPTokenList.Create;
   try
-    LocalEditReader.SaveToStream(EditorStream);
-    LocalEditReader.FreeFileData;
-    EditorStream.Position := EditorStream.Size;
-    FillChar(Buf, 23, 0); // 23?
-    EditorStream.WriteBuffer(Buf, 23);
-    EditorStream.Position := 0;
-    Parser := TmEPTokenList.Create;
-    try
-      Parser.SetOrigin(EditorStream.Memory, EditorStream.Size);
-      for j := 0 to Parser.Searcher.ClassList.Count - 1 do
-      begin
-        Parser.RunIndex := Parser.Searcher.ClassList[j];
-        case Parser.GetClassKind of
-          ikClass,
-          ikClEmpty:
+    Parser.SetOrigin(@FileContent[1], Length(FileContent));
+    for j := 0 to Parser.Searcher.ClassList.Count - 1 do
+    begin
+      Parser.RunIndex := Parser.Searcher.ClassList[j];
+      case Parser.GetClassKind of
+        ikClass,
+        ikClEmpty:
+          begin
+            ObjectInfo := TBrowseClassInfoCollection.Create;
+            FOList.Add(ObjectInfo);
+            ObjectInfo.ClassList := TClassList(Collection);
+            p1 := 0;
+            for i := 1 to Length(Parser.Info.Data) do
             begin
-              ObjectInfo := TBrowseClassInfoCollection.Create;
-              FOList.Add(ObjectInfo);
-              ObjectInfo.ClassList := TClassList(Collection);
-              p1 := 0;
-              for i := 1 to Length(Parser.Info.Data) do
-              begin
-                case Parser.Info.Data[i] of
-                  '=': ObjectInfo.FName := Trim(Copy(Parser.Info.Data, 1, i - 1));
-                  '(': p1 := i;
-                  ')': begin
-                         ObjectInfo.FDerivedFrom := Trim(Copy(Parser.Info.Data, p1 + 1, i - p1 - 1));
-                         // Handle the shortcut implied TObject
-                         if Trim(ObjectInfo.FDerivedFrom) = '' then
-                           ObjectInfo.FDerivedFrom := 'TObject';
-                         Break;
-                       end;
-                end;
+              case Parser.Info.Data[i] of
+                '=': ObjectInfo.FName := Trim(Copy(Parser.Info.Data, 1, i - 1));
+                '(': p1 := i;
+                ')': begin
+                       ObjectInfo.FDerivedFrom := Trim(Copy(Parser.Info.Data, p1 + 1, i - p1 - 1));
+                       // Handle the shortcut implied TObject
+                       if Trim(ObjectInfo.FDerivedFrom) = '' then
+                         ObjectInfo.FDerivedFrom := 'TObject';
+                       Break;
+                     end;
               end;
-              // ObjectInfo.LineNo:=Parser.Info.LineNumber;
-              ObjectInfo.FFileName := LocalEditReader.FileName;
-              if Parser.Info.AI <> nil then
-                ObjectInfo.FSourceName := Parser.Info.AI.aiUnit
-              else
-                ObjectInfo.FSourceName := ExtractPureFileName(ObjectInfo.FileName);
             end;
-        end; // case
-      end;
-    finally
-      FreeAndNil(Parser);
+            // ObjectInfo.LineNo:=Parser.Info.LineNumber;
+            ObjectInfo.FFileName := LocalEditReader.FileName;
+            if Parser.Info.AI <> nil then
+              ObjectInfo.FSourceName := Parser.Info.AI.aiUnit
+            else
+              ObjectInfo.FSourceName := ExtractPureFileName(ObjectInfo.FileName);
+          end;
+      end; // case
     end;
   finally
-    FreeAndNil(EditorStream);
+    FreeAndNil(Parser);
   end;
 end;
 
@@ -674,7 +664,7 @@ end;
 
 function TBrowseClassInfoCollection.RefreshLineNo: Integer;
 var
-  EditorStream: TMemoryStream;
+  FileContent: string;
   Parser: TmPasParser;
   LocalEditReader: TEditReader;
 begin
@@ -684,29 +674,24 @@ begin
   LocalEditReader.FileName := FileName;
   LocalEditReader.Reset;
 
-  EditorStream := TMemoryStream.Create;
+  FileContent := LocalEditReader.GetText;
+  LocalEditReader.FreeFileData;
+  Parser := TmPasParser.Create;
   try
-    LocalEditReader.SaveToStream(EditorStream);
-    LocalEditReader.FreeFileData;
-    Parser := TmPasParser.Create;
-    try
-      Parser.Origin := EditorStream.Memory;
-      if SetParser(Parser) then
-      begin
-        Result := Parser.Token.LineNumber;
-        FLineNo := Result;
-      end;
-    finally
-      FreeAndNil(Parser);
+    Parser.Origin := @FileContent[1];
+    if SetParser(Parser) then
+    begin
+      Result := Parser.Token.LineNumber;
+      FLineNo := Result;
     end;
   finally
-    FreeAndNil(EditorStream);
+    FreeAndNil(Parser);
   end;
 end;
 
 procedure TBrowseClassInfoCollection.LoadMethods;
 var
-  EditorStream: TMemoryStream;
+  FileContent: string;
   Parser: TmPasParser;
   LocalEditReader: TEditReader;
 begin
@@ -714,18 +699,15 @@ begin
     Exit;
   Clear;
 
-  EditorStream := nil;
-  Parser := nil;
   LocalEditReader := FClassList.EditRead;
-  try
-    LocalEditReader.FileName := FileName;
-    LocalEditReader.Reset;
+  LocalEditReader.FileName := FileName;
+  LocalEditReader.Reset;
 
-    FIsLoaded := True;
-    EditorStream := TMemoryStream.Create;
-    LocalEditReader.SaveToStream(EditorStream);
-    Parser := TmPasParser.Create;
-    Parser.Origin := EditorStream.Memory;
+  FIsLoaded := True;
+  FileContent := LocalEditReader.GetText;
+  Parser := TmPasParser.Create;
+  try
+    Parser.Origin := @FileContent[1];
     if SetParser(Parser) then
     begin
       while (Parser.Token.ID <> tkNull) and (Parser.Token.ID <> tkClass) do
@@ -743,7 +725,6 @@ begin
   finally
     LocalEditReader.FreeFileData;
     FreeAndNil(Parser);
-    FreeAndNil(EditorStream);
   end;
 end;
 
@@ -1006,7 +987,7 @@ function TBrowseMethodInfoItem.GetInterfaceLine: Integer;
   end;
 
 var
-  EditorStream: TMemoryStream;
+  FileContent: string;
   Parser: TmPasParser;
   LocalEditReader: TEditReader;
   LastTokenType: TTokenKind;
@@ -1017,13 +998,11 @@ begin
   LocalEditReader.FileName := Collection.FileName;
   LocalEditReader.Reset;
 
-  Parser := nil;
-  EditorStream := TMemoryStream.Create;
+  FileContent := LocalEditReader.GetText;
+  LocalEditReader.FreeFileData;
+  Parser := TmPasParser.Create;
   try
-    LocalEditReader.SaveToStream(EditorStream);
-    LocalEditReader.FreeFileData;
-    Parser := TmPasParser.Create;
-    Parser.Origin := EditorStream.Memory;
+    Parser.Origin := @FileContent[1];
     if Collection.SetParser(Parser) then
     begin
       // Temporarily set the line number in case we don't find a perfect match
@@ -1047,14 +1026,13 @@ begin
       end;
     end;
   finally
-    FreeAndNil(EditorStream);
     FreeAndNil(Parser);
   end;
 end;
 
 function TBrowseMethodInfoItem.GetImplementationLine: Integer;
 var
-  EditorStream: TMemoryStream;
+  FileContent: string;
   Parser: TmPasParser;
   LocalEditReader: TEditReader;
 begin
@@ -1062,19 +1040,14 @@ begin
   LocalEditReader.FileName := Collection.FileName;
   LocalEditReader.Reset;
 
-  EditorStream := TMemoryStream.Create;
+  FileContent := LocalEditReader.GetText;
+  LocalEditReader.FreeFileData;
+  Parser := TmPasParser.Create;
   try
-    LocalEditReader.SaveToStream(EditorStream);
-    LocalEditReader.FreeFileData;
-    Parser := TmPasParser.Create;
-    try
-      Parser.Origin := EditorStream.Memory;
-      Result := Parser.GetMethodImpLine(Collection.Name, Self.RName);
-    finally
-      FreeAndNil(Parser);
-    end;
+    Parser.Origin := @FileContent[1];
+    Result := Parser.GetMethodImpLine(Collection.Name, Self.RName);
   finally
-    FreeAndNil(EditorStream);
+    FreeAndNil(Parser);
   end;
 end;
 
