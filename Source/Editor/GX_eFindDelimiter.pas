@@ -85,7 +85,7 @@ resourcestring
 
 { TBaseDelimiterExpert }
 
-function FillMemoryStream(Stream: TStream; const FileName: string;
+function GetFileContent(out FileContent: string; const FileName: string;
   var EditorLine: string): Integer;
 var
   EditRead: TEditReader;
@@ -94,7 +94,7 @@ begin
   // immediately, do not call FreeFileData.
   EditRead := TEditReader.Create(FileName);
   try
-    EditRead.SaveToStream(Stream);
+    FileContent := EditRead.GetText;
     Result := EditRead.GetCurrentBufferPos;
   finally
     FreeAndNil(EditRead);
@@ -112,7 +112,7 @@ resourcestring
 const
   Offsets: array[0..2] of Integer=(0, -1, 1);
 var
-  MemStream: TMemoryStream;
+  FileContent: string;
   C: Integer;
 
   SPos: Integer;
@@ -142,7 +142,7 @@ var
     Result := False;
     Parser := TPasTokenList.Create;
     try
-      Parser.SetOrigin(MemStream.Memory, MemStream.Size);
+      Parser.SetOrigin(@FileContent[1], Length(FileContent));
       if Parser.Origin = nil then
       begin
         MessageDlg(SCouldNotGetSourceBuffer, mtError, [mbOK], 0);
@@ -487,7 +487,7 @@ var
     CEndToken := ctknull;
     CParser := TBCBTokenList.Create;
     try
-      CParser.SetOrigin(MemStream.Memory, MemStream.Size);
+      CParser.SetOrigin(@FileContent[1], Length(FileContent));
       if CParser.Origin = nil then
       begin
         MessageDlg(SCouldNotGetSourceBuffer, mtError, [mbOK], 0);
@@ -600,35 +600,27 @@ begin
   if (not Assigned(SourceEditor)) or (not Assigned(Module)) then
     Exit;
 
-  MemStream := TMemoryStream.Create;
-  try
-    SPos := FillMemoryStream(MemStream, SourceEditor.FileName, EditorLine);
+  SPos := GetFileContent(FileContent, SourceEditor.FileName, EditorLine);
 
-    MemStream.Position := 0;
-
-    if Language = ltPas then
-    begin
-      if not ExecutePas then
-        Exit;
-    end
-    else
-      if not ExecuteCpp then
-        Exit;
-
-    if c <> 0 then
-    begin
-      MessageDlg(SNoMatchingEndFound, mtInformation, [mbOK], 0);
+  if Language = ltPas then
+  begin
+    if not ExecutePas then
       Exit;
-    end;
+  end
+  else
+    if not ExecuteCpp then
+      Exit;
 
-    // A matching delimiter was found
-    SChar := GxOtaGetCharPosFromPos(SPos, GxOtaGetTopMostEditView(SourceEditor));
-    EChar := GxOtaGetCharPosFromPos(EPos, GxOtaGetTopMostEditView(SourceEditor));
-    DoDelimiterAction(SourceEditor, Offset, SChar, EChar);
-
-  finally
-    FreeAndNil(MemStream);
+  if c <> 0 then
+  begin
+    MessageDlg(SNoMatchingEndFound, mtInformation, [mbOK], 0);
+    Exit;
   end;
+
+  // A matching delimiter was found
+  SChar := GxOtaGetCharPosFromPos(SPos, GxOtaGetTopMostEditView(SourceEditor));
+  EChar := GxOtaGetCharPosFromPos(EPos, GxOtaGetTopMostEditView(SourceEditor));
+  DoDelimiterAction(SourceEditor, Offset, SChar, EChar);
 end;
 
 function TBaseDelimiterExpert.HasConfigOptions: Boolean;
