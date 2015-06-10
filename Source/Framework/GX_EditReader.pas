@@ -23,7 +23,7 @@ type
     Buf: PAnsiChar;
     FBufSize: Integer;
     FFileName: string;
-    //FIsUTF8: Boolean;
+    FIsUTF8: Boolean;
     FMode: TModuleMode;
     SFile: TStream;
     procedure AllocateFileData;
@@ -54,7 +54,7 @@ type
     property FileName: string read FFileName write SetFileName;
     property LineCount: Integer read GetLineCount;
     property Mode: TModuleMode read FMode;
-    //property IsUTF8: Boolean read FIsUTF8;
+    property IsUTF8: Boolean read FIsUTF8;
   end;
 
 implementation
@@ -156,22 +156,32 @@ resourcestring
   SNoModuleNotifier = 'TEditReader: Could not get module notifier';
 
   procedure AllocateFromDisk;
-  //var
-  //  UnicodeBOM: Integer;
-  //  Bytes: Integer;
+  var
+    UnicodeBOM: Integer;
+    Bytes: Integer;
+    FileStream: TFileStream;
   begin
     if not FileExists(FFileName) then
       raise Exception.CreateFmt(SFileDoesNotExist, [FFileName]);
 
-    //FileToWideString(FFileName);
-
     FMode := mmFile;
-    SFile := TFileStream.Create(FFileName, fmOpenRead or fmShareDenyWrite);
-    //Bytes := SFile.Read(UnicodeBOM, 3);
-    // This does not support other encodings such as UCS-2, UCS-4, etc.
-    //FIsUTF8 := (Bytes = 3) and ((UnicodeBOM and $00FFFFFF) = $00BFBBEF);
-    //if not FIsUTF8 then
-    //  SFile.Seek(0, soFromBeginning);
+
+    FileStream := TFileStream.Create(FFileName, fmOpenRead or fmShareDenyWrite);
+    try
+      Bytes := FileStream.Read(UnicodeBOM, 3);
+      // This does not support other encodings such as UCS-2, UCS-4, etc.
+      // but according to a poll I did on Google+, nobody uses these anyway.
+      // So we just support ANSI and UTF8 and hope for the best.
+      // 2015-06-10 twm
+      if (Bytes = 3) and ((UnicodeBOM and $00FFFFFF) = $00BFBBEF) then
+        FIsUTF8 := true
+      else
+        FileStream.Seek(0, soFromBeginning);
+      SFile := TMemoryStream.Create;
+      SFile.CopyFrom(FileStream, FileStream.Size - FileStream.Position);
+    finally
+      FileStream.Free;
+    end;
   end;
 
 begin
@@ -196,7 +206,7 @@ begin
   begin
     FMode := mmModule;
     {$IFOPT D+} SendDebug('EditReader: Got module for ' + FFileName); {$ENDIF}
-    //FIsUTF8 := RunningDelphi8OrGreater; // Delphi 8+ convert all edit buffers to UTF-8
+    FIsUTF8 := RunningDelphi8OrGreater; // Delphi 8+ convert all edit buffers to UTF-8
 
     // Allocate notifier for module
     Assert(FModuleNotifier = nil);
@@ -368,17 +378,18 @@ begin
   SetLength(Buffer, Stream.Size);
   Stream.Position := 0;
   Stream.ReadBuffer(Buffer[1], Stream.Size);
-  Result := HackBadEditorStringToNativeString(Buffer);
+  if FIsUTF8 then
+    Result := Utf8ToAnsi(Buffer);
   if (Result = '') and (Buffer <> '') then begin
-    // sometimes converting the buffer from UTF8 to string returns an empty string
+    // Sometimes converting the buffer from UTF8 to string returns an empty string
     // This happens when
-    // * The file is read from disk rather than from the IDE
+    // * The file is read from disk rather than from the IDE and
     // * the file contains high ASCII characters
     // the reason is probably that the file is stored as ANSI rather than UTF8
     // which causes converting it from UTF8 to string to fail.
     // In that case we just assign the buffer and hope for the best.
     // -- 2015-06-09 twm
-    Result := Buffer;
+    Result := String(Buffer);
   end;
 end;
 
