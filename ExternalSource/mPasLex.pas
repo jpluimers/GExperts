@@ -82,8 +82,8 @@ uses
   Classes, Contnrs;
   
 var
-  Identifiers: array[#0..#255] of ByteBool;
-  mHashTable: array[#0..#255] of Integer;
+  Identifiers: array[#0..#127] of ByteBool;
+  mHashTable: array[#0..#127] of Integer;
 
 type
   TTokenKind = (tkAbsolute, tkAbstract, tkAddressOp, tkAnd, tkAnsiComment,
@@ -244,6 +244,9 @@ type
     procedure UnknownProc;
     function GetToken: string;
     function InSymbols(aChar: Char): Boolean;
+    procedure doProcTable(AChar: Char);
+    function IsIdentifier(AChar: Char): boolean;
+    function CalcHash(AChar: Char): integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -312,16 +315,18 @@ procedure MakeIdentTable;
 var
   i, J: Char;
 begin
-  for I := #0 to #255 do
+  for I := #0 to #127 do
   begin
     case i of
       '_', '0'..'9', 'a'..'z', 'A'..'Z': Identifiers[i] := True;
-    else Identifiers[i] := False;
+    else
+      Identifiers[i] := False;
     end;
     J := UpperCase(i)[1];
     case i of
       'a'..'z', 'A'..'Z', '_': mHashTable[i] := Ord(J) - 64;
-    else mHashTable[Char(i)] := 0;
+    else
+      mHashTable[Char(i)] := 0;
     end;
   end;
 end;
@@ -406,12 +411,21 @@ begin
     end;
 end;
 
+function TmwPasLex.CalcHash(AChar: Char): integer;
+begin
+  if Ord(AChar) <=127 then
+    Result := mHashTable[AChar]
+  else
+    Result := 0;
+end;
+
 function TmwPasLex.KeyHash(ToHash: PChar): Integer;
 begin
   Result := 0;
   while CharInSet(ToHash^, ['a'..'z', 'A'..'Z']) do
   begin
-    Inc(Result, mHashTable[ToHash^]);
+    if Ord(ToHash^) <=127 then
+      Inc(Result, CalcHash(ToHash^));
     Inc(ToHash);
   end;
   if CharInSet(ToHash^, ['_', '0'..'9']) then Inc(ToHash);
@@ -428,7 +442,7 @@ begin
     Result := True;
     for i := 1 to fStringLen do
     begin
-      if mHashTable[Temp^] <> mHashTable[aKey[i]] then
+      if CalcHash(Temp^) <> CalcHash(aKey[i]) then
       begin
         Result := False;
         Break;
@@ -570,6 +584,14 @@ begin
     if KeyComp('Pascal') then Result := tkPascal else Result := tkIdentifier;
 end;
 
+function TmwPasLex.IsIdentifier(AChar: Char): boolean;
+begin
+  if Ord(AChar)<=127 then
+    Result := Identifiers[AChar]
+  else
+    Result := true;
+end;
+
 function TmwPasLex.Func54: TTokenKind;
 begin
   if KeyComp('Class') then
@@ -578,7 +600,8 @@ begin
     if fLastNoSpace = tkEqual then
     begin
       fIsClass := True;
-      if Identifiers[CharAhead(fStringLen)] then fIsClass := False;
+      if IsIdentifier(CharAhead(fStringLen)) then
+        fIsClass := False;
     end else fIsClass := False;
   end else Result := tkIdentifier;
 end;
@@ -894,14 +917,17 @@ var
 begin
   fToIdent := MayBe;
   HashKey := KeyHash(MayBe);
-  if HashKey < 192 then Result := fIdentFuncTable[HashKey] else Result := tkIdentifier;
+  if HashKey < 192 then
+    Result := fIdentFuncTable[HashKey]
+  else
+    Result := tkIdentifier;
 end;
 
 procedure TmwPasLex.MakeMethodTables;
 var
   i: Char;
 begin
-  for i := #0 to #255 do
+  for i := #0 to #127 do
     case i of
       #0: fProcTable[i] := NullProc;
       #10: fProcTable[i] := LFProc;
@@ -936,10 +962,12 @@ begin
             '[': fProcTable[i] := SquareOpenProc;
             ']': fProcTable[i] := SquareCloseProc;
             '^': fProcTable[i] := PointerSymbolProc;
-          else fProcTable[i] := SymbolProc;
+          else
+            fProcTable[i] := SymbolProc;
           end;
         end;
-    else fProcTable[i] := UnknownProc;
+    else
+      fProcTable[i] := UnknownProc;
     end;
 end;
 
@@ -1150,7 +1178,7 @@ procedure TmwPasLex.IdentProc;
 begin
   fTokenID := IdentKind((fOrigin + Run));
   Inc(Run, fStringLen);
-  while Identifiers[fOrigin[Run]] do
+  while IsIdentifier(fOrigin[Run]) do
     Inc(Run);
 end;
 
@@ -1428,6 +1456,16 @@ begin
   fTokenID := tkUnknown;
 end;
 
+procedure TmwPasLex.doProcTable(AChar: Char);
+begin
+  if Ord(AChar) <= 127 then begin
+    fProcTable[fOrigin[Run]];
+  end else begin
+    // This considers characters > #127 to be identifiers, AChar is a WideChar in Delphi >=2009 !
+    IdentProc;
+  end;
+end;
+
 procedure TmwPasLex.Next;
 begin
   case fTokenID of
@@ -1446,7 +1484,7 @@ begin
   end;
   fTokenPos := Run;
   case fComment of
-    csNo: fProcTable[fOrigin[Run]];
+    csNo: doProcTable(fOrigin[Run]);
   else
     case fComment of
       csBor: BorProc;
