@@ -123,7 +123,6 @@ end;
 procedure TBaseIdentExpert.Execute;
 var
   EditRead: TEditReader;
-  MemStream: TMemoryStream;
   SourceEditor: IOTASourceEditor;
 begin
   FSource := '';
@@ -132,18 +131,12 @@ begin
   if SourceEditor = nil then
     Exit;
 
-  MemStream := TMemoryStream.Create;
+  EditRead := TEditReader.Create(SourceEditor.FileName);
   try
-    EditRead := TEditReader.Create(SourceEditor.FileName);
-    try
-      EditRead.SaveToStream(MemStream);
-      FPosition := EditRead.GetCurrentBufferPos + 1;
-    finally
-      FreeAndNil(EditRead);
-    end;
-    SetString(FSource, PAnsiChar(MemStream.Memory), MemStream.Size);
+    FSource := EditRead.GetText;
+    FPosition := EditRead.GetCurrentBufferPos + 1;
   finally
-    FreeAndNil(MemStream);
+    FreeAndNil(EditRead);
   end;
 
   InternalExecute;

@@ -34,6 +34,9 @@ type
   protected
     procedure SetFileName(const Value: string);
     procedure ReleaseModuleNotifier;
+    procedure SaveToStreamFromPos(Stream: TStream);
+    procedure SaveToStreamToPos(Stream: TStream);
+    procedure SaveToStream(Stream: TStream);
   public
     constructor Create(const FileName: string);
     destructor Destroy; override;
@@ -43,9 +46,6 @@ type
     procedure GotoOffsetLine(L: Integer);
     procedure ShowSource;
     procedure ShowForm;
-    procedure SaveToStream(Stream: TStream);
-    procedure SaveToStreamFromPos(Stream: TStream);
-    procedure SaveToStreamToPos(Stream: TStream);
     function GetText: string;
     function GetTextFromPos: string;
     function GetTextToPos: string;
@@ -171,7 +171,7 @@ resourcestring
       Bytes := FileStream.Read(UnicodeBOM, 3);
       // This does not support other encodings such as UCS-2, UCS-4, etc.
       // but according to a poll I did on Google+, nobody uses these anyway.
-      // So we just support ANSI and UTF8 and hope for the best.
+      // So we just support ANSI and UTF-8 and hope for the best.
       // 2015-06-10 twm
       if (Bytes = 3) and ((UnicodeBOM and $00FFFFFF) = $00BFBBEF) then
         FIsUTF8 := true
