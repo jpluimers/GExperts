@@ -116,14 +116,26 @@ end;
 { TBaseIdentExpert }
 
 procedure TBaseIdentExpert.SetPosition(Value: Integer);
+var
+  EditPos: TOTAEditPos;
+  CharPos: TOTACharPos;
+  LinePos: TPoint;
+  EditView: IOTAEditView;
 begin
-  GxOtaSetCurrentSourcePosition(Value);
+  FPosition := Value;
+  LinePos := CharPosToLinePos(FPosition, FSource);
+  CharPos.Line := LinePos.Y;
+  CharPos.CharIndex := LinePos.X - 1;
+  EditView := GxOtaGetTopMostEditView;
+  EditView.ConvertPos(False, EditPos, CharPos);
+  GxOtaGotoEditPos(EditPos);
 end;
 
 procedure TBaseIdentExpert.Execute;
 var
   EditRead: TEditReader;
   SourceEditor: IOTASourceEditor;
+  CharPos: TOTACharPos;
 begin
   FSource := '';
   FPosition := -1;
@@ -134,7 +146,8 @@ begin
   EditRead := TEditReader.Create(SourceEditor.FileName);
   try
     FSource := EditRead.GetText;
-    FPosition := EditRead.GetCurrentBufferPos + 1;
+    CharPos :=   EditRead.GetCurrentCharPos;
+    FPosition := LinePosToCharPos(Point(CharPos.CharIndex + 1, CharPos.Line), FSource);
   finally
     FreeAndNil(EditRead);
   end;

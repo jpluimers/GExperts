@@ -656,6 +656,26 @@ procedure GetEnvironmentVariables(Strings: TStrings);
 function FindTextIdent(Id: string; const Source: string;
   LastPos: Integer; Prev: Boolean; var Pos: Integer): Boolean;
 
+///<symmary>
+/// Converts a line position (X/Y) into a character position, so that
+/// StringList[LinePos.Y - 1][LinePos.X] = StringList.Text[CharPos]
+/// LinPos is a 1-based X/Y position
+/// Examples:
+///   LinePosToCharPos(Point(5, 1), '12345') = 5
+///   LinePosToCharPos(Point(1, 2), '12345'#13#10'6789') = 8
+/// </summary>
+function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
+
+///<symmary>
+/// Converts a character position into line position (X/Y), so that
+/// StringList[LinePos.Y - 1][LinePos.X] = StringList.Text[CharPos]
+/// LinPos is a 1-based X/Y position
+/// Examples:
+///   CharPosToLinePos(5, '12345') = Point(5, 1)
+///   CharPosToLinePos(8, '12345'#13#10'6789') = Point(1, 2)
+/// </summary>
+function CharPosToLinePos(CharPos: integer; Text: string): TPoint;
+
 // Convert a Windows message number into a string description
 function MessageName(Msg: Longint): string;
 
@@ -3931,7 +3951,9 @@ begin
   Result := False;
   if Id = '' then
     Exit;
-
+  // todo: This is problematic since some locales do not have an upper case representation
+  //       of special characters like the French accented characters. The accents will get lost
+  //       in the conversion. It might find some occurrences which are not the same character.
   Id := AnsiUpperCase(Id);
   StartPos := LastPos;
 
@@ -3956,6 +3978,62 @@ begin
         end;
       end;
 end;
+
+function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
+var
+  Offset: integer;
+  LineIdx: integer;
+  sl: TStringList;
+  LineLen: Integer;
+begin
+  Assert(LinePos.X > 0);
+  Assert(LinePos.Y > 0);
+  sl := TStringList.Create;
+  try
+    sl.Text := Text;
+    Offset := 0;
+    // add the line lengths up to the line previous to the current line (and ajust for LineNo vs. LineIdx)
+    for LineIdx := 0 to LinePos.Y - 2 do begin
+      LineLen := Length(sl[LineIdx]);
+      Offset := Offset + LineLen + CRLFLength;
+    end;
+    Result := Offset + LinePos.X;
+  finally
+    FreeAndNil(sl);
+  end;
+end;
+
+function CharPosToLinePos(CharPos: integer; Text: string): TPoint;
+var
+  sl: TStringList;
+  LineIdx: Integer;
+  Offset: Integer;
+  LineLen: Integer;
+begin
+  Assert(CharPos > 0);
+
+  sl := TStringList.Create;
+  try
+    sl.Text := Text;
+    LineIdx := 0;
+    Offset := 0;
+    while LineIdx < sl.Count do begin
+      LineLen := Length(sl[LineIdx]);
+      if Offset + LineLen > CharPos then begin
+        Result.Y := LineIdx + 1;
+        Result.X := CharPos - Offset;
+        Exit;
+      end else begin
+        Inc(LineIdx);
+        Offset := Offset + LineLen + CRLFLength;
+      end;
+    end;
+  finally
+    FreeAndNil(sl);
+  end;
+  Result := Point(-1, -1);
+end;
+
 
 function MessageName(Msg: Longint): string;
 begin
