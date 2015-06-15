@@ -23,7 +23,7 @@ type
     Buf: PAnsiChar;
     FBufSize: Integer;
     FFileName: string;
-    FIsUTF8: Boolean;
+//    FIsUTF8: Boolean;
     FMode: TModuleMode;
     SFile: TStream;
     procedure AllocateFileData;
@@ -49,12 +49,18 @@ type
     function GetText: string;
     function GetTextFromPos: string;
     function GetTextToPos: string;
+    ///<summary>
+    /// Returns the cursor position as offset into the editor buffer,
+    /// that is into a possibly UTF-8 encoded buffer without expanding tabs </summary>
     function GetCurrentBufferPos: Integer;
+    ///<symmary>
+    /// Returns the cursor position in charcacter coordinates, that is without expanding tabs </summary>
+    function GetCurrentCharPos: TOTACharPos;
     property BufSize: Integer read FBufSize write SetBufSize;
     property FileName: string read FFileName write SetFileName;
     property LineCount: Integer read GetLineCount;
     property Mode: TModuleMode read FMode;
-    property IsUTF8: Boolean read FIsUTF8;
+//    property IsUTF8: Boolean read FIsUTF8;
   end;
 
 implementation
@@ -172,9 +178,9 @@ resourcestring
       // This does not support other encodings such as UCS-2, UCS-4, etc.
       // but according to a poll I did on Google+, nobody uses these anyway.
       // So we just support ANSI and UTF-8 and hope for the best.
-      // 2015-06-10 twm
+      // -- 2015-06-10 twm
       if (Bytes = 3) and ((UnicodeBOM and $00FFFFFF) = $00BFBBEF) then
-        FIsUTF8 := true
+//        FIsUTF8 := true
       else
         FileStream.Seek(0, soFromBeginning);
       SFile := TMemoryStream.Create;
@@ -206,7 +212,7 @@ begin
   begin
     FMode := mmModule;
     {$IFOPT D+} SendDebug('EditReader: Got module for ' + FFileName); {$ENDIF}
-    FIsUTF8 := RunningDelphi8OrGreater; // Delphi 8+ convert all edit buffers to UTF-8
+//    FIsUTF8 := RunningDelphi8OrGreater; // Delphi 8+ convert all edit buffers to UTF-8
 
     // Allocate notifier for module
     Assert(FModuleNotifier = nil);
@@ -378,17 +384,24 @@ begin
   SetLength(Buffer, Stream.Size);
   Stream.Position := 0;
   Stream.ReadBuffer(Buffer[1], Stream.Size);
-  if FIsUTF8 then
-    Result := Utf8ToAnsi(Buffer);
+  // In theory we could rely on UTF-8 having a BOM, meaning that
+  // every file not containing a BOM is ANSI. Unfortunately this
+  // turns out to be unreliable, so we assume everything to be
+  // UTF-8, try to convert it to ANSI.
+  // There are four possible cases:
+  // 1) If it is ANSI and does not contain any high ASCII charactes the
+  //    conversion will do nothing
+  // 2) If it is UTF-8, the conversion will work fine
+  // 3) If it is ANSI with high ASCII charactes, the conversion will fail
+  //    and return an empty string. In this case we take the string as is.
+  // 4) If it is neither valid UTF-8 nor ANSI, the conversion will fail
+  //    and return an empty string. In this case we still take the string
+  //    as is and hope for the best.
+  // If this is a non-unicode version of Delphi, all files should be ANSI anyway
+  // UTF8ToUnicodeString does nothing.
+  // -- 2015-06-14 twm
+  Result := UTF8ToUnicodeString(Buffer);
   if (Result = '') and (Buffer <> '') then begin
-    // Sometimes converting the buffer from UTF8 to string returns an empty string
-    // This happens when
-    // * The file is read from disk rather than from the IDE and
-    // * the file contains high ASCII characters
-    // the reason is probably that the file is stored as ANSI rather than UTF8
-    // which causes converting it from UTF8 to string to fail.
-    // In that case we just assign the buffer and hope for the best.
-    // -- 2015-06-09 twm
     Result := String(Buffer);
   end;
 end;
@@ -512,6 +525,27 @@ begin
     EditorPos := EditView.CursorPos;
     EditView.ConvertPos(True, EditorPos, CharPos);
     Result := EditView.CharPosToPos(CharPos);
+  end;
+end;
+
+function TEditReader.GetCurrentCharPos: TOTACharPos;
+var
+  EditorPos: TOTAEditPos;
+  EditView: IOTAEditView;
+begin
+  AllocateFileData;
+
+  Assert(FEditIntf <> nil);
+
+  Result.CharIndex := -1;
+  Result.Line := -1;
+  Assert(FEditIntf.EditViewCount > 0);
+
+  EditView := FEditIntf.EditViews[0];
+  if EditView <> nil then
+  begin
+    EditorPos := EditView.CursorPos;
+    EditView.ConvertPos(True, EditorPos, Result);
   end;
 end;
 
