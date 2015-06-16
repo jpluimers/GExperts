@@ -89,13 +89,16 @@ function GetFileContent(out FileContent: string; const FileName: string;
   var EditorLine: string): Integer;
 var
   EditRead: TEditReader;
+  CharPos: TOTACharPos;
 begin
   // Since this edit reader is destroyed almost
   // immediately, do not call FreeFileData.
   EditRead := TEditReader.Create(FileName);
   try
     FileContent := EditRead.GetText;
-    Result := EditRead.GetCurrentBufferPos;
+
+    CharPos :=EditRead.GetCurrentCharPos;
+    Result := LinePosToCharPos(Point(CharPos.CharIndex + 1, CharPos.Line), FileContent);
   finally
     FreeAndNil(EditRead);
   end;
@@ -117,6 +120,7 @@ var
 
   SPos: Integer;
   EPos: Integer;
+  Point: TPoint;
   SChar: TOTACharPos;
   EChar: TOTACharPos;
   Module: IOTAModule;
@@ -314,9 +318,13 @@ var
               Break;
             end;
           else
-            if i = 0 then
-              TextToken := HackBadEditorStringToNativeString(Parser.RunToken)
-            else if i = 2 then
+            if i = 0 then begin
+              TextToken := Parser.RunToken;
+              if TextToken = CRLF then
+                TextToken := '<cr><lf>'
+              else
+                TextToken := HackBadEditorStringToNativeString(TextToken)
+            end else if i = 2 then
             begin
               MessageDlg(Format(SNotValidIdentifier, [TextToken]), mtError, [mbOK], 0);
               Exit;
@@ -618,8 +626,12 @@ begin
   end;
 
   // A matching delimiter was found
-  SChar := GxOtaGetCharPosFromPos(SPos, GxOtaGetTopMostEditView(SourceEditor));
-  EChar := GxOtaGetCharPosFromPos(EPos, GxOtaGetTopMostEditView(SourceEditor));
+  Point := CharPosToLinePos(SPos + 1, FileContent);
+  SChar.Line := Point.Y;
+  SChar.CharIndex := Point.X - 1;
+  Point := CharPosToLinePos(EPos + 1, FileContent);
+  EChar.Line := Point.Y;
+  EChar.CharIndex := Point.X - 1;
   DoDelimiterAction(SourceEditor, Offset, SChar, EChar);
 end;
 
