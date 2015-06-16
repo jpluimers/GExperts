@@ -3992,7 +3992,7 @@ begin
   try
     sl.Text := Text;
     Offset := 0;
-    // add the line lengths up to the line previous to the current line (and ajust for LineNo vs. LineIdx)
+    // add the line lengths up to the line previous to the current line (and adjust for LineNo vs. LineIdx)
     for LineIdx := 0 to LinePos.Y - 2 do begin
       LineLen := Length(sl[LineIdx]);
       Offset := Offset + LineLen + CRLFLength;
@@ -4018,14 +4018,14 @@ begin
     LineIdx := 0;
     Offset := 0;
     while LineIdx < sl.Count do begin
-      LineLen := Length(sl[LineIdx]);
+      LineLen := Length(sl[LineIdx]) + CRLFLength;
       if Offset + LineLen > CharPos then begin
         Result.Y := LineIdx + 1;
         Result.X := CharPos - Offset;
         Exit;
       end else begin
         Inc(LineIdx);
-        Offset := Offset + LineLen + CRLFLength;
+        Offset := Offset + LineLen;
       end;
     end;
   finally
