@@ -40,10 +40,12 @@ type
   end;
 
   TGXUnicodeChar = Char;
+  PGXUnicodeChar = PChar;
   TGXUnicodeString = string;
   TGXUnicodeStringList = TGXStringList;
   {$ELSE}
   TGXUnicodeChar = WideChar;
+  PGXUnicodeChar = PWideChar;
   TGXUnicodeString = WideString;
   TGXUnicodeStringList = TUnicodeStringList; // SynEdit TUnicodeStringList in D2007 and lower
   {$ENDIF}
@@ -331,7 +333,7 @@ function EOLSizeAtPos(const S: string; Pos: Integer): Integer;
 // removed or added a CRLF at the end of the file
 // checking the length first prevents costly multiple
 // comparisons of potentially large strings
-function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: string): Boolean;
+function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: TGXUnicodeString): Boolean;
 
 // Returns True if S string contains an EOL on the end
 function HasTrailingEOL(S: string): Boolean;
@@ -1993,7 +1995,7 @@ begin
     Result := 0;
 end;
 
-function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: string): Boolean;
+function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: TGXUnicodeString): Boolean;
 var
   NewLen: Integer;
   OrigLen: Integer;

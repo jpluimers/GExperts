@@ -90,6 +90,7 @@ function GxOtaGetCurrentIdent: string;
 
 // Replace the source editor's text with the passed text
 procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
+procedure GxOtaReplaceEditorTextWithUnicodeString(SourceEditor: IOTASourceEditor; Text: TGXUnicodeString);
 
 // Returns current line from edit buffer
 // StartOffset is the start offset of line (zero-based)
@@ -559,11 +560,11 @@ procedure GxOtaShowIDEActions;
 procedure GxOtaShowEditViewDetails;
 
 {$IFDEF GX_VER160_up}
-function ConvertToIDEEditorString(const S: string): UTF8String;
+function ConvertToIDEEditorString(const S: string): UTF8String; overload;
 function IDEEditorStringToString(const S: UTF8String): string; overload;
 function IDEEditorStringToUnicodeString(const S: UTF8String): TGXUnicodeString;
 {$ELSE}
-function ConvertToIDEEditorString(const S: string): string;
+function ConvertToIDEEditorString(const S: string): string; overload;
 {$ENDIF}
 {$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
 function IDEEditorStringToString(const S: string): string; overload;
@@ -571,6 +572,7 @@ function IDEEditorStringToString(const S: string): string; overload;
 
 {$IFNDEF GX_VER200_up}
 function UTF8ToUnicodeString(S: UTF8String): WideString;
+function ConvertToIDEEditorString(const S: TGXUnicodeString): UTF8String; overload;
 {$ENDIF}
 
 function HackBadIDEUTF8StringToString(const S: string): string;
@@ -1865,6 +1867,19 @@ end;
 *)
 
 procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
+var
+  Writer: IOTAEditWriter;
+begin
+  Assert(Assigned(SourceEditor));
+  Writer := SourceEditor.CreateUndoableWriter;
+  if not Assigned(Writer) then
+    raise Exception.Create('No edit writer');
+  Writer.DeleteTo(MaxLongint);
+  Writer.Insert(PAnsiChar(ConvertToIDEEditorString(Text)));
+  Writer := nil;
+end;
+
+procedure GxOtaReplaceEditorTextWithUnicodeString(SourceEditor: IOTASourceEditor; Text: TGXUnicodeString);
 var
   Writer: IOTAEditWriter;
 begin
@@ -4546,6 +4561,13 @@ begin
     MessageBox(Application.Handle, PChar(Msg.Text), 'Edit View Details', 0);
   end;
 end;
+
+{$IFNDEF GX_VER200_up}
+function ConvertToIDEEditorString(const S: TGXUnicodeString): UTF8String;
+begin
+  Result := UTF8Encode(s);
+end;
+{$ENDIF}
 
 {$IFDEF GX_VER160_up}
 function IDEEditorStringToString(const S: UTF8String): string;
