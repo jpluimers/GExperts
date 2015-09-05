@@ -3748,8 +3748,16 @@ begin
   Assert(LineLength >= 0);
   if LineLength = 0 then
     Exit;
+// Unicode patch by Achim Kalwa
+{$IFDEF UNICODE}
+  Result := Copy(
+    IDEEditorStringToString(GxOtaGetEditorLine(View, EditPos.Line)),
+    1, LineLength
+  );
+{$ELSE}
   Result := ReadEditorTextToString(EditReader, LineStartPos, LineLength);
   Result := LastLineOf(Result);
+{$ENDIF}
 end;
 
 function GxOtaSelectCurrentIdent(const SourceEditor: IOTASourceEditor; MakeVisible: Boolean = True): Boolean;
