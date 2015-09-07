@@ -28,7 +28,7 @@ type
      ideRSXE6,
      ideRSXE7,
      ideRSXE8,
-     ideRS10Seattle,
+     ideRS10,
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -785,18 +785,18 @@ end;
   bds.exe
   dcldb230.bpl
 }
-function GetRS10SeattleVersion: TBorlandIdeVersion;
+function GetRS10Version: TBorlandIdeVersion;
 const
   CoreIde2300: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
 begin
-  Result := ideRS10Seattle;
+  Result := ideRS10;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide230.bpl');
   VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde2300);
   if VersionNumber > 0 then begin
-    //Result := ideRSXE8U1;
+    //Result := ideRS10U1;
   end;
 end;
 
@@ -900,8 +900,8 @@ begin
   {$ENDIF VER290}
 
   {$IFDEF VER300}
-    Result := GetRS10SeattleVersion;
-    Assert(Result in [ideRS10Seattle]);
+    Result := GetRS10Version;
+    Assert(Result in [ideRS10]);
   {$ENDIF VER300}
 
   if Result = ideUnknown then

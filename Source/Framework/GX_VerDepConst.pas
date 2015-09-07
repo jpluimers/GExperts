@@ -179,12 +179,12 @@ const
   {$ENDIF VER290}
 
   {$IFDEF VER300} // Delphi/RAD Studio 10 Seattle
-    GExpertsDll = 'GExpertsRS10Seattle.dll';
+    GExpertsDll = 'GExpertsRS10.dll';
     TTabDockHostFormClassContainer = 'designide230.bpl';
     MajorVersionNumberChar = '23';
-    IDEEnglishName = 'RAD Studio 10 Seattle';
+    IDEEnglishName = 'RAD Studio 10';
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\17.0';
-    ClassBrowserStorageFolder = 'Classes.RADStudio10Seattle'; //??
+    ClassBrowserStorageFolder = 'Classes.RADStudio10';
   {$ENDIF VER290}
 
 implementation

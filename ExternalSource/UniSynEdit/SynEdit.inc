@@ -60,7 +60,8 @@
 (* SYN_COMPILER_21_UP   : Delphi XE7  or higher is the compiler.              *)
 (* SYN_COMPILER_22      : Delphi XE8  is the compiler.                        *)
 (* SYN_COMPILER_22_UP   : Delphi XE8  or higher is the compiler.              *)
-(* SYN_COMPILER_23_UP   : Delphi 10 Seattle  or higher is the compiler.       *)
+(* SYN_COMPILER_23      : Delphi 10 is the compiler.                          *)
+(* SYN_COMPILER_23_UP   : Delphi 10 or higher is the compiler.                *)
 (* SYN_CPPB             : Any version of C++Builder is being used.            *)
 (* SYN_CPPB_1           : C++B v1.0x is being used.                           *)
 (* SYN_CPPB_3           : C++B v3.0x is being used.                           *)
@@ -113,8 +114,8 @@
 (* SYN_DELPHI_XE7_UP    : Delphi XE7  or higher is being used.                *)
 (* SYN_DELPHI_XE8       : Delphi XE8  is being used.                          *)
 (* SYN_DELPHI_XE8_UP    : Delphi XE8  or higher is being used.                *)
-(* SYN_DELPHI_10Seattle : Delphi 10 Seattle is being used.                    *)
-(* SYN_DELPHI_10Seattle_UP : Delphi 10 Seattle or higher is being used.       *)
+(* SYN_DELPHI_RS10      : Delphi 10 is being used.                            *)
+(* SYN_DELPHI_RS10_UP   : Delphi 10 or higher is being used.                  *)
 (* SYN_KYLIX            : Kylix 1.0 is being using.                           *)
 (* SYN_CLX              : A CLX application is being created.                 *)
 (******************************************************************************)
@@ -164,7 +165,7 @@
 {$IFDEF VER300}
   {$DEFINE SYN_COMPILER_23}
   {$DEFINE SYN_DELPHI}
-  {$DEFINE SYN_DELPHI_10Seattle}
+  {$DEFINE SYN_DELPHI_10}
 {$ENDIF}
 
 {$IFDEF VER290}
@@ -905,7 +906,7 @@
   {$DEFINE SYN_DELPHI_XE8_UP}
 {$ENDIF}
 
-{$IFDEF SYN_DELPHI_10Seattle}
+{$IFDEF SYN_DELPHI_10}
   {$DEFINE SYN_DELPHI_2_UP}
   {$DEFINE SYN_DELPHI_3_UP}
   {$DEFINE SYN_DELPHI_4_UP}
@@ -926,7 +927,7 @@
   {$DEFINE SYN_DELPHI_XE6_UP}
   {$DEFINE SYN_DELPHI_XE7_UP}
   {$DEFINE SYN_DELPHI_XE8_UP}
-  {$DEFINE SYN_DELPHI_10Seattle_UP}
+  {$DEFINE SYN_DELPHI_10_UP}
 {$ENDIF}
 
 {$IFDEF SYN_CPPB_6}
