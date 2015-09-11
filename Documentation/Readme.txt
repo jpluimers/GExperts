@@ -104,7 +104,7 @@ CHANGE LOG
 ----------------------
 VERSION 1.38 (September 2015)
 - General: Added support for RAD Studio 10 Seattle.
-- General: Improved unicode support for several GExperts tools (Thomas Mueller).
+- General: Improved Unicode support for several GExperts tools (Thomas Mueller).
 - General: Various minor bug fixes.
 
 

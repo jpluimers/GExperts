@@ -168,7 +168,7 @@
 
 
 #ifndef IDEShortName
-  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.37"
+  #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.38"
 #endif
 
 #define FullName    Product +" for "+ IDELongName +" "+ IDEVer
