@@ -1,4 +1,4 @@
-GExperts 1.37
+GExperts 1.38
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -102,9 +102,15 @@ Add/Remove Programs or Programs [and Features] tool.
 
 CHANGE LOG
 ----------------------
-VERSION 1.37 (Sept 2012 - September 2015)
-- General: Added support for RAD Studio XE3, XE4, XE5, XE6, XE7, XE8, and 10
-  (with help from Jeroen Pluimers).  Various minor big fixes.
+VERSION 1.38 (September 2015)
+- General: Added support for RAD Studio 10 Seattle.
+- General: Improved unicode support for several GExperts tools (Thomas Mueller).
+- General: Various minor bug fixes.
+
+
+VERSION 1.37 (September 2012 - May 2015)
+- General: Added support for RAD Studio XE3, XE4, XE5, XE6, XE7, and XE8
+  (with help from Jeroen Pluimers).  Various other minor bug fixes.
 - Grep: Add Ignore Delphi comments feature (via Paul Gardner).  Significantly
   speed up searches by updating the search status details less often.  Add
   ability to auto-hide the Grep Results window when jumping to a match.
