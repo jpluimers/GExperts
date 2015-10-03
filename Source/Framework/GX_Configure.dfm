@@ -387,7 +387,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxTabDockHost: TGroupBox
           Left = 8
-          Top = 165
+          Top = 189
           Width = 375
           Height = 68
           Caption = 'Tab Dock &Hosts'
@@ -412,7 +412,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 8
-          Top = 240
+          Top = 272
           Width = 375
           Height = 165
           Caption = 'Component &Palette'
@@ -481,12 +481,12 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 86
           Width = 375
-          Height = 70
+          Height = 91
           Caption = 'IDE'
           TabOrder = 1
           object chkEnhanceDialogs: TCheckBox
             Left = 8
-            Top = 19
+            Top = 22
             Width = 364
             Height = 17
             Hint = 
@@ -502,11 +502,20 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 43
+            Top = 60
             Width = 364
             Height = 17
             Caption = 'Show object inspector font names using the font'
+            TabOrder = 2
+          end
+          object chk_EnhanceSearchPaths: TCheckBox
+            Left = 24
+            Top = 41
+            Width = 348
+            Height = 17
+            Caption = 'Enable drag&&drop and autocomplete for search paths'
             TabOrder = 1
+            OnClick = chk_EnhanceSearchPathsClick
           end
         end
       end
@@ -609,6 +618,14 @@ object fmConfiguration: TfmConfiguration
           Caption = '&Disable all editor enhancements'
           TabOrder = 2
           OnClick = chkDisableEDTEnhancementsClick
+        end
+        object chk_HideNavbar: TCheckBox
+          Left = 16
+          Top = 328
+          Width = 210
+          Height = 17
+          Caption = 'Hide Navigation Bar (Delphi 10 up)'
+          TabOrder = 3
         end
       end
       object tshDebug: TTabSheet

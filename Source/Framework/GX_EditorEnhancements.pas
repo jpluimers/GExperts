@@ -5,7 +5,8 @@ unit GX_EditorEnhancements;
 interface
 
 uses
-  GX_EditorFormServices, GX_ConfigurationInfo, Classes, Controls;
+  GX_EditorFormServices, GX_ConfigurationInfo, Classes, Controls,
+  GX_HideNavbar;
 
 type
   TConfigurationSheet = (cfgEditor, cfgToolBar, cfgEditorExperts);
@@ -16,6 +17,7 @@ type
 type
   TEditorEnhancements = class(TComponent)
   private
+    FHideNavbarWizardIdx: integer;
     FToolBarAlign: TAlign;
     FToolBarActionsList: TStringList;
     FToolBarList: TList;
@@ -26,6 +28,7 @@ type
     FToolBarVisible: Boolean;
     FEnabled: Boolean;
     FMiddleButtonClose: Boolean;
+    FHideNavbar: boolean;
     procedure AddToolBar;
     procedure RemoveToolBar;
     procedure EditorFormListener(EventCode: TEditFormEventCode; EditFormProxy: IGxEditFormProxy);
@@ -39,6 +42,7 @@ type
     procedure SetEnabled(const Value: Boolean);
     procedure Install;
     procedure Remove;
+    procedure SetHideNavbar(const _Value: boolean);
   protected
     procedure Notification(Component: TComponent; Operation: TOperation); override;
     function ConfigurationKey: string;
@@ -63,6 +67,8 @@ type
     property HotTrack: Boolean read FHotTrack write FHotTrack;
     property Buttons: Boolean read FButtons write FButtons;
     property ButtonsFlat: Boolean read FButtonsFlat write FButtonsFlat;
+
+    property HideNavbar: boolean read FHideNavbar write SetHideNavbar;
   end;
 
 function EditorEnhancements: TEditorEnhancements;
@@ -212,6 +218,7 @@ destructor TEditorEnhancements.Destroy;
 begin
   {$IFOPT D+} SendDebug('Destroying Editor Enhancements'); {$ENDIF}
   Remove;
+  UnregisterHideNavbarWizard(FHideNavbarWizardIdx);
 
   FreeAndNil(FToolBarActionsList);
 
@@ -258,6 +265,7 @@ begin
     Buttons := Settings.ReadBool(ConfigurationKey, 'Buttons', Buttons);
     ButtonsFlat := Settings.ReadBool(ConfigurationKey, 'ButtonsFlat', ButtonsFlat);
     ToolBarVisible := Settings.ReadBool(ConfigurationKey, 'ToolBarVisible', ToolBarVisible);
+    HideNavbar := Settings.ReadBool(ConfigurationKey, 'HideNavbar', HideNavbar);
     FToolBarAlign := TAlign(Settings.ReadInteger(ConfigurationKey, 'ToolBarAlign', Ord(ToolBarAlign)));
     Assert(FToolBarAlign in [Low(TAlign)..High(TAlign)]);
   finally
@@ -364,6 +372,7 @@ begin
     Settings.WriteBool(ConfigurationKey, 'Buttons', Buttons);
     Settings.WriteBool(ConfigurationKey, 'ButtonsFlat', ButtonsFlat);
     Settings.WriteBool(ConfigurationKey, 'ToolBarVisible', ToolBarVisible);
+    Settings.WriteBool(ConfigurationKey, 'HideNavbar', HideNavbar);
     Settings.WriteInteger(ConfigurationKey, 'ToolBarAlign', Ord(ToolBarAlign));
   finally
     FreeAndNil(Settings);
@@ -394,6 +403,20 @@ begin
     Install
   else
     Remove;
+end;
+
+procedure TEditorEnhancements.SetHideNavbar(const _Value: boolean);
+begin
+  FHideNavbar := _Value;
+  if FHideNavbar then begin
+    if FHideNavbarWizardIdx = 0 then
+      FHideNavbarWizardIdx := RegisterHideNavbarWizard;
+  end else begin
+    if FHideNavbarWizardIdx > 0 then begin
+      UnregisterHideNavbarWizard(FHideNavbarWizardIdx);
+      FHideNavbarWizardIdx := 0;
+    end;
+  end;
 end;
 
 procedure TEditorEnhancements.SetToolBarActionsList(const Value: TStrings);

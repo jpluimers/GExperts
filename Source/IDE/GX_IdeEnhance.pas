@@ -73,6 +73,8 @@ type
     function ConfigurationKey: string;
     procedure SetEnhanceIDEForms(const Value: Boolean);
     function GetEnhanceIDEForms: Boolean;
+    function GetEnhanceSearchPath: boolean;
+    procedure SetEnhanceSearchPath(const Value: boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -83,6 +85,8 @@ type
 
     // IDE
     property EnhanceIDEForms: Boolean read GetEnhanceIDEForms write SetEnhanceIDEForms;
+    // Search path
+    property EnhanceSearchPath: boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
     // Fonts
     property OIFontEnabled: Boolean read FOIFontEnabled write SetOIFontEnabled;
     property OIFont: TFont read FOIFont;
@@ -116,7 +120,8 @@ uses
   {$IFDEF MSWINDOWS} VCLEditors, {$ENDIF MSWINDOWS}
   {$IFDEF VER150} Controls, Buttons, {$ENDIF VER150}
   SysUtils, Forms,
-  GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo;
+  GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo, 
+  GX_IdeSearchPathEnhancer;
 
 { TIdeEnhancements }
 
@@ -172,6 +177,11 @@ begin
     TIDEFormEnhancements.SetEnabled(False);
 end;
 
+procedure TIdeEnhancements.SetEnhanceSearchPath(const Value: boolean);
+begin
+  TGxIdeSearchPathEnhancer.SetEnabled(Value);
+end;
+
 destructor TIdeEnhancements.Destroy;
 begin
   if IsStandAlone then
@@ -197,6 +207,7 @@ begin
   with Settings do
     try
       EnhanceIDEForms := ReadBool(ConfigurationKey, 'EnhanceIDEForms', False);
+      EnhanceSearchPath := ReadBool(ConfigurationKey, 'EnhanceSearchPath', False);
       // File saving
       AutoSave := ReadBool(ConfigurationKey, 'AutoSave', False);
       AutoSaveInterval := ReadInteger(ConfigurationKey, 'AutoSaveInterval', 5);
@@ -238,6 +249,7 @@ begin
   with Settings do
     try
       WriteBool(ConfigurationKey, 'EnhanceIDEForms', EnhanceIDEForms);
+      WriteBool(ConfigurationKey, 'EnhanceSearchPath', EnhanceSearchPath);
       // File saving
       WriteBool(ConfigurationKey, 'AutoSave', AutoSave);
       WriteInteger(ConfigurationKey, 'AutoSaveInterval', AutoSaveInterval);
@@ -675,6 +687,11 @@ end;
 function TIdeEnhancements.GetEnhanceIDEForms: Boolean;
 begin
   Result := TIDEFormEnhancements.GetEnabled;
+end;
+
+function TIdeEnhancements.GetEnhanceSearchPath: boolean;
+begin
+  Result := TGxIdeSearchPathEnhancer.GetEnabled;
 end;
 
 function TIdeEnhancements.GetMultiLineTabDockHost: Boolean;

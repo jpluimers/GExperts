@@ -103,6 +103,8 @@ type
     tmrFilter: TTimer;
     lblFilter: TLabel;
     edtFilter: TEdit;
+    chk_HideNavbar: TCheckBox;
+    chk_EnhanceSearchPaths: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -142,6 +144,7 @@ type
     procedure btnCustomFontClick(Sender: TObject);
     procedure tmrFilterTimer(Sender: TObject);
     procedure edtFilterChange(Sender: TObject);
+    procedure chk_EnhanceSearchPathsClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -518,6 +521,7 @@ begin
   chkDefaultMultiLineTabDockHost.Checked := IdeEnhancements.DefaultMultiLineTabDockHost;
 
   chkEnhanceDialogs.Checked := IdeEnhancements.EnhanceIDEForms;
+  chk_EnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
   FCPFont.Assign(IdeEnhancements.CPFont);
@@ -557,6 +561,8 @@ begin
   chkButtons.Checked := EditorEnhancements.Buttons;
   chkEditTabButtonsFlat.Checked := EditorEnhancements.ButtonsFlat;
 
+  chk_HideNavbar.Checked := EditorEnhancements.HideNavbar;
+
   Assert(EditorEnhancements.ToolBarAlign in [alTop..alRight]);
   rgAlign.ItemIndex := Ord(EditorEnhancements.ToolBarAlign) - 1;
 
@@ -584,6 +590,7 @@ begin
   IdeEnhancements.CPFont.Assign(FCPFont);
 
   IdeEnhancements.EnhanceIDEForms := chkEnhanceDialogs.Checked;
+  IdeEnhancements.EnhanceSearchPath := chk_EnhanceSearchPaths.Checked;
 
   // Menus
   ConfigInfo.PlaceGxMainMenuInToolsMenu := chkPlaceGxMainMenuInToolsMenu.Checked;
@@ -623,6 +630,9 @@ begin
   {$IFOPT D+} SendDebug('Setting ToolBarAlign to ' + IntToStr(rgAlign.ItemIndex)); {$ENDIF}
   Assert(rgAlign.ItemIndex >= 0);
   EditorEnhancements.ToolBarAlign := TAlign(rgAlign.ItemIndex + 1);
+
+  {$IFOPT D+} SendDebug('Setting HideNabar to ' + BooleanText(chk_HideNavbar.Checked)); {$ENDIF}
+  EditorEnhancements.HideNavbar := chk_HideNavbar.Checked;
 
   {$IFOPT D+} SendDebug('Setting EditorEnhancements.Enabled to ' + BooleanText(not chkDisableEDTEnhancements.Checked)); {$ENDIF}
   EditorEnhancements.Enabled := not chkDisableEDTEnhancements.Checked;
@@ -689,6 +699,9 @@ begin
     btnCPFont.Enabled := False;
     chkCPFontEnabled.Enabled := False;
   end;
+{$ifndef GX_VER300_up}
+  chk_HideNavbar.Enabled := False;
+{$endif}
 end;
 
 procedure TfmConfiguration.DisableUnsupportedEditorItems;
@@ -795,6 +808,11 @@ begin
                  (Sender as TCheckBox).Enabled;
 
   chkDefaultMultiLineTabDockHost.Enabled := EnableState;
+end;
+
+procedure TfmConfiguration.chk_EnhanceSearchPathsClick(Sender: TObject);
+begin
+  //
 end;
 
 procedure TfmConfiguration.sbxExpertsMouseWheelDown(Sender: TObject;

@@ -2,6 +2,15 @@ unit GX_IdeFormEnhancer;
 
 interface
 
+uses
+  SysUtils,
+  Classes,
+  Forms;
+
+type
+  TFormChangeHandle = pointer;
+  TOnActiveFormChanged = procedure(_Sender: TObject; _NewForm: TCustomForm) of object;
+
 type
   TIDEFormEnhancements = class
   public
@@ -9,13 +18,15 @@ type
     class procedure SetEnabled(const Value: Boolean); //static;
     // Delphi 8- can't handle class properties
     //class property Enabled: Boolean read GetEnabled write SetEnabled;
+    class function RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
+    class procedure UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
   end;
 
 implementation
 
-uses Classes, Forms, Windows, Dialogs, SysUtils, ExtCtrls, Controls,
-ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
-GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils;
+uses Windows, Dialogs, ExtCtrls, Controls,
+  ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
+  GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils;
 
 type
   THackForm = class(TCustomForm);
@@ -66,11 +77,19 @@ type
     function GetForm(Index: Integer): TManagedForm; overload;
   end;
 
+  TFormChangeCallbackItem = class
+    FHandle: Pointer;
+    FCallback: TOnActiveFormChanged;
+    constructor Create(_Handle: Pointer; _Callback: TOnActiveFormChanged);
+  end;
+
   TFormChangeManager = class(TObject)
   private
     FOldActiveFormChanged: TNotifyEvent;
     FNewActiveFormChanged: TNotifyEvent;
     FManagedForms: TManagedFormList;
+    FNextFormChangeCallbacksIdx: integer;
+    FFormChangeCallbacks: TList;
   protected
     constructor Create;
     destructor Destroy; override;
@@ -82,6 +101,8 @@ type
     function FindManagedForm(Form: TCustomForm; var ManagedForm: TManagedForm): Boolean;
     function IsManagingForm(Form: TCustomForm): Boolean;
     procedure ModifyForm(Form: TCustomForm; ManagedForm: TManagedForm);
+    function RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
+    procedure UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
   end;
 
 const
@@ -323,6 +344,7 @@ constructor TFormChangeManager.Create;
 begin
   inherited;
   FManagedForms := TManagedFormList.Create(True);
+  FFormChangeCallbacks:= TList.Create;
   FOldActiveFormChanged := Screen.OnActiveFormChange;
   FNewActiveFormChanged := ScreenActiveFormChange;
   Screen.OnActiveFormChange := ScreenActiveFormChange;
@@ -330,6 +352,7 @@ end;
 
 destructor TFormChangeManager.Destroy;
 begin
+  FreeAndNil(FFormChangeCallbacks);
   FreeAndNil(FManagedForms); // This frees/unhooks any managed form objects
   if @Screen.OnActiveFormChange = @FNewActiveFormChanged then
     Screen.OnActiveFormChange := FOldActiveFormChanged;
@@ -409,8 +432,13 @@ procedure TFormChangeManager.ProcessActivatedForm(Form: TCustomForm);
 var
   Changes: TFormChanges;
   ManagedForm: TManagedForm;
+  i: Integer;
 begin
   Assert(Assigned(Form));
+
+  for i := 0 to FFormChangeCallbacks.Count - 1 do
+    TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
+
   if ShouldManageForm(Form, Changes) then
   begin
     ManagedForm := TManagedForm.Create;
@@ -431,6 +459,13 @@ begin
   end;
 end;
 
+function TFormChangeManager.RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
+begin
+  Result := Pointer(FNextFormChangeCallbacksIdx);
+  Inc(FNextFormChangeCallbacksIdx);
+  FFormChangeCallbacks.Add(TFormChangeCallbackItem.Create(Result, _Callback));
+end;
+
 procedure TFormChangeManager.ScreenActiveFormChange(Sender: TObject);
 begin
   if Assigned(FOldActiveFormChanged) then
@@ -448,7 +483,8 @@ var
 begin
   Assert(Assigned(Form));
   Result := False;
-  if StringInArray(Form.ClassName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) or (csDesigning in Form.ComponentState) then
+  if (csDesigning in Form.ComponentState)
+    or StringInArray(Form.ClassName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) then
     Exit;
   if (Form.ClassName = 'TAboutBox') then  // Or TAboutBoxHiColor in D7-
   begin
@@ -475,6 +511,22 @@ begin
     end;
   end;
 end;
+
+procedure TFormChangeManager.UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
+var
+  i: Integer;
+  Item: TFormChangeCallbackItem;
+begin
+  for i := 0 to FFormChangeCallbacks.Count - 1 do begin
+    Item := FFormChangeCallbacks[i];
+    if Item.FHandle = _Handle then begin
+      FFormChangeCallbacks.Delete(i);
+      Item.Free;
+      exit;
+    end;
+  end;
+end;
+
 
 { TManagedFormList }
 
@@ -513,6 +565,29 @@ begin
     PrivateFormChangeManager := TFormChangeManager.Create
   else if not Value then
     FreeAndNil(PrivateFormChangeManager);
+end;
+
+class function TIDEFormEnhancements.RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
+begin
+  if Assigned(PrivateFormChangeManager) then
+    Result := PrivateFormChangeManager.RegisterFormChangeCallback(_Callback)
+  else
+    Result := nil;
+end;
+
+class procedure TIDEFormEnhancements.UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
+begin
+  if Assigned(PrivateFormChangeManager) then
+    PrivateFormChangeManager.UnregisterFormChangeCallback(_Handle)
+end;
+
+{ TFormChangeCallbackItem }
+
+constructor TFormChangeCallbackItem.Create(_Handle: Pointer; _Callback: TOnActiveFormChanged);
+begin
+  inherited Create;
+  FHandle := _Handle;
+  FCallback := _Callback;
 end;
 
 initialization
