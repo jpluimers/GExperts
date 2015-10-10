@@ -156,7 +156,10 @@ uses
   GX_UsesManager in 'Framework\GX_UsesManager.pas',
   GX_VerDepConst in 'Framework\GX_VerDepConst.pas',
   GX_XmlUtils in 'Utils\GX_XmlUtils.pas',
-  GX_Zipper in 'BackupProject\GX_Zipper.pas';
+  GX_Zipper in 'BackupProject\GX_Zipper.pas',
+  GX_IdeSearchPathEnhancer in 'IDE\GX_IdeSearchPathEnhancer.pas',
+  GX_HideNavbar in 'Experts\GX_HideNavbar.pas',
+  GX_dzVclUtils in 'Utils\GX_dzVclUtils.pas';
 
 begin
 end.

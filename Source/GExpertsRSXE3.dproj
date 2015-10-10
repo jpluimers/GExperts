@@ -407,6 +407,9 @@
         <DCCReference Include="Framework\GX_VerDepConst.pas"/>
         <DCCReference Include="Utils\GX_XmlUtils.pas"/>
         <DCCReference Include="BackupProject\GX_Zipper.pas"/>
+        <DCCReference Include="IDE\GX_IdeSearchPathEnhancer.pas"/>
+        <DCCReference Include="Experts\GX_HideNavbar.pas"/>
+        <DCCReference Include="Utils\GX_dzVclUtils.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
