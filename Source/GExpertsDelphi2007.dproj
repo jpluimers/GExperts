@@ -16,6 +16,8 @@
     <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_Define>RELEASE</DCC_Define>
+    <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
+    <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Version>7.0</Version>
@@ -29,6 +31,8 @@
     <DCC_RangeChecking>True</DCC_RangeChecking>
     <DCC_GenerateStackFrames>True</DCC_GenerateStackFrames>
     <DCC_MapFile>3</DCC_MapFile>
+    <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
+    <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
   </PropertyGroup>
   <ProjectExtensions>
     <Borland.Personality>Delphi.Personality</Borland.Personality>
@@ -168,6 +172,7 @@
       <Form>fmExpertManager</Form>
     </DCCReference>
     <DCCReference Include="Experts\GX_FindComponentRef.pas" />
+    <DCCReference Include="Experts\GX_HideNavbar.pas" />
     <DCCReference Include="Experts\GX_HideNonVisualComps.pas" />
     <DCCReference Include="Experts\GX_IdeShortCuts.pas">
       <Form>fmIdeShortCuts</Form>
@@ -273,6 +278,7 @@
     </DCCReference>
     <DCCReference Include="IDE\GX_IdeEnhance.pas" />
     <DCCReference Include="IDE\GX_IdeFormEnhancer.pas" />
+    <DCCReference Include="IDE\GX_IdeSearchPathEnhancer.pas" />
     <DCCReference Include="IDE\GX_MultilineHost.pas" />
     <DCCReference Include="IDE\GX_MultiLinePalette.pas" />
     <DCCReference Include="MacroLibrary\GX_MacroLibrary.pas">
@@ -372,6 +378,7 @@
     <DCCReference Include="ToDoList\GX_ToDoOptions.pas">
       <Form>fmToDoOptions</Form>
     </DCCReference>
+    <DCCReference Include="Utils\GX_dzVclUtils.pas" />
     <DCCReference Include="Utils\GX_GenericClasses.pas" />
     <DCCReference Include="Utils\GX_GenericUtils.pas" />
     <DCCReference Include="Utils\GX_GxUtils.pas" />
