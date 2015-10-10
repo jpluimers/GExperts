@@ -28,6 +28,8 @@ type
 
 ///<summary>
 /// Enables autocompletion for an edit control using a call to SHAutoComplete
+/// NOTE that this will only work until the control handle is recreated which the VCL does
+///      quite often. See TEdit_AutoComplete which handles this problem.
 /// @param ed is a TCustomEdit control for which autocompletion should be enabled
 /// @param Source is a set of TAutoCompleteSourceEnum that determines from which source to
 ///               autocomplate, any combination of acsFileSystem, acsUrlHistory, acsUrlMru
@@ -39,16 +41,49 @@ type
 ///                        from which the user can then select using the arrow keys or the mouse.
 ///             is is possible to pass an empty set, in which case the registry setting.
 ///             (Unfortunately MSDN doesn't say where in the registry this setting is located.)
+/// @returns true, if autocomplete could be activated </summary>
 function TEdit_SetAutocomplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): Boolean;
 
+///<summary>
+/// Enables autocompletion for an edit control using a call to SHAutoComplete
+/// @param ed is a TCustomEdit control for which autocompletion should be enabled
+/// @param Source is a set of TAutoCompleteSourceEnum that determines from which source to
+///               autocomplate, any combination of acsFileSystem, acsUrlHistory, acsUrlMru
+///               is allowed.
+/// @param Type is a set fo TAutoCompleteEnumSet that determines the type of autocompletion
+///             actAppend means that the first match will be appended to the existing text and
+///                       selected, so that typing anything will automatically overwrite it.
+///             actSuggest means that a list of matches will be displayed as a dropdown list
+///                        from which the user can then select using the arrow keys or the mouse.
+///             is is possible to pass an empty set, in which case the registry setting.
+///             (Unfortunately MSDN doesn't say where in the registry this setting is located.)
+/// @returns the TAutoCompleteActivator instance created.
+///          NOTE: You do not need to free this object! It will automatically be freed when the
+///                TEdit is destroyed. </summary>
 function TEdit_AutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
 
 type
+  ///<summary>
+  /// Event used in TWinControl_ActivateDropFiles.
+  /// @param Sender is the control onto which the files were dropped
+  /// @param Files is a TStrings containg the full names of all files dropped.
+  ///              Use Files.DelimitedText to get a semicolon separated list of all files. </summary>
   TOnFilesDropped = procedure(_Sender: TObject; _Files: TStrings) of object;
 
+///<summary>
+/// Enables dropping of files (folders) from explorer to the given WinControl
+/// @param WinCtrl is a TWinControl for which dropping should be enabled
+/// @param Callback is a TOnFilesDropped event that is called when files are dropped on the form.
+/// @returns the TAutoCompleteActivator instance created.
+///          NOTE: You do not need to free this object! It will automatically be freed when the
+///                TEdit is destroyed. </summary>
 function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFilesDropped): TObject;
+
+///<summary>
+/// @returns true, if the shift key is currently pressed </summary>
+function IsShiftDown: Boolean;
 
 implementation
 
@@ -130,6 +165,14 @@ type
     destructor Destroy; override;
   end;
 
+function IsShiftDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[vk_Shift] and 128) <> 0);
+end;
+
 { TDropFilesActivator }
 
 constructor TDropFilesActivator.Create(_WinControl: TWinControl; _Callback: TOnFilesDropped);
@@ -182,6 +225,7 @@ var
 begin
   sl := TStringList.Create;
   try
+    sl.Delimiter := ';';
     cnt := DragQueryFile(_Msg.wParam, $FFFFFFFF, nil, 255);
     for i := 0 to cnt - 1 do begin
       DragQueryFile(_Msg.wParam, i, PChar(@arr), SizeOf(arr));

@@ -51,6 +51,7 @@ type
     procedure LoadFormSettings;
     procedure SaveFormSettings;
     procedure UpdateMRUs;
+    procedure cbDirectoryOnDropFiles(_Sender: TObject; _Files: TStrings);
   public
     constructor Create(AOwner: TComponent); override;
     procedure RetrieveSettings(var Value: TGrepSettings);
@@ -71,9 +72,9 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Messages, Graphics, Menus,
+  SysUtils, Windows, Messages, Graphics, Menus, RegExpr, Math,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions,
-  GX_GrepRegExSearch, RegExpr, Math;
+  GX_GrepRegExSearch, GX_dzVclUtils;
 
 resourcestring
   SGrepResultsNotActive = 'The Grep Results window is not active';
@@ -236,7 +237,21 @@ end;
 constructor TfmGrepSearch.Create(AOwner: TComponent);
 begin
   inherited;
+
+  TWinControl_ActivateDropFiles(cbDirectory, cbDirectoryOnDropFiles);
+
   LoadFormSettings;
+end;
+
+procedure TfmGrepSearch.cbDirectoryOnDropFiles(_Sender: TObject; _Files: TStrings);
+var
+  s: string;
+begin
+  if IsShiftDown then
+    s := cbDirectory.Text + ';'
+  else
+    s := '';
+  cbDirectory.Text := s + _Files.DelimitedText;
 end;
 
 procedure TfmGrepSearch.SaveFormSettings;

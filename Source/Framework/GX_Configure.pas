@@ -169,6 +169,9 @@ type
     procedure LoadEditorExperts;
 
     procedure FilterVisibleExperts;
+    procedure edVCLPathOnDropFiles(_Sender: TObject; _Files: TStrings);
+    procedure edConfigPathDropFiles(_Sender: TObject; _Files: TStrings);
+    procedure edHelpFileDropFiles(_Sender: TObject; _Files: TStrings);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -184,7 +187,7 @@ uses
   GX_GxUtils, GX_EditorEnhancements, GX_Experts, GX_IdeEnhance,
   GX_ConfigurationInfo, GX_EditorExpertManager, GX_MessageBox,
   GX_GExperts, GX_EditorShortcut, GX_MenuActions, GX_GenericUtils, GX_IdeUtils,
-  GX_OtaUtils;
+  GX_OtaUtils, GX_dzVclUtils;
 
 type
   TShowOldComCtrlVersionMessage = class(TGxMsgBoxAdaptor)
@@ -209,6 +212,13 @@ begin
 
   FOIFont := TFont.Create;
   FCPFont := TFont.Create;
+
+  TWinControl_ActivateDropFiles(edVCLPath, edVCLPathOnDropFiles);
+  TEdit_AutoComplete(edVCLPath, [acsFileSystem], [actSuggest]);
+  TWinControl_ActivateDropFiles(edConfigPath, edConfigPathDropFiles);
+  TEdit_AutoComplete(edConfigPath, [acsFileSystem], [actSuggest]);
+  TWinControl_ActivateDropFiles(edHelpFile, edHelpFileDropFiles);
+  TEdit_AutoComplete(edHelpFile, [acsFileSystem], [actSuggest]);
 
   pcConfig.ActivePage := tshExperts;
   LoadExperts;
@@ -236,6 +246,21 @@ begin
   FreeAndNil(FCPFont);
 
   inherited Destroy;
+end;
+
+procedure TfmConfiguration.edVCLPathOnDropFiles(_Sender: TObject; _Files: TStrings);
+begin
+  edVCLPath.Text := _Files[0];
+end;
+
+procedure TfmConfiguration.edConfigPathDropFiles(_Sender: TObject; _Files: TStrings);
+begin
+  edConfigPath.Text := _Files[0];
+end;
+
+procedure TfmConfiguration.edHelpFileDropFiles(_Sender: TObject; _Files: TStrings);
+begin
+  edHelpFile.Text := _Files[0];
 end;
 
 procedure TfmConfiguration.LoadGeneral;
