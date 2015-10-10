@@ -86,6 +86,8 @@ type
     procedure LoadSettings;
     procedure UpdateCleanExtList;
     function ConfigurationKey: string;
+    procedure clbDirsOnFilesDropped(_Sender: TObject; _Files: TStrings);
+    procedure clbExtensionsOnFilesDropped(_Sender: TObject; _Files: TStrings);
   public
     constructor CreateParametrized(OwningExpert: TCleanExpert);
   end;
@@ -117,8 +119,8 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Variants, SysUtils, FileCtrl, Dialogs,
-  ToolsAPI, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, Math;
+  Variants, SysUtils, FileCtrl, Dialogs, Math,
+  ToolsAPI, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils;
 
 resourcestring
   SCouldNotDelete = 'Could not delete %s' + sLineBreak +
@@ -297,6 +299,44 @@ begin
   CleanExpert := OwningExpert;
 
   inherited Create(nil);
+
+  TWinControl_ActivateDropFiles(clbDirs, clbDirsOnFilesDropped);
+  TWinControl_ActivateDropFiles(clbExtensions, clbExtensionsOnFilesDropped);
+end;
+
+procedure TfmCleanDirectories.clbDirsOnFilesDropped(_Sender: TObject; _Files: TStrings);
+var
+  i: Integer;
+  fn: string;
+  LastIdxAdded: integer;
+begin
+  LastIdxAdded := clbDirs.ItemIndex;
+  for i := 0 to _Files.Count - 1 do begin
+    fn := _Files[i];
+    if DirectoryExists(fn) then
+      LastIdxAdded := clbDirs.Items.Add(AddSlash(fn))
+    else
+      LastIdxAdded := clbDirs.Items.Add(AddSlash(ExtractFileDir(fn)));
+    clbDirs.ItemIndex := LastIdxAdded;
+  end;
+end;
+
+procedure TfmCleanDirectories.clbExtensionsOnFilesDropped(_Sender: TObject; _Files: TStrings);
+var
+  i: Integer;
+  fn: string;
+  LastIdxAdded: integer;
+  Ext: string;
+begin
+  LastIdxAdded := clbDirs.ItemIndex;
+  for i := 0 to _Files.Count - 1 do begin
+    fn := _Files[i];
+    if not DirectoryExists(fn) then begin
+      Ext := ExtractFileExt(fn);
+      LastIdxAdded := clbExtensions.Items.Add('*' + Ext);
+    end;
+    clbExtensions.ItemIndex := LastIdxAdded;
+  end;
 end;
 
 procedure TfmCleanDirectories.DeleteFoundFile(const FileName: string);
