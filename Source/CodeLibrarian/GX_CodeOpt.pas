@@ -36,6 +36,10 @@ type
     procedure sbBrowseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure eNumericKeyPress(Sender: TObject; var Key: Char);
+  private
+    procedure edPathOnFilesDropped(_Sender: TObject; _Files: TStrings);
+  public
+    constructor Create(_Owner: TComponent); override;
   end;
 
 implementation
@@ -43,7 +47,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, GX_GenericUtils;
+  SysUtils, GX_GenericUtils, GX_dzVclUtils;
 
 procedure TfmCodeOptions.sbBrowseClick(Sender: TObject);
 var
@@ -60,10 +64,23 @@ begin
   fcEditor.Items.Assign(Screen.Fonts);
 end;
 
+constructor TfmCodeOptions.Create(_Owner: TComponent);
+begin
+  inherited;
+
+  TWinControl_ActivateDropFiles(edPath, edPathOnFilesDropped);
+  TEdit_AutoComplete(edPath, [acsFileSystem], [actSuggest]);
+end;
+
 procedure TfmCodeOptions.eNumericKeyPress(Sender: TObject; var Key: Char);
 begin
   if not IsCharNumeric(Key) or IsCharTab(Key) then
     Key := #0;
+end;
+
+procedure TfmCodeOptions.edPathOnFilesDropped(_Sender: TObject; _Files: TStrings);
+begin
+  edPath.Text := _Files[0];
 end;
 
 end.
