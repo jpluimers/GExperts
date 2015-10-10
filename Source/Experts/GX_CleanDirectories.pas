@@ -310,7 +310,6 @@ var
   fn: string;
   LastIdxAdded: integer;
 begin
-  LastIdxAdded := clbDirs.ItemIndex;
   for i := 0 to _Files.Count - 1 do begin
     fn := _Files[i];
     if DirectoryExists(fn) then
