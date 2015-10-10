@@ -29,7 +29,10 @@ type
     procedure rbGenericBackupTargetClick(Sender: TObject);
     procedure cbBackupIncClick(Sender: TObject);
     procedure btHelpClick(Sender: TObject);
+  private
+    procedure edBackupDirOnDropFiles(_Sender: TObject; _Files: TStrings);
   public
+    constructor Create(_Owner: TComponent); override;
     procedure SetBackupTargetDirectoryEnabled(const Enable: Boolean);
   end;
 
@@ -38,7 +41,20 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_GenericUtils, GX_GxUtils;
+  GX_GenericUtils, GX_GxUtils, GX_dzVclUtils;
+
+constructor TfmBackupConfig.Create(_Owner: TComponent);
+begin
+  inherited;
+  TWinControl_ActivateDropFiles(edBackupDir, edBackupDirOnDropFiles);
+  TEdit_AutoComplete(edBackupDir, [acsFileSystem], [actSuggest]);
+end;
+
+
+procedure TfmBackupConfig.edBackupDirOnDropFiles(_Sender: TObject; _Files: TStrings);
+begin
+  edBackupDir.Text := _Files[0];
+end;
 
 procedure TfmBackupConfig.btnBackupDirClick(Sender: TObject);
 var
