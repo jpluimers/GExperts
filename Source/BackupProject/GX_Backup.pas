@@ -7,7 +7,7 @@ interface
 uses
   Classes, Controls, Forms, ExtCtrls, Dialogs, StdCtrls,
   ToolsAPI, GX_Progress, GX_Experts, GX_ConfigurationInfo,
-  GX_Zipper, AbArcTyp, AbUtils, GX_BaseForm;
+  GX_Zipper, AbArcTyp, AbUtils, GX_BaseForm, GX_GenericUtils;
 
 type
   TBackupExpert = class;
@@ -52,6 +52,7 @@ type
     FLibraryPath: TStringList;
     FFilesFoundNowhere: TStringList;
     FZipComponent: TGXZipper;
+    FFileSearchThreads: array of TFileFindThread;
     procedure AbbreviaProgress(Sender : TObject; Progress : Byte; var Abort : Boolean);
     procedure FileFailure(Sender: TObject; Item: TAbArchiveItem;
       ProcessType: TAbProcessType; ErrorClass: TAbErrorClass; ErrorCode: Integer);
@@ -67,6 +68,8 @@ type
     procedure CollectFilesForBackup;
     procedure IncrementProgress;
     function ConfigurationKey: string;
+    procedure lbFilesOnFilesDropped(_Sender: TObject; _Files: TStrings);
+    procedure AddFilesInDirs(_Dirs: TStrings);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -105,9 +108,9 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Windows, SysUtils, AbConst,
-  GX_GenericUtils, GX_OtaUtils, GX_MacroParser, GX_GxUtils,
-  GX_BackupOptions, GX_BackupConfig, StrUtils, Math;
+  Windows, SysUtils, AbConst, StrUtils, Math,
+  GX_OtaUtils, GX_MacroParser, GX_GxUtils,
+  GX_BackupOptions, GX_BackupConfig, GX_dzVclUtils, GX_MessageBox;
 
 const // Do not localize these constants.
   ItemSeparatorChar = '|';
@@ -421,11 +424,20 @@ begin
 
   FZipEncrypted := False;
   FHaveCollectedFiles := False;
+
+  TWinControl_ActivateDropFiles(lbFiles, lbFilesOnFilesDropped);
+
   LoadSettings;
 end;
 
 destructor TfmBackup.Destroy;
+var
+  i: Integer;
 begin
+  for i := Low(FFileSearchThreads) to High(FFileSearchThreads) do
+    FFileSearchThreads[i].Free;
+  SetLength(FFileSearchThreads, 0); 
+
   FreeAndNil(FFilesFoundNowhere);
   FreeAndNil(FLibraryPath);
 
@@ -818,6 +830,131 @@ begin
     pnlButtons.Enabled := True;
     pnlFiles.Enabled := True;
     FreeAndNil(Dlg);
+  end;
+end;
+
+type
+  TGxContainsDirectoriesMessage = class(TGxMsgBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+    function GetButtons: TMsgDlgButtons; override;
+    function GetDefaultButton: TMsgDlgBtn; override;
+  end;
+
+{ TGxContainsDirectoriesMessage }
+
+function TGxContainsDirectoriesMessage.GetButtons: TMsgDlgButtons;
+begin
+  Result := [mbYes, mbNo, mbCancel];
+end;
+
+function TGxContainsDirectoriesMessage.GetDefaultButton: TMsgDlgBtn;
+begin
+  Result := mbCancel;
+end;
+
+function TGxContainsDirectoriesMessage.GetMessage: string;
+resourcestring
+  SDroppedFilesContainedDirectories =
+    'The files you dropped contained at least one directory.  ' +
+    'Do you want to recursively add all files within these directories?';
+begin
+  Result := SDroppedFilesContainedDirectories + #13#10
+    + FData;
+end;
+
+type
+  TExtFindFileThread = class(TFileFindThread)
+  private
+    FListBox: TListBox;
+  public
+    constructor Create(_ListBox: TListBox);
+    // This method is called in the main thread using synchronize, so access to the
+    // VCL is allowed. 
+    procedure SyncFindComplete;
+  end;
+
+{ TExtFindFileThread }
+
+constructor TExtFindFileThread.Create(_ListBox: TListBox);
+begin
+  inherited Create;
+  FListBox := _ListBox;
+end;
+
+procedure TExtFindFileThread.SyncFindComplete;
+var
+  i: Integer;
+  fn: string;
+begin
+  LockResults;
+  try
+    FListBox.Items.BeginUpdate;
+    try
+      for i := 0 to Results.Count - 1 do begin
+        fn := Results[i];
+        if not DirectoryExists(fn) then
+          FListBox.Items.Add(fn);
+      end;
+    finally
+      FListBox.Items.EndUpdate;
+    end;
+  finally
+    ReleaseResults;
+  end;
+end;
+
+procedure TfmBackup.AddFilesInDirs(_Dirs: TStrings);
+var
+  DirThread: TExtFindFileThread;
+  Idx: integer;
+begin
+  DirThread := TExtFindFileThread.Create(lbFiles);
+  try
+    DirThread.FileMasks.Add(AllFilesWildCard);
+    DirThread.RecursiveSearchDirs.AddStrings(_Dirs);
+    DirThread.OnFindComplete := DirThread.SyncFindComplete;
+    DirThread.StartFind;
+    Idx :=  Length(FFileSearchThreads);
+    SetLength(FFileSearchThreads, Idx + 1);
+    FFileSearchThreads[Idx] := DirThread;
+    DirThread := nil;
+  finally
+    FreeAndNil(DirThread);
+  end;
+end;
+
+procedure TfmBackup.lbFilesOnFilesDropped(_Sender: TObject; _Files: TStrings);
+var
+  i: Integer;
+  fn: string;
+  Dirs: TStringList;
+begin
+  Dirs := TStringList.Create;
+  try
+  for i := _Files.Count - 1 downto 0 do begin
+    fn := _Files[i];
+    if DirectoryExists(fn) then     begin
+      Dirs.Add(fn);
+      _Files.Delete(i);
+    end;
+  end;
+  if Dirs.Count > 0 then
+    case ShowGxMessageBox(TGxContainsDirectoriesMessage, Dirs.Text) of
+      mrYes: begin
+        AddFilesInDirs(Dirs);
+      end;
+      mrNo: begin
+        // nothing to do, we already removed the directories from _Files
+      end
+    else // mrCancel
+      Exit;
+    end;
+  finally
+    FreeAndNil(Dirs);
+  end;
+  for i := 0 to _Files.Count - 1 do begin
+    lbFiles.Items.Add(_Files[i]);
   end;
 end;
 
