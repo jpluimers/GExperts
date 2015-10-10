@@ -8,6 +8,9 @@ interface
   {$DEFINE SUPPORTS_UNICODE_STRING}
 {$endif}
 
+{$WARN UNIT_PLATFORM OFF}
+{$WARN SYMBOL_PLATFORM OFF}
+
 uses
   Classes,
   Windows,
