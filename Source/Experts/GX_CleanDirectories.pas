@@ -312,7 +312,7 @@ var
 begin
   for i := 0 to _Files.Count - 1 do begin
     fn := _Files[i];
-    if DirectoryExists(fn) then
+    if SysUtils.DirectoryExists(fn) then
       LastIdxAdded := clbDirs.Items.Add(AddSlash(fn))
     else
       LastIdxAdded := clbDirs.Items.Add(AddSlash(ExtractFileDir(fn)));
@@ -330,7 +330,7 @@ begin
   LastIdxAdded := clbDirs.ItemIndex;
   for i := 0 to _Files.Count - 1 do begin
     fn := _Files[i];
-    if not DirectoryExists(fn) then begin
+    if not SysUtils.DirectoryExists(fn) then begin
       Ext := ExtractFileExt(fn);
       LastIdxAdded := clbExtensions.Items.Add('*' + Ext);
     end;
