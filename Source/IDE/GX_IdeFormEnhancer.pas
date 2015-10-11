@@ -106,7 +106,7 @@ type
   end;
 
 const
-  FormsToChange: array[0..3] of TFormChanges = (
+  FormsToChange: array[0..4] of TFormChanges = (
     (
       FormClassNames: 'TSrchDialog';
       MakeResizable: False;
@@ -147,6 +147,17 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
+      CollapseTreeNodes: '';
+      ResizePictureDialogs: False;
+      ComboDropDownCount: 15;
+    ),
+    (
+      FormClassNames: 'TOrderedListEditDlg;TInheritedListEditDlg';
+      MakeResizable: False;
+      RememberSize: True;
+      RememberWidth: False;
+      RememberPosition: True;
+      RememberSplitterPosition: False;
       CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
