@@ -94,6 +94,9 @@ var
 {$ENDIF GX_VER300_up}
 begin
 {$IFDEF GX_VER300_up}
+  if not Assigned(BorlandIDEServices) then
+    exit;
+
   FIsNavbarVisible := _Value;
   EditView := GxOtaGetTopMostEditView;
   if Assigned(EditView) then begin
@@ -105,10 +108,14 @@ end;
 {$IFDEF GX_VER300_up}
 
 constructor THideNavigationToolbarExpert.Create;
+var
+  OTAEditorServices: IOTAEditorServices;
 begin
   inherited;
-  FNotifierIdx := (BorlandIDEServices as IOTAEditorServices).AddNotifier(
-    TEditServiceNotifier.Create(EditorViewActivated));
+  if Assigned(BorlandIDEServices) then begin
+    FNotifierIdx := (BorlandIDEServices as IOTAEditorServices).AddNotifier(
+      TEditServiceNotifier.Create(EditorViewActivated));
+  end;
 end;
 
 destructor THideNavigationToolbarExpert.Destroy;
