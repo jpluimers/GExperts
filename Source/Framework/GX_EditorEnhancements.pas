@@ -17,7 +17,7 @@ type
 type
   TEditorEnhancements = class(TComponent)
   private
-    FHideNavbarWizardIdx: integer;
+    FHideNavigationToolbarExpert: IHideNavigationToolbarExpert;
     FToolBarAlign: TAlign;
     FToolBarActionsList: TStringList;
     FToolBarList: TList;
@@ -201,6 +201,8 @@ begin
 
   Name := 'GX_EditEnhance';
 
+  FHideNavigationToolbarExpert := CreateHideNavigationToolbarExpert;
+
   // Editor tab control
   FHotTrack := True;
 
@@ -218,7 +220,8 @@ destructor TEditorEnhancements.Destroy;
 begin
   {$IFOPT D+} SendDebug('Destroying Editor Enhancements'); {$ENDIF}
   Remove;
-  UnregisterHideNavbarWizard(FHideNavbarWizardIdx);
+
+  FHideNavigationToolbarExpert := Nil;
 
   FreeAndNil(FToolBarActionsList);
 
@@ -408,15 +411,7 @@ end;
 procedure TEditorEnhancements.SetHideNavbar(const _Value: boolean);
 begin
   FHideNavbar := _Value;
-  if FHideNavbar then begin
-    if FHideNavbarWizardIdx = 0 then
-      FHideNavbarWizardIdx := RegisterHideNavbarWizard;
-  end else begin
-    if FHideNavbarWizardIdx > 0 then begin
-      UnregisterHideNavbarWizard(FHideNavbarWizardIdx);
-      FHideNavbarWizardIdx := 0;
-    end;
-  end;
+  FHideNavigationToolbarExpert.SetVisible(not FHideNavbar);
 end;
 
 procedure TEditorEnhancements.SetToolBarActionsList(const Value: TStrings);

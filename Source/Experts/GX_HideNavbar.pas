@@ -18,14 +18,34 @@ uses
   Classes,
   DockForm;
 
-{$ifdef GX_VER300_up}
-// The navigation toolbar exists only in Delphi 10 (for now)
-
 type
-  THideNavigationToolbar = class(TNotifierObject, INTAEditServicesNotifier)
+  IHideNavigationToolbarExpert = interface ['{BC189A61-9313-4ABE-8AB3-2B80B3709DF5}']
+    procedure SetVisible(_Value: boolean);
+  end;
+
+function CreateHideNavigationToolbarExpert: IHideNavigationToolbarExpert;
+
+implementation
+
+uses
+  SysUtils,
+  Controls,
+  GX_OtaUtils;
+
+{$IFDEF GX_VER300_up}
+// The navigation toolbar exists only in Delphi 10 (for now)
+type
+
+  ///<summary>
+  /// We implement INTAEditServicesNotifier only to get a notification when the EditViewActivated
+  /// method is called. This in turn calls the OnEditorViewActivated event. </summary>
+  TEditServiceNotifier = class(TNotifierObject, INTAEditServicesNotifier)
   private
-    function FindComponentByName(const ParentComponent: TComponent; const aName: string): TComponent;
-  public
+    type
+      TOnEditorViewActivatedEvent = procedure(_Sender: TObject; _EditView: IOTAEditView) of object;
+    var
+      FOnEditorViewActivated: TOnEditorViewActivatedEvent;
+  private // INTAEditServicesNotifier
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
@@ -35,127 +55,181 @@ type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+  public
+    constructor Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
   end;
-{$endif GX_VER300_up}
+{$ENDIF GX_VER300_up}
 
-function RegisterHideNavbarWizard: integer;
-procedure UnregisterHideNavbarWizard(_Index: integer);
+type
+  THideNavigationToolbarExpert = class(TInterfacedObject, IHideNavigationToolbarExpert)
+{$IFDEF GX_VER300_up}
+  private
+    FNotifierIdx: integer;
+    FIsNavbarVisible: boolean;
+    function TryFindComponentByName(const ParentComponent: TComponent; const _Name: string;
+      out _Comp: TComponent): boolean;
+    function TrySetNavbarVisible(_EditView: IOTAEditView): boolean;
+    procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
+{$ENDIF GX_VER300_up}
+  private
+    procedure SetVisible(_Value: boolean);
+{$IFDEF GX_VER300_up}
+  public
+    constructor Create;
+    destructor Destroy; override;
+{$ENDIF GX_VER300_up}
+  end;
 
-implementation
+function CreateHideNavigationToolbarExpert: IHideNavigationToolbarExpert;
+begin
+  Result := THideNavigationToolbarExpert.Create;
+end;
 
-uses
-  SysUtils,
-  Controls;
+{ THideNavigationToolbarExpert }
 
-{$ifdef GX_VER300_up}
+procedure THideNavigationToolbarExpert.SetVisible(_Value: boolean);
+{$IFDEF GX_VER300_up}
+var
+  EditView: IOTAEditView;
+{$ENDIF GX_VER300_up}
+begin
+{$IFDEF GX_VER300_up}
+  FIsNavbarVisible := _Value;
+  EditView := GxOtaGetTopMostEditView;
+  if Assigned(EditView) then begin
+    TrySetNavbarVisible(EditView)
+  end;
+{$ENDIF GX_VER300_up}
+end;
 
-{ THideNavigationToolbar }
+{$IFDEF GX_VER300_up}
 
-function THideNavigationToolbar.FindComponentByName(const ParentComponent: TComponent; const aName: string): TComponent;
+constructor THideNavigationToolbarExpert.Create;
+begin
+  inherited;
+  FNotifierIdx := (BorlandIDEServices as IOTAEditorServices).AddNotifier(
+    TEditServiceNotifier.Create(EditorViewActivated));
+end;
+
+destructor THideNavigationToolbarExpert.Destroy;
+begin
+  if FNotifierIdx <> 0 then
+    (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
+
+  inherited Destroy;
+end;
+
+procedure THideNavigationToolbarExpert.EditorViewActivated(_Sender: TObject;
+  _EditView: IOTAEditView);
+begin
+  TrySetNavbarVisible(_EditView)
+end;
+
+function THideNavigationToolbarExpert.TryFindComponentByName(const ParentComponent: TComponent;
+  const _Name: string; out _Comp: TComponent): boolean;
 var
   i: Integer;
-  aComponent: TComponent;
+  cmp: TComponent;
 begin
-  Result := nil;
+  Result := false;
   if not Assigned(ParentComponent) then
     Exit;
 
   for i := 0 to ParentComponent.ComponentCount - 1 do begin
-    aComponent := ParentComponent.Components[i];
+    cmp := ParentComponent.Components[i];
 
-    if SameText(aComponent.Name, aName) then begin
-      Result := aComponent; // Found it!
-      Break;
+    if SameText(cmp.Name, _Name) then begin
+      _Comp := cmp;
+      Result := true;
+      exit;
     end else
-      Result := FindComponentByName(aComponent, aName); // Rekursion!
+      Result := TryFindComponentByName(cmp, _Name, _Comp); // Recursion!
   end;
-end { FindComponentByName };
-
-procedure THideNavigationToolbar.DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-//
 end;
 
-procedure THideNavigationToolbar.DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-//
-end;
-
-procedure THideNavigationToolbar.DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-//
-end;
-
-procedure THideNavigationToolbar.EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
+function THideNavigationToolbarExpert.TrySetNavbarVisible(_EditView: IOTAEditView): boolean;
 var
   C: TComponent;
-  aEditWindow: INTAEditWindow;
-  aControl: TWinControl;
-
+  EditWindow: INTAEditWindow;
+  ctrl: TWinControl;
 begin
-  aEditWindow := nil;
-  if Assigned(EditView) then begin
-    aEditWindow := EditView.GetEditWindow;
+  Result := False;
+  if not Assigned(_EditView) then
+    exit;
+
+  EditWindow := _EditView.GetEditWindow;
+  if not Assigned(EditWindow) then
+    exit;
+
+  ctrl := EditWindow.Form;
+  if not Assigned(ctrl) then
+    exit;
+
+  if TryFindComponentByName(ctrl, 'TEditorNavigationToolbar', c) then begin
+    TWinControl(C).Visible := FIsNavbarVisible;
+    TWinControl(C).Enabled := FIsNavbarVisible;
+    Result := True;
   end;
+end;
 
-  if Assigned(aEditWindow) then begin
-    aControl := aEditWindow.Form;
-    if Assigned(aControl) then begin
-      C := FindComponentByName(aControl, 'TEditorNavigationToolbar');
+{ TEditServiceNotifier }
 
-      if (C is TWinControl) and (TWinControl(C).Visible) then begin
-        TWinControl(C).Visible := False;
-        TWinControl(C).Enabled := False;
-      end;
-    end;
-  end; // if Assigned(aEditWindow)
-end { EditorViewActivated };
+constructor TEditServiceNotifier.Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
+begin
+  FOnEditorViewActivated := _OnEditorViewActivated;
+  inherited Create;
+end;
 
-procedure THideNavigationToolbar.EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
+procedure TEditServiceNotifier.DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
 begin
 //
 end;
 
-procedure THideNavigationToolbar.WindowActivated(const EditWindow: INTAEditWindow);
+procedure TEditServiceNotifier.DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
 begin
 //
 end;
 
-procedure THideNavigationToolbar.WindowCommand(const EditWindow: INTAEditWindow;
+procedure TEditServiceNotifier.DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+begin
+//
+end;
+
+procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
+begin
+  if Assigned(FOnEditorViewActivated) then
+    FOnEditorViewActivated(Self, EditView);
+end;
+
+procedure TEditServiceNotifier.EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
+begin
+//
+end;
+
+procedure TEditServiceNotifier.WindowActivated(const EditWindow: INTAEditWindow);
+begin
+//
+end;
+
+procedure TEditServiceNotifier.WindowCommand(const EditWindow: INTAEditWindow;
   Command, Param: Integer; var Handled: Boolean);
 begin
 //
 end;
 
-procedure THideNavigationToolbar.WindowNotification(const EditWindow: INTAEditWindow;
+procedure TEditServiceNotifier.WindowNotification(const EditWindow: INTAEditWindow;
   Operation: TOperation);
 begin
 //
 end;
 
-procedure THideNavigationToolbar.WindowShow(const EditWindow: INTAEditWindow; Show,
+procedure TEditServiceNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
   LoadedFromDesktop: Boolean);
 begin
 //
 end;
-{$endif GX_VER300_up}
 
-function RegisterHideNavbarWizard: integer;
-begin
-{$ifdef GX_VER300_up}
-  Result := (BorlandIDEServices as IOTAEditorServices).AddNotifier(THideNavigationToolbar.Create)
-{$else}
-  Result := 0;
-{$endif GX_VER300_up}
-end;
-
-procedure UnregisterHideNavbarWizard(_Index: integer);
-begin
-{$ifdef GX_VER300_up}
-  if _Index > 0 then
-    (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(_Index);
-{$endif GX_VER300_up}
-end;
+{$ENDIF GX_VER300_up}
 
 end.
 
