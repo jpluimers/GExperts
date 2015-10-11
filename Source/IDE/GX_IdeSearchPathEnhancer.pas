@@ -162,7 +162,7 @@ begin
       TWinControl_ActivateDropFiles(TListBox(cmp), HandleFilesDropped);
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
-        TLabel(cmp).Caption := TLabel(cmp).Caption + 'Drag and drop is enabled';
+        TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
     end;
   end;
 end;
