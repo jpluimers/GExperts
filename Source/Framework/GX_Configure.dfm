@@ -515,7 +515,6 @@ object fmConfiguration: TfmConfiguration
             Height = 17
             Caption = 'Enable drag&&drop and autocomplete for search paths'
             TabOrder = 1
-            OnClick = chk_EnhanceSearchPathsClick
           end
         end
       end

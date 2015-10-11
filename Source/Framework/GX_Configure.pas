@@ -144,7 +144,6 @@ type
     procedure btnCustomFontClick(Sender: TObject);
     procedure tmrFilterTimer(Sender: TObject);
     procedure edtFilterChange(Sender: TObject);
-    procedure chk_EnhanceSearchPathsClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -833,11 +832,6 @@ begin
                  (Sender as TCheckBox).Enabled;
 
   chkDefaultMultiLineTabDockHost.Enabled := EnableState;
-end;
-
-procedure TfmConfiguration.chk_EnhanceSearchPathsClick(Sender: TObject);
-begin
-  //
 end;
 
 procedure TfmConfiguration.sbxExpertsMouseWheelDown(Sender: TObject;
