@@ -695,8 +695,11 @@ begin
 
   CurrentListView.Items.BeginUpdate;
   try
-    CurrentListView.Items.Clear;
-    CurrentListView.SortType := stNone;
+    if FCurrentFilterIndex = 0 then
+    begin
+      CurrentListView.Items.Clear;
+      CurrentListView.SortType := stNone;
+    end;
     StartTime := GetTickCount;
     while (FCurrentFilterIndex <= FCurrentFilePaths.Count - 1) and not IsTimedOut(StartTime) do
     begin
