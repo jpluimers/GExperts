@@ -3846,16 +3846,72 @@ begin
   Assert(Assigned(Result), SEditWriterNotAvail);
 end;
 
+function GxOtaGetEditReaderForSourceEditor(SourceEditor: IOTASourceEditor = nil): IOTAEditReader;
+resourcestring
+  SEditReaderNotAvail = 'Edit reader not available';
+begin
+  if not Assigned(SourceEditor) then
+    SourceEditor := GxOtaGetCurrentSourceEditor;
+  if Assigned(SourceEditor) then
+  begin
+    Result := SourceEditor.CreateReader;
+  end;
+  Assert(Assigned(Result), SEditReaderNotAvail);
+end;
+
+
+// taken from http://stackoverflow.com/a/10388131/49925
+function UTF8PosToCharIndex(const S: UTF8String; Index: Integer): Integer;
+var
+  I: Integer;
+  P: PAnsiChar;
+begin
+  Result:= 0;
+  if (Index <= 0) or (Index > Length(S)) then Exit;
+  I:= 1;
+  P:= PAnsiChar(S);
+  while I <= Index do begin
+    if Ord(P^) and $C0 <> $80 then Inc(Result);
+    Inc(I);
+    Inc(P);
+  end;
+end;
+
+function CharIndexToUTF8Pos(const S: UTF8String; Index: Integer): Integer;
+var
+  P: PAnsiChar;
+begin
+  Result:= 0;
+  P:= PAnsiChar(S);
+  while (Result < Length(S)) and (Index > 0) do begin
+    Inc(Result);
+    if Ord(P^) and $C0 <> $80 then Dec(Index);
+    Inc(P);
+  end;
+  if Index <> 0 then Result:= 0;  // char index not found
+end;
+
 procedure GxOtaInsertTextIntoEditorAtPos(const Text: string; Position: Longint;
   SourceEditor: IOTASourceEditor);
 var
   EditWriter: IOTAEditWriter;
+  Buffer: string;
+  IdeString: UTF8String;
+  UTF8Pos: integer;
 begin
   if Text = '' then
     Exit;
+
+  // Position is a character position in a (possibly unicode) string
+  // the EditWriter needs a byte position in a UTF-8 string (for Delphi >=8)
+  // or in an ansistring (for Delphi <8)
+  Buffer := GxOtaReadEditorTextToString(GxOtaGetEditReaderForSourceEditor(SourceEditor));
+  IdeString := ConvertToIDEEditorString(Buffer);
+  UTF8Pos := CharIndexToUTF8Pos(IdeString, Position);
   EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
-  EditWriter.CopyTo(Position);
-  EditWriter.Insert(PAnsiChar(ConvertToIDEEditorString(Text)));
+  IdeString :=  ConvertToIDEEditorString(Text);
+  EditWriter.CopyTo(UTF8Pos);
+  EditWriter.Insert(PAnsiChar(IdeString));
 end;
 
 procedure GxOtaGotoPosition(Position: Longint; EditView: IOTAEditView; Middle: Boolean);
