@@ -121,7 +121,7 @@ uses
   {$IFDEF VER150} Controls, Buttons, {$ENDIF VER150}
   SysUtils, Forms,
   GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo, 
-  GX_IdeSearchPathEnhancer;
+  GX_IdeSearchPathEnhancer, GX_IdeProjectOptionsEnhancer;
 
 { TIdeEnhancements }
 
@@ -180,6 +180,7 @@ end;
 procedure TIdeEnhancements.SetEnhanceSearchPath(const Value: boolean);
 begin
   TGxIdeSearchPathEnhancer.SetEnabled(Value);
+  TGxIdeProjectOptionsEnhancer.SetEnabled(Value);
 end;
 
 destructor TIdeEnhancements.Destroy;

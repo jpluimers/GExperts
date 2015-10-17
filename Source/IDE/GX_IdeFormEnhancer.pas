@@ -5,11 +5,14 @@ interface
 uses
   SysUtils,
   Classes,
+  Controls,
   Forms;
 
 type
-  TFormChangeHandle = pointer;
+  TFormChangeHandle = class end;
+  TControlChangeHandle = class end;
   TOnActiveFormChanged = procedure(_Sender: TObject; _NewForm: TCustomForm) of object;
+  TOnActiveControlChanged = procedure(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl) of object;
 
 type
   TIDEFormEnhancements = class
@@ -20,13 +23,15 @@ type
     //class property Enabled: Boolean read GetEnabled write SetEnabled;
     class function RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
     class procedure UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
+    class function RegisterControlChangeCallback(_Callback: TOnActiveControlChanged): TControlChangeHandle;
+    class procedure UnregisterControlChangeCallback(_Handle: TControlChangeHandle);
   end;
 
 implementation
 
-uses Windows, Dialogs, ExtCtrls, Controls,
+uses Windows, Dialogs, ExtCtrls,
   ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
-  GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils;
+  GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils, GX_EventHook;
 
 type
   THackForm = class(TCustomForm);
@@ -78,31 +83,52 @@ type
   end;
 
   TFormChangeCallbackItem = class
+  private
     FHandle: Pointer;
     FCallback: TOnActiveFormChanged;
+  public
     constructor Create(_Handle: Pointer; _Callback: TOnActiveFormChanged);
+  end;
+
+  TControlChangeCallbackItem = class
+  private
+    FHandle: Pointer;
+    FCallback: TOnActiveControlChanged;
+  public
+    constructor Create(_Handle: Pointer; _Callback: TOnActiveControlChanged);
   end;
 
   TFormChangeManager = class(TObject)
   private
-    FOldActiveFormChanged: TNotifyEvent;
-    FNewActiveFormChanged: TNotifyEvent;
+    FScreenActiveFormChangeHook: TNotifyEventHook;
+    FScreenActiveControlChangeHook: TNotifyEventHook;
     FManagedForms: TManagedFormList;
-    FNextFormChangeCallbacksIdx: integer;
     FFormChangeCallbacks: TList;
+    FIsInFormChangeCallback: boolean;
+    FControlChangeCallbacks: TList;
+    FIsInControlChangeCallback: boolean;
+    procedure HookActiveControlChanged;
+    procedure ProcessActivatedControl(Form: TCustomForm; Control: TWinControl);
   protected
     constructor Create;
     destructor Destroy; override;
     function ShouldManageForm(Form: TCustomForm; var Changes: TFormChanges): Boolean;
     procedure ScreenActiveFormChange(Sender: TObject);
+    procedure ScreenActiveControlChange(Sender: TObject);
     procedure ProcessActivatedForm(Form: TCustomForm);
     function FindScreenForm(const FormClassName: string; Handle: HWND): TCustomForm;
     procedure FormDestroy(Sender: TObject);
     function FindManagedForm(Form: TCustomForm; var ManagedForm: TManagedForm): Boolean;
     function IsManagingForm(Form: TCustomForm): Boolean;
     procedure ModifyForm(Form: TCustomForm; ManagedForm: TManagedForm);
+    ///<summary>
+    /// @Result is <> NIL if the registration worked, NIL otherwise </summary>
     function RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
     procedure UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
+    ///<summary>
+    /// @Result is <> NIL if the registration worked, NIL otherwise </summary>
+    function RegisterControlChangeCallback(_Callback: TOnActiveControlChanged): TControlChangeHandle;
+    procedure UnregisterControlChangeCallback(_Handle: TControlChangeHandle);
   end;
 
 const
@@ -355,20 +381,56 @@ constructor TFormChangeManager.Create;
 begin
   inherited;
   FManagedForms := TManagedFormList.Create(True);
-  FFormChangeCallbacks:= TList.Create;
-  FOldActiveFormChanged := Screen.OnActiveFormChange;
-  FNewActiveFormChanged := ScreenActiveFormChange;
-  Screen.OnActiveFormChange := ScreenActiveFormChange;
+  FFormChangeCallbacks := TList.Create;
+  FControlChangeCallbacks := TList.Create;
+
+  // hook Screen.OnActiveFormChange using the method describe here:
+  // http://blog.dummzeuch.de/safe-event-hooking-for-delphi-ide-plugins/
+  FScreenActiveFormChangeHook := HookScreenActiveFormChange(ScreenActiveFormChange);
+
+  // hook Screen.OnActiveControlChange
+  HookActiveControlChanged;
 end;
 
 destructor TFormChangeManager.Destroy;
+var
+  i: Integer;
 begin
-  FreeAndNil(FFormChangeCallbacks);
+  // unhook first, to be sure none of these hooks is being called after we freed our lists
+  if Assigned(FScreenActiveControlChangeHook) then
+    UnhookScreenActiveControlChange(FScreenActiveControlChangeHook);
+
+  if Assigned(FScreenActiveFormChangeHook) then
+    UnhookScreenActiveFormChange(FScreenActiveFormChangeHook);
+
+  if Assigned(FControlChangeCallbacks) then begin
+    for i := 0 to FControlChangeCallbacks.Count - 1 do
+      TObject(FControlChangeCallbacks[i]).Free;
+    FreeAndNil(FControlChangeCallbacks);
+  end;
+
+  if Assigned(FFormChangeCallbacks) then begin
+    for i := 0 to FFormChangeCallbacks.Count - 1 do
+      TObject(FFormChangeCallbacks[i]).Free;
+    FreeAndNil(FFormChangeCallbacks);
+  end;
+
   FreeAndNil(FManagedForms); // This frees/unhooks any managed form objects
-  if @Screen.OnActiveFormChange = @FNewActiveFormChanged then
-    Screen.OnActiveFormChange := FOldActiveFormChanged;
-  FOldActiveFormChanged := nil;
+
   inherited;
+end;
+
+function IsSameMethod(_Method1, _Method2: TNotifyEvent): boolean;
+begin
+  result := (TMethod(_Method1).Code = TMethod(_Method2).Code)
+    and (TMethod(_Method1).Data = TMethod(_Method2).Data);
+end;
+
+procedure TFormChangeManager.HookActiveControlChanged;
+begin
+  if Assigned(FScreenActiveControlChangeHook) then
+    UnhookScreenActiveControlChange(FScreenActiveControlChangeHook);
+  FScreenActiveControlChangeHook := HookScreenActiveControlChange(ScreenActiveControlChange)
 end;
 
 function TFormChangeManager.FindManagedForm(Form: TCustomForm; var ManagedForm: TManagedForm): Boolean;
@@ -439,6 +501,24 @@ begin
   ManagedForm.DoComboDropDownCount(Form);
 end;
 
+procedure TFormChangeManager.ProcessActivatedControl(Form: TCustomForm; Control: TWinControl);
+var
+  i: Integer;
+begin
+  // We are executing the callbacks in last registered first order to allow callbacks to
+  // unregister themselves. (And we don't check whether a callback only unregisters itself, so
+  // please be cautios!). That means registering a new callback while executing a callback
+  // is not allowed.
+  FIsInControlChangeCallback := True;
+  try
+    for i := FControlChangeCallbacks.Count - 1 downto 0 do
+      TControlChangeCallbackItem(FControlChangeCallbacks[i]).FCallback(Self, Form, Control);
+  finally
+    FIsInControlChangeCallback := False;
+  end;
+
+end;
+
 procedure TFormChangeManager.ProcessActivatedForm(Form: TCustomForm);
 var
   Changes: TFormChanges;
@@ -447,8 +527,17 @@ var
 begin
   Assert(Assigned(Form));
 
-  for i := 0 to FFormChangeCallbacks.Count - 1 do
-    TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
+  // We are executing the callbacks in last registered first order to allow callbacks to
+  // unregister themselves. (And we don't check whether a callback only unregisters itself, so
+  // please be cautios!). That means registering a new callback while executing a callback
+  // is not allowed.
+  FIsInFormChangeCallback := True;
+  try
+    for i := FFormChangeCallbacks.Count - 1 downto 0 do
+      TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
+  finally
+    FIsInFormChangeCallback := False;
+  end;
 
   if ShouldManageForm(Form, Changes) then
   begin
@@ -470,17 +559,40 @@ begin
   end;
 end;
 
+function TFormChangeManager.RegisterControlChangeCallback(_Callback: TOnActiveControlChanged): TControlChangeHandle;
+begin
+  // We are executing the callbacks in last registered first order to allow callbacks to
+  // unregister themselves. (And we don't check whether a callback only unregisters itself, so
+  // please be cautios!). That means registering a new callback while executing a callback
+  // is not allowed.
+  if FIsInControlChangeCallback then
+    raise Exception.Create('Cannot register new ControlChange callback while callbacks are active.');
+  Result := Pointer(FControlChangeCallbacks.Count + 1);
+  FControlChangeCallbacks.Add(TControlChangeCallbackItem.Create(Result, _Callback));
+  HookActiveControlChanged;
+end;
+
 function TFormChangeManager.RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
 begin
-  Result := Pointer(FNextFormChangeCallbacksIdx);
-  Inc(FNextFormChangeCallbacksIdx);
+  // We are executing the callbacks in last registered first order to allow callbacks to
+  // unregister themselves. (And we don't check whether a callback only unregisters itself, so
+  // please be cautios!). That means registering a new callback while executing a callback
+  // is not allowed.
+  if FIsInFormChangeCallback then
+    raise Exception.Create('Cannot register new FormChange callback while callbacks are active.');
+  Result := Pointer(FFormChangeCallbacks.Count + 1);
   FFormChangeCallbacks.Add(TFormChangeCallbackItem.Create(Result, _Callback));
+end;
+
+procedure TFormChangeManager.ScreenActiveControlChange(Sender: TObject);
+begin
+  if Assigned(Screen) then
+    if Assigned(Screen.ActiveCustomForm) and Assigned(Screen.ActiveControl) then
+      ProcessActivatedControl(Screen.ActiveCustomForm, Screen.ActiveControl);
 end;
 
 procedure TFormChangeManager.ScreenActiveFormChange(Sender: TObject);
 begin
-  if Assigned(FOldActiveFormChanged) then
-    FOldActiveFormChanged(Sender);
   if Assigned(Screen) then
     if Assigned(Screen.ActiveCustomForm) then
       ProcessActivatedForm(Screen.ActiveCustomForm);
@@ -523,6 +635,21 @@ begin
   end;
 end;
 
+procedure TFormChangeManager.UnregisterControlChangeCallback(_Handle: TControlChangeHandle);
+var
+  i: Integer;
+  Item: TFormChangeCallbackItem;
+begin
+  for i := 0 to FControlChangeCallbacks.Count - 1 do begin
+    Item := FControlChangeCallbacks[i];
+    if Item.FHandle = _Handle then begin
+      FControlChangeCallbacks.Delete(i);
+      Item.Free;
+      Exit;
+    end;
+  end;
+end;
+
 procedure TFormChangeManager.UnregisterFormChangeCallback(_Handle: TFormChangeHandle);
 var
   i: Integer;
@@ -533,7 +660,7 @@ begin
     if Item.FHandle = _Handle then begin
       FFormChangeCallbacks.Delete(i);
       Item.Free;
-      exit;
+      Exit;
     end;
   end;
 end;
@@ -592,9 +719,32 @@ begin
     PrivateFormChangeManager.UnregisterFormChangeCallback(_Handle)
 end;
 
+class function TIDEFormEnhancements.RegisterControlChangeCallback(_Callback: TOnActiveControlChanged): TControlChangeHandle;
+begin
+  if Assigned(PrivateFormChangeManager) then
+    Result := PrivateFormChangeManager.RegisterControlChangeCallback(_Callback)
+  else
+    Result := nil;
+end;
+
+class procedure TIDEFormEnhancements.UnregisterControlChangeCallback(_Handle: TControlChangeHandle);
+begin
+  if Assigned(PrivateFormChangeManager) then
+    PrivateFormChangeManager.UnregisterControlChangeCallback(_Handle)
+end;
+
 { TFormChangeCallbackItem }
 
 constructor TFormChangeCallbackItem.Create(_Handle: Pointer; _Callback: TOnActiveFormChanged);
+begin
+  inherited Create;
+  FHandle := _Handle;
+  FCallback := _Callback;
+end;
+
+{ TControlChangeCallbackItem }
+
+constructor TControlChangeCallbackItem.Create(_Handle: Pointer; _Callback: TOnActiveControlChanged);
 begin
   inherited Create;
   FHandle := _Handle;

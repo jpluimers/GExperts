@@ -158,7 +158,7 @@ begin
     FIsAutocompleteEnabled := True;
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     cmp := _Form.FindComponent('CreationList');
-    if cmp is TListBox then begin
+    if Assigned(cmp) and (cmp is TListBox) then begin
       TWinControl_ActivateDropFiles(TListBox(cmp), HandleFilesDropped);
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
