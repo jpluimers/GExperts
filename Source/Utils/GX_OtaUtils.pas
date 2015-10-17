@@ -1591,6 +1591,37 @@ begin
   end;
 end;
 
+// taken from http://stackoverflow.com/a/10388131/49925
+function UTF8PosToCharIndex(const S: UTF8String; Index: Integer): Integer;
+var
+  I: Integer;
+  P: PAnsiChar;
+begin
+  Result:= 0;
+  if (Index <= 0) or (Index > Length(S)) then Exit;
+  I:= 1;
+  P:= PAnsiChar(S);
+  while I <= Index do begin
+    if Ord(P^) and $C0 <> $80 then Inc(Result);
+    Inc(I);
+    Inc(P);
+  end;
+end;
+
+function CharIndexToUTF8Pos(const S: UTF8String; Index: Integer): Integer;
+var
+  P: PAnsiChar;
+begin
+  Result:= 0;
+  P:= PAnsiChar(S);
+  while (Result < Length(S)) and (Index > 0) do begin
+    Inc(Result);
+    if Ord(P^) and $C0 <> $80 then Dec(Index);
+    Inc(P);
+  end;
+  if Index <> 0 then Result:= 0;  // char index not found
+end;
+
 function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; ByteBased: Boolean): string;
 
   // Returns column, line number, and source of the active editor
@@ -1600,6 +1631,7 @@ function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; Byt
     EditView: IOTAEditView;
     EditPos: TOTAEditPos;
     CharPos: TOTACharPos;
+    IdeString: UTF8String;
   begin
     Result := '';
     CursorPosition := 0;
@@ -1618,6 +1650,8 @@ function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; Byt
       EditView.ConvertPos(True, EditPos, CharPos);
       CursorLine := CharPos.Line;
       CursorPosition := EditView.CharPosToPos(CharPos);
+      IdeString := ConvertToIDEEditorString(Result);
+      CursorPosition := UTF8PosToCharIndex(IdeString, CursorPosition);
     end;
   end;
 
@@ -3859,38 +3893,6 @@ begin
   Assert(Assigned(Result), SEditReaderNotAvail);
 end;
 
-
-// taken from http://stackoverflow.com/a/10388131/49925
-function UTF8PosToCharIndex(const S: UTF8String; Index: Integer): Integer;
-var
-  I: Integer;
-  P: PAnsiChar;
-begin
-  Result:= 0;
-  if (Index <= 0) or (Index > Length(S)) then Exit;
-  I:= 1;
-  P:= PAnsiChar(S);
-  while I <= Index do begin
-    if Ord(P^) and $C0 <> $80 then Inc(Result);
-    Inc(I);
-    Inc(P);
-  end;
-end;
-
-function CharIndexToUTF8Pos(const S: UTF8String; Index: Integer): Integer;
-var
-  P: PAnsiChar;
-begin
-  Result:= 0;
-  P:= PAnsiChar(S);
-  while (Result < Length(S)) and (Index > 0) do begin
-    Inc(Result);
-    if Ord(P^) and $C0 <> $80 then Dec(Index);
-    Inc(P);
-  end;
-  if Index <> 0 then Result:= 0;  // char index not found
-end;
-
 procedure GxOtaInsertTextIntoEditorAtPos(const Text: string; Position: Longint;
   SourceEditor: IOTASourceEditor);
 var
@@ -4275,10 +4277,19 @@ var
   EditView: IOTAEditView;
   CharPos: TOTACharPos;
   EditPos: TOTAEditPos;
+  Buffer: string;
+  IdeString: UTF8String;
 begin
   EditView := GxOtaGetTopMostEditView;
   if Assigned(EditView) then
   begin
+    // Convert Position from character postion in the unicode/ansi string to
+    // character position in UTF-8 encoded buffer.
+    // todo: This should really be a function as well as the reverse.
+    if GxOtaGetActiveEditorTextAsString(Buffer, False) then begin
+      IdeString := ConvertToIDEEditorString(Buffer);
+      Position := CharIndexToUTF8Pos(IdeString, Position);
+    end;
     CharPos := GxOtaGetCharPosFromPos(Position - 1, EditView);
     EditView.ConvertPos(False, EditPos, CharPos);
     EditView.CursorPos := EditPos;
