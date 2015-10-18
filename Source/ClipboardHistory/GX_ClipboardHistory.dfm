@@ -1,6 +1,6 @@
 inherited fmClipboardHistory: TfmClipboardHistory
-  Left = 356
-  Top = 273
+  Left = -737
+  Top = 210
   ActiveControl = lvClip
   Caption = 'Clipboard History'
   ClientHeight = 428
@@ -9,10 +9,11 @@ inherited fmClipboardHistory: TfmClipboardHistory
   Menu = MainMenu
   Position = poScreenCenter
   OnClose = FormClose
+  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   object Splitter: TSplitter
     Left = 0
     Top = 278
@@ -35,13 +36,19 @@ inherited fmClipboardHistory: TfmClipboardHistory
   end
   object lvClip: TListView
     Left = 0
-    Top = 22
+    Top = 63
     Width = 550
-    Height = 256
+    Height = 215
     Align = alClient
     Columns = <
       item
         Caption = 'Time'
+        Width = -1
+        WidthType = (
+          -1)
+      end
+      item
+        Caption = 'Lines'
         Width = -1
         WidthType = (
           -1)
@@ -57,6 +64,7 @@ inherited fmClipboardHistory: TfmClipboardHistory
     MultiSelect = True
     ReadOnly = True
     RowSelect = True
+    PopupMenu = pmListMenu
     TabOrder = 1
     ViewStyle = vsReport
     OnChange = lvClipChange
@@ -67,11 +75,9 @@ inherited fmClipboardHistory: TfmClipboardHistory
     Left = 0
     Top = 0
     Width = 550
-    Height = 22
+    Height = 26
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
-    EdgeBorders = []
-    Flat = True
     Images = dmSharedImages.Images
     ParentShowHint = False
     ShowHint = True
@@ -79,54 +85,114 @@ inherited fmClipboardHistory: TfmClipboardHistory
     Wrapable = False
     object tbnClear: TToolButton
       Left = 0
-      Top = 0
+      Top = 2
       Action = actEditClear
     end
     object tbnDelete: TToolButton
       Left = 23
-      Top = 0
+      Top = 2
       Action = actDelete
     end
     object tbnSep1: TToolButton
       Left = 46
-      Top = 0
+      Top = 2
       Width = 8
       ImageIndex = 1
       Style = tbsSeparator
     end
     object tbnCopy: TToolButton
       Left = 54
-      Top = 0
+      Top = 2
       Action = actEditCopy
     end
     object tbnPaste: TToolButton
       Left = 77
-      Top = 0
+      Top = 2
       Action = actEditPasteToIde
     end
-    object tbnSep2: TToolButton
+    object tbnPasteAsPascal: TToolButton
       Left = 100
-      Top = 0
+      Top = 2
+      Action = actEditPasteAsPascalString
+    end
+    object tbnSep2: TToolButton
+      Left = 123
+      Top = 2
       Width = 8
       ImageIndex = 3
       Style = tbsSeparator
     end
-    object btnOptions: TToolButton
-      Left = 108
-      Top = 0
-      Action = actViewOptions
+    object tbnViewPasteAs: TToolButton
+      Left = 131
+      Top = 2
+      Action = actViewPasteAsOptions
     end
     object tbnSep3: TToolButton
-      Left = 131
-      Top = 0
+      Left = 154
+      Top = 2
       Width = 8
       ImageIndex = 1
       Style = tbsSeparator
     end
+    object btnOptions: TToolButton
+      Left = 162
+      Top = 2
+      Action = actViewOptions
+    end
+    object tbnSep4: TToolButton
+      Left = 185
+      Top = 2
+      Width = 8
+      Caption = 'tbnSep4'
+      ImageIndex = 1
+      Style = tbsSeparator
+    end
     object tbnHelp: TToolButton
-      Left = 139
-      Top = 0
+      Left = 193
+      Top = 2
       Action = actHelpHelp
+    end
+  end
+  object pnlPasteAsOptions: TPanel
+    Left = 0
+    Top = 26
+    Width = 550
+    Height = 37
+    Align = alTop
+    BevelOuter = bvLowered
+    TabOrder = 3
+    object lblMaxEntries: TLabel
+      Left = 14
+      Top = 10
+      Width = 78
+      Height = 14
+      Alignment = taRightJustify
+      Caption = 'Paste as type:'
+    end
+    object cbPasteAsType: TComboBox
+      Left = 100
+      Top = 7
+      Width = 170
+      Height = 22
+      Style = csDropDownList
+      ItemHeight = 14
+      TabOrder = 0
+    end
+    object chkCreateQuotedStrings: TCheckBox
+      Left = 285
+      Top = 1
+      Width = 250
+      Height = 25
+      Caption = 'Create quoted strings'
+      TabOrder = 1
+    end
+    object chkAddExtraSpaceAtTheEnd: TCheckBox
+      Left = 285
+      Top = 20
+      Width = 250
+      Height = 17
+      Caption = 'Add extra space char at the end'
+      TabOrder = 2
     end
   end
   object MainMenu: TMainMenu
@@ -156,14 +222,26 @@ inherited fmClipboardHistory: TfmClipboardHistory
       object mitEditCopy: TMenuItem
         Action = actEditCopy
       end
+      object mitEditCopyfromPascalstring: TMenuItem
+        Action = actEditCopyFromPascalString
+      end
       object mitEditPasteToIde: TMenuItem
         Action = actEditPasteToIde
+      end
+      object mitEditPasteAsPascalString: TMenuItem
+        Action = actEditPasteAsPascalString
+      end
+      object mitEditReplaceasPascalstring: TMenuItem
+        Action = actEditReplaceAsPascalString
       end
     end
     object mitView: TMenuItem
       Caption = 'View'
       object mitViewToolBar: TMenuItem
         Action = actViewToolBar
+      end
+      object ShowPasteAsoptions1: TMenuItem
+        Action = actViewPasteAsOptions
       end
       object mitViewOptions: TMenuItem
         Action = actViewOptions
@@ -268,6 +346,62 @@ inherited fmClipboardHistory: TfmClipboardHistory
       ImageIndex = 11
       ShortCut = 16430
       OnExecute = actDeleteExecute
+    end
+    object actEditPasteAsPascalString: TAction
+      Category = 'Edit'
+      Caption = 'Paste as Pascal string'
+      Hint = 'Paste as Pascal string'
+      ImageIndex = 78
+      OnExecute = actEditPasteAsPascalStringExecute
+    end
+    object actViewPasteAsOptions: TAction
+      Category = 'View'
+      Caption = 'Show PasteAs options'
+      Checked = True
+      Hint = 'Show or hide the PasteAs options panel'
+      ImageIndex = 27
+      OnExecute = actViewPasteAsOptionsExecute
+    end
+    object actEditCopyFromPascalString: TAction
+      Category = 'Edit'
+      Caption = 'Copy from Pascal string'
+      Hint = 'Copy from Pascal string'
+      ImageIndex = 6
+      OnExecute = actEditCopyExecute
+    end
+    object actEditReplaceAsPascalString: TAction
+      Category = 'Edit'
+      Caption = 'Replace as Pascal string'
+      Hint = 'Replace as Pascal string'
+      OnExecute = actEditPasteAsPascalStringExecute
+    end
+  end
+  object pmListMenu: TPopupMenu
+    Left = 208
+    Top = 56
+    object mitListCopy: TMenuItem
+      Action = actEditCopy
+    end
+    object mitListPasteIntoIDE: TMenuItem
+      Action = actEditPasteToIde
+    end
+    object mitListSep1: TMenuItem
+      Caption = '-'
+    end
+    object mitListPasteAsPascalString: TMenuItem
+      Action = actEditPasteAsPascalString
+    end
+    object mitListCopyfromPascalstring: TMenuItem
+      Action = actEditCopyFromPascalString
+    end
+    object mitReplaceasPascalstring: TMenuItem
+      Action = actEditReplaceAsPascalString
+    end
+    object mitListSep2: TMenuItem
+      Caption = '-'
+    end
+    object mitListDelete: TMenuItem
+      Action = actDelete
     end
   end
 end

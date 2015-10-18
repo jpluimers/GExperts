@@ -63,6 +63,31 @@ type
     mitEditDelete: TMenuItem;
     tbnSep1: TToolButton;
     mitEditSep1: TMenuItem;
+    pmListMenu: TPopupMenu;
+    mitListCopy: TMenuItem;
+    mitListPasteIntoIDE: TMenuItem;
+    mitListDelete: TMenuItem;
+    mitListSep2: TMenuItem;
+    actEditPasteAsPascalString: TAction;
+    mitEditPasteAsPascalString: TMenuItem;
+    mitListPasteAsPascalString: TMenuItem;
+    tbnPasteAsPascal: TToolButton;
+    pnlPasteAsOptions: TPanel;
+    actViewPasteAsOptions: TAction;
+    tbnViewPasteAs: TToolButton;
+    tbnSep4: TToolButton;
+    ShowPasteAsoptions1: TMenuItem;
+    lblMaxEntries: TLabel;
+    cbPasteAsType: TComboBox;
+    chkCreateQuotedStrings: TCheckBox;
+    chkAddExtraSpaceAtTheEnd: TCheckBox;
+    actEditCopyFromPascalString: TAction;
+    actEditReplaceAsPascalString: TAction;
+    mitEditCopyfromPascalstring: TMenuItem;
+    mitEditReplaceasPascalstring: TMenuItem;
+    mitListSep1: TMenuItem;
+    mitListCopyfromPascalstring: TMenuItem;
+    mitReplaceasPascalstring: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure SplitterMoved(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -82,6 +107,9 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure actRehookClipboardExecute(Sender: TObject);
     procedure actDeleteExecute(Sender: TObject);
+    procedure actEditPasteAsPascalStringExecute(Sender: TObject);
+    procedure actViewPasteAsOptionsExecute(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     FHelperWindow: TWinControl;
     IgnoreClip: Boolean;
@@ -98,6 +126,8 @@ type
     function HaveSelectedItem: Boolean;
     procedure RemoveDataListItem(Index: Integer);
     function GetSelectedItemsText: string;
+    procedure WmDrawClipBoard;
+    procedure AddClipItem(const AClipText: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -138,9 +168,10 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Windows, Messages, SysUtils, Clipbrd, Dialogs, OmniXML,
-  GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
-  GX_GExperts, GX_ClipboardOptions, GX_SharedImages, GX_XmlUtils, Math;
+  Windows, Messages, SysUtils, Clipbrd, Dialogs, Math, StrUtils, OmniXML,
+  GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils,
+  GX_GExperts, GX_ClipboardOptions, GX_SharedImages, GX_XmlUtils,
+  GX_PasteAs;
 
 const
   ClipStorageFileName = 'ClipboardHistory.xml';
@@ -156,17 +187,25 @@ type
     destructor Destroy; override;
   end;
 
-function FirstLineOfText(const AClipString: string): string;
+  TClipData = record
+    FirstLine: String;
+    Count: Integer;
+  end;
+
+function FirstLineOfText(const AClipString: string): TClipData;
 begin
+  Result.FirstLine := '';
   with TStringList.Create do
   try
     Text := AClipString;
-    if Count > 0 then
-      Result := Strings[0];
+    Result.Count := Count;
+    if Result.Count > 0 then
+      Result.FirstLine := Strings[0];
   finally
     Free;
   end;
 end;
+
 
 { THelperWinControl }
 
@@ -209,69 +248,12 @@ begin
 end;
 
 procedure THelperWinControl.WMDrawClipBoard(var Msg: TMessage);
-var
-  ItemCount: Integer;
-  ClipItem: TListItem;
-  Info: TClipInfo;
-  Handle: Cardinal;
-  DataSize: Cardinal;
-  ClipText: string;
 begin
   try
     {$IFOPT D+} SendDebug('In THelperWinControl WMDrawClipBoard'); {$ENDIF}
     if not Assigned(fmClipboardHistory) then
       Exit;
-    if fmClipboardHistory.IgnoreClip then
-      Exit;
-    try
-      if Clipboard.HasFormat(CF_TEXT) then
-      begin
-        Clipboard.Open;
-        try
-          Handle := Clipboard.GetAsHandle(CF_TEXT);
-          DataSize := GlobalSize(Handle);  // This function might over-estimate by a few bytes
-        finally
-          Clipboard.Close;
-        end;
-        // Don't try to save clipboard items over 512 KB for speed reasons
-        if DataSize > ((1024 * 512) + 32) then
-          Exit;
-
-        ClipText := Clipboard.AsText;
-        if (fmClipboardHistory.FDataList.Count = 0) or
-           (TClipInfo(fmClipboardHistory.FDataList[0]).ClipString <> clipText) then begin
-          {$IFOPT D+} SendDebug('New clipboard text detected'); {$ENDIF}
-          fmClipboardHistory.mmoClipText.Text := ClipText;
-
-          Info := TClipInfo.Create;
-          fmClipboardHistory.FDataList.Insert(0, Info);
-          Info.ClipString := fmClipboardHistory.mmoClipText.Text;
-          Info.ClipTimeStamp := TimeToStr(Time);
-
-          ClipItem := fmClipboardHistory.lvClip.Items.Insert(0);
-          ClipItem.Caption := Info.ClipTimeStamp;
-          ClipItem.SubItems.Add(Trim(FirstLineOfText(ClipText)));
-          ClipItem.Data := Info;
-
-          ItemCount := fmClipboardHistory.lvClip.Items.Count;
-          if ItemCount > ClipExpert.MaxClip then
-          begin
-            Dec(ItemCount);
-            fmClipboardHistory.lvClip.Items.Delete(ItemCount);
-            TClipInfo(fmClipboardHistory.FDataList[ItemCount]).Free;
-            fmClipboardHistory.FDataList.Delete(ItemCount);
-          end;
-          fmClipboardHistory.lvClip.Selected := nil;
-          fmClipboardHistory.lvClip.Selected := fmClipboardHistory.lvClip.Items[0];
-          fmClipboardHistory.lvClip.ItemFocused := fmClipboardHistory.lvClip.Selected;
-        end;
-      end;
-    except
-      on E: Exception do
-      begin
-        // Ignore exceptions
-      end;
-    end;
+    fmClipboardHistory.WmDrawClipBoard;
   finally
     if FPrevWindow <> 0 then
       SendMessage(FPrevWindow, WM_DRAWCLIPBOARD, Msg.WParam, Msg.LParam);
@@ -279,6 +261,16 @@ begin
 end;
 
 { TfmClipboardHistory }
+
+procedure TfmClipboardHistory.FormCreate(Sender: TObject);
+begin
+  inherited;
+  PasteAsHandler.GetTypeText(cbPasteAsType.Items);
+  cbPasteAsType.DropDownCount := Integer(High(TPasteAsType)) + 1;
+  cbPasteAsType.ItemIndex := Integer(PasteAsHandler.PasteAsType);
+  chkCreateQuotedStrings.Checked := PasteAsHandler.CreateQuotedString;
+  chkAddExtraSpaceAtTheEnd.Checked := PasteAsHandler.AddExtraSpaceAtTheEnd;
+end;
 
 procedure TfmClipboardHistory.FormResize(Sender: TObject);
 begin
@@ -323,6 +315,7 @@ begin
     Settings.WriteInteger(ConfigurationKey, 'Height', Height);
     Settings.WriteInteger(ConfigurationKey, 'SplitterRatio', Round(SplitterRatio * 100));
     Settings.WriteBool(ConfigurationKey, 'ViewToolBar', ToolBar.Visible);
+    Settings.WriteBool(ConfigurationKey, 'PasteAsOptions', pnlPasteAsOptions.Visible);
   finally
     FreeAndNil(Settings);
   end;
@@ -342,6 +335,7 @@ begin
     SplitterRatio := Settings.ReadInteger(ConfigurationKey, 'SplitterRatio', 50) / 100;
     mmoClipText.Height :=  Trunc(SplitterRatio * (mmoClipText.Height + lvClip.Height));
     ToolBar.Visible := Settings.ReadBool(ConfigurationKey, 'ViewToolBar', True);
+    pnlPasteAsOptions.Visible := Settings.ReadBool(ConfigurationKey, 'PasteAsOptions', True);
   finally
     FreeAndNil(Settings);
   end;
@@ -368,6 +362,7 @@ var
   Info: TClipInfo;
   ClipItem: TListItem;
   TimeNode: IXMLNode;
+  ClipData: TClipData;
 begin
   ClearDataList;
   Doc := CreateXMLDoc;
@@ -397,7 +392,9 @@ begin
 
         ClipItem := lvClip.Items.Add;
         ClipItem.Caption := Info.ClipTimeStamp;
-        ClipItem.SubItems.Add(Trim(FirstLineOfText(ClipStr)));
+        ClipData := FirstLineOfText(ClipStr);
+        ClipItem.SubItems.Add(IntToStr(ClipData.Count));
+        ClipItem.SubItems.Add(Trim(ClipData.FirstLine));
         ClipItem.Data := Info;
       end;
     finally
@@ -471,6 +468,8 @@ begin
   ToolBar.Top := 200;
   ToolBar.Align := alTop;
 
+  pnlPasteAsOptions.Top := ToolBar.Top + ToolBar.Height;
+
   HookClipboard;
 
   // Now load any saved clips from our XML storage.
@@ -501,14 +500,77 @@ begin
   fmClipboardHistory := nil;
 end;
 
+procedure TfmClipboardHistory.AddClipItem(const AClipText: string);
+var
+  Info: TClipInfo;
+  ClipItem: TListItem;
+  ClipData: TClipData;
+begin
+  Info := TClipInfo.Create;
+  FDataList.Insert(0, Info);
+  Info.ClipString := AClipText;
+  Info.ClipTimeStamp := TimeToStr(Time);
+
+  ClipItem := lvClip.Items.Insert(0);
+  ClipItem.Caption := Info.ClipTimeStamp;
+  ClipData := FirstLineOfText(Info.ClipString);
+  ClipItem.SubItems.Add(IntToStr(ClipData.Count));
+  ClipItem.SubItems.Add(Trim(ClipData.FirstLine));
+  ClipItem.Data := Info;
+end;
+
 procedure TfmClipboardHistory.actEditCopyExecute(Sender: TObject);
 var
-  ClipItem: TListItem;
-  Info: TClipInfo;
   idx: Integer;
   Buffer: string;
+  AsPascalString: Boolean;
+
+  function GetCopyText(AText: String): String;
+  var
+    AList: TStringList;
+    ALine: String;
+    APasteAsHandler: TPasteAsHandler;
+  begin
+    Result := AText;
+    if AsPascalString then
+    begin
+      AList := TStringList.Create;
+      try
+        AList.Text := AText;
+
+        if AList.Count = 1 then
+        begin
+          ALine := AList[0];
+          ALine := AnsiReplaceText(ALine, '#$D#$A', #$D#$A);
+          ALine := AnsiReplaceText(ALine, '#13#10', #13#10);
+          AList.Text := ALine;
+        end;
+
+        if actViewPasteAsOptions.Checked then
+        begin
+          APasteAsHandler := TPasteAsHandler.Create;
+          try
+            APasteAsHandler.PasteAsType := TPasteAsType(cbPasteAsType.ItemIndex);
+            APasteAsHandler.CreateQuotedString := chkCreateQuotedStrings.Checked;
+            APasteAsHandler.AddExtraSpaceAtTheEnd := chkAddExtraSpaceAtTheEnd.Checked;
+
+            Result := APasteAsHandler.ConvertFromString(AList, False);
+          finally
+            APasteAsHandler.Free;
+          end;
+        end
+        else
+          Result := PasteAsHandler.ConvertFromString(AList, False);
+      finally
+        AList.Free;
+      end;
+    end;
+  end;
+
 begin
   try
+    AsPascalString := Sender = actEditCopyFromPascalString;
+
     if mmoClipText.SelLength = 0 then
     begin
       if lvClip.SelCount = 1 then
@@ -516,22 +578,14 @@ begin
         IgnoreClip := True;
         try
           idx := lvClip.Selected.Index;
-          Buffer := mmoClipText.Text;
+          Buffer := GetCopyText(mmoClipText.Text);
           Clipboard.AsText := Buffer;
 
           lvClip.Items.Delete(idx);
           ClipInfoFromPointer(FDataList[idx]).Free;
           FDataList.Delete(idx);
 
-          Info := TClipInfo.Create;
-          FDataList.Insert(0, Info);
-          Info.ClipString := Buffer;
-          Info.ClipTimeStamp := TimeToStr(Time);
-
-          ClipItem := lvClip.Items.Insert(0);
-          ClipItem.Caption := Info.ClipTimeStamp;
-          ClipItem.SubItems.Add(Trim(FirstLineOfText(Buffer)));
-          ClipItem.Data := Info;
+          AddClipItem(Buffer);
 
           lvClip.Selected := lvClip.Items[0];
           lvClip.ItemFocused := lvClip.Selected;
@@ -540,10 +594,11 @@ begin
         end;
       end
       else
-        Clipboard.AsText := GetSelectedItemsText;
+        Clipboard.AsText := GetCopyText(GetSelectedItemsText);
     end
     else
-      mmoClipText.CopyToClipBoard;
+//      mmoClipText.CopyToClipBoard;
+      Clipboard.AsText := GetCopyText(mmoClipText.Text);
 
     if ClipExpert.FAutoClose then
       Self.Close;
@@ -602,16 +657,7 @@ begin
   actEditPasteToIde.Enabled := actEditCopy.Enabled;
   actDelete.Enabled := HaveSelectedItem;
   actViewToolBar.Checked := ToolBar.Visible;
-  if lvClip.Items.Count > 0 then
-  begin
-    lvClip.Columns[0].Width := -1;
-    lvClip.Columns[1].Width := -1;
-  end
-  else
-  begin
-    lvClip.Columns[0].Width := 100;
-    lvClip.Columns[1].Width := 150;
-  end;
+  actViewPasteAsOptions.Checked := pnlPasteAsOptions.Visible;
 end;
 
 procedure TfmClipboardHistory.actViewToolBarExecute(Sender: TObject);
@@ -718,6 +764,110 @@ begin
       if NotEmpty(Result) and (not HasTrailingEOL(Result)) then
         Result := Result + sLineBreak;
       Result := Result + ClipInfoForItem(ClipItem).ClipString;
+    end;
+  end;
+end;
+
+procedure TfmClipboardHistory.actViewPasteAsOptionsExecute(Sender: TObject);
+begin
+  pnlPasteAsOptions.Visible := not pnlPasteAsOptions.Visible;
+  if pnlPasteAsOptions.Visible then
+    pnlPasteAsOptions.Top := ToolBar.Top + ToolBar.Height;
+end;
+
+procedure TfmClipboardHistory.actEditPasteAsPascalStringExecute(Sender: TObject);
+var
+  AFromList: TStringList;
+  APasteAsHandler: TPasteAsHandler;
+  IsReplace: Boolean;
+begin
+  IsReplace := Sender = actEditReplaceAsPascalString;
+
+  AFromList := TStringList.Create;
+  try
+    if mmoClipText.SelLength = 0 then
+      AFromList.Text := mmoClipText.Text
+    else
+      AFromList.Text := mmoClipText.SelText;
+
+    if actViewPasteAsOptions.Checked then
+    begin
+      APasteAsHandler := TPasteAsHandler.Create;
+      try
+        APasteAsHandler.PasteAsType := TPasteAsType(cbPasteAsType.ItemIndex);
+        APasteAsHandler.CreateQuotedString := chkCreateQuotedStrings.Checked;
+        APasteAsHandler.AddExtraSpaceAtTheEnd := chkAddExtraSpaceAtTheEnd.Checked;
+
+        if IsReplace then
+          APasteAsHandler.ConvertFromString(AFromList, True);
+
+        APasteAsHandler.ConvertToString(AFromList, False)
+      finally
+        APasteAsHandler.Free;
+      end;
+    end
+    else
+    begin
+      if IsReplace then
+        PasteAsHandler.ConvertFromString(AFromList, True);
+
+      PasteAsHandler.ConvertToString(AFromList, False);
+    end;
+  finally
+    AFromList.Free;
+  end;
+end;
+
+procedure TfmClipboardHistory.WmDrawClipBoard;
+var
+  ItemCount: Integer;
+  ClipText: string;
+  Handle: Cardinal;
+  DataSize: Cardinal;
+begin
+  if IgnoreClip then
+    Exit;
+  try
+    if Clipboard.HasFormat(CF_TEXT) then
+    begin
+      Clipboard.Open;
+      try
+        Handle := Clipboard.GetAsHandle(CF_TEXT);
+        DataSize := GlobalSize(Handle);  // This function might over-estimate by a few bytes
+      finally
+        Clipboard.Close;
+      end;
+      // Don't try to save clipboard items over 512 KB for speed reasons
+      if DataSize > ((1024 * 512) + 32) then
+        Exit;
+
+      ClipText := Clipboard.AsText;
+      if (FDataList.Count = 0) or
+         (TClipInfo(FDataList[0]).ClipString <> clipText) then begin
+        {$IFOPT D+} SendDebug('New clipboard text detected'); {$ENDIF}
+        mmoClipText.Text := ClipText;
+
+        AddClipItem(ClipText);
+
+        ItemCount := lvClip.Items.Count;
+        if ItemCount > ClipExpert.MaxClip then
+        begin
+          Dec(ItemCount);
+          lvClip.Items.Delete(ItemCount);
+          TClipInfo(FDataList[ItemCount]).Free;
+          FDataList.Delete(ItemCount);
+        end;
+        lvClip.Selected := nil;
+        lvClip.Selected := lvClip.Items[0];
+        lvClip.ItemFocused := lvClip.Selected;
+
+        TListView_Resize(lvClip);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      // Ignore exceptions
     end;
   end;
 end;
