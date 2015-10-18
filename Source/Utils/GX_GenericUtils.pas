@@ -274,7 +274,9 @@ function GetMethodName(S: string): string;
 
 // Add an item to the top of a MRU string list.  Can optionally strip
 // off a trailing path delimiter.
-procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean = False);
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean = False); overload;
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean;
+  MaxListCount, MaxTextLength: Integer; AllowBlank: Boolean = False); overload;
 // Delete a string from a string list
 procedure DeleteStringFromList(List: TStrings; const Item: string);
 // Ensure a string is in a list
@@ -685,6 +687,9 @@ function MessageName(Msg: Longint): string;
 function IsoDateTimeToStr(DateTime: TDateTime): string;
 function IsoStringToDateTime(const ISODateTime: string): TDateTime;
 function IsoStringToDateTimeDef(const DateTime: string; Default: TDateTime): TDateTime;
+
+function GetFirstCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+function GetLastCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 
 type
   TFileFindThread = class(TThread)
@@ -1718,11 +1723,12 @@ begin
   end;
 end;
 
-procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean);
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean;
+  MaxListCount, MaxTextLength: Integer; AllowBlank: Boolean);
 begin
   if (Trim(Text) = '') and (not AllowBlank) then
     Exit;
-  if Length(Text) > 300 then
+  if ( MaxTextLength >= 0 ) and ( Length(Text) > MaxTextLength ) then
     Exit;
 
   if DeleteTrailingDelimiter then
@@ -1735,8 +1741,13 @@ begin
   else
     List.Insert(0, Text);
 
-  if List.Count > 20 then
+  if ( MaxListCount >= 0) and ( List.Count > MaxListCount ) then
     List.Delete(List.Count - 1);
+end;
+
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean);
+begin
+  AddMRUString(Text, List, DeleteTrailingDelimiter, 20, 300, AllowBlank);
 end;
 
 procedure DeleteStringFromList(List: TStrings; const Item: string);
@@ -4294,6 +4305,22 @@ begin
     Result := IsoStringToDateTime(DateTime);
   except
   end;
+end;
+
+function GetFirstCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+begin
+  for Result := 1 to Length(AText) do
+    if CharInSet(AText[Result], AChars) = SearchThis then
+      Exit;
+  Result := 0;
+end;
+
+function GetLastCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+begin
+  for Result := Length(AText) downto 1 do
+    if CharInSet(AText[Result], AChars) = SearchThis then
+      Exit;
+  Result := 0;
 end;
 
 { TFileFindThread }
