@@ -16,6 +16,8 @@ uses
   Windows,
   SysUtils,
   Controls,
+  ComCtrls,
+  CommCtrl,
   StdCtrls;
 
 type
@@ -87,6 +89,26 @@ function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFile
 ///<summary>
 /// @returns true, if the shift key is currently pressed </summary>
 function IsShiftDown: Boolean;
+
+type
+  TListViewResizeOptions = (lvrCaptions, lvrContent);
+  TLIstViewResizeOptionSet = set of TListViewResizeOptions;
+///<summary>
+/// Resize all columns of a TListView in vsReport ViewStyle
+/// @param lc is the TListColumn to resize
+/// @param Options is a set of tListViewResizeOptions
+///                lvrCaptions means resize so the captions fit
+///                lvrContent menas resize so the contents fit
+///                both can be combined. </summary>
+procedure TListView_ResizeColumn(_lc: TListColumn; _Options: TLIstViewResizeOptionSet);
+///<summary>
+/// Resize all columns of a TListView in vsReport ViewStyle
+/// @param lc is the TListColumn to resize
+/// @param Options is a set of tListViewResizeOptions
+///                lvrCaptions means resize so the captions fit
+///                lvrContent menas resize so the contents fit
+///                both can be combined. </summary>
+procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = [lvrCaptions, lvrContent]);
 
 implementation
 
@@ -423,6 +445,33 @@ function TEdit_AutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSe
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
 begin
   Result := TAutoCompleteActivator.Create(_ed, _Source, _Type);
+end;
+
+// This code is based on an idea from
+// http://delphi-wmi-class-generator.googlecode.com/svn/trunk/units/ListView_Helper.pas
+
+procedure TListView_ResizeColumn(_lc: TListColumn; _Options: TLIstViewResizeOptionSet);
+var
+  Width: Integer;
+begin
+  if _Options = [lvrCaptions, lvrContent] then begin
+    _lc.Width := LVSCW_AUTOSIZE;
+    Width := _lc.Width;
+    _lc.Width := LVSCW_AUTOSIZE_USEHEADER;
+    if Width > _lc.Width then
+      _lc.Width := LVSCW_AUTOSIZE;
+  end else if _Options = [lvrContent] then
+    _lc.Width := LVSCW_AUTOSIZE
+  else if _Options = [lvrCaptions] then
+    _lc.Width := LVSCW_AUTOSIZE_USEHEADER;
+end;
+
+procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = [lvrCaptions, lvrContent]);
+var
+  i: Integer;
+begin
+  for i := 0 to _lv.Columns.Count - 1 do
+    TListView_ResizeColumn(_lv.Columns[i], _Options);
 end;
 
 end.
