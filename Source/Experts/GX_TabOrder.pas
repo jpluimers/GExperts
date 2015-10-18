@@ -72,6 +72,7 @@ type
     class function GetName: string; override;
     procedure Click(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
+    function HasDesignerMenuItem: Boolean; override;
   end;
 
 { TfmTabOrder }
@@ -457,6 +458,11 @@ end;
 procedure TfmTabOrder.btnResetOrderClick(Sender: TObject);
 begin
   SortTreeViewComponentsByOriginalTabOrder;
+end;
+
+function TTabExpert.HasDesignerMenuItem: Boolean;
+begin
+  Result := True;
 end;
 
 initialization
