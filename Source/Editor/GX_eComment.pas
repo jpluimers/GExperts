@@ -6,12 +6,42 @@ interface
 
 uses
   GX_eSelectionEditorExpert, GX_ConfigurationInfo,
-  Classes, StdCtrls, Controls, Forms, GX_BaseForm;
+  Classes, StdCtrls, Controls, Forms, GX_BaseForm, ExtCtrls, ComCtrls;
 
 type
-  TCommentType = (ctSlash, ctC, ctPascal, ctCpp);
+//  //        ctSlash
+//  { }       ctPascal
+//  -- (SQL)  ctSQL
+//  /* */     ctCpp
+//  (* *)     ctC
+  TCommentType = (ctSlash, ctC, ctPascal, ctCpp, ctSQL);
 
-type
+  TExtensionStyle = class(TObject)
+  private
+    FExtensions: String;
+    FCommentType: TCommentType;
+    FInsertRemoveSpace: Boolean;
+    FIsDefault: Boolean;
+  protected
+  public
+    constructor Create;
+    property Extensions: String read FExtensions write FExtensions;
+    property CommentType: TCommentType read FCommentType write FCommentType;
+    property InsertRemoveSpace: Boolean read FInsertRemoveSpace write FInsertRemoveSpace;
+    property IsDefault: Boolean read FIsDefault write FIsDefault;
+  end ;
+
+  TCommentStyles = class(TStringList)
+  private
+    procedure ClearStyles;
+  protected
+  public
+    destructor Destroy; override;
+    procedure Clear; override;
+    function  GetStyle(AFileName: String): TExtensionStyle;
+    procedure CopyStyles(AFromStyles: TCommentStyles);
+  end;
+
   TCommentExpert = class(TSelectionEditorExpert)
   protected
     function GetDisplayName: string; override;
@@ -47,14 +77,32 @@ type
   end;
 
   TfmCommentConfig = class(TfmBaseForm)
-    GroupBox1: TGroupBox;
-    rbSlash: TRadioButton;
-    rbC: TRadioButton;
-    rbPascal: TRadioButton;
+    gbStyles: TGroupBox;
+    lvStyles: TListView;
+    gbStyle: TGroupBox;
+    lblExtensions: TLabel;
+    eExtensions: TEdit;
+    rgStyle: TRadioGroup;
+    chkInsertSpace: TCheckBox;
+    btnAdd: TButton;
+    btnDelete: TButton;
     btnOK: TButton;
     btnCancel: TButton;
-    rbCpp: TRadioButton;
-    chkInsertSpace: TCheckBox;
+    procedure lvStylesData(Sender: TObject; Item: TListItem);
+    procedure lvStylesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure btnAddClick(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure eExtensionsChange(Sender: TObject);
+    procedure rgStyleClick(Sender: TObject);
+    procedure chkInsertSpaceClick(Sender: TObject);
+  private
+    FStyles: TCommentStyles;
+    FCurrStyle: TExtensionStyle;
+    FCurrIndex: Integer;
+  protected
+    procedure Initialize;
   end;
 
 implementation
@@ -62,13 +110,20 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, GX_EditorExpert;
+  SysUtils, StrUtils, Math,
+  GX_EditorExpert, GX_OtaUtils;
 
 var
   // This is *local* and used by both the comment
   // and the uncomment expert...
-  CommentType: TCommentType = ctSlash;
-  InsertRemoveSpace: Boolean = False;
+  Styles: TCommentStyles;
+
+const
+  cNameDefaultStyle = 'Default style';
+  cIniStyleCount = 'StyleCount';
+  cIniExtensions = 'Extensions';
+  cIniCommentType = 'CommentType';
+  cIniInsertRemoveSpace = 'InsertRemoveSpace';
 
 { TCommentExpert }
 
@@ -78,26 +133,11 @@ var
 begin
   Dlg := TfmCommentConfig.Create(nil);
   try
-    case CommentType of
-      ctSlash: Dlg.rbSlash.Checked := True;
-      ctC: Dlg.rbC.Checked := True;
-      ctPascal: Dlg.rbPascal.Checked := True;
-      ctCpp: Dlg.rbCpp.Checked := True;
-    end;
-    Dlg.chkInsertSpace.Checked := InsertRemoveSpace;
+    Dlg.Initialize;
 
     if Dlg.ShowModal = mrOk then
     begin
-      if Dlg.rbSlash.Checked then
-        CommentType := ctSlash
-      else if Dlg.rbC.Checked then
-        CommentType := ctC
-      else if Dlg.rbCpp.Checked then
-        CommentType := ctCpp
-      else
-        CommentType := ctPascal;
-
-      InsertRemoveSpace := Dlg.chkInsertSpace.Checked;
+      Styles.CopyStyles(Dlg.FStyles);
 
       SaveSettings;
     end;
@@ -113,20 +153,6 @@ begin
   inherited Create;
 
   ShortCut := scCtrl + scAlt + VK_OEM_PERIOD;
-end;
-
-procedure AddBracketing(const CodeList: TStrings; const LeftBracket, RightBracket: string);
-begin
-  if InsertRemoveSpace then
-  begin
-    CodeList[0] := LeftBracket + ' ' + CodeList[0];
-    CodeList[CodeList.Count - 1] := CodeList[CodeList.Count - 1] + ' ' + RightBracket;
-  end
-  else
-  begin
-    CodeList[0] := LeftBracket + CodeList[0];
-    CodeList[CodeList.Count - 1] := CodeList[CodeList.Count - 1] + RightBracket;
-  end;
 end;
 
 function TCommentExpert.GetDisplayName: string;
@@ -154,36 +180,97 @@ begin
 end;
 
 procedure TCommentExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+var
+  I, ACount: Integer;
+  AIndexText: String;
+  AStyle: TExtensionStyle;
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the below items.
-  InsertRemoveSpace := Settings.ReadBool('Comment', 'InsertRemoveSpace', InsertRemoveSpace);
-  CommentType := TCommentType(Settings.ReadEnumerated('Comment', 'CommentType', TypeInfo(TCommentType), Ord(ctSlash)));
+  Styles.Clear;
+  ACount := Settings.ReadInteger(ConfigurationKey, cIniStyleCount, 1);  //1= default style is always created
+  for I := 0 to ACount-1 do
+  begin
+    AStyle := TExtensionStyle.Create;
+    AStyle.IsDefault := I = 0;
+    AIndexText := IfThen(not AStyle.IsDefault, IntToStr(I));
+
+    AStyle.Extensions := Settings.ReadString(ConfigurationKey, cIniExtensions + AIndexText, cNameDefaultStyle);
+    AStyle.CommentType :=
+      TCommentType(Settings.ReadEnumerated(ConfigurationKey, cIniCommentType + AIndexText, TypeInfo(TCommentType), Ord(ctSlash)));
+    AStyle.InsertRemoveSpace := Settings.ReadBool(ConfigurationKey, cIniInsertRemoveSpace + AIndexText, False);
+
+    Styles.AddObject(AStyle.Extensions, AStyle);
+  end;
 end;
 
 procedure TCommentExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+var
+  I, ACount: Integer;
+  AIndexText: String;
+  AStyle: TExtensionStyle;
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize any of the below items.
-  Settings.WriteBool('Comment', 'InsertRemoveSpace', InsertRemoveSpace);
-  Settings.WriteEnumerated('Comment', 'CommentType', TypeInfo(TCommentType), Ord(CommentType));
+  ACount := Settings.ReadInteger(ConfigurationKey, cIniStyleCount, 0);
+  Settings.WriteInteger(ConfigurationKey, cIniStyleCount, Styles.Count);
+  for I := 0 to Styles.Count-1 do
+  begin
+    AStyle := TExtensionStyle(Styles.Objects[I]);
+    AIndexText := IfThen(not AStyle.IsDefault, IntToStr(I));
+
+    if not AStyle.IsDefault then
+      Settings.WriteString(ConfigurationKey, cIniExtensions + AIndexText, AStyle.Extensions);
+    Settings.WriteEnumerated(ConfigurationKey, cIniCommentType + AIndexText, TypeInfo(TCommentType), Ord(AStyle.CommentType));
+    Settings.WriteBool(ConfigurationKey, cIniInsertRemoveSpace + AIndexText, AStyle.InsertRemoveSpace);
+  end;
+  for I := Styles.Count to ACount-1 do
+  begin
+    AIndexText := IntToStr(I);
+    Settings.DeleteKey(ConfigurationKey, cIniExtensions + AIndexText);
+    Settings.DeleteKey(ConfigurationKey, cIniCommentType + AIndexText);
+    Settings.DeleteKey(ConfigurationKey, cIniInsertRemoveSpace + AIndexText);
+  end;
 end;
 
 function TCommentExpert.ProcessSelected(Lines: TStrings): Boolean;
 var
   i: Integer;
   CommentPrefix: string;
+  AStyle: TExtensionStyle;
+
+  procedure AddBracketing(const CodeList: TStrings; const LeftBracket, RightBracket: string);
+  begin
+    if AStyle.InsertRemoveSpace then
+    begin
+      CodeList[0] := LeftBracket + ' ' + CodeList[0];
+      CodeList[CodeList.Count - 1] := CodeList[CodeList.Count - 1] + ' ' + RightBracket;
+    end
+    else
+    begin
+      CodeList[0] := LeftBracket + CodeList[0];
+      CodeList[CodeList.Count - 1] := CodeList[CodeList.Count - 1] + RightBracket;
+    end;
+  end;
+
 begin
   Assert(Assigned(Lines));
 
+  AStyle := Styles.GetStyle(GxOtaGetTopMostEditBufferFileName);
+
   // Do not localize any of the below lines.
-  case CommentType of
+  case AStyle.CommentType of
     ctSlash:
       begin
-        if InsertRemoveSpace then
-          CommentPrefix := '// '
-        else
-          CommentPrefix := '//';
+        CommentPrefix := '//' + IfThen(AStyle.InsertRemoveSpace, ' ');
+
+        for i := 0 to Lines.Count - 1 do
+          Lines[i] := CommentPrefix + Lines[i];
+      end;
+
+    ctSQL:
+      begin
+        CommentPrefix := '--' + IfThen(AStyle.InsertRemoveSpace, ' ');
 
         for i := 0 to Lines.Count - 1 do
           Lines[i] := CommentPrefix + Lines[i];
@@ -244,6 +331,8 @@ begin
 end;
 
 function TUnCommentExpert.ProcessSelected(Lines: TStrings): Boolean;
+var
+  AStyle: TExtensionStyle;
 
   function RemoveFirstString(const SubString, InString: string): string;
   var
@@ -275,7 +364,7 @@ function TUnCommentExpert.ProcessSelected(Lines: TStrings): Boolean;
     // If spaces are to be removed, try to first kill
     // WITH space, otherwise continue with default
     // comment removal.
-    if InsertRemoveSpace then
+    if AStyle.InsertRemoveSpace then
     begin
       Result := RemoveFirstInternal(SubString + ' ', InString);
       if Success then
@@ -312,7 +401,7 @@ function TUnCommentExpert.ProcessSelected(Lines: TStrings): Boolean;
     // If spaces are to be removed, try to first kill
     // WITH space, otherwise continue with default
     // comment removal.
-    if InsertRemoveSpace then
+    if AStyle.InsertRemoveSpace then
     begin
       Result := RemoveLastInternal(' ' + SubString, InString);
       if Success then
@@ -327,7 +416,9 @@ var
 begin
   Assert(Assigned(Lines));
 
-  case CommentType of
+  AStyle := Styles.GetStyle(GxOtaGetTopMostEditBufferFileName);
+
+  case AStyle.CommentType of
     ctSlash:
       for i := 0 to Lines.Count - 1 do
         Lines[i] := RemoveFirstString('//', Lines[i]);
@@ -346,6 +437,9 @@ begin
         Lines[0] := RemoveFirstString('{', Lines[0]);
         Lines[Lines.Count - 1] := RemoveLastString('}', Lines[Lines.Count - 1]);
       end;
+    ctSQL:
+      for i := 0 to Lines.Count - 1 do
+        Lines[i] := RemoveFirstString('--', Lines[i]);
   end;
   Result := True;
 end;
@@ -408,9 +502,168 @@ begin
   end;
 end;
 
+{ TExtensionStyle }
+
+constructor TExtensionStyle.Create;
+begin
+  inherited Create;
+  FExtensions := '';
+  FCommentType := ctSlash;
+  FInsertRemoveSpace := False;
+end;
+
+{ TCommentStyles }
+
+destructor TCommentStyles.Destroy;
+begin
+  ClearStyles;
+  inherited Destroy;
+end;
+
+procedure TCommentStyles.ClearStyles;
+var
+  I: Integer;
+begin
+  for I := 0 to Count-1 do
+    Objects[I].Free;
+end;
+
+procedure TCommentStyles.Clear;
+begin
+  ClearStyles;
+  inherited Clear;
+end;
+
+function TCommentStyles.GetStyle(AFileName: String): TExtensionStyle;
+var
+  I: Integer;
+  AExt: String;
+begin
+  AExt := ExtractFileExt(AFileName);
+  if LeftStr(AExt, 1) = '.' then
+    AExt := Copy(AExt, 2, MaxInt);
+
+  for I := 1 to Count-1 do
+    if AnsiContainsText(Strings[I], AExt) then
+    begin
+      Result := TExtensionStyle(Objects[I]);
+      Exit;
+    end;
+
+  Result := TExtensionStyle(Objects[0]);
+end;
+
+procedure TCommentStyles.CopyStyles(AFromStyles: TCommentStyles);
+var
+  I: Integer;
+  AStyle, AFromStyle: TExtensionStyle;
+begin
+  Clear;
+  for I := 0 to AFromStyles.Count-1 do
+  begin
+    AFromStyle := TExtensionStyle(AFromStyles.Objects[I]);
+    AStyle := TExtensionStyle.Create;
+    AStyle.Extensions := AFromStyle.Extensions;
+    AStyle.CommentType := AFromStyle.CommentType;
+    AStyle.InsertRemoveSpace := AFromStyle.InsertRemoveSpace;
+    AStyle.IsDefault := AFromStyle.IsDefault;
+    AddObject(AStyle.Extensions, AStyle);
+  end;
+end;
+
+{ TfmCommentConfig }
+
+procedure TfmCommentConfig.FormCreate(Sender: TObject);
+begin
+  FStyles := TCommentStyles.Create;
+  FCurrIndex := -1;
+  FCurrStyle := nil;
+end;
+
+procedure TfmCommentConfig.FormDestroy(Sender: TObject);
+begin
+  FStyles.Free;
+end;
+
+procedure TfmCommentConfig.Initialize;
+begin
+ FStyles.CopyStyles(Styles);
+ lvStyles.Clear;
+ lvStyles.Items.Count := FStyles.Count;
+ lvStyles.ItemIndex := 0;
+end;
+
+procedure TfmCommentConfig.lvStylesData(Sender: TObject; Item: TListItem);
+var
+  AStyle: TExtensionStyle;
+begin
+  AStyle := TExtensionStyle(FStyles.Objects[Item.Index]);
+  Item.Caption := AStyle.Extensions;
+  Item.SubItems.Add( rgStyle.Items[ Integer(AStyle.CommentType) ] );
+  Item.SubItems.Add( BoolToStr(AStyle.InsertRemoveSpace, True) );
+end;
+
+procedure TfmCommentConfig.lvStylesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+begin
+  if not Selected then
+    Exit;
+
+  FCurrIndex := Item.Index;
+  FCurrStyle := TExtensionStyle(FStyles.Objects[FCurrIndex]);
+  eExtensions.Text := FCurrStyle.Extensions;
+  eExtensions.ReadOnly := FCurrStyle.IsDefault;
+  rgStyle.ItemIndex := Integer(FCurrStyle.CommentType);
+  chkInsertSpace.Checked := FCurrStyle.InsertRemoveSpace;
+  btnDelete.Enabled := not FCurrStyle.IsDefault;
+end;
+
+procedure TfmCommentConfig.btnAddClick(Sender: TObject);
+begin
+  FStyles.AddObject('Style' + IntToStr(FStyles.Count), TExtensionStyle.Create);
+  lvStyles.Items.Count := FStyles.Count;
+  lvStyles.ItemIndex := FStyles.Count-1;
+  eExtensions.SetFocus;
+end;
+
+procedure TfmCommentConfig.btnDeleteClick(Sender: TObject);
+begin
+  lvStyles.SetFocus;
+  FCurrStyle.Free;
+  FStyles.Delete(FCurrIndex);
+  lvStyles.Items.Count := FStyles.Count;
+  lvStyles.ItemIndex := Min(FCurrIndex, FStyles.Count-1);
+end;
+
+procedure TfmCommentConfig.eExtensionsChange(Sender: TObject);
+begin
+  if eExtensions.ReadOnly then
+    Exit;
+
+  FCurrStyle.Extensions := eExtensions.Text;
+  FStyles[FCurrIndex] := eExtensions.Text;
+  lvStyles.Refresh;
+end;
+
+procedure TfmCommentConfig.rgStyleClick(Sender: TObject);
+begin
+  FCurrStyle.CommentType := TCommentType(rgStyle.ItemIndex);
+  lvStyles.Refresh;
+end;
+
+procedure TfmCommentConfig.chkInsertSpaceClick(Sender: TObject);
+begin
+  FCurrStyle.InsertRemoveSpace := chkInsertSpace.Checked;
+  lvStyles.Refresh;
+end;
+
 initialization
+  Styles := TCommentStyles.Create;
   RegisterEditorExpert(TCommentExpert);
   RegisterEditorExpert(TUnCommentExpert);
   RegisterEditorExpert(TSortExpert);
+
+finalization
+  Styles.Free;
+
 end.
 
