@@ -256,7 +256,8 @@ begin
       if not GxLoadBitmapForExpert(BitmapFile, FBitmap) then
       begin
         {$IFOPT D+} SendDebugError('Missing bitmap ' + BitmapFile + ' for ' + Self.ClassName); {$ENDIF}
-        ShowGxMessageBox(TShowMissingIconMessage, BitmapFile);
+        ShowGxMessageBox(TShowMissingIconMessage, ChangeFileExt(BitmapFile, '.bmp'));
+        GetBitmapFileName;
       end;
     end
     else
