@@ -68,7 +68,7 @@ type
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
-    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
+//    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
     function TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: integer;
       const _Name: string; out _cmb: TCustomCombobox): boolean;
     function TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): boolean;
@@ -110,18 +110,18 @@ begin
   inherited;
 end;
 
-procedure TProjectOptionsEnhancer.HandleControlChanged(_Sender: TObject; _Form: TCustomForm;
-  _Control: TWinControl);
-var
-  cmp: TComponent;
-begin
-  cmp := _Form.FindComponent('HostAppInput');
-  if Assigned(cmp) and (cmp.ClassName = 'THistoryPropComboBox') then begin
-    TComboboxDropHandler.Create(cmp);
-    TIDEFormEnhancements.UnregisterControlChangeCallback(FControlCallbackHandle);
-    FControlCallbackHandle := nil;
-  end;
-end;
+//procedure TProjectOptionsEnhancer.HandleControlChanged(_Sender: TObject; _Form: TCustomForm;
+//  _Control: TWinControl);
+//var
+//  cmp: TComponent;
+//begin
+//  cmp := _Form.FindComponent('HostAppInput');
+//  if Assigned(cmp) and (cmp.ClassName = 'THistoryPropComboBox') then begin
+//    TComboboxDropHandler.Create(cmp);
+//    TIDEFormEnhancements.UnregisterControlChangeCallback(FControlCallbackHandle);
+//    FControlCallbackHandle := nil;
+//  end;
+//end;
 
 function TProjectOptionsEnhancer.TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): boolean;
 var
@@ -201,9 +201,6 @@ procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCu
 
 var
   SettingsPanel: TPanel;
-  HostAppInput: TCustomComboBox;
-  CWDInput: TCustomComboBox;
-  SourcePathInput: TCustomComboBox;
 begin
   if not IsProjectOptionsForm(_Form) then begin
     if Assigned(FControlCallbackHandle) then begin
