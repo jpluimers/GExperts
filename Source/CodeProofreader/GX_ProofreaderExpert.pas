@@ -29,24 +29,12 @@ uses
   GX_ProofreaderConfig, GX_ProofreaderDefaults, GX_MessageBox;
 
 type
-  TCreateDefaultTablesMessage = class(TGxMsgBoxAdaptor)
+  TCreateDefaultTablesMessage = class(TGxQuestionBoxAdaptor)
   protected
     function GetMessage: string; override;
-    function GetButtons: TMsgDlgButtons; override;
-    function GetDefaultButton: TMsgDlgBtn; override;
   end;
 
 { TCreateDefaultTablesMessage }
-
-function TCreateDefaultTablesMessage.GetButtons: TMsgDlgButtons;
-begin
-  Result := [mbYes, mbNo];
-end;
-
-function TCreateDefaultTablesMessage.GetDefaultButton: TMsgDlgBtn;
-begin
-  Result := mbYes;
-end;
 
 function TCreateDefaultTablesMessage.GetMessage: string;
 resourcestring

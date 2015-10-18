@@ -38,6 +38,12 @@ type
     function ConfigurationKey: string;
   end;
 
+  TGxQuestionBoxAdaptor = class(TGxMsgBoxAdaptor)
+  protected
+    function GetButtons: TMsgDlgButtons; override;
+    function GetDefaultButton: TMsgDlgBtn; override;
+  end;
+
   TfmGxMessageBox = class(TfmBaseForm)
     chkNeverShowAgain: TCheckBox;
     bvlFrame: TBevel;
@@ -220,6 +226,18 @@ end;
 function TGxMsgBoxAdaptor.ConfigurationKey: string;
 begin
   Result := 'Misc' + PathDelim + 'SuppressedMessages';
+end;
+
+{ TGxQuestionBoxAdaptor }
+
+function TGxQuestionBoxAdaptor.GetButtons: TMsgDlgButtons;
+begin
+  Result := [mbYes, mbNo];
+end;
+
+function TGxQuestionBoxAdaptor.GetDefaultButton: TMsgDlgBtn;
+begin
+  Result := mbYes;
 end;
 
 end.

@@ -138,11 +138,9 @@ type
                     gesInvalid);
 
 
-  TShowDisableCurrentMessage = class(TGxMsgBoxAdaptor)
+  TShowDisableCurrentMessage = class(TGxQuestionBoxAdaptor)
   protected
     function GetMessage: string; override;
-    function GetButtons: TMsgDlgButtons; override;
-    function GetDefaultButton: TMsgDlgBtn; override;
   end;
 
 const
@@ -668,16 +666,6 @@ begin
 end;
 
 { TShowDisableCurrentMessage }
-
-function TShowDisableCurrentMessage.GetButtons: TMsgDlgButtons;
-begin
-  Result := [mbYes, mbNo];
-end;
-
-function TShowDisableCurrentMessage.GetDefaultButton: TMsgDlgBtn;
-begin
-  Result := mbYes;
-end;
 
 function TShowDisableCurrentMessage.GetMessage: string;
 resourcestring
