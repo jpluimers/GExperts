@@ -7,9 +7,11 @@ unit GX_ePrevNextIdentifier;
 interface
 
 uses
-  Classes, GX_EditorExpert;
+  Classes, StdCtrls, Controls, Forms, GX_BaseForm, GX_EditorExpert, GX_ConfigurationInfo;
 
 type
+  TViewChangeType = (vctOld_IfOnlyNeeded, vctNew_AlwaysInTheMiddle);
+
   TBaseIdentExpert = class(TEditorExpert)
   private
     FSource: string;
@@ -22,7 +24,6 @@ type
     procedure InternalExecute; virtual; abstract;
   public
     procedure Execute(Sender: TObject); override;
-    function HasConfigOptions: Boolean; override;
   end;
 
   TPrevIdentExpert = class(TBaseIdentExpert)
@@ -34,9 +35,12 @@ type
     procedure InternalExecute; override;
     function GetDisplayName: string; override;
     class function GetName: string; override;
+    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   public
     constructor Create; override;
     procedure GetHelpString(List: TStrings); override;
+    procedure Configure; override;
   end;
 
   TNextIdentExpert = class(TPrevIdentExpert)
@@ -46,9 +50,20 @@ type
   public
     constructor Create; override;
     procedure GetHelpString(List: TStrings); override;
+    function HasConfigOptions: Boolean; override;
+  end;
+
+  TfmPrevNextConfig = class(TfmBaseForm)
+    rbNewMode: TRadioButton;
+    rbOldMode: TRadioButton;
+    gbxPrevNextOptions: TGroupBox;
+    btnOK: TButton;
+    btnCancel: TButton;
   end;
 
 implementation
+
+{$R *.dfm}
 
 uses
   SysUtils, Windows, ToolsAPI,
@@ -59,6 +74,11 @@ resourcestring
     '  This expert detects the identifier under the cursor and ' +
     'allow you to quickly jump to the %s occurrence ' +
     'of that identifier in the same file.';
+
+var
+  // This is *local* and used by both the prevident
+  // and the nextident expert...
+  ViewChangeType: TViewChangeType = vctNew_AlwaysInTheMiddle;
 
 function CurrentIdent(const Source: string; CurPos: Integer;
   var Pos, Len: Integer): Boolean;
@@ -128,7 +148,16 @@ begin
   CharPos.CharIndex := LinePos.X - 1;
   EditView := GxOtaGetTopMostEditView;
   EditView.ConvertPos(False, EditPos, CharPos);
-  GxOtaGotoEditPos(EditPos);
+
+  case ViewChangeType of
+    vctNew_AlwaysInTheMiddle: GxOtaGotoEditPos(EditPos);
+    vctOld_IfOnlyNeeded:
+    begin
+      EditView.CursorPos := EditPos;
+      EditView.MoveViewToCursor;
+      EditView.Paint;
+    end;
+  end;
 end;
 
 procedure TBaseIdentExpert.Execute;
@@ -153,11 +182,6 @@ begin
   end;
 
   InternalExecute;
-end;
-
-function TBaseIdentExpert.HasConfigOptions: Boolean;
-begin
-  Result := False;
 end;
 
 { TPrevIdentExpert }
@@ -202,6 +226,45 @@ begin
   Result := 'PreviousIdent';
 end;
 
+procedure TPrevIdentExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+begin
+  inherited InternalLoadSettings(Settings);
+  // Do not localize any of the below items.
+  ViewChangeType := TViewChangeType(Settings.ReadEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(vctNew_AlwaysInTheMiddle)));
+end;
+
+procedure TPrevIdentExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+begin
+  inherited InternalSaveSettings(Settings);
+  // Do not localize any of the below items.
+  Settings.WriteEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(ViewChangeType));
+end;
+
+procedure TPrevIdentExpert.Configure;
+var
+  Dlg: TfmPrevNextConfig;
+begin
+  Dlg := TfmPrevNextConfig.Create(nil);
+  try
+    case ViewChangeType of
+      vctOld_IfOnlyNeeded: Dlg.rbOldMode.Checked := True;
+      vctNew_AlwaysInTheMiddle: Dlg.rbNewMode.Checked := True;
+    end;
+
+    if Dlg.ShowModal = mrOk then
+    begin
+      if Dlg.rbNewMode.Checked then
+        ViewChangeType := vctNew_AlwaysInTheMiddle
+      else
+        ViewChangeType := vctOld_IfOnlyNeeded;
+
+      SaveSettings;
+    end;
+  finally
+    FreeAndNil(Dlg);
+  end;
+end;
+
 { TNextIdentExpert }
 
 constructor TNextIdentExpert.Create;
@@ -224,6 +287,11 @@ end;
 class function TNextIdentExpert.GetName: string;
 begin
   Result := 'NextIdent';
+end;
+
+function TNextIdentExpert.HasConfigOptions: Boolean;
+begin
+  Result := False;
 end;
 
 initialization
