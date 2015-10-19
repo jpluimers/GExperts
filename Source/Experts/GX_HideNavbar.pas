@@ -20,7 +20,7 @@ uses
 
 type
   IHideNavigationToolbarExpert = interface ['{BC189A61-9313-4ABE-8AB3-2B80B3709DF5}']
-    procedure SetVisible(_Value: boolean);
+    procedure SetVisible(_Value: Boolean);
   end;
 
 function CreateHideNavigationToolbarExpert: IHideNavigationToolbarExpert;
@@ -136,21 +136,21 @@ function THideNavigationToolbarExpert.TryFindComponentByName(const ParentCompone
   const _Name: string; out _Comp: TComponent): boolean;
 var
   i: Integer;
-  cmp: TComponent;
+  Cmp: TComponent;
 begin
-  Result := false;
+  Result := False;
   if not Assigned(ParentComponent) then
     Exit;
 
   for i := 0 to ParentComponent.ComponentCount - 1 do begin
-    cmp := ParentComponent.Components[i];
+    Cmp := ParentComponent.Components[i];
 
     if SameText(cmp.Name, _Name) then begin
-      _Comp := cmp;
-      Result := true;
-      exit;
+      _Comp := Cmp;
+      Result := True;
+      Exit;
     end else
-      Result := TryFindComponentByName(cmp, _Name, _Comp); // Recursion!
+      Result := TryFindComponentByName(Cmp, _Name, _Comp); // Recursion!
   end;
 end;
 
@@ -158,21 +158,21 @@ function THideNavigationToolbarExpert.TrySetNavbarVisible(_EditView: IOTAEditVie
 var
   C: TComponent;
   EditWindow: INTAEditWindow;
-  ctrl: TWinControl;
+  Ctrl: TWinControl;
 begin
   Result := False;
   if not Assigned(_EditView) then
-    exit;
+    Exit;
 
   EditWindow := _EditView.GetEditWindow;
   if not Assigned(EditWindow) then
-    exit;
+    Exit;
 
   ctrl := EditWindow.Form;
-  if not Assigned(ctrl) then
-    exit;
+  if not Assigned(Ctrl) then
+    Exit;
 
-  if TryFindComponentByName(ctrl, 'TEditorNavigationToolbar', c) then begin
+  if TryFindComponentByName(Ctrl, 'TEditorNavigationToolbar', c) then begin
     TWinControl(C).Visible := FIsNavbarVisible;
     TWinControl(C).Enabled := FIsNavbarVisible;
     Result := True;

@@ -3,7 +3,7 @@ object fmPrevNextConfig: TfmPrevNextConfig
   Top = 211
   BorderStyle = bsDialog
   Caption = 'Prev/Next Identifier Options'
-  ClientHeight = 136
+  ClientHeight = 116
   ClientWidth = 312
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -16,38 +16,29 @@ object fmPrevNextConfig: TfmPrevNextConfig
   Scaled = False
   DesignSize = (
     312
-    136)
+    116)
   PixelsPerInch = 96
   TextHeight = 14
   object gbxPrevNextOptions: TGroupBox
     Left = 8
     Top = 8
     Width = 297
-    Height = 89
+    Height = 65
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Prev/Next Identifier Options'
     TabOrder = 0
-    object rbNewMode: TRadioButton
-      Left = 8
-      Top = 29
-      Width = 287
+    object chkCenterMatch: TCheckBox
+      Left = 16
+      Top = 32
+      Width = 265
       Height = 17
-      Caption = 'New mode: next identifier always in the middle'
-      Checked = True
+      Caption = 'Center found identifiers in the editor'
       TabOrder = 0
-      TabStop = True
-    end
-    object rbOldMode: TRadioButton
-      Left = 8
-      Top = 49
-      Width = 113
-      Height = 17
-      Caption = 'Old mode'
-      TabOrder = 1
     end
   end
   object btnOK: TButton
     Left = 148
-    Top = 103
+    Top = 83
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -58,7 +49,7 @@ object fmPrevNextConfig: TfmPrevNextConfig
   end
   object btnCancel: TButton
     Left = 228
-    Top = 103
+    Top = 83
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]

@@ -1,6 +1,6 @@
 inherited fmClipboardHistory: TfmClipboardHistory
-  Left = -737
-  Top = 210
+  Left = 337
+  Top = 220
   ActiveControl = lvClip
   Caption = 'Clipboard History'
   ClientHeight = 428
@@ -36,9 +36,9 @@ inherited fmClipboardHistory: TfmClipboardHistory
   end
   object lvClip: TListView
     Left = 0
-    Top = 63
+    Top = 61
     Width = 550
-    Height = 215
+    Height = 217
     Align = alClient
     Columns = <
       item
@@ -75,9 +75,10 @@ inherited fmClipboardHistory: TfmClipboardHistory
     Left = 0
     Top = 0
     Width = 550
-    Height = 26
+    Height = 24
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
+    Flat = True
     Images = dmSharedImages.Images
     ParentShowHint = False
     ShowHint = True
@@ -85,63 +86,65 @@ inherited fmClipboardHistory: TfmClipboardHistory
     Wrapable = False
     object tbnClear: TToolButton
       Left = 0
-      Top = 2
+      Top = 0
       Action = actEditClear
     end
     object tbnDelete: TToolButton
       Left = 23
-      Top = 2
+      Top = 0
       Action = actDelete
     end
     object tbnSep1: TToolButton
       Left = 46
-      Top = 2
+      Top = 0
       Width = 8
       ImageIndex = 1
       Style = tbsSeparator
     end
     object tbnCopy: TToolButton
       Left = 54
-      Top = 2
+      Top = 0
       Action = actEditCopy
     end
     object tbnPaste: TToolButton
       Left = 77
-      Top = 2
+      Top = 0
       Action = actEditPasteToIde
+      ImageIndex = 7
     end
     object tbnPasteAsPascal: TToolButton
       Left = 100
-      Top = 2
+      Top = 0
       Action = actEditPasteAsPascalString
+      ImageIndex = 20
     end
     object tbnSep2: TToolButton
       Left = 123
-      Top = 2
+      Top = 0
       Width = 8
       ImageIndex = 3
       Style = tbsSeparator
     end
     object tbnViewPasteAs: TToolButton
       Left = 131
-      Top = 2
+      Top = 0
       Action = actViewPasteAsOptions
     end
     object tbnSep3: TToolButton
       Left = 154
-      Top = 2
+      Top = 0
       Width = 8
       ImageIndex = 1
       Style = tbsSeparator
     end
     object btnOptions: TToolButton
       Left = 162
-      Top = 2
+      Top = 0
       Action = actViewOptions
     end
     object tbnSep4: TToolButton
       Left = 185
-      Top = 2
+      Top = 0
       Width = 8
       Caption = 'tbnSep4'
       ImageIndex = 1
@@ -149,28 +152,28 @@ inherited fmClipboardHistory: TfmClipboardHistory
     end
     object tbnHelp: TToolButton
       Left = 193
-      Top = 2
+      Top = 0
       Action = actHelpHelp
     end
   end
   object pnlPasteAsOptions: TPanel
     Left = 0
-    Top = 26
+    Top = 24
     Width = 550
     Height = 37
     Align = alTop
     BevelOuter = bvLowered
     TabOrder = 3
     object lblMaxEntries: TLabel
-      Left = 14
-      Top = 10
+      Left = 19
+      Top = 11
       Width = 78
       Height = 14
       Alignment = taRightJustify
       Caption = 'Paste as type:'
     end
     object cbPasteAsType: TComboBox
-      Left = 100
+      Left = 105
       Top = 7
       Width = 170
       Height = 22
@@ -179,7 +182,7 @@ inherited fmClipboardHistory: TfmClipboardHistory
       TabOrder = 0
     end
     object chkCreateQuotedStrings: TCheckBox
-      Left = 285
+      Left = 292
       Top = 1
       Width = 250
       Height = 25
@@ -187,11 +190,11 @@ inherited fmClipboardHistory: TfmClipboardHistory
       TabOrder = 1
     end
     object chkAddExtraSpaceAtTheEnd: TCheckBox
-      Left = 285
+      Left = 292
       Top = 20
       Width = 250
       Height = 17
-      Caption = 'Add extra space char at the end'
+      Caption = 'Add extra space at the end'
       TabOrder = 2
     end
   end
@@ -349,14 +352,14 @@ inherited fmClipboardHistory: TfmClipboardHistory
     end
     object actEditPasteAsPascalString: TAction
       Category = 'Edit'
-      Caption = 'Paste as Pascal string'
+      Caption = 'Paste as Pascal String'
       Hint = 'Paste as Pascal string'
       ImageIndex = 78
       OnExecute = actEditPasteAsPascalStringExecute
     end
     object actViewPasteAsOptions: TAction
       Category = 'View'
-      Caption = 'Show PasteAs options'
+      Caption = 'Show PasteAs Options'
       Checked = True
       Hint = 'Show or hide the PasteAs options panel'
       ImageIndex = 27
@@ -364,14 +367,14 @@ inherited fmClipboardHistory: TfmClipboardHistory
     end
     object actEditCopyFromPascalString: TAction
       Category = 'Edit'
-      Caption = 'Copy from Pascal string'
+      Caption = 'Copy from Pascal String'
       Hint = 'Copy from Pascal string'
       ImageIndex = 6
       OnExecute = actEditCopyExecute
     end
     object actEditReplaceAsPascalString: TAction
       Category = 'Edit'
-      Caption = 'Replace as Pascal string'
+      Caption = 'Replace as Pascal String'
       Hint = 'Replace as Pascal string'
       OnExecute = actEditPasteAsPascalStringExecute
     end

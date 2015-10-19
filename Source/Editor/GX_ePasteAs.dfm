@@ -1,10 +1,11 @@
 object fmPasteAsConfig: TfmPasteAsConfig
-  Left = 0
-  Top = 0
-  Width = 312
-  Height = 211
+  Left = 426
+  Top = 292
   ActiveControl = cbPasteAsType
+  BorderStyle = bsDialog
   Caption = 'PasteAs Options'
+  ClientHeight = 190
+  ClientWidth = 313
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,15 +15,16 @@ object fmPasteAsConfig: TfmPasteAsConfig
   OldCreateOrder = False
   OnCreate = FormCreate
   DesignSize = (
-    304
-    181)
+    313
+    190)
   PixelsPerInch = 96
   TextHeight = 13
   object gbxPasteAsOptions: TGroupBox
     Left = 8
     Top = 8
-    Width = 289
-    Height = 138
+    Width = 295
+    Height = 134
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'PasteAs Options'
     TabOrder = 0
     object lblMaxEntries: TLabel
@@ -55,35 +57,35 @@ object fmPasteAsConfig: TfmPasteAsConfig
       Top = 80
       Width = 250
       Height = 17
-      Caption = 'Add extra space char at the end'
+      Caption = 'Add extra space at the end'
       TabOrder = 2
     end
     object chkShowOptions: TCheckBox
       Left = 23
-      Top = 112
+      Top = 100
       Width = 250
       Height = 17
-      Caption = 'Show options dialog when paste as'
+      Caption = 'Show options dialog for each paste'
       TabOrder = 3
     end
   end
   object btnOK: TButton
-    Left = 142
-    Top = 152
+    Left = 148
+    Top = 155
     Width = 75
     Height = 25
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 222
-    Top = 152
+    Left = 228
+    Top = 155
     Width = 75
     Height = 25
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2

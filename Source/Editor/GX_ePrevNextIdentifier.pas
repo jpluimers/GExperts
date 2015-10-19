@@ -10,7 +10,7 @@ uses
   Classes, StdCtrls, Controls, Forms, GX_BaseForm, GX_EditorExpert, GX_ConfigurationInfo;
 
 type
-  TViewChangeType = (vctOld_IfOnlyNeeded, vctNew_AlwaysInTheMiddle);
+  TViewChangeType = (vctScrollIfNeeded, vctScrollCenter);
 
   TBaseIdentExpert = class(TEditorExpert)
   private
@@ -24,6 +24,8 @@ type
     procedure InternalExecute; virtual; abstract;
   public
     procedure Execute(Sender: TObject); override;
+    function HasConfigOptions: Boolean; override;
+    procedure Configure; override;
   end;
 
   TPrevIdentExpert = class(TBaseIdentExpert)
@@ -40,7 +42,6 @@ type
   public
     constructor Create; override;
     procedure GetHelpString(List: TStrings); override;
-    procedure Configure; override;
   end;
 
   TNextIdentExpert = class(TPrevIdentExpert)
@@ -50,15 +51,13 @@ type
   public
     constructor Create; override;
     procedure GetHelpString(List: TStrings); override;
-    function HasConfigOptions: Boolean; override;
   end;
 
   TfmPrevNextConfig = class(TfmBaseForm)
-    rbNewMode: TRadioButton;
-    rbOldMode: TRadioButton;
     gbxPrevNextOptions: TGroupBox;
     btnOK: TButton;
     btnCancel: TButton;
+    chkCenterMatch: TCheckBox;
   end;
 
 implementation
@@ -78,7 +77,7 @@ resourcestring
 var
   // This is *local* and used by both the prevident
   // and the nextident expert...
-  ViewChangeType: TViewChangeType = vctNew_AlwaysInTheMiddle;
+  ViewChangeType: TViewChangeType = vctScrollIfNeeded;
 
 function CurrentIdent(const Source: string; CurPos: Integer;
   var Pos, Len: Integer): Boolean;
@@ -150,8 +149,8 @@ begin
   EditView.ConvertPos(False, EditPos, CharPos);
 
   case ViewChangeType of
-    vctNew_AlwaysInTheMiddle: GxOtaGotoEditPos(EditPos);
-    vctOld_IfOnlyNeeded:
+    vctScrollCenter: GxOtaGotoEditPos(EditPos);
+    vctScrollIfNeeded:
     begin
       EditView.CursorPos := EditPos;
       EditView.MoveViewToCursor;
@@ -182,6 +181,33 @@ begin
   end;
 
   InternalExecute;
+end;
+
+function TBaseIdentExpert.HasConfigOptions: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TBaseIdentExpert.Configure;
+var
+  Dlg: TfmPrevNextConfig;
+begin
+  Dlg := TfmPrevNextConfig.Create(nil);
+  try
+    Dlg.chkCenterMatch.Checked := ViewChangeType = vctScrollCenter;
+
+    if Dlg.ShowModal = mrOk then
+    begin
+      if Dlg.chkCenterMatch.Checked then
+        ViewChangeType := vctScrollCenter
+      else
+        ViewChangeType := vctScrollIfNeeded;
+
+      SaveSettings;
+    end;
+  finally
+    FreeAndNil(Dlg);
+  end;
 end;
 
 { TPrevIdentExpert }
@@ -230,7 +256,7 @@ procedure TPrevIdentExpert.InternalLoadSettings(Settings: TGExpertsSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the below items.
-  ViewChangeType := TViewChangeType(Settings.ReadEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(vctNew_AlwaysInTheMiddle)));
+  ViewChangeType := TViewChangeType(Settings.ReadEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(vctScrollCenter)));
 end;
 
 procedure TPrevIdentExpert.InternalSaveSettings(Settings: TGExpertsSettings);
@@ -238,31 +264,6 @@ begin
   inherited InternalSaveSettings(Settings);
   // Do not localize any of the below items.
   Settings.WriteEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(ViewChangeType));
-end;
-
-procedure TPrevIdentExpert.Configure;
-var
-  Dlg: TfmPrevNextConfig;
-begin
-  Dlg := TfmPrevNextConfig.Create(nil);
-  try
-    case ViewChangeType of
-      vctOld_IfOnlyNeeded: Dlg.rbOldMode.Checked := True;
-      vctNew_AlwaysInTheMiddle: Dlg.rbNewMode.Checked := True;
-    end;
-
-    if Dlg.ShowModal = mrOk then
-    begin
-      if Dlg.rbNewMode.Checked then
-        ViewChangeType := vctNew_AlwaysInTheMiddle
-      else
-        ViewChangeType := vctOld_IfOnlyNeeded;
-
-      SaveSettings;
-    end;
-  finally
-    FreeAndNil(Dlg);
-  end;
 end;
 
 { TNextIdentExpert }
@@ -287,11 +288,6 @@ end;
 class function TNextIdentExpert.GetName: string;
 begin
   Result := 'NextIdent';
-end;
-
-function TNextIdentExpert.HasConfigOptions: Boolean;
-begin
-  Result := False;
 end;
 
 initialization

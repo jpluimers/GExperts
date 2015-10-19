@@ -59,7 +59,7 @@ type
 implementation
 
 uses
-  GX_PasteAs, Clipbrd;
+  GX_PasteAs, Clipbrd, Dialogs;
 
 {$R *.dfm}
 
@@ -103,11 +103,12 @@ end;
 procedure TPasteAsExpert.GetHelpString(List: TStrings);
 resourcestring
   SPasteAsHelp =
-    '  This expert insert text from clipboard to string constants. ' +
-    'To use it, select a block in the Delphi editor and ' +
-    'activate this expert.' + sLineBreak +
-    sLineBreak +
-    '  You can configure this expert to use different string separators.';
+    '  This expert inserts text lines from the clipboard into the code editor as properly formatted Delphi code.  ' +
+    'It can convert things like multi-line SQL statements or long error messages into sets of string constants, '+
+    'TStrings.Add() statements, etc.  To use it, copy some text to the clipboard, put the edit cursor in the '+
+    'desired location, and execute this editor expert.' + sLineBreak +
+    '  You can configure it to ask what type of prefix/suffix to use on each line and whether to ' +
+    'add a space to the end of each line''s text.';
 begin
   List.Text := SPasteAsHelp;
 end;
@@ -152,11 +153,14 @@ end;
 procedure TCopyAsExpert.GetHelpString(List: TStrings);
 resourcestring
   SCopyAsHelp =
-    '  This expert copy a selected block of string constants to clipboard as text. ' +
-    'To use it, select a block in the Delphi editor and ' +
+    '  This expert copies code lines to the clipboard and removes the prefixes/suffixes around the strings ' +
+    'that are used to make them proper Delphi code, leaving you with just the raw strings.  ' +
+    'You might use it to take a set of string constants (lines of SQL, for example) and ' +
+    'convert them back into the raw text.' + sLineBreak +
+    'To use it, select a block containing the string constants in the Delphi editor and ' +
     'activate this expert.' + sLineBreak +
     sLineBreak +
-    '  You can configure this expert to use different string separators.';
+    '  You can configure this expert to use different string prefix/suffix combinations.';
 begin
   List.Text := SCopyAsHelp;
 end;
@@ -195,12 +199,13 @@ end;
 procedure TReplaceAsExpert.GetHelpString(List: TStrings);
 resourcestring
   SReplaceAsHelp =
-    '  This expert replace a selected block of string constants separator. ' +
-    '  This expert comments out a selected block of code. ' +
-    'To use it, select a block in the Delphi editor and ' +
+    '  This expert copies code lines to the clipboard and removes the prefixes/suffixes around the strings ' +
+    'that are used to make them proper Delphi code, leaving you with just the raw strings.  ' +
+    'It then uses the selected string prefix/suffix combination to paste the lines back into the editor.' + sLineBreak +
+    '  To use it, select the string constants in the Delphi editor and ' +
     'activate this expert.' + sLineBreak +
     sLineBreak +
-    '  You can configure this expert to use different string separators.';
+    '  You can configure this expert to use different string prefix/suffix combinations.';
 begin
   List.Text := SReplaceAsHelp;
 end;

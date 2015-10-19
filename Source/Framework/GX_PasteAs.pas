@@ -6,7 +6,7 @@ uses
   Classes, GX_ConfigurationInfo, GX_EditorExpert;
 
 type
-  TPasteAsType = (paStringArray, paTStringsAdd, paLineBreak, paLineBreakResult,
+  TPasteAsType = (paStringArray, paAdd, paSLineBreak,
     paChar10, paChar13, paChars1310, paCRLF, paCR_LF);
 
   TPasteAsHandler = class
@@ -41,8 +41,8 @@ uses
 
 const
   cPasteAsTypeText: array[TPasteAsType] of String = (
-    'String Array', '[TStrings.]Add(', 'sLineBreak', 'sLineBreak Result',
-    '#10 +', '#13 +', '#13#10 +', ' + CRLF +', ' + CR_LF +');
+    '%s,', 'Add(%s);', '%s + sLineBreak +',
+    '%s + #10 +', '%s + #13 +', '%s + #13#10 +', '%s + CRLF +', '%s + CR_LF +');
   cStringSep = '''';
 
 { TPasteAsHandler }
@@ -60,7 +60,7 @@ var
   AType: TPasteAsType;
 begin
   for AType := Low(TPasteAsType) to High(TPasteAsType) do
-    AList.AddObject( cPasteAsTypeText[AType], TObject(Integer(AType)) );
+    AList.AddObject(cPasteAsTypeText[AType], TObject(Integer(AType)));
 end;
 
 procedure TPasteAsHandler.LoadSettings(Settings: TGExpertsSettings; AConfigKey: String);
@@ -82,7 +82,7 @@ end;
 procedure TPasteAsHandler.ConvertToString(ALines: TStrings; AOnlyUpdateLines: Boolean);
 var
   I, FirstCharPos: Integer;
-  ALine, BaseIndent, ALineStart, ALineEnd, ALineStartBase, AAddDot, S: String;
+  ALine, BaseIndent, ALineStart, ALineEnd, ALineStartBase, AAddDot: String;
 begin
   ALine := ALines[0];
   FirstCharPos := GetFirstCharPos(ALine, [' ', #09], False);
@@ -94,7 +94,7 @@ begin
   AAddDot := '';
   case FPasteAsType of
     paStringArray: ALineEnd := ',';
-    paTStringsAdd:
+    paAdd:
     begin
       if not AOnlyUpdateLines then
       begin
@@ -106,17 +106,12 @@ begin
       ALineStart := 'Add(';
       ALineEnd := ');';
     end;
-    paLineBreak: ALineEnd := ' + sLineBreak +';
-    paLineBreakResult:
-    begin
-      S := sLineBreak;
-      ALineEnd := '';
-      for I := 1 to Length(S) do
-        ALineEnd := ALineEnd + '#' + IntToStr(Ord(S[I]));
-      ALineEnd := ' + ' + ALineEnd + ' +';
-    end;
-    paChar10, paChar13, paChars1310, paCRLF, paCR_LF:
-      ALineEnd := cPasteAsTypeText[FPasteAsType];
+    paSLineBreak: ALineEnd := ' + sLineBreak +';
+    paChar10: ALineEnd := '#10 +';
+    paChar13: ALineEnd := '#13 +';
+    paChars1310: ALineEnd := '#13#10 +';
+    paCRLF: ALineEnd := ' + CRLF +';
+    paCR_LF: ALineEnd := ' + CR_LF +';
   end;
 
   for I := 0 to ALines.Count-1 do
@@ -129,7 +124,7 @@ begin
     ALine := ALineStart + ALine;
     if ALineStartBase <> '' then
       ALine := IfThen(I = 0, AAddDot, ALineStartBase) + ALine;
-    if (I < ALines.Count-1) or (FPasteAsType = paTStringsAdd) then
+    if (I < ALines.Count-1) or (FPasteAsType = paAdd) then
       ALine := ALine + ALineEnd;
 
     ALines[I] := BaseIndent + ALine;
@@ -198,8 +193,7 @@ initialization
   PasteAsHandler := TPasteAsHandler.Create;
 
 finalization
-  PasteAsHandler.Free;
-  PasteAsHandler := nil;
+  FreeAndNil(PasteAsHandler);
 
 end.
 

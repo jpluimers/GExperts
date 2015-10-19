@@ -159,7 +159,9 @@ uses
   GX_Zipper in 'BackupProject\GX_Zipper.pas',
   GX_IdeSearchPathEnhancer in 'IDE\GX_IdeSearchPathEnhancer.pas',
   GX_HideNavbar in 'Experts\GX_HideNavbar.pas',
-  GX_dzVclUtils in 'Utils\GX_dzVclUtils.pas';
+  GX_dzVclUtils in 'Utils\GX_dzVclUtils.pas',
+  GX_ePasteAs in 'Editor\GX_ePasteAs.pas' {fmPasteAsConfig},
+  GX_IdeProjectOptionsEnhancer in 'IDE\GX_IdeProjectOptionsEnhancer.pas';
 
 end.
 
