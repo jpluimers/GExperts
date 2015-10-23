@@ -108,8 +108,6 @@ end;
 {$IFDEF GX_VER300_up}
 
 constructor THideNavigationToolbarExpert.Create;
-var
-  OTAEditorServices: IOTAEditorServices;
 begin
   inherited;
   if Assigned(BorlandIDEServices) then begin
