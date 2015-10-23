@@ -81,11 +81,17 @@ end;
 
 procedure TPasteAsHandler.ConvertToString(ALines: TStrings; AOnlyUpdateLines: Boolean);
 var
-  I, FirstCharPos: Integer;
+  I, FirstCharPos, FCP: Integer;
   ALine, BaseIndent, ALineStart, ALineEnd, ALineStartBase, AAddDot: String;
 begin
-  ALine := ALines[0];
-  FirstCharPos := GetFirstCharPos(ALine, [' ', #09], False);
+  FirstCharPos := MaxInt;
+  for I := 0 to ALines.Count-1 do
+  begin
+    ALine := ALines[I];
+    FCP := GetFirstCharPos(ALine, [' ', #09], False);
+    if FCP < FirstCharPos then
+      FirstCharPos := FCP;
+  end;
   BaseIndent := LeftStr(ALine, FirstCharPos - 1);
 
   ALineStart := '';
