@@ -509,7 +509,7 @@ object fmConfiguration: TfmConfiguration
             TabOrder = 2
           end
           object chk_EnhanceSearchPaths: TCheckBox
-            Left = 24
+            Left = 8
             Top = 41
             Width = 348
             Height = 17
