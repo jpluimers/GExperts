@@ -15,13 +15,14 @@ type
     FPasteAsType: TPasteAsType;
     FAddExtraSpaceAtTheEnd: Boolean;
     FShowOptions: Boolean;
+    function DetermineIndent(ALines: TStrings): integer;
   protected
   public
     constructor Create;
     procedure LoadSettings(Settings: TGExpertsSettings; AConfigKey: String);
     procedure SaveSettings(Settings: TGExpertsSettings; AConfigKey: String);
     procedure ConvertToCode(ALines: TStrings; AOnlyUpdateLines: Boolean);
-    function  ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean): String;
+    procedure ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean);
     function  ExecuteConfig(AConfigExpert: TEditorExpert; ForceShow: Boolean): Boolean;
     class procedure GetTypeText(AList: TStrings);
     property CreateQuotedString: Boolean read FCreateQuotedString write FCreateQuotedString default True;
@@ -79,20 +80,29 @@ begin
   Settings.WriteBool(AConfigKey, 'ShowOptions', FShowOptions);
 end;
 
+function TPasteAsHandler.DetermineIndent(ALines: TStrings): integer;
+var
+  i: Integer;
+  Line: string;
+  FCP: Integer;
+begin
+  Result := MaxInt;
+  for i := 0 to ALines.Count-1 do begin
+    Line := ALines[i];
+    FCP := GetFirstCharPos(Line, [' ', #09], False);
+    if FCP < Result then
+      Result := FCP;
+  end;
+end;
+
 procedure TPasteAsHandler.ConvertToCode(ALines: TStrings; AOnlyUpdateLines: Boolean);
 var
-  I, FirstCharPos, FCP: Integer;
+  I, FirstCharPos: Integer;
   ALine, BaseIndent, ALineStart, ALineEnd, ALineStartBase, AAddDot: String;
 begin
-  FirstCharPos := MaxInt;
-  for I := 0 to ALines.Count-1 do
-  begin
-    ALine := ALines[I];
-    FCP := GetFirstCharPos(ALine, [' ', #09], False);
-    if FCP < FirstCharPos then
-      FirstCharPos := FCP;
-  end;
-  BaseIndent := LeftStr(ALine, FirstCharPos - 1);
+  FirstCharPos := DetermineIndent(ALines);
+  // this works, because FirstCharPos is the smallest Indent for all lines
+  BaseIndent := LeftStr(ALines[0], FirstCharPos - 1);
 
   ALineStart := '';
   ALineEnd := '';
@@ -140,31 +150,35 @@ begin
   end;
 end;
 
-function TPasteAsHandler.ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean): String;
+procedure TPasteAsHandler.ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean);
 var
-  I, FirstCharPos, FirstQuotePos, LastQuotePos: Integer;
+  i, FirstCharPos, FirstQuotePos, LastQuotePos: Integer;
   Line, BaseIndent: String;
   sl: TStringList;
 begin
-  Line := ALines[0];
-  FirstCharPos := GetFirstCharPos(Line, [' ', #09], False);
-  BaseIndent := LeftStr(Line, FirstCharPos - 1);
+  FirstCharPos := DetermineIndent(ALines);
+  // this works, because FirstCharPos is the smallest Indent for all lines
+  BaseIndent := LeftStr(ALines[0], FirstCharPos - 1);
 
   sl := TStringList.Create;
   try
-    for I := 0 to ALines.Count-1 do
+    for i := 0 to ALines.Count-1 do
     begin
-      Line := Trim(Copy(ALines[I], FirstCharPos, MaxInt));
+      Line := Trim(Copy(ALines[i], FirstCharPos, MaxInt));
 
       FirstQuotePos := GetFirstCharPos(Line, [cStringSep], True);
       LastQuotePos := GetLastCharPos(Line, [cStringSep], True);
       if (FirstQuotePos > 0) and (LastQuotePos > 0) then begin
-        Line := AnsiDequotedStr( Copy(Line, FirstQuotePos, LastQuotePos - FirstQuotePos + 1), cStringSep );
-        sl.Add(IfThen(ADoAddBaseIndent, BaseIndent) + TrimRight(Line));
+        Line := Copy(Line, FirstQuotePos, LastQuotePos - FirstQuotePos + 1);
+        // It's not "not FCreateQuotedString" because this is the ExtractRawStrings method
+        // the ConvertToCode will add the quotes again, if FCreateQuotedString is true.
+        if FCreateQuotedString then
+          Line := AnsiDequotedStr(Line, cStringSep);
+       sl.Add(IfThen(ADoAddBaseIndent, BaseIndent) + TrimRight(Line));
       end;
     end;
 
-    Result := sl.Text;
+    ALines.Assign(sl);
   finally
     FreeAndNil(sl);
   end;

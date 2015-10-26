@@ -171,7 +171,8 @@ end;
 
 function TCopyRawStringsExpert.ProcessSelected(Lines: TStrings): Boolean;
 begin
-  Clipboard.AsText := PasteAsHandler.ExtractRawStrings(Lines, False);
+  PasteAsHandler.ExtractRawStrings(Lines, False);
+  Clipboard.AsText := Lines.Text;
   Result := False;
 end;
 

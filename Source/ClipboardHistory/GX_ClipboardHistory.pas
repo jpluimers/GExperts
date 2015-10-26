@@ -554,13 +554,16 @@ var
             APasteAsHandler.CreateQuotedString := chkCreateQuotedStrings.Checked;
             APasteAsHandler.AddExtraSpaceAtTheEnd := chkAddExtraSpaceAtTheEnd.Checked;
 
-            Result := APasteAsHandler.ExtractRawStrings(AList, False);
+            APasteAsHandler.ExtractRawStrings(AList, False);
+            Result := AList.Text;
           finally
             APasteAsHandler.Free;
           end;
         end
-        else
-          Result := PasteAsHandler.ExtractRawStrings(AList, False);
+        else begin
+          PasteAsHandler.ExtractRawStrings(AList, False);
+          Result := AList.Text;
+        end;
       finally
         AList.Free;
       end;
