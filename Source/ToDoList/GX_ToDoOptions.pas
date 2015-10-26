@@ -47,6 +47,7 @@ type
   private
     procedure UpdateButtonState;
     procedure DirEnable(New: Boolean);
+    procedure HandleDirectoriesDropped(_Sender: TObject; _Files: TStrings);
   end;
 
 // #ToDo:4 Test2
@@ -56,7 +57,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_GenericUtils, GX_ToDo, Dialogs, Graphics, SysUtils;
+  GX_GenericUtils, GX_ToDo, GX_dzVclUtils, Dialogs, Graphics, SysUtils;
 
 procedure TfmToDoOptions.UpdateButtonState;
 var
@@ -201,9 +202,16 @@ procedure TfmToDoOptions.FormCreate(Sender: TObject);
 var
   i: TToDoPriority;
 begin
+  TWinControl_ActivateDropFiles(cboDirectories, HandleDirectoriesDropped);
+
   DirEnable(radScanDir.Checked);
   for i := Low(PriorityText) to High(PriorityText) do
     cboPriority.Items.Add(PriorityText[i]);
+end;
+
+procedure TfmToDoOptions.HandleDirectoriesDropped(_Sender: TObject; _Files: TStrings);
+begin
+  cboDirectories.Text := _Files[0];
 end;
 
 procedure TfmToDoOptions.radScanDirClick(Sender: TObject);
