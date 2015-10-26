@@ -20,7 +20,7 @@ type
     procedure GetHelpString(List: TStrings); override;
   end;
 
-  TCopyAsExpert = class(TSelectionEditorExpert)
+  TCopyRawStringsExpert = class(TSelectionEditorExpert)
   protected
     function GetDisplayName: string; override;
     class function GetName: string; override;
@@ -31,7 +31,7 @@ type
     function HasConfigOptions: Boolean; override;
   end;
 
-  TReplaceAsExpert = class(TSelectionEditorExpert)
+  TConvertRawStringsExpert = class(TSelectionEditorExpert)
   protected
     function GetDisplayName: string; override;
     class function GetName: string; override;
@@ -39,6 +39,7 @@ type
   public
     constructor Create; override;
     procedure GetHelpString(List: TStrings); override;
+    procedure Configure; override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -130,92 +131,96 @@ begin
   end;
 end;
 
-{ TCopyAsExpert }
+{ TCopyRawStringsExpert }
 
-constructor TCopyAsExpert.Create;
+constructor TCopyRawStringsExpert.Create;
 begin
   inherited Create;
   ShortCut := scCtrl + scAlt + Ord('C');
 end;
 
-function TCopyAsExpert.GetDisplayName: string;
+function TCopyRawStringsExpert.GetDisplayName: string;
 resourcestring
-  SCopyAsName = 'Copy As';
+  SCopyRawStringsName = 'Copy Raw Strings';
 begin
-  Result := SCopyAsName;
+  Result := SCopyRawStringsName;
 end;
 
-class function TCopyAsExpert.GetName: string;
+class function TCopyRawStringsExpert.GetName: string;
 begin
-  Result := 'CopyAs';
+  Result := 'CopyRawStrings';
 end;
 
-procedure TCopyAsExpert.GetHelpString(List: TStrings);
+procedure TCopyRawStringsExpert.GetHelpString(List: TStrings);
 resourcestring
-  SCopyAsHelp =
+  SCopyRawStringsHelp =
     '  This expert copies code lines to the clipboard and removes the prefixes/suffixes around the strings ' +
     'that are used to make them proper Delphi code, leaving you with just the raw strings.  ' +
     'You might use it to take a set of string constants (lines of SQL, for example) and ' +
     'convert them back into the raw text.' + sLineBreak +
     'To use it, select a block containing the string constants in the Delphi editor and ' +
-    'activate this expert.' + sLineBreak +
-    sLineBreak +
-    '  You can configure this expert to use different string prefix/suffix combinations.';
+    'activate this expert.';
 begin
-  List.Text := SCopyAsHelp;
+  List.Text := SCopyRawStringsHelp;
 end;
 
-function TCopyAsExpert.HasConfigOptions: Boolean;
+function TCopyRawStringsExpert.HasConfigOptions: Boolean;
 begin
   Result := False;
 end;
 
-function TCopyAsExpert.ProcessSelected(Lines: TStrings): Boolean;
+function TCopyRawStringsExpert.ProcessSelected(Lines: TStrings): Boolean;
 begin
   Clipboard.AsText := PasteAsHandler.ConvertFromString(Lines, False);
   Result := False;
 end;
 
-{ TReplaceAsExpert }
+{ TConvertRawStringsExpert }
 
-constructor TReplaceAsExpert.Create;
+constructor TConvertRawStringsExpert.Create;
 begin
   inherited Create;
   ShortCut := scCtrl + scShift + Ord('R');
 end;
 
-function TReplaceAsExpert.GetDisplayName: string;
+function TConvertRawStringsExpert.GetDisplayName: string;
 resourcestring
-  SReplaceAsName = 'Replace As';
+  SConvertRawStringsName = 'Convert Raw Strings';
 begin
-  Result := SReplaceAsName;
+  Result := SConvertRawStringsName;
 end;
 
-class function TReplaceAsExpert.GetName: string;
+class function TConvertRawStringsExpert.GetName: string;
 begin
-  Result := 'ReplaceAs';
+  Result := 'ConvertRawStrings';
 end;
 
-procedure TReplaceAsExpert.GetHelpString(List: TStrings);
+procedure TConvertRawStringsExpert.GetHelpString(List: TStrings);
 resourcestring
-  SReplaceAsHelp =
-    '  This expert copies code lines to the clipboard and removes the prefixes/suffixes around the strings ' +
+  SConvertRawStringsHelp =
+    '  This expert takes the selected code lines and removes the prefixes/suffixes around the strings ' +
     'that are used to make them proper Delphi code, leaving you with just the raw strings.  ' +
     'It then uses the selected string prefix/suffix combination to paste the lines back into the editor.' + sLineBreak +
     '  To use it, select the string constants in the Delphi editor and ' +
     'activate this expert.' + sLineBreak +
     sLineBreak +
-    '  You can configure this expert to use different string prefix/suffix combinations.';
+    '  You can configure this expert to use different string prefix/suffix combinations. Note that ' +
+    'it shares this configuration with the PasteAs expert.';
 begin
-  List.Text := SReplaceAsHelp;
+  List.Text := SConvertRawStringsHelp;
 end;
 
-function TReplaceAsExpert.HasConfigOptions: Boolean;
+procedure TConvertRawStringsExpert.Configure;
 begin
-  Result := False;
+  PasteAsHandler.ExecuteConfig(Self, True);
 end;
 
-function TReplaceAsExpert.ProcessSelected(Lines: TStrings): Boolean;
+function TConvertRawStringsExpert.HasConfigOptions: Boolean;
+begin
+  Result := True;
+end;
+
+function TConvertRawStringsExpert.ProcessSelected(Lines: TStrings): Boolean;
 begin
   Result := PasteAsHandler.ExecuteConfig(Self, False);
   if Result then
@@ -235,7 +240,7 @@ end;
 
 initialization
   RegisterEditorExpert(TPasteAsExpert);
-  RegisterEditorExpert(TCopyAsExpert);
-  RegisterEditorExpert(TReplaceAsExpert);
+  RegisterEditorExpert(TCopyRawStringsExpert);
+  RegisterEditorExpert(TConvertRawStringsExpert);
 
 end.
