@@ -554,13 +554,13 @@ var
             APasteAsHandler.CreateQuotedString := chkCreateQuotedStrings.Checked;
             APasteAsHandler.AddExtraSpaceAtTheEnd := chkAddExtraSpaceAtTheEnd.Checked;
 
-            Result := APasteAsHandler.ConvertFromString(AList, False);
+            Result := APasteAsHandler.ExtractRawStrings(AList, False);
           finally
             APasteAsHandler.Free;
           end;
         end
         else
-          Result := PasteAsHandler.ConvertFromString(AList, False);
+          Result := PasteAsHandler.ExtractRawStrings(AList, False);
       finally
         AList.Free;
       end;
@@ -799,9 +799,9 @@ begin
         APasteAsHandler.AddExtraSpaceAtTheEnd := chkAddExtraSpaceAtTheEnd.Checked;
 
         if IsReplace then
-          APasteAsHandler.ConvertFromString(AFromList, True);
+          APasteAsHandler.ExtractRawStrings(AFromList, True);
 
-        APasteAsHandler.ConvertToString(AFromList, False)
+        APasteAsHandler.ConvertToCode(AFromList, False)
       finally
         APasteAsHandler.Free;
       end;
@@ -809,9 +809,9 @@ begin
     else
     begin
       if IsReplace then
-        PasteAsHandler.ConvertFromString(AFromList, True);
+        PasteAsHandler.ExtractRawStrings(AFromList, True);
 
-      PasteAsHandler.ConvertToString(AFromList, False);
+      PasteAsHandler.ConvertToCode(AFromList, False);
     end;
   finally
     AFromList.Free;

@@ -20,8 +20,8 @@ type
     constructor Create;
     procedure LoadSettings(Settings: TGExpertsSettings; AConfigKey: String);
     procedure SaveSettings(Settings: TGExpertsSettings; AConfigKey: String);
-    procedure ConvertToString(ALines: TStrings; AOnlyUpdateLines: Boolean);
-    function  ConvertFromString(ALines: TStrings; ADoAddBaseIndent: Boolean): String;
+    procedure ConvertToCode(ALines: TStrings; AOnlyUpdateLines: Boolean);
+    function  ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean): String;
     function  ExecuteConfig(AConfigExpert: TEditorExpert; ForceShow: Boolean): Boolean;
     class procedure GetTypeText(AList: TStrings);
     property CreateQuotedString: Boolean read FCreateQuotedString write FCreateQuotedString default True;
@@ -79,7 +79,7 @@ begin
   Settings.WriteBool(AConfigKey, 'ShowOptions', FShowOptions);
 end;
 
-procedure TPasteAsHandler.ConvertToString(ALines: TStrings; AOnlyUpdateLines: Boolean);
+procedure TPasteAsHandler.ConvertToCode(ALines: TStrings; AOnlyUpdateLines: Boolean);
 var
   I, FirstCharPos, FCP: Integer;
   ALine, BaseIndent, ALineStart, ALineEnd, ALineStartBase, AAddDot: String;
@@ -140,27 +140,34 @@ begin
   end;
 end;
 
-function TPasteAsHandler.ConvertFromString(ALines: TStrings; ADoAddBaseIndent: Boolean): String;
+function TPasteAsHandler.ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean): String;
 var
-  I, FirstCharPos, FirstString, LastString: Integer;
-  ALine, BaseIndent: String;
+  I, FirstCharPos, FirstQuotePos, LastQuotePos: Integer;
+  Line, BaseIndent: String;
+  sl: TStringList;
 begin
-  ALine := ALines[0];
-  FirstCharPos := GetFirstCharPos(ALine, [' ', #09], False);
-  BaseIndent := LeftStr(ALine, FirstCharPos - 1);
+  Line := ALines[0];
+  FirstCharPos := GetFirstCharPos(Line, [' ', #09], False);
+  BaseIndent := LeftStr(Line, FirstCharPos - 1);
 
-  for I := 0 to ALines.Count-1 do
-  begin
-    ALine := Trim(Copy(ALines[I], FirstCharPos, MaxInt));
+  sl := TStringList.Create;
+  try
+    for I := 0 to ALines.Count-1 do
+    begin
+      Line := Trim(Copy(ALines[I], FirstCharPos, MaxInt));
 
-    FirstString := GetFirstCharPos(ALine, [cStringSep], True);
-    LastString := GetLastCharPos(ALine, [cStringSep], True);
-    ALine := AnsiDequotedStr( Copy(ALine, FirstString, LastString - FirstString + 1), cStringSep );
+      FirstQuotePos := GetFirstCharPos(Line, [cStringSep], True);
+      LastQuotePos := GetLastCharPos(Line, [cStringSep], True);
+      if (FirstQuotePos > 0) and (LastQuotePos > 0) then begin
+        Line := AnsiDequotedStr( Copy(Line, FirstQuotePos, LastQuotePos - FirstQuotePos + 1), cStringSep );
+        sl.Add(IfThen(ADoAddBaseIndent, BaseIndent) + TrimRight(Line));
+      end;
+    end;
 
-    ALines[I] := IfThen(ADoAddBaseIndent, BaseIndent) + TrimRight(ALine);
+    Result := sl.Text;
+  finally
+    FreeAndNil(sl);
   end;
-
-  Result := ALines.Text;
 end;
 
 function TPasteAsHandler.ExecuteConfig(AConfigExpert: TEditorExpert; ForceShow: Boolean): Boolean;

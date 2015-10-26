@@ -125,7 +125,7 @@ begin
   try
     ALines.Text := Clipboard.AsText;
     if PasteAsHandler.ExecuteConfig(Self, False) then
-      PasteAsHandler.ConvertToString(ALines, False);
+      PasteAsHandler.ConvertToCode(ALines, False);
   finally
     ALines.Free;
   end;
@@ -171,7 +171,7 @@ end;
 
 function TCopyRawStringsExpert.ProcessSelected(Lines: TStrings): Boolean;
 begin
-  Clipboard.AsText := PasteAsHandler.ConvertFromString(Lines, False);
+  Clipboard.AsText := PasteAsHandler.ExtractRawStrings(Lines, False);
   Result := False;
 end;
 
@@ -225,8 +225,8 @@ begin
   Result := PasteAsHandler.ExecuteConfig(Self, False);
   if Result then
   begin
-    PasteAsHandler.ConvertFromString(Lines, True);
-    PasteAsHandler.ConvertToString(Lines, True);
+    PasteAsHandler.ExtractRawStrings(Lines, True);
+    PasteAsHandler.ConvertToCode(Lines, True);
   end;
 end;
 
