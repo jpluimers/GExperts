@@ -173,19 +173,19 @@ begin
 
   Dlg := TfmPasteAsConfig.Create(nil);
   try
-    PasteAsHandler.GetTypeText(Dlg.cbPasteAsType.Items);
-    Dlg.cbPasteAsType.ItemIndex := Integer(PasteAsHandler.PasteAsType);
-    Dlg.chkCreateQuotedStrings.Checked := PasteAsHandler.CreateQuotedString;
-    Dlg.chkAddExtraSpaceAtTheEnd.Checked := PasteAsHandler.AddExtraSpaceAtTheEnd;
-    Dlg.chkShowOptions.Checked := PasteAsHandler.ShowOptions;
+    GetTypeText(Dlg.cbPasteAsType.Items);
+    Dlg.cbPasteAsType.ItemIndex := Integer(PasteAsType);
+    Dlg.chkCreateQuotedStrings.Checked := CreateQuotedString;
+    Dlg.chkAddExtraSpaceAtTheEnd.Checked := AddExtraSpaceAtTheEnd;
+    Dlg.chkShowOptions.Checked := ShowOptions;
 
     Result := Dlg.ShowModal = mrOk;
     if Result then
     begin
-      PasteAsHandler.PasteAsType := TPasteAsType(Dlg.cbPasteAsType.ItemIndex);
-      PasteAsHandler.CreateQuotedString := Dlg.chkCreateQuotedStrings.Checked;
-      PasteAsHandler.AddExtraSpaceAtTheEnd := Dlg.chkAddExtraSpaceAtTheEnd.Checked;
-      PasteAsHandler.ShowOptions := Dlg.chkShowOptions.Checked;
+      PasteAsType := TPasteAsType(Dlg.cbPasteAsType.ItemIndex);
+      CreateQuotedString := Dlg.chkCreateQuotedStrings.Checked;
+      AddExtraSpaceAtTheEnd := Dlg.chkAddExtraSpaceAtTheEnd.Checked;
+      ShowOptions := Dlg.chkShowOptions.Checked;
 
       if Assigned(AConfigExpert) then
         AConfigExpert.SaveSettings;
