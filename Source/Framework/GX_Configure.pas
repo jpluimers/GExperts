@@ -105,6 +105,7 @@ type
     edtFilter: TEdit;
     chk_HideNavbar: TCheckBox;
     chk_EnhanceSearchPaths: TCheckBox;
+    chk_EnhanceToolProperties: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -213,11 +214,11 @@ begin
   FCPFont := TFont.Create;
 
   TWinControl_ActivateDropFiles(edVCLPath, edVCLPathOnDropFiles);
-  TEdit_AutoComplete(edVCLPath, [acsFileSystem], [actSuggest]);
+  TEdit_ActivateAutoComplete(edVCLPath, [acsFileSystem], [actSuggest]);
   TWinControl_ActivateDropFiles(edConfigPath, edConfigPathDropFiles);
-  TEdit_AutoComplete(edConfigPath, [acsFileSystem], [actSuggest]);
+  TEdit_ActivateAutoComplete(edConfigPath, [acsFileSystem], [actSuggest]);
   TWinControl_ActivateDropFiles(edHelpFile, edHelpFileDropFiles);
-  TEdit_AutoComplete(edHelpFile, [acsFileSystem], [actSuggest]);
+  TEdit_ActivateAutoComplete(edHelpFile, [acsFileSystem], [actSuggest]);
 
   pcConfig.ActivePage := tshExperts;
   LoadExperts;
@@ -546,6 +547,7 @@ begin
 
   chkEnhanceDialogs.Checked := IdeEnhancements.EnhanceIDEForms;
   chk_EnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
+  chk_EnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
   FCPFont.Assign(IdeEnhancements.CPFont);
@@ -615,6 +617,7 @@ begin
 
   IdeEnhancements.EnhanceIDEForms := chkEnhanceDialogs.Checked;
   IdeEnhancements.EnhanceSearchPath := chk_EnhanceSearchPaths.Checked;
+  IdeEnhancements.EnhanceToolProperties := chk_EnhanceToolProperties.Checked;
 
   // Menus
   ConfigInfo.PlaceGxMainMenuInToolsMenu := chkPlaceGxMainMenuInToolsMenu.Checked;

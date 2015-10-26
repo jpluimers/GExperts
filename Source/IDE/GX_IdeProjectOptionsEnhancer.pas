@@ -90,9 +90,10 @@ end;
 
 class procedure TGxIdeProjectOptionsEnhancer.SetEnabled(const Value: Boolean);
 begin
-  if Value then
-    TheProjectOptionsEnhancer := TProjectOptionsEnhancer.Create
-  else
+  if Value then begin
+    if not Assigned(TheProjectOptionsEnhancer) then
+      TheProjectOptionsEnhancer := TProjectOptionsEnhancer.Create
+  end else
     FreeAndNil(TheProjectOptionsEnhancer);
 end;
 

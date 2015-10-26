@@ -387,7 +387,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxTabDockHost: TGroupBox
           Left = 8
-          Top = 189
+          Top = 197
           Width = 375
           Height = 68
           Caption = 'Tab Dock &Hosts'
@@ -412,7 +412,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 8
-          Top = 272
+          Top = 280
           Width = 375
           Height = 165
           Caption = 'Component &Palette'
@@ -481,7 +481,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 86
           Width = 375
-          Height = 91
+          Height = 99
           Caption = 'IDE'
           TabOrder = 1
           object chkEnhanceDialogs: TCheckBox
@@ -502,11 +502,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 60
+            Top = 76
             Width = 364
             Height = 17
             Caption = 'Show object inspector font names using the font'
-            TabOrder = 2
+            TabOrder = 3
           end
           object chk_EnhanceSearchPaths: TCheckBox
             Left = 8
@@ -515,6 +515,14 @@ object fmConfiguration: TfmConfiguration
             Height = 17
             Caption = 'Enable drag&&drop and autocomplete for search paths'
             TabOrder = 1
+          end
+          object chk_EnhanceToolProperties: TCheckBox
+            Left = 8
+            Top = 59
+            Width = 348
+            Height = 17
+            Caption = 'Enhance Tool Properties dialog'
+            TabOrder = 2
           end
         end
       end

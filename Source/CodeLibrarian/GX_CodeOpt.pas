@@ -69,7 +69,7 @@ begin
   inherited;
 
   TWinControl_ActivateDropFiles(edPath, edPathOnFilesDropped);
-  TEdit_AutoComplete(edPath, [acsFileSystem], [actSuggest]);
+  TEdit_ActivateAutoComplete(edPath, [acsFileSystem], [actSuggest]);
 end;
 
 procedure TfmCodeOptions.eNumericKeyPress(Sender: TObject; var Key: Char);

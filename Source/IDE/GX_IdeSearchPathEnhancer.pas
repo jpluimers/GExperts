@@ -51,9 +51,10 @@ end;
 
 class procedure TGxIdeSearchPathEnhancer.SetEnabled(const Value: Boolean);
 begin
-  if Value then
-    TheSearchPathEnhancer := TSearchPathEnhancer.Create
-  else
+  if Value then begin
+    if not Assigned(TheSearchPathEnhancer) then
+      TheSearchPathEnhancer := TSearchPathEnhancer.Create
+  end else
     FreeAndNil(TheSearchPathEnhancer);
 end;
 
@@ -154,7 +155,7 @@ begin
   end;
 
   if not FIsAutocompleteEnabled then begin
-    TEdit_SetAutocomplete(ed, [acsFileSystem], [actSuggest]);
+    TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
     FIsAutocompleteEnabled := True;
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     cmp := _Form.FindComponent('CreationList');

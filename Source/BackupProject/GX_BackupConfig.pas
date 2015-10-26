@@ -47,7 +47,7 @@ constructor TfmBackupConfig.Create(_Owner: TComponent);
 begin
   inherited;
   TWinControl_ActivateDropFiles(edBackupDir, edBackupDirOnDropFiles);
-  TEdit_AutoComplete(edBackupDir, [acsFileSystem], [actSuggest]);
+  TEdit_ActivateAutoComplete(edBackupDir, [acsFileSystem], [actSuggest]);
 end;
 
 

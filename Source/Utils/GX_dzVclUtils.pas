@@ -66,7 +66,7 @@ function TEdit_SetAutocomplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnu
 /// @returns the TAutoCompleteActivator instance created.
 ///          NOTE: You do not need to free this object! It will automatically be freed when the
 ///                TEdit is destroyed. </summary>
-function TEdit_AutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
+function TEdit_ActivateAutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
 
 type
@@ -441,7 +441,7 @@ begin
   inherited NewWindowProc(_Msg);
 end;
 
-function TEdit_AutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
+function TEdit_ActivateAutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
 begin
   Result := TAutoCompleteActivator.Create(_ed, _Source, _Type);
