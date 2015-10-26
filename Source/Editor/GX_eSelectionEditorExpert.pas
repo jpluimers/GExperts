@@ -90,7 +90,8 @@ begin
       case GetNoSelectionMode of
         nsmSelectLine: GxOtaSelectCurrentLine(SourceEditor, False);
         nsmSelectIdent: GxOtaSelectCurrentIdent(SourceEditor, False);
-        nsmError: raise Exception.Create(NoSelectionError);
+      else // nsmError:
+        raise Exception.Create(NoSelectionError);
       end;
       CodeList.Text := GxOtaGetCurrentSelection;
     end;
