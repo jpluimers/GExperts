@@ -74,7 +74,7 @@ end;
 
 function TPasteAsExpert.GetDisplayName: string;
 resourcestring
-  SPasteAsName = 'Paste As';
+  SPasteAsName = 'Paste Strings As';
 begin
   Result := SPasteAsName;
 end;

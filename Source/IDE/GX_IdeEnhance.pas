@@ -73,10 +73,10 @@ type
     function ConfigurationKey: string;
     procedure SetEnhanceIDEForms(const Value: Boolean);
     function GetEnhanceIDEForms: Boolean;
-    function GetEnhanceSearchPath: boolean;
-    procedure SetEnhanceSearchPath(const Value: boolean);
-    function GetEnhanceToolProperties: boolean;
-    procedure SetEnhanceToolProperties(const Value: boolean);
+    function GetEnhanceSearchPath: Boolean;
+    procedure SetEnhanceSearchPath(const Value: Boolean);
+    function GetEnhanceToolProperties: Boolean;
+    procedure SetEnhanceToolProperties(const Value: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -88,9 +88,9 @@ type
     // IDE
     property EnhanceIDEForms: Boolean read GetEnhanceIDEForms write SetEnhanceIDEForms;
     // Search path
-    property EnhanceSearchPath: boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
+    property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
     // Tool Options dialog
-    property EnhanceToolProperties: boolean read GetEnhanceToolProperties write SetEnhanceToolProperties;
+    property EnhanceToolProperties: Boolean read GetEnhanceToolProperties write SetEnhanceToolProperties;
     // Fonts
     property OIFontEnabled: Boolean read FOIFontEnabled write SetOIFontEnabled;
     property OIFont: TFont read FOIFont;
@@ -182,13 +182,13 @@ begin
     TIDEFormEnhancements.SetEnabled(False);
 end;
 
-procedure TIdeEnhancements.SetEnhanceSearchPath(const Value: boolean);
+procedure TIdeEnhancements.SetEnhanceSearchPath(const Value: Boolean);
 begin
   TGxIdeSearchPathEnhancer.SetEnabled(Value);
   TGxIdeProjectOptionsEnhancer.SetEnabled(Value);
 end;
 
-procedure TIdeEnhancements.SetEnhanceToolProperties(const Value: boolean);
+procedure TIdeEnhancements.SetEnhanceToolProperties(const Value: Boolean);
 begin
   TGxIdeToolPropertiesEnhancer.SetEnabled(Value);
 end;
@@ -703,12 +703,12 @@ begin
   Result := TIDEFormEnhancements.GetEnabled;
 end;
 
-function TIdeEnhancements.GetEnhanceSearchPath: boolean;
+function TIdeEnhancements.GetEnhanceSearchPath: Boolean;
 begin
   Result := TGxIdeSearchPathEnhancer.GetEnabled;
 end;
 
-function TIdeEnhancements.GetEnhanceToolProperties: boolean;
+function TIdeEnhancements.GetEnhanceToolProperties: Boolean;
 begin
    Result := TGxIdeToolPropertiesEnhancer.GetEnabled;
 end;

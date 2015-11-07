@@ -161,7 +161,8 @@ uses
   GX_HideNavbar in 'Experts\GX_HideNavbar.pas',
   GX_dzVclUtils in 'Utils\GX_dzVclUtils.pas',
   GX_ePasteAs in 'Editor\GX_ePasteAs.pas' {fmPasteAsConfig},
-  GX_IdeProjectOptionsEnhancer in 'IDE\GX_IdeProjectOptionsEnhancer.pas';
+  GX_IdeProjectOptionsEnhancer in 'IDE\GX_IdeProjectOptionsEnhancer.pas',
+  GX_IdeToolPropertiesEnhancer in 'IDE\GX_IdeToolPropertiesEnhancer.pas';
 
 end.
 
