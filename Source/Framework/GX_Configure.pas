@@ -104,8 +104,8 @@ type
     lblFilter: TLabel;
     edtFilter: TEdit;
     chk_HideNavbar: TCheckBox;
-    chk_EnhanceSearchPaths: TCheckBox;
-    chk_EnhanceToolProperties: TCheckBox;
+    chkEnhanceSearchPaths: TCheckBox;
+    chkEnhanceToolProperties: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -145,6 +145,7 @@ type
     procedure btnCustomFontClick(Sender: TObject);
     procedure tmrFilterTimer(Sender: TObject);
     procedure edtFilterChange(Sender: TObject);
+    procedure chkEnhanceDialogsClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -546,8 +547,8 @@ begin
   chkDefaultMultiLineTabDockHost.Checked := IdeEnhancements.DefaultMultiLineTabDockHost;
 
   chkEnhanceDialogs.Checked := IdeEnhancements.EnhanceIDEForms;
-  chk_EnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
-  chk_EnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
+  chkEnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
+  chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
   FCPFont.Assign(IdeEnhancements.CPFont);
@@ -616,8 +617,8 @@ begin
   IdeEnhancements.CPFont.Assign(FCPFont);
 
   IdeEnhancements.EnhanceIDEForms := chkEnhanceDialogs.Checked;
-  IdeEnhancements.EnhanceSearchPath := chk_EnhanceSearchPaths.Checked;
-  IdeEnhancements.EnhanceToolProperties := chk_EnhanceToolProperties.Checked;
+  IdeEnhancements.EnhanceSearchPath := chkEnhanceSearchPaths.Checked;
+  IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
 
   // Menus
   ConfigInfo.PlaceGxMainMenuInToolsMenu := chkPlaceGxMainMenuInToolsMenu.Checked;
@@ -1060,6 +1061,17 @@ begin
     chkUseCustomFont.Checked := True;
     Self.Font.Assign(dlgUIFont.Font);
   end;
+end;
+
+procedure TfmConfiguration.chkEnhanceDialogsClick(Sender: TObject);
+var
+  EnableState: Boolean;
+begin
+  EnableState := (Sender as TCheckBox).Checked and
+                 (Sender as TCheckBox).Enabled;
+
+  chkEnhanceSearchPaths.Enabled := EnableState;
+  chkEnhanceToolProperties.Enabled := EnableState;
 end;
 
 end.

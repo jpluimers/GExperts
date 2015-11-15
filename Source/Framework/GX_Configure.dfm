@@ -498,7 +498,7 @@ object fmConfiguration: TfmConfiguration
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
-            OnClick = chkAutoSaveClick
+            OnClick = chkEnhanceDialogsClick
           end
           object chkOIFontNames: TCheckBox
             Left = 8
@@ -508,20 +508,20 @@ object fmConfiguration: TfmConfiguration
             Caption = 'Show object inspector font names using the font'
             TabOrder = 3
           end
-          object chk_EnhanceSearchPaths: TCheckBox
-            Left = 8
+          object chkEnhanceSearchPaths: TCheckBox
+            Left = 24
             Top = 41
             Width = 348
             Height = 17
             Caption = 'Enable drag && drop and autocomplete for search paths'
             TabOrder = 1
           end
-          object chk_EnhanceToolProperties: TCheckBox
-            Left = 8
+          object chkEnhanceToolProperties: TCheckBox
+            Left = 24
             Top = 59
             Width = 348
             Height = 17
-            Caption = 'Enhance Tool menu Tools Properties dialog'
+            Caption = 'Enhance Tools menu Tool Properties dialog'
             TabOrder = 2
           end
         end
