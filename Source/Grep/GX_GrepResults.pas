@@ -394,14 +394,11 @@ begin
   // Do not localize any of the below strings.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
-    Settings.WriteBool(ConfigurationKey, 'OnTop', StayOnTop);
-    Settings.WriteInteger(ConfigurationKey, 'ResultsHeight', lbResults.Height);
-    Settings.WriteBool(ConfigurationKey, 'ShowToolBar', ToolBar.Visible);
-    Settings.WriteBool(ConfigurationKey, 'ShowContext', ShowContext);
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
+    Settings.WriteBool(ConfigurationKey + '\Window', 'OnTop', StayOnTop);
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'ResultsHeight', lbResults.Height);
+    Settings.WriteBool(ConfigurationKey + '\Window', 'ShowToolBar', ToolBar.Visible);
+    Settings.WriteBool(ConfigurationKey + '\Window', 'ShowContext', ShowContext);
   finally
     FreeAndNil(Settings);
   end;
@@ -414,14 +411,12 @@ begin
   // Do not localize any of the below strings.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-    StayOnTop := Settings.ReadBool(ConfigurationKey, 'OnTop', True);
-    lbResults.Height := Settings.ReadInteger(ConfigurationKey, 'ResultsHeight', lbResults.Height);
-    ShowContext := Settings.ReadBool(ConfigurationKey, 'ShowContext', True);
-    ToolBar.Visible := Settings.ReadBool(ConfigurationKey, 'ShowToolBar', ToolBar.Visible);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
+    EnsureFormVisible(Self)
+    StayOnTop := Settings.ReadBool(ConfigurationKey + '\Window', 'OnTop', True);
+    lbResults.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'ResultsHeight', lbResults.Height);
+    ShowContext := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowContext', True);
+    ToolBar.Visible := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowToolBar', ToolBar.Visible);
   finally
     FreeAndNil(Settings);
   end;
