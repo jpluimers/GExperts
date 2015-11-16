@@ -1010,11 +1010,8 @@ begin
   // Do not localize any of the following lines.
   Settings := TGExpertsSettings.Create(ExpertClassKey);
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
-    Settings.WriteInteger(ConfigurationKey, 'Split', tvBrowse.Width);
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'Split', tvBrowse.Width);
     Settings.WriteInteger(ConfigurationKey, 'ViewMode', Ord(FInfoViewMode));
     Settings.WriteBool(ConfigurationKey, 'PrimitiveTop', FPrimitiveTop);
     Settings.WriteBool(ConfigurationKey, 'StayInPackage', FStayInPackage);
@@ -1047,11 +1044,8 @@ begin
   // Do not localize any of the following lines.
   Settings := TGExpertsSettings.Create(ExpertClassKey);
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-    tvBrowse.Width := Settings.ReadInteger(ConfigurationKey, 'Split', tvBrowse.Width);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
+    tvBrowse.Width := Settings.ReadInteger(ConfigurationKey + '\Window', 'Split', tvBrowse.Width);
     if tvBrowse.Width = 0 then tvBrowse.Width := 100;
     FInfoViewMode := TInfoViewMode(Settings.ReadInteger(ConfigurationKey, 'ViewMode', Ord(FInfoViewMode)));
     FViewUnitNames := Settings.ReadBool(ConfigurationKey, 'UnitNames', False);
