@@ -288,7 +288,7 @@ type
     procedure DeleteMacro(AMacroIndex: Integer);
     function SelectedIndex: Integer;
     procedure SetSettings(const AValue: TTemplateSettings);
-    class function ConfigurationKey: string;
+    function WindowPosKey: string;
     procedure TemplateTextChanged(Sender: TObject);
   public
     property Settings: TTemplateSettings read FSettings write SetSettings;
@@ -692,14 +692,14 @@ begin
   // do not localize
   with TGExpertsSettings.Create(MacroTemplatesBaseKey) do
   try
-    LoadForm(Self, 'Window');
-    pnlList.Height := ReadInteger('Window', 'ListSplitter', pnlList.Height);
-    pnlUses.Width := ReadInteger('Window', 'UsesSplitter', pnlUses.Width);
-    pnlUsesImplementation.Height := ReadInteger('Window', 'UsesSecSplitter', pnlUsesImplementation.Height);
-    lvTemplates.Columns[0].Width := ReadInteger('Window', 'NameWidth', lvTemplates.Columns[0].Width);
-    lvTemplates.Columns[1].Width := ReadInteger('Window', 'DescriptionWidth', lvTemplates.Columns[1].Width);
-    lvTemplates.Columns[2].Width := ReadInteger('Window', 'ShortCutWidth', lvTemplates.Columns[2].Width);
-    CurrentSyntaxMode := TGXSyntaxHighlighter(ReadEnumerated('Window', 'SyntaxHighlighter',
+    LoadForm(Self, WindowPosKey);
+    pnlList.Height := ReadInteger(WindowPosKey, 'ListSplitter', pnlList.Height);
+    pnlUses.Width := ReadInteger(WindowPosKey, 'UsesSplitter', pnlUses.Width);
+    pnlUsesImplementation.Height := ReadInteger(WindowPosKey, 'UsesSecSplitter', pnlUsesImplementation.Height);
+    lvTemplates.Columns[0].Width := ReadInteger(WindowPosKey, 'NameWidth', lvTemplates.Columns[0].Width);
+    lvTemplates.Columns[1].Width := ReadInteger(WindowPosKey, 'DescriptionWidth', lvTemplates.Columns[1].Width);
+    lvTemplates.Columns[2].Width := ReadInteger(WindowPosKey, 'ShortCutWidth', lvTemplates.Columns[2].Width);
+    CurrentSyntaxMode := TGXSyntaxHighlighter(ReadEnumerated(WindowPosKey, 'SyntaxHighlighter',
       TypeInfo(TGXSyntaxHighlighter), Ord(FCurrentSyntaxMode)));
   finally
     Free;
@@ -713,14 +713,14 @@ begin
   try
     if WindowState = wsNormal then begin
       // Save only if not maximized/minimized
-      SaveForm(Self, 'Window');
-      WriteInteger('Window', 'ListSplitter', pnlList.Height);
-      WriteInteger('Window', 'UsesSplitter', pnlUses.Width);
-      WriteInteger('Window', 'UsesSecSplitter', pnlUsesImplementation.Height);
-      WriteInteger('Window', 'NameWidth', lvTemplates.Columns[0].Width);
-      WriteInteger('Window', 'DescriptionWidth', lvTemplates.Columns[1].Width);
-      WriteInteger('Window', 'ShortCutWidth', lvTemplates.Columns[2].Width);
-      WriteInteger('Window', 'SyntaxHighlighter', Ord(FCurrentSyntaxMode));
+      SaveForm(Self, WindowPosKey);
+      WriteInteger(WindowPosKey, 'ListSplitter', pnlList.Height);
+      WriteInteger(WindowPosKey, 'UsesSplitter', pnlUses.Width);
+      WriteInteger(WindowPosKey, 'UsesSecSplitter', pnlUsesImplementation.Height);
+      WriteInteger(WindowPosKey, 'NameWidth', lvTemplates.Columns[0].Width);
+      WriteInteger(WindowPosKey, 'DescriptionWidth', lvTemplates.Columns[1].Width);
+      WriteInteger(WindowPosKey, 'ShortCutWidth', lvTemplates.Columns[2].Width);
+      WriteInteger(WindowPosKey, 'SyntaxHighlighter', Ord(FCurrentSyntaxMode));
     end;
   finally
     Free;
@@ -1176,9 +1176,9 @@ begin
   end;
 end;
 
-class function TfmMacroTemplates.ConfigurationKey: string;
+function TfmMacroTemplates.WindowPosKey: string;
 begin
-  Result := 'MacroTemplates';
+  Result := 'ConfigWindow';
 end;
 
 procedure TfmMacroTemplates.MarkModified;
@@ -1207,8 +1207,7 @@ end;
 
 constructor TMacroTemplatesIni.Create;
 begin
-  FBaseKey := ConfigInfo.GExpertsIdeRootRegistryKey + PathDelim +
-    'EditorExperts' + PathDelim + TfmMacroTemplates.ConfigurationKey;
+  FBaseKey := MacroTemplatesBaseKey;
   inherited Create(FBaseKey);
 end;
 
