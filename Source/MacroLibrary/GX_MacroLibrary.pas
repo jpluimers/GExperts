@@ -386,45 +386,39 @@ end;
 
 procedure TfmMacroLibrary.SaveSettings;
 var
-  RegIni: TGExpertsSettings;
+  Settings: TGExpertsSettings;
 begin
   // Do not localize.
-  RegIni := TGExpertsSettings.Create(AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + RegistryKey);
+  Settings := TGExpertsSettings.Create(AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + RegistryKey);
   try
-    RegIni.WriteInteger(RegistrySection, 'Left', Left);
-    RegIni.WriteInteger(RegistrySection, 'Top', Top);
-    RegIni.WriteInteger(RegistrySection, 'Width', Width);
-    RegIni.WriteInteger(RegistrySection, 'Height', Height);
-    RegIni.WriteInteger(RegistrySection, 'ViewStyle', Integer(lvMacros.ViewStyle));
-    RegIni.WriteBool(RegistrySection, 'Suspended', FSuspended);
-    RegIni.WriteBool(RegistrySection, 'ViewToolbar', Toolbar.Visible);
-    RegIni.WriteBool(RegistrySection, 'ViewDescription', DescriptionVisible);
-    RegIni.WriteInteger(RegistrySection, 'DescriptionSize', pnlDescription.Height);
-    RegIni.WriteBool(RegistrySection, 'PromptForName', FPromptForName);
+    Settings.SaveForm(Self, 'Window');
+    Settings.WriteInteger('Window', 'ViewStyle', Integer(lvMacros.ViewStyle));
+    Settings.WriteBool(RegistrySection, 'Suspended', FSuspended);
+    Settings.WriteBool('Window', 'ViewToolbar', Toolbar.Visible);
+    Settings.WriteBool(RegistrySection, 'ViewDescription', DescriptionVisible);
+    Settings.WriteInteger('Window', 'DescriptionSize', pnlDescription.Height);
+    Settings.WriteBool(RegistrySection, 'PromptForName', FPromptForName);
   finally
-    FreeAndNil(RegIni);
+    FreeAndNil(Settings);
   end;
 end;
 
 procedure TfmMacroLibrary.LoadSettings;
 var
-  RegIni: TGExpertsSettings;
+  Settings: TGExpertsSettings;
 begin
   // Do not localize.
-  RegIni := TGExpertsSettings.Create(AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + RegistryKey);
+  Settings := TGExpertsSettings.Create(AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + RegistryKey);
   try
-    Left := RegIni.ReadInteger(RegistrySection, 'Left', Left);
-    Top := RegIni.ReadInteger(RegistrySection, 'Top', Top);
-    Width := RegIni.ReadInteger(RegistrySection, 'Width', Width);
-    Height := RegIni.ReadInteger(RegistrySection, 'Height', Height);
-    FSuspended := RegIni.ReadBool(RegistrySection, 'Suspended', False);
+    Settings.LoadForm(Self, 'Window');
+    FSuspended := Settings.ReadBool(RegistrySection, 'Suspended', False);
     //lvMacros.ViewStyle := TViewStyle(RegIni.ReadEnumerated(RegistrySection, 'ViewStyle', TypeInfo(TViewStyle), Integer(vsReport)));
-    Toolbar.Visible := RegIni.ReadBool(RegistrySection, 'ViewToolbar', True);
-    DescriptionVisible := RegIni.ReadBool(RegistrySection, 'ViewDescription', True);
-    pnlDescription.Height := RegIni.ReadInteger(RegistrySection, 'DescriptionSize', pnlDescription.Height);
-    FPromptForName := RegIni.ReadBool(RegistrySection, 'PromptForName', False);
+    Toolbar.Visible := Settings.ReadBool('Window', 'ViewToolbar', True);
+    DescriptionVisible := Settings.ReadBool(RegistrySection, 'ViewDescription', True);
+    pnlDescription.Height := Settings.ReadInteger('Window', 'DescriptionSize', pnlDescription.Height);
+    FPromptForName := Settings.ReadBool(RegistrySection, 'PromptForName', False);
   finally
-    FreeAndNil(RegIni);
+    FreeAndNil(Settings);
   end;
   EnsureFormVisible(Self);
 end;
