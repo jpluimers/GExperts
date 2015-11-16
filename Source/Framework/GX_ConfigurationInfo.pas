@@ -745,15 +745,24 @@ begin
     StorageSection := Form.ClassName
   else
     StorageSection := Section;
-  if fsPosition in FormSaveFlags then
-  begin
-    Form.Left := ReadInteger(StorageSection, 'Left', Form.Left);
-    Form.Top := ReadInteger(StorageSection, 'Top', Form.Top);
-  end;
+
+  if [fsSize] = FormSaveFlags then
+    TForm(Form).Position := poScreenCenter
+  else
+    TForm(Form).Position := poDesigned;
+
   if fsSize in FormSaveFlags then
   begin
     Form.Width := ReadInteger(StorageSection, 'Width', Form.Width);
     Form.Height := ReadInteger(StorageSection, 'Height', Form.Height);
+  end;
+  if fsPosition in FormSaveFlags then
+  begin
+    if ValueExists(StorageSection, 'Left') then begin
+      Form.Left := ReadInteger(StorageSection, 'Left', Form.Left);
+      Form.Top := ReadInteger(StorageSection, 'Top', Form.Top);
+    end else
+      CenterForm(Form)
   end;
 end;
 
