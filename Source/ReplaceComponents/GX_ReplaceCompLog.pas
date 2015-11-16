@@ -94,17 +94,13 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-
-    pnlBottom.Height := Settings.ReadInteger(ConfigurationKey, 'ListSplitter',
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
+    pnlBottom.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'ListSplitter',
       pnlBottom.Height);
 
     for i := 0 to lvLogItems.Columns.Count-1 do
       lvLogItems.Columns[i].Width :=
-        Settings.ReadInteger(ConfigurationKey, 'Col'+IntToStr(i)+'.Width',
+        Settings.ReadInteger(ConfigurationKey + '\Window', 'Col'+IntToStr(i)+'.Width',
           lvLogItems.Columns[i].Width);
   finally
     FreeAndNil(Settings);
@@ -122,15 +118,12 @@ begin
   try
     if not (WindowState in [wsMinimized, wsMaximized]) then
     begin
-      Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-      Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-      Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-      Settings.WriteInteger(ConfigurationKey, 'Height', Height);
-      Settings.WriteInteger(ConfigurationKey, 'ListSplitter', pnlBottom.Height);
+      Settings.SaveForm(Self, ConfigurationKey + '\Window');
+      Settings.WriteInteger(ConfigurationKey + '\Window', 'ListSplitter', pnlBottom.Height);
     end;
 
     for i := 0 to lvLogItems.Columns.Count-1 do
-      Settings.WriteInteger(ConfigurationKey, 'Col'+IntToStr(i)+'.Width',
+      Settings.WriteInteger(ConfigurationKey + '\Window', 'Col'+IntToStr(i)+'.Width',
         lvLogItems.Columns[i].Width);
   finally
     FreeAndNil(Settings);

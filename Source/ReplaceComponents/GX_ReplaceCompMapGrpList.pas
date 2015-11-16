@@ -300,7 +300,7 @@ end;
 
 function TfmReplaceCompMapGrpList.ConfigurationKey: string;
 begin
-  Result := FConfigData.RootConfigurationKey + PathDelim + Self.ClassName+'.Window';
+  Result := FConfigData.RootConfigurationKey + PathDelim + Self.ClassName + '\Window';
 end;
 
 procedure TfmReplaceCompMapGrpList.LoadSettings;
@@ -310,10 +310,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, ConfigurationKey);
   finally
     FreeAndNil(Settings);
   end;
@@ -329,10 +326,7 @@ begin
   try
     if not (WindowState in [wsMinimized, wsMaximized]) then
     begin
-      Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-      Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-      Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-      Settings.WriteInteger(ConfigurationKey, 'Height', Height);
+      Settings.SaveForm(Self, ConfigurationKey);
     end;
   finally
     FreeAndNil(Settings);

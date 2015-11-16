@@ -99,7 +99,7 @@ end;
 
 function TfmReplaceCompMapList.ConfigurationKey: string;
 begin
-  Result := FConfigData.RootConfigurationKey + PathDelim + Self.ClassName+'.Window';
+  Result := FConfigData.RootConfigurationKey + PathDelim + Self.ClassName + '\Window';
 end;
 
 procedure TfmReplaceCompMapList.LoadSettings;
@@ -110,10 +110,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, ConfigurationKey);
     FSelectedGroup := Settings.ReadString(ConfigurationKey, 'SelectedGrp', '');
     // note: values < 0 are better stored as string
     FSortOnColumn := StrToIntDef(Settings.ReadString(ConfigurationKey, 'SortOnColumn',
@@ -139,10 +136,7 @@ begin
   try
     if not (WindowState in [wsMinimized, wsMaximized]) then
     begin
-      Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-      Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-      Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-      Settings.WriteInteger(ConfigurationKey, 'Height', Height);
+      Settings.SaveForm(Self, ConfigurationKey);
     end;
     Settings.WriteString(ConfigurationKey, 'SelectedGrp', SelectedGroupName);
     // Note: Values < 0 are better stored as string

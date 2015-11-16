@@ -639,7 +639,7 @@ end;
 
 function TfmReplaceCompMapDets.ConfigurationKey: string;
 begin
-  Result := FConfigData.RootConfigurationKey + PathDelim + Self.ClassName+'.Window';
+  Result := FConfigData.RootConfigurationKey + PathDelim + Self.ClassName + '\Window';
 end;
 
 procedure TfmReplaceCompMapDets.LoadSettings;
@@ -649,8 +649,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
+    Settings.LoadForm(Self, ConfigurationKey, [fsPosition]);
   finally
     FreeAndNil(Settings);
   end;
@@ -664,8 +663,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
+    Settings.SaveForm(Self, ConfigurationKey, [fsPosition]);
   finally
     FreeAndNil(Settings);
   end;
