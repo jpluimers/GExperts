@@ -861,7 +861,6 @@ end;
 procedure TfmCodeLib.LoadSettings;
 var
   Settings: TGExpertsSettings;
-  BaseKey: string;
 begin
   // Do not localize any of the following lines.
   Settings := TGExpertsSettings.Create;
