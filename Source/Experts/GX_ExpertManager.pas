@@ -144,7 +144,7 @@ type
   end;
 
 const
-  FormSaveKey = '\ExpertManagerForm';
+  FormSaveKey = '\Window';
 
 function GetListItemState(ListItem: TListItem): TGxExpertState;
 begin
