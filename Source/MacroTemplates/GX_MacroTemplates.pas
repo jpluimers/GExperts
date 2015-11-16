@@ -689,16 +689,18 @@ end;
 
 procedure TfmMacroTemplates.LoadFormLayout;
 begin
+  // do not localize
   with TGExpertsSettings.Create(MacroTemplatesBaseKey) do
   try
-    LoadForm(Self, ConfigurationKey);
-    pnlList.Height := ReadInteger(ConfigurationKey, 'ListSplitter', pnlList.Height);
-    pnlUses.Width := ReadInteger(ConfigurationKey, 'UsesSplitter', pnlUses.Width);
-    pnlUsesImplementation.Height := ReadInteger(ConfigurationKey, 'UsesSecSplitter', pnlUsesImplementation.Height);
-    lvTemplates.Columns[0].Width := ReadInteger(ConfigurationKey, 'NameWidth', lvTemplates.Columns[0].Width);
-    lvTemplates.Columns[1].Width := ReadInteger(ConfigurationKey, 'DescriptionWidth', lvTemplates.Columns[1].Width);
-    lvTemplates.Columns[2].Width := ReadInteger(ConfigurationKey, 'ShortCutWidth', lvTemplates.Columns[2].Width);
-    CurrentSyntaxMode := TGXSyntaxHighlighter(ReadEnumerated(ConfigurationKey, 'SyntaxHighlighter', TypeInfo(TGXSyntaxHighlighter), Ord(FCurrentSyntaxMode)));
+    LoadForm(Self, 'Window');
+    pnlList.Height := ReadInteger('Window', 'ListSplitter', pnlList.Height);
+    pnlUses.Width := ReadInteger('Window', 'UsesSplitter', pnlUses.Width);
+    pnlUsesImplementation.Height := ReadInteger('Window', 'UsesSecSplitter', pnlUsesImplementation.Height);
+    lvTemplates.Columns[0].Width := ReadInteger('Window', 'NameWidth', lvTemplates.Columns[0].Width);
+    lvTemplates.Columns[1].Width := ReadInteger('Window', 'DescriptionWidth', lvTemplates.Columns[1].Width);
+    lvTemplates.Columns[2].Width := ReadInteger('Window', 'ShortCutWidth', lvTemplates.Columns[2].Width);
+    CurrentSyntaxMode := TGXSyntaxHighlighter(ReadEnumerated('Window', 'SyntaxHighlighter',
+      TypeInfo(TGXSyntaxHighlighter), Ord(FCurrentSyntaxMode)));
   finally
     Free;
   end;
@@ -706,17 +708,20 @@ end;
 
 procedure TfmMacroTemplates.SaveFormLayout;
 begin
+  // do not localize
   with TGExpertsSettings.Create(MacroTemplatesBaseKey) do
   try
-    if WindowState = wsNormal then // Save only if not maximized/minimized
-      SaveForm(Self, ConfigurationKey);
-    WriteInteger(ConfigurationKey, 'ListSplitter', pnlList.Height);
-    WriteInteger(ConfigurationKey, 'UsesSplitter', pnlUses.Width);
-    WriteInteger(ConfigurationKey, 'UsesSecSplitter', pnlUsesImplementation.Height);
-    WriteInteger(ConfigurationKey, 'NameWidth', lvTemplates.Columns[0].Width);
-    WriteInteger(ConfigurationKey, 'DescriptionWidth', lvTemplates.Columns[1].Width);
-    WriteInteger(ConfigurationKey, 'ShortCutWidth', lvTemplates.Columns[2].Width);
-    WriteInteger(ConfigurationKey, 'SyntaxHighlighter', Ord(FCurrentSyntaxMode));
+    if WindowState = wsNormal then begin
+      // Save only if not maximized/minimized
+      SaveForm(Self, 'Window');
+      WriteInteger('Window', 'ListSplitter', pnlList.Height);
+      WriteInteger('Window', 'UsesSplitter', pnlUses.Width);
+      WriteInteger('Window', 'UsesSecSplitter', pnlUsesImplementation.Height);
+      WriteInteger('Window', 'NameWidth', lvTemplates.Columns[0].Width);
+      WriteInteger('Window', 'DescriptionWidth', lvTemplates.Columns[1].Width);
+      WriteInteger('Window', 'ShortCutWidth', lvTemplates.Columns[2].Width);
+      WriteInteger('Window', 'SyntaxHighlighter', Ord(FCurrentSyntaxMode));
+    end;
   finally
     Free;
   end;
