@@ -1101,9 +1101,10 @@ procedure TfmOpenFile.LoadSettings;
 var
   Settings: TGExpertsSettings;
 begin
+  // do not localize
   Settings := TGExpertsSettings.Create;
   try
-    Settings.LoadForm(Self, ConfigurationKey + '\OpenFileForm');
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
     FFileColumnWidth := Settings.ReadInteger(ConfigurationKey, 'FileColumnWidth', lvSearchPath.Columns[0].Width);
   finally
     FreeAndNil(Settings);
@@ -1115,9 +1116,10 @@ procedure TfmOpenFile.SaveSettings;
 var
   Settings: TGExpertsSettings;
 begin
+  // do not localize
   Settings := TGExpertsSettings.Create;
   try
-    Settings.SaveForm(Self, ConfigurationKey + '\OpenFileForm');
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
     if Assigned(CurrentListView) then
       Settings.WriteInteger(ConfigurationKey, 'FileColumnWidth', CurrentListView.Columns[0].Width);
   finally
