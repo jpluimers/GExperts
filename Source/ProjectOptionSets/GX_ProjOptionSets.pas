@@ -1301,8 +1301,7 @@ begin
   // Do not localize any of the below items
   with TGExpertsSettings.Create do
   try
-    WriteInteger(ConfigurationKey, 'Height', Height);
-    WriteInteger(ConfigurationKey, 'Width', Width);
+    SaveForm(Self, ConfigurationKey + '\Window', [fsSize]);
   finally
     Free;
   end;
@@ -1313,8 +1312,7 @@ begin
   // Do not localize any of the below items
   with TGExpertsSettings.Create do
   try
-    Width := ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := ReadInteger(ConfigurationKey, 'Height', Height);
+    LoadForm(Self, ConfigurationKey + '\Window', [fsSize]);
   finally
     Free;
   end;
