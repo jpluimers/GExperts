@@ -568,8 +568,7 @@ begin
   // Do not localize any of the below strings.
   Settings := TGExpertsSettings.Create;
   try
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window', [fsSize]);
   finally
     FreeAndNil(Settings);
   end;
@@ -582,8 +581,7 @@ begin
   // Do not localize any of the below strings.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
+    Settings.SaveForm(Self, ConfigurationKey + '\Window', [fsSize]);
   finally
     FreeAndNil(Settings);
   end;

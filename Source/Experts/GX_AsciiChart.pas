@@ -170,10 +170,7 @@ begin
     Settings.WriteBool(ConfigurationKey, 'Show Hex', FShowHex);
     Settings.WriteInteger(ConfigurationKey, 'Zoom Font Size', FZoomFontSize);
     Settings.WriteBool(ConfigurationKey, 'Show Hint', FShowHints);
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
   finally
     FreeAndNil(Settings);
   end;
@@ -733,10 +730,7 @@ begin
     FZoomFontSize := Settings.ReadInteger(ConfigurationKey, 'Zoom Font Size', 32);
     eChars.Text := Settings.ReadString(ConfigurationKey, 'Edit Display Text', '');
     FShowHints := Settings.ReadBool(ConfigurationKey, 'Show Hint', True);
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
   finally
     FreeAndNil(Settings);
   end;
