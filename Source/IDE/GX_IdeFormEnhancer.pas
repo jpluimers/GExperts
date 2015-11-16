@@ -280,29 +280,29 @@ var
   Settings: TGExpertsSettings;
   Section: string;
   Panel: TCustomPanel;
+  Flags: TFormSaveFlags;
 begin
   Assert(Assigned(Form));
   Settings := TGExpertsSettings.Create(GetRegistryKey);
   try
     Section := Form.ClassName;
+    Flags := [];
     if RememberSize then
-    begin
-      Form.Width := Settings.ReadInteger(Section, WidthIdent, Form.Width);
-      Form.Height := Settings.ReadInteger(Section, HeightIdent, Form.Height);
-    end;
+      Include(Flags, fsSize);
     if RememberPosition then
-    begin
-      Form.Top := Settings.ReadInteger(Section, TopIdent, Form.Top);
-      Form.Left := Settings.ReadInteger(Section, LeftIdent, Form.Left);
-    end;
-    if RememberSize or RememberPosition then
+      Include(Flags, fsPosition);
+    if Flags <> [] then begin
+      Settings.LoadForm(Form, Section, Flags);
       EnsureFormVisible(Form);
+    end;
+
     if RememberSplitterPosition then
     begin
       Panel := FindSplitPanel(Form);
       if Assigned(Panel) then
         Panel.Width := Settings.ReadInteger(Section, SplitPosIdent, Panel.Width);
     end;
+
     if RememberWidth and (not RememberSize) then
     begin
       Form.Width := Settings.ReadInteger(Section, WidthIdent, Form.Width);
