@@ -309,10 +309,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
+    Settings.SaveForm(Self, ConfigurationKey);
     Settings.WriteInteger(ConfigurationKey, 'SplitterRatio', Round(SplitterRatio * 100));
     Settings.WriteBool(ConfigurationKey, 'ViewToolBar', ToolBar.Visible);
     Settings.WriteBool(ConfigurationKey, 'PasteAsOptions', pnlPasteAsOptions.Visible);
@@ -328,10 +325,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, ConfigurationKey);
     SplitterRatio := Settings.ReadInteger(ConfigurationKey, 'SplitterRatio', 50) / 100;
     mmoClipText.Height :=  Trunc(SplitterRatio * (mmoClipText.Height + lvClip.Height));
     ToolBar.Visible := Settings.ReadBool(ConfigurationKey, 'ViewToolBar', True);
