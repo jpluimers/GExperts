@@ -253,10 +253,7 @@ begin
   // do not localize any of the below lines
   with TGExpertsSettings.Create do
   try
-    WriteInteger(ConfigurationKey, 'Left', Left);
-    WriteInteger(ConfigurationKey, 'Top', Top);
-    WriteInteger(ConfigurationKey, 'Width', Width);
-    WriteInteger(ConfigurationKey, 'Height', Height);
+    SaveForm(Self, ConfigurationKey + '\Window');
     WriteInteger(ConfigurationKey, 'Numbers', Integer(NumberType));
     WriteString(ConfigurationKey, 'BinPath', ExtractFilePath(dlgOpen.FileName));
   finally
@@ -269,15 +266,13 @@ begin
   // do not localize any of the below lines
   with TGExpertsSettings.Create do
   try
-    Left := ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := ReadInteger(ConfigurationKey, 'Height', Height);
+    LoadForm(Self, ConfigurationKey + '\Window');
     NumberType := TNumberType(ReadInteger(ConfigurationKey, 'Numbers', Ord(ntHex)));
     dlgOpen.InitialDir := ReadString(ConfigurationKey, 'BinPath', '');
   finally
     Free;
   end;
+  EnsureFormVisible(Self);
 end;
 
 procedure TfmPeInformation.pcMainChange(Sender: TObject);
