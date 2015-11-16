@@ -229,7 +229,7 @@ procedure TfmIdeShortCuts.InitializeForm;
   end;
 
 begin
-  CenterForm(Self);
+  LoadSettings;
   MainMenu.Items.Clear;
   FillMenuBar(GxOtaGetIdeMainMenu.Items, MainMenu.Items);
   ReadFromRegistryCFG;
@@ -243,10 +243,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(WindowConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(WindowConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(WindowConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(WindowConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, WindowConfigurationKey, [fsSize, fsPosition]);
   finally
     FreeAndNil(Settings);
   end;
@@ -340,10 +337,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(WindowConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(WindowConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(WindowConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(WindowConfigurationKey, 'Height', Height);
+    Settings.SaveForm(Self, WindowConfigurationKey, [fsSize, fsPosition]);
   finally
     FreeAndNil(Settings);
   end;
