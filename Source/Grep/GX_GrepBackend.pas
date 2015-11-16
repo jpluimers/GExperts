@@ -603,7 +603,7 @@ begin
   begin
     {TODO -o##jwp -cFix : When project has multiple forms using IFDEF, search them all}
     FormFile := ChangeFileExt(FileName, '.dfm');
-    {TODO : Support firemonkey forms, maybe simlpy like this: }
+    {TODO : Support firemonkey forms, maybe simply like this: }
 //    if not FileExists(FormFile) then
 //      FormFile := ChangeFileExt(FormFile, '.fmx'); // firemonkey
     if not FileExists(FormFile) then
