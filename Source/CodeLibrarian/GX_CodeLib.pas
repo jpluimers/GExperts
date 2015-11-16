@@ -840,32 +840,19 @@ end;
 procedure TfmCodeLib.SaveSettings;
 var
   Settings: TGExpertsSettings;
-  BaseKey: string;
 begin
   // Do not localize any of the following lines.
-  BaseKey := ConfigInfo.GExpertsIdeRootRegistryKey;
-
-  Settings := TGExpertsSettings.Create(BaseKey);
+  Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
-    Settings.WriteInteger(ConfigurationKey, 'Layout', Ord(Layout));
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'Layout', Ord(Layout));
     if Layout = clSide then
-      Settings.WriteInteger(ConfigurationKey, 'Splitter', tvTopics.Width)
+      Settings.WriteInteger(ConfigurationKey + '\Window', 'Splitter', tvTopics.Width)
     else
-      Settings.WriteInteger(ConfigurationKey, 'Splitter', tvTopics.Height);
+      Settings.WriteInteger(ConfigurationKey + '\Window', 'Splitter', tvTopics.Height);
     Settings.WriteString(ConfigurationKey, 'StoragePath', StoragePath);
-  finally
-    FreeAndNil(Settings);
-  end;
-
-  BaseKey := AddSlash(BaseKey) + ConfigurationKey;
-  Settings := TGExpertsSettings.Create(BaseKey);
-  try
-    RegSaveFont(Settings, 'Editor', FCodeText.Font);
-    RegSaveFont(Settings, 'TreeView', tvTopics.Font);
+    Settings.SaveFont(ConfigurationKey + '\Editor', FCodeText.Font);
+    Settings.SaveFont(ConfigurationKey + '\TreeView', tvTopics.Font);
   finally
     FreeAndNil(Settings);
   end;
@@ -877,29 +864,17 @@ var
   BaseKey: string;
 begin
   // Do not localize any of the following lines.
-  BaseKey := ConfigInfo.GExpertsIdeRootRegistryKey;
-
-  Settings := TGExpertsSettings.Create(BaseKey);
+  Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-    Layout := TCodeLayout(Settings.ReadInteger(ConfigurationKey, 'Layout', 0));
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
+    Layout := TCodeLayout(Settings.ReadInteger(ConfigurationKey + '\Window', 'Layout', 0));
     if Layout = clSide then
-      tvTopics.Width := Settings.ReadInteger(ConfigurationKey, 'Splitter', tvTopics.Width)
+      tvTopics.Width := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter', tvTopics.Width)
     else
-      tvTopics.Height := Settings.ReadInteger(ConfigurationKey, 'Splitter', tvTopics.Height);
+      tvTopics.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter', tvTopics.Height);
     StoragePath := Settings.ReadString(ConfigurationKey, 'StoragePath', StoragePath);
-  finally
-    FreeAndNil(Settings);
-  end;
-
-  BaseKey := AddSlash(BaseKey) + ConfigurationKey;
-  Settings := TGExpertsSettings.Create(BaseKey);
-  try
-    RegLoadFont(Settings, 'Editor', FCodeText.Font);
-    RegLoadFont(Settings, 'TreeView', tvTopics.Font);
+    Settings.LoadFont(ConfigurationKey + '\Editor', FCodeText.Font);
+    Settings.LoadFont(ConfigurationKey + '\TreeView', tvTopics.Font);
   finally
     FreeAndNil(Settings);
   end;
