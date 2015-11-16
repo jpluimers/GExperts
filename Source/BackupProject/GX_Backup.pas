@@ -1010,10 +1010,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
     Settings.WriteString(ConfigurationKey, 'LastZipDir', ExtractFilePath(dlgSave.FileName));
   finally
     FreeAndNil(Settings);
@@ -1027,10 +1024,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
     dlgSave.InitialDir := Settings.ReadString(ConfigurationKey, 'LastZipDir', '');
   finally
     FreeAndNil(Settings);
