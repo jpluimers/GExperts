@@ -748,12 +748,9 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
-    Settings.WriteInteger(ConfigurationKey, 'Splitter', Max(tvFolders.Width, 30));
-    Settings.WriteInteger(ConfigurationKey, 'Splitter2', Max(FFileViewer.Height, 30));
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'Splitter', Max(tvFolders.Width, 30));
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'Splitter2', Max(FFileViewer.Height, 30));
     if FEntryFile = GetDefaultEntryFileName then
       Settings.DeleteKey(ConfigurationKey, 'EntryFile')
     else
@@ -762,7 +759,7 @@ begin
     Settings.WriteBool(ConfigurationKey, 'ExpandAll', FExpandAll);
     Settings.WriteBool(ConfigurationKey, 'ExecHide', FExecHide);
     Settings.WriteBool(ConfigurationKey, 'ShowPreview', ShowPreview);
-    Settings.WriteInteger(ConfigurationKey, 'ListView', Ord(ListView.ViewStyle));
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'ListView', Ord(ListView.ViewStyle));
     Settings.WriteStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
   finally
     FreeAndNil(Settings);
@@ -780,18 +777,15 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-    tvFolders.Width := Settings.ReadInteger(ConfigurationKey, 'Splitter', tvFolders.Width);
-    FFileViewer.Height := Settings.ReadInteger(ConfigurationKey, 'Splitter2', FFileViewer.Height);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
+    tvFolders.Width := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter', tvFolders.Width);
+    FFileViewer.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter2', FFileViewer.Height);
     EntryFile := Settings.ReadString(ConfigurationKey, 'EntryFile', GetDefaultEntryFileName);
     FFolderDelete := Settings.ReadBool(ConfigurationKey, 'FolderDelete', FFolderDelete);
     FExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', FExpandAll);
     FExecHide := Settings.ReadBool(ConfigurationKey, 'ExecHide', FExecHide);
     ShowPreview := Settings.ReadBool(ConfigurationKey, 'ShowPreview', ShowPreview);
-    ListView.ViewStyle := TViewStyle(Settings.ReadInteger(ConfigurationKey, 'ListView', Ord(ListView.ViewStyle)));
+    ListView.ViewStyle := TViewStyle(Settings.ReadInteger(ConfigurationKey + '\Window', 'ListView', Ord(ListView.ViewStyle)));
     Assert(ListView.ViewStyle in [Low(TViewStyle)..High(TViewStyle)]);
     Settings.ReadStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
   finally
