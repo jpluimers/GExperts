@@ -28,7 +28,7 @@ type
     procedure LoadFormLayout;
     procedure SaveFormLayout;
     procedure SizeColumns;
-    function ConfigurationKey: string;
+    function WindowPosKey: string;
   public
     function GetSelectedMacroCode: Integer;
     procedure LoadTemplates(AMacroFile: TMacroFile);
@@ -163,10 +163,11 @@ end;
 
 procedure TfmMacroSelect.LoadFormLayout;
 begin
+  // do not localize
   with TGExpertsSettings.Create(MacroTemplatesBaseKey) do
   try
-    LoadForm(Self, ConfigurationKey, [fsSize]);
-    lvMacros.Columns[0].Width := ReadInteger(ConfigurationKey, 'NameWidth', lvMacros.Columns[0].Width);
+    LoadForm(Self, WindowPosKey, [fsSize]);
+    lvMacros.Columns[0].Width := ReadInteger(WindowPosKey, 'NameWidth', lvMacros.Columns[0].Width);
   finally
     Free;
   end;
@@ -174,11 +175,12 @@ end;
 
 procedure TfmMacroSelect.SaveFormLayout;
 begin
+  // do not localize
   with TGExpertsSettings.Create(MacroTemplatesBaseKey) do
   try
     if WindowState = wsNormal then // save only if not maximized/minimized
-      SaveForm(Self, ConfigurationKey, [fsSize]);
-    WriteInteger(ConfigurationKey, 'NameWidth', lvMacros.Columns[0].Width);
+      SaveForm(Self, WindowPosKey, [fsSize]);
+    WriteInteger(WindowPosKey, 'NameWidth', lvMacros.Columns[0].Width);
   finally
     Free;
   end;
@@ -214,9 +216,9 @@ begin
   LoadTemplates(GetExpandMacroExpertReq.MacroFile);
 end;
 
-function TfmMacroSelect.ConfigurationKey: string;
+function TfmMacroSelect.WindowPosKey: string;
 begin
-  Result := 'SelectMacro';
+  Result := 'SelectWindow';
 end;
 
 end.
