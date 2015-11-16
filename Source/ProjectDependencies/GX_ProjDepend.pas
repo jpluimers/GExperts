@@ -630,11 +630,8 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteInteger(ConfigurationKey, 'Left', Left);
-    Settings.WriteInteger(ConfigurationKey, 'Top', Top);
-    Settings.WriteInteger(ConfigurationKey, 'Width', Width);
-    Settings.WriteInteger(ConfigurationKey, 'Height', Height);
-    Settings.WriteInteger(ConfigurationKey, 'Splitter', tvUnits.Width);
+    Settings.SaveForm(Self, ConfigurationKey + '\Window');
+    Settings.WriteInteger(ConfigurationKey + '\Window', 'Splitter', tvUnits.Width);
     Settings.WriteString(ConfigurationKey, 'ExcludedFiles', FFilterList.CommaText);
   finally
     FreeAndNil(Settings);
@@ -648,11 +645,8 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Left := Settings.ReadInteger(ConfigurationKey, 'Left', Left);
-    Top := Settings.ReadInteger(ConfigurationKey, 'Top', Top);
-    Width := Settings.ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := Settings.ReadInteger(ConfigurationKey, 'Height', Height);
-    tvUnits.Width := Settings.ReadInteger(ConfigurationKey, 'Splitter', tvUnits.Width);
+    Settings.LoadForm(Self, ConfigurationKey + '\Window');
+    tvUnits.Width := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter', tvUnits.Width);
     FFilterList.CommaText := Settings.ReadString(ConfigurationKey, 'ExcludedFiles', '');
   finally
     FreeAndNil(Settings);
