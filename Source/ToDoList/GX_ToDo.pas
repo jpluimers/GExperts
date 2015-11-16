@@ -1127,8 +1127,7 @@ begin
   try
     WriteBool(ConfigurationKey, 'SortAscending', FSortAscending);
     WriteInteger(ConfigurationKey, 'SortColumn', FColumnIndex);
-    WriteInteger(ConfigurationKey, 'Height', Height);
-    WriteInteger(ConfigurationKey, 'Width', Width);
+    SaveForm(Self, ConfigurationKey + '\Window', [fsSize]);
   finally
     Free;
   end;
@@ -1141,8 +1140,7 @@ begin
   try
     FSortAscending := ReadBool(ConfigurationKey, 'SortAscending', True);
     FColumnIndex := ReadInteger(ConfigurationKey, 'SortColumn', 0);
-    Width := ReadInteger(ConfigurationKey, 'Width', Width);
-    Height := ReadInteger(ConfigurationKey, 'Height', Height);
+    LoadForm(Self, ConfigurationKey + '\Window', [fsSize]);
   finally
     Free;
   end;
