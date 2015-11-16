@@ -704,6 +704,7 @@ begin
   finally
     Free;
   end;
+  EnsureFormVisible(Self);
 end;
 
 procedure TfmMacroTemplates.SaveFormLayout;
