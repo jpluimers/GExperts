@@ -412,7 +412,7 @@ begin
   Settings := TGExpertsSettings.Create;
   try
     Settings.LoadForm(Self, ConfigurationKey + '\Window');
-    EnsureFormVisible(Self)
+    EnsureFormVisible(Self);
     StayOnTop := Settings.ReadBool(ConfigurationKey + '\Window', 'OnTop', True);
     lbResults.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'ResultsHeight', lbResults.Height);
     ShowContext := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowContext', True);
