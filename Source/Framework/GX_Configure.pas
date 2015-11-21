@@ -5,7 +5,7 @@ unit GX_Configure;
 interface
 
 uses
-  Windows, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, Classes, Graphics, Controls, Forms, Dialogs, Menus,
   StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert, GX_BaseForm;
 
 type
@@ -106,6 +106,7 @@ type
     chk_HideNavbar: TCheckBox;
     chkEnhanceSearchPaths: TCheckBox;
     chkEnhanceToolProperties: TCheckBox;
+    chkReplaceListWithMemo: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -184,7 +185,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Menus, SysUtils,
+  SysUtils,
   GX_GxUtils, GX_EditorEnhancements, GX_Experts, GX_IdeEnhance,
   GX_ConfigurationInfo, GX_EditorExpertManager, GX_MessageBox,
   GX_GExperts, GX_EditorShortcut, GX_MenuActions, GX_GenericUtils, GX_IdeUtils,
@@ -548,6 +549,7 @@ begin
 
   chkEnhanceDialogs.Checked := IdeEnhancements.EnhanceIDEForms;
   chkEnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
+  chkReplaceListWithMemo.Checked := IdeEnhancements.EnhanceSearchPathAggressive;
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
@@ -618,6 +620,7 @@ begin
 
   IdeEnhancements.EnhanceIDEForms := chkEnhanceDialogs.Checked;
   IdeEnhancements.EnhanceSearchPath := chkEnhanceSearchPaths.Checked;
+  IdeEnhancements.EnhanceSearchPathAggressive := chkReplaceListWithMemo.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
 
   // Menus

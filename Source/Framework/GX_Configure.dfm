@@ -387,7 +387,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxTabDockHost: TGroupBox
           Left = 8
-          Top = 197
+          Top = 210
           Width = 375
           Height = 68
           Caption = 'Tab Dock &Hosts'
@@ -479,9 +479,9 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxIDEForms: TGroupBox
           Left = 8
-          Top = 86
+          Top = 81
           Width = 375
-          Height = 99
+          Height = 123
           Caption = 'IDE'
           TabOrder = 1
           object chkEnhanceDialogs: TCheckBox
@@ -502,11 +502,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 76
+            Top = 98
             Width = 364
             Height = 17
             Caption = 'Show object inspector font names using the font'
-            TabOrder = 3
+            TabOrder = 4
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
@@ -518,10 +518,18 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceToolProperties: TCheckBox
             Left = 24
-            Top = 59
+            Top = 79
             Width = 348
             Height = 17
             Caption = 'Enhance Tools menu Tool Properties dialog'
+            TabOrder = 3
+          end
+          object chkReplaceListWithMemo: TCheckBox
+            Left = 40
+            Top = 60
+            Width = 329
+            Height = 17
+            Caption = 'Replace listbox with memo'
             TabOrder = 2
           end
         end
