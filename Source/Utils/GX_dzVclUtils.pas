@@ -18,6 +18,7 @@ uses
   Controls,
   ComCtrls,
   CommCtrl,
+  ActnList,
   StdCtrls;
 
 type
@@ -109,6 +110,15 @@ procedure TListView_ResizeColumn(_lc: TListColumn; _Options: TLIstViewResizeOpti
 ///                lvrContent menas resize so the contents fit
 ///                both can be combined. </summary>
 procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = [lvrCaptions, lvrContent]);
+
+///<summary>
+/// Append a new action to the given action list, assign Caption
+/// and optionally Shortcut and OnExecute event.
+/// @returns the new action </summary>
+function TActionlist_Append(_al: TActionList; _Caption: string = ''): TAction; overload;
+function TActionlist_Append(_al: TActionList; _Caption: string; _Shortcut: TShortCut): TAction; overload;
+function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction; overload;
+function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction; overload;
 
 implementation
 
@@ -472,6 +482,32 @@ var
 begin
   for i := 0 to _lv.Columns.Count - 1 do
     TListView_ResizeColumn(_lv.Columns[i], _Options);
+end;
+
+function TActionlist_Append(_al: TActionList; _Caption: string = ''): TAction;
+begin
+  Result := TAction.Create(_al);
+  Result.Name := '';
+  Result.ActionList := _al;
+  Result.Caption := _Caption;
+end;
+
+function TActionlist_Append(_al: TActionList; _Caption: string; _Shortcut: TShortCut): TAction;
+begin
+  Result := TActionlist_Append(_al, _Caption);
+  Result.ShortCut := _Shortcut;
+end;
+
+function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction;
+begin
+  Result:= TActionlist_Append(_al, _Caption);
+  Result.OnExecute := _OnExecute;
+end;
+
+function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction;
+begin
+  Result:= TActionlist_Append(_al, _Caption, _Shortcut);
+  Result.OnExecute := _OnExecute;
 end;
 
 end.
