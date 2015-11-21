@@ -13,27 +13,48 @@ uses
 type
   TGxIdeSearchPathEnhancer = class
   public
-    class function GetEnabled: Boolean; // static;
-    class procedure SetEnabled(const Value: Boolean); //static;
+    class function GetEnabled: boolean; // static;
+    class procedure SetEnabled(_Value: boolean); // static;
+    class function GetAggressive: boolean; // static;
+    class procedure SetAggressive(_Value: boolean); // static;
   end;
 
 implementation
 
 uses
+  Controls,
+  Menus,
+  Buttons,
+  ActnList,
   GX_IdeFormEnhancer,
-  GX_dzVclUtils;
+  GX_dzVclUtils, Windows;
+
+var
+  gblAggressive: boolean;
 
 type
   TSearchPathEnhancer = class
   private
     FCallbackHandle: TFormChangeHandle;
     FIsAutocompleteEnabled: Boolean;
+    FListbox: TListbox;
+    FMemo: TMemo;
+    FEdit: TEdit;
+    FUpClick: TNotifyEvent;
+    FDownClick: TNotifyEvent;
+    FUpBtn: TBitBtn;
+    FDownBtn: TBitBtn;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
     ///<summary>
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsSearchPathForm(_Form: TCustomForm): Boolean;
     function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
+    procedure HandleMemoChange(_Sender: TObject);
+    procedure HandleUpButton(_Sender: TObject);
+    procedure HandleDownButton(_Sender: TObject);
+    procedure HandleAddBtn(_Sender: TObject);
+    procedure HandleReplaceBtn(_Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -44,18 +65,27 @@ var
 
 { TGxIdeSearchPathEnhancer }
 
-class function TGxIdeSearchPathEnhancer.GetEnabled: Boolean;
+class function TGxIdeSearchPathEnhancer.GetEnabled: boolean;
 begin
   Result := Assigned(TheSearchPathEnhancer);
 end;
 
-class procedure TGxIdeSearchPathEnhancer.SetEnabled(const Value: Boolean);
+class procedure TGxIdeSearchPathEnhancer.SetEnabled(_Value: Boolean);
 begin
-  if Value then begin
-    if not Assigned(TheSearchPathEnhancer) then
-      TheSearchPathEnhancer := TSearchPathEnhancer.Create
-  end else
-    FreeAndNil(TheSearchPathEnhancer);
+  if not _Value then
+    FreeAndNil(TheSearchPathEnhancer)
+  else if not Assigned(TheSearchPathEnhancer) then
+    TheSearchPathEnhancer := TSearchPathEnhancer.Create;
+end;
+
+class function TGxIdeSearchPathEnhancer.GetAggressive: boolean;
+begin
+  Result := gblAggressive;
+end;
+
+class procedure TGxIdeSearchPathEnhancer.SetAggressive(_Value: boolean);
+begin
+  gblAggressive := _Value;
 end;
 
 { TSearchPathEnhancer }
@@ -101,10 +131,16 @@ begin
   Result := True;
 end;
 
+type
+  TSearchPathDialogClassArr = array[0..2] of string;
+const
+  SearchPathDialogClassArr: TSearchPathDialogClassArr = (
+    'TInheritedListEditDlg', 'TInheritedListEditDlg', 'TOrderedListEditDlg'
+  );
+
 {$IFDEF GX_VER220_up}
 // Delphi XE and up
 const
-  SearchPathDialogClass = 'TInheritedListEditDlg';
   SearchPathDialogName = 'InheritedListEditDlg';
   SearchPathDialogCaption = 'Search Path';
   SearchPathDialogCaptionFR = 'Chemin de recherche';
@@ -113,7 +149,6 @@ const
 {$IFDEF GX_VER200_up}
 // Delphi 2009 and up
 const
-  SearchPathDialogClass = 'TInheritedListEditDlg';
   SearchPathDialogName = 'InheritedListEditDlg';
   SearchPathDialogCaption = 'Search path';
   SearchPathDialogCaptionFR = 'Chemin de recherche';
@@ -121,7 +156,6 @@ const
 {$ELSE GX_VER200_up}
 // Delphi 2007 and earlier
 const
-  SearchPathDialogClass = 'TOrderedListEditDlg';
   SearchPathDialogName = 'OrderedListEditDlg';
   SearchPathDialogCaption = 'Directories';
   SearchPathDialogCaptionFR = 'Chemin de recherche';
@@ -130,12 +164,18 @@ const
 {$ENDIF GX_VER220_up}
 
 function TSearchPathEnhancer.IsSearchPathForm(_Form: TCustomForm): Boolean;
+var
+  i: Integer;
 begin
   Result := False;
   if not Assigned(_Form) then
     Exit;
-  if not SameText(_Form.ClassName, SearchPathDialogClass)
-    or not SameText(_Form.Name, SearchPathDialogName) then
+  for i := Low(SearchPathDialogClassArr) to High(SearchPathDialogClassArr) do begin
+    Result := Result or SameText(_Form.ClassName, SearchPathDialogClassArr[i]);
+  end;
+  if not Result then
+    Exit;
+  if not SameText(_Form.Name, SearchPathDialogName) then
     Exit;
   if not SameText(_Form.Caption, SearchPathDialogCaption)
     and not SameText(_Form.Caption, SearchPathDialogCaptionFR)
@@ -146,21 +186,104 @@ end;
 
 procedure TSearchPathEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 var
-  ed: TEdit;
+  TheActionList: TActionList;
+
+  function TryFindBitBtn(const _BtnName: string; out _Btn: TBitBtn): boolean;
+  var
+    cmp: TComponent;
+  begin
+    cmp := _Form.FindComponent(_BtnName);
+    Result := Assigned(cmp) and (cmp is TBitBtn);
+    if Result then
+      _btn := cmp as TBitBtn;
+  end;
+
+  function TryFindButton(const _BtnName: string; out _Btn: TButton): boolean;
+  var
+    cmp: TComponent;
+  begin
+    cmp := _Form.FindComponent(_BtnName);
+    Result := Assigned(cmp) and (cmp is TButton);
+    if Result then
+      _btn := cmp as TButton;
+  end;
+
+var
   cmp: TComponent;
+  act_Up: TAction;
+  act_Down: TAction;
+  btn: TButton;
 begin
-  if not IsSearchPathForm(_Form) or not TryGetElementEdit(_Form, ed) then begin
+  FListbox := nil;
+  FMemo := nil;
+
+  if not IsSearchPathForm(_Form) or not TryGetElementEdit(_Form, FEdit) then begin
     FIsAutocompleteEnabled := False;
     Exit;
   end;
 
   if not FIsAutocompleteEnabled then begin
-    TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
+    TEdit_ActivateAutoComplete(FEdit, [acsFileSystem], [actSuggest]);
     FIsAutocompleteEnabled := True;
-    TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
+    TWinControl_ActivateDropFiles(FEdit, HandleFilesDropped);
+
     cmp := _Form.FindComponent('CreationList');
     if Assigned(cmp) and (cmp is TListBox) then begin
-      TWinControl_ActivateDropFiles(TListBox(cmp), HandleFilesDropped);
+      FListbox := TListBox(cmp);
+
+      TheActionList := TActionList.Create(_Form);
+      TheActionList.Name := 'TheActionList';
+
+      // Assign shortcuts to the Up/Down buttons via actions
+      if TryFindBitBtn('UpButton', FUpBtn) then begin
+        // Unfortunately we can't just assign the button's OnClick event to the
+        // OnExecute event of the action because Delphi apparently assigns the
+        // same event to both buttons and then checks which one was pressed
+        // by inspecting the Sender parameter. So, instead we save the OnClick
+        // event, assign our own event to OnExecute and there call the original
+        // OnClick event with the original Sender parameter.
+        FUpClick := FUpBtn.OnClick;
+        act_Up := TActionlist_Append(TheActionList, '', HandleUpButton, ShortCut(VK_UP, [ssCtrl]));
+        FUpBtn.Action := act_Up;
+      end;
+      if TryFindBitBtn('DownButton', FDownBtn) then begin
+        FDownClick := FDownBtn.OnClick;
+        act_Down := TActionlist_Append(TheActionList, '', HandleDownButton, ShortCut(VK_DOWN, [ssCtrl]));
+        FDownBtn.Action := act_Down;
+      end;
+
+      if not gblAggressive then begin
+        TWinControl_ActivateDropFiles(FListbox, HandleFilesDropped);
+      end else begin
+        FMemo := TMemo.Create(_Form);
+        FMemo.Parent := _Form;
+        FMemo.BoundsRect := FListbox.BoundsRect;
+        FMemo.Anchors := [akLeft, akTop, akRight, akBottom];
+        FMemo.Lines.Text := FListbox.Items.Text;
+        FMemo.OnChange := Self.HandleMemoChange;
+        FListbox.Visible := False;
+        TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
+
+        if TryFindButton('DeleteButton', btn) then begin
+          // Does it still make sense to have a delete button?
+          btn.Enabled := False;
+        end;
+        if TryFindButton('DeleteInvalidBtn', btn) then begin
+          // todo: Figure out a way to implement this button
+          // Maybe call the original event and copy the new listbox
+          // content over to the memo?
+          btn.Enabled := False;
+        end;
+        if TryFindButton('AddButton', btn) then begin
+          btn.OnClick := HandleAddBtn;
+        end;
+        if TryFindButton('ReplaceButton', btn) then begin
+          // Until I have figured out how to sensibly mark the current line in the memo
+          // so the user knows what he is about to replace, I'll disable this button.
+          btn.Enabled := False;
+          btn.OnClick := nil; // HandleReplaceBtn;
+        end;
+      end;
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
         TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
@@ -168,7 +291,61 @@ begin
   end;
 end;
 
+procedure TSearchPathEnhancer.HandleUpButton(_Sender: TObject);
+var
+  LineIdx: integer;
+  Pos: TPoint;
+begin
+  if Assigned(FMemo) then begin
+    Pos := FMemo.CaretPos;
+    LineIdx := Pos.Y;
+    if LineIdx > 0 then
+      FMemo.Lines.Exchange(LineIdx-1, LineIdx);
+    FMemo.SetFocus;
+    Pos.Y := Pos.Y -1 ;
+    FMemo.CaretPos := Pos;
+  end else
+    FUpClick(FUpBtn);
+end;
+
+procedure TSearchPathEnhancer.HandleDownButton(_Sender: TObject);
+var
+  LineIdx: integer;
+begin
+  if Assigned(FMemo) then begin
+    LineIdx := FMemo.CaretPos.Y;
+    if LineIdx < FMemo.Lines.Count - 1 then
+      FMemo.Lines.Exchange(LineIdx, LineIdx + 1);
+    FMemo.SetFocus;
+  end else
+    FDownClick(FDownBtn);
+end;
+
+procedure TSearchPathEnhancer.HandleAddBtn(_Sender: TObject);
+begin
+  if Assigned(FMemo) then
+    FMemo.Lines.Add(FEdit.Text);
+end;
+
+procedure TSearchPathEnhancer.HandleReplaceBtn(_Sender: TObject);
+var
+  LineIdx: Integer;
+begin
+  if Assigned(FMemo) then begin
+    LineIdx := FMemo.CaretPos.Y;
+    FMemo.Lines[LineIdx] := FEdit.Text;
+  end;
+end;
+
+procedure TSearchPathEnhancer.HandleMemoChange(_Sender: TObject);
+begin
+  if Assigned(FListbox)  and Assigned(FMemo) then
+    FListbox.Items := FMemo.Lines;
+end;
+
 initialization
 finalization
+  gblAggressive := False;
   TGxIdeSearchPathEnhancer.SetEnabled(False);
 end.
+

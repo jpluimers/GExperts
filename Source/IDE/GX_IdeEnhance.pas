@@ -77,6 +77,8 @@ type
     procedure SetEnhanceSearchPath(const Value: Boolean);
     function GetEnhanceToolProperties: Boolean;
     procedure SetEnhanceToolProperties(const Value: Boolean);
+    procedure SetEnhanceSearchPathAggressive(const Value: Boolean);
+    function GetEnhanceSearchPathAggressive: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -89,6 +91,7 @@ type
     property EnhanceIDEForms: Boolean read GetEnhanceIDEForms write SetEnhanceIDEForms;
     // Search path
     property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
+    property EnhanceSearchPathAggressive: Boolean read GetEnhanceSearchPathAggressive write SetEnhanceSearchPathAggressive;
     // Tool Options dialog
     property EnhanceToolProperties: Boolean read GetEnhanceToolProperties write SetEnhanceToolProperties;
     // Fonts
@@ -188,6 +191,11 @@ begin
   TGxIdeProjectOptionsEnhancer.SetEnabled(Value);
 end;
 
+procedure TIdeEnhancements.SetEnhanceSearchPathAggressive(const Value: Boolean);
+begin
+  TGxIdeSearchPathEnhancer.SetAggressive(Value);
+end;
+
 procedure TIdeEnhancements.SetEnhanceToolProperties(const Value: Boolean);
 begin
   TGxIdeToolPropertiesEnhancer.SetEnabled(Value);
@@ -219,6 +227,7 @@ begin
     try
       EnhanceIDEForms := ReadBool(ConfigurationKey, 'EnhanceIDEForms', False);
       EnhanceSearchPath := ReadBool(ConfigurationKey, 'EnhanceSearchPath', False);
+      EnhanceSearchPathAggressive := ReadBool(ConfigurationKey, 'EnhanceSearchPathAggressive', False);
       EnhanceToolProperties := ReadBool(ConfigurationKey, 'EnhanceToolProperties', False);
       // File saving
       AutoSave := ReadBool(ConfigurationKey, 'AutoSave', False);
@@ -262,6 +271,7 @@ begin
     try
       WriteBool(ConfigurationKey, 'EnhanceIDEForms', EnhanceIDEForms);
       WriteBool(ConfigurationKey, 'EnhanceSearchPath', EnhanceSearchPath);
+      WriteBool(ConfigurationKey, 'EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
       WriteBool(ConfigurationKey, 'EnhanceToolProperties', EnhanceToolProperties);
 
       // File saving
@@ -706,6 +716,11 @@ end;
 function TIdeEnhancements.GetEnhanceSearchPath: Boolean;
 begin
   Result := TGxIdeSearchPathEnhancer.GetEnabled;
+end;
+
+function TIdeEnhancements.GetEnhanceSearchPathAggressive: Boolean;
+begin
+  Result := TGxIdeSearchPathEnhancer.GetAggressive;
 end;
 
 function TIdeEnhancements.GetEnhanceToolProperties: Boolean;
