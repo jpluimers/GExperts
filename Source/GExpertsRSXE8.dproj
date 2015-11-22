@@ -412,6 +412,12 @@
         <DCCReference Include="IDE\GX_IdeSearchPathEnhancer.pas"/>
         <DCCReference Include="Experts\GX_HideNavbar.pas"/>
         <DCCReference Include="Utils\GX_dzVclUtils.pas"/>
+        <DCCReference Include="Editor\GX_ePasteAs.pas">
+            <Form>fmPasteAsConfig</Form>
+        </DCCReference>
+        <DCCReference Include="Framework\GX_PasteAs.pas"/>
+        <DCCReference Include="IDE\GX_IdeProjectOptionsEnhancer.pas"/>
+        <DCCReference Include="IDE\GX_IdeToolPropertiesEnhancer.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -442,6 +448,12 @@
             </Platforms>
             <ModelSupport>False</ModelSupport>
             <Deployment Version="1">
+                <DeployFile LocalName="GExpertsRSXE8.dll" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>GExpertsRSXE8.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Required="true" Name="DependencyPackage">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
@@ -760,13 +772,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

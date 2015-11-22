@@ -54,7 +54,7 @@ type
     procedure HandleUpButton(_Sender: TObject);
     procedure HandleDownButton(_Sender: TObject);
     procedure HandleAddBtn(_Sender: TObject);
-    procedure HandleReplaceBtn(_Sender: TObject);
+    //procedure HandleReplaceBtn(_Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -327,6 +327,7 @@ begin
     FMemo.Lines.Add(FEdit.Text);
 end;
 
+{
 procedure TSearchPathEnhancer.HandleReplaceBtn(_Sender: TObject);
 var
   LineIdx: Integer;
@@ -336,6 +337,7 @@ begin
     FMemo.Lines[LineIdx] := FEdit.Text;
   end;
 end;
+}
 
 procedure TSearchPathEnhancer.HandleMemoChange(_Sender: TObject);
 begin
