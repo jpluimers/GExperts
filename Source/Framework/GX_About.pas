@@ -26,6 +26,9 @@ type
     procedure lblWebPageClick(Sender: TObject);
   private
     procedure InitVersionInfoControls;
+  protected
+    class function GetVersionStr: string;
+    class function doAddToAboutDialog: integer; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     // If you release an experimental GExperts, either
@@ -34,6 +37,9 @@ type
     // describe your build and provide feedback email adresses.
     class procedure SetCustomBuildDetails(const Details: string);
     class procedure SetCustomBuildEmails(const ABugEmail, ASuggestionEmail: string);
+    class procedure AddToSplashScreen;
+    class procedure AddToAboutDialog;
+    class procedure RemoveFromAboutDialog;
   end;
 
 type
@@ -48,7 +54,7 @@ implementation
 {$R GX_About.res}
 
 uses
-  SysUtils, Graphics,
+  Windows, SysUtils, Graphics, ToolsApi,
   GX_GenericUtils, GX_FeedbackWizard;
 
 const
@@ -141,7 +147,78 @@ begin
   SuggestionEmail := ASuggestionEmail;
 end;
 
+class function TfmAbout.GetVersionStr: string;
+resourcestring
+  SVersion = 'Version';
+  SUnknown = '<unknown>';
+var
+  Version: TVersionNumber;
+begin
+  try
+    Version := GetFileVersionNumber(ThisDllName);
+    Result := Format('%s %d.%d%d', [SVersion, Version.Major, Version.Minor, Version.Release]);
+  except
+    Result := Format('%s %s', [SVersion, SUnknown]);
+  end;
+  if Version.Build <> 0 then
+    Result := Result + '.' + IntToStr(Version.Build);
+end;
+
+class procedure TfmAbout.AddToSplashScreen;
+var
+  bmSplashScreen: HBITMAP;
+begin
+  if Assigned(SplashScreenServices) then begin
+    bmSplashScreen := LoadBitmap(HInstance, 'SplashScreenBitMap');
+    SplashScreenServices.AddPluginBitmap(
+      'GExperts',
+      bmSplashScreen,
+      False,
+      GetVersionStr);
+  end;
+end;
+
+class function TfmAbout.doAddToAboutDialog: integer;
+var
+  bmSplashScreen: HBITMAP;
+  AboutBoxServices: IOTAAboutBoxServices;
+begin
+  Result := -1;
+  if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then begin
+    bmSplashScreen := LoadBitmap(HInstance, 'SplashScreenBitMap');
+    Result := AboutBoxServices.AddPluginInfo(
+      'GExperts',
+      'GExperts is a free set of tools built to increase the productivity of Delphi and C++Builder'
+      + ' programmers by adding several features to the IDE.'
+      + ' GExperts is developed as Open Source software and we encourage user contributions to the project.'#13#10
+      + '(c) by Erik Berry and the GExperts Team'#13#10
+      + 'http://www.gexperts.org',
+      bmSplashScreen,
+      False,
+      GetVersionStr, 'Open Source');
+  end;
+end;
+
+var
+  FAboutPluginIndex: Integer;
+
+class procedure TfmAbout.AddToAboutDialog;
+begin
+  FAboutPluginIndex := doAddToAboutDialog;
+end;
+
+class procedure TfmAbout.RemoveFromAboutDialog;
+var
+  AboutBoxServices: IOTAAboutBoxServices;
+begin
+  if FAboutPluginIndex <> -1 then
+    if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then
+      AboutBoxServices.RemovePluginInfo(FAboutPluginIndex);
+end;
+
 initialization
+  TfmAbout.AddToSplashScreen;
   gblAboutFormClass := TfmAbout;
+finalization
 end.
 

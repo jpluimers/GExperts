@@ -127,6 +127,7 @@ begin
   FStartingUp := True;
   InitializeGExperts;
   InitHelper := TInitHelper.Create(DoAfterIDEInitialized);
+  gblAboutFormClass.AddToAboutDialog;
 end;
 
 class procedure TGExperts.DelayedRegister;
@@ -173,6 +174,7 @@ begin
   try
     {$IFOPT D+} SendDebug('Destroying GExperts'); {$ENDIF}
 
+    gblAboutFormClass.RemoveFromAboutDialog;
     GxKeyboardShortCutBroker.BeginUpdate;
     try
       try
