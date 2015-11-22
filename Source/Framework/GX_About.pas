@@ -1,5 +1,7 @@
 unit GX_About;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
@@ -165,9 +167,13 @@ begin
 end;
 
 class procedure TfmAbout.AddToSplashScreen;
+{$IFDEF GX_VER170_up}
+// Only Delphi 2005 and up support the splash screen services
 var
   bmSplashScreen: HBITMAP;
+{$ENDIF GX_VER170_up}
 begin
+{$IFDEF GX_VER170_up}
   if Assigned(SplashScreenServices) then begin
     bmSplashScreen := LoadBitmap(HInstance, 'SplashScreenBitMap');
     SplashScreenServices.AddPluginBitmap(
@@ -176,14 +182,19 @@ begin
       False,
       GetVersionStr);
   end;
+{$ENDIF GX_VER170_up}
 end;
 
 class function TfmAbout.doAddToAboutDialog: integer;
+{$IFDEF GX_VER170_up}
+// Only Delphi 2005 and up support the about box services
 var
   bmSplashScreen: HBITMAP;
   AboutBoxServices: IOTAAboutBoxServices;
+{$ENDIF GX_VER170_up}
 begin
   Result := -1;
+{$IFDEF GX_VER170_up}
   if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then begin
     bmSplashScreen := LoadBitmap(HInstance, 'SplashScreenBitMap');
     Result := AboutBoxServices.AddPluginInfo(
@@ -197,6 +208,7 @@ begin
       False,
       GetVersionStr, 'Open Source');
   end;
+{$ENDIF GX_VER170_up}
 end;
 
 var
@@ -208,12 +220,17 @@ begin
 end;
 
 class procedure TfmAbout.RemoveFromAboutDialog;
+{$IFDEF GX_VER170_up}
+// Only Delphi 2005 and up support the about box services
 var
   AboutBoxServices: IOTAAboutBoxServices;
+{$ENDIF GX_VER170_up}
 begin
+{$IFDEF GX_VER170_up}
   if FAboutPluginIndex <> -1 then
     if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then
       AboutBoxServices.RemovePluginInfo(FAboutPluginIndex);
+{$ENDIF GX_VER170_up}
 end;
 
 initialization
