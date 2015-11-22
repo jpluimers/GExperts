@@ -206,7 +206,8 @@ begin
       + 'http://www.gexperts.org',
       bmSplashScreen,
       False,
-      GetVersionStr, 'Open Source');
+      '', // leave this empty!
+      GetVersionStr);
   end;
 {$ENDIF GX_VER170_up}
 end;
