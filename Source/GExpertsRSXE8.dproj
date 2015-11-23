@@ -73,7 +73,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_Release>8</VerInfo_Release>
-        <Debugger_HostApplication>D:\IDE\Delphi XE7\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>D:\IDE\Delphi XE8\Studio\16.0\bin\bds.exe</Debugger_HostApplication>
         <Debugger_RunParams>-ns</Debugger_RunParams>
         <DCC_DcuOutput>.</DCC_DcuOutput>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE8;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE8;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE8.dll;ProductName=GExperts for RAD Studio XE8;ProductVersion=1.38;Comments=Open Source</VerInfo_Keys>
@@ -85,7 +85,7 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_HostApplication>D:\IDE\Delphi XE7\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>D:\IDE\Delphi XE8\Studio\16.0\bin\bds.exe</Debugger_HostApplication>
         <Debugger_RunParams>-ns</Debugger_RunParams>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE7;FileVersion=1.3.7.0;InternalName=GExperts for RAD Studio XE7;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE7.dll;ProductName=GExperts for RAD Studio XE7;ProductVersion=1.37;Comments=Open Source</VerInfo_Keys>
     </PropertyGroup>
@@ -772,13 +772,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

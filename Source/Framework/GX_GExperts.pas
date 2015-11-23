@@ -359,10 +359,10 @@ function TUnsupportedIDEMessage.GetMessage: string;
 resourcestring
   SBadIDEVersion =
     'You are currently using an outdated version of this IDE that has ' +
-    'patches or update packs available from CodeGear.  GExperts might work, but is ' +
+    'patches or update packs available from Embarcadero.  GExperts might work, but is ' +
     'unsupported running under your IDE.  We recommend you upgrade ' +
-    'using the downloads available on the CodeGear web site: '+
-    'http://www.codegear.com/downloads';
+    'using the downloads available on the Embarcadero web site: '+
+    'http://cc.embarcadero.com/myreg';
 begin
   Result := SBadIDEVersion;
 end;

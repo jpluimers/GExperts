@@ -30,7 +30,7 @@ type
     procedure InitVersionInfoControls;
   protected
     class function GetVersionStr: string;
-    class function doAddToAboutDialog: integer; virtual;
+    class function DoAddToAboutDialog: Integer; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     // If you release an experimental GExperts, either
@@ -167,57 +167,49 @@ begin
 end;
 
 class procedure TfmAbout.AddToSplashScreen;
-{$IFDEF GX_VER170_up}
-// Only Delphi 2005 and up support the splash screen services
-var
-  bmSplashScreen: HBITMAP;
-{$ENDIF GX_VER170_up}
 begin
 {$IFDEF GX_VER170_up}
-  if Assigned(SplashScreenServices) then begin
-    bmSplashScreen := LoadBitmap(HInstance, 'SplashScreenBitMap');
-    SplashScreenServices.AddPluginBitmap(
-      'GExperts',
-      bmSplashScreen,
-      False,
-      GetVersionStr);
-  end;
+  // Only Delphi 2005 and up support the splash screen services
+  if Assigned(SplashScreenServices) then
+    SplashScreenServices.AddPluginBitmap('GExperts',
+      LoadBitmap(HInstance, 'SplashAbout'), False, GetVersionStr);
 {$ENDIF GX_VER170_up}
 end;
 
-class function TfmAbout.doAddToAboutDialog: integer;
+class function TfmAbout.DoAddToAboutDialog: Integer;
 {$IFDEF GX_VER170_up}
 // Only Delphi 2005 and up support the about box services
 var
-  bmSplashScreen: HBITMAP;
   AboutBoxServices: IOTAAboutBoxServices;
-{$ENDIF GX_VER170_up}
 begin
   Result := -1;
-{$IFDEF GX_VER170_up}
-  if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then begin
-    bmSplashScreen := LoadBitmap(HInstance, 'SplashScreenBitMap');
+  if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then
+  begin
     Result := AboutBoxServices.AddPluginInfo(
       'GExperts',
       'GExperts is a free set of tools built to increase the productivity of Delphi and C++Builder'
       + ' programmers by adding several features to the IDE.'
       + ' GExperts is developed as Open Source software and we encourage user contributions to the project.'#13#10
-      + '(c) by Erik Berry and the GExperts Team'#13#10
+      + '(c) Erik Berry and the GExperts Team'#13#10
       + 'http://www.gexperts.org',
-      bmSplashScreen,
+      LoadBitmap(HInstance, 'SplashAbout'),
       False,
       '', // leave this empty!
       GetVersionStr);
   end;
-{$ENDIF GX_VER170_up}
 end;
+{$ELSE not GX_VER170_up}
+begin
+  Result := -1;
+end;
+{$ENDIF not GX_VER170_up}
 
 var
   FAboutPluginIndex: Integer;
 
 class procedure TfmAbout.AddToAboutDialog;
 begin
-  FAboutPluginIndex := doAddToAboutDialog;
+  FAboutPluginIndex := DoAddToAboutDialog;
 end;
 
 class procedure TfmAbout.RemoveFromAboutDialog;
@@ -225,18 +217,23 @@ class procedure TfmAbout.RemoveFromAboutDialog;
 // Only Delphi 2005 and up support the about box services
 var
   AboutBoxServices: IOTAAboutBoxServices;
-{$ENDIF GX_VER170_up}
 begin
-{$IFDEF GX_VER170_up}
   if FAboutPluginIndex <> -1 then
+  begin
     if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then
       AboutBoxServices.RemovePluginInfo(FAboutPluginIndex);
-{$ENDIF GX_VER170_up}
+    FAboutPluginIndex := -1;
+  end;
 end;
+{$ELSE not GX_VER170_up}
+begin
+end;
+{$ENDIF not GX_VER170_up}
 
 initialization
   TfmAbout.AddToSplashScreen;
   gblAboutFormClass := TfmAbout;
+
 finalization
 end.
 
