@@ -77,13 +77,13 @@ end;
 procedure TSearcher.Execute;
 var
   i, index, index2: Integer;
-  iParen, iCurly, iTick, iSlash : integer;
-  bInCurlyComment, bInParenComment, bInTick: boolean;
+  iParen, iCurly, iTick, iSlash : Integer;
+  bInCurlyComment, bInParenComment, bInTick: Boolean;
   s, sTick: string;
 
   procedure RemoveTicks;
   var
-    idx : integer;
+    idx : Integer;
   begin
     // Now remove all comments in the line.
     bInTick := False;

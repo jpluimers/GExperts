@@ -907,7 +907,7 @@ end;
 procedure TfmBackup.AddFilesInDirs(_Dirs: TStrings);
 var
   DirThread: TExtFindFileThread;
-  Idx: integer;
+  Idx: Integer;
 begin
   DirThread := TExtFindFileThread.Create(lbFiles);
   try

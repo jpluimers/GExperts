@@ -34,7 +34,7 @@ type
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsToolPropertiesForm(_Form: TCustomForm): Boolean;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
-    function TryFindEdit(_Form: TCustomForm; const _Name: string; out _ed: TEdit): boolean;
+    function TryFindEdit(_Form: TCustomForm; const _Name: string; out _ed: TEdit): Boolean;
 //    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
   public
     constructor Create;
@@ -100,7 +100,7 @@ begin
   Result := True;
 end;
 
-function TToolPropertiesEnhancer.TryFindEdit(_Form: TCustomForm; const _Name: string; out _ed: TEdit): boolean;
+function TToolPropertiesEnhancer.TryFindEdit(_Form: TCustomForm; const _Name: string; out _ed: TEdit): Boolean;
 begin
   _ed := TEdit(_Form.FindComponent(_Name));
   Result := Assigned(_ed);
@@ -159,4 +159,3 @@ initialization
 finalization
   TGxIdeToolPropertiesEnhancer.SetEnabled(False);
 end.
-

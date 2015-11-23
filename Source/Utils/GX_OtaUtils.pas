@@ -3899,7 +3899,7 @@ var
   EditWriter: IOTAEditWriter;
   Buffer: string;
   IdeString: UTF8String;
-  UTF8Pos: integer;
+  UTF8Pos: Integer;
 begin
   if Text = '' then
     Exit;

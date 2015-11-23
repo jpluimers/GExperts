@@ -28,7 +28,7 @@ type
     FToolBarVisible: Boolean;
     FEnabled: Boolean;
     FMiddleButtonClose: Boolean;
-    FHideNavbar: boolean;
+    FHideNavbar: Boolean;
     procedure AddToolBar;
     procedure RemoveToolBar;
     procedure EditorFormListener(EventCode: TEditFormEventCode; EditFormProxy: IGxEditFormProxy);
@@ -42,7 +42,7 @@ type
     procedure SetEnabled(const Value: Boolean);
     procedure Install;
     procedure Remove;
-    procedure SetHideNavbar(const _Value: boolean);
+    procedure SetHideNavbar(const _Value: Boolean);
   protected
     procedure Notification(Component: TComponent; Operation: TOperation); override;
     function ConfigurationKey: string;
@@ -68,7 +68,7 @@ type
     property Buttons: Boolean read FButtons write FButtons;
     property ButtonsFlat: Boolean read FButtonsFlat write FButtonsFlat;
 
-    property HideNavbar: boolean read FHideNavbar write SetHideNavbar;
+    property HideNavbar: Boolean read FHideNavbar write SetHideNavbar;
   end;
 
 function EditorEnhancements: TEditorEnhancements;
@@ -408,7 +408,7 @@ begin
     Remove;
 end;
 
-procedure TEditorEnhancements.SetHideNavbar(const _Value: boolean);
+procedure TEditorEnhancements.SetHideNavbar(const _Value: Boolean);
 begin
   FHideNavbar := _Value;
   FHideNavigationToolbarExpert.SetVisible(not FHideNavbar);

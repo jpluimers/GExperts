@@ -13,7 +13,7 @@ type
     b_Cancel: TButton;
   private
   public
-    class function Execute(var APromptForName: boolean): boolean;
+    class function Execute(var APromptForName: Boolean): Boolean;
   end;
 
 implementation
@@ -22,7 +22,7 @@ implementation
 
 { TfmGxMacroLibraryConfig }
 
-class function TfmGxMacroLibraryConfig.Execute(var APromptForName: boolean): boolean;
+class function TfmGxMacroLibraryConfig.Execute(var APromptForName: Boolean): Boolean;
 var
   frm: TfmGxMacroLibraryConfig;
 begin

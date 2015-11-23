@@ -529,7 +529,7 @@ object fmConfiguration: TfmConfiguration
             Top = 60
             Width = 329
             Height = 17
-            Caption = 'Replace listbox with memo'
+            Caption = 'Replace path listbox with memo'
             TabOrder = 2
           end
         end

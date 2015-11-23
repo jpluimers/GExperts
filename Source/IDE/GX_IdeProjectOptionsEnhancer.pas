@@ -31,7 +31,7 @@ type
     class function GenerateName(_cmb: TCustomComboBox): string;
   public
     constructor Create(_Owner: TComponent); override;
-    class function IsAlreadyHooked(_cmb: TCustomComboBox): boolean;
+    class function IsAlreadyHooked(_cmb: TCustomComboBox): Boolean;
   end;
 
   { TComboboxDropHandler }
@@ -41,7 +41,7 @@ begin
   Result := _cmb.Name + '_FilesDropHandler';
 end;
 
-class function TComboboxDropHandler.IsAlreadyHooked(_cmb: TCustomComboBox): boolean;
+class function TComboboxDropHandler.IsAlreadyHooked(_cmb: TCustomComboBox): Boolean;
 begin
   Result := _cmb.FindComponent(GenerateName(_cmb)) <> nil;
 end;
@@ -69,9 +69,9 @@ type
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
 //    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
-    function TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: integer;
-      const _Name: string; out _cmb: TCustomCombobox): boolean;
-    function TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): boolean;
+    function TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: Integer;
+      const _Name: string; out _cmb: TCustomCombobox): Boolean;
+    function TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): Boolean;
 //    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
   public
     constructor Create;
@@ -124,7 +124,7 @@ end;
 //  end;
 //end;
 
-function TProjectOptionsEnhancer.TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): boolean;
+function TProjectOptionsEnhancer.TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): Boolean;
 var
   Ctrl: TControl;
   wctrl: TWinControl;
@@ -161,8 +161,8 @@ begin
   Result := true;
 end;
 
-function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: integer;
-  const _Name: string; out _cmb: TCustomCombobox): boolean;
+function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: Integer;
+  const _Name: string; out _cmb: TCustomCombobox): Boolean;
 var
   Ctrl: TControl;
   wctrl: TWinControl;
@@ -187,7 +187,7 @@ end;
 
 procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 
-  function TryHookCombo(_SettingsPanel: TPanel; _Index: integer; const _Name: string): boolean;
+  function TryHookCombo(_SettingsPanel: TPanel; _Index: Integer; const _Name: string): Boolean;
   var
     cmb: TCustomComboBox;
   begin

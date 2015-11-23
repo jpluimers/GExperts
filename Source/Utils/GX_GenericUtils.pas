@@ -678,7 +678,7 @@ function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
 ///   CharPosToLinePos(5, '12345') = Point(5, 1)
 ///   CharPosToLinePos(8, '12345'#13#10'6789') = Point(1, 2)
 /// </summary>
-function CharPosToLinePos(CharPos: integer; Text: string): TPoint;
+function CharPosToLinePos(CharPos: Integer; Text: string): TPoint;
 
 // Convert a Windows message number into a string description
 function MessageName(Msg: Longint): string;
@@ -3994,8 +3994,8 @@ end;
 
 function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
 var
-  Offset: integer;
-  LineIdx: integer;
+  Offset: Integer;
+  LineIdx: Integer;
   sl: TStringList;
   LineLen: Integer;
 begin
@@ -4016,7 +4016,7 @@ begin
   end;
 end;
 
-function CharPosToLinePos(CharPos: integer; Text: string): TPoint;
+function CharPosToLinePos(CharPos: Integer; Text: string): TPoint;
 var
   sl: TStringList;
   LineIdx: Integer;

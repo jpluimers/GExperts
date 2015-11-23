@@ -64,15 +64,15 @@ type
   THideNavigationToolbarExpert = class(TInterfacedObject, IHideNavigationToolbarExpert)
 {$IFDEF GX_VER300_up}
   private
-    FNotifierIdx: integer;
-    FIsNavbarVisible: boolean;
+    FNotifierIdx: Integer;
+    FIsNavbarVisible: Boolean;
     function TryFindComponentByName(const ParentComponent: TComponent; const _Name: string;
-      out _Comp: TComponent): boolean;
-    function TrySetNavbarVisible(_EditView: IOTAEditView): boolean;
+      out _Comp: TComponent): Boolean;
+    function TrySetNavbarVisible(_EditView: IOTAEditView): Boolean;
     procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
 {$ENDIF GX_VER300_up}
   private
-    procedure SetVisible(_Value: boolean);
+    procedure SetVisible(_Value: Boolean);
 {$IFDEF GX_VER300_up}
   public
     constructor Create;
@@ -87,7 +87,7 @@ end;
 
 { THideNavigationToolbarExpert }
 
-procedure THideNavigationToolbarExpert.SetVisible(_Value: boolean);
+procedure THideNavigationToolbarExpert.SetVisible(_Value: Boolean);
 {$IFDEF GX_VER300_up}
 var
   EditView: IOTAEditView;
@@ -131,7 +131,7 @@ begin
 end;
 
 function THideNavigationToolbarExpert.TryFindComponentByName(const ParentComponent: TComponent;
-  const _Name: string; out _Comp: TComponent): boolean;
+  const _Name: string; out _Comp: TComponent): Boolean;
 var
   i: Integer;
   Cmp: TComponent;
@@ -152,7 +152,7 @@ begin
   end;
 end;
 
-function THideNavigationToolbarExpert.TrySetNavbarVisible(_EditView: IOTAEditView): boolean;
+function THideNavigationToolbarExpert.TrySetNavbarVisible(_EditView: IOTAEditView): Boolean;
 var
   C: TComponent;
   EditWindow: INTAEditWindow;

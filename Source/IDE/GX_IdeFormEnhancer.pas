@@ -104,9 +104,9 @@ type
     FScreenActiveControlChangeHook: TNotifyEventHook;
     FManagedForms: TManagedFormList;
     FFormChangeCallbacks: TList;
-    FIsInFormChangeCallback: boolean;
+    FIsInFormChangeCallback: Boolean;
     FControlChangeCallbacks: TList;
-    FIsInControlChangeCallback: boolean;
+    FIsInControlChangeCallback: Boolean;
     procedure HookActiveControlChanged;
     procedure ProcessActivatedControl(Form: TCustomForm; Control: TWinControl);
   protected
@@ -291,7 +291,8 @@ begin
       Include(Flags, fsSize);
     if RememberPosition then
       Include(Flags, fsPosition);
-    if Flags <> [] then begin
+    if Flags <> [] then
+    begin
       Settings.LoadForm(Form, Section, Flags);
       EnsureFormVisible(Form);
     end;
@@ -420,7 +421,7 @@ begin
   inherited;
 end;
 
-function IsSameMethod(_Method1, _Method2: TNotifyEvent): boolean;
+function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
 begin
   result := (TMethod(_Method1).Code = TMethod(_Method2).Code)
     and (TMethod(_Method1).Data = TMethod(_Method2).Data);

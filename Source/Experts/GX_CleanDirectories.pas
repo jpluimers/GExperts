@@ -308,7 +308,7 @@ procedure TfmCleanDirectories.clbDirsOnFilesDropped(_Sender: TObject; _Files: TS
 var
   i: Integer;
   fn: string;
-  LastIdxAdded: integer;
+  LastIdxAdded: Integer;
 begin
   for i := 0 to _Files.Count - 1 do begin
     fn := _Files[i];
@@ -324,7 +324,7 @@ procedure TfmCleanDirectories.clbExtensionsOnFilesDropped(_Sender: TObject; _Fil
 var
   i: Integer;
   fn: string;
-  LastIdxAdded: integer;
+  LastIdxAdded: Integer;
   Ext: string;
 begin
   LastIdxAdded := clbDirs.ItemIndex;

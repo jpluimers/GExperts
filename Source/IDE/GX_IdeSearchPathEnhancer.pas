@@ -13,10 +13,10 @@ uses
 type
   TGxIdeSearchPathEnhancer = class
   public
-    class function GetEnabled: boolean; // static;
-    class procedure SetEnabled(_Value: boolean); // static;
-    class function GetAggressive: boolean; // static;
-    class procedure SetAggressive(_Value: boolean); // static;
+    class function GetEnabled: Boolean; // static;
+    class procedure SetEnabled(_Value: Boolean); // static;
+    class function GetAggressive: Boolean; // static;
+    class procedure SetAggressive(_Value: Boolean); // static;
   end;
 
 implementation
@@ -30,7 +30,7 @@ uses
   GX_dzVclUtils, Windows;
 
 var
-  gblAggressive: boolean;
+  gblAggressive: Boolean;
 
 type
   TSearchPathEnhancer = class
@@ -65,7 +65,7 @@ var
 
 { TGxIdeSearchPathEnhancer }
 
-class function TGxIdeSearchPathEnhancer.GetEnabled: boolean;
+class function TGxIdeSearchPathEnhancer.GetEnabled: Boolean;
 begin
   Result := Assigned(TheSearchPathEnhancer);
 end;
@@ -78,12 +78,12 @@ begin
     TheSearchPathEnhancer := TSearchPathEnhancer.Create;
 end;
 
-class function TGxIdeSearchPathEnhancer.GetAggressive: boolean;
+class function TGxIdeSearchPathEnhancer.GetAggressive: Boolean;
 begin
   Result := gblAggressive;
 end;
 
-class procedure TGxIdeSearchPathEnhancer.SetAggressive(_Value: boolean);
+class procedure TGxIdeSearchPathEnhancer.SetAggressive(_Value: Boolean);
 begin
   gblAggressive := _Value;
 end;
@@ -188,7 +188,7 @@ procedure TSearchPathEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustom
 var
   TheActionList: TActionList;
 
-  function TryFindBitBtn(const _BtnName: string; out _Btn: TBitBtn): boolean;
+  function TryFindBitBtn(const _BtnName: string; out _Btn: TBitBtn): Boolean;
   var
     cmp: TComponent;
   begin
@@ -198,7 +198,7 @@ var
       _btn := cmp as TBitBtn;
   end;
 
-  function TryFindButton(const _BtnName: string; out _Btn: TButton): boolean;
+  function TryFindButton(const _BtnName: string; out _Btn: TButton): Boolean;
   var
     cmp: TComponent;
   begin
@@ -293,7 +293,7 @@ end;
 
 procedure TSearchPathEnhancer.HandleUpButton(_Sender: TObject);
 var
-  LineIdx: integer;
+  LineIdx: Integer;
   Pos: TPoint;
 begin
   if Assigned(FMemo) then begin
@@ -310,7 +310,7 @@ end;
 
 procedure TSearchPathEnhancer.HandleDownButton(_Sender: TObject);
 var
-  LineIdx: integer;
+  LineIdx: Integer;
 begin
   if Assigned(FMemo) then begin
     LineIdx := FMemo.CaretPos.Y;
@@ -350,4 +350,3 @@ finalization
   gblAggressive := False;
   TGxIdeSearchPathEnhancer.SetEnabled(False);
 end.
-

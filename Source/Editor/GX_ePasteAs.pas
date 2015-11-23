@@ -158,7 +158,7 @@ resourcestring
     'that are used to make them proper Delphi code, leaving you with just the raw strings.  ' +
     'You might use it to take a set of string constants (lines of SQL, for example) and ' +
     'convert them back into the raw text.' + sLineBreak +
-    'To use it, select a block containing the string constants in the Delphi editor and ' +
+    '  To use it, select a block containing the string constants in the Delphi editor and ' +
     'activate this expert.';
 begin
   List.Text := SCopyRawStringsHelp;
@@ -204,7 +204,6 @@ resourcestring
     'It then uses the selected string prefix/suffix combination to paste the lines back into the editor.' + sLineBreak +
     '  To use it, select the string constants in the Delphi editor and ' +
     'activate this expert.' + sLineBreak +
-    sLineBreak +
     '  You can configure this expert to use different string prefix/suffix combinations. Note that ' +
     'it shares this configuration with the PasteAs expert.';
 begin

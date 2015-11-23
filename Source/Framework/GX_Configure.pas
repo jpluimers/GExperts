@@ -1075,6 +1075,7 @@ begin
 
   chkEnhanceSearchPaths.Enabled := EnableState;
   chkEnhanceToolProperties.Enabled := EnableState;
+  chkReplaceListWithMemo.Enabled := EnableState;
 end;
 
 end.

@@ -119,7 +119,7 @@ type
   end;
 
 procedure ShowExpertManager; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
-procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: Integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 
 implementation
 
@@ -618,7 +618,7 @@ begin
   end;
 end;
 
-procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: integer);
+procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: Integer);
 var
   Succeeded: Boolean;
 begin

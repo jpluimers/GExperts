@@ -15,7 +15,7 @@ type
     FPasteAsType: TPasteAsType;
     FAddExtraSpaceAtTheEnd: Boolean;
     FShowOptions: Boolean;
-    function DetermineIndent(ALines: TStrings): integer;
+    function DetermineIndent(ALines: TStrings): Integer;
   protected
   public
     constructor Create;
@@ -80,14 +80,15 @@ begin
   Settings.WriteBool(AConfigKey, 'ShowOptions', FShowOptions);
 end;
 
-function TPasteAsHandler.DetermineIndent(ALines: TStrings): integer;
+function TPasteAsHandler.DetermineIndent(ALines: TStrings): Integer;
 var
   i: Integer;
   Line: string;
   FCP: Integer;
 begin
   Result := MaxInt;
-  for i := 0 to ALines.Count-1 do begin
+  for i := 0 to ALines.Count-1 do
+  begin
     Line := ALines[i];
     FCP := GetFirstCharPos(Line, [' ', #09], False);
     if FCP < Result then
@@ -168,7 +169,8 @@ begin
 
       FirstQuotePos := GetFirstCharPos(Line, [cStringSep], True);
       LastQuotePos := GetLastCharPos(Line, [cStringSep], True);
-      if (FirstQuotePos > 0) and (LastQuotePos > 0) then begin
+      if (FirstQuotePos > 0) and (LastQuotePos > 0) then
+      begin
         Line := Copy(Line, FirstQuotePos, LastQuotePos - FirstQuotePos + 1);
         // It's not "not FCreateQuotedString" because this is the ExtractRawStrings method
         // the ConvertToCode will add the quotes again, if FCreateQuotedString is true.
