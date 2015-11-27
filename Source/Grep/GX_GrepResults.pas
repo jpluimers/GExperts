@@ -7,7 +7,7 @@ interface
 uses
   Windows, Classes, Graphics, Controls, Forms,
   StdCtrls, ExtCtrls, GX_GrepBackend, GX_GrepExpert, ComCtrls,
-  Menus, DropSource, GX_IdeDock, ActnList,
+  Menus, DropSource, GX_IdeDock, ActnList, Dialogs,
   ToolWin;
 
 type
@@ -63,7 +63,7 @@ type
     mitListSep1: TMenuItem;
     mitFileSep1: TMenuItem;
     reContext: TRichEdit;
-    Splitter: TSplitter;
+    SplitterContext: TSplitter;
     mitViewSep1: TMenuItem;
     actViewShowContext: TAction;
     miViewShowMatchContext: TMenuItem;
@@ -90,6 +90,65 @@ type
     pnlMain: TPanel;
     actListGotoSelectedAndClose: TAction;
     GotoSelectedandClose1: TMenuItem;
+    lbFoundList: TListBox;
+    SplitterFoundList: TSplitter;
+    pmFoundMenu: TPopupMenu;
+    actFoundView: TAction;
+    actFoundDelete: TAction;
+    actFoundRefresh: TAction;
+    actFoundSave: TAction;
+    miFoundView: TMenuItem;
+    miFoundRefresh: TMenuItem;
+    N1: TMenuItem;
+    miFoundDelete: TMenuItem;
+    N2: TMenuItem;
+    miFoundSave: TMenuItem;
+    N3: TMenuItem;
+    miFoundItemName: TMenuItem;
+    actViewShowFoundList: TAction;
+    actViewShowFullFilename: TAction;
+    miViewShowfoundlist: TMenuItem;
+    N4: TMenuItem;
+    miViewShowfullfilename: TMenuItem;
+    actFoundDeleteAll: TAction;
+    actFoundSaveAll: TAction;
+    N5: TMenuItem;
+    miFoundDeleteAll: TMenuItem;
+    miFoundSaveAll: TMenuItem;
+    pmContextMenu: TPopupMenu;
+    actContextSelSearch: TAction;
+    miContextSearchSelectedText: TMenuItem;
+    actFoundSearch: TAction;
+    miFoundSearch: TMenuItem;
+    actFoundPrintToFile: TAction;
+    actFoundSavePrint: TAction;
+    actFoundPrintAllToFile: TAction;
+    actFoundSavePrintAll: TAction;
+    miFoundPrintToFile: TMenuItem;
+    miFoundSavePrint: TMenuItem;
+    miFoundPrintAllToTile: TMenuItem;
+    miFoundSavePrintAllToTile: TMenuItem;
+    N6: TMenuItem;
+    N7: TMenuItem;
+    miFileSaveAll: TMenuItem;
+    miFilePrintAllToFile: TMenuItem;
+    miFileSavePrintAllToFile: TMenuItem;
+    actFilePrintToFile: TAction;
+    actFileSavePrint: TAction;
+    actFileOpen: TAction;
+    miFilePrintToFile: TMenuItem;
+    miFileSavePrint: TMenuItem;
+    N8: TMenuItem;
+    Open1: TMenuItem;
+    N9: TMenuItem;
+    OpenDialog: TOpenDialog;
+    actFoundRefreshAll: TAction;
+    N11: TMenuItem;
+    miFileRefreshAll: TMenuItem;
+    actFoundModifySearchOptions: TAction;
+    miFoundModifySearchOptions: TMenuItem;
+    tbnSep8: TToolButton;
+    tbnShowFullFilename: TToolButton;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);
@@ -121,6 +180,22 @@ type
     procedure actReplaceSelectedExecute(Sender: TObject);
     procedure lbResultsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure actListGotoSelectedAndCloseExecute(Sender: TObject);
+    procedure lbFoundListData(Control: TWinControl; Index: Integer; var Data: string);
+    procedure lbFoundListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure actFoundViewExecute(Sender: TObject);
+    procedure actFoundRefreshExecute(Sender: TObject);
+    procedure lbFoundListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure lbFoundListDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
+    procedure actFoundSaveExecute(Sender: TObject);
+    procedure actFoundDeleteExecute(Sender: TObject);
+    procedure actViewShowFoundListExecute(Sender: TObject);
+    procedure actViewShowFullFilenameExecute(Sender: TObject);
+    procedure actContextSelSearchExecute(Sender: TObject);
+    procedure actFoundDeleteAllExecute(Sender: TObject);
+    procedure actFoundSaveAllExecute(Sender: TObject);
+    procedure actFileOpenExecute(Sender: TObject);
+    procedure actFoundRefreshAllExecute(Sender: TObject);
+    procedure lbFoundListDblClick(Sender: TObject);
   private
     FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
@@ -131,6 +206,11 @@ type
     FSearcher: TGrepSearchRunner;
     FShowContext: Boolean;
     FDoSearchReplace: Boolean;
+    FShowFullFilename: Boolean;
+    FShowFoundList: Boolean;
+    FLoadContextHeight: Integer;
+    FLoadFoundListWidth: Integer;
+    FContextSearchText: string;
     procedure SetStayOnTop(Value: Boolean);
     procedure RefreshContextLines;
     procedure SetShowContext(Value: Boolean);
@@ -139,21 +219,25 @@ type
     procedure SaveSettings;
     procedure LoadSettings;
     procedure ToggleFileResultExpanded(ListBoxIndex: Integer);
-    procedure ExpandList;
-    procedure ContractList;
+    procedure ExpandList(AUsedState, ASetState: Boolean; AExpandFewLines: Integer);
+    procedure ContractList(ASetState: Boolean);
     procedure ResizeListBox;
     procedure GotoHighlightedListEntry;
     procedure ClearResultsListbox;
     function ShowModalForm(Dlg: TCustomForm): TModalResult;
-    function QueryUserForGrepOptions: Boolean;
+    function QueryUserForGrepOptions(AState: TGrepSearchState): Boolean;
     function QueryUserForReplaceOptions(const ReplaceInString: string): Boolean;
     procedure Abort;
     procedure SetStatusString(const StatusStr: string);
     procedure SetMatchString(const MatchStr: string);
     function DoingSearchOrReplace: Boolean;
-    procedure ExpandOrContractList(Expand: Boolean);
+    procedure ExpandOrContractList(Expand, UsedState, SetState: Boolean; AExpandFewLines: Integer);
     function GetStayOnTop: Boolean;
     procedure ResizeStatusBar;
+    procedure RefreshInformation(AMatchesFound: Integer; ADoExpand, AUSedExpandState, ASetExpandState: Boolean);
+    procedure ViewFoundListItems(AIndex: Integer; AUsedExpandState: Boolean);
+    procedure SetShowFoundList(const Value: Boolean);
+    procedure SetShowFullFilename(const Value: Boolean);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
@@ -162,10 +246,15 @@ type
     GrepExpert: TGrepExpert;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Execute(DoRefresh: Boolean);
+    procedure Execute(AState: TGrepSearchState);
+    procedure UpdateFromSettings;
     property StayOnTop: Boolean read GetStayOnTop write SetStayOnTop;
     property ShowContext: Boolean read FShowContext write SetShowContext;
+    property ShowFullFilename: Boolean read FShowFullFilename write SetShowFullFilename;
+    property ShowFoundList: Boolean read FShowFoundList write SetShowFoundList;
     property DoSearchReplace: Boolean read FDoSearchReplace write FDoSearchReplace;
+    property ContextSearchText: string read FContextSearchText;
+    property GrepSettings: TGrepSettings read FGrepSettings;
   end;
 
 var
@@ -180,7 +269,10 @@ uses
   SysUtils, Messages, ToolsAPI,
   GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_GrepPrinting, GX_GrepSearch,
   GX_GExperts, GX_ConfigurationInfo, GX_SharedImages, GX_Replace, GX_GrepReplace,
-  GX_MessageBox, GX_IdeUtils, Math;
+  GX_MessageBox, GX_IdeUtils, Math, StrUtils, IniFiles;
+
+resourcestring
+  SGrepReplaceStats = 'Replaced %d occurrence(s) in %.2f seconds';
 
 type
   TShowUnicodeReplaceMessage = class(TGxMsgBoxAdaptor)
@@ -189,8 +281,15 @@ type
     function ShouldShow: Boolean; override;
   end;
 
-resourcestring
-  SGrepReplaceStats = 'Replaced %d occurrence(s) in %.2f seconds';
+  TGxResultRefreshAllQuestion = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+  TGxResultCloseAllQuestion = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
 
 procedure GoToMatchLine(MatchLine: TLineResult; SourceEditorInMiddle: Boolean);
 var
@@ -204,6 +303,35 @@ begin
     GXShellExecute(MatchFileName, '', True)
   else
     GxOtaGoToFileLineColumn(MatchFileName, MatchLine.LineNo, MatchLine.Matches[0].SPos, MatchLine.Matches[0].EPos, SourceEditorInMiddle);
+end;
+
+{ TShowUnicodeReplaceMessage }
+
+function TShowUnicodeReplaceMessage.GetMessage: string;
+begin
+  Result := 'Using GExperts grep replace can corrupt your source code if the file ' +
+    'being replaced is in a UNICODE format on disk or if the file is loaded into the IDE ' +
+    'editor and contains characters other than low ASCII.  Canceling the replace ' +
+    'is recommended if any of your files fall into one of these categories.';
+end;
+
+function TShowUnicodeReplaceMessage.ShouldShow: Boolean;
+begin
+  Result := RunningDelphi8OrGreater;
+end;
+
+{ TGxResultRefreshAllQuestion }
+
+function TGxResultRefreshAllQuestion.GetMessage: string;
+begin
+  Result := 'Are you sure that refresh all found item lists?';
+end;
+
+{ TGxResultCloseAllQuestion }
+
+function TGxResultCloseAllQuestion.GetMessage: string;
+begin
+  Result := 'Are you sure that close all found items?';
 end;
 
 { TfmGrepResults }
@@ -225,37 +353,39 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.Execute(DoRefresh: Boolean);
+procedure TfmGrepResults.Execute(AState: TGrepSearchState);
 resourcestring
   SGrepActive = 'A Grep search is currently active; either abort it or wait until it is finished.';
   SGrepSearchStats = 'Searched %d files in %.2f seconds for "%s"';
-  SMatches = '%d matches';
-  SMatches1 = '%d match';
-  SFiles = 'in %d files';
-  SFiles1 = 'in %d file';
 var
   TimeStart: TDateTime;
   FilesSearched: Cardinal;
   MatchesFound: Cardinal;
-  FilesHit: Cardinal;
   Cursor: IInterface;
-  MatchString: string;
   ResultFiles: TStringList;
-  i: Integer;
+  i : Integer;
+  AFoundIndex : Integer;
+  ATopIndex: Integer;
 begin
   if FSearchInProgress then
     raise Exception.Create(SGrepActive);
 
-  if not (DoRefresh and FGrepSettings.CanRefresh) then
-    if not QueryUserForGrepOptions then
+  if (AState in [gssNormal, gssSearchAgain, gssSearchModifyOptions]) or not FGrepSettings.CanRefresh then
+    if not QueryUserForGrepOptions(AState) then
       Exit;
+
+  if AState = gssSearchModifyOptions then
+  begin
+    GrepExpert.FoundList.UpdateGrepSettings(FGrepSettings);
+    Exit;
+  end;
 
   FLastRepaintTick := GetTickCount;
   reContext.Clear;
 
   ResultFiles := TStringList.Create;
   try
-    ContractList;
+    ContractList(False);
     for i := 0 to lbResults.Items.Count - 1 do
       ResultFiles.Add(lbResults.Items[i]);
     SetStatusString('');
@@ -283,24 +413,52 @@ begin
     FreeAndNil(ResultFiles);
   end;
 
-  FilesHit := lbResults.Items.Count;
-
   SetStatusString(Format(SGrepSearchStats, [FilesSearched, (Now - TimeStart) * 24*60*60, FGrepSettings.Pattern]));
 
   lbResults.Sorted := True;  // There is no Sort method
   lbResults.Sorted := False;
-  if (lbResults.Items.Count = 1) or GrepExpert.GrepExpandAll then
+
+  ATopIndex := lbFoundList.TopIndex;
+  AFoundIndex := GrepExpert.FoundList.AddItem(FGrepSettings, lbResults.Items);
+
+  lbFoundList.Count := GrepExpert.FoundList.Count;
+  lbFoundList.ItemIndex := AFoundIndex;
+  if (ATopIndex < lbFoundList.Count) and (AFoundIndex < lbFoundList.Count-1) then
+    lbFoundList.TopIndex := ATopIndex;
+
+  RefreshInformation(MatchesFound, GrepExpert.GrepExpandAll, False, True);
+
+  GrepExpert.FoundListSaveSettings(AFoundIndex);
+end;
+
+procedure TfmGrepResults.RefreshInformation(AMatchesFound: Integer; ADoExpand, AUSedExpandState, ASetExpandState: Boolean);
+resourcestring
+  SMatches = '%d matches';
+  SMatches1 = '%d match';
+  SFiles = 'in %d files';
+  SFiles1 = 'in %d file';
+var
+  MatchString: string;
+  FilesHit: Integer;
+begin
+  FilesHit := lbResults.Items.Count;
+
+  if (lbResults.Items.Count = 1) or ADoExpand or GrepExpert.GrepExpandFew or
+    (GrepExpert.GrepExpandIf and
+      (AMatchesFound <= GrepExpert.GrepExpandIfMatches) and (FilesHit <= GrepExpert.GrepExpandIfFiles)
+    )
+  then
   begin
     lbResults.ItemIndex := 0;
-    ExpandList;
+    ExpandList(AUSedExpandState, ASetExpandState, IfThen(GrepExpert.GrepExpandFew, GrepExpert.GrepExpandFewLines));
   end;
 
   lbResults.Refresh;
 
-  if MatchesFound = 1 then
-    MatchString := Format(SMatches1, [MatchesFound])
+  if AMatchesFound = 1 then
+    MatchString := Format(SMatches1, [AMatchesFound])
   else
-    MatchString := Format(SMatches, [MatchesFound]);
+    MatchString := Format(SMatches, [AMatchesFound]);
 
   if FilesHit = 1 then
     MatchString := MatchString + ' ' + Format(SFiles1, [FilesHit])
@@ -311,26 +469,7 @@ begin
 end;
 
 procedure TfmGrepResults.ClearResultsListbox;
-var
-  i: Integer;
-  j: Integer;
 begin
-  for i := 0 to lbResults.Items.Count - 1 do
-  begin
-    if lbResults.Items.Objects[i] is TFileResult then
-    begin
-      j := i + 1;
-      // First nil out all child item pointers before
-      // freeing the parent collection
-      while (j < lbResults.Items.Count) and (lbResults.Items.Objects[j] is TLineResult) do
-      begin
-        lbResults.Items.Objects[j] := nil;
-        Inc(j);
-      end;
-      lbResults.Items.Objects[i].Free;
-      lbResults.Items.Objects[i] := nil;
-    end;
-  end;
   lbResults.Clear;
 end;
 
@@ -399,6 +538,12 @@ begin
     Settings.WriteInteger(ConfigurationKey + '\Window', 'ResultsHeight', lbResults.Height);
     Settings.WriteBool(ConfigurationKey + '\Window', 'ShowToolBar', ToolBar.Visible);
     Settings.WriteBool(ConfigurationKey + '\Window', 'ShowContext', ShowContext);
+    Settings.WriteBool(ConfigurationKey + '\Window', 'ShowFullFilename', ShowFullFilename);
+    Settings.WriteBool(ConfigurationKey + '\Window', 'ShowFoundList', ShowFoundList);
+    if GrepExpert.ContextSaveSize then
+      Settings.WriteInteger(ConfigurationKey + '\Window', 'ContextHeight', reContext.Height);
+    if GrepExpert.FoundListSaveSize then
+      Settings.WriteInteger(ConfigurationKey + '\Window', 'FoundListWidth', lbFoundList.Width);
   finally
     FreeAndNil(Settings);
   end;
@@ -417,8 +562,31 @@ begin
     lbResults.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'ResultsHeight', lbResults.Height);
     ShowContext := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowContext', True);
     ToolBar.Visible := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowToolBar', ToolBar.Visible);
+    ShowFullFilename := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowFullFilename', False);
+    ShowFoundList := Settings.ReadBool(ConfigurationKey + '\Window', 'ShowFoundList', True);
+    if Settings.ValueExists(ConfigurationKey + '\Window', 'ContextHeight') then
+      FLoadContextHeight := Settings.ReadInteger(ConfigurationKey + '\Window', 'ContextHeight', reContext.Height)
+    else
+      FLoadContextHeight := pnlMain.Height - ToolBar.Height - SplitterContext.Height -
+        	Settings.ReadInteger(ConfigurationKey + '\Window', 'ResultsHeight', lbResults.Height);
+    FLoadFoundListWidth := Settings.ReadInteger(ConfigurationKey + '\Window', 'FoundListWidth', lbFoundList.Width);
   finally
     FreeAndNil(Settings);
+  end;
+end;
+
+procedure TfmGrepResults.UpdateFromSettings;
+begin
+  GrepExpert.FoundList.Enabled := ShowFoundList;
+  if GrepExpert.ContextSaveSize then
+    reContext.Height := FLoadContextHeight;
+  if GrepExpert.FoundListSaveSize then
+    lbFoundList.Width := FLoadFoundListWidth;
+  if GrepExpert.GrepSaveResultListItems and FShowFoundList and (GrepExpert.FoundList.Count > 0) then
+  begin
+    lbFoundList.Count := GrepExpert.FoundList.Count;
+    lbFoundList.ItemIndex := 0;
+    ViewFoundListItems(0, True);
   end;
 end;
 
@@ -436,7 +604,7 @@ procedure TfmGrepResults.SetShowContext(Value: Boolean);
 begin
   FShowContext := Value;
   reContext.Visible := ShowContext;
-  Splitter.Visible := ShowContext;
+  SplitterContext.Visible := ShowContext;
   RefreshContextLines;
 end;
 
@@ -445,6 +613,7 @@ resourcestring
   SMatchContextNotAvail = 'Unable to load match context lines';
 var
   CurrentLine: TLineResult;
+  CurrentFile: TFileResult;
   MatchLineNo, BeginLineNo, EndLineNo, REMatchLineNo: Integer;
   FileLines: TGXUnicodeStringList;
   FileName: string;
@@ -463,7 +632,10 @@ begin
       if (lbResults.Items.Objects[lbResults.ItemIndex] is TLineResult) then
       begin
         CurrentLine := TLineResult(lbResults.Items.Objects[lbResults.ItemIndex]);
-        FileName := TFileResult(CurrentLine.Collection).FileName;
+        CurrentFile := TFileResult(CurrentLine.Collection);
+        FileName := CurrentFile.FileName;
+        SetStatusString(CurrentFile.RelativeFileName);
+
         MatchLineNo := CurrentLine.LineNo - 1;
 
         FileLines := TGXUnicodeStringList.Create;
@@ -492,7 +664,7 @@ begin
           reContext.SelStart := reContext.GetTextLen;
           for i := BeginLineNo to EndLineNo do
           begin
-            reContext.SelText := FileLines[i] + sLineBreak;
+            reContext.SelText := FileLines[i] + IfThen(i <> EndLineNo, sLineBreak);
             if i = MatchLineNo then
               REMatchLineNo := reContext.Lines.Count - 1;
           end;
@@ -500,7 +672,7 @@ begin
           FreeAndNil(FileLines);
         end;
         HighlightMemo(TFileResult(CurrentLine.Collection), BeginLineNo, REMatchLineNo);
-        CenterLineInEdit(reContext, REMatchLineNo)        
+        CenterLineInEdit(reContext, REMatchLineNo)
       end;
     end;
   finally
@@ -524,7 +696,7 @@ begin
   // Highlight the matched line
   reContext.SelStart := reContext.Perform(EM_LINEINDEX, MatchLineNo, 0);
   reContext.SelLength := Length(reContext.Lines[MatchLineNo]);
-  reContext.SelAttributes.Color := GrepExpert.ContextMatchColor;
+  reContext.SelAttributes.Color := GrepExpert.ContextMatchLineColor;
 
   for i := StartLine + 1 to StartLine + reContext.Lines.Count + 1 do
   begin
@@ -535,6 +707,7 @@ begin
       begin
         reContext.SelStart := reContext.Perform(EM_LINEINDEX, i - StartLine - 1, 0) + Matches[j].SPos - 1;
         reContext.SelLength := Matches[j].EPos - Matches[j].SPos + 1;
+        reContext.SelAttributes.Color := GrepExpert.ContextMatchColor;
         reContext.SelAttributes.Style := [fsBold];
       end;
     end;
@@ -583,12 +756,14 @@ begin
           lbResults.Items.Delete(ListBoxIndex + 1);
         end;
         AFileResult.Expanded := False;
+        AFileResult.ExpandState := False;
       end
       else
       begin
         for i := AFileResult.Count - 1 downto 0 do
           lbResults.Items.InsertObject(ListBoxIndex + 1, AFileResult.Items[i].Line, AFileResult.Items[i]);
         AFileResult.Expanded := True;
+        AFileResult.ExpandState := True;
       end
     finally
       lbResults.Items.EndUpdate;
@@ -692,7 +867,10 @@ resourcestring
       Frame3D(ResultsCanvas, Rect, TopColor, BottomColor, 1);
 
     i := ResultsCanvas.TextWidth('+');
-    FileString := FileResult.RelativeFileName;
+    if ShowFullFilename then
+      FileString := FileResult.FileName
+    else
+      FileString := FileResult.RelativeFileName;
     ResultsCanvas.TextOut(Rect.Left + i + 8, Rect.Top, FileString);
 
     if FileResult.Expanded then
@@ -728,17 +906,37 @@ resourcestring
 
     if odSelected in State then
     begin
-      nb := clHighLight;
-      nf := clHighLightText;
-      sb := clWindow;
-      sf := clWindowText;
+      if GrepExpert.ListUseDefaultColors then
+      begin
+        nb := clHighLight;
+        nf := clHighLightText;
+        sb := clWindow;
+        sf := clWindowText;
+      end
+      else
+      begin
+        nb := GrepExpert.ListMatchBrushColor;
+        nf := GrepExpert.ListMatchTextColor;
+        sb := clWindow;
+        sf := GrepExpert.ListFont.Color;
+      end;
     end
     else
     begin
-      sb := clHighLight;
-      sf := clHighLightText;
-      nb := clWindow;
-      nf := clWindowText;
+      if GrepExpert.ListUseDefaultColors then
+      begin
+        sb := clHighLight;
+        sf := clHighLightText;
+        nb := clWindow;
+        nf := clWindowText;
+      end
+      else
+      begin
+        sb := GrepExpert.ListMatchBrushColor;
+        sf := GrepExpert.ListMatchTextColor;
+        nb := clWindow;
+        nf := GrepExpert.ListFont.Color;
+      end;
     end;
 
     // Paint line number of match line
@@ -802,19 +1000,19 @@ end;
 
 procedure TfmGrepResults.actFileSearchExecute(Sender: TObject);
 begin
-  Execute(False);
+  Execute(gssNormal);
 end;
 
 procedure TfmGrepResults.actFileRefreshExecute(Sender: TObject);
 begin
-  Execute(True);
+  Execute(gssRefresh);
   RefreshContextLines;
 end;
 
 procedure TfmGrepResults.actFileAbortExecute(Sender: TObject);
 begin
-  Self.Abort;
   {$IFOPT D+} SendDebug('Grep abort requested by user'); {$ENDIF}
+  Self.Abort;
 end;
 
 procedure TfmGrepResults.actFilePrintExecute(Sender: TObject);
@@ -830,9 +1028,51 @@ begin
     PrintGrepResults(Self, lbResults.Items, grCopy);
 end;
 
-procedure TfmGrepResults.actFileSaveExecute(Sender: TObject);
+procedure TfmGrepResults.actFileOpenExecute(Sender: TObject);
+var
+  AIni: TIniFile;
+  AIndex: Integer;
 begin
-  PrintGrepResults(Self, lbResults.Items, grFile);
+  if not OpenDialog.Execute then
+    Exit;
+
+  AIni := TIniFile.Create(OpenDialog.FileName);
+  try
+    if AIni.SectionExists(TGrepFoundList.KeyName) then
+    begin
+      if not GrepExpert.FoundList.LoadFromSettings(FGrepSettings, AIni, TGrepFoundList.KeyName, TGrepFoundList.SubKeyName, True) then
+        MessageDlg('Not read all match list!', mtWarning, [mbOK], 0);
+    end
+    else if AIni.SectionExists(TGrepFoundList.KeyName) then
+    begin
+      AIndex := GrepExpert.FoundList.LoadItemFromIni(FGrepSettings, AIni, TGrepFoundList.KeyName);
+      if AIndex = -1 then
+        MessageDlg('Not read the match list from file!', mtWarning, [mbOK], 0)
+      else
+        ViewFoundListItems(AIndex, True);
+    end;
+  finally
+    AIni.Free;
+  end;
+end;
+
+procedure TfmGrepResults.actFileSaveExecute(Sender: TObject);
+var
+  AItem: TGrepFoundListItems;
+  AMode: TSaveToFileMode;
+begin
+  AItem := GrepExpert.FoundList.Items[lbFoundList.ItemIndex];
+  if not Assigned(AItem) then
+    Exit;
+
+  if Sender = actFilePrintToFile then
+    AMode := sfPrintToFile
+  else if Sender = actFileSavePrint then
+    AMode := sfBoth
+  else
+    AMode := sfSaveToLoadable;
+
+  SaveGrepResultsToLoadableFile(Self, AItem, AMode, 'GxGrep.' + FGrepSettings.Pattern);
 end;
 
 procedure TfmGrepResults.actViewStayOnTopExecute(Sender: TObject);
@@ -865,15 +1105,15 @@ end;
 
 procedure TfmGrepResults.actListContractExecute(Sender: TObject);
 begin
-  ContractList;
+  ContractList(True);
 end;
 
 procedure TfmGrepResults.actListExpandExecute(Sender: TObject);
 begin
-  ExpandList;
+  ExpandList(False, True, 0);
 end;
 
-procedure TfmGrepResults.ExpandOrContractList(Expand: Boolean);
+procedure TfmGrepResults.ExpandOrContractList(Expand, UsedState, SetState: Boolean; AExpandFewLines: Integer);
 
   function ExpandFileResult(ListBoxIndex: Integer): Integer;
   var
@@ -886,11 +1126,14 @@ procedure TfmGrepResults.ExpandOrContractList(Expand: Boolean);
       lbResults.Items.InsertObject(ListBoxIndex + 1, FileResult.Items[t].Line, FileResult.Items[t]);
 
     FileResult.Expanded := True;
+    if SetState then
+      FileResult.ExpandState := True;
     Result := ListBoxIndex + FileResult.Count - 1;
   end;
 
 var
   i: Integer;
+  LFileResult: TFileResult;
 begin
   lbResults.Items.BeginUpdate;
   try
@@ -903,7 +1146,11 @@ begin
       begin
         if lbResults.Items.Objects[i] is TFileResult then
         begin
-          if not TFileResult(lbResults.Items.Objects[i]).Expanded then
+          LFileResult := TFileResult(lbResults.Items.Objects[i]);
+
+          if not LFileResult.Expanded and (not UsedState or LFileResult.ExpandState) and
+            ( (AExpandFewLines = 0) or (LFileResult.Count <= AExpandFewLines) )
+          then
             i := ExpandFileResult(i);
         end;
 
@@ -915,7 +1162,11 @@ begin
           lbResults.Items.Delete(i)
         else
         begin
-          (lbResults.Items.Objects[i] as TFileResult).Expanded := False;
+          LFileResult := TFileResult(lbResults.Items.Objects[i]);
+          LFileResult.Expanded := False;
+          if SetState then
+            LFileResult.ExpandState := False;
+
           Inc(i);
         end;
       end;
@@ -925,14 +1176,14 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.ExpandList;
+procedure TfmGrepResults.ExpandList(AUsedState, ASetState: Boolean; AExpandFewLines: Integer);
 begin
-  ExpandOrContractList(True);
+  ExpandOrContractList(True, AUsedState, ASetState, AExpandFewLines);
 end;
 
-procedure TfmGrepResults.ContractList;
+procedure TfmGrepResults.ContractList(ASetState: Boolean);
 begin
-  ExpandOrContractList(False);
+  ExpandOrContractList(False, False, ASetState, 0);
 end;
 
 function TfmGrepResults.GetStayOnTop: Boolean;
@@ -985,7 +1236,15 @@ begin
   ResizeListBox;
   SetMatchString('');
 
+  FContextSearchText := '';
+
   FDragSource := TDropFileSource.Create(nil);
+
+  if IsStandAlone then
+  begin
+    FormStyle := fsNormal;
+    BorderStyle := bsSizeable;
+  end;
 end;
 
 destructor TfmGrepResults.Destroy;
@@ -1029,6 +1288,8 @@ begin
   actReplaceSelected.Enabled := not Processing and HaveItems;
   actReplaceAll.Enabled := not Processing and HaveItems;
   actViewStayOnTop.Visible := IsStandAlone;
+  actViewShowFoundList.Checked := ShowFoundList;
+  actViewShowFullFilename.Checked := ShowFullFilename;
   tbnSep6.Visible := actViewStayOnTop.Visible;
 end;
 
@@ -1084,6 +1345,7 @@ begin
   AssignSettingsToForm;
   ResizeListBox;
   RefreshContextLines;
+  lbFoundList.Refresh;
 end;
 
 procedure TfmGrepResults.FormShow(Sender: TObject);
@@ -1194,19 +1456,29 @@ begin
   ResizeStatusBar;
 end;
 
-function TfmGrepResults.QueryUserForGrepOptions: Boolean;
+function TfmGrepResults.QueryUserForGrepOptions(AState: TGrepSearchState): Boolean;
+resourcestring
+  rsSearchAgainCaption = 'Grep Search Again';
+  rsSearchModifyOptionCaption = 'Grep Search Modify Options';
 var
   Dlg: TfmGrepSearch;
 begin
   Result := False;
   Dlg := TfmGrepSearch.Create(nil);
   try
+    case AState of
+      gssSearchAgain: Dlg.Caption := rsSearchAgainCaption;
+      gssSearchModifyOptions: Dlg.Caption := rsSearchModifyOptionCaption;
+    end;
+    if AState in [gssSearchAgain, gssSearchModifyOptions] then
+      Dlg.AdjustSettings(FGrepSettings);
     if ShowModalForm(Dlg) <> mrOk then
       Exit;
     FGrepSettings.CanRefresh := True;
     SetMatchString('');
     Dlg.RetrieveSettings(FGrepSettings);
-    Dlg.GrepExpert.SaveSettings;
+    if AState <> gssSearchModifyOptions then
+      Dlg.GrepExpert.SaveSettings;
     Result := True;
   finally
     FreeAndNil(Dlg);
@@ -1244,25 +1516,302 @@ begin
   StatusBar.Panels.Items[0].Width := StatusBar.ClientWidth - StatusBar.Panels.Items[1].Width;
 end;
 
-{ TShowUnicodeReplaceMessage }
-
-function TShowUnicodeReplaceMessage.GetMessage: string;
+procedure TfmGrepResults.SetShowFoundList(const Value: Boolean);
 begin
-  Result := 'Using GExperts grep replace can corrupt your source code if the file ' +
-    'being replaced is in a UNICODE format on disk or if the file is loaded into the IDE ' +
-    'editor and contains characters other than low ASCII.  Canceling the replace ' +
-    'is recommended if any of your files fall into one of these categories.';
+  if FShowFoundList <> Value then
+  begin
+    FShowFoundList := Value;
+    if Assigned(GrepExpert) then
+      GrepExpert.FoundList.Enabled := ShowFoundList;
+    lbFoundList.Visible := ShowFoundList;
+    if Value then
+      SplitterFoundList.Left := lbFoundList.Left + lbFoundList.Width;
+    SplitterFoundList.Visible := ShowFoundList;
+    if lbFoundList.Items.Count > 0 then
+    begin
+      lbFoundList.ItemIndex := 0;
+      ViewFoundListItems(lbFoundList.ItemIndex, True);
+    end;
+  end;
 end;
 
-function TShowUnicodeReplaceMessage.ShouldShow: Boolean;
+procedure TfmGrepResults.SetShowFullFilename(const Value: Boolean);
 begin
-  Result := RunningDelphi8OrGreater;
+  if FShowFullFilename <> Value then
+  begin
+    FShowFullFilename := Value;
+    lbResults.Refresh;
+  end;
 end;
 
 procedure TfmGrepResults.actListGotoSelectedAndCloseExecute(Sender: TObject);
 begin
   GotoHighlightedListEntry;
   Close;
+end;
+
+procedure TfmGrepResults.actViewShowFoundListExecute(Sender: TObject);
+begin
+  ShowFoundList := not ShowFoundList
+end;
+
+procedure TfmGrepResults.actViewShowFullFilenameExecute(Sender: TObject);
+begin
+  ShowFullFilename := not ShowFullFilename;
+end;
+
+procedure TfmGrepResults.ViewFoundListItems(AIndex: Integer; AUsedExpandState: Boolean);
+var
+  AFoundItem: TGrepFoundListItems;
+begin
+  AFoundItem := GrepExpert.FoundList.Items[AIndex];
+  if Assigned(AFoundItem) then
+  begin
+    reContext.Clear;
+    ContractList(False);
+    SetStatusString('');
+    SetMatchString('');
+    ClearResultsListbox;
+    AFoundItem.View(lbResults.Items);
+    RefreshInformation(AFoundItem.TotalMatchCount, True, AUsedExpandState, False);
+    FGrepSettings := AFoundItem.GrepSettings;
+  end ;
+end;
+
+procedure TfmGrepResults.lbFoundListData(Control: TWinControl; Index: Integer; var Data: string);
+begin
+  Data := GrepExpert.FoundList[Index];
+end;
+
+procedure TfmGrepResults.lbFoundListDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
+  State: TOwnerDrawState);
+var
+  AItem: TGrepFoundListItems;
+begin
+  AItem := GrepExpert.FoundList.Items[Index];
+  if not Assigned(AItem) or not (AItem is TGrepFoundListItems) then
+    Exit;
+
+  if not GrepExpert.ListUseDefaultColors then
+  begin
+    if odSelected in State then
+    begin
+      lbFoundList.Canvas.Font.Color := GrepExpert.ListMatchTextColor;
+      lbFoundList.Canvas.Brush.Color := GrepExpert.ListMatchBrushColor;
+    end
+    else
+    begin
+      lbFoundList.Canvas.Font.Color := GrepExpert.ListFont.Color;
+      lbFoundList.Canvas.Brush.Color := clWindow;
+    end;
+  end;
+
+  lbFoundList.Canvas.FillRect(Rect);
+
+  lbFoundList.Canvas.TextOut(Rect.Left + 1, Rect.Top + 1, lbFoundList.Items[Index]);
+  lbFoundList.Canvas.TextOut(Rect.Left + 10, Rect.Top + 12, Format('%d in %d', [AItem.TotalMatchCount, AItem.ResultList.Count]));
+end;
+
+procedure TfmGrepResults.lbFoundListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+var
+  ClickedEntry: Integer;
+begin
+  if Button = mbLeft then
+  begin
+    ClickedEntry := lbFoundList.ItemAtPos(Point(X, Y), True);
+    if ClickedEntry <> -1 then
+      ViewFoundListItems(ClickedEntry, True);
+  end;
+end;
+
+procedure TfmGrepResults.lbFoundListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+var
+  AIndex: Integer;
+  HasIndex, HasItem: Boolean;
+begin
+  AIndex := lbFoundList.ItemAtPos(MousePos, True);
+  pmFoundMenu.Tag := AIndex;
+
+  HasIndex := AIndex <> -1;
+  HasItem := lbFoundList.Count > 0;
+
+  miFoundItemName.Enabled := HasIndex;
+  miFoundView.Enabled := HasIndex;
+  miFoundRefresh.Enabled := HasIndex;
+  miFoundSearch.Enabled := HasIndex;
+  miFoundModifySearchOptions.Enabled := HasIndex;
+  miFoundDelete.Enabled := HasIndex;
+  miFoundSave.Enabled := HasIndex;
+
+  miFoundDeleteAll.Enabled := HasItem;
+  miFoundSaveAll.Enabled := HasItem;
+  miFoundPrintAllToTile.Enabled := HasItem;
+  miFoundSavePrintAllToTile.Enabled := HasItem;
+
+  if HasIndex then
+    miFoundItemName.Caption := Format('[SearchText=%s]', [lbFoundList.Items[AIndex]])
+  else
+    miFoundItemName.Caption := '[All items]';
+end;
+
+procedure TfmGrepResults.lbFoundListDblClick(Sender: TObject);
+begin
+//
+end;
+
+procedure TfmGrepResults.actFoundViewExecute(Sender: TObject);
+begin
+  lbFoundList.ItemIndex := pmFoundMenu.Tag;
+  ViewFoundListItems(lbFoundList.ItemIndex, True);
+end;
+
+procedure TfmGrepResults.actFoundRefreshExecute(Sender: TObject);
+var
+  AItem: TGrepFoundListItems;
+  ASaveSettings: TGrepSettings;
+begin
+  AItem := GrepExpert.FoundList.Items[pmFoundMenu.Tag];
+  if not Assigned(AItem) then
+    Exit;
+
+  ASaveSettings := FGrepSettings;
+  FGrepSettings := AItem.GrepSettings;
+  if Sender = actFoundRefresh then
+    actFileRefresh.Execute
+  else if Sender = actFoundSearch then
+  begin
+    Execute(gssSearchAgain);
+    RefreshContextLines;
+  end
+  else if Sender = actFoundModifySearchOptions then
+  begin
+    try
+      Execute(gssSearchModifyOptions);
+    finally
+      FGrepSettings := ASaveSettings;
+    end;
+  end;
+end;
+
+procedure TfmGrepResults.actFoundSaveExecute(Sender: TObject);
+var
+  AItem: TGrepFoundListItems;
+  AMode: TSaveToFileMode;
+begin
+  AItem := GrepExpert.FoundList.Items[pmFoundMenu.Tag];
+  if not Assigned(AItem) then
+    Exit;
+
+  if Sender = actFoundPrintToFile then
+    AMode := sfPrintToFile
+  else if Sender = actFoundSavePrint then
+    AMode := sfBoth
+  else
+    AMode := sfSaveToLoadable;
+
+  SaveGrepResultsToLoadableFile(Self, AItem, AMode, 'GxGrep.' + AItem.GrepSettings.Pattern);
+end;
+
+procedure TfmGrepResults.actFoundDeleteExecute(Sender: TObject);
+var
+  AIndex, ATopIndex: Integer;
+  IsCurrent: Boolean;
+  Settings: TIniFile;
+begin
+  AIndex := pmFoundMenu.Tag;
+  if AIndex = -1 then
+   Exit;
+
+  IsCurrent := AIndex = lbFoundList.ItemIndex;
+  if IsCurrent then
+  begin
+    reContext.Clear;
+    ContractList(False);
+    SetStatusString('');
+    SetMatchString('');
+    ClearResultsListbox;
+  end;
+
+  if GrepExpert.GrepSaveResultListItems then
+  begin
+    Settings := TIniFile.Create(AddSlash(ConfigInfo().ConfigPath) + 'GrepFound.ini');
+    try
+      GrepExpert.FoundList.RemoveFromSettings(Settings, 'FoundList', AIndex);
+    finally
+      FreeAndNil(Settings);
+    end;
+  end;
+
+  GrepExpert.FoundList.Items[AIndex].Free;
+  GrepExpert.FoundList.Delete(AIndex);
+
+  ATopIndex := lbFoundList.TopIndex;
+  lbFoundList.Count := GrepExpert.FoundList.Count;
+  if AIndex >= lbFoundList.Count then
+    Dec(AIndex);
+  if (ATopIndex < lbFoundList.Count) and (AIndex < lbFoundList.Count-1) then
+    lbFoundList.TopIndex := ATopIndex;
+
+  if IsCurrent and (AIndex > -1) then
+  begin
+    lbFoundList.ItemIndex := AIndex;
+    ViewFoundListItems(lbFoundList.ItemIndex, True);
+  end ;
+end;
+
+procedure TfmGrepResults.actFoundDeleteAllExecute(Sender: TObject);
+begin
+  if lbFoundList.Count = 0 then
+    Exit;
+
+  if GrepExpert.GrepSaveResultListItems then
+    DeleteFile(AddSlash(ConfigInfo().ConfigPath) + 'GrepFound.ini');
+
+  reContext.Clear;
+  ContractList(False);
+  SetStatusString('');
+  SetMatchString('');
+  ClearResultsListbox;
+
+  lbFoundList.Count := 0;
+  GrepExpert.FoundList.Clear;
+end;
+
+procedure TfmGrepResults.actFoundSaveAllExecute(Sender: TObject);
+var
+  AMode: TSaveToFileMode;
+begin
+  if (lbFoundList.Count = 0) or ( ShowGxMessageBox(TGxResultCloseAllQuestion) <> mrYes ) then
+    Exit;
+
+  if Sender = actFoundPrintAllToFile then
+    AMode := sfPrintToFile
+  else if Sender = actFoundSavePrintAll then
+    AMode := sfBoth
+  else
+    AMode := sfSaveToLoadable;
+
+  SaveGrepResultsToLoadableFile(Self, GrepExpert.FoundList, AMode, 'GxGrep.FoundList');
+end;
+
+procedure TfmGrepResults.actFoundRefreshAllExecute(Sender: TObject);
+begin
+  if (lbFoundList.Count = 0) or ( ShowGxMessageBox(TGxResultRefreshAllQuestion) <> mrYes ) then
+    Exit;
+
+  lbFoundList.ItemIndex := 0;
+  Execute(gssRefreshAll);
+
+  ViewFoundListItems(lbFoundList.ItemIndex, True);
+  RefreshContextLines;
+end;
+
+procedure TfmGrepResults.actContextSelSearchExecute(Sender: TObject);
+begin
+  FContextSearchText := reContext.SelText;
+  Execute(gssNormal);
+  FContextSearchText := '';
 end;
 
 end.

@@ -37,6 +37,7 @@ type
     rbResults: TRadioButton;
     cbExcludedDirs: TComboBox;
     lblExcludeDirs: TLabel;
+    cbSQLFiles: TCheckBox;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -55,6 +56,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure RetrieveSettings(var Value: TGrepSettings);
+    procedure AdjustSettings(Value: TGrepSettings);
     property GrepExpert: TGrepExpert read FGrepExpert;
   end;
 
@@ -153,7 +155,7 @@ end;
 procedure TGrepDlgExpert.Click(Sender: TObject);
 begin
   if Assigned(fmGrepResults) then
-    fmGrepResults.Execute(False)
+    fmGrepResults.Execute(gssNormal)
   else
     raise Exception.Create(SGrepResultsNotActive);
 end;
@@ -256,7 +258,7 @@ end;
 
 procedure TfmGrepSearch.SaveFormSettings;
 begin
-  AddMRUString(cbText.Text, FGrepExpert.SearchList, False);
+  AddMRUString(cbText.Text, FGrepExpert.SearchList, False, 90, -1);
   AddMRUString(cbDirectory.Text, FGrepExpert.DirList, True);
   AddMRUString(cbMasks.Text, FGrepExpert.MaskList, False);
   AddMRUString(cbExcludedDirs.Text, FGrepExpert.ExcludedDirsList, False, True);
@@ -264,6 +266,7 @@ begin
   FGrepExpert.GrepCaseSensitive := cbCaseSensitive.Checked;
   FGrepExpert.GrepComments := not cbNoComments.Checked;
   FGrepExpert.GrepForms := cbForms.Checked;
+  FGrepExpert.GrepSQLFiles := cbSQLFiles.Checked;
   FGrepExpert.GrepSub := cbInclude.Checked;
   FGrepExpert.GrepWholeWord := cbWholeWord.Checked;
   FGrepExpert.GrepRegEx := cbRegEx.Checked;
@@ -311,9 +314,16 @@ procedure TfmGrepSearch.LoadFormSettings;
   var
     Selection: string;
   begin
-    Selection := RetrieveEditorBlockSelection;
+    Selection := fmGrepResults.ContextSearchText;
+    if Trim(Selection) = '' then
+      Selection := RetrieveEditorBlockSelection;
     if (Trim(Selection) = '') and FGrepExpert.GrepUseCurrentIdent then
-      Selection := GxOtaGetCurrentIdent;
+      try
+        Selection := GxOtaGetCurrentIdent;  //if access violation created
+      except
+        on E: Exception do
+          Selection := '';
+      end;
     if (Selection = '') and (cbText.Items.Count > 0) then
       Selection := cbText.Items[0];
     SetSearchPattern(Selection);
@@ -333,6 +343,7 @@ begin
   cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
   cbNoComments.Checked := not FGrepExpert.GrepComments;
   cbForms.Checked := FGrepExpert.GrepForms;
+  cbSQLFiles.Checked := FGrepExpert.GrepSQLFiles;
   cbInclude.Checked := FGrepExpert.GrepSub;
   cbWholeWord.Checked := FGrepExpert.GrepWholeWord;
   cbRegEx.Checked := FGrepExpert.GrepRegEx;
@@ -403,11 +414,12 @@ begin
   Value.WholeWord := cbWholeWord.Checked;
   Value.RegEx := cbRegEx.Checked;
   Value.Pattern := cbText.Text;
-  Value.IncludeSubdirs := cbInclude.Checked;
+  Value.IncludeForms := cbForms.Checked;
+  Value.IncludeSQLs := cbSQLFiles.Checked;
   Value.Mask := '';
   Value.Directories := '';
-  Value.ExcludedDirs := cbExcludedDirs.Text;
-  Value.IncludeForms := cbForms.Checked;
+  Value.ExcludedDirs := '';
+  Value.IncludeSubdirs := True;
 
   if rbAllProjFiles.Checked then
     Value.GrepAction := gaProjGrep
@@ -424,7 +436,42 @@ begin
     Value.GrepAction := gaDirGrep;
     Value.Mask := cbMasks.Text;
     Value.Directories := cbDirectory.Text;
+    Value.IncludeSubdirs := cbInclude.Checked;
+    Value.ExcludedDirs := cbExcludedDirs.Text;
   end;
+end;
+
+procedure TfmGrepSearch.AdjustSettings(Value: TGrepSettings);
+begin
+  cbNoComments.Checked := not Value.IncludeComments;
+  cbCaseSensitive.Checked := Value.CaseSensitive;
+  cbWholeWord.Checked := Value.WholeWord;
+  cbRegEx.Checked := Value.RegEx;
+  cbText.Text := Value.Pattern;
+  cbText.SelectAll;
+  cbForms.Checked := Value.IncludeForms;
+  cbSQLFiles.Checked := Value.IncludeSQLs;
+
+  cbMasks.Text := '';
+  cbDirectory.Text := '';
+  cbExcludedDirs.Text := '';
+  cbInclude.Checked := True;
+  case Value.GrepAction of
+    gaProjGrep: rbAllProjFiles.Checked := True;
+    gaCurrentOnlyGrep: rbCurrentOnly.Checked := True;
+    gaOpenFilesGrep: rbOpenFiles.Checked := True;
+    gaProjGroupGrep: rbAllProjGroupFiles.Checked := True;
+    gaResults: rbResults.Checked := True;
+    gaDirGrep:
+    begin
+      rbDirectories.Checked := True;
+      cbMasks.Text := Value.Mask;
+      cbDirectory.Text := Value.Directories;
+      cbInclude.Checked := Value.IncludeSubdirs;
+      cbExcludedDirs.Text := Value.ExcludedDirs;
+    end ;
+  end;
+  EnableDirectoryControls(rbDirectories.Checked);
 end;
 
 procedure TfmGrepSearch.FormShow(Sender: TObject);

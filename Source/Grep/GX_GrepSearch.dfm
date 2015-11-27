@@ -36,7 +36,6 @@ object fmGrepSearch: TfmGrepSearch
     Height = 22
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 15
-    ItemHeight = 14
     TabOrder = 0
     OnKeyDown = ComboKeyDown
   end
@@ -49,7 +48,7 @@ object fmGrepSearch: TfmGrepSearch
     TabOrder = 1
     object cbCaseSensitive: TCheckBox
       Left = 10
-      Top = 19
+      Top = 18
       Width = 200
       Height = 17
       Caption = '&Case sensitive'
@@ -57,7 +56,7 @@ object fmGrepSearch: TfmGrepSearch
     end
     object cbNoComments: TCheckBox
       Left = 10
-      Top = 101
+      Top = 119
       Width = 200
       Height = 17
       Caption = '&Ignore Delphi comments'
@@ -65,7 +64,7 @@ object fmGrepSearch: TfmGrepSearch
     end
     object cbForms: TCheckBox
       Left = 10
-      Top = 60
+      Top = 58
       Width = 200
       Height = 17
       Caption = 'Search for&m files'
@@ -73,7 +72,7 @@ object fmGrepSearch: TfmGrepSearch
     end
     object cbWholeWord: TCheckBox
       Left = 10
-      Top = 39
+      Top = 38
       Width = 200
       Height = 17
       Caption = '&Whole word'
@@ -81,11 +80,19 @@ object fmGrepSearch: TfmGrepSearch
     end
     object cbRegEx: TCheckBox
       Left = 10
-      Top = 80
+      Top = 98
       Width = 200
       Height = 17
       Caption = 'Regular e&xpression'
       TabOrder = 3
+    end
+    object cbSQLFiles: TCheckBox
+      Left = 10
+      Top = 78
+      Width = 200
+      Height = 17
+      Caption = 'Search S&QL files'
+      TabOrder = 5
     end
   end
   object gbxWhere: TGroupBox
@@ -198,7 +205,6 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 14
       TabOrder = 3
       OnKeyDown = ComboKeyDown
     end
@@ -218,7 +224,6 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 14
       TabOrder = 0
       OnDropDown = cbDirectoryDropDown
       OnKeyDown = ComboKeyDown
@@ -244,7 +249,6 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 14
       TabOrder = 2
       OnDropDown = cbExcludedDirsDropDown
       OnKeyDown = ComboKeyDown
