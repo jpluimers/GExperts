@@ -2621,12 +2621,10 @@ begin
 
   if not Form.Floating then
     Exit;
-  Rect := GetScreenWorkArea;
-  with Form do
-  begin
-    SetBounds((Rect.Right - Rect.Left - Width) div 2,
-      (Rect.Bottom - Rect.Top - Height) div 2, Width, Height);
-  end;
+
+  Rect := GetScreenWorkArea(Form);
+  Form.SetBounds(Rect.Left + (Rect.Right - Rect.Left - Form.Width) div 2,
+    Rect.Top + (Rect.Bottom - Rect.Top - Form.Height) div 2, Form.Width, Form.Height);
 end;
 
 function GetScreenWorkArea(const Form: TCustomForm = nil): TRect;
