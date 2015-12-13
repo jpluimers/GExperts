@@ -79,6 +79,10 @@ type
     procedure SetEnhanceToolProperties(const Value: Boolean);
     procedure SetEnhanceSearchPathAggressive(const Value: Boolean);
     function GetEnhanceSearchPathAggressive: Boolean;
+    function GetIdeFormsAllowResize: Boolean;
+    function GetIdeFormsRememberPosition: Boolean;
+    procedure SetIdeFormsAllowResize(const Value: Boolean);
+    procedure SetIdeFormsRememberPosition(const Value: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -89,6 +93,9 @@ type
 
     // IDE
     property EnhanceIDEForms: Boolean read GetEnhanceIDEForms write SetEnhanceIDEForms;
+    property IdeFormsAllowResize: Boolean read GetIdeFormsAllowResize write SetIdeFormsAllowResize;
+    property IdeFormsRememberPosition: Boolean read GetIdeFormsRememberPosition write SetIdeFormsRememberPosition;
+
     // Search path
     property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
     property EnhanceSearchPathAggressive: Boolean read GetEnhanceSearchPathAggressive write SetEnhanceSearchPathAggressive;
@@ -201,6 +208,16 @@ begin
   TGxIdeToolPropertiesEnhancer.SetEnabled(Value);
 end;
 
+procedure TIdeEnhancements.SetIdeFormsAllowResize(const Value: Boolean);
+begin
+  TIDEFormEnhancements.SetAllowResize(Value);
+end;
+
+procedure TIdeEnhancements.SetIdeFormsRememberPosition(const Value: Boolean);
+begin
+  TIDEFormEnhancements.SetRememberPosition(Value);
+end;
+
 destructor TIdeEnhancements.Destroy;
 begin
   if IsStandAlone then
@@ -226,6 +243,8 @@ begin
   with Settings do
     try
       EnhanceIDEForms := ReadBool(ConfigurationKey, 'EnhanceIDEForms', False);
+      IdeFormsAllowResize := ReadBool(ConfigurationKey, 'IdeFormsAllowResize', False);
+      IdeFormsRememberPosition := ReadBool(ConfigurationKey, 'IdeFormsRememberPosition', False);
       EnhanceSearchPath := ReadBool(ConfigurationKey, 'EnhanceSearchPath', False);
       EnhanceSearchPathAggressive := ReadBool(ConfigurationKey, 'EnhanceSearchPathAggressive', False);
       EnhanceToolProperties := ReadBool(ConfigurationKey, 'EnhanceToolProperties', False);
@@ -270,6 +289,8 @@ begin
   with Settings do
     try
       WriteBool(ConfigurationKey, 'EnhanceIDEForms', EnhanceIDEForms);
+      WriteBool(ConfigurationKey, 'IdeFormsAllowResize', IdeFormsAllowResize);
+      WriteBool(ConfigurationKey, 'IdeFormsRememberPosition', IdeFormsRememberPosition);
       WriteBool(ConfigurationKey, 'EnhanceSearchPath', EnhanceSearchPath);
       WriteBool(ConfigurationKey, 'EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
       WriteBool(ConfigurationKey, 'EnhanceToolProperties', EnhanceToolProperties);
@@ -726,6 +747,16 @@ end;
 function TIdeEnhancements.GetEnhanceToolProperties: Boolean;
 begin
    Result := TGxIdeToolPropertiesEnhancer.GetEnabled;
+end;
+
+function TIdeEnhancements.GetIdeFormsAllowResize: Boolean;
+begin
+  Result := TIDEFormEnhancements.GetAllowResize;
+end;
+
+function TIdeEnhancements.GetIdeFormsRememberPosition: Boolean;
+begin
+  Result := TIDEFormEnhancements.GetRememberPosition;
 end;
 
 function TIdeEnhancements.GetMultiLineTabDockHost: Boolean;

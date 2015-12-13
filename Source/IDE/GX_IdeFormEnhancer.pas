@@ -19,6 +19,10 @@ type
   public
     class function GetEnabled: Boolean;// static;
     class procedure SetEnabled(const Value: Boolean); //static;
+    class function GetAllowResize: Boolean; //static;
+    class procedure SetAllowResize(const Value: Boolean); //static;
+    class function GetRememberPosition: Boolean; //static;
+    class procedure SetRememberPosition(const Value: Boolean); //static;
     // Delphi 8- can't handle class properties
     //class property Enabled: Boolean read GetEnabled write SetEnabled;
     class function RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
@@ -63,18 +67,29 @@ type
     // Runtime properties
     Handle: HWnd;
     OldDestroy: TNotifyEvent;
+    FMinHeight: Integer; // if negative: Height is fixed
+    FMinWidth: Integer;
+    FItems: TStrings;
     // Methods
+    constructor Create;
     destructor Destroy; override;
     function GetRegistryKey: string;
     function FindSplitPanel(Form: TCustomForm): TCustomPanel;
     procedure SetComboDropDownCount(Control: TControl);
 
+    procedure PrepareForm(Form: TCustomForm);
     procedure DoMakeResizable(Form: TCustomForm);
     procedure DoCollapseTreeNodes(Form: TCustomForm);
     procedure DoSaveFormState(Form: TCustomForm);
     procedure DoLoadFormState(Form: TCustomForm);
     procedure DoResizePictureDialogs(Form: TCustomForm);
     procedure DoComboDropDownCount(Form: TCustomForm);
+  private
+    procedure MakeSearchFormResizable(Form: TCustomForm);
+    procedure FormCanResize(Sender: TObject; var NewWidth,
+      NewHeight: Integer; var Resize: Boolean);
+    procedure MakeReplaceFormResizable(Form: TCustomForm);
+    procedure MakePasEnvironmentDialogResizable(Form: TCustomForm);
   end;
 
   TManagedFormList = class(TObjectList)
@@ -107,6 +122,8 @@ type
     FIsInFormChangeCallback: Boolean;
     FControlChangeCallbacks: TList;
     FIsInControlChangeCallback: Boolean;
+    FAllowResize: boolean;
+    FRememberPosition: Boolean;
     procedure HookActiveControlChanged;
     procedure ProcessActivatedControl(Form: TCustomForm; Control: TWinControl);
   protected
@@ -129,14 +146,16 @@ type
     /// @Result is <> NIL if the registration worked, NIL otherwise </summary>
     function RegisterControlChangeCallback(_Callback: TOnActiveControlChanged): TControlChangeHandle;
     procedure UnregisterControlChangeCallback(_Handle: TControlChangeHandle);
+    property AllowResize: Boolean read FAllowResize write FAllowResize;
+    property RememberPosition: Boolean read FRememberPosition write FRememberPosition;
   end;
 
 const
   FormsToChange: array[0..4] of TFormChanges = (
     (
-      FormClassNames: 'TSrchDialog';
-      MakeResizable: False;
-      RememberSize: False;
+      FormClassNames: 'TSrchDialog;TRplcDialog';
+      MakeResizable: True;
+      RememberSize: True;
       RememberWidth: True;
       RememberPosition: False;
       RememberSplitterPosition: False;
@@ -167,7 +186,9 @@ const
       ComboDropDownCount: 15;
     ),
     (
-      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;TLoadProcessDialog;TDotNetOptionForm;TPasEnvironmentDialog;TPasEditorPropertyDialog;TCppProjOptsDlg;TReopenMenuPropertiesDialog';
+      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;TCppProjOptsDlg;TReopenMenuPropertiesDialog';
+      // TPasEnvironmentDialog;
+      // --> See comment in TManagedForm.PrepareForm why this not implemented 
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;
@@ -199,6 +220,12 @@ const
 var
   PrivateFormChangeManager: TFormChangeManager = nil;
 
+constructor TManagedForm.Create;
+begin
+  inherited Create;
+  FItems := TStringList.Create;
+end;
+
 destructor TManagedForm.Destroy;
 var
   Form: TCustomForm;
@@ -206,6 +233,7 @@ begin
   Form := PrivateFormChangeManager.FindScreenForm(FormClassName, Handle);
   if Assigned(Form) then
     THackForm(Form).OnDestroy := OldDestroy;
+  FItems.Free;
   inherited;
 end;
 
@@ -315,12 +343,233 @@ begin
   end;
 end;
 
+type
+  TCustomFormHack = class(TCustomForm)
+  end;
+
+procedure TManagedForm.FormCanResize(Sender: TObject; var NewWidth, NewHeight: Integer;
+  var Resize: Boolean);
+begin
+  if NewWidth < FMinWidth then
+    NewWidth := FMinWidth;
+  if (FMinHeight < 0) or (NewHeight < FMinHeight) then
+    NewHeight := Abs(FMinHeight);
+end;
+
+procedure TManagedForm.MakeSearchFormResizable(Form: TCustomForm);
+var
+  frm: TForm;
+  i: Integer;
+  cmp: TComponent;
+begin
+  // This is only ever called in Delphi6 because the Search form of later
+  // versions is already resizable.
+  frm := TForm(Form);
+  FMinHeight := -frm.Height;
+  FMinWidth := frm.Width;
+  frm.OnCanResize := FormCanResize;
+  for i := 0 to Form.ComponentCount - 1 do begin
+    cmp := Form.Components[i];
+    if cmp is TPageControl then begin
+      TPageControl(cmp).Anchors := [akLeft, akTop, akRight, akBottom];
+    end else if cmp is TButton then begin
+      TButton(cmp).Anchors := [akRight, akBottom];
+    end else if cmp is TCustomComboBox then begin
+      TCombobox(cmp).Anchors := [akLeft, akRight, akTop];
+    end else if cmp is TGroupBox then begin
+      if cmp.Name = 'GroupBox4' then begin
+        // stupid developer forgot to give it a meaningful name :-(
+        TGroupBox(cmp).Anchors := [akLeft, akRight, akTop];
+      end;
+    end;
+  end;
+end;
+
+procedure TManagedForm.MakeReplaceFormResizable(Form: TCustomForm);
+var
+  frm: TForm;
+  i: Integer;
+  cmp: TComponent;
+begin
+  // This is only ever called in Delphi6 because the Replace form of later
+  // versions is already resizable.
+  frm := TForm(Form);
+  FMinHeight := -frm.Height;
+  FMinWidth := frm.Width;
+  frm.OnCanResize := FormCanResize;
+  for i := 0 to Form.ComponentCount - 1 do begin
+    cmp := Form.Components[i];
+    if cmp is TPageControl then begin
+      TPageControl(cmp).Anchors := [akLeft, akTop, akRight, akBottom];
+    end else if cmp is TButton then begin
+      TButton(cmp).Anchors := [akRight, akBottom];
+    end else if cmp is TCustomComboBox then begin
+      TCombobox(cmp).Anchors := [akLeft, akRight, akTop];
+    end;
+  end;
+end;
+
+procedure TManagedForm.MakePasEnvironmentDialogResizable(Form: TCustomForm);
+var
+  VariableOptionsFrame: TWinControl;
+
+  function IsInVarOptionsFrame(_cmp: TComponent): boolean;
+  begin
+    Result := Assigned(VariableOptionsFrame) and (_cmp is TControl);
+    if Result then
+      Result := VariableOptionsFrame.ContainsControl(TControl(_cmp));
+  end;
+
+  procedure HandleComponent(_cmp: TComponent);
+  var
+    i: Integer;
+  begin
+    if _cmp.ClassNameIs('TVariableOptionsFrame') then begin
+      if SameText(_cmp.Name, 'VariableOptionsFrame') then begin
+        VariableOptionsFrame := TWinControl(_cmp);
+        VariableOptionsFrame.Align := alClient;
+      end;
+    end else if _cmp is TPageControl then begin
+      TPageControl(_cmp).Anchors := [akLeft, akTop, akRight, akBottom];
+    end else if _cmp is TPanel then begin
+      if SameText(_cmp.Name, 'ToolListPanel') or IsInVarOptionsFrame(_cmp) then
+        TPanel(_cmp).Anchors := [akLeft, akTop, akRight, akBottom];
+    end else if _cmp is TButton then begin
+      TButton(_cmp).Anchors := [akRight, akBottom];
+    end else if _cmp is TColorBox then begin
+      if SameText(_cmp.Name, 'cbColorPicker') then
+        TColorBox(_cmp).Anchors := [akLeft, akBottom];
+    end else if _cmp is TCustomComboBox then begin
+      if SameText(_cmp.Name, 'ecLibraryPath') or SameText(_cmp.Name, 'ecDLLOutput')
+        or SameText(_cmp.Name, 'ecDCPOutput') or SameText(_cmp.Name, 'ecBrowsing') then begin
+        TCombobox(_cmp).Anchors := [akLeft, akRight, akTop];
+      end;
+    end else if _cmp is TGroupBox then begin
+      if SameText(_cmp.Name, 'GroupBox10') or SameText(_cmp.Name, 'Repository') then begin
+        TGroupBox(_cmp).Anchors := [akLeft, akTop, akRight];
+      end else if SameText(_cmp.Name, 'gbColors') then begin
+        TGroupBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+      end else if IsInVarOptionsFrame(_cmp) then begin
+        if SameText(_cmp.Name, 'GroupBox1') then begin
+          TGroupBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+        end else if SameText(_cmp.Name, 'GroupBox2') then begin
+          TGroupBox(_cmp).Anchors := [akLeft, akBottom];
+        end;
+      end;
+    end else if _cmp is TListBox then begin
+      if SameText(_cmp.Name, 'lbColors')  then begin
+        TListBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+      end else if SameText(_cmp.Name, 'PageListBox') then begin
+        TListBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+        if (TListBox(_cmp).Items.Count = 0) and (FItems.Count <> 0) then
+          TListBox(_cmp).Items.Assign(FItems);
+      end;
+    end else if _cmp.ClassNameIs('TPropEdit') then begin
+      if SameText(_cmp.Name, 'ecRepositoryDir') then begin
+        TCustomEdit(_cmp).Anchors := [akLeft, akTop, akRight];
+      end;
+    end else if _cmp.ClassNameIs('THintListView') then begin
+      if IsInVarOptionsFrame(_cmp) then
+        TWinControl(_cmp).Anchors := [akLeft, akTop, akRight];
+    end;
+    for i := 0 to _cmp.ComponentCount - 1 do begin
+      HandleComponent(_cmp.Components[i]);
+    end;
+  end;
+
+var
+  frm: TForm;
+begin
+  // This is called in Delphi6 and Delphi 7 because the Environment form of later
+  // versions is already resizable.
+  frm := TForm(Form);
+  FMinHeight := frm.Height;
+  FMinWidth := frm.Width;
+  frm.OnCanResize := FormCanResize;
+  HandleComponent(frm);
+end;
+
+procedure TManagedForm.PrepareForm(Form: TCustomForm);
+var
+  PageListBox: TListBox;
+  ToolListBox: TListBox;
+
+  procedure HandleComponent(_cmp: TComponent);
+  var
+    i: Integer;
+  begin
+    if _cmp is TListBox then begin
+      if SameText(_cmp.Name, 'PageListBox') then begin
+        PageListBox := TListBox(_cmp);
+      end else if SameText(_cmp.Name, 'ToolListBox') then begin
+        ToolListBox := TListBox(_cmp);
+      end;
+    end;
+    for i := 0 to _cmp.ComponentCount - 1 do begin
+      HandleComponent(_cmp.Components[i]);
+    end;
+  end;
+
+begin
+  if Form.ClassName <> 'TPasEnvironmentDialog' then
+    Exit;
+
+  // This is called only in Delphi6 and Delphi 7 because the Environment form of later
+  // versions is already resizable.
+    
+  // The problem is that setting
+  // Form.BorderStyle
+  // recreates the window handle for the form.
+  // This in turn removes all items from the PageListBox (the listbox that
+  // contains the names of the tabs of the component palette).
+  // If it was just about the strings, we could save them and restore them
+  // after the handle was recreated, but unfortunately the Delphi developers
+  // chose to also store lists of the components shown on these tabs in
+  // PageListBox.Items.Objects[]. These lists store TComponentItem objects
+  // that are not a standard type (I only know what they are called because
+  // ClassName returns this name). The same items are stored in
+  // ToolListBox.Items.Objects[], so in theory we could convert the pointers
+  // into the index here and set them again.
+  // But that would just be quite a lot of work for a very small gain because
+  // Delphi 6 and 7 are the only versions that would get any adavantage from it and
+  // we may even drop support for them in the near future.
+  // I leave this code here just in case somebody else wants to make the effort.
+  // 2015-12-13 twm
+  Exit;
+
+  HandleComponent(Form);
+  Assert(Assigned(PageListBox));
+  Assert(Assigned(ToolListBox));
+end;
+
 procedure TManagedForm.DoMakeResizable(Form: TCustomForm);
+var
+  WasShowing: boolean;
 begin
   Assert(Assigned(Form));
-  if MakeResizable and (Form.BorderStyle <> bsSizeable) then
-    if RunningBDS2006OrGreater then // Delphi 6/7/8/2005 fail with an exception: "Can't change Visible in OnShow"
-      Form.BorderStyle := bsSizeable;
+  if MakeResizable and (Form.BorderStyle <> bsSizeable) then begin
+    PrepareForm(Form);
+    WasShowing := (fsShowing in TCustomFormHack(Form).FFormState);
+    if WasShowing then
+      Exclude(TCustomFormHack(Form).FFormState, fsShowing);
+    Form.BorderStyle := bsSizeable;
+    if WasShowing then begin
+      if Form.ClassName = 'TSrchDialog' then
+        MakeSearchFormResizable(Form)
+      else if Form.ClassName = 'TRplcDialog' then
+        MakeReplaceFormResizable(Form)
+      else if Form.ClassName = 'TPasEnvironmentDialog' then begin
+        // This is never called because TPasEnvironmentDialog was removed
+        // from the form list. See comment in TManagedForm.PrepareForm
+        // why.
+        MakePasEnvironmentDialogResizable(Form);
+      end;
+      Form.HandleNeeded;
+      Handle := Form.Handle;
+      SendMessage(Handle, CM_SHOWINGCHANGED, 0, 0)
+//      Include(TCustomFormHack(Form).FFormState, fsShowing);
+    end;
+  end;
 end;
 
 procedure TManagedForm.DoResizePictureDialogs(Form: TCustomForm);
@@ -545,11 +794,11 @@ begin
     ManagedForm := TManagedForm.Create;
     ManagedForm.FormClassName := Form.ClassName;
     ManagedForm.Handle := Form.Handle;
-    ManagedForm.MakeResizable := Changes.MakeResizable;
-    ManagedForm.RememberSize := Changes.RememberSize;
-    ManagedForm.RememberPosition := Changes.RememberPosition;
+    ManagedForm.MakeResizable := Changes.MakeResizable and AllowResize;
+    ManagedForm.RememberSize := Changes.RememberSize and AllowResize;
+    ManagedForm.RememberPosition := Changes.RememberPosition and RememberPosition;
     ManagedForm.RememberSplitterPosition := Changes.RememberSplitterPosition;
-    ManagedForm.RememberWidth := Changes.RememberWidth;
+    ManagedForm.RememberWidth := Changes.RememberWidth and AllowResize;
     ManagedForm.CollapseTreeNodes := Changes.CollapseTreeNodes;
     ManagedForm.ResizePictureDialogs := Changes.ResizePictureDialogs;
     ManagedForm.ComboDropDownCount := Changes.ComboDropDownCount;
@@ -693,9 +942,25 @@ end;
 
 { TIDEFormEnhancements }
 
+class function TIDEFormEnhancements.GetAllowResize: Boolean;
+begin
+  Result := Assigned(PrivateFormChangeManager) and PrivateFormChangeManager.AllowResize;
+end;
+
 class function TIDEFormEnhancements.GetEnabled: Boolean;
 begin
   Result := Assigned(PrivateFormChangeManager);
+end;
+
+class function TIDEFormEnhancements.GetRememberPosition: Boolean;
+begin
+  Result := Assigned(PrivateFormChangeManager) and PrivateFormChangeManager.RememberPosition;
+end;
+
+class procedure TIDEFormEnhancements.SetAllowResize(const Value: Boolean);
+begin
+  if Assigned(PrivateFormChangeManager) then
+    PrivateFormChangeManager.AllowResize := Value;
 end;
 
 class procedure TIDEFormEnhancements.SetEnabled(const Value: Boolean);
@@ -704,6 +969,12 @@ begin
     PrivateFormChangeManager := TFormChangeManager.Create
   else if not Value then
     FreeAndNil(PrivateFormChangeManager);
+end;
+
+class procedure TIDEFormEnhancements.SetRememberPosition(const Value: Boolean);
+begin
+  if Assigned(PrivateFormChangeManager) then
+    PrivateFormChangeManager.RememberPosition := Value;
 end;
 
 class function TIDEFormEnhancements.RegisterFormChangeCallback(_Callback: TOnActiveFormChanged): TFormChangeHandle;
