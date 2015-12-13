@@ -5,7 +5,7 @@ unit GX_About;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
+  Windows, Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
 
 type
   TfmAbout = class(TfmBaseForm)
@@ -31,6 +31,8 @@ type
   protected
     class function GetVersionStr: string;
     class function DoAddToAboutDialog: Integer; virtual;
+    class function GetAboutIcon: HBITMAP; virtual;
+    class function GetSplashIcon: HBITMAP; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     // If you release an experimental GExperts, either
@@ -56,7 +58,7 @@ implementation
 {$R GX_About.res}
 
 uses
-  Windows, SysUtils, Graphics, ToolsApi,
+  SysUtils, Graphics, ToolsApi,
   GX_GenericUtils, GX_FeedbackWizard;
 
 const
@@ -149,6 +151,20 @@ begin
   SuggestionEmail := ASuggestionEmail;
 end;
 
+class function TfmAbout.GetAboutIcon: HBITMAP;
+const
+  GX_ABOUT_ICON32 = 'GX32';
+begin
+  Result := LoadBitmap(HInstance, GX_ABOUT_ICON32);
+end;
+
+class function TfmAbout.GetSplashIcon: HBITMAP;
+const
+  GX_ABOUT_ICON24 = 'GX24';
+begin
+  Result := LoadBitmap(HInstance, GX_ABOUT_ICON24);
+end;
+
 class function TfmAbout.GetVersionStr: string;
 resourcestring
   SVersion = 'Version';
@@ -172,7 +188,7 @@ begin
   // Only Delphi 2005 and up support the splash screen services
   if Assigned(SplashScreenServices) then
     SplashScreenServices.AddPluginBitmap('GExperts',
-      LoadBitmap(HInstance, 'SplashAbout'), False, GetVersionStr);
+      GetSplashIcon, False, GetVersionStr);
 {$ENDIF GX_VER170_up}
 end;
 
@@ -192,7 +208,7 @@ begin
       + ' GExperts is developed as Open Source software and we encourage user contributions to the project.'#13#10
       + '(c) Erik Berry and the GExperts Team'#13#10
       + 'http://www.gexperts.org',
-      LoadBitmap(HInstance, 'SplashAbout'),
+      GetAboutIcon,
       False,
       '', // leave this empty!
       GetVersionStr);
