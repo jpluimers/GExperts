@@ -746,11 +746,6 @@ begin
   else
     StorageSection := Section;
 
-  if [fsSize] = FormSaveFlags then
-    TForm(Form).Position := poScreenCenter
-  else
-    TForm(Form).Position := poDesigned;
-
   if fsSize in FormSaveFlags then
   begin
     Form.Width := ReadInteger(StorageSection, 'Width', Form.Width);
@@ -763,6 +758,8 @@ begin
       Form.Top := ReadInteger(StorageSection, 'Top', Form.Top);
     end else
       CenterForm(Form)
+  end else begin
+    CenterForm(Form);
   end;
 end;
 

@@ -322,15 +322,15 @@ object fmConfiguration: TfmConfiguration
               ScrollBars = ssVertical
               TabOrder = 4
             end
-            object chkDisableEditorExperts: TCheckBox
+            object chkDisableAllEditorExperts: TCheckBox
               Left = 488
               Top = 22
               Width = 84
               Height = 21
               Anchors = [akTop, akRight]
-              Caption = '&Disable'
+              Caption = '&Disable all'
               TabOrder = 1
-              OnClick = chkDisableEditorExpertsClick
+              OnClick = chkDisableAllEditorExpertsClick
             end
             object lvEditorExperts: TListView
               Left = 10
@@ -364,14 +364,14 @@ object fmConfiguration: TfmConfiguration
         object gbxIDEMenu: TGroupBox
           Left = 8
           Top = 8
-          Width = 375
+          Width = 257
           Height = 70
           Caption = '&Menu'
           TabOrder = 0
           object chkAlphabetizeMenu: TCheckBox
             Left = 8
             Top = 22
-            Width = 364
+            Width = 241
             Height = 17
             Caption = 'Alphabetize the GExperts menu items'
             TabOrder = 0
@@ -379,23 +379,23 @@ object fmConfiguration: TfmConfiguration
           object chkPlaceGxMainMenuInToolsMenu: TCheckBox
             Left = 8
             Top = 41
-            Width = 364
+            Width = 241
             Height = 17
             Caption = 'Place GExperts menu under Tools'
             TabOrder = 1
           end
         end
         object gbxTabDockHost: TGroupBox
-          Left = 8
-          Top = 210
-          Width = 375
-          Height = 68
+          Left = 272
+          Top = 8
+          Width = 257
+          Height = 70
           Caption = 'Tab Dock &Hosts'
-          TabOrder = 2
+          TabOrder = 1
           object chkMultiLineTabDockHost: TCheckBox
             Left = 8
             Top = 22
-            Width = 364
+            Width = 241
             Height = 17
             Caption = 'Enable multiline tabs for docked forms'
             TabOrder = 0
@@ -404,7 +404,7 @@ object fmConfiguration: TfmConfiguration
           object chkDefaultMultiLineTabDockHost: TCheckBox
             Left = 24
             Top = 41
-            Width = 348
+            Width = 225
             Height = 17
             Caption = 'Default to multiline tabs'
             TabOrder = 1
@@ -412,15 +412,15 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 8
-          Top = 280
-          Width = 375
+          Top = 256
+          Width = 521
           Height = 165
           Caption = 'Component &Palette'
           TabOrder = 3
           object chkCPMultiLine: TCheckBox
             Left = 8
             Top = 22
-            Width = 364
+            Width = 505
             Height = 17
             Caption = 'Multiline tabs'
             TabOrder = 0
@@ -429,7 +429,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPAsButtons: TCheckBox
             Left = 8
             Top = 79
-            Width = 364
+            Width = 505
             Height = 17
             Caption = 'Show tabs as buttons'
             TabOrder = 3
@@ -438,7 +438,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPTabsInPopup: TCheckBox
             Left = 8
             Top = 118
-            Width = 364
+            Width = 505
             Height = 17
             Caption = 'Add popup menu/button with tab names'
             TabOrder = 5
@@ -447,7 +447,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPFlat: TCheckBox
             Left = 24
             Top = 98
-            Width = 348
+            Width = 489
             Height = 17
             Caption = 'Flat buttons'
             TabOrder = 4
@@ -455,7 +455,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPTabsInPopupAlphaSort: TCheckBox
             Left = 24
             Top = 137
-            Width = 348
+            Width = 489
             Height = 19
             Caption = 'Show tab names in alphabetical order'
             TabOrder = 6
@@ -463,7 +463,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPScrollOpposite: TCheckBox
             Left = 24
             Top = 41
-            Width = 348
+            Width = 489
             Height = 17
             Caption = 'Scroll &opposite'
             TabOrder = 1
@@ -471,7 +471,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPRaggedRight: TCheckBox
             Left = 24
             Top = 60
-            Width = 348
+            Width = 489
             Height = 17
             Caption = 'Ragged &right'
             TabOrder = 2
@@ -480,21 +480,21 @@ object fmConfiguration: TfmConfiguration
         object gbxIDEForms: TGroupBox
           Left = 8
           Top = 81
-          Width = 375
-          Height = 123
+          Width = 521
+          Height = 168
           Caption = 'IDE'
-          TabOrder = 1
+          TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
             Left = 8
             Top = 22
-            Width = 364
+            Width = 505
             Height = 17
             Hint = 
               'Enhance IDE options dialogs to allow resizing, remember position' +
               's, increase'#13'combobox DropDownCounts, resizable picture open dial' +
               'ogs, collapse Together'#13'options tree node, etc.  (Most enhancemen' +
               'ts require BDS 2006 or later)'
-            Caption = 'Enhance IDE dialogs (allow resize, remember position, etc.)'
+            Caption = 'Enhance IDE dialogs'
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
@@ -502,47 +502,63 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 98
-            Width = 364
+            Top = 146
+            Width = 505
             Height = 17
             Caption = 'Show object inspector font names using the font'
             TabOrder = 4
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
-            Top = 41
-            Width = 348
+            Top = 79
+            Width = 489
             Height = 17
             Caption = 'Enable drag && drop and autocomplete for search paths'
             TabOrder = 1
           end
           object chkEnhanceToolProperties: TCheckBox
             Left = 24
-            Top = 79
-            Width = 348
+            Top = 117
+            Width = 489
             Height = 17
             Caption = 'Enhance Tools menu Tool Properties dialog'
             TabOrder = 3
           end
           object chkReplaceListWithMemo: TCheckBox
             Left = 40
-            Top = 60
-            Width = 329
+            Top = 98
+            Width = 473
             Height = 17
             Caption = 'Replace path listbox with memo'
             TabOrder = 2
+          end
+          object chkAllowResize: TCheckBox
+            Left = 24
+            Top = 41
+            Width = 489
+            Height = 17
+            Caption = 'Allow resize (and remember size)'
+            TabOrder = 5
+          end
+          object chkRememberPosition: TCheckBox
+            Left = 24
+            Top = 60
+            Width = 489
+            Height = 17
+            Caption = 'Remember position'
+            TabOrder = 6
           end
         end
       end
       object tshEditor: TTabSheet
         Caption = 'Code Editor'
-        object gbxEditor: TGroupBox
+        object gbxEditorTabs: TGroupBox
           Left = 8
-          Top = 8
+          Top = 192
           Width = 225
           Height = 121
           Caption = 'Editor T&abs'
-          TabOrder = 0
+          TabOrder = 1
           object chkMultiLine: TCheckBox
             Left = 8
             Top = 21
@@ -586,13 +602,13 @@ object fmConfiguration: TfmConfiguration
             TabOrder = 1
           end
         end
-        object gbxToolBar: TGroupBox
+        object gbxEditorToolBar: TGroupBox
           Left = 8
-          Top = 138
+          Top = 10
           Width = 225
           Height = 172
           Caption = 'Editor &Toolbar'
-          TabOrder = 1
+          TabOrder = 0
           object chkEditorToolBar: TCheckBox
             Left = 8
             Top = 21
@@ -631,7 +647,7 @@ object fmConfiguration: TfmConfiguration
           Width = 238
           Height = 17
           Caption = '&Disable all editor enhancements'
-          TabOrder = 2
+          TabOrder = 3
           OnClick = chkDisableEDTEnhancementsClick
         end
         object chk_HideNavbar: TCheckBox
@@ -640,7 +656,7 @@ object fmConfiguration: TfmConfiguration
           Width = 210
           Height = 17
           Caption = 'Hide Navigation Bar (Delphi 10 up)'
-          TabOrder = 3
+          TabOrder = 2
         end
       end
       object tshDebug: TTabSheet
@@ -892,7 +908,7 @@ object fmConfiguration: TfmConfiguration
     Enabled = False
     Interval = 10
     OnTimer = tmrFilterTimer
-    Left = 16
-    Top = 176
+    Left = 352
+    Top = 392
   end
 end

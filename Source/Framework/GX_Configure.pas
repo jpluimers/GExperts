@@ -20,11 +20,11 @@ type
     tshIDE: TTabSheet;
     tshEditorExperts: TTabSheet;
     tshEditor: TTabSheet;
-    gbxEditor: TGroupBox;
+    gbxEditorTabs: TGroupBox;
     chkMultiLine: TCheckBox;
     chkHotTrack: TCheckBox;
     chkButtons: TCheckBox;
-    gbxToolBar: TGroupBox;
+    gbxEditorToolBar: TGroupBox;
     chkEditorToolBar: TCheckBox;
     gbxIDEMenu: TGroupBox;
     dlgUIFont: TFontDialog;
@@ -77,7 +77,7 @@ type
     btnConfigure: TButton;
     btnShortcut: TButton;
     meHelp: TMemo;
-    chkDisableEditorExperts: TCheckBox;
+    chkDisableAllEditorExperts: TCheckBox;
     lvEditorExperts: TListView;
     pnlGeneral: TPanel;
     gbxLocations: TGroupBox;
@@ -107,6 +107,8 @@ type
     chkEnhanceSearchPaths: TCheckBox;
     chkEnhanceToolProperties: TCheckBox;
     chkReplaceListWithMemo: TCheckBox;
+    chkAllowResize: TCheckBox;
+    chkRememberPosition: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -118,7 +120,7 @@ type
     procedure btnConfigureClick(Sender: TObject);
     procedure btnShortCutClick(Sender: TObject);
     procedure EditShortCutClick(Sender: TObject);
-    procedure chkDisableEditorExpertsClick(Sender: TObject);
+    procedure chkDisableAllEditorExpertsClick(Sender: TObject);
     procedure chkFontEnabledClick(Sender: TObject);
     procedure btnFontClick(Sender: TObject);
     procedure chkDisableEDTEnhancementsClick(Sender: TObject);
@@ -151,8 +153,8 @@ type
     FOIFont: TFont;
     FCPFont: TFont;
     FThumbSize: Integer;
-    procedure DisableUnsupportedIdeItems;
-    procedure DisableUnsupportedEditorItems;
+    procedure HideUnsupportedIdeItems;
+    procedure HideUnsupportedEditorItems;
     procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert);
     procedure LoadExperts;
     procedure SaveExperts;
@@ -174,6 +176,7 @@ type
     procedure edVCLPathOnDropFiles(_Sender: TObject; _Files: TStrings);
     procedure edConfigPathDropFiles(_Sender: TObject; _Files: TStrings);
     procedure edHelpFileDropFiles(_Sender: TObject; _Files: TStrings);
+    procedure UpdateIdeDialogCheckboxes;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -227,7 +230,7 @@ begin
   LoadGeneral;
 
   LoadEditorExperts;
-  chkDisableEditorExperts.Checked := not ConfigInfo.EditorExpertsEnabled;
+  chkDisableAllEditorExperts.Checked := not ConfigInfo.EditorExpertsEnabled;
 
   LoadIdeEnhancements;
 
@@ -237,7 +240,9 @@ begin
   LoadEditorEnhancements;
   chkEditorKeyTracing.Checked := GxOtaGetEditorKeyTracingEnabled;
   chkDisableEDTEnhancements.Checked := not EditorEnhancements.Enabled;
-  DisableUnsupportedIdeItems;
+  HideUnsupportedIdeItems;
+
+  HideUnsupportedEditorItems;
 
   tshDebug.TabVisible := False;
 end;
@@ -528,12 +533,6 @@ procedure TfmConfiguration.LoadIdeEnhancements;
 begin
   Assert(IdeEnhancements <> nil);
 
-  if not EditorEnhancementsPossible then
-    tshEditor.TabVisible := False;
-  gbxEditor.Enabled := RunningDelphi7OrLess;
-
-  if not ComponentPaletteAvailable then
-    gbxCompPalette.Visible := False;
   // Multi-line component palette
   chkCPMultiLine.Checked := IdeEnhancements.CPMultiLine;
   chkCPAsButtons.Checked := IdeEnhancements.CPAsButtons;
@@ -548,9 +547,12 @@ begin
   chkDefaultMultiLineTabDockHost.Checked := IdeEnhancements.DefaultMultiLineTabDockHost;
 
   chkEnhanceDialogs.Checked := IdeEnhancements.EnhanceIDEForms;
+  chkAllowResize.Checked := IdeEnhancements.IdeFormsAllowResize;
+  chkRememberPosition.Checked := IdeEnhancements.IdeFormsRememberPosition;
   chkEnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
   chkReplaceListWithMemo.Checked := IdeEnhancements.EnhanceSearchPathAggressive;
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
+  UpdateIdeDialogCheckboxes;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
   FCPFont.Assign(IdeEnhancements.CPFont);
@@ -619,6 +621,8 @@ begin
   IdeEnhancements.CPFont.Assign(FCPFont);
 
   IdeEnhancements.EnhanceIDEForms := chkEnhanceDialogs.Checked;
+  IdeEnhancements.IdeFormsAllowResize := chkAllowResize.Checked;
+  IdeEnhancements.IdeFormsRememberPosition := chkRememberPosition.Checked;
   IdeEnhancements.EnhanceSearchPath := chkEnhanceSearchPaths.Checked;
   IdeEnhancements.EnhanceSearchPathAggressive := chkReplaceListWithMemo.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
@@ -674,11 +678,11 @@ begin
   EditorEnhancements.ApplyToolbarSettings;
 end;
 
-procedure TfmConfiguration.chkDisableEditorExpertsClick(Sender: TObject);
+procedure TfmConfiguration.chkDisableAllEditorExpertsClick(Sender: TObject);
 var
   Enable: Boolean;
 begin
-  Enable := not chkDisableEditorExperts.Checked;
+  Enable := not chkDisableAllEditorExperts.Checked;
   meHelp.Lines.Clear;
   if not Enable then
   begin
@@ -707,37 +711,34 @@ var
   EnableState: Boolean;
 begin
   EnableState := not chkDisableEDTEnhancements.Checked;
-  SetupGroupBox(gbxEditor, EnableState and RunningDelphi7OrLess);
-  SetupGroupBox(gbxToolBar, EnableState);
+  SetupGroupBox(gbxEditorTabs, EnableState);
+  SetupGroupBox(gbxEditorToolBar, EnableState);
   chkEditorToolBarClick(chkEditorToolBar);
   chkButtonsClick(chkButtons);
-
-  DisableUnsupportedEditorItems;
 end;
 
-procedure TfmConfiguration.DisableUnsupportedIdeItems;
+procedure TfmConfiguration.HideUnsupportedIdeItems;
 begin
-  // Option not integrated yet
-  lblMinutes.Enabled := False;
-  edtMinutes.Enabled := False;
-  udMinutes.Enabled := False;
-  lblEvery.Enabled := False;
-  chkAutoSave.Enabled := False;
-  if not MultilineTabDockHostPossible then
-    SetupGroupBox(gbxTabDockHost, False);
-  if not ComponentPaletteAvailable then
-  begin
-    btnCPFont.Enabled := False;
-    chkCPFontEnabled.Enabled := False;
+  if not MultilineTabDockHostPossible then begin
+    gbxIDEMenu.Width := gbxTabDockHost.Left + gbxTabDockHost.Width - gbxIDEMenu.Left;
+    gbxTabDockHost.Visible := False;
   end;
-{$ifndef GX_VER300_up}
-  chk_HideNavbar.Enabled := False;
-{$endif}
+
+  if not ComponentPaletteAvailable then begin
+    gbxCompPalette.Visible := False;
+    // these are on the debug tab and normally not visible
+    btnCPFont.Visible := False;
+    chkCPFontEnabled.Visible := False;
+  end;
 end;
 
-procedure TfmConfiguration.DisableUnsupportedEditorItems;
+procedure TfmConfiguration.HideUnsupportedEditorItems;
 begin
-  // Nothing in here at this time.
+  tshEditor.TabVisible := EditorEnhancementsPossible;
+  gbxEditorTabs.Visible := RunningDelphi7OrLess;
+{$ifndef GX_VER300_up}
+  chk_HideNavbar.Visible := False;
+{$endif}
 end;
 
 procedure TfmConfiguration.chkFontEnabledClick(Sender: TObject);
@@ -816,7 +817,6 @@ begin
                  not chkDisableEDTEnhancements.Checked;
 
   chkEditTabButtonsFlat.Enabled := EnableState;
-  DisableUnsupportedEditorItems;
 end;
 
 procedure TfmConfiguration.chkEditorToolBarClick(Sender: TObject);
@@ -1067,12 +1067,18 @@ begin
 end;
 
 procedure TfmConfiguration.chkEnhanceDialogsClick(Sender: TObject);
+begin
+  UpdateIdeDialogCheckboxes;
+end;
+
+procedure TfmConfiguration.UpdateIdeDialogCheckboxes;
 var
   EnableState: Boolean;
 begin
-  EnableState := (Sender as TCheckBox).Checked and
-                 (Sender as TCheckBox).Enabled;
-
+  EnableState := chkEnhanceDialogs.Checked and
+                 chkEnhanceDialogs.Enabled;
+  chkAllowResize.Enabled := EnableState;
+  chkRememberPosition.Enabled := EnableState;
   chkEnhanceSearchPaths.Enabled := EnableState;
   chkEnhanceToolProperties.Enabled := EnableState;
   chkReplaceListWithMemo.Enabled := EnableState;
