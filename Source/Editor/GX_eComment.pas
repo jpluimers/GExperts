@@ -10,10 +10,10 @@ uses
 
 type
 //  //        ctSlash
-//  { }       ctPascal
-//  -- (SQL)  ctSQL
-//  /* */     ctCpp
 //  (* *)     ctC
+//  { }       ctPascal
+//  /* */     ctCpp
+//  -- (SQL)  ctSQL
   TCommentType = (ctSlash, ctC, ctPascal, ctCpp, ctSQL);
 
   TExtensionStyle = class(TObject)
@@ -101,6 +101,8 @@ type
     FStyles: TCommentStyles;
     FCurrStyle: TExtensionStyle;
     FCurrIndex: Integer;
+    function  ConvertStyleTypeToViewedType(AStyleType: TCommentType): Integer;
+    function  ConvertViewedTypeToStyleType(AViewedType: Integer): TCommentType;
   protected
     procedure Initialize;
   end;
@@ -593,13 +595,34 @@ begin
  lvStyles.ItemIndex := 0;
 end;
 
+//  //        ctSlash
+//  { }       ctPascal
+//  -- (SQL)  ctSQL
+//  /* */     ctCpp
+//  (* *)     ctC
+//  TCommentType = (ctSlash, ctC, ctPascal, ctCpp, ctSQL);
+
+function TfmCommentConfig.ConvertStyleTypeToViewedType(AStyleType: TCommentType): Integer;
+const
+  cCommentTypeArray: array[TCommentType] of Integer = (0, 4, 1, 3, 2);
+begin
+  Result := cCommentTypeArray[AStyleType];
+end;
+
+function TfmCommentConfig.ConvertViewedTypeToStyleType(AViewedType: Integer): TCommentType;
+const
+  cViewedArray: array[0..Integer(High(TCommentType))] of TCommentType = (ctSlash, ctPascal, ctSQL, ctCpp, ctC);
+begin
+  Result := cViewedArray[AViewedType];
+end;
+
 procedure TfmCommentConfig.lvStylesData(Sender: TObject; Item: TListItem);
 var
   AStyle: TExtensionStyle;
 begin
   AStyle := TExtensionStyle(FStyles.Objects[Item.Index]);
   Item.Caption := AStyle.Extensions;
-  Item.SubItems.Add( rgStyle.Items[ Integer(AStyle.CommentType) ] );
+  Item.SubItems.Add( rgStyle.Items[ ConvertStyleTypeToViewedType(AStyle.CommentType) ] );
   Item.SubItems.Add( BoolToStr(AStyle.InsertRemoveSpace, True) );
 end;
 
@@ -612,7 +635,7 @@ begin
   FCurrStyle := TExtensionStyle(FStyles.Objects[FCurrIndex]);
   eExtensions.Text := FCurrStyle.Extensions;
   eExtensions.ReadOnly := FCurrStyle.IsDefault;
-  rgStyle.ItemIndex := Integer(FCurrStyle.CommentType);
+  rgStyle.ItemIndex := ConvertStyleTypeToViewedType(FCurrStyle.CommentType);
   chkInsertSpace.Checked := FCurrStyle.InsertRemoveSpace;
   btnDelete.Enabled := not FCurrStyle.IsDefault;
 end;
@@ -646,7 +669,7 @@ end;
 
 procedure TfmCommentConfig.rgStyleClick(Sender: TObject);
 begin
-  FCurrStyle.CommentType := TCommentType(rgStyle.ItemIndex);
+  FCurrStyle.CommentType := ConvertViewedTypeToStyleType(rgStyle.ItemIndex);
   lvStyles.Refresh;
 end;
 
