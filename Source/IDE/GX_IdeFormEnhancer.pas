@@ -511,12 +511,13 @@ begin
     WasShowing := (fsShowing in TCustomFormHack(Form).FFormState);
     if WasShowing then
       Exclude(TCustomFormHack(Form).FFormState, fsShowing);
-    Handle := Form.Handle;
     if WasShowing then begin
-      ForceVisibleToBeSizable(Handle);
+      ForceVisibleToBeSizable(Form.Handle);
     end else begin
       Form.BorderStyle := bsSizeable;
+      Form.HandleNeeded;
     end;
+    Handle := Form.Handle;
     if Form.ClassName = 'TSrchDialog' then
       MakeSearchFormResizable(Form)
     else if Form.ClassName = 'TRplcDialog' then
