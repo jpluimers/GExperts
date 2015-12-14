@@ -77,7 +77,6 @@ type
     function FindSplitPanel(Form: TCustomForm): TCustomPanel;
     procedure SetComboDropDownCount(Control: TControl);
 
-    procedure PrepareForm(Form: TCustomForm);
     procedure DoMakeResizable(Form: TCustomForm);
     procedure DoCollapseTreeNodes(Form: TCustomForm);
     procedure DoSaveFormState(Form: TCustomForm);
@@ -90,6 +89,7 @@ type
       NewHeight: Integer; var Resize: Boolean);
     procedure MakeReplaceFormResizable(Form: TCustomForm);
     procedure MakePasEnvironmentDialogResizable(Form: TCustomForm);
+    procedure ForceVisibleToBeSizable(WndHandle: HWND);
   end;
 
   TManagedFormList = class(TObjectList)
@@ -186,9 +186,9 @@ const
       ComboDropDownCount: 15;
     ),
     (
-      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;TCppProjOptsDlg;TReopenMenuPropertiesDialog';
-      // TPasEnvironmentDialog;
-      // --> See comment in TManagedForm.PrepareForm why this not implemented 
+      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;'
+        + 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
+        + 'TCppProjOptsDlg;TPasEnvironmentDialog;TReopenMenuPropertiesDialog';
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;
@@ -489,57 +489,17 @@ begin
   HandleComponent(frm);
 end;
 
-procedure TManagedForm.PrepareForm(Form: TCustomForm);
-var
-  PageListBox: TListBox;
-  ToolListBox: TListBox;
-
-  procedure HandleComponent(_cmp: TComponent);
-  var
-    i: Integer;
-  begin
-    if _cmp is TListBox then begin
-      if SameText(_cmp.Name, 'PageListBox') then begin
-        PageListBox := TListBox(_cmp);
-      end else if SameText(_cmp.Name, 'ToolListBox') then begin
-        ToolListBox := TListBox(_cmp);
-      end;
-    end;
-    for i := 0 to _cmp.ComponentCount - 1 do begin
-      HandleComponent(_cmp.Components[i]);
-    end;
-  end;
-
+procedure TManagedForm.ForceVisibleToBeSizable(WndHandle: HWND);
 begin
-  if Form.ClassName <> 'TPasEnvironmentDialog' then
-    Exit;
-
-  // This is called only in Delphi6 and Delphi 7 because the Environment form of later
-  // versions is already resizable.
-    
-  // The problem is that setting
-  // Form.BorderStyle
-  // recreates the window handle for the form.
-  // This in turn removes all items from the PageListBox (the listbox that
-  // contains the names of the tabs of the component palette).
-  // If it was just about the strings, we could save them and restore them
-  // after the handle was recreated, but unfortunately the Delphi developers
-  // chose to also store lists of the components shown on these tabs in
-  // PageListBox.Items.Objects[]. These lists store TComponentItem objects
-  // that are not a standard type (I only know what they are called because
-  // ClassName returns this name). The same items are stored in
-  // ToolListBox.Items.Objects[], so in theory we could convert the pointers
-  // into the index here and set them again.
-  // But that would just be quite a lot of work for a very small gain because
-  // Delphi 6 and 7 are the only versions that would get any adavantage from it and
-  // we may even drop support for them in the near future.
-  // I leave this code here just in case somebody else wants to make the effort.
-  // 2015-12-13 twm
-  Exit;
-
-  HandleComponent(Form);
-  Assert(Assigned(PageListBox));
-  Assert(Assigned(ToolListBox));
+  // this is taken from http://stackoverflow.com/a/34255563/49925
+  SetWindowLong(WndHandle, GWL_STYLE,
+    GetWindowLong(WndHandle, GWL_STYLE) and not WS_POPUP or WS_THICKFRAME);
+  SetWindowLong(WndHandle, GWL_EXSTYLE,
+    GetWindowLong(WndHandle, GWL_EXSTYLE) and not WS_EX_DLGMODALFRAME);
+  InsertMenu(GetSystemMenu(WndHandle, False), 1, MF_STRING or MF_BYPOSITION, SC_SIZE, 'Size');
+  SetWindowPos(WndHandle, 0, 0, 0, 0, 0,
+    SWP_NOSIZE or SWP_NOMOVE or SWP_NOZORDER or SWP_FRAMECHANGED);
+  DrawMenuBar(WndHandle);
 end;
 
 procedure TManagedForm.DoMakeResizable(Form: TCustomForm);
@@ -548,26 +508,23 @@ var
 begin
   Assert(Assigned(Form));
   if MakeResizable and (Form.BorderStyle <> bsSizeable) then begin
-    PrepareForm(Form);
     WasShowing := (fsShowing in TCustomFormHack(Form).FFormState);
     if WasShowing then
       Exclude(TCustomFormHack(Form).FFormState, fsShowing);
-    Form.BorderStyle := bsSizeable;
+    Handle := Form.Handle;
     if WasShowing then begin
-      if Form.ClassName = 'TSrchDialog' then
-        MakeSearchFormResizable(Form)
-      else if Form.ClassName = 'TRplcDialog' then
-        MakeReplaceFormResizable(Form)
-      else if Form.ClassName = 'TPasEnvironmentDialog' then begin
-        // This is never called because TPasEnvironmentDialog was removed
-        // from the form list. See comment in TManagedForm.PrepareForm
-        // why.
-        MakePasEnvironmentDialogResizable(Form);
-      end;
-      Form.HandleNeeded;
-      Handle := Form.Handle;
-      SendMessage(Handle, CM_SHOWINGCHANGED, 0, 0)
-//      Include(TCustomFormHack(Form).FFormState, fsShowing);
+      ForceVisibleToBeSizable(Handle);
+    end else begin
+      Form.BorderStyle := bsSizeable;
+    end;
+    if Form.ClassName = 'TSrchDialog' then
+      MakeSearchFormResizable(Form)
+    else if Form.ClassName = 'TRplcDialog' then
+      MakeReplaceFormResizable(Form)
+    else if Form.ClassName = 'TPasEnvironmentDialog' then
+      MakePasEnvironmentDialogResizable(Form);
+    if WasShowing then begin
+      SendMessage(Handle, CM_SHOWINGCHANGED, 0, 0);
     end;
   end;
 end;
