@@ -5,11 +5,11 @@ unit GX_OtaUtils;
 interface
 
 uses
-  SysUtils, Classes, Controls, Forms, ActnList, ImgList, Menus, ToolsAPI,
+  SysUtils, Classes, Controls, Contnrs, Forms, ActnList, ImgList, Menus, ToolsAPI,
   {$IFDEF GX_VER240_up}
   System.Actions,
   {$ENDIF GX_VER240_up}
-  GX_GenericUtils, Contnrs;
+  GX_GenericUtils, GX_IdeUtils;
 
 // Returns the TObject represented by an IOTAComponent, if possible
 function GxOtaGetNativeObject(const AComponent: IOTAComponent): TObject;
@@ -559,21 +559,25 @@ procedure GxOtaShowProjectModuleInformation;
 procedure GxOtaShowIDEActions;
 procedure GxOtaShowEditViewDetails;
 
-{$IFDEF GX_VER160_up}
-function ConvertToIDEEditorString(const S: string): UTF8String; overload;
-function IDEEditorStringToString(const S: UTF8String): string; overload;
-function IDEEditorStringToUnicodeString(const S: UTF8String): TGXUnicodeString;
-{$ELSE}
-function ConvertToIDEEditorString(const S: string): string; overload;
-{$ENDIF}
-{$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
-function IDEEditorStringToString(const S: string): string; overload;
-{$IFEND}
-
-{$IFNDEF GX_VER200_up}
+{$IFNDEF GX_VER160_up}
+// Delphi 6/7: IDE is non-unicode, string is ansistring
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: IDEEditBufferString): string;
 function UTF8ToUnicodeString(S: UTF8String): WideString;
-function ConvertToIDEEditorString(const S: TGXUnicodeString): UTF8String; overload;
-{$ENDIF}
+{$ELSE GX_VER160_up}
+// Delphi 8+
+{$IFNDEF GX_VER200_up}
+// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: IDEEditBufferString): string;
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+{$ELSE GX_VER200_up}
+// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: string): string; overload;
+function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
+{$ENDIF GX_VER200_up}
+{$ENDIF GX_VER160_up}
 
 function HackBadIDEUTF8StringToString(const S: string): string;
 // Convert an editor string (UTF-8) possibly improperly stored in an
@@ -619,7 +623,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
-  GX_EditReader, GX_IdeUtils, GX_VerDepConst, SynUnicode, Math,
+  GX_EditReader, GX_VerDepConst, SynUnicode, Math,
   GX_GetIdeVersion;
 
 const
@@ -4637,52 +4641,71 @@ begin
   end;
 end;
 
-{$IFNDEF GX_VER200_up}
-function ConvertToIDEEditorString(const S: TGXUnicodeString): UTF8String;
-begin
-  Result := UTF8Encode(s);
-end;
-{$ENDIF}
+{$IFNDEF GX_VER160_up}
+// Delphi 6/7: IDE is non-unicode, string is ansistring
 
-{$IFDEF GX_VER160_up}
-function IDEEditorStringToString(const S: UTF8String): string;
+// no conversion necessary
+function ConvertToIDEEditorString(const S: string): string;
+begin
+  Result := S;
+end;
+
+// no conversion necessary
+function IDEEditorStringToString(const S: string): string;
+begin
+  Result := S;
+end;
+
+// converting AnsiString to WideString is done automatically on assignment
+function UTF8ToUnicodeString(S: UTF8String): WideString;
 begin
   Result := Utf8ToAnsi(S);
 end;
+
+{$ELSE GX_VER160_up}
+// Delphi 8+
+{$IFNDEF GX_VER200_up}
+// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
 
 function ConvertToIDEEditorString(const S: string): UTF8String;
 begin
   Result := AnsiToUtf8(S);
 end;
 
-function IDEEditorStringToUnicodeString(const S: UTF8String): TGXUnicodeString;
+function IDEEditorStringToString(const S: UTF8String): string;
 begin
-  {$IFDEF UNICODE}
-  Result := TGXUnicodeString(S);
-  {$ELSE}
-  Result := UTF8Decode(S);
-  {$ENDIF}
+  Result := Utf8ToAnsi(S);
 end;
-{$ELSE}
-function ConvertToIDEEditorString(const S: string): string;
-begin
-  Result := S;
-end;
-{$ENDIF}
 
-{$IF Defined(GX_VER200_up) or not Defined(GX_VER160_up)}
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := UTF8Decode(S);
+end;
+
+{$ELSE GX_VER200_up}
+// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
+
+function ConvertToIDEEditorString(const S: string): UTF8String;
+begin
+  Result := UTF8Encode(s);
+end;
+
 function IDEEditorStringToString(const S: string): string;
 begin
   Result := S;
 end;
-{$IFEND}
 
-{$IFNDEF GX_VER200_up}
+function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
 function UTF8ToUnicodeString(S: UTF8String): WideString;
 begin
   Result := Utf8ToAnsi(S);
 end;
-{$ENDIF}
+{$ENDIF GX_VER200_up}
+{$ENDIF GX_VER160_up}
 
 function HackBadIDEUTF8StringToString(const S: string): string;
 begin
