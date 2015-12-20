@@ -58,6 +58,7 @@ implementation
 {$R GX_About.res}
 
 uses
+  {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Graphics, ToolsApi,
   GX_GenericUtils, GX_FeedbackWizard;
 
@@ -182,14 +183,90 @@ begin
     Result := Result + '.' + IntToStr(Version.Build);
 end;
 
+{$IFOPT D+}
+procedure SendDebugComponent(_cmp: TComponent; _Recursive: Boolean = False; _Prefix: string = '');
+var
+  i: integer;
+begin
+  SendDebug(_Prefix + _cmp.Name + ': ' + _cmp.ClassName);
+  if  _Recursive and (_cmp.ComponentCount > 0) then begin
+    SendIndent;
+    for i := 0 to _cmp.ComponentCount - 1 do begin
+      SendDebugComponent(_cmp.Components[i], _Recursive, '(' + IntToStr(i) + ') ');
+    end;
+    SendUnIndent;
+  end;
+end;
+{$ENDIF}
+
+procedure AddPluginToSplashScreen(_Icon: HBITMAP; const _Title: string; const _Version: string);
+{$IFDEF GX_VER170_up}
+// Only Delphi 2005 and up support the splash screen services
+begin
+  if Assigned(SplashScreenServices) then
+    SplashScreenServices.AddPluginBitmap(_Title,
+      _Icon, False, _Version);
+end;
+{$ELSE GX_VER170_up}
+const
+  XPOS = 140;
+  YPOS = 150;
+  PluginLogoStr = 'PluginLogo';
+var
+  imgLogo: TImage;
+  lblTitle: TLabel;
+  lblVersion: TLabel;
+  i: integer;
+  PluginIdx: integer;
+  frm: TCustomForm;
+begin
+{$IFOPT D+} SendDebug('Screen.Forms[]:'); {$ENDIF}
+{$IFOPT D+} SendIndent; {$ENDIF}
+  for i := 0 to Screen.FormCount - 1 do begin
+    frm := Screen.Forms[i];
+    if (frm.Name = 'SplashScreen') and frm.ClassNameIs('TForm') then begin
+      {$IFOPT D+} SendDebugComponent(frm, True, '(' + IntToStr(i) + ') '); {$ENDIF}
+      PluginIdx := 0;
+      while frm.FindComponent(PluginLogoStr + IntToStr(PluginIdx)) <> nil do
+        Inc(PluginIdx);
+
+      imgLogo := TImage.Create(frm);
+      imgLogo.Name := PluginLogoStr + IntToStr(PluginIdx);
+      imgLogo.Parent := frm;
+      imgLogo.AutoSize := True;
+      imgLogo.Picture.Bitmap.Handle := _Icon;
+      imgLogo.Left := XPOS;
+      imgLogo.Top := YPOS + 32 * PluginIdx;
+
+      lblTitle := TLabel.Create(frm);
+      lblTitle.Name := 'PluginTitle' + IntToStr(PluginIdx);
+      lblTitle.Parent := frm;
+      lblTitle.Caption := _Title;
+      lblTitle.Top := imgLogo.Top;
+      lblTitle.Left := imgLogo.Left + 32 + 8;
+      lblTitle.Transparent := True;
+      lblTitle.Font.Color := clWhite;
+      lblTitle.Font.Style := [fsbold];
+
+      lblVersion := TLabel.Create(frm);
+      lblVersion.Name := 'PluginVersion' + IntToStr(PluginIdx);
+      lblVersion.Parent := frm;
+      lblVersion.Caption := _Version;
+      lblVersion.Top := imgLogo.Top + lblTitle.Height;
+      lblVersion.Left := imgLogo.Left + 32 + 20;
+      lblVersion.Transparent := True;
+      lblVersion.Font.Color := clWhite;
+    end else begin
+      {$IFOPT D+} SendDebugComponent(frm, False, '(' + IntToStr(i) + ') '); {$ENDIF}
+    end;
+  end;
+{$IFOPT D+} SendUnIndent; {$ENDIF}
+end;
+{$ENDIF GX_VER170_up}
+
 class procedure TfmAbout.AddToSplashScreen;
 begin
-{$IFDEF GX_VER170_up}
-  // Only Delphi 2005 and up support the splash screen services
-  if Assigned(SplashScreenServices) then
-    SplashScreenServices.AddPluginBitmap('GExperts',
-      GetSplashIcon, False, GetVersionStr);
-{$ENDIF GX_VER170_up}
+  AddPluginToSplashScreen(GetAboutIcon, 'GExperts', GetVersionStr);
 end;
 
 class function TfmAbout.DoAddToAboutDialog: Integer;
