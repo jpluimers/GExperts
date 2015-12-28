@@ -44,6 +44,7 @@ inherited fmGrepResults: TfmGrepResults
       AutoSnap = False
       Beveled = True
       MinSize = 20
+      Visible = False
     end
     object lbResults: TListBox
       Left = 89
@@ -228,6 +229,7 @@ inherited fmGrepResults: TfmGrepResults
       ParentFont = False
       PopupMenu = pmFoundMenu
       TabOrder = 3
+      Visible = False
       OnContextPopup = lbFoundListContextPopup
       OnData = lbFoundListData
       OnDblClick = lbFoundListDblClick
@@ -629,7 +631,6 @@ inherited fmGrepResults: TfmGrepResults
     object actViewShowFoundList: TAction
       Category = 'View'
       Caption = 'Show found list'
-      Checked = True
       Hint = 'Show found list'
       OnExecute = actViewShowFoundListExecute
     end
