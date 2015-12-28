@@ -266,7 +266,7 @@ end;
 
 class procedure TfmAbout.AddToSplashScreen;
 begin
-  AddPluginToSplashScreen(GetAboutIcon, 'GExperts', GetVersionStr);
+  AddPluginToSplashScreen(GetSplashIcon, 'GExperts', GetVersionStr);
 end;
 
 class function TfmAbout.DoAddToAboutDialog: Integer;
