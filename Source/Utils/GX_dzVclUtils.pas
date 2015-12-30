@@ -112,6 +112,19 @@ procedure TListView_ResizeColumn(_lc: TListColumn; _Options: TLIstViewResizeOpti
 procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = [lvrCaptions, lvrContent]);
 
 ///<summary>
+/// Gets the index of the selected item of the ListView
+/// @param lv is the ListView to work on
+/// @param Idx is the index of the selected item, only valid if Result = true
+/// @returns true, if an item was selected, false otherwise </summary>
+function TListView_TryGetSelected(_lv: TListView; out _Idx: integer): boolean; overload;
+///<summary>
+/// Gets the selected item of the ListView
+/// @param lv is the ListView to work on
+/// @param li is the selected item, only valid if Result = true
+/// @returns true, if an item was selected, false otherwise </summary>
+function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): boolean; overload;
+
+///<summary>
 /// Append a new action to the given action list, assign Caption
 /// and optionally Shortcut and OnExecute event.
 /// @returns the new action </summary>
@@ -508,6 +521,21 @@ function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNot
 begin
   Result:= TActionlist_Append(_al, _Caption, _Shortcut);
   Result.OnExecute := _OnExecute;
+end;
+
+function TListView_TryGetSelected(_lv: TListView; out _Idx: integer): boolean;
+begin
+  _Idx := _lv.ItemIndex;
+  Result := (_Idx <> -1);
+end;
+
+function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): boolean;
+var
+  Idx: Integer;
+begin
+  Result := TListView_TryGetSelected(_lv, Idx);
+  if Result then
+    _li := _lv.Items[Idx];
 end;
 
 end.
