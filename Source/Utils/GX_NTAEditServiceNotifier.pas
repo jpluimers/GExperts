@@ -1,14 +1,18 @@
 unit GX_NTAEditServiceNotifier;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
-  ToolsAPI, System.Classes, DockForm;
+  Classes, ToolsAPI, DockForm;
+
+{$IFDEF GX_VER160_up}
 
 type
   ///<summary>
-  /// We implement INTAEditServicesNotifier only to get a notification when the EditViewActivated
-  /// method is called. This in turn calls the OnEditorViewActivated event. </summary>
+  /// This is a dummy implementation of INTAEditServicesNotifier that does nothing.
+  /// Descendants override some methods to get the notifications they are interested in. </summary>
   TGxNTAEditServiceNotifier = class(TNotifierObject, INTAEditServicesNotifier)
   protected // INTAEditServicesNotifier
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean); virtual;
@@ -21,8 +25,11 @@ type
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm); virtual;
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm); virtual;
   end;
+{$ENDIF}
 
 implementation
+
+{$IFDEF GX_VER160_up}
 
 { TGxNTAEditServiceNotifier }
 
@@ -73,5 +80,6 @@ procedure TGxNTAEditServiceNotifier.WindowShow(const EditWindow: INTAEditWindow;
 begin
   // do nothing
 end;
+{$ENDIF}
 
 end.
