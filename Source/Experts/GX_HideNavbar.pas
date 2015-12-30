@@ -30,31 +30,23 @@ implementation
 uses
   SysUtils,
   Controls,
-  GX_OtaUtils;
+  GX_OtaUtils,
+  GX_NTAEditServiceNotifier;
 
 {$IFDEF GX_VER300_up}
 // The navigation toolbar exists only in Delphi 10 (for now)
 type
-
   ///<summary>
   /// We implement INTAEditServicesNotifier only to get a notification when the EditViewActivated
   /// method is called. This in turn calls the OnEditorViewActivated event. </summary>
-  TEditServiceNotifier = class(TNotifierObject, INTAEditServicesNotifier)
+  TEditServiceNotifier = class(TGxNTAEditServiceNotifier, INTAEditServicesNotifier)
   private
     type
       TOnEditorViewActivatedEvent = procedure(_Sender: TObject; _EditView: IOTAEditView) of object;
     var
       FOnEditorViewActivated: TOnEditorViewActivatedEvent;
-  private // INTAEditServicesNotifier
-    procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
-    procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
-    procedure WindowActivated(const EditWindow: INTAEditWindow);
-    procedure WindowCommand(const EditWindow: INTAEditWindow; Command, Param: Integer; var Handled: Boolean);
-    procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-    procedure EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-    procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+  protected // INTAEditServicesNotifier
+    procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView); override;
   public
     constructor Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
   end;
@@ -185,53 +177,10 @@ begin
   inherited Create;
 end;
 
-procedure TEditServiceNotifier.DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-//
-end;
-
-procedure TEditServiceNotifier.DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-//
-end;
-
-procedure TEditServiceNotifier.DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-//
-end;
-
 procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
 begin
   if Assigned(FOnEditorViewActivated) then
     FOnEditorViewActivated(Self, EditView);
-end;
-
-procedure TEditServiceNotifier.EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-begin
-//
-end;
-
-procedure TEditServiceNotifier.WindowActivated(const EditWindow: INTAEditWindow);
-begin
-//
-end;
-
-procedure TEditServiceNotifier.WindowCommand(const EditWindow: INTAEditWindow;
-  Command, Param: Integer; var Handled: Boolean);
-begin
-//
-end;
-
-procedure TEditServiceNotifier.WindowNotification(const EditWindow: INTAEditWindow;
-  Operation: TOperation);
-begin
-//
-end;
-
-procedure TEditServiceNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
-  LoadedFromDesktop: Boolean);
-begin
-//
 end;
 
 {$ENDIF GX_VER300_up}
