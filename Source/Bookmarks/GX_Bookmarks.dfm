@@ -10,13 +10,20 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
     Align = alClient
     Columns = <
       item
+        Caption = 'No.'
+        Width = 40
+      end
+      item
         Caption = 'Unit'
+        Width = 200
       end
       item
         Caption = 'Line'
       end>
     ReadOnly = True
+    RowSelect = True
     TabOrder = 0
     ViewStyle = vsReport
+    OnDblClick = lv_BookmarksDblClick
   end
 end

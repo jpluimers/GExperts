@@ -16,6 +16,7 @@ uses
 type
   TfmGxBookmarksForm = class(TfmIdeDockForm)
     lv_Bookmarks: TListView;
+    procedure lv_BookmarksDblClick(Sender: TObject);
   private
     function GetEditView(var _SourceEditor: IOTASourceEditor;
       var _EditView: IOTAEditView): boolean;
@@ -30,30 +31,33 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Registry, Menus, GX_GExperts, GX_ConfigurationInfo, GX_OtaUtils,
-  GX_GenericUtils, GX_OTAEditorNotifier;
+  GX_GenericUtils, GX_NTAEditServiceNotifier, GX_dzVclUtils;
 
 type
-  TGxBookmarksExpert = class;
-
-  TGxBookmarksNotifier = class(TGxOTAEditorNotifier, IGxOTAEditorNotifier, IOTAEditorNotifier, IOTANotifier)
+  ///<summary>
+  /// We implement INTAEditServicesNotifier only to get a notification when the EditViewActivated
+  /// method is called. This in turn calls the OnEditorViewActivated event. </summary>
+  // todo: Merge this code with the duplicate in GX_HideNavbar
+  TEditServiceNotifier = class(TGxNTAEditServiceNotifier, INTAEditServicesNotifier)
   private
-    FClient: TGxBookmarksExpert;
-  private
-    procedure ViewActivated(const View: IOTAEditView); override;
+    type
+      TOnEditorViewActivatedEvent = procedure(_Sender: TObject; _EditView: IOTAEditView) of object;
+    var
+      FOnEditorViewActivated: TOnEditorViewActivatedEvent;
+  protected // INTAEditServicesNotifier
+    procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView); override;
   public
-    constructor Create(const _Client: TGxBookmarksExpert; _Editor: IOTASourceEditor);
-    destructor Destroy; override;
+    constructor Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
   end;
 
+type
   TGxBookmarksExpert = class(TGX_Expert)
   private
     fmGxBookmarksForm: TfmGxBookmarksForm;
-    FSomeData: string;
-    FNotifier: IGxOtaEditorNotifier;
+    FNotifierIdx: Integer;
+    procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
   protected
     procedure SetActive(New: Boolean); override;
-    procedure AddNotifier;
-    procedure RemoveNotifier;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -69,6 +73,32 @@ type
 
 { TGxBookmarksExpert }
 
+constructor TGxBookmarksExpert.Create;
+begin
+  inherited Create;
+
+  fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
+  IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm');
+
+  if Assigned(BorlandIDEServices) then begin
+    FNotifierIdx := (BorlandIDEServices as IOTAEditorServices).AddNotifier(
+      TEditServiceNotifier.Create(EditorViewActivated));
+  end;
+end;
+
+destructor TGxBookmarksExpert.Destroy;
+begin
+  if FNotifierIdx <> 0 then
+    (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
+
+  if Assigned(fmGxBookmarksForm) then begin
+    IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
+    fmGxBookmarksForm.Free;
+  end;
+
+  inherited Destroy;
+end;
+
 procedure TGxBookmarksExpert.Click(Sender: TObject);
 begin
   fmGxBookmarksForm.Init;
@@ -83,38 +113,13 @@ begin
   MessageDlg(SYouClickedConfigure, mtInformation, [mbOK], 0);
 end;
 
-constructor TGxBookmarksExpert.Create;
+procedure TGxBookmarksExpert.EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
 begin
-  inherited Create;
-
-  FNotifier := nil;
-
-  fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
-  IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm');
+  if Assigned(fmGxBookmarksForm) then
+    fmGxBookmarksForm.Init;
 end;
 
 { TfmGxBookmarksForm }
-
-procedure TfmGxBookmarksForm.Init;
-var
-  SourceEditor: IOTASourceEditor;
-  EditView: IOTAEditView;
-  i: Integer;
-  BmPos: TOTACharPos;
-  li: TListItem;
-begin
-  lv_Bookmarks.Clear;
-  if not GetEditView(SourceEditor, EditView) then
-    Exit;
-  for i := 0 to 19 do begin
-    BmPos := EditView.BookmarkPos[i];
-    if BmPos.Line <> 0 then begin
-      li := lv_Bookmarks.Items.Add;
-      li.Caption :=     SourceEditor.FileName;
-      li.SubItems.Add(IntToStr(BmPos.Line));
-    end;
-  end;
-end;
 
 function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor; var _EditView: IOTAEditView): boolean;
 begin
@@ -126,14 +131,51 @@ begin
   Result := Assigned(_EditView);
 end;
 
-destructor TGxBookmarksExpert.Destroy;
+procedure TfmGxBookmarksForm.Init;
+var
+  SourceEditor: IOTASourceEditor;
+  EditView: IOTAEditView;
+  i: Integer;
+  BmPos: TOTACharPos;
+  li: TListItem;
+  Items: TListItems;
 begin
-  if Assigned(fmGxBookmarksForm) then begin
-    IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
-    fmGxBookmarksForm.Free;
+  Items := lv_Bookmarks.Items;
+  Items.BeginUpdate;
+  try
+    Items.Clear;
+    if not GetEditView(SourceEditor, EditView) then
+      Exit;
+    for i := 0 to 19 do begin
+      BmPos := EditView.BookmarkPos[i];
+      if BmPos.Line <> 0 then begin
+        li := Items.Add;
+        li.Data := Pointer(i);
+        li.Caption := IntToStr(i);
+        li.SubItems.Add(ExtractFilename(SourceEditor.FileName));
+        li.SubItems.Add(IntToStr(BmPos.Line));
+      end;
+    end;
+    TListView_Resize(lv_Bookmarks);
+  finally
+    Items.EndUpdate;
   end;
+end;
 
-  inherited Destroy;
+procedure TfmGxBookmarksForm.lv_BookmarksDblClick(Sender: TObject);
+var
+  li: TListItem;
+  SourceEditor: IOTASourceEditor;
+  EditView: IOTAEditView;
+begin
+  if not TListView_TryGetSelected(lv_Bookmarks, li) then
+    Exit;
+  if not GetEditView(SourceEditor, EditView) then
+    Exit;
+  SourceEditor.Show;
+  EditView.BookmarkGoto(Integer(li.Data));
+  EditView.MoveViewToCursor;
+  EditView.Paint;
 end;
 
 function TGxBookmarksExpert.GetActionCaption: string;
@@ -161,68 +203,41 @@ end;
 procedure TGxBookmarksExpert.InternalLoadSettings(Settings: TGExpertsSettings);
 begin
   inherited;
-  FSomeData := Settings.ReadString(ConfigurationKey, 'Bookmarks', FSomeData);
+//  FSomeData := Settings.ReadString(ConfigurationKey, 'Bookmarks', FSomeData);
 end;
 
 procedure TGxBookmarksExpert.InternalSaveSettings(Settings: TGExpertsSettings);
 begin
   inherited;
-  Settings.WriteString(ConfigurationKey, 'Bookmarks', FSomeData);
-end;
-
-procedure TGxBookmarksExpert.AddNotifier;
-var
-  Editor: IOTASourceEditor;
-begin
-  if not Assigned(FNotifier) then begin
-    Editor := GxOtaGetCurrentSourceEditor;
-    if Assigned(Editor) then begin
-      FNotifier := TGxBookmarksNotifier.Create(Self, Editor);
-    end;
-  end;
-end;
-
-procedure TGxBookmarksExpert.RemoveNotifier;
-begin
-  if Assigned(FNotifier) then begin
-    FNotifier.Detach;
-    FNotifier := nil;
-  end;
+//  Settings.WriteString(ConfigurationKey, 'Bookmarks', FSomeData);
 end;
 
 procedure TGxBookmarksExpert.SetActive(New: Boolean);
 begin
-  if New <> Active then
-  begin
-    inherited SetActive(New);
-    if New then
-      AddNotifier
-    else
-      RemoveNotifier;
-  end;
+  inherited SetActive(New);
+//  if New <> Active then
+//  begin
+//    inherited SetActive(New);
+//    if New then
+//      AddNotifier
+//    else
+//      RemoveNotifier;
+//  end;
 end;
 
-{ TGxBookmarksNotifier }
+{ TEditServiceNotifier }
 
-constructor TGxBookmarksNotifier.Create(const _Client: TGxBookmarksExpert;
-  _Editor: IOTASourceEditor);
+constructor TEditServiceNotifier.Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
 begin
   inherited Create;
-  FClient := _Client;
-  Attach(_Editor);
+  FOnEditorViewActivated := _OnEditorViewActivated;
 end;
 
-destructor TGxBookmarksNotifier.Destroy;
+procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
+  const EditView: IOTAEditView);
 begin
-  Detach;
-  inherited;
-  FClient := nil;
-end;
-
-procedure TGxBookmarksNotifier.ViewActivated(const View: IOTAEditView);
-begin
-  inherited;
-
+  if Assigned(FOnEditorViewActivated) then
+    FOnEditorViewActivated(Self, EditView);
 end;
 
 initialization
