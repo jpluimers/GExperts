@@ -22,6 +22,7 @@ type
       var _EditView: IOTAEditView): boolean;
     procedure Init;
   public
+    destructor Destroy; override;
   end;
 
 implementation
@@ -37,7 +38,7 @@ type
   ///<summary>
   /// We implement INTAEditServicesNotifier only to get a notification when the EditViewActivated
   /// method is called. This in turn calls the OnEditorViewActivated event. </summary>
-  // todo: Merge this code with the duplicate in GX_HideNavbar
+  // todo -otwm -cCleanup: Merge this code with the duplicate in GX_HideNavbar
   TEditServiceNotifier = class(TGxNTAEditServiceNotifier, INTAEditServicesNotifier)
   private
     type
@@ -119,7 +120,23 @@ begin
     fmGxBookmarksForm.Init;
 end;
 
+type
+  TBookmarkInfo = class
+  private
+    FBmIndex: integer;
+    FModuleName: string;
+    FLineNo: integer;
+  public
+    constructor Create(_BmIndex: integer; const _ModuleName: string; _LineNo: integer);
+  end;
+
 { TfmGxBookmarksForm }
+
+destructor TfmGxBookmarksForm.Destroy;
+begin
+  TListView_ClearWithObjects(lv_Bookmarks);
+  inherited;
+end;
 
 function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor; var _EditView: IOTAEditView): boolean;
 begin
@@ -143,14 +160,14 @@ begin
   Items := lv_Bookmarks.Items;
   Items.BeginUpdate;
   try
-    Items.Clear;
+    TListItems_ClearWithObjects(Items);
     if not GetEditView(SourceEditor, EditView) then
       Exit;
     for i := 0 to 19 do begin
       BmPos := EditView.BookmarkPos[i];
       if BmPos.Line <> 0 then begin
         li := Items.Add;
-        li.Data := Pointer(i);
+        li.Data := TBookmarkInfo.Create(i, SourceEditor.FileName, BmPos.Line);
         li.Caption := IntToStr(i);
         li.SubItems.Add(ExtractFilename(SourceEditor.FileName));
         li.SubItems.Add(IntToStr(BmPos.Line));
@@ -163,18 +180,40 @@ begin
 end;
 
 procedure TfmGxBookmarksForm.lv_BookmarksDblClick(Sender: TObject);
+resourcestring
+  SCouldNotOpenFile = 'Could not open file %s';
 var
   li: TListItem;
+  bmi: TBookmarkInfo;
+  fn: string;
+  Module: IOTAModule;
   SourceEditor: IOTASourceEditor;
   EditView: IOTAEditView;
 begin
   if not TListView_TryGetSelected(lv_Bookmarks, li) then
     Exit;
-  if not GetEditView(SourceEditor, EditView) then
+  bmi := li.Data;
+  fn := bmi.FModuleName;
+
+  if not GxOtaMakeSourceVisible(fn) then
+    raise Exception.CreateFmt(SCouldNotOpenFile, [fn]);
+
+  Module := GxOtaGetModule(fn);
+  if not Assigned(Module) then
+    Exit;
+
+  SourceEditor := GxOtaGetSourceEditorFromModule(Module, fn);
+  if not Assigned(SourceEditor) then
     Exit;
   SourceEditor.Show;
-  EditView.BookmarkGoto(Integer(li.Data));
+
+  EditView := GxOtaGetTopMostEditView(SourceEditor);
+  if not Assigned(EditView) then
+    Exit;
+
+  EditView.BookmarkGoto(bmi.FBmIndex);
   EditView.MoveViewToCursor;
+  GxOtaFocusCurrentIDEEditControl;
   EditView.Paint;
 end;
 
@@ -238,6 +277,16 @@ procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWin
 begin
   if Assigned(FOnEditorViewActivated) then
     FOnEditorViewActivated(Self, EditView);
+end;
+
+{ TBookmarkInfo }
+
+constructor TBookmarkInfo.Create(_BmIndex: integer; const _ModuleName: string; _LineNo: integer);
+begin
+  inherited Create;
+  FBmIndex:= _BmIndex;
+  FModuleName:=_ModuleName;
+  FLineNo := _LineNo;
 end;
 
 initialization
