@@ -211,7 +211,11 @@ type
 procedure ClearCompInfoList(const List: TList);
 procedure GxOtaFillComponentInfoList(const List: TList);
 
+///<summary>
+/// Frees all Objects in the List and clears it. </summary>
 procedure ClearUnitInfoList(const List: TList);
+///<summary>
+/// Fills List with TUnitInfo objects for all modules in the current project. </summary>
 procedure GxOtaFillUnitInfoListForCurrentProject(const List: TList);
 
 //
