@@ -10,13 +10,15 @@ unit GX_Bookmarks;
 interface
 
 uses
-  GX_Experts, SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, GX_BaseForm,
-  GX_IdeDock, Vcl.ComCtrls, ToolsAPI;
+  GX_Experts, SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, ComCtrls, ToolsAPI, ExtCtrls,
+  GX_BaseForm, GX_IdeDock;
 
 type
   TfmGxBookmarksForm = class(TfmIdeDockForm)
     lv_Bookmarks: TListView;
+    tim_Update: TTimer;
     procedure lv_BookmarksDblClick(Sender: TObject);
+    procedure tim_UpdateTimer(Sender: TObject);
   private
     function GetEditView(var _SourceEditor: IOTASourceEditor;
       var _EditView: IOTAEditView): boolean;
@@ -57,8 +59,6 @@ type
     fmGxBookmarksForm: TfmGxBookmarksForm;
     FNotifierIdx: Integer;
     procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
-  protected
-    procedure SetActive(New: Boolean); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -66,9 +66,6 @@ type
     class function GetName: string; override;
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
-    procedure Configure; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
     procedure Click(Sender: TObject); override;
   end;
 
@@ -105,13 +102,6 @@ begin
   fmGxBookmarksForm.Init;
   IdeDockManager.ShowForm(fmGxBookmarksForm);
   EnsureFormVisible(fmGxBookmarksForm);
-end;
-
-procedure TGxBookmarksExpert.Configure;
-resourcestring
-  SYouClickedConfigure = 'You clicked the Configuration button!';
-begin
-  MessageDlg(SYouClickedConfigure, mtInformation, [mbOK], 0);
 end;
 
 procedure TGxBookmarksExpert.EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
@@ -179,6 +169,11 @@ begin
   end;
 end;
 
+procedure TfmGxBookmarksForm.tim_UpdateTimer(Sender: TObject);
+begin
+  Init;
+end;
+
 procedure TfmGxBookmarksForm.lv_BookmarksDblClick(Sender: TObject);
 resourcestring
   SCouldNotOpenFile = 'Could not open file %s';
@@ -231,37 +226,12 @@ end;
 
 function TGxBookmarksExpert.HasConfigOptions: Boolean;
 begin
-  Result := True;
+  Result := False;
 end;
 
 function TGxBookmarksExpert.HasMenuItem: Boolean;
 begin
   Result := True;
-end;
-
-procedure TGxBookmarksExpert.InternalLoadSettings(Settings: TGExpertsSettings);
-begin
-  inherited;
-//  FSomeData := Settings.ReadString(ConfigurationKey, 'Bookmarks', FSomeData);
-end;
-
-procedure TGxBookmarksExpert.InternalSaveSettings(Settings: TGExpertsSettings);
-begin
-  inherited;
-//  Settings.WriteString(ConfigurationKey, 'Bookmarks', FSomeData);
-end;
-
-procedure TGxBookmarksExpert.SetActive(New: Boolean);
-begin
-  inherited SetActive(New);
-//  if New <> Active then
-//  begin
-//    inherited SetActive(New);
-//    if New then
-//      AddNotifier
-//    else
-//      RemoveNotifier;
-//  end;
 end;
 
 { TEditServiceNotifier }

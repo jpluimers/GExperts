@@ -26,4 +26,9 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
     ViewStyle = vsReport
     OnDblClick = lv_BookmarksDblClick
   end
+  object tim_Update: TTimer
+    OnTimer = tim_UpdateTimer
+    Left = 144
+    Top = 104
+  end
 end
