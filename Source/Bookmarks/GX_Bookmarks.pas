@@ -10,19 +10,39 @@ unit GX_Bookmarks;
 interface
 
 uses
-  GX_Experts, SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, ComCtrls, ToolsAPI, ExtCtrls,
-  GX_BaseForm, GX_IdeDock;
+  SysUtils,
+  Classes,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  ComCtrls,
+  ToolsAPI,
+  ExtCtrls,
+  Menus,
+  GX_Experts,
+  GX_BaseForm,
+  GX_IdeDock;
 
 type
   TfmGxBookmarksForm = class(TfmIdeDockForm)
     lv_Bookmarks: TListView;
     tim_Update: TTimer;
+    pm_Bookmarks: TPopupMenu;
+    mi_Delete: TMenuItem;
+    mi_Add: TMenuItem;
+    mi_Edit: TMenuItem;
     procedure lv_BookmarksDblClick(Sender: TObject);
     procedure tim_UpdateTimer(Sender: TObject);
+    procedure mi_DeleteClick(Sender: TObject);
+    procedure mi_AddClick(Sender: TObject);
+    procedure mi_EditClick(Sender: TObject);
   private
     function GetEditView(var _SourceEditor: IOTASourceEditor;
-      var _EditView: IOTAEditView): boolean;
+      var _EditView: IOTAEditView): Boolean;
     procedure Init;
+    procedure SetBookmark(const _ModuleName: string; _LineNo: Integer; _BmIdx: Integer = -1);
+    procedure DeleteBookmark(const _ModuleName: string; _BmIdx: Integer);
   public
     destructor Destroy; override;
   end;
@@ -32,9 +52,16 @@ implementation
 {$R *.dfm}
 
 uses
-  {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Registry, Menus, GX_GExperts, GX_ConfigurationInfo, GX_OtaUtils,
-  GX_GenericUtils, GX_NTAEditServiceNotifier, GX_dzVclUtils;
+{$IFOPT D+}GX_DbugIntf,
+{$ENDIF}
+  Registry,
+  GX_GExperts,
+  GX_ConfigurationInfo,
+  GX_OtaUtils,
+  GX_GenericUtils,
+  GX_NTAEditServiceNotifier,
+  GX_dzVclUtils,
+  GX_EditBookmark;
 
 type
   ///<summary>
@@ -113,11 +140,11 @@ end;
 type
   TBookmarkInfo = class
   private
-    FBmIndex: integer;
+    FBmIndex: Integer;
     FModuleName: string;
-    FLineNo: integer;
+    FLineNo: Integer;
   public
-    constructor Create(_BmIndex: integer; const _ModuleName: string; _LineNo: integer);
+    constructor Create(_BmIndex: Integer; const _ModuleName: string; _LineNo: Integer);
   end;
 
 { TfmGxBookmarksForm }
@@ -128,7 +155,7 @@ begin
   inherited;
 end;
 
-function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor; var _EditView: IOTAEditView): boolean;
+function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor; var _EditView: IOTAEditView): Boolean;
 begin
   Result := False;
   _SourceEditor := GxOtaGetCurrentSourceEditor;
@@ -147,25 +174,30 @@ var
   li: TListItem;
   Items: TListItems;
 begin
-  Items := lv_Bookmarks.Items;
-  Items.BeginUpdate;
+  tim_Update.Enabled := False;
   try
-    TListItems_ClearWithObjects(Items);
-    if not GetEditView(SourceEditor, EditView) then
-      Exit;
-    for i := 0 to 19 do begin
-      BmPos := EditView.BookmarkPos[i];
-      if BmPos.Line <> 0 then begin
-        li := Items.Add;
-        li.Data := TBookmarkInfo.Create(i, SourceEditor.FileName, BmPos.Line);
-        li.Caption := IntToStr(i);
-        li.SubItems.Add(ExtractFilename(SourceEditor.FileName));
-        li.SubItems.Add(IntToStr(BmPos.Line));
+    Items := lv_Bookmarks.Items;
+    Items.BeginUpdate;
+    try
+      TListItems_ClearWithObjects(Items);
+      if not GetEditView(SourceEditor, EditView) then
+        Exit;
+      for i := 0 to 19 do begin
+        BmPos := EditView.BookmarkPos[i];
+        if BmPos.Line <> 0 then begin
+          li := Items.Add;
+          li.Data := TBookmarkInfo.Create(i, SourceEditor.Filename, BmPos.Line);
+          li.Caption := IntToStr(i);
+          li.SubItems.Add(ExtractFileName(SourceEditor.Filename));
+          li.SubItems.Add(IntToStr(BmPos.Line));
+        end;
       end;
+      TListView_Resize(lv_Bookmarks);
+    finally
+      Items.EndUpdate;
     end;
-    TListView_Resize(lv_Bookmarks);
   finally
-    Items.EndUpdate;
+    tim_Update.Enabled := True;
   end;
 end;
 
@@ -251,12 +283,134 @@ end;
 
 { TBookmarkInfo }
 
-constructor TBookmarkInfo.Create(_BmIndex: integer; const _ModuleName: string; _LineNo: integer);
+constructor TBookmarkInfo.Create(_BmIndex: Integer; const _ModuleName: string; _LineNo: Integer);
 begin
   inherited Create;
-  FBmIndex:= _BmIndex;
-  FModuleName:=_ModuleName;
+  FBmIndex := _BmIndex;
+  FModuleName := _ModuleName;
   FLineNo := _LineNo;
+end;
+
+function TryGetEditView(const _fn: string; out _EditView: IOTAEditView): Boolean;
+var
+  SourceEditor: IOTASourceEditor;
+begin
+  SourceEditor := GxOtaGetSourceEditor(_fn);
+  Result := Assigned(SourceEditor) and (SourceEditor.EditViewCount > 0);
+  if Result then
+    _EditView := SourceEditor.EditViews[0];
+end;
+
+procedure TfmGxBookmarksForm.DeleteBookmark(const _ModuleName: string; _BmIdx: Integer);
+var
+  EditView: IOTAEditView;
+  SaveCursorPos: TOTAEditPos;
+  BmEditPos: TOTAEditPos;
+begin
+  if not TryGetEditView(_ModuleName, EditView) then
+    Exit;
+
+  if EditView.BookmarkPos[_BmIdx].Line <> 0 then begin
+    SaveCursorPos := EditView.GetCursorPos;
+    try
+      BmEditPos.Line := EditView.BookmarkPos[_BmIdx].Line;
+      BmEditPos.Col := EditView.BookmarkPos[_BmIdx].CharIndex;
+      EditView.SetCursorPos(BmEditPos);
+      EditView.BookmarkToggle(_BmIdx);
+    finally
+      EditView.SetCursorPos(SaveCursorPos);
+    end;
+  end;
+end;
+
+procedure TfmGxBookmarksForm.SetBookmark(const _ModuleName: string; _LineNo: Integer; _BmIdx: Integer = -1);
+var
+  EditView: IOTAEditView;
+  i: Integer;
+  SaveCursorPos: TOTAEditPos;
+  BmEditPos: TOTAEditPos;
+begin
+  if not TryGetEditView(_ModuleName, EditView) then
+    Exit;
+
+  if _BmIdx = -1 then begin
+    // no bookmark index was given, find the first one that's free
+    for i := 0 to 19 do begin
+      if EditView.BookmarkPos[i].Line = 0 then begin
+        _BmIdx := i;
+        break;
+      end;
+    end;
+    if _BmIdx = -1 then
+      Exit; // no free bookmark index found
+  end;
+
+  SaveCursorPos := EditView.GetCursorPos;
+  try
+    BmEditPos.Line := _LineNo;
+    BmEditPos.Col := 1;
+    EditView.SetCursorPos(BmEditPos);
+    EditView.BookmarkRecord(_BmIdx);
+  finally
+    EditView.SetCursorPos(SaveCursorPos);
+  end;
+end;
+
+procedure TfmGxBookmarksForm.mi_AddClick(Sender: TObject);
+var
+  SourceEditor: IOTASourceEditor;
+  EditView: IOTAEditView;
+  ModuleName: string;
+  LineNo: Integer;
+  BmIndex: Integer;
+begin
+  if not GetEditView(SourceEditor, EditView) then
+    Exit;
+
+  try
+    ModuleName := SourceEditor.Filename;
+    LineNo := EditView.CursorPos.Line;
+    if not TfmEditBookmarks.Execute(Self, ModuleName, LineNo, BmIndex) then
+      Exit;
+
+    SetBookmark(ModuleName, LineNo, BmIndex);
+  finally
+    Init;
+  end;
+end;
+
+procedure TfmGxBookmarksForm.mi_DeleteClick(Sender: TObject);
+var
+  li: TListItem;
+  bmi: TBookmarkInfo;
+begin
+  if not TListView_TryGetSelected(lv_Bookmarks, li) then
+    Exit;
+  bmi := li.Data;
+  DeleteBookmark(bmi.FModuleName, bmi.FBmIndex);
+end;
+
+procedure TfmGxBookmarksForm.mi_EditClick(Sender: TObject);
+var
+  li: TListItem;
+  bmi: TBookmarkInfo;
+  ModuleName: string;
+  LineNo: Integer;
+begin
+  if not TListView_TryGetSelected(lv_Bookmarks, li) then
+    Exit;
+
+  bmi := li.Data;
+  try
+    ModuleName := bmi.FModuleName;
+    LineNo := bmi.FLineNo;
+    if not TfmEditBookmarks.Execute(Self, ModuleName, LineNo) then
+      Exit;
+
+    SetBookmark(ModuleName, LineNo, bmi.fBmIndex);
+  finally
+    Init;
+  end;
 end;
 
 initialization

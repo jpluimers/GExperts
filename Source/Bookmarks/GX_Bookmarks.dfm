@@ -22,6 +22,7 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
       end>
     ReadOnly = True
     RowSelect = True
+    PopupMenu = pm_Bookmarks
     TabOrder = 0
     ViewStyle = vsReport
     OnDblClick = lv_BookmarksDblClick
@@ -30,5 +31,21 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
     OnTimer = tim_UpdateTimer
     Left = 144
     Top = 104
+  end
+  object pm_Bookmarks: TPopupMenu
+    Left = 232
+    Top = 104
+    object mi_Edit: TMenuItem
+      Caption = 'Edit ...'
+      OnClick = mi_EditClick
+    end
+    object mi_Add: TMenuItem
+      Caption = 'Add ...'
+      OnClick = mi_AddClick
+    end
+    object mi_Delete: TMenuItem
+      Caption = 'Delete'
+      OnClick = mi_DeleteClick
+    end
   end
 end
