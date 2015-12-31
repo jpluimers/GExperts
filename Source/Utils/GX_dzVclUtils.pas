@@ -91,6 +91,75 @@ function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFile
 /// @returns true, if the shift key is currently pressed </summary>
 function IsShiftDown: Boolean;
 
+///<summary> Sets the control's Constraints.MinHeight und Constraints.MinWidth properties
+///          to the control's Width and Height. </summary>
+procedure TControl_SetMinConstraints(_Control: TControl);
+
+///<summary> sets the with of a ComboBox's dropdown  in pixels </summary>
+procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
+
+///<summary> Selects the item if it is in the list and returns the new ItemIndex
+///          @param cmb is the TCustomCombobox (descendant) to use
+///          @param Item is the item to select
+///          @param DefaultIdx is the ItemIndex to use if no item matches.
+///          @returns the index of the newly selected item or -1 if it doesn't exist </summary>
+function TComboBox_Select(_cmb: TCustomComboBox; const _Item: string; _DefaultIdx: Integer = -1;
+  _AllowPartialMatch: Boolean = False): Integer;
+
+///<summary>
+/// Add a new item with Object = Pointer(Value) </summary>
+procedure TComboBox_AddIntObject(_cmb: TCustomComboBox; const _Item: string; _Value: Integer);
+
+///<summary> Frees all objects assigned to the combobox and then clears the combobox </summary>
+procedure TComboBox_ClearWithObjects(_cmb: TCustomComboBox);
+
+///<summary> Selects the entry in a combobox that has an object pointer matching Value
+///          @param cmb is the TCustomCombobox (descendant) to select
+///          @param Value is the desired object value
+///          @returns true, if the value could be found, false otherwise </summary>
+function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Pointer): Boolean; overload;
+function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Integer): Boolean; overload;
+
+///<summary> Gets the caption of the selected combobox item
+///          @param cmb is the TCustomCombobox (descendant) to read from
+///          @param Item is the selected item, only valid if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if an item was selected </summary>
+function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Item: string;
+  _FocusControl: Boolean = False): Boolean; overload;
+
+///<summary> Gets the index of the selected combobox item
+///          @param cmb is the TCustomCombobox (descendant) to read from
+///          @param Item is the selected item, only valid if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if an item was selected </summary>
+function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Idx: Integer;
+  _FocusControl: Boolean = False): Boolean; overload;
+
+///<summary> Gets the object pointer of the selected combobox item
+///          @param cmb is the TCustomCombobox (descendant) to read from
+///          @param Idx is the combobox's ItemIndex, only valid if the function returns true
+///          @param Obj is the value of the object pointer of the selected item, only valid
+///                     if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if these out parameters are valid </summary>
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload; inline;
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Idx: Integer; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean; overload;
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Item: string; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Item: string; out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean; overload;
+
+function TComboBox_GetSelectedObjectDef(_cmb: TCustomComboBox;
+  _Default: Integer; _FocusControl: Boolean = False): Integer;
+
 type
   TListViewResizeOptions = (lvrCaptions, lvrContent);
   TLIstViewResizeOptionSet = set of TListViewResizeOptions;
@@ -148,7 +217,8 @@ uses
 {$ENDIF SUPPORTS_UNICODE_STRING}
   ShellApi,
   Types,
-  FileCtrl;
+  FileCtrl,
+  StrUtils;
 
 type
   TWindowProcHook = class(TComponent)
@@ -559,5 +629,181 @@ begin
   TListItems_ClearWithObjects(_lv.Items);
 end;
 
+procedure TControl_SetMinConstraints(_Control: TControl);
+begin
+  _Control.Constraints.MinHeight := _Control.Height;
+  _Control.Constraints.MinWidth := _Control.Width;
+end;
+
+procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
+begin
+  _cmb.HandleNeeded;
+  _cmb.Perform(CB_SETDROPPEDWIDTH, _Pixels, 0);
+end;
+
+procedure TComboBox_AddIntObject(_cmb: TCustomComboBox; const _Item: string; _Value: Integer);
+begin
+  _cmb.Items.AddObject(_Item, Pointer(_Value));
+end;
+
+function TComboBox_Select(_cmb: TCustomComboBox; const _Item: string; _DefaultIdx: Integer = -1;
+  _AllowPartialMatch: Boolean = False): Integer;
+var
+  i: Integer;
+  sl: TStringList;
+begin
+  if _AllowPartialMatch then begin
+    sl := TStringList.Create;
+    try
+      sl.Assign(_cmb.Items);
+      Result := _DefaultIdx;
+      for i := 0 to sl.Count - 1 do
+        if StartsText(_Item, sl[i]) then begin
+          Result := i;
+          Break;
+        end;
+    finally
+      FreeAndNil(sl);
+    end;
+  end else begin
+    Result := _cmb.Items.IndexOf(_Item);
+    if Result = -1 then
+      Result := _DefaultIdx;
+  end;
+  _cmb.ItemIndex := Result;
+end;
+
+function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Pointer): Boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to _cmb.Items.Count - 1 do begin
+    Result := (_cmb.Items.Objects[i] = _Value);
+    if Result then begin
+      _cmb.ItemIndex := i;
+      Exit;
+    end;
+  end;
+  Result := False;
+end;
+
+function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Integer): Boolean;
+begin
+  Result := TComboBox_SelectByObject(_cmb, Pointer(_Value));
+end;
+
+function TComboBox_GetObjectCaption(_cmb: TCustomComboBox; _Obj: Pointer; out _s: string): Boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to _cmb.Items.Count - 1 do begin
+    Result := (_cmb.Items.Objects[i] = _Obj);
+    if Result then begin
+      _s := _cmb.Items[i];
+      Exit;
+    end;
+  end;
+  Result := False;
+end;
+
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
+var
+  Idx: Integer;
+begin
+  Result := TComboBox_GetSelectedObject(_cmb, Idx, _Obj, _FocusControl);
+end;
+
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean;
+var
+  Obj: Pointer;
+begin
+  Result := TComboBox_GetSelectedObject(_cmb, Obj, _FocusControl);
+  if Result then
+    _ObjAsInt := Integer(Obj);
+end;
+
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _Idx: Integer;
+  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
+begin
+  _Idx := _cmb.ItemIndex;
+  Result := (_Idx <> -1);
+  if Result then
+    _Obj := _cmb.Items.Objects[_Idx]
+  else if _FocusControl then
+    _cmb.SetFocus;
+end;
+
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Item: string; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
+var
+  Idx: Integer;
+begin
+  Idx := _cmb.ItemIndex;
+  Result := (Idx <> -1);
+  if Result then begin
+    _Item := _cmb.Items[Idx];
+    _Obj := _cmb.Items.Objects[Idx];
+  end else if _FocusControl then
+    _cmb.SetFocus;
+end;
+
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Item: string; out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean;
+var
+  Obj: Pointer;
+begin
+  Result := TComboBox_GetSelectedObject(_cmb, _Item, Obj, _FocusControl);
+  if Result then
+    _ObjAsInt := Integer(Obj);
+end;
+
+function TComboBox_GetSelectedObjectDef(_cmb: TCustomComboBox; _Default: Integer;
+  _FocusControl: Boolean = False): Integer;
+begin
+  if not TComboBox_GetSelectedObject(_cmb, Result, _FocusControl) then
+    Result := _Default;
+end;
+
+function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Idx: Integer;
+  _FocusControl: Boolean = False): Boolean;
+begin
+  _Idx := _cmb.ItemIndex;
+  Result := (_Idx <> -1);
+  if not Result then
+    if _FocusControl then
+      _cmb.SetFocus;
+end;
+
+function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Item: string;
+  _FocusControl: Boolean = False): Boolean;
+var
+  Idx: Integer;
+begin
+  Result := TComboBox_GetSelected(_cmb, Idx, _FocusControl);
+  if Result then
+    _Item := _cmb.Items[Idx];
+end;
+
+/// <summary>
+/// Frees all objects stored in the TStrings intance and returns the instance,
+/// meant to be called like
+/// @code( TStrings_FreeAllObjects(sl).Free; ) or
+/// @code( TStrings_FreeAllObjects(sl).Clear; ) </summary>
+function TStrings_FreeAllObjects(_Strings: TStrings): TStrings;
+var
+  i: Integer;
+begin
+  for i := 0 to _Strings.Count - 1 do begin
+    _Strings.Objects[i].Free;
+    _Strings.Objects[i] := nil;
+  end;
+  Result := _Strings;
+end;
+
+procedure TComboBox_ClearWithObjects(_cmb: TCustomComboBox);
+begin
+  TStrings_FreeAllObjects(_cmb.Items);
+  _cmb.Clear;
+end;
 
 end.
