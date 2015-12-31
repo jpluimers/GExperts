@@ -124,6 +124,11 @@ function TListView_TryGetSelected(_lv: TListView; out _Idx: integer): boolean; o
 /// @returns true, if an item was selected, false otherwise </summary>
 function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): boolean; overload;
 
+///<summary> free all lv.Items[n].Data objects and then clear the items </summary>
+procedure TListView_ClearWithObjects(_lv: TListView);
+///<summary> free all li[n].Data objects and then clear the items </summary>
+procedure TListItems_ClearWithObjects(_li: TListItems);
+
 ///<summary>
 /// Append a new action to the given action list, assign Caption
 /// and optionally Shortcut and OnExecute event.
@@ -537,5 +542,22 @@ begin
   if Result then
     _li := _lv.Items[Idx];
 end;
+
+procedure TListItems_ClearWithObjects(_li: TListItems);
+var
+  i: Integer;
+begin
+  for i := 0 to _li.Count - 1 do begin
+    TObject(_li[i].Data).Free;
+    _li[i].Data := nil;
+  end;
+  _li.Clear;
+end;
+
+procedure TListView_ClearWithObjects(_lv: TListView);
+begin
+  TListItems_ClearWithObjects(_lv.Items);
+end;
+
 
 end.
