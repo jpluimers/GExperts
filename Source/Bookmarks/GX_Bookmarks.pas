@@ -22,7 +22,8 @@ uses
   Menus,
   GX_Experts,
   GX_BaseForm,
-  GX_IdeDock;
+  GX_IdeDock,
+  GX_BookmarkList;
 
 type
   TfmGxBookmarksForm = class(TfmIdeDockForm)
@@ -43,6 +44,8 @@ type
     procedure Init;
     procedure SetBookmark(const _ModuleName: string; _LineNo: Integer; _BmIdx: Integer = -1);
     procedure DeleteBookmark(const _ModuleName: string; _BmIdx: Integer);
+    procedure AddBookmarks(const _ModuleName: string; _EditView: IOTAEditView; _Bookmarks: TBookmarkList);
+    function HasChanged(_Bookmarks: TBookmarkList; _Items: TListItems): Boolean;
   public
     destructor Destroy; override;
   end;
@@ -137,16 +140,6 @@ begin
     fmGxBookmarksForm.Init;
 end;
 
-type
-  TBookmarkInfo = class
-  private
-    FBmIndex: Integer;
-    FModuleName: string;
-    FLineNo: Integer;
-  public
-    constructor Create(_BmIndex: Integer; const _ModuleName: string; _LineNo: Integer);
-  end;
-
 { TfmGxBookmarksForm }
 
 destructor TfmGxBookmarksForm.Destroy;
@@ -155,7 +148,8 @@ begin
   inherited;
 end;
 
-function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor; var _EditView: IOTAEditView): Boolean;
+function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor;
+  var _EditView: IOTAEditView): Boolean;
 begin
   Result := False;
   _SourceEditor := GxOtaGetCurrentSourceEditor;
@@ -165,36 +159,79 @@ begin
   Result := Assigned(_EditView);
 end;
 
+procedure TfmGxBookmarksForm.AddBookmarks(const _ModuleName: string; _EditView: IOTAEditView;
+  _Bookmarks: TBookmarkList);
+var
+  i: Integer;
+  BmPos: TOTACharPos;
+begin
+  for i := 0 to 19 do begin
+    BmPos := _EditView.BookmarkPos[i];
+    if BmPos.Line <> 0 then begin
+      _Bookmarks.Add(i, BmPos.Line, BmPos.CharIndex, _ModuleName);
+    end;
+  end;
+end;
+
+function TfmGxBookmarksForm.HasChanged(_Bookmarks: TBookmarkList; _Items: TListItems): Boolean;
+var
+  i: Integer;
+  bm1: TBookmark;
+  bm2: Pointer;
+begin
+  Result := True;
+  if _Bookmarks.Count <> _Items.Count then
+    Exit;
+
+  for i := 0 to _Bookmarks.Count - 1 do begin
+    bm1 := _Bookmarks[i];
+    bm2 := _Items[i].Data;
+    if not bm1.IsSame(bm2) then
+      Exit;
+  end;
+
+  Result := False;
+end;
+
 procedure TfmGxBookmarksForm.Init;
 var
   SourceEditor: IOTASourceEditor;
   EditView: IOTAEditView;
   i: Integer;
-  BmPos: TOTACharPos;
+  bm: TBookmark;
   li: TListItem;
   Items: TListItems;
+  Bookmarks: TBookmarkList;
 begin
   tim_Update.Enabled := False;
   try
-    Items := lv_Bookmarks.Items;
-    Items.BeginUpdate;
+    if not GetEditView(SourceEditor, EditView) then
+      Exit;
+    Bookmarks := TBookmarkList.Create;
     try
-      TListItems_ClearWithObjects(Items);
-      if not GetEditView(SourceEditor, EditView) then
-        Exit;
-      for i := 0 to 19 do begin
-        BmPos := EditView.BookmarkPos[i];
-        if BmPos.Line <> 0 then begin
-          li := Items.Add;
-          li.Data := TBookmarkInfo.Create(i, SourceEditor.Filename, BmPos.Line);
-          li.Caption := IntToStr(i);
-          li.SubItems.Add(ExtractFileName(SourceEditor.Filename));
-          li.SubItems.Add(IntToStr(BmPos.Line));
+      AddBookmarks(SourceEditor.Filename, EditView, Bookmarks);
+
+      Items := lv_Bookmarks.Items;
+      if HasChanged(Bookmarks, Items) then begin
+
+        Items.BeginUpdate;
+        try
+          TListItems_ClearWithObjects(Items);
+          for i := 0 to Bookmarks.Count - 1 do begin
+            bm := Bookmarks[i];
+            li := Items.Add;
+            li.Data := TBookmark.Create(bm);
+            li.Caption := IntToStr(bm.Number);
+            li.SubItems.Add(ExtractFileName(bm.Module));
+            li.SubItems.Add(IntToStr(bm.Line));
+          end;
+          TListView_Resize(lv_Bookmarks);
+        finally
+          Items.EndUpdate;
         end;
       end;
-      TListView_Resize(lv_Bookmarks);
     finally
-      Items.EndUpdate;
+      FreeAndNil(Bookmarks);
     end;
   finally
     tim_Update.Enabled := True;
@@ -211,7 +248,7 @@ resourcestring
   SCouldNotOpenFile = 'Could not open file %s';
 var
   li: TListItem;
-  bmi: TBookmarkInfo;
+  bmi: TBookmark;
   fn: string;
   Module: IOTAModule;
   SourceEditor: IOTASourceEditor;
@@ -220,7 +257,7 @@ begin
   if not TListView_TryGetSelected(lv_Bookmarks, li) then
     Exit;
   bmi := li.Data;
-  fn := bmi.FModuleName;
+  fn := bmi.Module;
 
   if not GxOtaMakeSourceVisible(fn) then
     raise Exception.CreateFmt(SCouldNotOpenFile, [fn]);
@@ -238,7 +275,7 @@ begin
   if not Assigned(EditView) then
     Exit;
 
-  EditView.BookmarkGoto(bmi.FBmIndex);
+  EditView.BookmarkGoto(bmi.Number);
   EditView.MoveViewToCursor;
   GxOtaFocusCurrentIDEEditControl;
   EditView.Paint;
@@ -279,16 +316,6 @@ procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWin
 begin
   if Assigned(FOnEditorViewActivated) then
     FOnEditorViewActivated(Self, EditView);
-end;
-
-{ TBookmarkInfo }
-
-constructor TBookmarkInfo.Create(_BmIndex: Integer; const _ModuleName: string; _LineNo: Integer);
-begin
-  inherited Create;
-  FBmIndex := _BmIndex;
-  FModuleName := _ModuleName;
-  FLineNo := _LineNo;
 end;
 
 function TryGetEditView(const _fn: string; out _EditView: IOTAEditView): Boolean;
@@ -382,18 +409,18 @@ end;
 procedure TfmGxBookmarksForm.mi_DeleteClick(Sender: TObject);
 var
   li: TListItem;
-  bmi: TBookmarkInfo;
+  bmi: TBookmark;
 begin
   if not TListView_TryGetSelected(lv_Bookmarks, li) then
     Exit;
   bmi := li.Data;
-  DeleteBookmark(bmi.FModuleName, bmi.FBmIndex);
+  DeleteBookmark(bmi.Module, bmi.Number);
 end;
 
 procedure TfmGxBookmarksForm.mi_EditClick(Sender: TObject);
 var
   li: TListItem;
-  bmi: TBookmarkInfo;
+  bmi: TBookmark;
   ModuleName: string;
   LineNo: Integer;
 begin
@@ -402,12 +429,12 @@ begin
 
   bmi := li.Data;
   try
-    ModuleName := bmi.FModuleName;
-    LineNo := bmi.FLineNo;
+    ModuleName := bmi.Module;
+    LineNo := bmi.Line;
     if not TfmEditBookmarks.Execute(Self, ModuleName, LineNo) then
       Exit;
 
-    SetBookmark(ModuleName, LineNo, bmi.fBmIndex);
+    SetBookmark(ModuleName, LineNo, bmi.Number);
   finally
     Init;
   end;
