@@ -346,6 +346,7 @@ begin
       EditView.BookmarkToggle(_BmIdx);
     finally
       EditView.SetCursorPos(SaveCursorPos);
+      EditView.Paint;
     end;
   end;
 end;
