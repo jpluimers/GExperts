@@ -163,6 +163,15 @@ function TComboBox_GetSelectedObjectDef(_cmb: TCustomComboBox;
 ///<summary> Frees all objects assigned to the list and then clears the list </summary>
 procedure TListbox_ClearWithObjects(_lst: TCustomListbox);
 
+///<summary> Gets the caption of the selected listbox item
+///          @param cmb is the TCustomListbox (descendant) to read from
+///          @param Item is the selected item, only valid if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if an item was selected </summary>
+function TListBox_GetSelected(_lb: TCustomListbox; out _Item: string;
+  _FocusControl: Boolean = False): Boolean;
+
 ///<summary> Gets the object pointer of the selected listbox item
 ///          @param lst is the TCustomListbox (descendant) to read from
 ///          @param Idx is the listbox's ItemIndex, only valid if the function returns true
@@ -834,6 +843,19 @@ procedure TListbox_ClearWithObjects(_lst: TCustomListbox);
 begin
   TStrings_FreeAllObjects(_lst.Items);
   _lst.Items.Clear;
+end;
+
+function TListBox_GetSelected(_lb: TCustomListbox; out _Item: string;
+  _FocusControl: Boolean = False): Boolean;
+var
+  Idx: Integer;
+begin
+  Idx := _lb.ItemIndex;
+  Result := Idx <> -1;
+  if Result then
+    _Item := _lb.Items[Idx]
+  else if _FocusControl then
+    _lb.SetFocus;
 end;
 
 function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Idx: Integer; out _Obj: Pointer): Boolean;
