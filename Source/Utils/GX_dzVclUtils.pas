@@ -4,9 +4,9 @@ interface
 
 {$I GX_CondDefine.inc}
 
-{$ifdef GX_VER200_up}
-  {$DEFINE SUPPORTS_UNICODE_STRING}
-{$endif}
+{$IFDEF GX_VER200_up}
+{$DEFINE SUPPORTS_UNICODE_STRING}
+{$ENDIF}
 
 {$WARN UNIT_PLATFORM OFF}
 {$WARN SYMBOL_PLATFORM OFF}
@@ -147,7 +147,7 @@ function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Idx: Integer;
 ///                              if it does not contain a valid value, default = false
 ///          @returns true, if these out parameters are valid </summary>
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
-  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload; inline;
+  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
   out _Idx: Integer; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
@@ -605,13 +605,13 @@ end;
 
 function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction;
 begin
-  Result:= TActionlist_Append(_al, _Caption);
+  Result := TActionlist_Append(_al, _Caption);
   Result.OnExecute := _OnExecute;
 end;
 
 function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction;
 begin
-  Result:= TActionlist_Append(_al, _Caption, _Shortcut);
+  Result := TActionlist_Append(_al, _Caption, _Shortcut);
   Result.OnExecute := _OnExecute;
 end;
 
@@ -662,6 +662,13 @@ procedure TComboBox_AddIntObject(_cmb: TCustomComboBox; const _Item: string; _Va
 begin
   _cmb.Items.AddObject(_Item, Pointer(_Value));
 end;
+
+{$IFNDEF GX_VER170_up}
+function StartsText(const ASubText, AText: string): Boolean;
+begin
+  Result := AnsiStartsText(ASubText, AText);
+end;
+{$ENDIF}
 
 function TComboBox_Select(_cmb: TCustomComboBox; const _Item: string; _DefaultIdx: Integer = -1;
   _AllowPartialMatch: Boolean = False): Integer;
