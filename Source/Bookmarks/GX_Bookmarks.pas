@@ -71,6 +71,7 @@ uses
   GX_dzVclUtils,
   GX_EditBookmark;
 
+{$IFDEF GX_VER170_up}
 type
   ///<summary>
   /// We implement INTAEditServicesNotifier only to get a notification when the EditViewActivated
@@ -87,13 +88,16 @@ type
   public
     constructor Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
   end;
+{$ENDIF}
 
 type
   TGxBookmarksExpert = class(TGX_Expert)
   private
     fmGxBookmarksForm: TfmGxBookmarksForm;
+{$IFDEF GX_VER170_up}
     FNotifierIdx: Integer;
     procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
+{$ENDIF}
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -113,16 +117,20 @@ begin
   fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
   IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm');
 
+{$IFDEF GX_VER170_up}
   if Assigned(BorlandIDEServices) then begin
     FNotifierIdx := (BorlandIDEServices as IOTAEditorServices).AddNotifier(
       TEditServiceNotifier.Create(EditorViewActivated));
   end;
+{$ENDIF}
 end;
 
 destructor TGxBookmarksExpert.Destroy;
 begin
+{$IFDEF GX_VER170_up}
   if FNotifierIdx <> 0 then
     (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
+{$ENDIF}
 
   if Assigned(fmGxBookmarksForm) then begin
     IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
@@ -139,11 +147,13 @@ begin
   EnsureFormVisible(fmGxBookmarksForm);
 end;
 
+{$IFDEF GX_VER170_up}
 procedure TGxBookmarksExpert.EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
 begin
   if Assigned(fmGxBookmarksForm) then
     fmGxBookmarksForm.Init;
 end;
+{$ENDIF}
 
 function TGxBookmarksExpert.GetActionCaption: string;
 resourcestring
@@ -518,6 +528,7 @@ begin
 
 end;
 
+{$IFDEF GX_VER170_up}
 { TEditServiceNotifier }
 
 constructor TEditServiceNotifier.Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
@@ -532,6 +543,7 @@ begin
   if Assigned(FOnEditorViewActivated) then
     FOnEditorViewActivated(Self, EditView);
 end;
+{$ENDIF}
 
 initialization
   RegisterGX_Expert(TGxBookmarksExpert);

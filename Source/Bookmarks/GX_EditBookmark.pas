@@ -34,9 +34,9 @@ type
     procedure CheckInput;
   public
     class function Execute(_Owner: TWinControl;
-      var _Module: string; var _LineNo: Integer; var _BmIndex: Integer): Boolean; overload; static;
+      var _Module: string; var _LineNo: Integer; var _BmIndex: Integer): Boolean; overload;
     class function Execute(_Owner: TWinControl; const _Module: string;
-      var _LineNo: Integer): Boolean; overload; static;
+      var _LineNo: Integer): Boolean; overload;
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
   end;

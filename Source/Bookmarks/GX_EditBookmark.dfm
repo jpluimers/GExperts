@@ -7,8 +7,6 @@ inherited fmEditBookmarks: TfmEditBookmarks
   ClientWidth = 233
   ParentFont = False
   Position = poOwnerFormCenter
-  ExplicitWidth = 241
-  ExplicitHeight = 167
   PixelsPerInch = 96
   TextHeight = 13
   object l_BmIndex: TLabel
