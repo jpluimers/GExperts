@@ -13,6 +13,7 @@ type
     FNumber: Integer;
     FCharIdx: Integer;
     FModule: string;
+    FText: string;
   public
     constructor Create(_Number, _Line, _CharIdx: Integer; const _Module: string); overload;
     constructor Create(_bm: TBookmark); overload;
@@ -21,6 +22,7 @@ type
     property Line: Integer read FLine;
     property CharIdx: Integer read FCharIdx;
     property Module: string read FModule;
+    property Text: string read FText write FText;
   end;
 
 type
