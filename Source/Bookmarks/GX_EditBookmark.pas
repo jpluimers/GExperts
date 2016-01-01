@@ -111,7 +111,8 @@ begin
     FreeAndNil(List);
   end;
 
-  TComboBox_AddIntObject(cmb_BmIndex, rcNext, -1);
+  // -1 would raise an exception in Delphi 6 when retrieving it again, but -2 is fine too 
+  TComboBox_AddIntObject(cmb_BmIndex, rcNext, -2);
   for i := 0 to 19 do begin
     TComboBox_AddIntObject(cmb_BmIndex, IntToStr(i), i);
   end;

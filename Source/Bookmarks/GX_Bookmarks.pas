@@ -34,6 +34,7 @@ type
     mi_Delete: TMenuItem;
     mi_Add: TMenuItem;
     mi_Edit: TMenuItem;
+    mi_DeleteAll: TMenuItem;
     procedure lb_BookmarksDblClick(Sender: TObject);
     procedure tim_UpdateTimer(Sender: TObject);
     procedure mi_DeleteClick(Sender: TObject);
@@ -41,6 +42,7 @@ type
     procedure mi_EditClick(Sender: TObject);
     procedure lb_BookmarksDrawItem(Control: TWinControl; Index: Integer; _Rect: TRect;
       State: TOwnerDrawState);
+    procedure mi_DeleteAllClick(Sender: TObject);
   private
     FBookmarks: TBookmarkList;
     function GetEditView(var _SourceEditor: IOTASourceEditor;
@@ -51,6 +53,7 @@ type
     procedure AddBookmarks(const _ModuleName: string; _EditView: IOTAEditView; _Bookmarks: TBookmarkList);
     function HasChanged(_NewBookmarks: TBookmarkList): Boolean;
   public
+    constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
   end;
 
@@ -98,6 +101,8 @@ type
     FNotifierIdx: Integer;
     procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
 {$ENDIF}
+  protected
+    procedure SetActive(New: Boolean); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -114,8 +119,7 @@ constructor TGxBookmarksExpert.Create;
 begin
   inherited Create;
 
-  fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
-  IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm');
+  fmGxBookmarksForm := nil;
 
 {$IFDEF GX_VER170_up}
   if Assigned(BorlandIDEServices) then begin
@@ -132,16 +136,29 @@ begin
     (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
 {$ENDIF}
 
-  if Assigned(fmGxBookmarksForm) then begin
-    IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
-    fmGxBookmarksForm.Free;
-  end;
+  fmGxBookmarksForm := nil;
 
   inherited Destroy;
 end;
 
+procedure TGxBookmarksExpert.SetActive(New: Boolean);
+begin
+  if New <> Active then begin
+    inherited SetActive(New);
+    if New then
+      IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm')
+    else begin
+      FreeAndNil(fmGxBookmarksForm);
+      IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
+    end;
+  end;
+end;
+
 procedure TGxBookmarksExpert.Click(Sender: TObject);
 begin
+  if fmGxBookmarksForm = nil then begin
+    fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
+  end;
   fmGxBookmarksForm.Init;
   IdeDockManager.ShowForm(fmGxBookmarksForm);
   EnsureFormVisible(fmGxBookmarksForm);
@@ -178,6 +195,11 @@ begin
 end;
 
 { TfmGxBookmarksForm }
+
+constructor TfmGxBookmarksForm.Create(_Owner: TComponent);
+begin
+  inherited;
+end;
 
 destructor TfmGxBookmarksForm.Destroy;
 begin
@@ -356,7 +378,7 @@ begin
   if not TryGetEditView(_ModuleName, EditView) then
     Exit;
 
-  if _BmIdx = -1 then begin
+  if _BmIdx < 0 then begin
     // no bookmark index was given, find the first one that's free
     for i := 0 to 19 do begin
       if EditView.BookmarkPos[i].Line = 0 then begin
@@ -364,7 +386,7 @@ begin
         break;
       end;
     end;
-    if _BmIdx = -1 then
+    if _BmIdx < 0 then
       Exit; // no free bookmark index found
   end;
 
@@ -389,13 +411,11 @@ var
 begin
   if not GetEditView(SourceEditor, EditView) then
     Exit;
-
   try
     ModuleName := SourceEditor.Filename;
     LineNo := EditView.CursorPos.Line;
     if not TfmEditBookmarks.Execute(Self, ModuleName, LineNo, BmIndex) then
       Exit;
-
     SetBookmark(ModuleName, LineNo, BmIndex);
   finally
     Init;
@@ -409,6 +429,17 @@ begin
   if not TListBox_GetSelectedObject(lb_Bookmarks, Pointer(bm)) then
     Exit;
   DeleteBookmark(bm.Module, bm.Number);
+end;
+
+procedure TfmGxBookmarksForm.mi_DeleteAllClick(Sender: TObject);
+var
+  i: integer;
+  bm: TBookmark;
+begin
+  for i := lb_bookmarks.Items.Count - 1 downto 0 do begin
+    bm := TBookmark(lb_Bookmarks.Items.Objects[i]);
+    DeleteBookmark(bm.Module, bm.Number);
+  end;
 end;
 
 procedure TfmGxBookmarksForm.mi_EditClick(Sender: TObject);
@@ -525,7 +556,6 @@ begin
     PaintFileHeader(Rect(_Rect.Left, _Rect.Top, _Rect.Right, _Rect.Top + 16));
     PaintLines(Rect(_Rect.Left, _Rect.Top + 16, _Rect.Right, _Rect.Bottom));
   end;
-
 end;
 
 {$IFDEF GX_VER170_up}

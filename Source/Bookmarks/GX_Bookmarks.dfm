@@ -35,5 +35,10 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
       Caption = 'Delete'
       OnClick = mi_DeleteClick
     end
+    object mi_DeleteAll: TMenuItem
+      Caption = 'Delete All'
+      ShortCut = 16452
+      OnClick = mi_DeleteAllClick
+    end
   end
 end
