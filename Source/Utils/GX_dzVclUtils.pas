@@ -160,6 +160,23 @@ function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
 function TComboBox_GetSelectedObjectDef(_cmb: TCustomComboBox;
   _Default: Integer; _FocusControl: Boolean = False): Integer;
 
+///<summary> Frees all objects assigned to the list and then clears the list </summary>
+procedure TListbox_ClearWithObjects(_lst: TCustomListbox);
+
+///<summary> Gets the object pointer of the selected listbox item
+///          @param lst is the TCustomListbox (descendant) to read from
+///          @param Idx is the listbox's ItemIndex, only valid if the function returns true
+///          @param Obj is the value of the object pointer of the selected item, only valid
+///                     if the function returns true
+///          @returns true, if out parameters are valid </summary>
+function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Idx: Integer; out _Obj: Pointer): Boolean; overload;
+///<summary> Gets the object pointer of the selected listbox item
+///          @param lst is the TCustomListbox (descendant) to read from
+///          @param Obj is the value of the object pointer of the selected item, only valid
+///                     if the function returns true
+///          @returns true, if out parameters are valid </summary>
+function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Obj: Pointer): Boolean; overload;
+
 type
   TListViewResizeOptions = (lvrCaptions, lvrContent);
   TLIstViewResizeOptionSet = set of TListViewResizeOptions;
@@ -804,6 +821,30 @@ procedure TComboBox_ClearWithObjects(_cmb: TCustomComboBox);
 begin
   TStrings_FreeAllObjects(_cmb.Items);
   _cmb.Clear;
+end;
+
+procedure TListbox_ClearWithObjects(_lst: TCustomListbox);
+begin
+  TStrings_FreeAllObjects(_lst.Items);
+  _lst.Items.Clear;
+end;
+
+function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Idx: Integer; out _Obj: Pointer): Boolean;
+begin
+  _Idx := _lst.ItemIndex;
+  Result := _Idx <> -1;
+  if Result then
+    _Obj := _lst.Items.Objects[_Idx];
+end;
+
+function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Obj: Pointer): Boolean;
+var
+  Idx: Integer;
+begin
+  Idx := _lst.ItemIndex;
+  Result := Idx <> -1;
+  if Result then
+    _Obj := _lst.Items.Objects[Idx];
 end;
 
 end.
