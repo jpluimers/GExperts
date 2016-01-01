@@ -109,6 +109,11 @@ type
     chkReplaceListWithMemo: TCheckBox;
     chkAllowResize: TCheckBox;
     chkRememberPosition: TCheckBox;
+    tshSuppressedMessages: TTabSheet;
+    gbSuppressedMessages: TGroupBox;
+    lbSuppressedMesages: TListBox;
+    btnDeleteSuppressedMessage: TButton;
+    btnClearSuppressedMessages: TButton;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -149,6 +154,8 @@ type
     procedure tmrFilterTimer(Sender: TObject);
     procedure edtFilterChange(Sender: TObject);
     procedure chkEnhanceDialogsClick(Sender: TObject);
+    procedure btnDeleteSuppressedMessageClick(Sender: TObject);
+    procedure btnClearSuppressedMessagesClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -171,6 +178,8 @@ type
     // Editor experts save themselves automatically
     // hence there is no SaveEditorExperts method
     procedure LoadEditorExperts;
+
+    procedure LoadSuppressedMessages;
 
     procedure FilterVisibleExperts;
     procedure edVCLPathOnDropFiles(_Sender: TObject; _Files: TStrings);
@@ -243,6 +252,8 @@ begin
   HideUnsupportedIdeItems;
 
   HideUnsupportedEditorItems;
+
+  LoadSuppressedMessages;
 
   tshDebug.TabVisible := False;
 end;
@@ -472,6 +483,19 @@ begin
   end;
 end;
 
+procedure TfmConfiguration.btnClearSuppressedMessagesClick(Sender: TObject);
+var
+  Settings: TGExpertsSettings;
+begin
+  Settings := TGExpertsSettings.Create;
+  try
+    Settings.EraseSection(TGxMsgBoxAdaptor.ConfigurationKey);
+  finally
+    Settings.Free;
+  end;
+  LoadSuppressedMessages;
+end;
+
 procedure TfmConfiguration.btnConfigureClick(Sender: TObject);
 var
   EditorExpert: TEditorExpert;
@@ -598,6 +622,32 @@ begin
   rgAlign.ItemIndex := Ord(EditorEnhancements.ToolBarAlign) - 1;
 
   chkDisableEDTEnhancementsClick(chkDisableEDTEnhancements);
+end;
+
+procedure TfmConfiguration.LoadSuppressedMessages;
+var
+  Section: string;
+  Settings: TGExpertsSettings;
+  sl: TStringList;
+  i: Integer;
+begin
+  sl := TStringList.Create;
+  try
+    Settings := TGExpertsSettings.Create;
+    try
+      Section := TGxMsgBoxAdaptor.ConfigurationKey;
+      Settings.ReadSection(Section, sl);
+      for i := sl.Count - 1 downto 0 do begin
+        if not Settings.ReadBool(Section, sl[i], False) then
+          sl.Delete(i);
+      end;
+      lbSuppressedMesages.Items.Assign(sl);
+    finally
+      Settings.Free;
+    end;
+  finally
+    sl.Free;
+  end;
 end;
 
 procedure TfmConfiguration.SaveIdeEnhancements;
@@ -1064,6 +1114,22 @@ begin
     chkUseCustomFont.Checked := True;
     Self.Font.Assign(dlgUIFont.Font);
   end;
+end;
+
+procedure TfmConfiguration.btnDeleteSuppressedMessageClick(Sender: TObject);
+var
+  s: string;
+  Settings: TGExpertsSettings;
+begin
+  if not TListBox_GetSelected(lbSuppressedMesages, s) then
+    Exit;
+  Settings := TGExpertsSettings.Create;
+  try
+    Settings.WriteBool(TGxMsgBoxAdaptor.ConfigurationKey, s, False);
+  finally
+    Settings.Free;
+  end;
+  LoadSuppressedMessages;
 end;
 
 procedure TfmConfiguration.chkEnhanceDialogsClick(Sender: TObject);

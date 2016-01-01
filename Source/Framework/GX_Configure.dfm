@@ -659,6 +659,52 @@ object fmConfiguration: TfmConfiguration
           TabOrder = 2
         end
       end
+      object tshSuppressedMessages: TTabSheet
+        Caption = 'Suppressed Messages'
+        ImageIndex = 6
+        DesignSize = (
+          591
+          454)
+        object gbSuppressedMessages: TGroupBox
+          Left = 8
+          Top = 8
+          Width = 433
+          Height = 433
+          Anchors = [akLeft, akTop, akBottom]
+          Caption = 'Suppressed Messages'
+          TabOrder = 0
+          DesignSize = (
+            433
+            433)
+          object lbSuppressedMesages: TListBox
+            Left = 8
+            Top = 24
+            Width = 321
+            Height = 401
+            Anchors = [akLeft, akTop, akBottom]
+            ItemHeight = 14
+            TabOrder = 0
+          end
+          object btnDeleteSuppressedMessage: TButton
+            Left = 344
+            Top = 80
+            Width = 75
+            Height = 25
+            Caption = 'Delete'
+            TabOrder = 1
+            OnClick = btnDeleteSuppressedMessageClick
+          end
+          object btnClearSuppressedMessages: TButton
+            Left = 344
+            Top = 112
+            Width = 75
+            Height = 25
+            Caption = 'Clear'
+            TabOrder = 2
+            OnClick = btnClearSuppressedMessagesClick
+          end
+        end
+      end
       object tshDebug: TTabSheet
         Caption = 'Debug'
         ImageIndex = 6

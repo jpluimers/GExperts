@@ -35,7 +35,8 @@ type
     // Returns whether the message box should be shown.
     function ShouldShow: Boolean; virtual;
     function AllowSuppress: Boolean; virtual;
-    function ConfigurationKey: string;
+  public
+    class function ConfigurationKey: string;
   end;
 
   TGxQuestionBoxAdaptor = class(TGxMsgBoxAdaptor)
@@ -223,7 +224,7 @@ begin
   Result := True;
 end;
 
-function TGxMsgBoxAdaptor.ConfigurationKey: string;
+class function TGxMsgBoxAdaptor.ConfigurationKey: string;
 begin
   Result := 'Misc' + PathDelim + 'SuppressedMessages';
 end;
