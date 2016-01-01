@@ -20,6 +20,7 @@ uses
   ToolsAPI,
   ExtCtrls,
   Menus,
+  Types,
   GX_Experts,
   GX_BaseForm,
   GX_IdeDock,
@@ -27,25 +28,28 @@ uses
 
 type
   TfmGxBookmarksForm = class(TfmIdeDockForm)
-    lv_Bookmarks: TListView;
+    lb_Bookmarks: TListBox;
     tim_Update: TTimer;
     pm_Bookmarks: TPopupMenu;
     mi_Delete: TMenuItem;
     mi_Add: TMenuItem;
     mi_Edit: TMenuItem;
-    procedure lv_BookmarksDblClick(Sender: TObject);
+    procedure lb_BookmarksDblClick(Sender: TObject);
     procedure tim_UpdateTimer(Sender: TObject);
     procedure mi_DeleteClick(Sender: TObject);
     procedure mi_AddClick(Sender: TObject);
     procedure mi_EditClick(Sender: TObject);
+    procedure lb_BookmarksDrawItem(Control: TWinControl; Index: Integer; _Rect: TRect;
+      State: TOwnerDrawState);
   private
+    FBookmarks: TBookmarkList;
     function GetEditView(var _SourceEditor: IOTASourceEditor;
       var _EditView: IOTAEditView): Boolean;
     procedure Init;
     procedure SetBookmark(const _ModuleName: string; _LineNo: Integer; _BmIdx: Integer = -1);
     procedure DeleteBookmark(const _ModuleName: string; _BmIdx: Integer);
     procedure AddBookmarks(const _ModuleName: string; _EditView: IOTAEditView; _Bookmarks: TBookmarkList);
-    function HasChanged(_Bookmarks: TBookmarkList; _Items: TListItems): Boolean;
+    function HasChanged(_NewBookmarks: TBookmarkList): Boolean;
   public
     destructor Destroy; override;
   end;
@@ -57,7 +61,8 @@ implementation
 uses
 {$IFOPT D+}GX_DbugIntf,
 {$ENDIF}
-  Registry,
+  Windows,
+  Graphics,
   GX_GExperts,
   GX_ConfigurationInfo,
   GX_OtaUtils,
@@ -140,11 +145,33 @@ begin
     fmGxBookmarksForm.Init;
 end;
 
+function TGxBookmarksExpert.GetActionCaption: string;
+resourcestring
+  SMenuCaption = 'Bookmarks';
+begin
+  Result := SMenuCaption;
+end;
+
+class function TGxBookmarksExpert.GetName: string;
+begin
+  Result := 'BookmarksExpert';
+end;
+
+function TGxBookmarksExpert.HasConfigOptions: Boolean;
+begin
+  Result := False;
+end;
+
+function TGxBookmarksExpert.HasMenuItem: Boolean;
+begin
+  Result := True;
+end;
+
 { TfmGxBookmarksForm }
 
 destructor TfmGxBookmarksForm.Destroy;
 begin
-  TListView_ClearWithObjects(lv_Bookmarks);
+  FreeAndNil(FBookmarks);
   inherited;
 end;
 
@@ -173,19 +200,19 @@ begin
   end;
 end;
 
-function TfmGxBookmarksForm.HasChanged(_Bookmarks: TBookmarkList; _Items: TListItems): Boolean;
+function TfmGxBookmarksForm.HasChanged(_NewBookmarks: TBookmarkList): Boolean;
 var
   i: Integer;
   bm1: TBookmark;
   bm2: Pointer;
 begin
   Result := True;
-  if _Bookmarks.Count <> _Items.Count then
+  if not Assigned(FBookmarks) or (_NewBookmarks.Count <> FBookmarks.Count) then
     Exit;
 
-  for i := 0 to _Bookmarks.Count - 1 do begin
-    bm1 := _Bookmarks[i];
-    bm2 := _Items[i].Data;
+  for i := 0 to _NewBookmarks.Count - 1 do begin
+    bm1 := _NewBookmarks[i];
+    bm2 := FBookmarks[i];
     if not bm1.IsSame(bm2) then
       Exit;
   end;
@@ -199,39 +226,36 @@ var
   EditView: IOTAEditView;
   i: Integer;
   bm: TBookmark;
-  li: TListItem;
-  Items: TListItems;
-  Bookmarks: TBookmarkList;
+  NewBookmarks: TBookmarkList;
+  s: string;
 begin
   tim_Update.Enabled := False;
   try
     if not GetEditView(SourceEditor, EditView) then
       Exit;
-    Bookmarks := TBookmarkList.Create;
+    NewBookmarks := TBookmarkList.Create;
     try
-      AddBookmarks(SourceEditor.Filename, EditView, Bookmarks);
+      AddBookmarks(SourceEditor.Filename, EditView, NewBookmarks);
 
-      Items := lv_Bookmarks.Items;
-      if HasChanged(Bookmarks, Items) then begin
-
-        Items.BeginUpdate;
-        try
-          TListItems_ClearWithObjects(Items);
-          for i := 0 to Bookmarks.Count - 1 do begin
-            bm := Bookmarks[i];
-            li := Items.Add;
-            li.Data := TBookmark.Create(bm);
-            li.Caption := IntToStr(bm.Number);
-            li.SubItems.Add(ExtractFileName(bm.Module));
-            li.SubItems.Add(IntToStr(bm.Line));
-          end;
-          TListView_Resize(lv_Bookmarks);
-        finally
-          Items.EndUpdate;
+      if HasChanged(NewBookmarks) then begin
+        FreeAndNil(FBookmarks);
+        FBookmarks := NewBookmarks;
+        NewBookmarks := nil;
+        lb_Bookmarks.Items.Clear;
+        for i := 0 to FBookmarks.Count - 1 do begin
+          bm := FBookmarks[i];
+          lb_Bookmarks.AddItem(Format('%d [%d] %s', [bm.Number, bm.Line, ExtractFileName(bm.Module)]), bm);
+          if bm.Line > 1 then
+            s := ' ' + GxOtaGetEditorLineAsString(EditView, bm.Line - 1)
+          else
+            s := ' ' + CRLF;
+          s := s + '> ' + GxOtaGetEditorLineAsString(EditView, bm.Line);
+          s := s + ' ' + GxOtaGetEditorLineAsString(EditView, bm.Line + 1);
+          bm.Text := s;
         end;
       end;
     finally
-      FreeAndNil(Bookmarks);
+      FreeAndNil(NewBookmarks);
     end;
   finally
     tim_Update.Enabled := True;
@@ -243,21 +267,19 @@ begin
   Init;
 end;
 
-procedure TfmGxBookmarksForm.lv_BookmarksDblClick(Sender: TObject);
+procedure TfmGxBookmarksForm.lb_BookmarksDblClick(Sender: TObject);
 resourcestring
   SCouldNotOpenFile = 'Could not open file %s';
 var
-  li: TListItem;
-  bmi: TBookmark;
+  bm: TBookmark;
   fn: string;
   Module: IOTAModule;
   SourceEditor: IOTASourceEditor;
   EditView: IOTAEditView;
 begin
-  if not TListView_TryGetSelected(lv_Bookmarks, li) then
+  if not TListBox_GetSelectedObject(lb_Bookmarks, Pointer(bm)) then
     Exit;
-  bmi := li.Data;
-  fn := bmi.Module;
+  fn := bm.Module;
 
   if not GxOtaMakeSourceVisible(fn) then
     raise Exception.CreateFmt(SCouldNotOpenFile, [fn]);
@@ -275,47 +297,10 @@ begin
   if not Assigned(EditView) then
     Exit;
 
-  EditView.BookmarkGoto(bmi.Number);
+  EditView.BookmarkGoto(bm.Number);
   EditView.MoveViewToCursor;
   GxOtaFocusCurrentIDEEditControl;
   EditView.Paint;
-end;
-
-function TGxBookmarksExpert.GetActionCaption: string;
-resourcestring
-  SMenuCaption = 'Bookmarks';
-begin
-  Result := SMenuCaption;
-end;
-
-class function TGxBookmarksExpert.GetName: string;
-begin
-  Result := 'BookmarksExpert';
-end;
-
-function TGxBookmarksExpert.HasConfigOptions: Boolean;
-begin
-  Result := False;
-end;
-
-function TGxBookmarksExpert.HasMenuItem: Boolean;
-begin
-  Result := True;
-end;
-
-{ TEditServiceNotifier }
-
-constructor TEditServiceNotifier.Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
-begin
-  inherited Create;
-  FOnEditorViewActivated := _OnEditorViewActivated;
-end;
-
-procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
-  if Assigned(FOnEditorViewActivated) then
-    FOnEditorViewActivated(Self, EditView);
 end;
 
 function TryGetEditView(const _fn: string; out _EditView: IOTAEditView): Boolean;
@@ -409,36 +394,143 @@ end;
 
 procedure TfmGxBookmarksForm.mi_DeleteClick(Sender: TObject);
 var
-  li: TListItem;
-  bmi: TBookmark;
+  bm: TBookmark;
 begin
-  if not TListView_TryGetSelected(lv_Bookmarks, li) then
+  if not TListBox_GetSelectedObject(lb_Bookmarks, Pointer(bm)) then
     Exit;
-  bmi := li.Data;
-  DeleteBookmark(bmi.Module, bmi.Number);
+  DeleteBookmark(bm.Module, bm.Number);
 end;
 
 procedure TfmGxBookmarksForm.mi_EditClick(Sender: TObject);
 var
-  li: TListItem;
-  bmi: TBookmark;
+  bm: TBookmark;
   ModuleName: string;
   LineNo: Integer;
 begin
-  if not TListView_TryGetSelected(lv_Bookmarks, li) then
+  if not TListBox_GetSelectedObject(lb_Bookmarks, Pointer(bm)) then
     Exit;
 
-  bmi := li.Data;
   try
-    ModuleName := bmi.Module;
-    LineNo := bmi.Line;
+    ModuleName := bm.Module;
+    LineNo := bm.Line;
     if not TfmEditBookmarks.Execute(Self, ModuleName, LineNo) then
       Exit;
 
-    SetBookmark(ModuleName, LineNo, bmi.Number);
+    SetBookmark(ModuleName, LineNo, bm.Number);
   finally
     Init;
   end;
+end;
+
+procedure TfmGxBookmarksForm.lb_BookmarksDrawItem(Control: TWinControl; Index: Integer; _Rect: TRect;
+  State: TOwnerDrawState);
+resourcestring
+  SLine = 'Line %d';
+var
+  LbCanvas: TCanvas;
+  bm: TBookmark;
+
+  procedure PaintFileHeader(_Rect: TRect);
+  var
+    TopColor: TColor;
+    BottomColor: TColor;
+    i: Integer;
+    FileNameWidth: Integer;
+    FileString: string;
+    LineText: string;
+  begin
+    TopColor := clBtnHighlight;
+    BottomColor := clBtnShadow;
+
+    LbCanvas.Brush.Color := clBtnFace;
+    LbCanvas.Font.Color := clBtnText;
+    LbCanvas.FillRect(_Rect);
+
+    _Rect.Right := _Rect.Right + 2;
+    if odSelected in State then
+      Frame3D(LbCanvas, _Rect, BottomColor, TopColor, 1)
+    else
+      Frame3D(LbCanvas, _Rect, TopColor, BottomColor, 1);
+
+    i := LbCanvas.TextWidth('00');
+    FileString := ExtractFileName(bm.Module);
+    LbCanvas.TextOut(_Rect.Left + i + 8, _Rect.Top, FileString);
+
+    LbCanvas.TextOut(_Rect.Left + 3, _Rect.Top, IntToStr(bm.Number));
+
+    LineText := Format(SLine, [bm.Line]);
+
+    FileNameWidth := LbCanvas.TextWidth(LineText) + 10;
+    if (LbCanvas.TextWidth(FileString) + i + 10) <= _Rect.Right - FileNameWidth then
+      LbCanvas.TextOut(lb_Bookmarks.ClientWidth - FileNameWidth, _Rect.Top, LineText);
+  end;
+
+  procedure PaintLines(_Rect: TRect);
+  var
+    TextTop: Integer;
+    sl: TStringList;
+    i: Integer;
+    LineText: string;
+    s: string;
+    BGNormal: TColor;
+    BGBookmark: TColor;
+  begin
+    if [odSelected, odFocused] * State = [odSelected, odFocused] then begin
+      BGNormal := clHighLight;
+      LbCanvas.Font.Color := clHighLightText;
+      BGBookmark := BGNormal;
+    end else begin
+      BGNormal := clWindow;
+      LbCanvas.Font.Color := clWindowText;
+      BGBookmark := RGB(250, 255, 230);
+    end;
+    LbCanvas.Brush.Color := BGNormal;
+    LbCanvas.FillRect(_Rect);
+
+    TextTop := _Rect.Top + 1;
+    sl := TStringList.Create;
+    try
+      sl.Text := bm.Text;
+      for i := 0 to sl.Count - 1 do begin
+        s := sl[i];
+        LineText := Copy(s, 2, 255);
+        s := Copy(s, 1, 1);
+        if s = '>' then begin
+          LbCanvas.Brush.Color := BGBookmark;
+          LbCanvas.FillRect(Rect(_Rect.Left, TextTop, _Rect.Right, TextTop + 16));
+        end else
+          LbCanvas.Brush.Color := BGNormal;
+        LbCanvas.TextOut(_Rect.Left, TextTop, LineText);
+        Inc(TextTop, 16);
+      end;
+    finally
+      sl.Free;
+    end;
+  end;
+
+begin
+  LbCanvas := lb_Bookmarks.Canvas;
+  if Assigned(lb_Bookmarks.Items.Objects[Index]) then begin
+    bm := TBookmark(lb_Bookmarks.Items.Objects[Index]);
+    PaintFileHeader(Rect(_Rect.Left, _Rect.Top, _Rect.Right, _Rect.Top + 16));
+    PaintLines(Rect(_Rect.Left, _Rect.Top + 16, _Rect.Right, _Rect.Bottom));
+  end;
+
+end;
+
+{ TEditServiceNotifier }
+
+constructor TEditServiceNotifier.Create(_OnEditorViewActivated: TOnEditorViewActivatedEvent);
+begin
+  inherited Create;
+  FOnEditorViewActivated := _OnEditorViewActivated;
+end;
+
+procedure TEditServiceNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
+  const EditView: IOTAEditView);
+begin
+  if Assigned(FOnEditorViewActivated) then
+    FOnEditorViewActivated(Self, EditView);
 end;
 
 initialization

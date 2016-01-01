@@ -2,30 +2,18 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
   Caption = 'Bookmarks'
   PixelsPerInch = 96
   TextHeight = 14
-  object lv_Bookmarks: TListView
+  object lb_Bookmarks: TListBox
     Left = 0
     Top = 0
     Width = 304
     Height = 204
+    Style = lbOwnerDrawFixed
     Align = alClient
-    Columns = <
-      item
-        Caption = 'No.'
-        Width = 40
-      end
-      item
-        Caption = 'Unit'
-        Width = 200
-      end
-      item
-        Caption = 'Line'
-      end>
-    ReadOnly = True
-    RowSelect = True
+    ItemHeight = 64
     PopupMenu = pm_Bookmarks
     TabOrder = 0
-    ViewStyle = vsReport
-    OnDblClick = lv_BookmarksDblClick
+    OnDblClick = lb_BookmarksDblClick
+    OnDrawItem = lb_BookmarksDrawItem
   end
   object tim_Update: TTimer
     OnTimer = tim_UpdateTimer
