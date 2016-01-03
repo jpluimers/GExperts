@@ -418,7 +418,7 @@ function GxOtaOpenFileFromPath(const FileName: string): Boolean;
 procedure GxOtaGetUnitAliases(Aliases: TStrings);
 
 // Returns IDE's base registry key, for instance
-//   Software\Borland\Delphi\4.0\
+//   Software\Borland\Delphi\4.0
 // The returned string is guaranteed to NOT have a
 // backslash appended and it does NOT have a leading
 // backslash either (Windows 2000 is allergic to that).
