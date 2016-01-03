@@ -222,7 +222,7 @@ begin
     Exit;
   end;
 
-  if not FIsAutocompleteEnabled then begin
+  if not FIsAutocompleteEnabled and (_Form.FindComponent('TheActionList') = nil) then begin
     TEdit_ActivateAutoComplete(FEdit, [acsFileSystem], [actSuggest]);
     FIsAutocompleteEnabled := True;
     TWinControl_ActivateDropFiles(FEdit, HandleFilesDropped);
