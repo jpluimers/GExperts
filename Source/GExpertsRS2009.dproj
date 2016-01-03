@@ -76,6 +76,9 @@
 			<DCCReference Include="Framework\GX_BaseForm.pas">
 				<Form>fmBaseForm</Form>
 			</DCCReference>
+			<DCCReference Include="Bookmarks\GX_Bookmarks.pas">
+				<Form>fmGxBookmarksForm</Form>
+			</DCCReference>
 			<DCCReference Include="ClassBrowser\GX_ClassBrowser.pas">
 				<Form>fmClassBrowser</Form>
 			</DCCReference>
@@ -152,6 +155,17 @@
 			<DCCReference Include="Editor\GX_eDate.pas">
 				<Form>fmDateFormat</Form>
 			</DCCReference>
+			<DCCReference Include="Editor\GX_eFindDelimiter.pas"/>
+			<DCCReference Include="Editor\GX_ePasteAs.pas">
+				<Form>fmPasteAsConfig</Form>
+			</DCCReference>
+			<DCCReference Include="Editor\GX_ePrevNextIdentifier.pas"/>
+			<DCCReference Include="Editor\GX_eReverseStatement.pas"/>
+			<DCCReference Include="Editor\GX_eSelectIdentifier.pas"/>
+			<DCCReference Include="Editor\GX_eSelectionEditorExpert.pas"/>
+			<DCCReference Include="Editor\GX_eUsesManager.pas">
+				<Form>fmUsesManager</Form>
+			</DCCReference>
 			<DCCReference Include="Framework\GX_EditorChangeServices.pas"/>
 			<DCCReference Include="Framework\GX_EditorEnhancements.pas"/>
 			<DCCReference Include="Editor\GX_EditorExpert.pas"/>
@@ -161,14 +175,6 @@
 				<Form>fmEditorShortcut</Form>
 			</DCCReference>
 			<DCCReference Include="Framework\GX_EditReader.pas"/>
-			<DCCReference Include="Editor\GX_eFindDelimiter.pas"/>
-			<DCCReference Include="Editor\GX_ePrevNextIdentifier.pas"/>
-			<DCCReference Include="Editor\GX_eReverseStatement.pas"/>
-			<DCCReference Include="Editor\GX_eSelectIdentifier.pas"/>
-			<DCCReference Include="Editor\GX_eSelectionEditorExpert.pas"/>
-			<DCCReference Include="Editor\GX_eUsesManager.pas">
-				<Form>fmUsesManager</Form>
-			</DCCReference>
 			<DCCReference Include="Experts\GX_ExpertManager.pas">
 				<Form>fmExpertManager</Form>
 			</DCCReference>
@@ -369,6 +375,17 @@
 			<DCCReference Include="Framework\GX_VerDepConst.pas"/>
 			<DCCReference Include="Utils\GX_XmlUtils.pas"/>
 			<DCCReference Include="BackupProject\GX_Zipper.pas"/>
+			<DCCReference Include="IDE\GX_IdeSearchPathEnhancer.pas"/>
+			<DCCReference Include="Experts\GX_HideNavbar.pas"/>
+			<DCCReference Include="Utils\GX_dzVclUtils.pas"/>
+			<DCCReference Include="IDE\GX_IdeProjectOptionsEnhancer.pas"/>
+			<DCCReference Include="IDE\GX_IdeToolPropertiesEnhancer.pas"/>
+			<DCCReference Include="Utils\GX_NTAEditServiceNotifier.pas"/>
+			<DCCReference Include="Bookmarks\GX_EditBookmark.pas">
+				<Form>fmEditBookmarks</Form>
+			</DCCReference>
+			<DCCReference Include="Utils\GX_BookmarkList.pas"/>
+			<DCCReference Include="Utils\GX_dzQuicksort.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
