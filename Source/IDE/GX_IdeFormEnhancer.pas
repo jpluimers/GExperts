@@ -741,8 +741,14 @@ begin
   // is not allowed.
   FIsInFormChangeCallback := True;
   try
-    for i := FFormChangeCallbacks.Count - 1 downto 0 do
-      TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
+    for i := FFormChangeCallbacks.Count - 1 downto 0 do begin
+      try
+        TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
+      except
+        // just so we can have a look at any exceptions that might be raised ...
+        raise;
+      end;
+    end;
   finally
     FIsInFormChangeCallback := False;
   end;
