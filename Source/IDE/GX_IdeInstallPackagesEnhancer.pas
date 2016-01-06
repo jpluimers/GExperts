@@ -186,7 +186,7 @@ end;
 // -> [3] Panel2: TPanel
 //    -> [1] PropertySheetControl1: TpropertySheetControl
 //       -> [??] '': TPackageInstall
-//          -> [0] GroupBox1: TGroupBox
+//          -> [0] GroupBox1: TGroupBox !or! [0] gbDesignPackages: TGroupBox
 //             -> [0] DesignPackageList: TCheckListBox
 //             -> [1] Panel1: TPanel
 //                -> [0] LabelPackageFile: TLabel
