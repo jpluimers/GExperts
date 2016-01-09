@@ -77,8 +77,10 @@ type
     procedure SetEnhanceSearchPath(const Value: Boolean);
     function GetEnhanceToolProperties: Boolean;
     procedure SetEnhanceToolProperties(const Value: Boolean);
-    procedure SetEnhanceSearchPathAggressive(const Value: Boolean);
     function GetEnhanceSearchPathAggressive: Boolean;
+    procedure SetEnhanceSearchPathAggressive(const Value: Boolean);
+    function GetEnhanceInstallPackages: Boolean;
+    procedure SetEnhanceInstallPackages(const Value: Boolean);
     function GetIdeFormsAllowResize: Boolean;
     function GetIdeFormsRememberPosition: Boolean;
     procedure SetIdeFormsAllowResize(const Value: Boolean);
@@ -96,6 +98,8 @@ type
     property IdeFormsAllowResize: Boolean read GetIdeFormsAllowResize write SetIdeFormsAllowResize;
     property IdeFormsRememberPosition: Boolean read GetIdeFormsRememberPosition write SetIdeFormsRememberPosition;
 
+    // Install Packages dialog
+    property EnhanceInstallPackages: boolean read GetEnhanceInstallPackages write SetEnhanceInstallPackages;
     // Search path
     property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
     property EnhanceSearchPathAggressive: Boolean read GetEnhanceSearchPathAggressive write SetEnhanceSearchPathAggressive;
@@ -136,7 +140,7 @@ uses
   SysUtils, Forms,
   GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo, 
   GX_IdeSearchPathEnhancer, GX_IdeProjectOptionsEnhancer,
-  GX_IdeToolPropertiesEnhancer;
+  GX_IdeToolPropertiesEnhancer, GX_IdeInstallPackagesEnhancer;
 
 { TIdeEnhancements }
 
@@ -190,6 +194,11 @@ begin
     TIDEFormEnhancements.SetEnabled(True)
   else
     TIDEFormEnhancements.SetEnabled(False);
+end;
+
+procedure TIdeEnhancements.SetEnhanceInstallPackages(const Value: Boolean);
+begin
+  TGxIdeInstallPackagesEnhancer.SetEnabled(Value);
 end;
 
 procedure TIdeEnhancements.SetEnhanceSearchPath(const Value: Boolean);
@@ -248,6 +257,8 @@ begin
       EnhanceSearchPath := ReadBool(ConfigurationKey, 'EnhanceSearchPath', False);
       EnhanceSearchPathAggressive := ReadBool(ConfigurationKey, 'EnhanceSearchPathAggressive', False);
       EnhanceToolProperties := ReadBool(ConfigurationKey, 'EnhanceToolProperties', False);
+      EnhanceInstallPackages := ReadBool(ConfigurationKey, 'EnhanceInstallPackages', False);
+
       // File saving
       AutoSave := ReadBool(ConfigurationKey, 'AutoSave', False);
       AutoSaveInterval := ReadInteger(ConfigurationKey, 'AutoSaveInterval', 5);
@@ -294,6 +305,7 @@ begin
       WriteBool(ConfigurationKey, 'EnhanceSearchPath', EnhanceSearchPath);
       WriteBool(ConfigurationKey, 'EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
       WriteBool(ConfigurationKey, 'EnhanceToolProperties', EnhanceToolProperties);
+      WriteBool(ConfigurationKey, 'EnhanceInstallPackages', EnhanceInstallPackages);
 
       // File saving
       WriteBool(ConfigurationKey, 'AutoSave', AutoSave);
@@ -732,6 +744,11 @@ end;
 function TIdeEnhancements.GetEnhanceIDEForms: Boolean;
 begin
   Result := TIDEFormEnhancements.GetEnabled;
+end;
+
+function TIdeEnhancements.GetEnhanceInstallPackages: Boolean;
+begin
+  Result := TGxIdeInstallPackagesEnhancer.GetEnabled;
 end;
 
 function TIdeEnhancements.GetEnhanceSearchPath: Boolean;
