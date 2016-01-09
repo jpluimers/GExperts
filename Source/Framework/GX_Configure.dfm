@@ -412,7 +412,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 8
-          Top = 256
+          Top = 280
           Width = 521
           Height = 165
           Caption = 'Component &Palette'
@@ -481,7 +481,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 81
           Width = 521
-          Height = 168
+          Height = 192
           Caption = 'IDE'
           TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
@@ -502,11 +502,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 146
+            Top = 162
             Width = 505
             Height = 17
             Caption = 'Show object inspector font names using the font'
-            TabOrder = 4
+            TabOrder = 7
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
@@ -514,7 +514,7 @@ object fmConfiguration: TfmConfiguration
             Width = 489
             Height = 17
             Caption = 'Enable drag && drop and autocomplete for search paths'
-            TabOrder = 1
+            TabOrder = 3
           end
           object chkEnhanceToolProperties: TCheckBox
             Left = 24
@@ -522,7 +522,7 @@ object fmConfiguration: TfmConfiguration
             Width = 489
             Height = 17
             Caption = 'Enhance Tools menu Tool Properties dialog'
-            TabOrder = 3
+            TabOrder = 5
           end
           object chkReplaceListWithMemo: TCheckBox
             Left = 40
@@ -530,7 +530,7 @@ object fmConfiguration: TfmConfiguration
             Width = 473
             Height = 17
             Caption = 'Replace path listbox with memo'
-            TabOrder = 2
+            TabOrder = 4
           end
           object chkAllowResize: TCheckBox
             Left = 24
@@ -538,7 +538,7 @@ object fmConfiguration: TfmConfiguration
             Width = 489
             Height = 17
             Caption = 'Allow resize (and remember size)'
-            TabOrder = 5
+            TabOrder = 1
           end
           object chkRememberPosition: TCheckBox
             Left = 24
@@ -546,6 +546,14 @@ object fmConfiguration: TfmConfiguration
             Width = 489
             Height = 17
             Caption = 'Remember position'
+            TabOrder = 2
+          end
+          object chkEnhanceInstallPackages: TCheckBox
+            Left = 24
+            Top = 136
+            Width = 489
+            Height = 17
+            Caption = 'Enhance Install Packages dialog'
             TabOrder = 6
           end
         end

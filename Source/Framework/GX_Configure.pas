@@ -114,6 +114,7 @@ type
     lbSuppressedMesages: TListBox;
     btnDeleteSuppressedMessage: TButton;
     btnClearSuppressedMessages: TButton;
+    chkEnhanceInstallPackages: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -576,6 +577,7 @@ begin
   chkEnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
   chkReplaceListWithMemo.Checked := IdeEnhancements.EnhanceSearchPathAggressive;
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
+  chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   UpdateIdeDialogCheckboxes;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
@@ -675,6 +677,7 @@ begin
   IdeEnhancements.IdeFormsRememberPosition := chkRememberPosition.Checked;
   IdeEnhancements.EnhanceSearchPath := chkEnhanceSearchPaths.Checked;
   IdeEnhancements.EnhanceSearchPathAggressive := chkReplaceListWithMemo.Checked;
+  IdeEnhancements.EnhanceInstallPackages := chkEnhanceInstallPackages.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
 
   // Menus
@@ -1148,6 +1151,7 @@ begin
   chkEnhanceSearchPaths.Enabled := EnableState;
   chkEnhanceToolProperties.Enabled := EnableState;
   chkReplaceListWithMemo.Enabled := EnableState;
+  chkEnhanceInstallPackages.Enabled := EnableState;
 end;
 
 end.
