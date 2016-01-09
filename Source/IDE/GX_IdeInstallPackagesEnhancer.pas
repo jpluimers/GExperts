@@ -110,7 +110,8 @@ end;
 
 function TInstallPackagesEnhancer.IsProjectOptionsForm(_Form: TCustomForm): Boolean;
 begin
-  Result := (_Form.ClassName = 'TDelphiProjectOptionsDialog') and (_Form.Name = 'DelphiProjectOptionsDialog');
+  Result := (_Form.ClassName = 'TDelphiProjectOptionsDialog') and (_Form.Name = 'DelphiProjectOptionsDialog')
+    or (_Form.ClassName = 'TProjectOptionsDialog') and (_Form.Name = 'ProjectOptionsDialog');
 end;
 
 function TInstallPackagesEnhancer.TryGetPackageInstallControlsOnProjectOptions(_Form: TCustomForm;
@@ -124,17 +125,25 @@ var
 begin
   Result := False;
 
-  if _Form.ControlCount < 4 then
+  if _Form.ControlCount < 2 then
     Exit;
 
-  ctrl := _Form.Controls[3];
-  if (ctrl.ClassName <> 'TPanel') or (ctrl.Name <> 'Panel2') then
-    Exit;
+  ctrl := _Form.Controls[1]; // Delphi 6 (and probably 7)
+  if (ctrl.ClassName <> 'TPanel') or (ctrl.Name <> 'Panel2') then begin
+    if _Form.ControlCount < 4 then
+      Exit;
+    ctrl := _Form.Controls[3]; // Delphi 2007 and up (probably Delphi 8 and up)
+    if (ctrl.ClassName <> 'TPanel') or (ctrl.Name <> 'Panel2') then
+      Exit;
+  end;
   wctrl := TWinControl(ctrl);
 
-  ctrl := wctrl.Controls[1];
-  if ctrl.ClassName <> 'TPropertySheetControl' then
-    Exit;
+  if (wctrl.ControlCount > 0) and (wctrl.Controls[0].ClassName = 'TPropertySheetControl') then
+    ctrl := wctrl.Controls[0]
+  else if (wctrl.ControlCount > 1) and (wctrl.Controls[1].ClassName = 'TPropertySheetControl') then
+    ctrl := wctrl.Controls[1]
+  else
+    exit;
   wctrl := TWinControl(ctrl);
 
   PackageInstall := nil;
@@ -182,9 +191,9 @@ end;
 
 // when called via Component -> Install Packages and a project is loaded
 // or via Project -> Options:
-// DelphiProjectOptionsDialog: TdelphiProjectOptionsDialog
-// -> [3] Panel2: TPanel
-//    -> [1] PropertySheetControl1: TpropertySheetControl
+// DelphiProjectOptionsDialog !or! ProjectOptionsDialog: TDelphiProjectOptionsDialog !or! TProjectOptionsDialog
+// -> [1 or 3] Panel2: TPanel
+//    -> [0 or 1] PropertySheetControl1 !or! PropSheetControl: TpropertySheetControl
 //       -> [??] '': TPackageInstall
 //          -> [0] GroupBox1: TGroupBox !or! [0] gbDesignPackages: TGroupBox
 //             -> [0] DesignPackageList: TCheckListBox
@@ -197,6 +206,8 @@ end;
 
 procedure TInstallPackagesEnhancer.EnhanceForm(_Form: TCustomForm; _BtnParent: TWinControl;
   _AddBtn: TButton; _FilenamePanel: TPanel);
+resourcestring
+  rcSelectAModule = 'Open an explorer window with this package selected.';
 var
 //  RenameBtn: TButton;
   SelectBtn: TButton;
@@ -220,6 +231,8 @@ begin
   SelectBtn.Caption := '...';
   SelectBtn.Align := alRight;
   SelectBtn.OnClick := b_SelectClick;
+  SelectBtn.Hint := rcSelectAModule;
+  SelectBtn.ShowHint := True;
 end;
 
 procedure TInstallPackagesEnhancer.EnhanceProjectOptionsForm(_Form: TCustomForm);
