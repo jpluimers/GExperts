@@ -125,18 +125,16 @@ var
 begin
   Result := False;
 
-  if _Form.ControlCount < 2 then
-    Exit;
-
-  ctrl := _Form.Controls[1]; // Delphi 6 (and probably 7)
-  if (ctrl.ClassName <> 'TPanel') or (ctrl.Name <> 'Panel2') then begin
-    if _Form.ControlCount < 4 then
-      Exit;
-    ctrl := _Form.Controls[3]; // Delphi 2007 and up (probably Delphi 8 and up)
-    if (ctrl.ClassName <> 'TPanel') or (ctrl.Name <> 'Panel2') then
-      Exit;
+  wctrl := nil;
+  for i := 0 to _Form.ControlCount - 1 do begin
+    ctrl := _Form.Controls[i];
+    if (ctrl.ClassName = 'TPanel') and (ctrl.Name = 'Panel2') then begin
+      wctrl := TWinControl(ctrl);
+       Break;
+    end;
   end;
-  wctrl := TWinControl(ctrl);
+  if not Assigned(wctrl) then
+    Exit;
 
   if (wctrl.ControlCount > 0) and (wctrl.Controls[0].ClassName = 'TPropertySheetControl') then
     ctrl := wctrl.Controls[0]
@@ -192,7 +190,7 @@ end;
 // when called via Component -> Install Packages and a project is loaded
 // or via Project -> Options:
 // DelphiProjectOptionsDialog !or! ProjectOptionsDialog: TDelphiProjectOptionsDialog !or! TProjectOptionsDialog
-// -> [1 or 3] Panel2: TPanel
+// -> [1, 2 or 3] Panel2: TPanel
 //    -> [0 or 1] PropertySheetControl1 !or! PropSheetControl: TpropertySheetControl
 //       -> [??] '': TPackageInstall
 //          -> [0] GroupBox1: TGroupBox !or! [0] gbDesignPackages: TGroupBox
