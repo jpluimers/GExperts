@@ -74,6 +74,10 @@ uses
   GX_dzVclUtils,
   GX_EditBookmark;
 
+var
+  fmGxBookmarksForm: TfmGxBookmarksForm = nil;
+
+
 {$IFDEF GX_VER170_up}
 type
   ///<summary>
@@ -96,7 +100,6 @@ type
 type
   TGxBookmarksExpert = class(TGX_Expert)
   private
-    fmGxBookmarksForm: TfmGxBookmarksForm;
 {$IFDEF GX_VER170_up}
     FNotifierIdx: Integer;
     procedure EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
@@ -136,7 +139,7 @@ begin
     (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
 {$ENDIF}
 
-  fmGxBookmarksForm := nil;
+  FreeAndNil(fmGxBookmarksForm);
 
   inherited Destroy;
 end;
@@ -148,8 +151,8 @@ begin
     if New then
       IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm')
     else begin
-      FreeAndNil(fmGxBookmarksForm);
       IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
+      FreeAndNil(fmGxBookmarksForm);
     end;
   end;
 end;
@@ -158,6 +161,7 @@ procedure TGxBookmarksExpert.Click(Sender: TObject);
 begin
   if fmGxBookmarksForm = nil then begin
     fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
+    SetFormIcon(fmGxBookmarksForm);
   end;
   fmGxBookmarksForm.Init;
   IdeDockManager.ShowForm(fmGxBookmarksForm);
@@ -203,6 +207,7 @@ end;
 
 destructor TfmGxBookmarksForm.Destroy;
 begin
+  fmGxBookmarksForm := nil;
   FreeAndNil(FBookmarks);
   inherited;
 end;
