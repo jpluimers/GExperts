@@ -111,20 +111,22 @@ uses
   SysUtils, GX_GxUtils, GX_GenericUtils, GX_Experts,
   GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math;
 
-var
-  fmPeInformation: TfmPeInformation = nil;
-
 type
   TPEExpert = class(TGX_Expert)
   protected
     procedure SetActive(New: Boolean); override;
   public
     constructor Create; override;
+    destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Click(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
+
+var
+  fmPeInformation: TfmPeInformation = nil;
+  PeExpert: TPEExpert;
 
 procedure SetListViewItem(AItem: TListItem; AValue: string);
 var
@@ -585,6 +587,10 @@ begin
   inherited Create(AOwner);
 
   SetToolbarGradient(ToolBar);
+
+  if Assigned(PeExpert) then
+    PeExpert.SetFormIcon(Self);
+
   FileDrop := TDropFileTarget.Create(nil);
   FileDrop.OnDrop := DropFiles;
   FileDrop.DragTypes := [dtCopy, dtMove, dtLink];
@@ -644,6 +650,13 @@ constructor TPEExpert.Create;
 begin
   inherited Create;
   ShortCut := 0;
+  PeExpert := Self;
+end;
+
+destructor TPEExpert.Destroy;
+begin
+  PeExpert := nil;
+  inherited;
 end;
 
 procedure TPEExpert.SetActive(New: Boolean);
@@ -655,8 +668,8 @@ begin
       IdeDockManager.RegisterDockableForm(TfmPeInformation, fmPeInformation, 'fmPeInformation')
     else
     begin
-      FreeAndNil(fmPeInformation);
       IdeDockManager.UnRegisterDockableForm(fmPeInformation, 'fmPeInformation');
+      FreeAndNil(fmPeInformation);
     end;
   end;
 end;
@@ -676,11 +689,9 @@ end;
 procedure TPEExpert.Click(Sender: TObject);
 begin
   if fmPeInformation = nil then
-  begin
     fmPeInformation := TfmPeInformation.Create(nil);
-    SetFormIcon(fmPeInformation);
-  end;
   IdeDockManager.ShowForm(fmPeInformation);
+  EnsureFormVisible(fmPeInformation);
 end;
 
 function TPEExpert.HasConfigOptions: Boolean;
