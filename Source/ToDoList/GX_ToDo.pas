@@ -66,8 +66,6 @@ type
 
   TToDoScanType = (tstProject, tstOpenFiles, tstDirectory, tstProjectGroup);
 
-  TToDoExpert = class;
-
   TfmToDo = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
     lvToDo: TListView;
@@ -928,6 +926,9 @@ begin
   inherited Create(AOwner);
   SetToolbarGradient(ToolBar);
 
+  if Assigned(ToDoExpert) then
+      ToDoExpert.SetFormIcon(Self);
+
   FIsFirstActivation := True;
   FColumnIndex := -1;
   FSortAscending := True;
@@ -1195,7 +1196,6 @@ begin
   if fmToDo = nil then
   begin
     fmToDo := TfmToDo.Create(nil);
-    SetFormIcon(fmToDo);
   end;
   IdeDockManager.ShowForm(fmToDo);
 end;
