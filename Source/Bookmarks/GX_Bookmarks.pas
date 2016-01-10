@@ -74,10 +74,6 @@ uses
   GX_dzVclUtils,
   GX_EditBookmark;
 
-var
-  fmGxBookmarksForm: TfmGxBookmarksForm = nil;
-
-
 {$IFDEF GX_VER170_up}
 type
   ///<summary>
@@ -116,13 +112,15 @@ type
     procedure Click(Sender: TObject); override;
   end;
 
+var
+  fmBookmarks: TfmGxBookmarksForm = nil;
+  BookmarksExpert: TGxBookmarksExpert = nil;
+
 { TGxBookmarksExpert }
 
 constructor TGxBookmarksExpert.Create;
 begin
   inherited Create;
-
-  fmGxBookmarksForm := nil;
 
 {$IFDEF GX_VER170_up}
   if Assigned(BorlandIDEServices) then begin
@@ -130,16 +128,19 @@ begin
       TEditServiceNotifier.Create(EditorViewActivated));
   end;
 {$ENDIF}
+
+  BookmarksExpert :=  Self;
 end;
 
 destructor TGxBookmarksExpert.Destroy;
 begin
+  BookmarksExpert := nil;
 {$IFDEF GX_VER170_up}
   if FNotifierIdx <> 0 then
     (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
 {$ENDIF}
 
-  FreeAndNil(fmGxBookmarksForm);
+  FreeAndNil(fmBookmarks);
 
   inherited Destroy;
 end;
@@ -149,30 +150,29 @@ begin
   if New <> Active then begin
     inherited SetActive(New);
     if New then
-      IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmGxBookmarksForm, 'fmGxBookmarksForm')
+      IdeDockManager.RegisterDockableForm(TfmGxBookmarksForm, fmBookmarks, 'fmGxBookmarksForm')
     else begin
-      IdeDockManager.UnRegisterDockableForm(fmGxBookmarksForm, 'fmGxBookmarksForm');
-      FreeAndNil(fmGxBookmarksForm);
+      IdeDockManager.UnRegisterDockableForm(fmBookmarks, 'fmGxBookmarksForm');
+      FreeAndNil(fmBookmarks);
     end;
   end;
 end;
 
 procedure TGxBookmarksExpert.Click(Sender: TObject);
 begin
-  if fmGxBookmarksForm = nil then begin
-    fmGxBookmarksForm := TfmGxBookmarksForm.Create(nil);
-    SetFormIcon(fmGxBookmarksForm);
+  if fmBookmarks = nil then begin
+    fmBookmarks := TfmGxBookmarksForm.Create(nil);
   end;
-  fmGxBookmarksForm.Init;
-  IdeDockManager.ShowForm(fmGxBookmarksForm);
-  EnsureFormVisible(fmGxBookmarksForm);
+  fmBookmarks.Init;
+  IdeDockManager.ShowForm(fmBookmarks);
+  EnsureFormVisible(fmBookmarks);
 end;
 
 {$IFDEF GX_VER170_up}
 procedure TGxBookmarksExpert.EditorViewActivated(_Sender: TObject; _EditView: IOTAEditView);
 begin
-  if Assigned(fmGxBookmarksForm) then
-    fmGxBookmarksForm.Init;
+  if Assigned(fmBookmarks) then
+    fmBookmarks.Init;
 end;
 {$ENDIF}
 
@@ -203,11 +203,13 @@ end;
 constructor TfmGxBookmarksForm.Create(_Owner: TComponent);
 begin
   inherited;
+  if Assigned(BookmarksExpert) then
+    BookmarksExpert.SetFormIcon(Self);
 end;
 
 destructor TfmGxBookmarksForm.Destroy;
 begin
-  fmGxBookmarksForm := nil;
+  fmBookmarks := nil;
   FreeAndNil(FBookmarks);
   inherited;
 end;
