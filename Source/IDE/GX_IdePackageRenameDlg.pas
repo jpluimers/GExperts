@@ -1,3 +1,4 @@
+// This file is unused, for now
 unit GX_IdePackageRenameDlg;
 
 interface

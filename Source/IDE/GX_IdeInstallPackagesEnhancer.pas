@@ -29,8 +29,7 @@ uses
   Registry,
   GX_GenericUtils,
   Classes,
-  GX_IdeUtils,
-  GX_IdePackageRenameDlg;
+  GX_IdeUtils;
 
 type
   TInstallPackagesEnhancer = class
