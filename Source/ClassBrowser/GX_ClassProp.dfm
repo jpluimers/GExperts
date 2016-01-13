@@ -1,6 +1,6 @@
 object fmClassProp: TfmClassProp
-  Left = 227
-  Top = 125
+  Left = 311
+  Top = 225
   Width = 479
   Height = 303
   ActiveControl = btnOK
@@ -17,7 +17,7 @@ object fmClassProp: TfmClassProp
   Scaled = False
   DesignSize = (
     463
-    267)
+    265)
   PixelsPerInch = 96
   TextHeight = 14
   object pgeProperties: TPageControl

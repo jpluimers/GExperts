@@ -147,8 +147,6 @@ type
     miFileRefreshAll: TMenuItem;
     actFoundModifySearchOptions: TAction;
     miFoundModifySearchOptions: TMenuItem;
-    tbnSep8: TToolButton;
-    tbnShowFullFilename: TToolButton;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);

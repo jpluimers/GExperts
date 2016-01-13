@@ -24,11 +24,11 @@ inherited fmGxBookmarksForm: TfmGxBookmarksForm
     Left = 232
     Top = 104
     object mi_Edit: TMenuItem
-      Caption = 'Edit ...'
+      Caption = 'Edit...'
       OnClick = mi_EditClick
     end
     object mi_Add: TMenuItem
-      Caption = 'Add ...'
+      Caption = 'Add...'
       OnClick = mi_AddClick
     end
     object mi_Delete: TMenuItem

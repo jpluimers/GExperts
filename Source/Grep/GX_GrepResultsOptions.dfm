@@ -1,6 +1,6 @@
 object fmGrepResultsOptions: TfmGrepResultsOptions
-  Left = -1095
-  Top = 296
+  Left = 360
+  Top = 227
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Grep Results Options'
@@ -82,7 +82,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Hide results when jumping to match'
+      Caption = 'Hide results window when jumping to match'
       TabOrder = 7
     end
     object chkGrepExpandIf: TCheckBox
@@ -91,7 +91,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Expand if all matches/files less after searching'
+      Caption = 'Expand all if matches/files are less than:'
       TabOrder = 1
       OnClick = chkGrepExpandClick
     end
@@ -119,7 +119,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Expand files if lines less after searching'
+      Caption = 'Expand files if match lines are less than:'
       TabOrder = 4
       OnClick = chkGrepExpandClick
     end
@@ -190,14 +190,15 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Min = 1
       Position = 1
       TabOrder = 4
+      Wrap = False
     end
     object chkSaveContextSize: TCheckBox
       Left = 8
       Top = 168
-      Width = 305
+      Width = 297
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Save context display size (height)'
+      Caption = 'Save context display height'
       TabOrder = 5
     end
     object pnlContextMacthLineFontColor: TPanel
@@ -237,7 +238,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Top = 8
     Width = 317
     Height = 169
-    Caption = 'Found List (list of the Results'#39' list)'
+    Caption = 'Search History'
     TabOrder = 0
     DesignSize = (
       317
@@ -248,7 +249,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Save found list size (width)'
+      Caption = 'Save search history pane width'
       TabOrder = 1
     end
     object chkGrepSaveResultListItems: TCheckBox
@@ -257,7 +258,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Save items (item: search text + its results list)'
+      Caption = 'Save search parameters and results'
       TabOrder = 0
     end
   end
@@ -321,6 +322,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
+    MinFontSize = 0
+    MaxFontSize = 0
     Left = 271
     Top = 220
   end
@@ -330,25 +333,31 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Style = []
+    MinFontSize = 0
+    MaxFontSize = 0
     Left = 602
     Top = 217
   end
   object dlgContextMatchFontColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 601
     Top = 297
   end
   object dlgListMatchTextColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 273
     Top = 289
   end
   object dlgListMatchBackgroundColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 273
     Top = 329
   end
   object dlgContextMatchLineFontColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 601
     Top = 257

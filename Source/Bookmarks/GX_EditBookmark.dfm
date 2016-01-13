@@ -1,32 +1,33 @@
 inherited fmEditBookmarks: TfmEditBookmarks
-  Left = 0
-  Top = 0
+  Left = 335
+  Top = 219
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Edit Bookmark'
   ClientHeight = 137
   ClientWidth = 233
   ParentFont = False
+  OldCreateOrder = True
   Position = poOwnerFormCenter
   PixelsPerInch = 96
   TextHeight = 13
   object l_BmIndex: TLabel
     Left = 136
     Top = 56
-    Width = 46
+    Width = 48
     Height = 13
     Caption = 'Bookmark'
   end
   object l_Module: TLabel
     Left = 8
     Top = 8
-    Width = 34
+    Width = 35
     Height = 13
     Caption = 'Module'
   end
   object l_Line: TLabel
     Left = 8
     Top = 57
-    Width = 19
+    Width = 20
     Height = 13
     Caption = 'Line'
   end
@@ -44,6 +45,7 @@ inherited fmEditBookmarks: TfmEditBookmarks
     Width = 89
     Height = 21
     Style = csDropDownList
+    DropDownCount = 15
     ItemHeight = 13
     TabOrder = 2
     OnChange = cmb_BmIndexChange
@@ -55,6 +57,7 @@ inherited fmEditBookmarks: TfmEditBookmarks
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
+    DropDownCount = 15
     ItemHeight = 13
     TabOrder = 0
     OnChange = cmb_ModuleChange

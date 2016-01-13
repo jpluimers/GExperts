@@ -492,7 +492,7 @@ object fmConfiguration: TfmConfiguration
             Hint = 
               'Enhance IDE options dialogs to allow resizing, remember position' +
               's, increase'#13'combobox DropDownCounts, resizable picture open dial' +
-              'ogs, collapse Together'#13'options tree node, etc.  (Most enhancemen' +
+              'ogs, collapse Together'#13'options tree node, etc.  (Some enhancemen' +
               'ts require BDS 2006 or later)'
             Caption = 'Enhance IDE dialogs'
             ParentShowHint = False
@@ -537,7 +537,7 @@ object fmConfiguration: TfmConfiguration
             Top = 41
             Width = 489
             Height = 17
-            Caption = 'Allow resize (and remember size)'
+            Caption = 'Allow resize and remember size'
             TabOrder = 1
           end
           object chkRememberPosition: TCheckBox
@@ -553,7 +553,7 @@ object fmConfiguration: TfmConfiguration
             Top = 136
             Width = 489
             Height = 17
-            Caption = 'Enhance Install Packages dialog'
+            Caption = 'Enhance Install Packages dialog with ... Explorer button'
             TabOrder = 6
           end
         end

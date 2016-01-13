@@ -1,10 +1,10 @@
 object fmIdxPackageRenameDlg: TfmIdxPackageRenameDlg
-  Left = 0
-  Top = 0
+  Left = 333
+  Top = 237
+  Width = 417
+  Height = 151
   BorderIcons = [biSystemMenu]
   Caption = 'Set Package Description'
-  ClientHeight = 113
-  ClientWidth = 401
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

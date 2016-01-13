@@ -167,7 +167,8 @@ uses
   GX_NTAEditServiceNotifier in 'Utils\GX_NTAEditServiceNotifier.pas',
   GX_EditBookmark in 'Bookmarks\GX_EditBookmark.pas' {fmEditBookmarks},
   GX_BookmarkList in 'Utils\GX_BookmarkList.pas',
-  GX_dzQuicksort in 'Utils\GX_dzQuicksort.pas';
+  GX_dzQuicksort in 'Utils\GX_dzQuicksort.pas',
+  GX_IdeInstallPackagesEnhancer in 'IDE\GX_IdeInstallPackagesEnhancer.pas';
 
 end.
 
