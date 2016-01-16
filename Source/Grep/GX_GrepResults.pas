@@ -1697,9 +1697,6 @@ var
   AItem: TGrepHistoryListItems;
   ASaveSettings: TGrepSettings;
 begin
-  if pmHistoryMenu.Tag = -1 then
-    Exit;
-
   AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
   if not Assigned(AItem) then
     Exit;
