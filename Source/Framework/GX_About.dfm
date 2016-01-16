@@ -174,6 +174,7 @@ object fmAbout: TfmAbout
       'Per-Eric Larsson'
       'Piotr Likus'
       'Ray Lischner'
+      'Thomas Mueller'
       'Gerald Nunn'
       'Alex Petrov'
       'Puthoon'
@@ -182,5 +183,10 @@ object fmAbout: TfmAbout
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 4
+  end
+  object tim_Scroll: TTimer
+    OnTimer = tim_ScrollTimer
+    Left = 296
+    Top = 144
   end
 end

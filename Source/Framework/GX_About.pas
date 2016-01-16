@@ -24,8 +24,10 @@ type
     lblPreRelease2: TLabel;
     mmoBuildDetails: TMemo;
     mmoContributors: TMemo;
+    tim_Scroll: TTimer;
     procedure btnEmailClick(Sender: TObject);
     procedure lblWebPageClick(Sender: TObject);
+    procedure tim_ScrollTimer(Sender: TObject);
   private
     procedure InitVersionInfoControls;
   protected
@@ -59,7 +61,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Graphics, ToolsApi,
+  SysUtils, Graphics, ToolsApi, Messages,
   GX_GenericUtils, GX_FeedbackWizard;
 
 const
@@ -150,6 +152,18 @@ class procedure TfmAbout.SetCustomBuildEmails(const ABugEmail, ASuggestionEmail:
 begin
   BugEmail := ABugEmail;
   SuggestionEmail := ASuggestionEmail;
+end;
+
+procedure TfmAbout.tim_ScrollTimer(Sender: TObject);
+var
+  Res: Integer;
+begin
+  inherited;
+  Res :=  SendMessage(mmoContributors.Handle, WM_VSCROLL, SB_LINEDOWN, 0);
+  if Res = 0 then begin
+    // we have reached the end
+    SendMessage(mmoContributors.Handle, WM_VSCROLL, SB_TOP, 0);
+  end;
 end;
 
 class function TfmAbout.GetAboutIcon: HBITMAP;
