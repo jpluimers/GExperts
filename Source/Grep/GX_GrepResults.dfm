@@ -37,9 +37,10 @@ inherited fmGrepResults: TfmGrepResults
     end
     object SplitterHistoryList: TSplitter
       Left = 139
-      Top = 26
+      Top = 22
       Width = 8
-      Height = 548
+      Height = 552
+      Cursor = crHSplit
       AutoSnap = False
       Beveled = True
       MinSize = 20
@@ -47,9 +48,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbResults: TListBox
       Left = 147
-      Top = 26
+      Top = 22
       Width = 476
-      Height = 548
+      Height = 552
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -67,7 +68,7 @@ inherited fmGrepResults: TfmGrepResults
       Left = 0
       Top = 0
       Width = 623
-      Height = 26
+      Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
       Images = dmSharedImages.Images
@@ -77,119 +78,120 @@ inherited fmGrepResults: TfmGrepResults
       Wrapable = False
       object tbnSearch: TToolButton
         Left = 0
-        Top = 2
+        Top = 0
         Action = actFileSearch
       end
       object tbnRefresh: TToolButton
         Left = 23
-        Top = 2
+        Top = 0
         Action = actFileRefresh
       end
       object tbnSep1: TToolButton
         Left = 46
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 7
         Style = tbsSeparator
       end
       object tbnAbort: TToolButton
         Left = 54
-        Top = 2
+        Top = 0
         Action = actFileAbort
       end
       object tbnSep2: TToolButton
         Left = 77
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 3
         Style = tbsSeparator
       end
       object tbnGoto: TToolButton
         Left = 85
-        Top = 2
+        Top = 0
         Action = actListGotoSelected
       end
       object tbnSep3: TToolButton
         Left = 108
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 4
         Style = tbsSeparator
       end
       object tbnPrint: TToolButton
         Left = 116
-        Top = 2
+        Top = 0
         Action = actFilePrint
       end
       object tbnSep4: TToolButton
         Left = 139
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 5
         Style = tbsSeparator
       end
       object tbnContract: TToolButton
         Left = 147
-        Top = 2
+        Top = 0
         Action = actListContract
       end
       object tbnExpand: TToolButton
         Left = 170
-        Top = 2
+        Top = 0
         Action = actListExpand
       end
       object tbnSep5: TToolButton
         Left = 193
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 8
         Style = tbsSeparator
       end
       object tbnReplaceSelected: TToolButton
         Left = 201
-        Top = 2
+        Top = 0
         Action = actReplaceSelected
       end
       object tbnReplaceAll: TToolButton
         Left = 224
-        Top = 2
+        Top = 0
         Action = actReplaceAll
       end
       object tbnSep6: TToolButton
         Left = 247
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 9
         Style = tbsSeparator
       end
       object tbnStayOnTop: TToolButton
         Left = 255
-        Top = 2
+        Top = 0
         Action = actViewStayOnTop
       end
       object tbnSep7: TToolButton
         Left = 278
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 2
         Style = tbsSeparator
       end
       object tbnShowFullFilename: TToolButton
         Left = 286
-        Top = 2
+        Top = 0
         Action = actViewShowFullFilename
         Style = tbsCheck
       end
       object tbnSep8: TToolButton
         Left = 309
-        Top = 2
+        Top = 0
         Width = 8
+        Caption = ''
         ImageIndex = 1
         Style = tbsSeparator
       end
       object tbnHelp: TToolButton
         Left = 317
-        Top = 2
+        Top = 0
         Action = actHelpHelp
       end
     end
@@ -210,12 +212,13 @@ inherited fmGrepResults: TfmGrepResults
       ScrollBars = ssBoth
       TabOrder = 1
       WordWrap = False
+      Zoom = 100
     end
     object lbHistoryList: TListBox
       Left = 0
-      Top = 26
+      Top = 22
       Width = 139
-      Height = 548
+      Height = 552
       Style = lbVirtualOwnerDraw
       Align = alLeft
       Font.Charset = ANSI_CHARSET
@@ -455,6 +458,7 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 34
       ShortCut = 116
       OnExecute = actFileRefreshExecute
+      OnUpdate = actHistoryUpdate
     end
     object actFileAbort: TAction
       Category = 'File'
@@ -471,6 +475,7 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 3
       ShortCut = 16464
       OnExecute = actFilePrintExecute
+      OnUpdate = actHistoryUpdate
     end
     object actViewStayOnTop: TAction
       Category = 'View'
@@ -546,6 +551,7 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 31
       ShortCut = 49235
       OnExecute = actFileSaveExecute
+      OnUpdate = actHistoryUpdate
     end
     object actFilePrintToFile: TAction
       Category = 'File'
@@ -553,6 +559,7 @@ inherited fmGrepResults: TfmGrepResults
       Hint = 'Print results to file...'
       ImageIndex = 31
       OnExecute = actFileSaveExecute
+      OnUpdate = actHistoryUpdate
     end
     object actFileSavePrint: TAction
       Category = 'File'
@@ -560,6 +567,7 @@ inherited fmGrepResults: TfmGrepResults
       Hint = 'Print results + Save loadable results to file...'
       ImageIndex = 31
       OnExecute = actFileSaveExecute
+      OnUpdate = actHistoryUpdate
     end
     object actFileCopy: TAction
       Category = 'File'
@@ -602,34 +610,40 @@ inherited fmGrepResults: TfmGrepResults
       Category = 'History'
       Caption = 'View'
       OnExecute = actHistoryViewExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistoryDelete: TAction
       Category = 'History'
       Caption = 'Delete'
       ImageIndex = 11
       OnExecute = actHistoryDeleteExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistoryRefresh: TAction
       Category = 'History'
       Caption = 'Refresh'
       ImageIndex = 34
       OnExecute = actHistoryRefreshExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistorySearch: TAction
       Category = 'History'
       Caption = 'Search...'
       OnExecute = actHistoryRefreshExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistoryModifySearchOptions: TAction
       Category = 'History'
       Caption = 'Modify search options...'
       OnExecute = actHistoryRefreshExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistorySave: TAction
       Category = 'History'
       Caption = 'Save...'
       ImageIndex = 31
       OnExecute = actHistorySaveExecute
+      OnUpdate = actHistoryUpdate
     end
     object actViewShowHistoryList: TAction
       Category = 'View'
@@ -648,23 +662,27 @@ inherited fmGrepResults: TfmGrepResults
       Caption = 'Print to file...'
       ImageIndex = 3
       OnExecute = actHistorySaveExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistorySavePrint: TAction
       Category = 'History'
       Caption = 'Save && Print...'
       OnExecute = actHistorySaveExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistoryDeleteAll: TAction
       Category = 'History'
       Caption = 'Delete all'
       ImageIndex = 11
       OnExecute = actHistoryDeleteAllExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistorySaveAll: TAction
       Category = 'History'
       Caption = 'Save all...'
       ImageIndex = 31
       OnExecute = actHistorySaveAllExecute
+      OnUpdate = actHistoryUpdate
     end
     object actContextSelSearch: TAction
       Category = 'Context'
@@ -676,11 +694,13 @@ inherited fmGrepResults: TfmGrepResults
       Caption = 'Print all to file...'
       ImageIndex = 3
       OnExecute = actHistorySaveAllExecute
+      OnUpdate = actHistoryUpdate
     end
     object actHistorySavePrintAll: TAction
       Category = 'History'
       Caption = 'Save && Print all to file...'
       OnExecute = actHistorySaveAllExecute
+      OnUpdate = actHistoryUpdate
     end
     object actFileOpen: TAction
       Category = 'File'
@@ -694,13 +714,14 @@ inherited fmGrepResults: TfmGrepResults
       Caption = 'Refresh all'
       ImageIndex = 34
       OnExecute = actHistoryRefreshAllExecute
+      OnUpdate = actHistoryUpdate
     end
   end
   object pmHistoryMenu: TPopupMenu
     Left = 16
     Top = 160
     object miHistoryItemName: TMenuItem
-      Caption = '[Itemname]'
+      Caption = '[Search text=---]'
     end
     object mitHistorySep1: TMenuItem
       Caption = '-'

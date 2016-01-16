@@ -1,3 +1,5 @@
+{Search history author: (ERT) Ferenc Kiffer, Hungary <kifferferenc@yahoo.com>}
+
 unit GX_GrepResults;
 
 {$I GX_CondDefine.inc}
@@ -192,6 +194,7 @@ type
     procedure actFileOpenExecute(Sender: TObject);
     procedure actHistoryRefreshAllExecute(Sender: TObject);
     procedure lbHistoryListDblClick(Sender: TObject);
+    procedure actHistoryUpdate(Sender: TObject);
   private
     FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
@@ -1662,23 +1665,20 @@ end;
 procedure TfmGrepResults.lbHistoryListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 var
   AIndex: Integer;
-  HasActiveItem: Boolean;
-  i: Integer;
-  Act: TAction;
 begin
   AIndex := lbHistoryList.ItemAtPos(MousePos, True);
   if AIndex = -1 then
     AIndex := lbHistoryList.ItemIndex;
+
   pmHistoryMenu.Tag := AIndex;
-  HasActiveItem := (AIndex <> -1);
-  if HasActiveItem then
-    miHistoryItemName.Caption := Format('[SearchText=%s]', [lbHistoryList.Items[AIndex]]);
-  miHistoryItemName.Visible := HasActiveItem;
-  for i := 0 to Actions.ActionCount-1 do begin
-    Act := Actions.Actions[i] as TAction;
-    if Act.Category = 'History' then
-      Act.Enabled := HasActiveItem;
+
+  if AIndex = -1 then
+  begin
+    miHistoryItemName.Caption := '[Search text=---]';
+    Exit;
   end;
+
+  miHistoryItemName.Caption := Format('[Search text=%s]', [lbHistoryList.Items[AIndex]]);
 end;
 
 procedure TfmGrepResults.lbHistoryListDblClick(Sender: TObject);
@@ -1831,6 +1831,11 @@ begin
   FContextSearchText := reContext.SelText;
   Execute(gssNormal);
   FContextSearchText := '';
+end;
+
+procedure TfmGrepResults.actHistoryUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := lbHistoryList.Count > 0;
 end;
 
 end.
