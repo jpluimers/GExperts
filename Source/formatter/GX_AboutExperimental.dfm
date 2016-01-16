@@ -48,7 +48,7 @@ inherited fmAboutExperimental: TfmAboutExperimental
     Cursor = crHandPoint
     Alignment = taCenter
     AutoSize = False
-    Caption = 'http://www.dummzeuch.de'
+    Caption = 'http://blog.dummzeuch.de/experimental-gexperts-version/'
     OnClick = lblWebPageClick
   end
   object l_Formatter: TLabel [11]
