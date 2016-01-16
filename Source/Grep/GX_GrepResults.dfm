@@ -37,10 +37,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object SplitterHistoryList: TSplitter
       Left = 139
-      Top = 22
+      Top = 26
       Width = 8
-      Height = 552
-      Cursor = crHSplit
+      Height = 548
       AutoSnap = False
       Beveled = True
       MinSize = 20
@@ -48,9 +47,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbResults: TListBox
       Left = 147
-      Top = 22
+      Top = 26
       Width = 476
-      Height = 552
+      Height = 548
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -68,10 +67,9 @@ inherited fmGrepResults: TfmGrepResults
       Left = 0
       Top = 0
       Width = 623
-      Height = 22
+      Height = 26
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
-      Flat = True
       Images = dmSharedImages.Images
       ParentShowHint = False
       ShowHint = True
@@ -79,120 +77,119 @@ inherited fmGrepResults: TfmGrepResults
       Wrapable = False
       object tbnSearch: TToolButton
         Left = 0
-        Top = 0
+        Top = 2
         Action = actFileSearch
       end
       object tbnRefresh: TToolButton
         Left = 23
-        Top = 0
+        Top = 2
         Action = actFileRefresh
       end
       object tbnSep1: TToolButton
         Left = 46
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 7
         Style = tbsSeparator
       end
       object tbnAbort: TToolButton
         Left = 54
-        Top = 0
+        Top = 2
         Action = actFileAbort
       end
       object tbnSep2: TToolButton
         Left = 77
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 3
         Style = tbsSeparator
       end
       object tbnGoto: TToolButton
         Left = 85
-        Top = 0
+        Top = 2
         Action = actListGotoSelected
       end
       object tbnSep3: TToolButton
         Left = 108
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 4
         Style = tbsSeparator
       end
       object tbnPrint: TToolButton
         Left = 116
-        Top = 0
+        Top = 2
         Action = actFilePrint
       end
       object tbnSep4: TToolButton
         Left = 139
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 5
         Style = tbsSeparator
       end
       object tbnContract: TToolButton
         Left = 147
-        Top = 0
+        Top = 2
         Action = actListContract
       end
       object tbnExpand: TToolButton
         Left = 170
-        Top = 0
+        Top = 2
         Action = actListExpand
       end
       object tbnSep5: TToolButton
         Left = 193
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 8
         Style = tbsSeparator
       end
       object tbnReplaceSelected: TToolButton
         Left = 201
-        Top = 0
+        Top = 2
         Action = actReplaceSelected
       end
       object tbnReplaceAll: TToolButton
         Left = 224
-        Top = 0
+        Top = 2
         Action = actReplaceAll
       end
       object tbnSep6: TToolButton
         Left = 247
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 9
         Style = tbsSeparator
       end
       object tbnStayOnTop: TToolButton
         Left = 255
-        Top = 0
+        Top = 2
         Action = actViewStayOnTop
       end
       object tbnSep7: TToolButton
         Left = 278
-        Top = 0
+        Top = 2
         Width = 8
         ImageIndex = 2
         Style = tbsSeparator
       end
       object tbnShowFullFilename: TToolButton
         Left = 286
-        Top = 0
+        Top = 2
         Action = actViewShowFullFilename
         Style = tbsCheck
       end
       object tbnSep8: TToolButton
         Left = 309
-        Top = 0
+        Top = 2
         Width = 8
-        Caption = ''
         ImageIndex = 1
         Style = tbsSeparator
       end
       object tbnHelp: TToolButton
         Left = 317
-        Top = 0
+        Top = 2
         Action = actHelpHelp
       end
     end
@@ -216,9 +213,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbHistoryList: TListBox
       Left = 0
-      Top = 22
+      Top = 26
       Width = 139
-      Height = 552
+      Height = 548
       Style = lbVirtualOwnerDraw
       Align = alLeft
       Font.Charset = ANSI_CHARSET
@@ -251,7 +248,6 @@ inherited fmGrepResults: TfmGrepResults
         Width = 60
       end>
     ParentFont = True
-    SimplePanel = False
     UseSystemFont = False
   end
   object MainMenu: TMainMenu
