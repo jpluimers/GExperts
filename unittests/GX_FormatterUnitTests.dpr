@@ -40,18 +40,18 @@ uses
   GUITestRunner,
   DelForExTestOldNew in 'DelForExTestOldNew.pas',
   DelForExTestFiles in 'DelForExTestFiles.pas',
-  GX_CodeFormatterDefaultSettings in '..\GX_CodeFormatterDefaultSettings.pas',
-  GX_CodeFormatterTokenList in '..\engine\GX_CodeFormatterTokenList.pas',
-  GX_CodeFormatterTypes in '..\engine\GX_CodeFormatterTypes.pas',
-  GX_CodeFormatterEngine in '..\engine\GX_CodeFormatterEngine.pas',
-  GX_CodeFormatterTokens in '..\engine\GX_CodeFormatterTokens.pas',
-  GX_CodeFormatterSettings in '..\engine\GX_CodeFormatterSettings.pas',
-  GX_CodeFormatterFormatter in '..\engine\GX_CodeFormatterFormatter.pas',
-  GX_CodeFormatterStack in '..\engine\GX_CodeFormatterStack.pas',
-  GX_CodeFormatterParser in '..\engine\GX_CodeFormatterParser.pas',
-  GX_CodeFormatterConfigHandler in '..\GX_CodeFormatterConfigHandler.pas',
-  GX_CodeFormatterUnicode in '..\engine\GX_CodeFormatterUnicode.pas',
-  GX_GenericUtils in '..\..\gx\source\Utils\GX_GenericUtils.pas';
+  GX_CodeFormatterDefaultSettings in '..\Source\formatter\GX_CodeFormatterDefaultSettings.pas',
+  GX_CodeFormatterTokenList in '..\Source\formatter\engine\GX_CodeFormatterTokenList.pas',
+  GX_CodeFormatterTypes in '..\Source\formatter\engine\GX_CodeFormatterTypes.pas',
+  GX_CodeFormatterEngine in '..\Source\formatter\engine\GX_CodeFormatterEngine.pas',
+  GX_CodeFormatterTokens in '..\Source\formatter\engine\GX_CodeFormatterTokens.pas',
+  GX_CodeFormatterSettings in '..\Source\formatter\engine\GX_CodeFormatterSettings.pas',
+  GX_CodeFormatterFormatter in '..\Source\formatter\engine\GX_CodeFormatterFormatter.pas',
+  GX_CodeFormatterStack in '..\Source\formatter\engine\GX_CodeFormatterStack.pas',
+  GX_CodeFormatterParser in '..\Source\formatter\engine\GX_CodeFormatterParser.pas',
+  GX_CodeFormatterConfigHandler in '..\Source\formatter\GX_CodeFormatterConfigHandler.pas',
+  GX_CodeFormatterUnicode in '..\Source\formatter\engine\GX_CodeFormatterUnicode.pas',
+  GX_GenericUtils in '..\Source\Utils\GX_GenericUtils.pas';
 
 begin
   ReportMemoryLeaksOnShutdown := True;
