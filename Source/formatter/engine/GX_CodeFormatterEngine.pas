@@ -12,7 +12,7 @@ interface
 uses
 {$IFDEF debug}
   // NOTE: including DbugIntf adds around 300 k to the dll
-  DbugIntf,
+  GX_DbugIntf,
 {$ENDIF}
   SysUtils,
   Classes,
