@@ -1064,13 +1064,13 @@ begin
     if AIni.SectionExists(TGrepHistoryList.KeyName) then
     begin
       if not GrepExpert.HistoryList.LoadFromSettings(FGrepSettings, AIni, GrepExpert.HistoryIniVersion, '', True) then
-        MessageDlg('Not read all match list!', mtWarning, [mbOK], 0);
+        MessageDlg('Could not read history list', mtWarning, [mbOK], 0);
     end
     else if AIni.SectionExists(TGrepHistoryListItems.SubKeyName) then
     begin
       AIndex := GrepExpert.HistoryList.LoadItemFromIni(FGrepSettings, AIni, GrepExpert.HistoryIniVersion);
       if AIndex = -1 then
-        MessageDlg('Not read the match list from file!', mtWarning, [mbOK], 0)
+        MessageDlg('Could not read history list from file!', mtWarning, [mbOK], 0)
       else
         ViewHistoryListItems(AIndex, True);
     end;
@@ -1595,18 +1595,21 @@ var
   AHistoryItem: TGrepHistoryListItems;
 begin
   FHistoryListClickedEntry := AIndex;
-  AHistoryItem := GrepExpert.HistoryList.Items[AIndex];
-  if Assigned(AHistoryItem) then
+  if AIndex <> -1 then
   begin
-    reContext.Clear;
-    ContractList(False);
-    SetStatusString('');
-    SetMatchString('');
-    ClearResultsListbox;
-    AHistoryItem.View(lbResults.Items);
-    RefreshInformation(AHistoryItem.TotalMatchCount, True, AUsedExpandState, False);
-    FGrepSettings := AHistoryItem.GrepSettings;
-  end ;
+    AHistoryItem := GrepExpert.HistoryList.Items[AIndex];
+    if Assigned(AHistoryItem) then
+    begin
+      reContext.Clear;
+      ContractList(False);
+      SetStatusString('');
+      SetMatchString('');
+      ClearResultsListbox;
+      AHistoryItem.View(lbResults.Items);
+      RefreshInformation(AHistoryItem.TotalMatchCount, True, AUsedExpandState, False);
+      FGrepSettings := AHistoryItem.GrepSettings;
+    end;
+  end;
 end;
 
 procedure TfmGrepResults.lbHistoryListData(Control: TWinControl; Index: Integer; var Data: string);
@@ -1659,12 +1662,23 @@ end;
 procedure TfmGrepResults.lbHistoryListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 var
   AIndex: Integer;
+  HasActiveItem: Boolean;
+  i: Integer;
+  Act: TContainedAction;
 begin
   AIndex := lbHistoryList.ItemAtPos(MousePos, True);
   if AIndex = -1 then
     AIndex := lbHistoryList.ItemIndex;
   pmHistoryMenu.Tag := AIndex;
-  miHistoryItemName.Caption := Format('[SearchText=%s]', [lbHistoryList.Items[AIndex]]);
+  HasActiveItem := (AIndex <> -1);
+  if HasActiveItem then
+    miHistoryItemName.Caption := Format('[SearchText=%s]', [lbHistoryList.Items[AIndex]]);
+  miHistoryItemName.Visible := HasActiveItem;
+  for i := 0 to Actions.ActionCount-1 do begin
+    Act := Actions.Actions[i];
+    if Act.Category = 'History' then
+      Act.Enabled := HasActiveItem;
+  end;
 end;
 
 procedure TfmGrepResults.lbHistoryListDblClick(Sender: TObject);
@@ -1683,6 +1697,9 @@ var
   AItem: TGrepHistoryListItems;
   ASaveSettings: TGrepSettings;
 begin
+  if pmHistoryMenu.Tag = -1 then
+    Exit;
+
   AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
   if not Assigned(AItem) then
     Exit;
