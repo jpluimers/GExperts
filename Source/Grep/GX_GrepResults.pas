@@ -1664,7 +1664,7 @@ var
   AIndex: Integer;
   HasActiveItem: Boolean;
   i: Integer;
-  Act: TContainedAction;
+  Act: TAction;
 begin
   AIndex := lbHistoryList.ItemAtPos(MousePos, True);
   if AIndex = -1 then
@@ -1675,7 +1675,7 @@ begin
     miHistoryItemName.Caption := Format('[SearchText=%s]', [lbHistoryList.Items[AIndex]]);
   miHistoryItemName.Visible := HasActiveItem;
   for i := 0 to Actions.ActionCount-1 do begin
-    Act := Actions.Actions[i];
+    Act := Actions.Actions[i] as TAction;
     if Act.Category = 'History' then
       Act.Enabled := HasActiveItem;
   end;
