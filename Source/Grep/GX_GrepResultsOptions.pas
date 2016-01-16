@@ -22,8 +22,8 @@ type
     chkGrepExpandAll: TCheckBox;
     edtContextLines: TEdit;
     udContextLines: TUpDown;
-    gbxFoundList: TGroupBox;
-    chkSaveFoundListSize: TCheckBox;
+    gbxHistoryList: TGroupBox;
+    chkSaveHistoryListSize: TCheckBox;
     chkSaveContextSize: TCheckBox;
     gbxListColors: TGroupBox;
     pnlListMatchTextColor: TPanel;
@@ -34,7 +34,7 @@ type
     pnlContextMacthLineFontColor: TPanel;
     dlgContextMatchLineFontColor: TColorDialog;
     chkGrepAutoHide: TCheckBox;
-    chkGrepSaveResultListItems: TCheckBox;
+    chkGrepSaveHistoryListItems: TCheckBox;
     chkGrepExpandIf: TCheckBox;
     eExpandIfMatches: TEdit;
     eExpandIfFiles: TEdit;
@@ -43,6 +43,8 @@ type
     chkGrepExpandFew: TCheckBox;
     lblExpandFewLines: TLabel;
     eExpandFewLines: TEdit;
+    rbSaveToRegistry: TRadioButton;
+    rbSaveToIniFile: TRadioButton;
     procedure pnlContextFontClick(Sender: TObject);
     procedure pnlContextMatchFontColorClick(Sender: TObject);
     procedure pnlListFontClick(Sender: TObject);
@@ -51,6 +53,7 @@ type
     procedure pnlContextMacthLineFontColorClick(Sender: TObject);
     procedure chkDefaultListColorsClick(Sender: TObject);
     procedure chkGrepExpandClick(Sender: TObject);
+    procedure chkGrepSaveHistoryListItemsClick(Sender: TObject);
   private
     FExpandsChanging: Boolean;
   end;
@@ -187,6 +190,12 @@ begin
   finally
     FExpandsChanging := False;
   end;
+end;
+
+procedure TfmGrepResultsOptions.chkGrepSaveHistoryListItemsClick(Sender: TObject);
+begin
+  rbSaveToIniFile.Enabled := chkGrepSaveHistoryListItems.Checked;
+  rbSaveToRegistry.Enabled := chkGrepSaveHistoryListItems.Checked;
 end;
 
 end.

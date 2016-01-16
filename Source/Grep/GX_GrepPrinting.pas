@@ -13,7 +13,8 @@ type
   TSaveToFileMode = (sfPrintToFile, sfSaveToLoadable, sfBoth);
 
 procedure PrintGrepResults(Owner: TWinControl; Results: TStrings; Where: TGrepOutputMode; AFileName: String = '');
-procedure SaveGrepResultsToLoadableFile(Owner: TWinControl; Results: TObject; AMode: TSaveToFileMode; AFileName: String = '');
+procedure SaveGrepResultsToLoadableFile(Owner: TWinControl; Results: TObject; AMode: TSaveToFileMode;
+  AIniVersion: Integer; AFileName: String = '');
 
 implementation
 
@@ -101,7 +102,7 @@ var
   end;
 
 var
-  FoundItem: TGrepFoundListItems;
+  HistoryItem: TGrepHistoryListItems;
   I: Integer;
 begin
   if Results.Count = 0 then
@@ -118,7 +119,7 @@ begin
     try
       if Results.Objects[0] is TFileResult then
         PrintResults(Results)
-      else if Results.Objects[0] is TGrepFoundListItems then
+      else if Results.Objects[0] is TGrepHistoryListItems then
       begin
         for I := 0 to Results.Count-1 do
         begin
@@ -128,13 +129,13 @@ begin
             RichEdit.Lines.Add('');
           end ;
 
-          FoundItem := TGrepFoundListItems(Results.Objects[I]);
+          HistoryItem := TGrepHistoryListItems(Results.Objects[I]);
 
           RichEdit.SelAttributes.Style := [fsBold, fsUnderline];
-          RichEdit.Lines.Add(FoundItem.GrepSettings.Pattern);
+          RichEdit.Lines.Add(HistoryItem.GrepSettings.Pattern);
           RichEdit.SelAttributes.Style := [];
 
-          PrintResults(FoundItem.ResultList);
+          PrintResults(HistoryItem.ResultList);
         end;
       end;
     finally
@@ -161,18 +162,18 @@ begin
 end;
 
 procedure SaveGrepResultsToLoadableFile(Owner: TWinControl; Results: TObject; AMode: TSaveToFileMode;
-  AFileName: String);
+  AIniVersion: Integer; AFileName: String);
 var
-  AIni: TIniFile;
+  AIni: TGrepIniFile;
 begin
   if not OpenSaveDialog(AFileName) then
     Exit;
 
   if AMode <> sfSaveToLoadable then
-    if Results is TGrepFoundList then
-      PrintGeneric(Owner, TGrepFoundList(Results), grFile, AFileName, False)
-    else if Results is TGrepFoundListItems then
-      PrintGeneric(Owner, TGrepFoundListItems(Results).ResultList, grFile, AFileName, False);
+    if Results is TGrepHistoryList then
+      PrintGeneric(Owner, TGrepHistoryList(Results), grFile, AFileName, False)
+    else if Results is TGrepHistoryListItems then
+      PrintGeneric(Owner, TGrepHistoryListItems(Results).ResultList, grFile, AFileName, False);
 
   if AMode = sfPrintToFile then
     Exit;
@@ -180,12 +181,15 @@ begin
   if (AMode <> sfBoth) and FileExists(AFileName) then
     DeleteFile(AFileName);
 
-  AIni := TIniFile.Create(AFileName);
+  AIni := TGrepIniFile.Create(AFileName);
   try
-    if Results is TGrepFoundList then
-      TGrepFoundList(Results).SaveToSettings(AIni, TGrepFoundList.KeyName, TGrepFoundList.SubKeyName)
-    else if Results is TGrepFoundListItems then
-      TGrepFoundListItems(Results).WriteToIni(AIni, TGrepFoundListItems.SubKeyName);
+    if Results is TGrepHistoryList then
+      TGrepHistoryList(Results).SaveToSettings(AIni, AIniVersion, '')
+    else if Results is TGrepHistoryListItems then
+    begin
+      AIni.WriteInteger(TGrepHistoryList.KeyName, 'IniVersion', AIniVersion);
+      TGrepHistoryListItems(Results).WriteToIni(AIni, TGrepHistoryListItems.SubKeyName);
+    end;
   finally
     AIni.Free;
   end;

@@ -97,7 +97,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object eExpandIfMatches: TEdit
       Left = 88
-      Top = 56
+      Top = 57
       Width = 33
       Height = 22
       Enabled = False
@@ -106,7 +106,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object eExpandIfFiles: TEdit
       Left = 176
-      Top = 56
+      Top = 57
       Width = 34
       Height = 22
       Enabled = False
@@ -125,7 +125,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object eExpandFewLines: TEdit
       Left = 88
-      Top = 96
+      Top = 97
       Width = 33
       Height = 22
       Enabled = False
@@ -145,7 +145,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       193)
     object lblContextLines: TLabel
       Left = 48
-      Top = 144
+      Top = 147
       Width = 132
       Height = 14
       Caption = 'Number of context lines'
@@ -233,33 +233,54 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     ModalResult = 2
     TabOrder = 5
   end
-  object gbxFoundList: TGroupBox
+  object gbxHistoryList: TGroupBox
     Left = 8
     Top = 8
     Width = 317
     Height = 169
-    Caption = 'Search History'
+    Caption = 'Search history'
     TabOrder = 0
     DesignSize = (
       317
       169)
-    object chkSaveFoundListSize: TCheckBox
+    object chkSaveHistoryListSize: TCheckBox
       Left = 8
-      Top = 48
+      Top = 62
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Save search history pane width'
       TabOrder = 1
     end
-    object chkGrepSaveResultListItems: TCheckBox
+    object chkGrepSaveHistoryListItems: TCheckBox
       Left = 8
       Top = 24
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Save search parameters and results'
+      Caption = 'Save search parameters and results '
       TabOrder = 0
+      OnClick = chkGrepSaveHistoryListItemsClick
+    end
+    object rbSaveToRegistry: TRadioButton
+      Left = 153
+      Top = 42
+      Width = 113
+      Height = 17
+      Caption = 'To Registry'
+      Enabled = False
+      TabOrder = 2
+    end
+    object rbSaveToIniFile: TRadioButton
+      Left = 33
+      Top = 42
+      Width = 113
+      Height = 17
+      Caption = 'To IniFile'
+      Checked = True
+      Enabled = False
+      TabOrder = 3
+      TabStop = True
     end
   end
   object gbxListColors: TGroupBox

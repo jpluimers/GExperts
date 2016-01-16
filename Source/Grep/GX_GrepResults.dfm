@@ -35,11 +35,11 @@ inherited fmGrepResults: TfmGrepResults
       Beveled = True
       MinSize = 20
     end
-    object SplitterFoundList: TSplitter
+    object SplitterHistoryList: TSplitter
       Left = 139
-      Top = 24
+      Top = 22
       Width = 8
-      Height = 550
+      Height = 552
       Cursor = crHSplit
       AutoSnap = False
       Beveled = True
@@ -48,9 +48,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbResults: TListBox
       Left = 147
-      Top = 24
+      Top = 22
       Width = 476
-      Height = 550
+      Height = 552
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -68,7 +68,7 @@ inherited fmGrepResults: TfmGrepResults
       Left = 0
       Top = 0
       Width = 623
-      Height = 24
+      Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
       Flat = True
@@ -176,8 +176,22 @@ inherited fmGrepResults: TfmGrepResults
         ImageIndex = 2
         Style = tbsSeparator
       end
-      object tbnHelp: TToolButton
+      object tbnShowFullFilename: TToolButton
         Left = 286
+        Top = 0
+        Action = actViewShowFullFilename
+        Style = tbsCheck
+      end
+      object tbnSep8: TToolButton
+        Left = 309
+        Top = 0
+        Width = 8
+        Caption = ''
+        ImageIndex = 1
+        Style = tbsSeparator
+      end
+      object tbnHelp: TToolButton
+        Left = 317
         Top = 0
         Action = actHelpHelp
       end
@@ -200,11 +214,11 @@ inherited fmGrepResults: TfmGrepResults
       TabOrder = 1
       WordWrap = False
     end
-    object lbFoundList: TListBox
+    object lbHistoryList: TListBox
       Left = 0
-      Top = 24
+      Top = 22
       Width = 139
-      Height = 550
+      Height = 552
       Style = lbVirtualOwnerDraw
       Align = alLeft
       Font.Charset = ANSI_CHARSET
@@ -214,14 +228,14 @@ inherited fmGrepResults: TfmGrepResults
       Font.Style = []
       ItemHeight = 25
       ParentFont = False
-      PopupMenu = pmFoundMenu
+      PopupMenu = pmHistoryMenu
       TabOrder = 3
       Visible = False
-      OnContextPopup = lbFoundListContextPopup
-      OnData = lbFoundListData
-      OnDblClick = lbFoundListDblClick
-      OnDrawItem = lbFoundListDrawItem
-      OnMouseUp = lbFoundListMouseUp
+      OnContextPopup = lbHistoryListContextPopup
+      OnData = lbHistoryListData
+      OnDblClick = lbHistoryListDblClick
+      OnDrawItem = lbHistoryListDrawItem
+      OnMouseUp = lbHistoryListMouseUp
     end
   end
   object StatusBar: TStatusBar
@@ -271,13 +285,13 @@ inherited fmGrepResults: TfmGrepResults
         Left = 562
         Top = 391
       end
-      object N6: TMenuItem
+      object mitFileSep2: TMenuItem
         Caption = '-'
       end
-      object Open1: TMenuItem
+      object mitFileOpen: TMenuItem
         Action = actFileOpen
       end
-      object N9: TMenuItem
+      object mitFileSep3: TMenuItem
         Caption = '-'
       end
       object mitFileSave: TMenuItem
@@ -289,25 +303,31 @@ inherited fmGrepResults: TfmGrepResults
       object miFileSavePrint: TMenuItem
         Action = actFileSavePrint
       end
-      object N7: TMenuItem
+      object mitFileSep4: TMenuItem
         Caption = '-'
       end
       object miFileRefreshAll: TMenuItem
-        Action = actFoundRefreshAll
+        Action = actHistoryRefreshAll
       end
-      object N11: TMenuItem
+      object mitFileSep5: TMenuItem
         Caption = '-'
       end
       object miFileSaveAll: TMenuItem
-        Action = actFoundSaveAll
+        Action = actHistorySaveAll
       end
       object miFilePrintAllToFile: TMenuItem
-        Action = actFoundPrintAllToFile
+        Action = actHistoryPrintAllToFile
       end
       object miFileSavePrintAllToFile: TMenuItem
-        Action = actFoundSavePrintAll
+        Action = actHistorySavePrintAll
       end
-      object mitFileSep3: TMenuItem
+      object mitFileSep6: TMenuItem
+        Caption = '-'
+      end
+      object mitFileDeleteAll: TMenuItem
+        Action = actHistoryDeleteAll
+      end
+      object mitFileSep7: TMenuItem
         Caption = '-'
       end
       object mitFileExit: TMenuItem
@@ -362,16 +382,16 @@ inherited fmGrepResults: TfmGrepResults
       object miViewShowMatchContext: TMenuItem
         Action = actViewShowContext
       end
-      object miViewShowfoundlist: TMenuItem
-        Action = actViewShowFoundList
-      end
-      object N4: TMenuItem
-        Caption = '-'
-      end
-      object miViewShowfullfilename: TMenuItem
-        Action = actViewShowFullFilename
+      object miViewShowHistoryList: TMenuItem
+        Action = actViewShowHistoryList
       end
       object mitViewSep2: TMenuItem
+        Caption = '-'
+      end
+      object miViewShowFullFilename: TMenuItem
+        Action = actViewShowFullFilename
+      end
+      object mitViewSep3: TMenuItem
         Caption = '-'
       end
       object mitViewStayOnTop: TMenuItem
@@ -533,7 +553,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actFilePrintToFile: TAction
       Category = 'File'
-      Caption = 'Print to File..'
+      Caption = 'Print to file...'
       Hint = 'Print results to file...'
       ImageIndex = 31
       OnExecute = actFileSaveExecute
@@ -582,89 +602,89 @@ inherited fmGrepResults: TfmGrepResults
       ShortCut = 16397
       OnExecute = actListGotoSelectedAndCloseExecute
     end
-    object actFoundView: TAction
+    object actHistoryView: TAction
       Category = 'History'
       Caption = 'View'
-      OnExecute = actFoundViewExecute
+      OnExecute = actHistoryViewExecute
     end
-    object actFoundDelete: TAction
+    object actHistoryDelete: TAction
       Category = 'History'
       Caption = 'Delete'
       ImageIndex = 11
-      OnExecute = actFoundDeleteExecute
+      OnExecute = actHistoryDeleteExecute
     end
-    object actFoundRefresh: TAction
+    object actHistoryRefresh: TAction
       Category = 'History'
       Caption = 'Refresh'
       ImageIndex = 34
-      OnExecute = actFoundRefreshExecute
+      OnExecute = actHistoryRefreshExecute
     end
-    object actFoundSearch: TAction
+    object actHistorySearch: TAction
       Category = 'History'
       Caption = 'Search...'
-      OnExecute = actFoundRefreshExecute
+      OnExecute = actHistoryRefreshExecute
     end
-    object actFoundModifySearchOptions: TAction
+    object actHistoryModifySearchOptions: TAction
       Category = 'History'
-      Caption = 'Modify Search Options...'
-      OnExecute = actFoundRefreshExecute
+      Caption = 'Modify search options...'
+      OnExecute = actHistoryRefreshExecute
     end
-    object actFoundSave: TAction
+    object actHistorySave: TAction
       Category = 'History'
       Caption = 'Save...'
       ImageIndex = 31
-      OnExecute = actFoundSaveExecute
+      OnExecute = actHistorySaveExecute
     end
-    object actViewShowFoundList: TAction
+    object actViewShowHistoryList: TAction
       Category = 'View'
-      Caption = 'Show Search History'
-      Hint = 'Show found list'
-      OnExecute = actViewShowFoundListExecute
+      Caption = 'Show history list'
+      Hint = 'Show history list'
+      OnExecute = actViewShowHistoryListExecute
     end
     object actViewShowFullFilename: TAction
       Category = 'View'
-      Caption = 'Show Full Filename'
+      Caption = 'Show full filename'
       Hint = 'Show full or relative filename'
       OnExecute = actViewShowFullFilenameExecute
     end
-    object actFoundPrintToFile: TAction
+    object actHistoryPrintToFile: TAction
       Category = 'History'
-      Caption = 'Print to File...'
+      Caption = 'Print to file...'
       ImageIndex = 3
-      OnExecute = actFoundSaveExecute
+      OnExecute = actHistorySaveExecute
     end
-    object actFoundSavePrint: TAction
+    object actHistorySavePrint: TAction
       Category = 'History'
       Caption = 'Save && Print...'
-      OnExecute = actFoundSaveExecute
+      OnExecute = actHistorySaveExecute
     end
-    object actFoundDeleteAll: TAction
+    object actHistoryDeleteAll: TAction
       Category = 'History'
-      Caption = 'Delete All'
+      Caption = 'Delete all'
       ImageIndex = 11
-      OnExecute = actFoundDeleteAllExecute
+      OnExecute = actHistoryDeleteAllExecute
     end
-    object actFoundSaveAll: TAction
+    object actHistorySaveAll: TAction
       Category = 'History'
-      Caption = 'Save All...'
+      Caption = 'Save all...'
       ImageIndex = 31
-      OnExecute = actFoundSaveAllExecute
+      OnExecute = actHistorySaveAllExecute
     end
     object actContextSelSearch: TAction
       Category = 'Context'
-      Caption = 'Search Selected Text...'
+      Caption = 'Search selected text...'
       OnExecute = actContextSelSearchExecute
     end
-    object actFoundPrintAllToFile: TAction
+    object actHistoryPrintAllToFile: TAction
       Category = 'History'
-      Caption = 'Print All to File...'
+      Caption = 'Print all to file...'
       ImageIndex = 3
-      OnExecute = actFoundSaveAllExecute
+      OnExecute = actHistorySaveAllExecute
     end
-    object actFoundSavePrintAll: TAction
+    object actHistorySavePrintAll: TAction
       Category = 'History'
-      Caption = 'Save && Print All to File...'
-      OnExecute = actFoundSaveAllExecute
+      Caption = 'Save && Print all to file...'
+      OnExecute = actHistorySaveAllExecute
     end
     object actFileOpen: TAction
       Category = 'File'
@@ -673,74 +693,56 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 1
       OnExecute = actFileOpenExecute
     end
-    object actFoundRefreshAll: TAction
+    object actHistoryRefreshAll: TAction
       Category = 'History'
-      Caption = 'Refresh All'
+      Caption = 'Refresh all'
       ImageIndex = 34
-      OnExecute = actFoundRefreshAllExecute
+      OnExecute = actHistoryRefreshAllExecute
     end
   end
-  object pmFoundMenu: TPopupMenu
+  object pmHistoryMenu: TPopupMenu
     Left = 16
     Top = 160
-    object miFoundItemName: TMenuItem
+    object miHistoryItemName: TMenuItem
       Caption = '[Itemname]'
     end
-    object N3: TMenuItem
+    object mitHistorySep1: TMenuItem
       Caption = '-'
     end
-    object miFoundView: TMenuItem
-      Action = actFoundView
+    object miHistoryView: TMenuItem
+      Action = actHistoryView
     end
-    object miFoundRefresh: TMenuItem
-      Action = actFoundRefresh
+    object miHistoryRefresh: TMenuItem
+      Action = actHistoryRefresh
     end
-    object miFoundSearch: TMenuItem
-      Action = actFoundSearch
+    object miHistorySearch: TMenuItem
+      Action = actHistorySearch
     end
-    object miFoundModifySearchOptions: TMenuItem
-      Action = actFoundModifySearchOptions
+    object miHistoryModifySearchOptions: TMenuItem
+      Action = actHistoryModifySearchOptions
     end
-    object N1: TMenuItem
+    object mitHistorySep2: TMenuItem
       Caption = '-'
     end
-    object miFoundDelete: TMenuItem
-      Action = actFoundDelete
+    object miHistoryDelete: TMenuItem
+      Action = actHistoryDelete
     end
-    object N2: TMenuItem
+    object mitHistorySep3: TMenuItem
       Caption = '-'
     end
-    object miFoundSave: TMenuItem
-      Action = actFoundSave
+    object miHistorySave: TMenuItem
+      Action = actHistorySave
     end
-    object miFoundPrintToFile: TMenuItem
-      Action = actFoundPrintToFile
+    object miHistoryPrintToFile: TMenuItem
+      Action = actHistoryPrintToFile
     end
-    object miFoundSavePrint: TMenuItem
-      Action = actFoundSavePrint
-    end
-    object N5: TMenuItem
-      Caption = '-'
-    end
-    object miFoundDeleteAll: TMenuItem
-      Action = actFoundDeleteAll
-    end
-    object N8: TMenuItem
-      Caption = '-'
-    end
-    object miFoundSaveAll: TMenuItem
-      Action = actFoundSaveAll
-    end
-    object miFoundPrintAllToTile: TMenuItem
-      Action = actFoundPrintAllToFile
-    end
-    object miFoundSavePrintAllToTile: TMenuItem
-      Action = actFoundSavePrintAll
+    object miHistorySavePrint: TMenuItem
+      Action = actHistorySavePrint
     end
   end
   object pmContextMenu: TPopupMenu
-    Left = 152
-    Top = 552
+    Left = 16
+    Top = 592
     object miContextSearchSelectedText: TMenuItem
       Action = actContextSelSearch
     end
@@ -749,7 +751,7 @@ inherited fmGrepResults: TfmGrepResults
     DefaultExt = 'txt'
     Filter = 'Text Files (*.txt, *.log)|*.txt;*.log|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 120
-    Top = 224
+    Left = 360
+    Top = 32
   end
 end

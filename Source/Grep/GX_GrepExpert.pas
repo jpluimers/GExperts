@@ -4,11 +4,12 @@ interface
 
 uses
   Classes, Graphics,
-  GX_Experts, GX_ConfigurationInfo, GX_GrepBackend;
+  GX_Experts, GX_ConfigurationInfo, GX_GrepBackend, IniFiles;
 
 type
   TGrepExpert = class(TGX_Expert)
   private
+    FHistoryIniVersion: Integer; //0: old, 1: renamed new {, 2:___}
     FGrepMiddle: Boolean;
     FGrepExpandAll: Boolean;
     FGrepExpandIf: Boolean;
@@ -45,17 +46,19 @@ type
     FContextMatchColor: TColor;
     FAutoHide: Boolean;
     FContextMatchLineColor: TColor;
-    FGrepSaveResultListItems: Boolean;
-    FFoundList: TGrepFoundList;
+    FGrepSaveHistoryListItems: Integer;
+    FHistoryList: TGrepHistoryList;
     FContextSaveSize: Boolean;
-    FFoundListSaveSize: Boolean;
+    FHistoryListSaveSize: Boolean;
+    function  GetGrepSaveHistoryListItems(AIndex: Integer): Boolean;
     procedure SetSearchList(New: TStrings);
     procedure SetReplaceList(New: TStrings);
     procedure SetMaskList(New: TStrings);
     procedure SetDirList(New: TStrings);
     procedure SetExcludedDirsList(const Value: TStrings);
-    procedure LoadFoundList(AGrepSettings : TGrepSettings);
+    procedure LoadHistoryList(AGrepSettings : TGrepSettings);
   protected
+    function  CreateSettings: TCustomIniFile;
     procedure SetActive(New: Boolean); override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
@@ -68,7 +71,10 @@ type
     class function GetName: string; override;
     procedure Click(Sender: TObject); override;
     procedure Configure; override;
-    procedure FoundListSaveSettings(AFoundIndex: Integer = -1); //if -1 then all
+    procedure HistoryListSaveSettings(AHistoryIndex: Integer = -1); //if -1 then all
+    procedure HistoryListDeleteFromSettings(AHistoryIndex: Integer = -1); //if -1 then all
+    function  GrepConfigPath: String;
+    function  GrepHistorySettingsFileName: String;
     property GrepMiddle: Boolean read FGrepMiddle write FGrepMiddle;
     property GrepExpandAll: Boolean read FGrepExpandAll write FGrepExpandAll;
     property GrepExpandIf: Boolean read FGrepExpandIf write FGrepExpandIf;
@@ -102,9 +108,12 @@ type
     property ContextMatchLineColor: TColor read FContextMatchLineColor write FContextMatchLineColor;
     property AutoHide: Boolean read FAutoHide write FAutoHide;
 
-    property GrepSaveResultListItems: Boolean read FGrepSaveResultListItems write FGrepSaveResultListItems;
+    property GrepSaveHistoryListItems: Boolean index 3 read GetGrepSaveHistoryListItems;
+    property GrepSaveHistoryListItemsToIni: Boolean index 1 read GetGrepSaveHistoryListItems;
+    property GrepSaveHistoryListItemsToReg: Boolean index 2 read GetGrepSaveHistoryListItems;
+
     property ContextSaveSize: Boolean read FContextSaveSize write FContextSaveSize;
-    property FoundListSaveSize: Boolean read FFoundListSaveSize write FFoundListSaveSize;
+    property HistoryListSaveSize: Boolean read FHistoryListSaveSize write FHistoryListSaveSize;
 
     property SearchList: TStrings read FSearchList write SetSearchList;
     property ReplaceList: TStrings read FReplaceList write SetReplaceList;
@@ -112,7 +121,8 @@ type
     property DirList: TStrings read FDirList write SetDirList;
     property ExcludedDirsList: TStrings read FExcludedDirsList write SetExcludedDirsList;
 
-    property FoundList: TGrepFoundList read FFoundList;
+    property HistoryIniVersion: Integer read FHistoryIniVersion;
+    property HistoryList: TGrepHistoryList read FHistoryList;
   end;
 
 var
@@ -123,7 +133,7 @@ procedure ShowGrep; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 implementation
 
 uses
-  SysUtils, Menus, Controls, ComCtrls, IniFiles,
+  SysUtils, Menus, Controls, ComCtrls,
   {$IFOPT D+} GX_DbugIntf, {$ENDIF D+}
   GX_OtaUtils, GX_GenericUtils,
   GX_GrepResults, GX_GrepResultsOptions,
@@ -151,8 +161,7 @@ begin
   FNumContextLines := 2;
   FAutoHide := False;
   
-
-  FFoundList := TGrepFoundList.Create;
+  FHistoryList := TGrepHistoryList.Create;
 
   FGrepExpandAll := False;
   FGrepExpandIf := False;
@@ -161,9 +170,11 @@ begin
   FGrepExpandFew := False;
   FGrepExpandFewLines := 20;
   FGrepUseCurrentIdent := False;
-  FGrepSaveResultListItems := False;
+  FGrepSaveHistoryListItems := 0;
   FContextSaveSize := False;
-  FFoundListSaveSize := False;
+  FHistoryListSaveSize := False;
+
+  FHistoryIniVersion := 0;
 
   ShortCut := Menus.ShortCut(Word('R'), [ssCtrl, ssAlt]);
   fmGrepResults := TfmGrepResults.Create(nil);
@@ -177,10 +188,10 @@ destructor TGrepExpert.Destroy;
 begin
   IdeDockManager.UnRegisterDockableForm(fmGrepResults, 'fmGrepResults');
 
-  FoundListSaveSettings;
+  HistoryListSaveSettings;
   SaveSettings;
 
-  FreeAndNil(FFoundList);
+  FreeAndNil(FHistoryList);
 
   FreeAndNil(fmGrepResults);
   FreeAndNil(FSearchList);
@@ -249,8 +260,10 @@ begin
 
     Dialog.udContextLines.Position := NumContextLines;
     Dialog.chkSaveContextSize.Checked := ContextSaveSize;
-    Dialog.chkSaveFoundListSize.Checked := FoundListSaveSize;
-    Dialog.chkGrepSaveResultListItems.Checked := GrepSaveResultListItems;
+    Dialog.chkSaveHistoryListSize.Checked := HistoryListSaveSize;
+    Dialog.chkGrepSaveHistoryListItems.Checked := GrepSaveHistoryListItems;
+    Dialog.rbSaveToIniFile.Checked := GrepSaveHistoryListItemsToIni;
+    Dialog.rbSaveToRegistry.Checked := GrepSaveHistoryListItemsToReg;
 
     Dialog.chkGrepAutoHide.Checked := AutoHide;
         
@@ -274,8 +287,13 @@ begin
 
       NumContextLines := Dialog.udContextLines.Position;
       ContextSaveSize := Dialog.chkSaveContextSize.Checked;
-      FoundListSaveSize := Dialog.chkSaveFoundListSize.Checked;
-      GrepSaveResultListItems := Dialog.chkGrepSaveResultListItems.Checked;
+      HistoryListSaveSize := Dialog.chkSaveHistoryListSize.Checked;
+      if not Dialog.chkGrepSaveHistoryListItems.Checked then
+        FGrepSaveHistoryListItems := 0
+      else if Dialog.rbSaveToIniFile.Checked then
+        FGrepSaveHistoryListItems := 1
+      else if Dialog.rbSaveToRegistry.Checked then
+        FGrepSaveHistoryListItems := 2;
 
       AutoHide := DIalog.chkGrepAutoHide.Checked;
       SaveSettings;
@@ -289,6 +307,8 @@ procedure TGrepExpert.InternalSaveSettings(Settings: TGExpertsSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // do not localize any of the following lines
+  Settings.WriteInteger(ConfigurationKey, 'HistoryIniVersion', FHistoryIniVersion);
+
   Settings.WriteBool(ConfigurationKey, 'CaseSensitive', GrepCaseSensitive);
   Settings.WriteBool(ConfigurationKey, 'Code', GrepCode);
   Settings.WriteBool(ConfigurationKey, 'Strings', GrepStrings);
@@ -322,9 +342,9 @@ begin
   Settings.WriteInteger(ConfigurationKey, 'ContextMatchLineColor', ContextMatchLineColor);
 
   Settings.WriteInteger(ConfigurationKey, 'NumContextLines', NumContextLines);
-  Settings.WriteBool(ConfigurationKey, 'SaveResultListItems', GrepSaveResultListItems);
+  Settings.WriteInteger(ConfigurationKey, 'SaveHistoryListItems', FGrepSaveHistoryListItems);
   Settings.WriteBool(ConfigurationKey, 'ContextSaveSize', ContextSaveSize);
-  Settings.WriteBool(ConfigurationKey, 'FoundListSaveSize', FoundListSaveSize);
+  Settings.WriteBool(ConfigurationKey, 'HistoryListSaveSize', HistoryListSaveSize);
 
   RegWriteStrings(Settings, DirList, ConfigurationKey + PathDelim + 'DirectoryList', 'GrepDir');
   RegWriteStrings(Settings, SearchList, ConfigurationKey + PathDelim + 'SearchList', 'GrepSearch');
@@ -333,33 +353,85 @@ begin
   RegWriteStrings(Settings, ExcludedDirsList, ConfigurationKey + PathDelim + 'ExcludedDirsList', 'GrepExcludedDirs');
 end;
 
-procedure TGrepExpert.FoundListSaveSettings(AFoundIndex: Integer);
-var
-  Settings: TIniFile;
+function TGrepExpert.GrepConfigPath: String;
 begin
-  if not GrepSaveResultListItems then
+  Result := AddSlash(ConfigInfo.ConfigPath);
+end;
+
+function TGrepExpert.GrepHistorySettingsFileName: String;
+begin
+  if FHistoryIniVersion = 0 then
+    Result := 'GrepFound.ini'
+  else
+    Result := TGrepHistoryList.SettingsFileName;
+end;
+
+function TGrepExpert.CreateSettings: TCustomIniFile;
+begin
+  Result := nil;
+  case FGrepSaveHistoryListItems of
+    1: Result := TGrepIniFile.Create(GrepConfigPath + GrepHistorySettingsFileName);
+    2: Result := TGExpertsSettings.Create;
+  end;
+end;
+
+procedure TGrepExpert.LoadHistoryList(AGrepSettings : TGrepSettings);
+var
+  Settings: TCustomIniFile;
+  BaseKey: String;
+begin
+  if not GrepSaveHistoryListItems then
     Exit;
 
-  Settings := TIniFile.Create(AddSlash(ConfigInfo().ConfigPath) + TGrepFoundList.SettingsFileName);
+  BaseKey := '';
+  if GrepSaveHistoryListItemsToReg then
+    BaseKey := ConfigurationKey + PathDelim;
+
+  Settings := CreateSettings;
   try
-    FoundList.SaveToSettings(Settings, TGrepFoundList.KeyName, TGrepFoundList.SubKeyName, AFoundIndex);
+    HistoryList.LoadFromSettings(AGrepSettings, Settings, HistoryIniVersion, BaseKey, True);
   finally
     FreeAndNil(Settings);
   end;
 end;
 
-procedure TGrepExpert.LoadFoundList(AGrepSettings : TGrepSettings);
+procedure TGrepExpert.HistoryListSaveSettings(AHistoryIndex: Integer);
 var
-  Settings: TIniFile;
+  Settings: TCustomIniFile;
+  BaseKey: String;
 begin
-  if not GrepSaveResultListItems then
+  if not GrepSaveHistoryListItems then
     Exit;
 
-  Settings := TIniFile.Create(AddSlash(ConfigInfo().ConfigPath) + TGrepFoundList.SettingsFileName);
+  BaseKey := '';
+  if GrepSaveHistoryListItemsToReg then
+    BaseKey := ConfigurationKey + PathDelim;
+
+  Settings := CreateSettings;
   try
-    FoundList.LoadFromSettings(AGrepSettings, Settings, TGrepFoundList.KeyName, TGrepFoundList.SubKeyName, True);
+    HistoryList.SaveToSettings(Settings, HistoryIniVersion, BaseKey, AHistoryIndex);
   finally
     FreeAndNil(Settings);
+  end;
+end;
+
+procedure TGrepExpert.HistoryListDeleteFromSettings(AHistoryIndex: Integer);
+var
+  Settings: TCustomIniFile;
+begin
+  if not GrepSaveHistoryListItemsToIni then
+    Exit;
+
+  if AHistoryIndex = -1 then
+    DeleteFile(GrepConfigPath + GrepHistorySettingsFileName)
+  else
+  begin
+    Settings := CreateSettings;
+    try
+      HistoryList.RemoveFromSettings(Settings, AHistoryIndex);
+    finally
+      FreeAndNil(Settings);
+    end;
   end;
 end;
 
@@ -401,6 +473,8 @@ var
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the following lines
+  FHistoryIniVersion := Settings.ReadInteger(ConfigurationKey, 'HistoryIniVersion', FHistoryIniVersion);
+
   FGrepCaseSensitive := Settings.ReadBool(ConfigurationKey, 'CaseSensitive', False);
   FGrepCode := Settings.ReadBool(ConfigurationKey, 'Code', True);
   FGrepStrings := Settings.ReadBool(ConfigurationKey, 'Strings', True);
@@ -424,7 +498,6 @@ begin
   FAutoHide := Settings.ReadBool(ConfigurationKey, 'AutoHide', False);
   FGrepRegEx := Settings.ReadBool(ConfigurationKey, 'RegEx', False);
   FGrepUseCurrentIdent := Settings.ReadBool(ConfigurationKey, 'UseCurrentIdent', False);
-  FGrepSaveResultListItems := Settings.ReadBool(ConfigurationKey, 'SaveResultListItems', False);
 
   FListUseDefaultColors := Settings.ReadBool(ConfigurationKey, 'ListUseDefaultColors', False);
   Settings.LoadFont(AddSlash(ConfigurationKey) + 'ListFont', ListFont, [ffColor]);
@@ -439,7 +512,6 @@ begin
 
   FNumContextLines :=  Settings.ReadInteger(ConfigurationKey, 'NumContextLines', FNumContextLines);
   FContextSaveSize := Settings.ReadBool(ConfigurationKey, 'ContextSaveSize', False);
-  FFoundListSaveSize := Settings.ReadBool(ConfigurationKey, 'FoundListSaveSize', False);
 
   RegReadStrings(Settings, DirList, ConfigurationKey + PathDelim + 'DirectoryList', 'GrepDir');
   RegReadStrings(Settings, SearchList, ConfigurationKey + PathDelim + 'SearchList', 'GrepSearch');
@@ -447,13 +519,22 @@ begin
   RegReadStrings(Settings, MaskList, ConfigurationKey + PathDelim + 'MaskList', 'GrepMask');
   RegReadStrings(Settings, ExcludedDirsList, ConfigurationKey + PathDelim + 'ExcludedDirsList', 'GrepExcludedDirs');
 
-  if GrepSaveResultListItems then
-    LoadFoundList(fmGrepResults.GrepSettings);
+  if FHistoryIniVersion = 0 then
+  begin
+    FGrepSaveHistoryListItems := Settings.ReadInteger(ConfigurationKey, 'SaveResultListItems', 0);
+    FHistoryListSaveSize := Settings.ReadBool(ConfigurationKey, 'FoundListSaveSize', False);
+  end
+  else
+  begin
+    FGrepSaveHistoryListItems := Settings.ReadInteger(ConfigurationKey, 'SaveHistoryListItems', 0);
+    FHistoryListSaveSize := Settings.ReadBool(ConfigurationKey, 'HistoryListSaveSize', False);
+  end;
+
+  LoadHistoryList(fmGrepResults.GrepSettings);
 
   if MaskList.Count = 0 then
   begin
     MaskList.Add('*.pas;*.dpr;*.inc');
-    MaskList.Add('*.pas;*.dpr;*.inc;*.sql');
     MaskList.Add('*.txt;*.html;*.htm;.rc;*.xml;*.todo;*.me');
     if IsStandAlone or GxOtaHaveCPPSupport then
       MaskList.Add('*.cpp;*.hpp;*.h;*.pas;*.dpr');
@@ -471,6 +552,28 @@ begin
   end;
 
   fmGrepResults.UpdateFromSettings;
+
+  if FHistoryIniVersion = 0 then
+  begin
+    HistoryListDeleteFromSettings;
+
+    FHistoryIniVersion := 1;
+
+    Settings.EraseSection(ConfigurationKey);
+
+    InternalSaveSettings(Settings);
+    fmGrepResults.InternalSaveSettings(Settings);
+
+    HistoryListSaveSettings;
+  end;
+end;
+
+function TGrepExpert.GetGrepSaveHistoryListItems(AIndex: Integer): Boolean;
+begin
+  if AIndex = 3 then
+    Result := FGrepSaveHistoryListItems in [1..2]
+  else
+    Result := FGrepSaveHistoryListItems = AIndex;
 end;
 
 procedure TGrepExpert.SetSearchList(New: TStrings);
@@ -529,7 +632,7 @@ begin
       {$IFOPT D+} SendDebug('Created grep window'); {$ENDIF}
       GrepStandAlone.LoadSettings;
       GrepStandAlone.ShowModal;
-      GrepStandAlone.FoundListSaveSettings;
+      GrepStandAlone.HistoryListSaveSettings;
       GrepStandAlone.SaveSettings;
     finally
       FreeAndNil(GrepStandAlone);
