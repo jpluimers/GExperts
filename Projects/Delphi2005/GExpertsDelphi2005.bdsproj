@@ -115,11 +115,11 @@
 			<Linker Name="ExeDescription" Type="String"></Linker>
 		</Linker>
 		<Directories>
-			<Directories Name="OutputDir" Type="String"></Directories>
-			<Directories Name="UnitOutputDir" Type="String"></Directories>
+			<Directories Name="OutputDir" Type="String">..\..\DLLs</Directories>
+			<Directories Name="UnitOutputDir" Type="String">dcu</Directories>
 			<Directories Name="PackageDLLOutputDir" Type="String"></Directories>
 			<Directories Name="PackageDCPOutputDir" Type="String"></Directories>
-			<Directories Name="SearchPath" Type="String">Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit</Directories>
+			<Directories Name="SearchPath" Type="String">..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</Directories>
 			<Directories Name="Packages" Type="String">vcl;rtl;vclx;designide</Directories>
 			<Directories Name="Conditionals" Type="String"></Directories>
 			<Directories Name="DebugSourceDirs" Type="String"></Directories>
@@ -169,19 +169,6 @@
 			<Language Name="ActiveLang" Type="String"></Language>
 			<Language Name="ProjectLang" Type="String">$00000000</Language>
 			<Language Name="RootDir" Type="String"></Language>
-		</Language>  <Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\bin\dclado90.bpl">Borland ADO DB Components</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dcl31w90.bpl">Delphi 1.0 Compatibility Components</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\ibevnt90.bpl">Borland Interbase Event Alerter Component</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dclshlctrls90.bpl">Shell Control Property and Component Editors</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dclmcn90.bpl">Borland DataSnap Connection Components</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dcltee90.bpl">TeeChart Components</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dcldbxcds90.bpl">Borland SimpleDataset Component (DBX)</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dclact90.bpl">Borland ActionBar Components</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dclsmpedit90.bpl">Borland Editor Script Enhancements</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dclemacsedit90.bpl">Borland Editor Emacs Enhancements</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\dclmlwiz90.bpl">Borland Markup Language Wizards</Excluded_Packages>
-      <Excluded_Packages Name="d:\borland\delphi2005\Bin\applet90.bpl">Borland Control Panel Applet Package</Excluded_Packages>
-    </Excluded_Packages>
-  </Delphi.Personality>
+		</Language>
+	</Delphi.Personality>
 </BorlandProject>
