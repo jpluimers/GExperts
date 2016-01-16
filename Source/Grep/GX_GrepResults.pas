@@ -8,7 +8,7 @@ uses
   Windows, Classes, Graphics, Controls, Forms,
   StdCtrls, ExtCtrls, GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, ComCtrls,
   Menus, DropSource, GX_IdeDock, ActnList, Dialogs,
-  ToolWin, System.Actions;
+  ToolWin;
 
 type
   TfmGrepResults = class(TfmIdeDockForm)
