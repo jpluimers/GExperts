@@ -90,11 +90,11 @@ MaxStackSize=1048576
 ImageBase=5242880
 ExeDescription=
 [Directories]
-OutputDir=
-UnitOutputDir=
+OutputDir=..\..\DLLs
+UnitOutputDir=dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit
+SearchPath=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit
 Packages=rtl;vcl;vclx;vclsmp;designide;vcljpg
 Conditionals=
 DebugSourceDirs=
@@ -110,7 +110,7 @@ IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=1
 MinorVer=3
-Release=4
+Release=8
 Build=0
 Debug=0
 PreRelease=0
@@ -122,36 +122,23 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Erik Berry and the GExperts Development Team
 FileDescription=GExperts for Delphi 7
-FileVersion=1.3.4.0
+FileVersion=1.3.8.0
 InternalName=GExperts for Delphi 7
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=GExpertsD7.dll
-ProductName=GExperts for Delphi 7
-ProductVersion=1.34
+ProductName=GExperts for Delphi
+ProductVersion=1.38
 Comments=Open Source
-[Excluded Packages]
-D:\Borland\Delphi7\Bin\dclmid70.bpl=Borland MyBase DataAccess Components
-d:\borland\delphi7\Bin\dclado70.bpl=Borland ADO DB Components
-d:\borland\delphi7\Bin\dclact70.bpl=Borland ActionBar Components
-d:\borland\delphi7\Bin\dclnet70.bpl=Borland Internet Components
-d:\borland\delphi7\Bin\dclmcn70.bpl=Borland DataSnap Connection Components
-d:\borland\delphi7\Bin\dcldbx70.bpl=Borland dbExpress Components
-d:\borland\delphi7\Bin\dcldbxcds70.bpl=Borland SimpleDataset Component (DBX)
-d:\borland\delphi7\Bin\DBWEBXPRT.BPL=Borland Web Wizard Package
-D:\Borland\Delphi7\Bin\dclbde70.bpl=Borland BDE DB Components
-D:\Borland\Delphi7\Bin\dbx70.bpl=Borland SQL Explorer UI Package
-d:\borland\delphi7\Bin\dclwbm70.bpl=Borland InternetExpress Components
-d:\borland\delphi7\Bin\dclie70.bpl=Internet Explorer Components
-d:\borland\delphi7\Bin\dclwebsnap70.bpl=Borland WebSnap Components
-d:\borland\delphi7\Bin\DCLIB70.bpl=InterBase Data Access Components
-d:\borland\delphi7\Bin\dcltee70.bpl=TeeChart Components
-d:\borland\delphi7\Bin\dcldss70.bpl=Borland Decision Cube Components
-d:\borland\delphi7\Bin\dclclxdb70.bpl=Borland CLX Database Components
-D:\Borland\Delphi7\Bin\dclclxstd70.bpl=Borland CLX Standard Components
-d:\borland\delphi7\Bin\dclsmpedit70.bpl=Borland Editor Script Enhancements
-d:\borland\delphi7\Bin\applet70.bpl=Borland Control Panel Applet Package
-d:\borland\delphi7\Bin\dclemacsedit70.bpl=Borland Editor Emacs Enhancements
-d:\borland\delphi7\Bin\dclmlwiz70.bpl=Borland Markup Language Wizards
-C:\WINDOWS\system32\ibevnt70.bpl=Borland Interbase Event Alerter Component
-d:\borland\delphi7\Bin\dclshlctrls70.bpl=Shell Control Property and Component Editors
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=dcu
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..\..\DLLs

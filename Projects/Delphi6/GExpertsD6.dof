@@ -41,11 +41,11 @@ MaxStackSize=1048576
 ImageBase=5242880
 ExeDescription=
 [Directories]
-OutputDir=
-UnitOutputDir=
+OutputDir=..\..\DLLs
+UnitOutputDir=dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit
+SearchPath=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit
 Packages=rtl;vcl;vclx;vclsmp;designide
 Conditionals=
 DebugSourceDirs=
@@ -78,40 +78,21 @@ InternalName=GExperts for Delphi 6
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=GExpertsD6.dll
-ProductName=GExperts for Delphi 6
+ProductName=GExperts for Delphi
 ProductVersion=1.38
 Comments=Open Source
 CompileDate=Monday, September 29, 2008 12:24 AM
 [Excluded Packages]
-D:\Borland\Delphi6\Bin\dcldb60.bpl=Borland Database Components
-D:\Borland\Delphi6\Bin\dclact60.bpl=Borland ActionBar Components
 C:\Windows\SysWOW64\ibevnt60.bpl=Borland Interbase Event Alerter Component
-d:\borland\delphi6\Bin\dclado60.bpl=Borland ADO DB Components
-D:\Borland\Delphi6\Bin\dbx60.bpl=Borland SQL Explorer UI Package
-d:\borland\delphi6\Bin\dclbde60.bpl=Borland BDE DB Components
-d:\borland\delphi6\Bin\DCLIB60.bpl=InterBase Data Access Components
-d:\borland\delphi6\Bin\dclcds60.bpl=Borland Base Cached ClientDataset Component
-D:\Borland\Delphi6\Bin\dclmid60.bpl=Borland MyBase DataAccess Components
-d:\borland\delphi6\Bin\dclbdecds60.bpl=Borland Local BDE ClientDataset Components
-d:\borland\delphi6\Bin\dclqrt60.bpl=QuickReport Components
-d:\borland\delphi6\Bin\dcltee60.bpl=TeeChart Components
-d:\borland\delphi6\Bin\dcldss60.bpl=Borland Decision Cube Components
-d:\borland\delphi6\Bin\dcltqr60.bpl=TeeChart for QuickReport Components
-d:\borland\delphi6\Bin\dclclxdb60.bpl=Borland CLX Database Components
-D:\Borland\Delphi6\Bin\dclclxstd60.bpl=Borland CLX Standard Components
-d:\borland\delphi6\Bin\dclmcn60.bpl=Borland DataSnap Connection Components
-d:\borland\delphi6\Bin\dclsmpedit60.bpl=Borland Editor Script Enhancements
-d:\borland\delphi6\Bin\applet60.bpl=Borland Control Panel Applet Package
-d:\borland\delphi6\Bin\dclemacsedit60.bpl=Borland Editor Emacs Enhancements
-d:\borland\delphi6\Bin\dcl31w60.bpl=Delphi 1.0 Compatibility Components
-d:\borland\delphi6\Bin\dclshlctrls60.bpl=Shell Control Property and Component Editors
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[Warnings]
-SymbolDeprecated=1
-SymbolLibrary=1
-SymbolPlatform=1
-UnitLibrary=1
-UnitPlatform=1
-UnitDeprecated=1
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=dcu
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..\..\DLLs
