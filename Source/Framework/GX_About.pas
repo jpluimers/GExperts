@@ -159,6 +159,10 @@ var
   Res: Integer;
 begin
   inherited;
+
+  if mmoContributors.Focused then
+    Exit;
+    
   Res :=  SendMessage(mmoContributors.Handle, WM_VSCROLL, SB_LINEDOWN, 0);
   if Res = 0 then begin
     // we have reached the end
