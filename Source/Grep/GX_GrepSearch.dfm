@@ -36,6 +36,7 @@ object fmGrepSearch: TfmGrepSearch
     Height = 22
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 15
+    ItemHeight = 14
     TabOrder = 0
     OnKeyDown = ComboKeyDown
   end
@@ -60,7 +61,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 200
       Height = 17
       Caption = '&Ignore Delphi comments'
-      TabOrder = 4
+      TabOrder = 5
     end
     object cbForms: TCheckBox
       Left = 10
@@ -84,7 +85,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 200
       Height = 17
       Caption = 'Regular e&xpression'
-      TabOrder = 3
+      TabOrder = 4
     end
     object cbSQLFiles: TCheckBox
       Left = 10
@@ -92,7 +93,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 200
       Height = 17
       Caption = 'Search S&QL files'
-      TabOrder = 5
+      TabOrder = 3
     end
   end
   object gbxWhere: TGroupBox
@@ -205,6 +206,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
+      ItemHeight = 14
       TabOrder = 3
       OnKeyDown = ComboKeyDown
     end
@@ -224,6 +226,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
+      ItemHeight = 14
       TabOrder = 0
       OnDropDown = cbDirectoryDropDown
       OnKeyDown = ComboKeyDown
@@ -249,6 +252,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
+      ItemHeight = 14
       TabOrder = 2
       OnDropDown = cbExcludedDirsDropDown
       OnKeyDown = ComboKeyDown

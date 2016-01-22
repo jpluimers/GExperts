@@ -238,7 +238,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Top = 8
     Width = 317
     Height = 169
-    Caption = 'Search history'
+    Caption = 'Search History'
     TabOrder = 0
     DesignSize = (
       317
@@ -250,7 +250,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Save search history pane width'
-      TabOrder = 1
+      TabOrder = 3
     end
     object chkGrepSaveHistoryListItems: TCheckBox
       Left = 8
@@ -258,7 +258,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Save search parameters and results '
+      Caption = 'Save search parameters and results'
       TabOrder = 0
       OnClick = chkGrepSaveHistoryListItemsClick
     end
@@ -267,7 +267,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Top = 42
       Width = 113
       Height = 17
-      Caption = 'To Registry'
+      Caption = 'To registry'
       Enabled = False
       TabOrder = 2
     end
@@ -276,10 +276,10 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Top = 42
       Width = 113
       Height = 17
-      Caption = 'To IniFile'
+      Caption = 'To .ini file'
       Checked = True
       Enabled = False
-      TabOrder = 3
+      TabOrder = 1
       TabStop = True
     end
   end

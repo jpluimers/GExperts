@@ -96,3 +96,10 @@ Item0=dcu
 [HistoryLists\hlOutputDirectorry]
 Count=1
 Item0=..\..\DLLs
+[Warnings]
+SymbolDeprecated=1
+SymbolLibrary=1
+SymbolPlatform=1
+UnitLibrary=1
+UnitPlatform=1
+UnitDeprecated=1

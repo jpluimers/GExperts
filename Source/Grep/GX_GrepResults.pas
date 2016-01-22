@@ -143,8 +143,6 @@ type
     miFileRefreshAll: TMenuItem;
     actHistoryModifySearchOptions: TAction;
     miHistoryModifySearchOptions: TMenuItem;
-    tbnSep8: TToolButton;
-    tbnShowFullFilename: TToolButton;
     mitFileDeleteAll: TMenuItem;
     mitFileSep7: TMenuItem;
     procedure FormResize(Sender: TObject);
@@ -326,14 +324,14 @@ end;
 
 function TGxResultRefreshAllQuestion.GetMessage: string;
 begin
-  Result := 'Are you sure that refresh all history item lists?';
+  Result := 'Are you sure you want to refresh all search history items?';
 end;
 
 { TGxResultDeleteAllQuestion }
 
 function TGxResultDeleteAllQuestion.GetMessage: string;
 begin
-  Result := 'Are you sure that delete all history items?';
+  Result := 'Are you sure you want to delete all search history items?';
 end;
 
 { TfmGrepResults }
@@ -1798,7 +1796,7 @@ procedure TfmGrepResults.actHistorySaveAllExecute(Sender: TObject);
 var
   AMode: TSaveToFileMode;
 begin
-  if lbHistoryList.Count = 0then
+  if lbHistoryList.Count = 0 then
     Exit;
 
   if Sender = actHistoryPrintAllToFile then
