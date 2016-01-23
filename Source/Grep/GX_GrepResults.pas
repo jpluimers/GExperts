@@ -527,20 +527,32 @@ begin
 end;
 
 procedure TfmGrepResults.InternalSaveSettings(Settings: TGExpertsSettings);
+var
+  WindowSettings: TExpertSettings;
+  Percent: integer;
 begin
-  Settings.SaveForm(Self, ConfigWindowKey);
-  Settings.WriteBool(ConfigWindowKey, 'OnTop', StayOnTop);
-  Settings.WriteBool(ConfigWindowKey, 'ShowToolBar', ToolBar.Visible);
-  Settings.WriteBool(ConfigWindowKey, 'ShowContext', ShowContext);
-  Settings.WriteBool(ConfigWindowKey, 'ShowHistoryList', ShowHistoryList);
-  if GrepExpert.ContextSaveSize then
-    Settings.WriteInteger(ConfigWindowKey, 'ContextHeight', reContext.Height);
-  if GrepExpert.HistoryListSaveSize then
-    Settings.WriteInteger(ConfigWindowKey, 'HistoryListWidth', lbHistoryList.Width);
+  WindowSettings := Settings.CreateExpertSettings(ConfigWindowKey);
+  try
+    Settings.SaveForm(Self, ConfigWindowKey);
+    WindowSettings.WriteBool('OnTop', StayOnTop);
+    WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
+    WindowSettings.WriteBool('ShowContext', ShowContext);
+    WindowSettings.WriteBool('ShowHistoryList', ShowHistoryList);
+    if GrepExpert.ContextSaveSize then
+    begin
+      Percent := (reContext.Height * 100) div ClientHeight;
+      WindowSettings.WriteInteger('ContextHeightPercent', Percent);
+      Settings.DeleteKey(ConfigWindowKey, 'ContextHeight');
+    end;
+    if GrepExpert.HistoryListSaveSize then
+      WindowSettings.WriteInteger('HistoryListWidth', lbHistoryList.Width);
 
-  Settings.WriteBool(ConfigWindowKey, 'ShowFullFilename', ShowFullFilename);
+    WindowSettings.WriteBool('ShowFullFilename', ShowFullFilename);
 
-  Settings.WriteInteger(ConfigWindowKey, 'LastViewedItem', FHistoryListClickedEntry);
+    WindowSettings.WriteInteger('LastViewedItem', FHistoryListClickedEntry);
+  finally
+    WindowSettings.Free;
+  end;
 end;
 
 procedure TfmGrepResults.SaveSettings;
@@ -558,40 +570,53 @@ end;
 
 procedure TfmGrepResults.LoadSettings;
 var
+  WindowSettings: TExpertSettings;
   Settings: TGExpertsSettings;
   AHistoryIniVersion: Integer;
 begin
   // Do not localize any of the below strings.
+  WindowSettings := nil;
   Settings := TGExpertsSettings.Create;
   try
     AHistoryIniVersion := Settings.ReadInteger(ConfigurationKey, 'HistoryIniVersion', 0);
 
+    WindowSettings := Settings.CreateExpertSettings(ConfigWindowKey);
     Settings.LoadForm(Self, ConfigWindowKey);
     EnsureFormVisible(Self);
-    StayOnTop := Settings.ReadBool(ConfigWindowKey, 'OnTop', True);
-    ToolBar.Visible := Settings.ReadBool(ConfigWindowKey, 'ShowToolBar', ToolBar.Visible);
-    ShowContext := Settings.ReadBool(ConfigWindowKey, 'ShowContext', True);
-    FHistoryListClickedEntry := Settings.ReadInteger(ConfigWindowKey, 'LastViewedItem', FHistoryListClickedEntry);
+    StayOnTop := WindowSettings.ReadBool('OnTop', True);
+    ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible);
+    ShowContext := WindowSettings.ReadBool('ShowContext', True);
+    FHistoryListClickedEntry := WindowSettings.ReadInteger('LastViewedItem', FHistoryListClickedEntry);
 
     if AHistoryIniVersion = 0 then
     begin
-      ShowHistoryList := Settings.ReadBool(ConfigWindowKey, 'ShowFoundList', True);
-      FLoadHistoryListWidth := Settings.ReadInteger(ConfigWindowKey, 'FoundListWidth', lbHistoryList.Width)
+      ShowHistoryList := WindowSettings.ReadBool('ShowFoundList', True);
+      FLoadHistoryListWidth := WindowSettings.ReadInteger('FoundListWidth', lbHistoryList.Width)
     end
     else
     begin
-      ShowHistoryList := Settings.ReadBool(ConfigWindowKey, 'ShowHistoryList', True);
-      FLoadHistoryListWidth := Settings.ReadInteger(ConfigWindowKey, 'HistoryListWidth', lbHistoryList.Width);
+      ShowHistoryList := WindowSettings.ReadBool('ShowHistoryList', True);
+      FLoadHistoryListWidth := WindowSettings.ReadInteger('HistoryListWidth', lbHistoryList.Width);
     end;
 
-    if Settings.ValueExists(ConfigWindowKey, 'ContextHeight') then
-      FLoadContextHeight := Settings.ReadInteger(ConfigWindowKey, 'ContextHeight', reContext.Height)
+    if WindowSettings.ValueExists('ContextHeightPercent') then
+    begin
+      FLoadContextHeight := WindowSettings.ReadInteger('ContextHeightPercent', 20);
+    end
     else
-      FLoadContextHeight := pnlMain.Height - ToolBar.Height - SplitterContext.Height -
-        Settings.ReadInteger(ConfigWindowKey, 'ResultsHeight', lbResults.Height);
+    begin
+      if Settings.ValueExists(ConfigWindowKey, 'ContextHeight') then
+        FLoadContextHeight := WindowSettings.ReadInteger('ContextHeight', reContext.Height)
+      else
+        FLoadContextHeight := pnlMain.Height - ToolBar.Height - SplitterContext.Height -
+          WindowSettings.ReadInteger('ResultsHeight', lbResults.Height);
+      // negative means this is an absoulte pixel value rather than a percent value
+      FLoadContextHeight := -FLoadContextHeight;
+    end;
 
-    ShowFullFilename := Settings.ReadBool(ConfigWindowKey, 'ShowFullFilename', False);
+    ShowFullFilename := WindowSettings.ReadBool('ShowFullFilename', False);
   finally
+    FreeAndNil(WindowSettings);
     FreeAndNil(Settings);
   end;
 end;
@@ -600,7 +625,12 @@ procedure TfmGrepResults.UpdateFromSettings;
 begin
   GrepExpert.HistoryList.Enabled := ShowHistoryList;
   if GrepExpert.ContextSaveSize then
-    reContext.Height := FLoadContextHeight;
+  begin
+    if FLoadContextHeight < 0 then
+      reContext.Height := -FLoadContextHeight
+    else
+      reContext.Height := (ClientHeight * FLoadContextHeight) div 100;
+  end;
   if GrepExpert.HistoryListSaveSize then
     lbHistoryList.Width := FLoadHistoryListWidth;
   if GrepExpert.GrepSaveHistoryListItems and FShowHistoryList and (GrepExpert.HistoryList.Count > 0) then
