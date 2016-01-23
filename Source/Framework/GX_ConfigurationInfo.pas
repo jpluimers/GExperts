@@ -71,6 +71,26 @@ type
   TFormSaveFlags = set of TFormSaveFlag;
 
   TGExpertsBaseSettings = class(TRegistryIniFile);
+  TGExpertsSettings = class;
+
+  ///<summary>
+  /// handles the settings of a particular expert, stored under the section given in the constructor </summary>
+  TExpertSettings = class
+  private
+    FGExpertsSettings: TGExpertsSettings;
+    FSection: string;
+  public
+    constructor Create(GExpertsSettings: TGExpertsSettings; const Section: string);
+    function ReadBool(const Ident: string; Default: Boolean): Boolean;
+    procedure WriteBool(const Ident: string; Value: Boolean);
+    function ReadInteger(const Ident: string; Default: Longint): Longint; 
+    procedure WriteInteger(const Ident: string; Value: Longint);
+    procedure LoadFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
+    procedure SaveFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
+    procedure ReadStrings(const List: TStrings; const ListName, Ident: string);
+    procedure WriteStrings(const List: TStrings; const ListName, Ident: string);
+    function ValueExists(const Ident: string): Boolean;
+  end;
 
   TGExpertsSettings = class(TGExpertsBaseSettings)
   public
@@ -89,6 +109,7 @@ type
     procedure LoadForm(Form: TCustomForm; Section: string = '';
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
     constructor Create(const FileName: string = '');
+    function CreateExpertSettings(const Section: string): TExpertSettings;
   end;
 
 function ConfigInfo: IConfigInfo;
@@ -789,6 +810,70 @@ begin
   if Assigned(FPrivateConfigurationInfo) then
     FPrivateConfigurationInfo.SaveSettings;
   FreeAndNil(FPrivateConfigurationInfo);
+end;
+
+function TGExpertsSettings.CreateExpertSettings(const Section: string): TExpertSettings;
+begin
+  Result := TExpertSettings.Create(Self, Section);
+end;
+
+{ TExpertSettings }
+
+constructor TExpertSettings.Create(GExpertsSettings: TGExpertsSettings;
+  const Section: string);
+begin
+  inherited Create;
+  FGexpertsSettings := GExpertsSettings;
+  FSection := Section;
+end;
+
+procedure TExpertSettings.LoadFont(const FontName: string; const Font: TFont;
+  Flags: TGXFontFlags);
+begin
+  FGExpertsSettings.LoadFont(AddSlash(FSection) + FontName, Font, Flags);
+end;
+
+function TExpertSettings.ReadBool(const Ident: string; Default: Boolean): Boolean;
+begin
+  Result := FGExpertsSettings.ReadBool(FSection, Ident, Default);
+end;
+
+function TExpertSettings.ReadInteger(const Ident: string; Default: Integer): Longint;
+begin
+  Result := FGExpertsSettings.ReadInteger(FSection, Ident, Default);
+end;
+
+procedure TExpertSettings.ReadStrings(const List: TStrings;
+  const ListName, Ident: string);
+begin
+  FGExpertsSettings.ReadStrings(List, AddSlash(FSection) + ListName, Ident);
+end;
+
+procedure TExpertSettings.SaveFont(const FontName: string; const Font: TFont;
+  Flags: TGXFontFlags);
+begin
+  FGExpertsSettings.SaveFont(AddSlash(FSection) + FontName, Font, Flags);
+end;
+
+function TExpertSettings.ValueExists(const Ident: string): Boolean;
+begin
+  Result := FGExpertsSettings.ValueExists(FSection, Ident);
+end;
+
+procedure TExpertSettings.WriteBool(const Ident: string; Value: Boolean);
+begin
+  FGExpertsSettings.WriteBool(FSection, Ident, Value);
+end;
+
+procedure TExpertSettings.WriteInteger(const Ident: string; Value: Integer);
+begin
+  FGExpertsSettings.WriteInteger(FSection, Ident, Value);
+end;
+
+procedure TExpertSettings.WriteStrings(const List: TStrings;
+  const ListName, Ident: string);
+begin
+
 end;
 
 initialization
