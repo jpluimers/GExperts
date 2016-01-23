@@ -200,6 +200,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Save context display height'
       TabOrder = 5
+      Visible = False
     end
     object pnlContextMacthLineFontColor: TPanel
       Left = 48
@@ -245,12 +246,13 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       169)
     object chkSaveHistoryListSize: TCheckBox
       Left = 8
-      Top = 62
+      Top = 78
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Save search history pane width'
       TabOrder = 3
+      Visible = False
     end
     object chkGrepSaveHistoryListItems: TCheckBox
       Left = 8
@@ -263,18 +265,18 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       OnClick = chkGrepSaveHistoryListItemsClick
     end
     object rbSaveToRegistry: TRadioButton
-      Left = 153
-      Top = 42
-      Width = 113
+      Left = 25
+      Top = 58
+      Width = 288
       Height = 17
-      Caption = 'To registry'
+      Caption = 'To registry (not recommended)'
       Enabled = False
       TabOrder = 2
     end
     object rbSaveToIniFile: TRadioButton
-      Left = 33
+      Left = 25
       Top = 42
-      Width = 113
+      Width = 288
       Height = 17
       Caption = 'To .ini file'
       Checked = True
