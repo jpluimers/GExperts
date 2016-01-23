@@ -542,7 +542,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actFilePrintToFile: TAction
       Category = 'File'
-      Caption = 'Print to File...'
+      Caption = 'Print to file...'
       Hint = 'Print results to file...'
       ImageIndex = 31
       OnExecute = actFileSaveExecute
@@ -621,7 +621,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actHistoryModifySearchOptions: TAction
       Category = 'History'
-      Caption = 'Modify Search Options...'
+      Caption = 'Modify search options...'
       OnExecute = actHistoryRefreshExecute
       OnUpdate = actHistoryUpdate
     end
@@ -634,19 +634,19 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actViewShowHistoryList: TAction
       Category = 'View'
-      Caption = 'Show History List'
+      Caption = 'Show history list'
       Hint = 'Show history list'
       OnExecute = actViewShowHistoryListExecute
     end
     object actViewShowFullFilename: TAction
       Category = 'View'
-      Caption = 'Show Full Filename'
+      Caption = 'Show full filename'
       Hint = 'Show full or relative filename'
       OnExecute = actViewShowFullFilenameExecute
     end
     object actHistoryPrintToFile: TAction
       Category = 'History'
-      Caption = 'Print to File...'
+      Caption = 'Print to file...'
       ImageIndex = 3
       OnExecute = actHistorySaveExecute
       OnUpdate = actHistoryUpdate
@@ -659,33 +659,33 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actHistoryDeleteAll: TAction
       Category = 'History'
-      Caption = 'Delete All'
+      Caption = 'Delete all'
       ImageIndex = 11
       OnExecute = actHistoryDeleteAllExecute
       OnUpdate = actHistoryUpdate
     end
     object actHistorySaveAll: TAction
       Category = 'History'
-      Caption = 'Save All...'
+      Caption = 'Save all...'
       ImageIndex = 31
       OnExecute = actHistorySaveAllExecute
       OnUpdate = actHistoryUpdate
     end
     object actContextSelSearch: TAction
       Category = 'Context'
-      Caption = 'Search Selected Text...'
+      Caption = 'Search selected text...'
       OnExecute = actContextSelSearchExecute
     end
     object actHistoryPrintAllToFile: TAction
       Category = 'History'
-      Caption = 'Print All to File...'
+      Caption = 'Print all to file...'
       ImageIndex = 3
       OnExecute = actHistorySaveAllExecute
       OnUpdate = actHistoryUpdate
     end
     object actHistorySavePrintAll: TAction
       Category = 'History'
-      Caption = 'Save && Print All to File...'
+      Caption = 'Save && Print all to file...'
       OnExecute = actHistorySaveAllExecute
       OnUpdate = actHistoryUpdate
     end
@@ -698,7 +698,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actHistoryRefreshAll: TAction
       Category = 'History'
-      Caption = 'Refresh All'
+      Caption = 'Refresh all'
       ImageIndex = 34
       OnExecute = actHistoryRefreshAllExecute
       OnUpdate = actHistoryUpdate

@@ -1,3 +1,5 @@
+{Search history author: (ERT) Ferenc Kiffer, Hungary <kifferferenc@yahoo.com>}
+
 unit GX_GrepExpert;
 
 interface
@@ -9,7 +11,7 @@ uses
 type
   TGrepExpert = class(TGX_Expert)
   private
-    FHistoryIniVersion: Integer; //0: old, 1: renamed new {, 2:___}
+    FHistoryIniVersion: Integer; //0: old, 1: renamed new, 2: multiINI/indexed new
     FGrepMiddle: Boolean;
     FGrepExpandAll: Boolean;
     FGrepExpandIf: Boolean;
@@ -368,6 +370,8 @@ end;
 function TGrepExpert.GrepConfigPath: String;
 begin
   Result := AddSlash(ConfigInfo.ConfigPath);
+  if FHistoryIniVersion >= 2 then
+    Result := AddSlash(Result + ConfigurationKey + '.' + TGrepHistoryList.KeyName);
 end;
 
 function TGrepExpert.GrepHistorySettingsFileName: String;
@@ -382,7 +386,10 @@ function TGrepExpert.CreateSettings: TCustomIniFile;
 begin
   Result := nil;
   case FGrepSaveHistoryListItems of
-    1: Result := TGrepIniFile.Create(GrepConfigPath + GrepHistorySettingsFileName);
+    1: begin
+      ForceDirectories(GrepConfigPath);
+      Result := TGrepIniFile.Create(GrepConfigPath + GrepHistorySettingsFileName);
+    end;
     2: Result := TGExpertsSettings.Create;
   end;
 end;
@@ -391,6 +398,7 @@ procedure TGrepExpert.LoadHistoryList(AGrepSettings : TGrepSettings);
 var
   Settings: TCustomIniFile;
   BaseKey: String;
+  AIniMode: TIniFileMode;
 begin
   if not GrepSaveHistoryListItems then
     Exit;
@@ -399,9 +407,13 @@ begin
   if GrepSaveHistoryListItemsToReg then
     BaseKey := ConfigurationKey + PathDelim;
 
+  AIniMode := ifmMulti;
+  if FHistoryIniVersion < 2 then
+    AIniMode := ifmSingle;
+
   Settings := CreateSettings;
   try
-    HistoryList.LoadFromSettings(AGrepSettings, Settings, HistoryIniVersion, BaseKey, True);
+    HistoryList.LoadFromSettings(AGrepSettings, Settings, HistoryIniVersion, AIniMode, BaseKey, True);
   finally
     FreeAndNil(Settings);
   end;
@@ -430,17 +442,22 @@ end;
 procedure TGrepExpert.HistoryListDeleteFromSettings(AHistoryIndex: Integer);
 var
   Settings: TCustomIniFile;
+  BaseKey: String;
 begin
-  if not GrepSaveHistoryListItemsToIni then
+  if not GrepSaveHistoryListItems then
     Exit;
 
-  if AHistoryIndex = -1 then
-    DeleteFile(GrepConfigPath + GrepHistorySettingsFileName)
+  BaseKey := '';
+  if GrepSaveHistoryListItemsToReg then
+    BaseKey := ConfigurationKey + PathDelim;
+
+  if GrepSaveHistoryListItemsToIni and ((AHistoryIndex = -1) or (HistoryIniVersion >= 2)) then
+    HistoryList.DeleteINIFiles(GrepConfigPath + GrepHistorySettingsFileName, HistoryIniVersion, AHistoryIndex)
   else
   begin
     Settings := CreateSettings;
     try
-      HistoryList.RemoveFromSettings(Settings, AHistoryIndex);
+      HistoryList.RemoveFromSettings(Settings, BaseKey, AHistoryIndex);
     finally
       FreeAndNil(Settings);
     end;
@@ -575,13 +592,20 @@ begin
     begin
       HistoryListDeleteFromSettings;
 
-      FHistoryIniVersion := 1;
+    FHistoryIniVersion := 2;
 
       Settings.EraseSection(ConfigurationKey);
 
       InternalSaveSettings(Settings);
       fmGrepResults.InternalSaveSettings(Settings);
 
+      HistoryListSaveSettings;
+    end
+    else if FHistoryIniVersion = 1 then
+    begin
+      HistoryListDeleteFromSettings;
+      FHistoryIniVersion := 2;
+      InternalSaveSettings(Settings);
       HistoryListSaveSettings;
     end;
   finally

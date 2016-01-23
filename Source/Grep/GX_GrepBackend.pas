@@ -1,4 +1,39 @@
+{Search history author: (ERT) Ferenc Kiffer, Hungary <kifferferenc@yahoo.com>}
+
 unit GX_GrepBackend;
+
+{Grep history settings format: iniversion=2
+
+ifmMulti: multi INI files mode
+for autosave and autoload
+[HistoryList]
+GrepHistoryXX=ZZ
+  where
+    XX=KeyIndex
+    ZZ=Order
+LastIndex= last keyindex
+[HistoryXX]
+  where
+    XX=KeyIndex
+KeyIndex= the item's unique index
+Multi INI file filenames:
+Main: GrepHistory.ini
+Item: HistoryXX.ini
+
+ifmSingle: one INI file mode
+only for Save, Save & Pint, Open
+[HistoryList]
+GrepHistoryCount=the count of the items
+GrepHistoryAA=BB
+  where
+    AA=index number
+    BB=search text
+[HistoryAA]
+  where
+    AA=index number
+INI file name:
+"any filename".ini
+}
 
 {$I GX_CondDefine.inc}
 
@@ -34,7 +69,9 @@ type
   end;
 
 type
-  TGrepIniFile = class(TIniFile)
+  TIniFileMode = (ifmSingle, ifmMulti);
+
+  TGrepIniFile = class(TMemIniFile)
   end;
 
   // Individual grep match in a line
@@ -50,7 +87,6 @@ type
     function Length: Integer;
     procedure LoadFromIni(AIni: TCustomIniFile; ASection, ASubKey: String);
     procedure WriteToIni(AIni: TCustomIniFile; ASection, ASubKey: String);
-    procedure RemoveFromSettings(AIni: TCustomIniFile; ASection, ASubKey: String);
 
     property SPos: Integer read FSPos write FSPos;
     property EPos: Integer read FEPos write FEPos;
@@ -84,7 +120,6 @@ type
     function Add: TMatchResult;
     procedure LoadFromIni(AIni: TCustomIniFile; ASection: String);
     procedure WriteToIni(AIni: TCustomIniFile; ASection: String);
-    procedure RemoveFromSettings(AIni: TCustomIniFile; ASection: String);
 
     property Line: string read FLine write FLine;
     property LineNo: Integer read FLineNo write FLineNo; // 1-based
@@ -114,7 +149,6 @@ type
     procedure GetMatchesOnLine(Line: Integer; var Matches: TMatchArray);
     procedure LoadFromIni(AIni: TCustomIniFile; ASection: String);
     procedure WriteToIni(AIni: TCustomIniFile; ASection: String);
-    procedure RemoveFromSettings(AIni: TCustomIniFile; ASection: String);
 
     property Expanded: Boolean read FExpanded write FExpanded;
     property ExpandState: Boolean read FExpandState write FExpandState;
@@ -124,6 +158,82 @@ type
     property LastLineResult: Integer read FLastLineResult write FLastLineResult;
     property Items[Index: Integer]: TLineResult read GetItem write SetItem; default;
     property TotalMatches: Integer read FTotalMatches write FTotalMatches;
+  end;
+
+  TGrepHistoryListItem = class
+  private
+    FKeyIndex: Integer;
+    FResultList: TStringList;
+    FTotalMatchCount: Integer;
+    FGrepSettings: TGrepSettings;
+    FChecked: Boolean;
+    FLastSearchTime: TDateTime;
+    FSaved: Boolean;
+    function  GetSearchText: String;
+    procedure ClearResultList;
+    function  GetItemIni(AIni: TCustomIniFile; AIniMode: TIniFileMode; DoClear: Boolean): TCustomIniFile;
+    procedure FreeItemIni(var AIni: TCustomIniFile; AIniMode: TIniFileMode);
+
+    function  SubKeyIndexedName: String; //Used only in multi mode
+  public
+    class function SubKeyNameHistory: string;
+
+    constructor Create(AGrepSettings: TGrepSettings);
+    destructor Destroy; override;
+    procedure View(AResultList: TStrings);
+    procedure Update(AGrepSettings: TGrepSettings; DoClearResults, DoClearMatchCount: Boolean);
+    procedure LoadFromIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; ASection: String);
+    procedure WriteToIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; ASection: String);
+    procedure RemoveFromSettings(AIni: TCustomIniFile; const BaseKey: String);
+
+    property SearchText: String read GetSearchText;
+    property GrepSettings: TGrepSettings read FGrepSettings;
+    property ResultList: TStringList read FResultList;
+    property TotalMatchCount: Integer read FTotalMatchCount write FTotalMatchCount;
+
+    property KeyIndex: Integer read FKeyIndex;
+    property Checked: Boolean read FChecked write FChecked;
+    property LastSearchTime: TDateTime read FLastSearchTime;
+    property Saved: Boolean read FSaved write FSaved;
+  end;
+
+  TGrepHistoryList = class(TStringList)
+  private
+    FEnabled: Boolean;
+    FLastIndex: Integer;
+    function  GetItems(AIndex: Integer): TGrepHistoryListItem;
+    procedure ClearItems;
+    function  SearchItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItem): Integer;
+    function  GetNextIndex: Integer;
+
+    function  SubKeyNameGrepHistory(AKeyIndex: Integer): String; overload; //Used only in multi mode
+  protected
+  public
+    class function KeyName: string;
+    class function SubKeyNameGrepHistory: string; overload;
+    class function SettingsFileName: string;
+
+    constructor Create;
+    destructor Destroy; override;
+    procedure Clear; override;
+    function  AddItem(AGrepSettings: TGrepSettings; AResultList: TStrings): Integer;
+    procedure UpdateGrepSettings(AGrepSettings: TGrepSettings);
+
+    function  LoadFromSettings(ADefGrepSettings: TGrepSettings; const AIni: TCustomIniFile;
+      AMainIniVersion: Integer; AIniMode: TIniFileMode; const BaseKey: String; DoClear: Boolean): Boolean;
+    function  LoadItemFromIni(ADefGrepSettings: TGrepSettings; const AIni: TCustomIniFile; AMainIniVersion: Integer): Integer;
+    procedure SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode;
+      const BaseKey: String); overload;
+    procedure SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; const BaseKey: String;
+      AHistoryIndex: Integer); overload;
+
+    procedure RemoveFromSettings(const AIni: TCustomIniFile; const BaseKey: String; AHistoryIndex: Integer);
+    procedure DeleteINIFiles(AMainINIFileName: String; AIniVersion, AHistoryIndex: Integer);
+
+    procedure SetAllChecked(AChecked: Boolean);
+
+    property Items[AIndex: Integer]: TGrepHistoryListItem read GetItems;
+    property Enabled: Boolean read FEnabled write FEnabled;
   end;
 
 type
@@ -177,59 +287,6 @@ type
     property AbortSignalled: Boolean read FAbortSignalled write FAbortSignalled;
   end;
 
-  TGrepHistoryListItems = class
-  private
-    FSection: string;
-    FResultList: TStringList;
-    FTotalMatchCount: Integer;
-    FGrepSettings: TGrepSettings;
-    function  GetSearchText: String;
-    procedure ClearResultList;
-  public
-    class function SubKeyName: string;
-
-    constructor Create(AGrepSettings: TGrepSettings);
-    destructor Destroy; override;
-    procedure View(AResultList: TStrings);
-    procedure Update(AGrepSettings: TGrepSettings; DoClearResults, DoClearMatchCount: Boolean);
-    procedure LoadFromIni(AIni: TCustomIniFile; ASection: String);
-    procedure WriteToIni(AIni: TCustomIniFile; ASection: String);
-    procedure RemoveFromSettings(AIni: TCustomIniFile);
-
-    property SearchText: String read GetSearchText;
-    property GrepSettings: TGrepSettings read FGrepSettings;
-    property ResultList: TStringList read FResultList;
-    property TotalMatchCount: Integer read FTotalMatchCount write FTotalMatchCount;
-  end;
-
-  TGrepHistoryList = class(TStringList)
-  private
-    FEnabled: Boolean;
-    function  GetItems(AIndex: Integer): TGrepHistoryListItems;
-    procedure ClearItems;
-    function  SearchItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItems): Integer;
-  protected
-  public
-    class function KeyName: string;
-    class function SubKeyName: string;
-    class function SettingsFileName: string;
-
-    constructor Create;
-    destructor Destroy; override;
-    procedure Clear; override;
-    function  AddItem(AGrepSettings: TGrepSettings; AResultList: TStrings): Integer;
-    procedure UpdateGrepSettings(AGrepSettings: TGrepSettings);
-    function  LoadFromSettings(ADefGrepSettings: TGrepSettings; const AIni: TCustomIniFile; AMainIniVersion: Integer;
-      const BaseKey: String; DoClear: Boolean): Boolean;
-    function  LoadItemFromIni(ADefGrepSettings: TGrepSettings; const AIni: TCustomIniFile; AMainIniVersion: Integer): Integer;
-    procedure SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; const BaseKey: String); overload;
-    procedure SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; const BaseKey: String; AHistoryIndex: Integer); overload;
-    procedure RemoveFromSettings(const AIni: TCustomIniFile; AHistoryIndex: Integer);
-
-    property Items[AIndex: Integer]: TGrepHistoryListItems read GetItems;
-    property Enabled: Boolean read FEnabled write FEnabled;
-  end;
-
 implementation
 
 uses
@@ -239,205 +296,6 @@ uses
 
 const
   cIniSubKeyCount = 'Count';
-
-{ TLineMatches }
-
-constructor TLineMatches.Create;
-begin
-  inherited Create(TMatchResult);
-end;
-
-function TLineMatches.Add: TMatchResult;
-begin
-  Result := TMatchResult(inherited Add);
-end;
-
-function TLineMatches.GetItem(Index: Integer): TMatchResult;
-begin
-  Result := TMatchResult(inherited GetItem(Index));
-end;
-
-procedure TLineMatches.SetItem(Index: Integer; Value: TMatchResult);
-begin
-  inherited SetItem(Index, Value);
-end;
-
-class function TLineMatches.SubKeyName: string;
-begin
-  Result := 'Line';
-end;
-
-{ TLineResult }
-
-constructor TLineResult.Create(Collection: TCollection);
-begin
-  inherited Create(Collection);
-  FMatches := TLineMatches.Create;
-end;
-
-destructor TLineResult.Destroy;
-begin
-  if Assigned(FMatches) then
-  begin
-    FMatches.Clear;
-    FreeAndNil(FMatches);
-  end;
-  inherited Destroy;
-end;
-
-function TLineResult.Add: TMatchResult;
-begin
-  Result := Matches.Add;
-end;
-
-procedure TLineResult.LoadFromIni(AIni: TCustomIniFile; ASection: String);
-var
-  I, ACount: Integer;
-  ASubKey: String;
-begin
-  // INI file trims when reading back in, so a magic marker is used but we need to strip it when reading in.
-  Line := Copy(AIni.ReadString(ASection, 'Line', '#' + Line), 2, MaxInt);
-  LineNo := AIni.ReadInteger(ASection, 'LineNo', LineNo);
-
-//MatchList
-  ASubKey := TMatchResult.SubKeyName;
-  Matches.Clear;
-  ACount := AIni.ReadInteger(ASection, ASubKey + cIniSubKeyCount, 0);
-  for I := 0 to ACount - 1 do
-    Add.LoadFromIni(AIni, ASection, Format('%s%d', [ASubKey, I]));
-end;
-
-procedure TLineResult.WriteToIni(AIni: TCustomIniFile; ASection: String);
-var
-  I: Integer;
-  ASubKey: String;
-begin
-  // INI file trims when reading back in, so a magic marker is used to keep the read contents.
-  AIni.WriteString(ASection, 'Line', '#' + Line);
-  AIni.WriteInteger(ASection, 'LineNo', LineNo);
-
-//MatchList
-  ASubKey := TMatchResult.SubKeyName;
-  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, 0);
-  for I := 0 to Matches.Count - 1 do
-    Matches.Items[I].WriteToIni(AIni, ASection, Format('%s%d', [ASubKey, I]));
-  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, Matches.Count);
-end;
-
-procedure TLineResult.RemoveFromSettings(AIni: TCustomIniFile; ASection: String);
-var
-  ASubKey: String;
-  I: Integer;
-begin
-  ASubKey := TMatchResult.SubKeyName;
-  AIni.EraseSection(ASection);
-
-  for I := 0 to Matches.Count - 1 do
-    Matches.Items[I].RemoveFromSettings(AIni, ASection, Format('%s%d', [ASubKey, I]));
-end;
-
-{ TFileResult }
-
-constructor TFileResult.Create;
-begin
-  inherited Create(TLineResult);
-  FLastLineResult := -1;
-  FTotalMatches := 0;
-end;
-
-function TFileResult.Add: TLineResult;
-begin
-  Result := TLineResult(inherited Add);
-end;
-
-function TFileResult.GetItem(Index: Integer): TLineResult;
-begin
-  Result := TLineResult(inherited GetItem(Index));
-end;
-
-procedure TFileResult.SetItem(Index: Integer; Value: TLineResult);
-begin
-  inherited SetItem(Index, Value);
-end;
-
-class function TFileResult.SubKeyName: string;
-begin
-  Result := 'File';
-end;
-
-procedure TFileResult.GetMatchesOnLine(Line: Integer; var Matches: TMatchArray);
-var
-  i, j: Integer;
-  LineMatches: TLineResult;
-  MR: TMatchResult;
-begin
-  SetLength(Matches, 0);
-  for i := 0 to Count - 1 do
-  begin
-    LineMatches := GetItem(i);
-    if LineMatches.FLineNo = Line then
-    begin
-      for j := 0 to LineMatches.Matches.Count - 1 do
-      begin
-        SetLength(Matches, Length(Matches) + 1);
-        MR := LineMatches.Matches.GetItem(j);
-        Matches[Length(Matches) - 1] := MR;
-      end;
-    end;
-  end;
-end;
-
-procedure TFileResult.LoadFromIni(AIni: TCustomIniFile; ASection: String);
-var
-  I, ACount: Integer;
-  ASubKey: String;
-begin
-  ExpandState := AIni.ReadBool(ASection, 'ExpandState', False);
-  FileName := AIni.ReadString(ASection, 'FileName', FileName);
-  RelativeFileName := AIni.ReadString(ASection, 'RelativeFileName', RelativeFileName);
-  LastLineResult := AIni.ReadInteger(ASection, 'LastLineResult', LastLineResult);
-  LastIndex := AIni.ReadInteger(ASection, 'LastIndex', LastIndex);
-  TotalMatches := AIni.ReadInteger(ASection, 'TotalMatches', TotalMatches);
-
-//LineList
-  ASubKey := TLineMatches.SubKeyName;
-  Clear;
-  ACount := AIni.ReadInteger(ASection, ASubKey + cIniSubKeyCount, 0);
-  for I := 0 to ACount - 1 do
-    Add.LoadFromIni(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
-end;
-
-procedure TFileResult.WriteToIni(AIni: TCustomIniFile; ASection: String);
-var
-  I: Integer;
-  ASubKey: String;
-begin
-  AIni.WriteBool(ASection, 'ExpandState', ExpandState);
-  AIni.WriteString(ASection, 'FileName', FileName);
-  AIni.WriteString(ASection, 'RelativeFileName', RelativeFileName);
-  AIni.WriteInteger(ASection, 'LastLineResult', LastLineResult);
-  AIni.WriteInteger(ASection, 'LastIndex', LastIndex);
-  AIni.WriteInteger(ASection, 'TotalMatches', TotalMatches);
-
-//LineList
-  ASubKey := TLineMatches.SubKeyName;
-  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, 0);
-  for I := 0 to Count - 1 do
-    Items[I].WriteToIni(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
-  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, Count);
-end;
-
-procedure TFileResult.RemoveFromSettings(AIni: TCustomIniFile; ASection: String);
-var
-  ASubKey: String;
-  I: Integer;
-begin
-  ASubKey := TLineMatches.SubKeyName;
-
-  AIni.EraseSection(ASection);
-  for I := 0 to Count - 1 do
-    Items[I].RemoveFromSettings(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
-end;
 
 { TGrepSearchRunner }
 
@@ -907,43 +765,6 @@ begin
     FOnHitMatch(Self, LineNo, Line, SPos, EPos);
 end;
 
-{ TMatchResult }
-
-constructor TMatchResult.Create(Collection: TCollection);
-begin
-  inherited;
-  ShowBold := True;
-end;
-
-function TMatchResult.Length: Integer;
-begin
-  Result := EPos - SPos + 1;
-end;
-
-procedure TMatchResult.LoadFromIni(AIni: TCustomIniFile; ASection, ASubKey: String);
-begin
-  SPos := AIni.ReadInteger(ASection, ASubKey + 'SPos', SPos);
-  EPos := AIni.ReadInteger(ASection, ASubKey + 'EPos', EPos);
-  ShowBold := AIni.ReadBool(ASection, ASubKey + 'ShowBold', ShowBold);
-end;
-
-class function TMatchResult.SubKeyName: string;
-begin
-  Result := 'Match';
-end;
-
-procedure TMatchResult.WriteToIni(AIni: TCustomIniFile; ASection, ASubKey: String);
-begin
-  AIni.WriteInteger(ASection, ASubKey + 'SPos', SPos);
-  AIni.WriteInteger(ASection, ASubKey + 'EPos', EPos);
-  AIni.WriteBool(ASection, ASubKey + 'ShowBold', ShowBold);
-end;
-
-procedure TMatchResult.RemoveFromSettings(AIni: TCustomIniFile; ASection, ASubKey: String);
-begin
-  AIni.EraseSection(AddSlash(ASection) + ASubKey);
-end;
-
 { TGrepSearchContext }
 
 function TGrepSearchContext.ToString: string;
@@ -966,23 +787,239 @@ In the future, try to handle these:
 }
 end;
 
-{ TGrepHistoryListItems }
+{ TMatchResult }
 
-constructor TGrepHistoryListItems.Create(AGrepSettings: TGrepSettings);
+class function TMatchResult.SubKeyName: string;
+begin
+  Result := 'Match';
+end;
+
+constructor TMatchResult.Create(Collection: TCollection);
+begin
+  inherited;
+  ShowBold := True;
+end;
+
+function TMatchResult.Length: Integer;
+begin
+  Result := EPos - SPos + 1;
+end;
+
+procedure TMatchResult.LoadFromIni(AIni: TCustomIniFile; ASection, ASubKey: String);
+begin
+  SPos := AIni.ReadInteger(ASection, ASubKey + 'SPos', SPos);
+  EPos := AIni.ReadInteger(ASection, ASubKey + 'EPos', EPos);
+  ShowBold := AIni.ReadBool(ASection, ASubKey + 'ShowBold', ShowBold);
+end;
+
+procedure TMatchResult.WriteToIni(AIni: TCustomIniFile; ASection, ASubKey: String);
+begin
+  AIni.WriteInteger(ASection, ASubKey + 'SPos', SPos);
+  AIni.WriteInteger(ASection, ASubKey + 'EPos', EPos);
+  AIni.WriteBool(ASection, ASubKey + 'ShowBold', ShowBold);
+end;
+
+{ TLineMatches }
+
+class function TLineMatches.SubKeyName: string;
+begin
+  Result := 'Line';
+end;
+
+constructor TLineMatches.Create;
+begin
+  inherited Create(TMatchResult);
+end;
+
+function TLineMatches.Add: TMatchResult;
+begin
+  Result := TMatchResult(inherited Add);
+end;
+
+function TLineMatches.GetItem(Index: Integer): TMatchResult;
+begin
+  Result := TMatchResult(inherited GetItem(Index));
+end;
+
+procedure TLineMatches.SetItem(Index: Integer; Value: TMatchResult);
+begin
+  inherited SetItem(Index, Value);
+end;
+
+{ TLineResult }
+
+constructor TLineResult.Create(Collection: TCollection);
+begin
+  inherited Create(Collection);
+  FMatches := TLineMatches.Create;
+end;
+
+destructor TLineResult.Destroy;
+begin
+  if Assigned(FMatches) then
+  begin
+    FMatches.Clear;
+    FreeAndNil(FMatches);
+  end;
+  inherited Destroy;
+end;
+
+function TLineResult.Add: TMatchResult;
+begin
+  Result := Matches.Add;
+end;
+
+procedure TLineResult.LoadFromIni(AIni: TCustomIniFile; ASection: String);
+var
+  I, ACount: Integer;
+  ASubKey: String;
+begin
+  // INI file trims when reading back in, so a magic marker is used but we need to strip it when reading in.
+  Line := Copy(AIni.ReadString(ASection, 'Line', '#' + Line), 2, MaxInt);
+  LineNo := AIni.ReadInteger(ASection, 'LineNo', LineNo);
+
+//MatchList
+  ASubKey := TMatchResult.SubKeyName;
+  Matches.Clear;
+  ACount := AIni.ReadInteger(ASection, ASubKey + cIniSubKeyCount, 0);
+  for I := 0 to ACount - 1 do
+    Add.LoadFromIni(AIni, ASection, Format('%s%d', [ASubKey, I]));
+end;
+
+procedure TLineResult.WriteToIni(AIni: TCustomIniFile; ASection: String);
+var
+  I: Integer;
+  ASubKey: String;
+begin
+  // INI file trims when reading back in, so a magic marker is used to keep the read contents.
+  AIni.WriteString(ASection, 'Line', '#' + Line);
+  AIni.WriteInteger(ASection, 'LineNo', LineNo);
+
+//MatchList
+  ASubKey := TMatchResult.SubKeyName;
+  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, 0);
+  for I := 0 to Matches.Count - 1 do
+    Matches.Items[I].WriteToIni(AIni, ASection, Format('%s%d', [ASubKey, I]));
+  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, Matches.Count);
+end;
+
+{ TFileResult }
+
+class function TFileResult.SubKeyName: string;
+begin
+  Result := 'File';
+end;
+
+constructor TFileResult.Create;
+begin
+  inherited Create(TLineResult);
+  FLastLineResult := -1;
+  FTotalMatches := 0;
+end;
+
+function TFileResult.Add: TLineResult;
+begin
+  Result := TLineResult(inherited Add);
+end;
+
+function TFileResult.GetItem(Index: Integer): TLineResult;
+begin
+  Result := TLineResult(inherited GetItem(Index));
+end;
+
+procedure TFileResult.SetItem(Index: Integer; Value: TLineResult);
+begin
+  inherited SetItem(Index, Value);
+end;
+
+procedure TFileResult.GetMatchesOnLine(Line: Integer; var Matches: TMatchArray);
+var
+  i, j: Integer;
+  LineMatches: TLineResult;
+  MR: TMatchResult;
+begin
+  SetLength(Matches, 0);
+  for i := 0 to Count - 1 do
+  begin
+    LineMatches := GetItem(i);
+    if LineMatches.FLineNo = Line then
+    begin
+      for j := 0 to LineMatches.Matches.Count - 1 do
+      begin
+        SetLength(Matches, Length(Matches) + 1);
+        MR := LineMatches.Matches.GetItem(j);
+        Matches[Length(Matches) - 1] := MR;
+      end;
+    end;
+  end;
+end;
+
+procedure TFileResult.LoadFromIni(AIni: TCustomIniFile; ASection: String);
+var
+  I, ACount: Integer;
+  ASubKey: String;
+begin
+  ExpandState := AIni.ReadBool(ASection, 'ExpandState', False);
+  FileName := AIni.ReadString(ASection, 'FileName', FileName);
+  RelativeFileName := AIni.ReadString(ASection, 'RelativeFileName', RelativeFileName);
+  LastLineResult := AIni.ReadInteger(ASection, 'LastLineResult', LastLineResult);
+  LastIndex := AIni.ReadInteger(ASection, 'LastIndex', LastIndex);
+  TotalMatches := AIni.ReadInteger(ASection, 'TotalMatches', TotalMatches);
+
+//LineList
+  ASubKey := TLineMatches.SubKeyName;
+  Clear;
+  ACount := AIni.ReadInteger(ASection, ASubKey + cIniSubKeyCount, 0);
+  for I := 0 to ACount - 1 do
+    Add.LoadFromIni(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
+end;
+
+procedure TFileResult.WriteToIni(AIni: TCustomIniFile; ASection: String);
+var
+  I: Integer;
+  ASubKey: String;
+begin
+  AIni.WriteBool(ASection, 'ExpandState', ExpandState);
+  AIni.WriteString(ASection, 'FileName', FileName);
+  AIni.WriteString(ASection, 'RelativeFileName', RelativeFileName);
+  AIni.WriteInteger(ASection, 'LastLineResult', LastLineResult);
+  AIni.WriteInteger(ASection, 'LastIndex', LastIndex);
+  AIni.WriteInteger(ASection, 'TotalMatches', TotalMatches);
+
+//LineList
+  ASubKey := TLineMatches.SubKeyName;
+  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, 0);
+  for I := 0 to Count - 1 do
+    Items[I].WriteToIni(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
+  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, Count);
+end;
+
+{ TGrepHistoryListItem }
+
+class function TGrepHistoryListItem.SubKeyNameHistory: string;
+begin
+  Result := 'History';
+end;
+
+constructor TGrepHistoryListItem.Create(AGrepSettings: TGrepSettings);
 begin
   inherited Create;
+  FKeyIndex := -1;
+  FChecked := False;
+  FLastSearchTime := 0;
+  FSaved := True;
   FResultList := TStringList.Create;
   Update(AGrepSettings, False, True);
 end;
 
-destructor TGrepHistoryListItems.Destroy;
+destructor TGrepHistoryListItem.Destroy;
 begin
   ClearResultList;
   FResultList.Free;
   inherited Destroy;
 end;
 
-procedure TGrepHistoryListItems.ClearResultList;
+procedure TGrepHistoryListItem.ClearResultList;
 var
   I: Integer;
 begin
@@ -990,12 +1027,17 @@ begin
     FResultList.Objects[I].Free;
 end;
 
-function TGrepHistoryListItems.GetSearchText: String;
+function TGrepHistoryListItem.GetSearchText: String;
 begin
   Result := FGrepSettings.Pattern;
 end;
 
-procedure TGrepHistoryListItems.View(AResultList: TStrings);
+function TGrepHistoryListItem.SubKeyIndexedName: String;
+begin
+  Result := Format('%s%d', [SubKeyNameHistory, FKeyIndex]);
+end;
+
+procedure TGrepHistoryListItem.View(AResultList: TStrings);
 var
   I: Integer;
 begin
@@ -1003,7 +1045,7 @@ begin
     AResultList.AddObject(FResultList[I], FResultList.Objects[I]);
 end;
 
-procedure TGrepHistoryListItems.Update(AGrepSettings: TGrepSettings; DoClearResults, DoClearMatchCount: Boolean);
+procedure TGrepHistoryListItem.Update(AGrepSettings: TGrepSettings; DoClearResults, DoClearMatchCount: Boolean);
 begin
   FGrepSettings := AGrepSettings;
   if DoClearMatchCount then
@@ -1015,101 +1057,148 @@ begin
   end;
 end;
 
-procedure TGrepHistoryListItems.LoadFromIni(AIni: TCustomIniFile; ASection: String);
+function TGrepHistoryListItem.GetItemIni(AIni: TCustomIniFile; AIniMode: TIniFileMode; DoClear: Boolean): TCustomIniFile;
+begin
+  if (AIni is TGrepIniFile) and (AIniMode = ifmMulti) then
+  begin
+    Result := TGrepIniFile.Create(ExtractFilePath(AIni.FileName) + SubKeyIndexedName + ExtractFileExt(AIni.FileName));
+    if DoClear then
+      TGrepIniFile(Result).Clear;
+  end
+  else
+    Result := AIni;
+end;
+
+procedure TGrepHistoryListItem.FreeItemIni(var AIni: TCustomIniFile; AIniMode: TIniFileMode);
+begin
+  if (AIni is TGrepIniFile) and (AIniMode = ifmMulti) then
+    FreeAndNil(AIni);
+end;
+
+procedure TGrepHistoryListItem.LoadFromIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; ASection: String);
 var
   I, ACount: Integer;
   ASubKey: String;
   AFileItem: TFileResult;
+  AItemIni: TCustomIniFile;
 begin
-  // Used for deleting single
-  FSection := ASection;
+  AItemIni := GetItemIni(AIni, AIniMode, False);
+  try
+    if AIniMode = ifmMulti then
+      FKeyIndex := AItemIni.ReadInteger(ASection, 'KeyIndex', FKeyIndex);
 
-  TotalMatchCount := AIni.ReadInteger(ASection, 'TotalMatchCount', TotalMatchCount);
+    FLastSearchTime := AItemIni.ReadDateTime(ASection, 'LastSearchTime', LastSearchTime);
 
-//GrepSettings
-  FGrepSettings.IncludeComments := AIni.ReadBool(ASection, 'IncludeComments', GrepSettings.IncludeComments);
-  FGrepSettings.CaseSensitive := AIni.ReadBool(ASection, 'CaseSensitive', GrepSettings.CaseSensitive);
-  FGrepSettings.WholeWord := AIni.ReadBool(ASection, 'WholeWord', GrepSettings.WholeWord);
-  FGrepSettings.RegEx := AIni.ReadBool(ASection, 'RegEx', GrepSettings.RegEx);
-  FGrepSettings.IncludeSubdirs := AIni.ReadBool(ASection, 'IncludeSubdirs', GrepSettings.IncludeSubdirs);
-  FGrepSettings.Directories := AIni.ReadString(ASection, 'Directories', GrepSettings.Directories);
-  FGrepSettings.ExcludedDirs := AIni.ReadString(ASection, 'ExcludedDirs', GrepSettings.ExcludedDirs);
-  FGrepSettings.Mask := AIni.ReadString(ASection, 'Mask', GrepSettings.Mask);
-  FGrepSettings.Pattern := AIni.ReadString(ASection, 'Pattern', GrepSettings.Pattern);
-  FGrepSettings.Replace := AIni.ReadString(ASection, 'Replace', GrepSettings.Replace);
-  FGrepSettings.GrepAction := TGrepAction(AIni.ReadInteger(ASection, 'GrepAction', Integer(GrepSettings.GrepAction)));
-  FGrepSettings.IncludeForms := AIni.ReadBool(ASection, 'IncludeForms', GrepSettings.IncludeForms);
-  FGrepSettings.IncludeSQLs := AIni.ReadBool(ASection, 'IncludeSQLs', GrepSettings.IncludeSQLs);
-  FGrepSettings.CanRefresh := True;
+    TotalMatchCount := AItemIni.ReadInteger(ASection, 'TotalMatchCount', TotalMatchCount);
 
-//ResultList
-  ASubKey := TFileResult.SubKeyName;
-  ACount := AIni.ReadInteger(ASection, ASubKey + cIniSubKeyCount, 0);
-  for I := 0 to ACount - 1 do
-  begin
-    AFileItem := TFileResult.Create;
-    AFileItem.LoadFromIni(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
-    ResultList.AddObject(AFileItem.FileName, AFileItem);
+  //GrepSettings
+    FGrepSettings.IncludeComments := AItemIni.ReadBool(ASection, 'IncludeComments', GrepSettings.IncludeComments);
+    FGrepSettings.CaseSensitive := AItemIni.ReadBool(ASection, 'CaseSensitive', GrepSettings.CaseSensitive);
+    FGrepSettings.WholeWord := AItemIni.ReadBool(ASection, 'WholeWord', GrepSettings.WholeWord);
+    FGrepSettings.RegEx := AItemIni.ReadBool(ASection, 'RegEx', GrepSettings.RegEx);
+    FGrepSettings.IncludeSubdirs := AItemIni.ReadBool(ASection, 'IncludeSubdirs', GrepSettings.IncludeSubdirs);
+    FGrepSettings.Directories := AItemIni.ReadString(ASection, 'Directories', GrepSettings.Directories);
+    FGrepSettings.ExcludedDirs := AItemIni.ReadString(ASection, 'ExcludedDirs', GrepSettings.ExcludedDirs);
+    FGrepSettings.Mask := AItemIni.ReadString(ASection, 'Mask', GrepSettings.Mask);
+    FGrepSettings.Pattern := AItemIni.ReadString(ASection, 'Pattern', GrepSettings.Pattern);
+    FGrepSettings.Replace := AItemIni.ReadString(ASection, 'Replace', GrepSettings.Replace);
+    FGrepSettings.GrepAction := TGrepAction(AItemIni.ReadInteger(ASection, 'GrepAction', Integer(GrepSettings.GrepAction)));
+    FGrepSettings.IncludeForms := AItemIni.ReadBool(ASection, 'IncludeForms', GrepSettings.IncludeForms);
+    FGrepSettings.IncludeSQLs := AItemIni.ReadBool(ASection, 'IncludeSQLs', GrepSettings.IncludeSQLs);
+    FGrepSettings.CanRefresh := True;
+
+  //ResultList
+    ASubKey := TFileResult.SubKeyName;
+    ACount := AItemIni.ReadInteger(ASection, ASubKey + cIniSubKeyCount, 0);
+    for I := 0 to ACount - 1 do
+    begin
+      AFileItem := TFileResult.Create;
+      AFileItem.LoadFromIni(AItemIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
+      ResultList.AddObject(AFileItem.FileName, AFileItem);
+    end;
+  finally
+    FreeItemIni(AItemIni, AIniMode);;
   end;
 end;
 
-class function TGrepHistoryListItems.SubKeyName: string;
-begin
-  Result := 'History';
-end;
-
-procedure TGrepHistoryListItems.WriteToIni(AIni: TCustomIniFile; ASection: String);
+procedure TGrepHistoryListItem.WriteToIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode;
+  ASection: String);
 var
   I: Integer;
   ASubKey: String;
+  AItemIni: TCustomIniFile;
 begin
-  AIni.WriteInteger(ASection, 'TotalMatchCount', TotalMatchCount);
+  AItemIni := GetItemIni(AIni, AIniMode, True);
+  try
+    if not (AItemIni is TGrepIniFile) then
+      AItemIni.EraseSection(ASection);
 
-//GrepSettings
-  AIni.WriteBool(ASection, 'IncludeComments', GrepSettings.IncludeComments);
-  AIni.WriteBool(ASection, 'CaseSensitive', GrepSettings.CaseSensitive);
-  AIni.WriteBool(ASection, 'WholeWord', GrepSettings.WholeWord);
-  AIni.WriteBool(ASection, 'RegEx', GrepSettings.RegEx);
-  AIni.WriteBool(ASection, 'IncludeSubdirs', GrepSettings.IncludeSubdirs);
-  AIni.WriteString(ASection, 'Directories', GrepSettings.Directories);
-  AIni.WriteString(ASection, 'ExcludedDirs', GrepSettings.ExcludedDirs);
-  AIni.WriteString(ASection, 'Mask', GrepSettings.Mask);
-  AIni.WriteString(ASection, 'Pattern', GrepSettings.Pattern);
-  AIni.WriteString(ASection, 'Replace', GrepSettings.Replace);
-  AIni.WriteInteger(ASection, 'GrepAction', Integer(GrepSettings.GrepAction));
-  AIni.WriteBool(ASection, 'IncludeForms', GrepSettings.IncludeForms);
-  AIni.WriteBool(ASection, 'IncludeSQLs', GrepSettings.IncludeSQLs);
+    if AItemIni is TGrepIniFile then
+      AItemIni.WriteInteger(ASection, 'IniVersion', AIniVersion);
+    if AIniMode = ifmMulti then
+      AItemIni.WriteInteger(ASection, 'KeyIndex', FKeyIndex);
 
-//ResultList
-  ASubKey := TFileResult.SubKeyName;
-  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, 0);
-  for I := 0 to ResultList.Count - 1 do
-    TFileResult(ResultList.Objects[I]).WriteToIni(AIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
-  AIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, ResultList.Count);
-end;
+    AItemIni.WriteDateTime(ASection, 'LastSearchTime', LastSearchTime);
 
-procedure TGrepHistoryListItems.RemoveFromSettings(AIni: TCustomIniFile);
-var
-  ASubKey: String;
-  FileSection: String;
-  I: Integer;
-begin
-  ASubKey := TFileResult.SubKeyName;
-  AIni.EraseSection(FSection);
+    AItemIni.WriteInteger(ASection, 'TotalMatchCount', TotalMatchCount);
 
-  for I := 0 to ResultList.Count - 1 do
-  begin
-    FileSection := AddSlash(FSection) + Format('%s%d', [ASubKey, I]);
-    TFileResult(ResultList.Objects[I]).RemoveFromSettings(AIni, FileSection);
+  //GrepSettings
+    AItemIni.WriteBool(ASection, 'IncludeComments', GrepSettings.IncludeComments);
+    AItemIni.WriteBool(ASection, 'CaseSensitive', GrepSettings.CaseSensitive);
+    AItemIni.WriteBool(ASection, 'WholeWord', GrepSettings.WholeWord);
+    AItemIni.WriteBool(ASection, 'RegEx', GrepSettings.RegEx);
+    AItemIni.WriteBool(ASection, 'IncludeSubdirs', GrepSettings.IncludeSubdirs);
+    AItemIni.WriteString(ASection, 'Directories', GrepSettings.Directories);
+    AItemIni.WriteString(ASection, 'ExcludedDirs', GrepSettings.ExcludedDirs);
+    AItemIni.WriteString(ASection, 'Mask', GrepSettings.Mask);
+    AItemIni.WriteString(ASection, 'Pattern', GrepSettings.Pattern);
+    AItemIni.WriteString(ASection, 'Replace', GrepSettings.Replace);
+    AItemIni.WriteInteger(ASection, 'GrepAction', Integer(GrepSettings.GrepAction));
+    AItemIni.WriteBool(ASection, 'IncludeForms', GrepSettings.IncludeForms);
+    AItemIni.WriteBool(ASection, 'IncludeSQLs', GrepSettings.IncludeSQLs);
+
+  //ResultList
+    ASubKey := TFileResult.SubKeyName;
+    AItemIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, 0);
+    for I := 0 to ResultList.Count - 1 do
+      TFileResult(ResultList.Objects[I]).WriteToIni(AItemIni, ASection + PathDelim + Format('%s%d', [ASubKey, I]));
+    AItemIni.WriteInteger(ASection, ASubKey + cIniSubKeyCount, ResultList.Count);
+    AItemIni.UpdateFile;
+  finally
+    FreeItemIni(AItemIni, AIniMode);
   end;
+end;
+
+procedure TGrepHistoryListItem.RemoveFromSettings(AIni: TCustomIniFile; const BaseKey: String);
+var
+  ASubKey: String;
+begin
+  ASubKey := BaseKey + PathDelim + SubKeyIndexedName;
+  AIni.EraseSection(ASubKey);
 end;
 
 { TGrepHistoryList }
+
+class function TGrepHistoryList.KeyName: string;
+begin
+  Result := 'HistoryList';    //Main
+end;
+
+class function TGrepHistoryList.SettingsFileName: string;
+begin
+  Result := 'GrepHistory.ini';
+end;
+
+class function TGrepHistoryList.SubKeyNameGrepHistory: string;
+begin
+  Result := 'GrepHistory';
+end;
 
 constructor TGrepHistoryList.Create;
 begin
   inherited Create;
   FEnabled := True;
+  FLastIndex := 0;
 end;
 
 destructor TGrepHistoryList.Destroy;
@@ -1132,12 +1221,23 @@ begin
   inherited Clear;
 end;
 
-function TGrepHistoryList.GetItems(AIndex: Integer): TGrepHistoryListItems;
+function TGrepHistoryList.GetNextIndex: Integer;
 begin
-  Result := TGrepHistoryListItems(Objects[AIndex]);
+  Inc(FLastIndex);
+  Result := FLastIndex;
 end;
 
-function TGrepHistoryList.SearchItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItems): Integer;
+function TGrepHistoryList.SubKeyNameGrepHistory(AKeyIndex: Integer): String;
+begin
+  Result := Format('%s%d', [SubKeyNameGrepHistory, AKeyIndex])
+end;
+
+function TGrepHistoryList.GetItems(AIndex: Integer): TGrepHistoryListItem;
+begin
+  Result := TGrepHistoryListItem(Objects[AIndex]);
+end;
+
+function TGrepHistoryList.SearchItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItem): Integer;
 begin
   AHistoryItem := nil;
   for Result := 0 to Count - 1 do
@@ -1151,24 +1251,9 @@ begin
   end;
 end;
 
-class function TGrepHistoryList.KeyName: string;
-begin
-  Result := 'HistoryList';    //Main
-end;
-
-class function TGrepHistoryList.SettingsFileName: string;
-begin
-  Result := 'GrepHistory.ini';
-end;
-
-class function TGrepHistoryList.SubKeyName: string;
-begin
-  Result := 'GrepHistory';
-end;
-
 function TGrepHistoryList.AddItem(AGrepSettings: TGrepSettings; AResultList: TStrings): Integer;
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
   I: Integer;
   AResultItem: TFileResult;
   IsUpdate: Boolean;
@@ -1179,7 +1264,7 @@ begin
   if IsUpdate then
     AItem.Update(AGrepSettings, True, True)
   else
-    AItem := TGrepHistoryListItems.Create(AGrepSettings);
+    AItem := TGrepHistoryListItem.Create(AGrepSettings);
 
   for I := 0 to AResultList.Count - 1 do
   begin
@@ -1194,7 +1279,7 @@ end;
 
 procedure TGrepHistoryList.UpdateGrepSettings(AGrepSettings: TGrepSettings);
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
 begin
   SearchItem(AGrepSettings, AItem);
   if Assigned(AItem) then
@@ -1202,60 +1287,117 @@ begin
 end;
 
 function TGrepHistoryList.LoadFromSettings(ADefGrepSettings: TGrepSettings; const AIni: TCustomIniFile;
-  AMainIniVersion: Integer; const BaseKey: String; DoClear: Boolean): Boolean;
+  AMainIniVersion: Integer; AIniMode: TIniFileMode; const BaseKey: String; DoClear: Boolean): Boolean;
 var
-  I, ACount, Added: Integer;
-  AItemText, Key, ASubKeyName, AItemSubKeyName: String;
-  AItem: TGrepHistoryListItems;
+  Key: String;
   AIniVersion: Integer;
+
+  function LoadIniSingle: Boolean;
+  var
+    I, ACount, Added: Integer;
+    AItemText, ASubKeyName, AItemSubKeyName: String;
+    AItem: TGrepHistoryListItem;
+  begin
+    ASubKeyName := SubKeyNameGrepHistory;
+    AItemSubKeyName := TGrepHistoryListItem.SubKeyNameHistory;
+    if AIniVersion = 0 then
+    begin
+      Key := BaseKey + 'FoundList';
+      ASubKeyName := 'GrepFound';
+      AItemSubKeyName := 'Found';
+    end;
+
+    ACount := AIni.ReadInteger(Key, ASubKeyName + cIniSubKeyCount, 0);
+    if DoClear then
+      ClearItems;
+    Added := 0;
+    for I := 0 to ACount - 1 do
+    begin
+      AItemText := AIni.ReadString(Key, Format('%s%d', [ASubKeyName, I]), '');
+      if Trim(AItemText) <> '' then
+      begin
+        AItem := TGrepHistoryListItem.Create(ADefGrepSettings);
+        AItem.LoadFromIni(AIni, AIniVersion, ifmSingle, Key + PathDelim + Format('%s%d', [AItemSubKeyName, I]));
+        if not DoClear and (IndexOf(AItem.GrepSettings.Pattern) <> -1) then
+        begin
+          AItem.Free;
+          Continue;
+        end;
+
+        AddObject(AItemText, AItem);
+        Inc(Added);
+      end;
+    end;
+    Result := ACount <> Added;
+  end;
+
+  function LoadIniMulti: Boolean;
+  var
+    I, Added: Integer;
+    AItems: TStringList;
+    AKeyText: String;
+    AItem: TGrepHistoryListItem;
+  begin
+    AItems := TStringList.Create;
+    try
+      AIni.ReadSectionValues(Key, AItems);
+      for I := 0 to AItems.Count - 1 do
+                     //order index to first                                 //keyindex
+        AItems[I] := AItems.ValueFromIndex[I] + AItems.NameValueSeparator + Copy(AItems.Names[I], 12, MaxInt);
+      AItems.Sort;
+      if DoClear then
+        ClearItems;
+      Added := 0;
+      for I := 0 to AItems.Count - 1 do
+      begin
+        AKeyText := AItems.ValueFromIndex[I];
+        if Trim(AKeyText) <> '' then
+        begin
+          AItem := TGrepHistoryListItem.Create(ADefGrepSettings);
+          AItem.FKeyIndex := StrToIntDef(AKeyText, -1);
+          AItem.LoadFromIni(AIni, AIniVersion, ifmMulti, Key + PathDelim + TGrepHistoryListItem.SubKeyNameHistory + AKeyText);
+          if not DoClear and (IndexOf(AItem.GrepSettings.Pattern) <> -1) then
+          begin
+            AItem.Free;
+            Continue;
+          end;
+
+          AddObject(AItem.GrepSettings.Pattern, AItem);
+          Inc(Added);
+        end;
+      end;
+      Result := AItems.Count <> Added;
+    finally
+      AItems.Free;
+    end;
+  end;
+
 begin
   Key := BaseKey + KeyName;
-  ASubKeyName := SubKeyName;
-  AItemSubKeyName := TGrepHistoryListItems.SubKeyName;
 
   if AIni is TGrepIniFile then
     AIniVersion := AIni.ReadInteger(Key, 'IniVersion', 0)
   else
     AIniVersion := AMainIniVersion;
-  if AIniVersion = 0 then
-  begin
-    Key := BaseKey + 'FoundList';
-    ASubKeyName := 'GrepFound';
-    AItemSubKeyName := 'Found';
-  end;
 
-  ACount := AIni.ReadInteger(Key, ASubKeyName + cIniSubKeyCount, 0);
-  if DoClear then
-    ClearItems;
-  Added := 0;
-  for I := 0 to ACount - 1 do
-  begin
-    AItemText := AIni.ReadString(Key, Format('%s%d', [ASubKeyName, I]), '');
-    if Trim(AItemText) <> '' then
-    begin
-      AItem := TGrepHistoryListItems.Create(ADefGrepSettings);
-      AItem.LoadFromIni(AIni, Key + PathDelim + Format('%s%d', [AItemSubKeyName, I]));
-      if not DoClear and (IndexOf(AItem.GrepSettings.Pattern) <> -1) then
-      begin
-        AItem.Free;
-        Continue;
-      end;
+  FLastIndex := AIni.ReadInteger(Key, 'LastIndex', 0);
 
-      AddObject(AItemText, AItem);
-      Inc(Added);
-    end;
+  case AIniMode of
+  ifmSingle:
+    Result := LoadIniSingle;
+  else // ifmMulti:
+    Result := LoadIniMulti;
   end;
-  Result := ACount <> Added;
 end;
 
 function TGrepHistoryList.LoadItemFromIni(ADefGrepSettings: TGrepSettings; const AIni: TCustomIniFile;
   AMainIniVersion: Integer): Integer;
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
   AItemSubKeyName: String;
   AIniVersion: Integer;
 begin
-  AItemSubKeyName := TGrepHistoryListItems.SubKeyName;
+  AItemSubKeyName := TGrepHistoryListItem.SubKeyNameHistory;
 
   if AIni is TGrepIniFile then
     AIniVersion := AIni.ReadInteger(KeyName, 'IniVersion', 0)
@@ -1264,8 +1406,8 @@ begin
   if AIniVersion = 0 then
     AItemSubKeyName := 'Found';
 
-  AItem := TGrepHistoryListItems.Create(ADefGrepSettings);
-  AItem.LoadFromIni(AIni, AItemSubKeyName);
+  AItem := TGrepHistoryListItem.Create(ADefGrepSettings);
+  AItem.LoadFromIni(AIni, AIniVersion, ifmSingle, AItemSubKeyName);
   if IndexOf(AItem.GrepSettings.Pattern) <> -1 then
   begin
     AItem.Free;
@@ -1276,10 +1418,41 @@ begin
   Result := AddObject(AItem.GrepSettings.Pattern, AItem)
 end;
 
-procedure TGrepHistoryList.SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; const BaseKey: String);
+procedure TGrepHistoryList.SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode;
+  const BaseKey: String);
 var
-  I: Integer;
   Key: String;
+
+  procedure SaveIniSingle;
+  var
+    I: Integer;
+  begin
+    AIni.WriteInteger(Key, SubKeyNameGrepHistory + cIniSubKeyCount, 0);
+    for I := 0 to Count - 1 do
+    begin
+      //This is old and single format
+      AIni.WriteString(Key, Format('%s%d', [SubKeyNameGrepHistory, I]), Strings[I]);                                                    //for ordered read
+      Items[I].WriteToIni(AIni, AIniVersion, ifmSingle, Key + PathDelim + Format('%s%d', [TGrepHistoryListItem.SubKeyNameHistory, I])); //data
+    end;
+    AIni.WriteInteger(Key, SubKeyNameGrepHistory + cIniSubKeyCount, Count);
+  end;
+
+  procedure SaveIniMulti;
+  var
+    I: Integer;
+    AItem: TGrepHistoryListItem;
+  begin
+    for I := 0 to Count - 1 do
+    begin
+      AItem := Items[I];
+      if AItem.KeyIndex = -1 then
+        AItem.FKeyIndex := GetNextIndex;
+      AIni.WriteString(Key, SubKeyNameGrepHistory(AItem.KeyIndex), Format('%5.5d', [I]));       //for ordered read
+      AItem.WriteToIni(AIni, AIniVersion, ifmMulti, Key + PathDelim + AItem.SubKeyIndexedName); //data
+    end;
+    AIni.WriteInteger(Key, 'LastIndex', FLastIndex);
+  end;
+
 begin
   Key := BaseKey + KeyName;
 
@@ -1287,46 +1460,92 @@ begin
   if AIni is TGrepIniFile then
     AIni.WriteInteger(Key, 'IniVersion', AIniVersion);
 
-  AIni.WriteInteger(Key, SubKeyName + cIniSubKeyCount, 0);
-  for I := 0 to Count - 1 do
-  begin
-    AIni.WriteString(Key, Format('%s%d', [SubKeyName, I]), Strings[I]);
-    Items[I].WriteToIni(AIni, Key + PathDelim + Format('%s%d', [TGrepHistoryListItems.SubKeyName, I]));
+  case AIniMode of
+    ifmSingle: SaveIniSingle;
+    ifmMulti: SaveIniMulti;
   end;
-  AIni.WriteInteger(Key, SubKeyName + cIniSubKeyCount, Count);
+  AIni.UpdateFile;
 end;
 
 procedure TGrepHistoryList.SaveToSettings(const AIni: TCustomIniFile; AIniVersion: Integer; const BaseKey: String;
   AHistoryIndex: Integer);
 var
-  ACount: Integer;
   Key: String;
+  AItem: TGrepHistoryListItem;
+  I: Integer;
 begin
-  Key := BaseKey + KeyName;
-
-  ACount := AIni.ReadInteger(Key, SubKeyName + cIniSubKeyCount, 0);
-  if (AHistoryIndex = -1) or not (Count - ACount in [0, 1]) then
+  if (AHistoryIndex = -1) or (Count = 1) then
   begin
-    SaveToSettings(AIni, AIniVersion, BaseKey);
+    SaveToSettings(AIni, AIniVersion, ifmMulti, BaseKey);
     Exit;
   end;
 
-  if Count > ACount then
-  begin
-    AIni.WriteString(Key, Format('%s%d', [SubKeyName, AHistoryIndex]), Strings[AHistoryIndex]);
-    AIni.WriteInteger(Key, SubKeyName + cIniSubKeyCount, Count);
-  end;
-  Items[AHistoryIndex].WriteToIni(AIni, Key + PathDelim + Format('%s%d', [TGrepHistoryListItems.SubKeyName, AHistoryIndex]));
+  Key := BaseKey + KeyName;
+
+  AItem := Items[AHistoryIndex];
+  if AItem.KeyIndex = -1 then
+    AItem.FKeyIndex := GetNextIndex;
+  AItem.WriteToIni(AIni, AIniVersion, ifmMulti, Key + PathDelim + AItem.SubKeyIndexedName);  //data
+
+  AIni.WriteInteger(Key, 'LastIndex', FLastIndex);
+
+  //write order list
+  //csak akkor mindegyik ha uj ertek kerul a lista vegere, mert lehet, hogy torolt van a listaban
+  for I := 0 to Count-1 do
+    AIni.WriteString(Key, SubKeyNameGrepHistory(Items[I].KeyIndex), Format('%5.5d', [I])); //for ordered read
+  AIni.UpdateFile;
 end;
 
-procedure TGrepHistoryList.RemoveFromSettings(const AIni: TCustomIniFile; AHistoryIndex: Integer);
+procedure TGrepHistoryList.RemoveFromSettings(const AIni: TCustomIniFile; const BaseKey: String; AHistoryIndex: Integer);
 var
-  LGrepHistoryListItems: TGrepHistoryListItems;
+  Key: String;
+  AItem: TGrepHistoryListItem;
 begin
-  LGrepHistoryListItems := Items[AHistoryIndex];
-  LGrepHistoryListItems.RemoveFromSettings(AIni);
+  Key := BaseKey + KeyName;
+  if AHistoryIndex = -1 then
+    AIni.EraseSection(Key)
+  else
+  begin
+    AItem := Items[AHistoryIndex];
+    AIni.DeleteKey(Key, SubKeyNameGrepHistory(AItem.KeyIndex));
+    AItem.RemoveFromSettings(AIni, Key);
+  end;
+end;
 
-  AIni.EraseSection(KeyName);
+procedure TGrepHistoryList.DeleteINIFiles(AMainINIFileName: String; AIniVersion, AHistoryIndex: Integer);
+var
+  I: Integer;
+  AConfigPath, AExt: String;
+  Settings: TCustomIniFile;
+begin
+  AConfigPath := ExtractFilePath(AMainINIFileName);
+  AExt := ExtractFileExt(AMainINIFileName);
+  if AHistoryIndex = -1 then
+  begin
+    DeleteFile(AMainINIFileName);
+    if AIniVersion >= 2 then
+      for I := 0 to Count-1 do
+        DeleteFile(AConfigPath + Items[I].SubKeyIndexedName + AExt);
+  end
+  else
+  begin
+    Settings := TGrepIniFile.Create(AMainINIFileName);
+    try
+      Settings.DeleteKey(KeyName, SubKeyNameGrepHistory(Items[AHistoryIndex].FKeyIndex));
+      Settings.UpdateFile;
+    finally
+      FreeAndNil(Settings);
+    end;
+    DeleteFile(AConfigPath + Items[AHistoryIndex].SubKeyIndexedName + AExt);
+  end;
+end;
+
+procedure TGrepHistoryList.SetAllChecked(AChecked: Boolean);
+var
+  I: Integer;
+begin
+  for I := 0 to Count-1 do
+    Items[I].Checked := AChecked;
 end;
 
 end.

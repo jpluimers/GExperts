@@ -102,7 +102,7 @@ var
   end;
 
 var
-  HistoryItem: TGrepHistoryListItems;
+  HistoryItem: TGrepHistoryListItem;
   I: Integer;
 begin
   if Results.Count = 0 then
@@ -119,7 +119,7 @@ begin
     try
       if Results.Objects[0] is TFileResult then
         PrintResults(Results)
-      else if Results.Objects[0] is TGrepHistoryListItems then
+      else if Results.Objects[0] is TGrepHistoryListItem then
       begin
         for I := 0 to Results.Count-1 do
         begin
@@ -129,7 +129,7 @@ begin
             RichEdit.Lines.Add('');
           end ;
 
-          HistoryItem := TGrepHistoryListItems(Results.Objects[I]);
+          HistoryItem := TGrepHistoryListItem(Results.Objects[I]);
 
           RichEdit.SelAttributes.Style := [fsBold, fsUnderline];
           RichEdit.Lines.Add(HistoryItem.GrepSettings.Pattern);
@@ -172,8 +172,8 @@ begin
   if AMode <> sfSaveToLoadable then
     if Results is TGrepHistoryList then
       PrintGeneric(Owner, TGrepHistoryList(Results), grFile, AFileName, False)
-    else if Results is TGrepHistoryListItems then
-      PrintGeneric(Owner, TGrepHistoryListItems(Results).ResultList, grFile, AFileName, False);
+    else if Results is TGrepHistoryListItem then
+      PrintGeneric(Owner, TGrepHistoryListItem(Results).ResultList, grFile, AFileName, False);
 
   if AMode = sfPrintToFile then
     Exit;
@@ -184,11 +184,11 @@ begin
   AIni := TGrepIniFile.Create(AFileName);
   try
     if Results is TGrepHistoryList then
-      TGrepHistoryList(Results).SaveToSettings(AIni, AIniVersion, '')
-    else if Results is TGrepHistoryListItems then
+      TGrepHistoryList(Results).SaveToSettings(AIni, AIniVersion, ifmSingle, '')
+    else if Results is TGrepHistoryListItem then
     begin
       AIni.WriteInteger(TGrepHistoryList.KeyName, 'IniVersion', AIniVersion);
-      TGrepHistoryListItems(Results).WriteToIni(AIni, TGrepHistoryListItems.SubKeyName);
+      TGrepHistoryListItem(Results).WriteToIni(AIni, AIniVersion, ifmSingle, TGrepHistoryListItem.SubKeyNameHistory);
     end;
   finally
     AIni.Free;

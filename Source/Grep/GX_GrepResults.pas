@@ -10,7 +10,7 @@ uses
   Windows, Classes, Graphics, Controls, Forms,
   StdCtrls, ExtCtrls, GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, ComCtrls,
   Menus, DropSource, GX_IdeDock, ActnList, Dialogs,
-  ToolWin;
+  ToolWin, Actions;
 
 type
   TfmGrepResults = class(TfmIdeDockForm)
@@ -324,7 +324,7 @@ end;
 
 function TGxResultRefreshAllQuestion.GetMessage: string;
 begin
-  Result := 'Are you sure you want to refresh all search history items?';
+  Result := 'Are you sure you want to refresh all search history item lists?';
 end;
 
 { TGxResultDeleteAllQuestion }
@@ -639,7 +639,7 @@ begin
     if FHistoryListClickedEntry <> -1 then
       lbHistoryList.ItemIndex := FHistoryListClickedEntry
     else
-      lbHistoryList.ItemIndex := 0;
+      lbHistoryList.ItemIndex := lbHistoryList.Count-1;
     ViewHistoryListItems(lbHistoryList.ItemIndex, True);
   end;
 end;
@@ -1094,10 +1094,10 @@ begin
   try
     if AIni.SectionExists(TGrepHistoryList.KeyName) then
     begin
-      if not GrepExpert.HistoryList.LoadFromSettings(FGrepSettings, AIni, GrepExpert.HistoryIniVersion, '', True) then
+      if not GrepExpert.HistoryList.LoadFromSettings(FGrepSettings, AIni, GrepExpert.HistoryIniVersion, ifmSingle, '', True) then
         MessageDlg('Could not read history list', mtWarning, [mbOK], 0);
     end
-    else if AIni.SectionExists(TGrepHistoryListItems.SubKeyName) then
+    else if AIni.SectionExists(TGrepHistoryListItem.SubKeyNameHistory) then
     begin
       AIndex := GrepExpert.HistoryList.LoadItemFromIni(FGrepSettings, AIni, GrepExpert.HistoryIniVersion);
       if AIndex = -1 then
@@ -1112,7 +1112,7 @@ end;
 
 procedure TfmGrepResults.actFileSaveExecute(Sender: TObject);
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
   AMode: TSaveToFileMode;
 begin
   AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex];
@@ -1623,7 +1623,7 @@ end;
 
 procedure TfmGrepResults.ViewHistoryListItems(AIndex: Integer; AUsedExpandState: Boolean);
 var
-  AHistoryItem: TGrepHistoryListItems;
+  AHistoryItem: TGrepHistoryListItem;
 begin
   FHistoryListClickedEntry := AIndex;
   if AIndex <> -1 then
@@ -1651,10 +1651,10 @@ end;
 procedure TfmGrepResults.lbHistoryListDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
   State: TOwnerDrawState);
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
 begin
   AItem := GrepExpert.HistoryList.Items[Index];
-  if not Assigned(AItem) or not (AItem is TGrepHistoryListItems) then
+  if not Assigned(AItem) or not (AItem is TGrepHistoryListItem) then
     Exit;
 
   if not GrepExpert.ListUseDefaultColors then
@@ -1722,7 +1722,7 @@ end;
 
 procedure TfmGrepResults.actHistoryRefreshExecute(Sender: TObject);
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
   ASaveSettings: TGrepSettings;
 begin
   AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
@@ -1750,7 +1750,7 @@ end;
 
 procedure TfmGrepResults.actHistorySaveExecute(Sender: TObject);
 var
-  AItem: TGrepHistoryListItems;
+  AItem: TGrepHistoryListItem;
   AMode: TSaveToFileMode;
 begin
   AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
