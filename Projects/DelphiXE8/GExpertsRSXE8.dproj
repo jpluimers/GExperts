@@ -62,7 +62,7 @@
         <DCC_F>false</DCC_F>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE8;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE8;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE8.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CFBundleName=</VerInfo_Keys>
         <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
-        <DCC_DcuOutput>..\dcu</DCC_DcuOutput>
+        <DCC_DcuOutput>dcu</DCC_DcuOutput>
         <GenDll>true</GenDll>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -93,7 +93,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <RcCompile Include="..\..\images\GXIcons.rc">
-            <Form>GXIcons.res</Form>
+            <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
         <DCCReference Include="..\..\source\Framework\GX_About.pas">
             <Form>fmAbout</Form>
@@ -188,6 +188,7 @@
         <DCCReference Include="..\..\source\Editor\GX_eChangeCase.pas">
             <Form>fmChangeCase</Form>
         </DCCReference>
+        <DCCReference Include="..\..\source\formatter\GX_eCodeFormatter.pas"/>
         <DCCReference Include="..\..\source\Editor\GX_eComment.pas">
             <Form>fmCommentConfig</Form>
         </DCCReference>
@@ -414,6 +415,34 @@
         <DCCReference Include="..\..\source\Framework\GX_VerDepConst.pas"/>
         <DCCReference Include="..\..\source\Utils\GX_XmlUtils.pas"/>
         <DCCReference Include="..\..\source\BackupProject\GX_Zipper.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_Formatter.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterBreakpoints.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterConfig.pas">
+            <Form>fmCodeFormatterConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterConfigHandler.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterDefaultSettings.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterDone.pas">
+            <Form>fmCodeFormatterDone</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterEditCapitalization.pas">
+            <Form>fmCodeFormatterEditCapitalization</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterExpert.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterGXConfigWrapper.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_CodeFormatterBookmarks.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterTokenList.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterTypes.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterTokens.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterFormatter.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterParser.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterSettings.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterStack.pas"/>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterEngine.pas"/>
+        <DCCReference Include="..\..\source\formatter\GX_AboutExperimental.pas">
+            <Form>fmAboutExperimental</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\formatter\engine\GX_CodeFormatterUnicode.pas"/>
         <DCCReference Include="..\..\source\IDE\GX_IdeSearchPathEnhancer.pas"/>
         <DCCReference Include="..\..\source\Experts\GX_HideNavbar.pas"/>
         <DCCReference Include="..\..\source\Utils\GX_dzVclUtils.pas"/>
