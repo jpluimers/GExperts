@@ -448,6 +448,7 @@
       <Form>fmToDoOptions</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\Utils\GX_BookmarkList.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzClassUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzQuicksort.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzVclUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_GenericClasses.pas" />

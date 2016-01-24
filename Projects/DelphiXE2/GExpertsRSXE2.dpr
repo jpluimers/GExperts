@@ -170,7 +170,8 @@ uses
   GX_BookmarkList in '..\..\source\Utils\GX_BookmarkList.pas',
   GX_dzQuicksort in '..\..\source\Utils\GX_dzQuicksort.pas',
   GX_IdeInstallPackagesEnhancer in '..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas',
-  GX_IdePackageRenameDlg in '..\..\source\IDE\GX_IdePackageRenameDlg.pas' {fmIdxPackageRenameDlg};
+  GX_IdePackageRenameDlg in '..\..\source\IDE\GX_IdePackageRenameDlg.pas' {fmIdxPackageRenameDlg},
+  GX_dzClassUtils in '..\..\..\gexperts\Source\Utils\GX_dzClassUtils.pas';
 
 begin
 end.
