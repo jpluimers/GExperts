@@ -291,8 +291,8 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Forms,
-  GX_OtaUtils, GX_EditReader, GX_IdeUtils, Dialogs, Controls;
+  SysUtils, Forms, Dialogs, Controls,
+  GX_OtaUtils, GX_EditReader, GX_IdeUtils, GX_dzClassUtils;
 
 const
   cIniSubKeyCount = 'Count';
@@ -1343,14 +1343,14 @@ var
       AIni.ReadSectionValues(Key, AItems);
       for I := 0 to AItems.Count - 1 do
                      //order index to first                                 //keyindex
-        AItems[I] := AItems.ValueFromIndex[I] + AItems.NameValueSeparator + Copy(AItems.Names[I], 12, MaxInt);
+        AItems[I] := TStrings_ValueFromIndex(AItems, I) + '=' + Copy(AItems.Names[I], 12, MaxInt);
       AItems.Sort;
       if DoClear then
         ClearItems;
       Added := 0;
       for I := 0 to AItems.Count - 1 do
       begin
-        AKeyText := AItems.ValueFromIndex[I];
+        AKeyText := TStrings_ValueFromIndex(AItems, I);
         if Trim(AKeyText) <> '' then
         begin
           AItem := TGrepHistoryListItem.Create(ADefGrepSettings);
