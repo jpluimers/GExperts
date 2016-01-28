@@ -18,7 +18,7 @@ interface
 implementation
 
 uses SysUtils, Classes, ToolsAPI,
-  GX_OtaUtils, GX_Experts, GX_GenericUtils;
+  GX_OtaUtils, GX_Experts, GX_GenericUtils, GX_KbdShortCutBroker;
 
 resourcestring
   rsNoComponentFound = 'A component named %s was not found on the form';
@@ -32,6 +32,7 @@ resourcestring
 type
   TFindCompRefWizard = class(TGX_Expert)
   private
+    FTwoKeyShortcut: IGxTwoKeyShortCut;
     procedure FindSelectedComponentInSource(Module: IOTAModule; FrmEditor: IOTAFormEditor);
     procedure FindSelectedComponentOnForm(Module: IOTAModule; SrcEditor: IOTASourceEditor);
   public
@@ -144,6 +145,7 @@ constructor TFindCompRefWizard.Create;
 begin
   inherited;
   ShortCut := scCtrl + scShift + Ord('F');
+  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Click, 'C', 'Find component');
 end;
 
 function TFindCompRefWizard.GetActionCaption: string;

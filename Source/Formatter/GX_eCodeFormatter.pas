@@ -11,12 +11,14 @@ uses
   Classes,
   GX_EditorExpert,
   GX_CodeFormatterExpert,
-  GX_ConfigurationInfo;
+  GX_ConfigurationInfo,
+  GX_KbdShortCutBroker;
 
 type
   TeCodeFormatterExpert = class(TEditorExpert)
   private
     FExpert: TCodeFormatterExpert;
+    FTwoKeyShortcut: IGxTwoKeyShortCut;
   protected
     function GetDisplayName: string; override;
     class function GetName: string; override;
@@ -53,6 +55,8 @@ begin
   FExpert := TCodeFormatterExpert.Create;
 
   ShortCut := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
+
+  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Execute, 'F', DisplayName);
 end;
 
 destructor TeCodeFormatterExpert.Destroy;
@@ -126,4 +130,3 @@ end;
 initialization
   RegisterEditorExpert(TeCodeFormatterExpert);
 end.
-

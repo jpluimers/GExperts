@@ -5,7 +5,8 @@ unit GX_KbdShortCutBroker;
 interface
 
 uses
-  SysUtils, Classes, Menus;
+  SysUtils, Classes, Menus,
+  GX_EventHook;
 
 type
   EDuplicateShortCut = class(Exception);
@@ -14,14 +15,16 @@ type
   TTriggerMethod = TNotifyEvent;
 
 type
+  IGxTwoKeyShortCut = interface(IUnknown)
+    ['{8D73EB9A-2093-4916-9341-03D51EC98A75}']
+  end;
+
   IGxKeyboardShortCut = interface(IUnknown)
     ['{D97839F1-CF61-11D3-A93F-D0E07D000000}']
     function GetShortCut: TShortCut;
-    function GetTrigger: TTriggerMethod;
     procedure SetShortCut(const Value: TShortCut);
 
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
-    property Trigger: TTriggerMethod read GetTrigger;
   end;
 
   IGxKeyboardShortCutForMenuItem = interface(IGxKeyboardShortCut)
@@ -34,7 +37,13 @@ type
   IGxKeyboardShortCutBroker = interface(IUnknown)
     ['{0C1C3891-CFEA-11D3-A940-AA8F24000000}']
     // Request an *IDE-global* keyboard shortcut.
-    function RequestShortCut(const Trigger: TTriggerMethod; ShortCut: TShortCut = 0): IGxKeyboardShortCut;
+    function RequestOneKeyShortCut(const Trigger: TTriggerMethod; ShortCut: TShortCut = 0): IGxKeyboardShortCut;
+    // Request a two key shortcut, that is a shortcut that consists of the standard GExperts
+    // keyboard shortcut followed by Ctrl+<the given character>
+    // (similar to the WordStar compatible Ctrl+<k> Ctrl+i shortcuts)
+    function RequestTwoKeyShortCut(const ATrigger: TTriggerMethod; AKey: AnsiChar;
+      const ADescription: string): IGxTwoKeyShortCut;
+
     // Request an IDE keyboard shortcut which at the same
     // time is a keyboard shortcut for a menu item.
     function RequestMenuShortCut(const Trigger: TTriggerMethod; const MenuItem: TMenuItem): IGxKeyboardShortCut;
@@ -56,7 +65,8 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   ToolsAPI,
-  Contnrs, GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo, Forms;
+  Forms, Controls, Types, Graphics, Messages, Windows, Contnrs,
+  GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo;
 
 // First of all we have shared code; in
 // particular, we share a large chunk
@@ -67,10 +77,13 @@ type
   TGxBaseKeyboardShortCutBroker = class(TSingletonInterfacedObject, IGxKeyboardShortCutBroker)
   private
     FShortCutList: TObjectList;
+    FTwoKeyShortCutList: TObjectList;
     FKeyboardName: string;
   private
-    procedure NotifyDestruction(AGxKeyboardShortCut: TObject);
-    procedure RemoveShortCut(AGxKeyboardShortCut: TObject);
+    procedure NotifyOneShortCutDestruction(AGxKeyboardShortCut: TObject);
+    procedure NotifyTwoKeyShortCutDestruction(AGxTwoKeyShortCut: TObject);
+    procedure RemoveOneKeyShortCut(AGxOneKeyShortCut: TObject);
+    procedure RemoveTowKeyShortCut(AGxTwoKeyShortCut: TObject);
     procedure UpdateShortCut(AGxKeyboardShortCut: TObject; NewShortCut: TShortCut);
     procedure AssertNoDuplicateShortCut(const Value: TShortCut); virtual;
 
@@ -81,6 +94,7 @@ type
     // imply the use if IOTAKeyboardBindingServices (although that
     // is exactly the way it is implemented in a descendant class).
     procedure DoUpdateKeyBindings; virtual; abstract;
+    procedure RemoveShortCut(AShortcutList: TObjectList; AGxKeyboardShortCut: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -88,8 +102,10 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
 
-    function RequestShortCut(const Trigger: TTriggerMethod; ShortCut: TShortCut = 0): IGxKeyboardShortCut; virtual;
-    function RequestMenuShortCut(const Trigger: TTriggerMethod; const MenuItem: TMenuItem): IGxKeyboardShortCut; virtual; abstract;
+    function RequestOneKeyShortCut(const ATrigger: TTriggerMethod; AShortCut: TShortCut = 0): IGxKeyboardShortCut; virtual;
+    function RequestTwoKeyShortCut(const ATrigger: TTriggerMethod; AKey: AnsiChar;
+      const ADescription: string): IGxTwoKeyShortCut; virtual;
+    function RequestMenuShortCut(const ATrigger: TTriggerMethod; const AMenuItem: TMenuItem): IGxKeyboardShortCut; virtual; abstract;
     function GetKeyboardName: string;
   end;
 
@@ -97,30 +113,52 @@ var
   PrivateGxKeyboardShortCutBroker: TGxBaseKeyboardShortCutBroker;
 
 type
-  TGxKeyboardShortCut = class(TInterfacedObject,
-                              IGxKeyboardShortCut,
-                              IGxKeyboardShortCutForMenuItem)
-  private
+  TGxKeyboardShortCut = class(TInterfacedObject)
+  protected
     FOwner: TGxBaseKeyboardShortCutBroker;
-
-    FShortCut: TShortCut;
     FTrigger: TTriggerMethod;
+  public
+    constructor Create(AOwner: TGxBaseKeyboardShortCutBroker; ATrigger: TTriggerMethod);
+    function GetShortCut: TShortCut; virtual; abstract;
+    procedure Execute;
+  end;
+
+type
+  TGxOneKeyShortCut = class(TGxKeyboardShortCut,
+                           IGxKeyboardShortCut,
+                           IGxKeyboardShortCutForMenuItem)
+  private
+    FShortCut: TShortCut;
     FMenuItemName: string;
   protected
     // IGxKeyboardShortCut
-    function GetShortCut: TShortCut;
+    function GetShortCut: TShortCut; override;
     function GetTrigger: TTriggerMethod;
     procedure SetShortCut(const Value: TShortCut);
 
     // IGxKeyboardShortCutForMenuItem
     function GetMenuItemName: string;
   public
-    constructor Create(AOwner: TGxBaseKeyboardShortCutBroker);
+    constructor Create(AOwner: TGxBaseKeyboardShortCutBroker; ATrigger: TTriggerMethod;
+      AShortCut: TShortCut);
     destructor Destroy; override;
 
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
     property Trigger: TTriggerMethod read GetTrigger write FTrigger;
     property MenuItemName: string read GetMenuItemName write FMenuItemName;
+  end;
+
+type
+  TGxTwoKeyShortCut = class(TGxKeyboardShortCut, IGxTwoKeyShortCut)
+  private
+    FKey: AnsiChar;
+    FDescription: string;
+  protected
+    function GetShortCut: TShortCut; override;
+  public
+    constructor Create(AOwner: TGxBaseKeyboardShortCutBroker; ATrigger: TTriggerMethod;
+      AKey: Ansichar; const ADescription: string);
+    destructor Destroy; override;
   end;
 
 // ****************************************************************************
@@ -140,19 +178,12 @@ begin
     Dec(i);
     AShortCutItem := ShortCutList[i] as TGxKeyboardShortCut;
     Assert(Assigned(AShortCutItem));
-    if AShortCutItem.ShortCut = KeyCode then
+    if AShortCutItem.GetShortCut = KeyCode then
     begin
       Result := AShortCutItem;
       Break;
     end;
   end;
-end;
-
-procedure TriggerKeyboardShortCut(AShortCutItem: TGxKeyboardShortCut);
-begin
-  if Assigned(AShortCutItem) then
-    if Assigned(AShortCutItem.Trigger) then
-      AShortCutItem.Trigger(nil);
 end;
 
 // ****************************************************************************
@@ -171,7 +202,7 @@ begin
   for i := 0 to FShortCutList.Count-1 do
   begin
     AGxShortCut := FShortCutList[i] as TGxKeyboardShortCut;
-    if AGxShortCut.ShortCut = Value then
+    if AGxShortCut.GetShortCut = Value then
     begin
       // The shortcut being passed in has already
       // been claimed by someone else. Complain.
@@ -192,6 +223,7 @@ begin
   inherited Create;
 
   FShortCutList := TObjectList.Create(not DoOwnObjects);
+  FTwoKeyShortCutList:=TObjectList.Create(not DoOwnObjects);
 end;
 
 destructor TGxBaseKeyboardShortCutBroker.Destroy;
@@ -201,6 +233,12 @@ begin
     Assert(FShortCutList.Count = 0);
 
     FreeAndNil(FShortCutList);
+  end;
+
+  if Assigned(FTwoKeyShortCutList) then
+  begin
+    Assert(FTwoKeyShortCutList.Count = 0);
+    FreeAndNil(FTwoKeyShortCutList);
   end;
 
   inherited Destroy;
@@ -216,57 +254,83 @@ begin
   Result := FKeyboardName;
 end;
 
-procedure TGxBaseKeyboardShortCutBroker.NotifyDestruction(
+procedure TGxBaseKeyboardShortCutBroker.NotifyOneShortCutDestruction(
   AGxKeyboardShortCut: TObject);
 begin
   Assert(Assigned(AGxKeyboardShortCut));
 
-  RemoveShortCut(AGxKeyboardShortCut);
+  RemoveOneKeyShortCut(AGxKeyboardShortCut);
 end;
 
-procedure TGxBaseKeyboardShortCutBroker.RemoveShortCut(
+procedure TGxBaseKeyboardShortCutBroker.NotifyTwoKeyShortCutDestruction(
+  AGxTwoKeyShortCut: TObject);
+begin
+  Assert(Assigned(AGxTwoKeyShortCut));
+
+  RemoveTowKeyShortCut(AGxTwoKeyShortCut);
+end;
+
+procedure TGxBaseKeyboardShortCutBroker.RemoveShortCut(AShortcutList: TObjectList;
   AGxKeyboardShortCut: TObject);
 begin
-  Assert(FShortCutList <> nil);
+  Assert(AShortCutList <> nil);
 
   // Since all keyboard shortcuts are exposed and
   // managed through interfaces, they auto-destroy
   // themselves. Hence we must guarantee that the
   // internal list to keep their references does
   // not destroy them, too.
-  Assert(FShortCutList.OwnsObjects = False);
-  Assert(FShortCutList.Remove(AGxKeyboardShortCut) <> -1);
+  Assert(AShortCutList.OwnsObjects = False);
+  Assert(AShortCutList.Remove(AGxKeyboardShortCut) <> -1);
 
   if not Updating then
     DoUpdateKeyBindings;
 end;
 
-function TGxBaseKeyboardShortCutBroker.RequestShortCut(
-  const Trigger: TTriggerMethod; ShortCut: TShortCut): IGxKeyboardShortCut;
+procedure TGxBaseKeyboardShortCutBroker.RemoveOneKeyShortCut(AGxOneKeyShortCut: TObject);
+begin
+  RemoveShortCut(FShortCutList, AGxOneKeyShortCut);
+end;
+
+procedure TGxBaseKeyboardShortCutBroker.RemoveTowKeyShortCut(AGxTwoKeyShortCut: TObject);
+begin
+  RemoveShortCut(FTwoKeyShortCutList, AGxTwoKeyShortCut);
+end;
+
+function TGxBaseKeyboardShortCutBroker.RequestOneKeyShortCut(
+  const ATrigger: TTriggerMethod; AShortCut: TShortCut): IGxKeyboardShortCut;
 var
   AShortCutContainer: TGxKeyboardShortCut;
 begin
-  AShortCutContainer := TGxKeyboardShortCut.Create(Self);
-  AShortCutContainer.Trigger := Trigger;
+  AShortCutContainer := TGxOneKeyShortCut.Create(Self, ATrigger, AShortCut);
   FShortCutList.Add(AShortCutContainer);
-  AShortCutContainer.ShortCut := ShortCut;
 
   Result := AShortCutContainer as IGxKeyboardShortCut;
+end;
+
+function TGxBaseKeyboardShortCutBroker.RequestTwoKeyShortCut(const ATrigger: TTriggerMethod;
+  AKey: AnsiChar; const ADescription: string): IGxTwoKeyShortCut;
+var
+  AShortCutContainer: TGxTwoKeyShortCut;
+begin
+  AShortCutContainer := TGxTwoKeyShortCut.Create(Self, ATrigger, AKey, ADescription);
+  FTwoKeyShortCutList.Add(AShortCutContainer);
+  Result := AShortCutContainer as IGxTwoKeyShortCut;
 end;
 
 procedure TGxBaseKeyboardShortCutBroker.UpdateShortCut(
   AGxKeyboardShortCut: TObject; NewShortCut: TShortCut);
 var
   ListIndex: Integer;
-  KbdShortCut: TGxKeyboardShortCut;
+  KbdShortCut: TGxOneKeyShortCut;
 begin
   Assert(FShortCutList <> nil);
 
   ListIndex := FShortCutList.IndexOf(AGxKeyboardShortCut);
   Assert(ListIndex <> -1);
 
-  KbdShortCut := FShortCutList.Items[ListIndex] as TGxKeyboardShortCut;
-  if NewShortCut <> KbdShortCut.ShortCut then
+  KbdShortCut := FShortCutList.Items[ListIndex] as TGxOneKeyShortCut;
+  if NewShortCut <> KbdShortCut.GetShortCut then
   begin
     // Verify that the new shortcut has not been claimed
     // already; throws an exception if the shortcut has
@@ -293,40 +357,59 @@ end;
 
 { TGxKeyboardShortCut }
 
-constructor TGxKeyboardShortCut.Create(AOwner: TGxBaseKeyboardShortCutBroker);
+constructor TGxKeyboardShortCut.Create(AOwner: TGxBaseKeyboardShortCutBroker;
+  ATrigger: TTriggerMethod);
 begin
   inherited Create;
 
   Assert(AOwner <> nil);
+  Assert(Assigned(ATrigger));
+
   FOwner := AOwner;
+  FTrigger := ATrigger;
 end;
 
-destructor TGxKeyboardShortCut.Destroy;
+procedure TGxKeyboardShortCut.Execute;
+begin
+  if Assigned(FTrigger) then
+    FTrigger(nil);
+end;
+
+{ TGxOneKeyShortCut }
+
+constructor TGxOneKeyShortCut.Create(AOwner: TGxBaseKeyboardShortCutBroker;
+  ATrigger: TTriggerMethod; AShortCut: TShortCut);
+begin
+  inherited Create(AOwner, ATrigger);
+  FShortCut := AShortCut;
+end;
+
+destructor TGxOneKeyShortCut.Destroy;
 begin
   Assert(FOwner <> nil);
-  FOwner.NotifyDestruction(Self);
+  FOwner.NotifyOneShortCutDestruction(Self);
 
   FOwner := nil;
 
   inherited Destroy;
 end;
 
-function TGxKeyboardShortCut.GetMenuItemName: string;
+function TGxOneKeyShortCut.GetMenuItemName: string;
 begin
   Result := FMenuItemName;
 end;
 
-function TGxKeyboardShortCut.GetShortCut: TShortCut;
+function TGxOneKeyShortCut.GetShortCut: TShortCut;
 begin
   Result := FShortCut;
 end;
 
-function TGxKeyboardShortCut.GetTrigger: TTriggerMethod;
+function TGxOneKeyShortCut.GetTrigger: TTriggerMethod;
 begin
   Result := FTrigger;
 end;
 
-procedure TGxKeyboardShortCut.SetShortCut(const Value: TShortCut);
+procedure TGxOneKeyShortCut.SetShortCut(const Value: TShortCut);
 begin
   Assert(FOwner <> nil);
 
@@ -370,6 +453,8 @@ type
   TGxKeyboardBinding = class(TNotifierObject,
                              IOTAKeyboardBinding)
   private
+    FHintWindow: THintWindow;
+    FEventHook: TMessageEventHook;
     // IOTAKeyboardBinding
     function GetBindingType: TBindingType;
     function GetDisplayName: string;
@@ -378,8 +463,12 @@ type
   private
     procedure KeyBindingHandler(const Context: IOTAKeyContext; KeyCode: TShortCut;
       var BindingResult: TKeyBindingResult);
+    procedure TwoKeyBindingHandler(const Context: IOTAKeyContext; KeyCode: TShortCut;
+      var BindingResult: TKeyBindingResult);
   private
     FOwner: TGxNativeKeyboardShortCutBroker;
+    procedure HandleApplicationMessage(var Msg: TMsg; var Handled: Boolean);
+    function GetHintWindow: THintWindow;
   public
     constructor Create(AOwner: TGxNativeKeyboardShortCutBroker);
     destructor Destroy; override;
@@ -457,7 +546,7 @@ begin
   if Assigned(Application) and (csDestroying in Application.ComponentState) then
     Exit;
 
-  if FShortCutList.Count > 0 then
+  if (FTwoKeyShortCutList.Count > 0) or (FShortCutList.Count > 0) then
   begin
     IKeyboardServices := BorlandIDEServices as IOTAKeyboardServices;
     IKeyboardBinding := TGxKeyboardBinding.Create(Self);
@@ -513,7 +602,9 @@ begin
   BeginUpdate;
   try
     while FShortCutList.Count > 0 do
-      RemoveShortCut(FShortCutList.Items[0]);
+      RemoveOneKeyShortCut(FShortCutList.Items[0]);
+    while FTwoKeyShortCutList.Count > 0 do
+      RemoveTowKeyShortCut(FTwoKeyShortCutList[0]);
   finally
     EndUpdate;
   end;
@@ -522,12 +613,12 @@ end;
 function TGxNativeKeyboardShortCutBroker.RequestMenuShortCut(
   const Trigger: TTriggerMethod; const MenuItem: TMenuItem): IGxKeyboardShortCut;
 var
-  AShortCutContainer: TGxKeyboardShortCut;
+  AShortCutContainer: TGxOneKeyShortCut;
 begin
   Assert(Assigned(MenuItem));
   Assert(Length(MenuItem.Name) > 0);
 
-  AShortCutContainer := TGxKeyboardShortCut.Create(Self);
+  AShortCutContainer := TGxOneKeyShortCut.Create(Self, Trigger, 0);
   AShortCutContainer.FTrigger := Trigger;
   AShortCutContainer.FMenuItemName := MenuItem.Name;
 
@@ -549,7 +640,8 @@ const
 var
   i: Integer;
   KeyboardName: string;
-  AShortCutItem: TGxKeyboardShortCut;
+  AShortCutItem: TGxOneKeyShortCut;
+  ATwoKeyShortCut: TGxTwoKeyShortCut;
 begin
   Assert(FOwner <> nil);
   Assert(FOwner.FShortCutList <> nil);
@@ -561,11 +653,21 @@ begin
 
   for i := 0 to FOwner.FShortCutList.Count-1 do
   begin
-    AShortCutItem := FOwner.FShortCutList[i] as TGxKeyboardShortCut;
+    AShortCutItem := FOwner.FShortCutList[i] as TGxOneKeyShortCut;
     if AShortCutItem.ShortCut <> 0 then
     begin
       BindingServices.AddKeyBinding([AShortCutItem.ShortCut], KeyBindingHandler, nil,
           DefaultKeyBindingsFlag, KeyboardName, AShortCutItem.MenuItemName);
+    end;
+  end;
+
+  for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
+  begin
+    ATwoKeyShortCut := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
+    if ATwoKeyShortCut.GetShortCut <> 0 then
+    begin
+      BindingServices.AddKeyBinding([ShortCut(Ord('H'), [ssCtrl]), ATwoKeyShortCut.GetShortCut],
+        TwoKeyBindingHandler, nil, DefaultKeyBindingsFlag, KeyboardName, '');
     end;
   end;
 end;
@@ -579,10 +681,14 @@ begin
   // and install every item found there.
   Assert(AOwner <> nil);
   FOwner := AOwner;
+
+  FEventHook := HookApplicationOnMessage(HandleApplicationMessage);
 end;
 
 destructor TGxKeyboardBinding.Destroy;
 begin
+  UnhookApplicationOnMessage(FEventHook);
+
   FOwner := nil;
 
   inherited Destroy;
@@ -609,7 +715,7 @@ procedure TGxKeyboardBinding.KeyBindingHandler(
   const Context: IOTAKeyContext; KeyCode: TShortCut;
   var BindingResult: TKeyBindingResult);
 var
-  AShortCutItem: TGxKeyboardShortCut;
+  AShortCutItem: TGxOneKeyShortCut;
 begin
   BindingResult := krUnhandled;
 
@@ -618,18 +724,99 @@ begin
   Assert(FOwner <> nil);
   Assert(FOwner.FShortCutList <> nil);
 
-  AShortCutItem := LocateKeyboardShortCut(FOwner.FShortCutList, KeyCode);
+  AShortCutItem := LocateKeyboardShortCut(FOwner.FShortCutList, KeyCode) as TGxOneKeyShortCut;
   if Assigned(AShortCutItem) and Assigned(AShortCutItem.Trigger) then
   begin
     BindingResult := krHandled;
     try
-      TriggerKeyboardShortCut(AShortCutItem);
+      AShortCutItem.Execute;
     except
       on E: Exception do
       begin
         // If we don't handle these, the hotkey is passed to the editor (inserts
         // a character) or another expert (may show another error, dialog, etc.)
         ApplicationShowException(E);
+      end;
+    end;
+  end;
+end;
+
+function TGxKeyboardBinding.GetHintWindow: THintWindow;
+begin
+  if not Assigned(FHintWindow) then begin
+     FHintWindow := THintWindow.Create(Application);
+      FHintWindow.Color := clMoneyGreen;
+  end;
+  Result := FHintWindow;
+end;
+
+procedure TGxKeyboardBinding.HandleApplicationMessage(var Msg: TMsg; var Handled: Boolean);
+var
+  r : TRect;
+  State: TKeyboardState;
+  h: THintWindow;
+  ctl: TWinControl;
+  i: Integer;
+  TheShortCut: TGxTwoKeyShortCut;
+  s: string;
+  MaxWidth: integer;
+begin
+  if (Msg.message = WM_KEYDOWN) then begin
+    if Msg.wParam = Ord('H') then begin
+      GetKeyboardState(State);
+      if ((State[VK_CONTROL] and 128) <> 0)
+        and ((State[VK_SHIFT] and 128) = 0)
+        and ((State[VK_MENU] and 128) = 0) then
+      begin
+        if FOwner.FTwoKeyShortCutList.Count > 0 then
+        begin
+          ctl := Screen.ActiveControl;
+          if Assigned(ctl) and (ctl.Name = 'Editor') and ctl.ClassNameIs('TEditControl') then begin
+            h := GetHintWindow;
+            s := '';
+            for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
+            begin
+              TheShortCut := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
+              s := s + ShortCutToText(TheShortCut.GetShortCut) + '  ' + TheShortCut.FDescription + #13#10;
+            end;
+            r := ctl.ClientRect;
+            MaxWidth := r.Right - r.Left;
+            r := h.CalcHintRect(MaxWidth, s, nil);
+            r.TopLeft := ctl.ClientToScreen(r.TopLeft);
+            r.Right := r.Left + r.Right;
+            r.Bottom := r.Top + r.Bottom;
+            h.ActivateHint(r, s);
+            exit;
+          end;
+        end;
+      end;
+    end;
+    GetHintWindow.ReleaseHandle;
+  end;
+end;
+
+procedure TGxKeyboardBinding.TwoKeyBindingHandler(
+  const Context: IOTAKeyContext; KeyCode: TShortCut;
+  var BindingResult: TKeyBindingResult);
+var
+  i: integer;
+  AShortCutItem: TGxTwoKeyShortCut;
+begin
+  for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
+  begin
+    AShortCutItem := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
+    if KeyCode = AShortCutItem.GetShortCut then
+    begin
+      BindingResult := krHandled;
+      try
+        AShortCutItem.Execute;
+      except
+        on E: Exception do
+        begin
+          // If we don't handle these, the hotkey is passed to the editor (inserts
+          // a character) or another expert (may show another error, dialog, etc.)
+          ApplicationShowException(E);
+        end;
       end;
     end;
   end;
@@ -646,6 +833,27 @@ end;
 procedure ReleasePrivateGxShortCutBroker;
 begin
   FreeAndNil(PrivateGxKeyboardShortCutBroker);
+end;
+
+{ TGxTwoKeyShortCut }
+
+constructor TGxTwoKeyShortCut.Create(AOwner: TGxBaseKeyboardShortCutBroker; ATrigger: TTriggerMethod;
+  AKey: Ansichar; const ADescription: string);
+begin
+  inherited Create(AOwner, ATrigger);
+  FKey := AKey;
+  FDescription := ADescription;
+end;
+
+destructor TGxTwoKeyShortCut.Destroy;
+begin
+  FOwner.NotifyTwoKeyShortCutDestruction(Self);
+  inherited;
+end;
+
+function TGxTwoKeyShortCut.GetShortCut: TShortCut;
+begin
+  Result := ShortCut(Ord(FKey), []);
 end;
 
 initialization

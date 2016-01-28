@@ -7,7 +7,8 @@ interface
 uses
   Classes, Controls, Forms, Menus, ComCtrls,
   ExtCtrls, ActnList, Dialogs, StdCtrls,
-  GX_ConfigurationInfo, GX_EditorExpert, GX_GenericUtils, GX_BaseForm;
+  GX_ConfigurationInfo, GX_EditorExpert, GX_GenericUtils, GX_BaseForm, 
+  GX_KbdShortCutBroker;
 
 type
   TUsesExpert = class(TEditorExpert)
@@ -15,6 +16,7 @@ type
     FFavoriteUnits: TStringList;
     FSingleActionMode: Boolean;
     FAvailTabIndex: Integer;
+    FTwoKeyShortcut: IGxTwoKeyShortCut;
     procedure InternalExecute;
   protected
     function GetDisplayName: string; override;
@@ -188,6 +190,9 @@ constructor TUsesExpert.Create;
 begin
   inherited;
   ShortCut := scShift + scAlt + Ord('U');
+
+  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Execute, 'U', GetDisplayName);
+
   FFavoriteUnits := TStringList.Create;
   LoadSettings;
 end;

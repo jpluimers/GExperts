@@ -386,7 +386,7 @@ begin
 
     if not Assigned(IdeShortCut) then
     begin
-      IdeShortCut := GxKeyboardShortCutBroker.RequestShortCut(OnExecute, Value);
+      IdeShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(OnExecute, Value);
       Assert(Assigned(IdeShortCut));
     end;
   end;
