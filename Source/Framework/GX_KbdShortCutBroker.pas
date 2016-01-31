@@ -39,8 +39,8 @@ type
     // Request an *IDE-global* keyboard shortcut.
     function RequestOneKeyShortCut(const Trigger: TTriggerMethod; ShortCut: TShortCut = 0): IGxKeyboardShortCut;
     // Request a two key shortcut, that is a shortcut that consists of the standard GExperts
-    // keyboard shortcut followed by Ctrl+<the given character>
-    // (similar to the WordStar compatible Ctrl+<k> Ctrl+i shortcuts)
+    // keyboard shortcut followed by <the given character>
+    // (similar to the WordStar compatible (e.g. Ctrl+<k> i) shortcuts)
     function RequestTwoKeyShortCut(const ATrigger: TTriggerMethod; AKey: AnsiChar;
       const ADescription: string): IGxTwoKeyShortCut;
 
@@ -66,7 +66,8 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   ToolsAPI,
   Forms, Controls, Types, Graphics, Messages, Windows, Contnrs,
-  GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo;
+  GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo,
+  GX_EditorEnhancements, GX_GxUtils, GX_dzVclUtils;
 
 // First of all we have shared code; in
 // particular, we share a large chunk
@@ -152,12 +153,13 @@ type
   TGxTwoKeyShortCut = class(TGxKeyboardShortCut, IGxTwoKeyShortCut)
   private
     FKey: AnsiChar;
+    FShortCut: TShortCut;
     FDescription: string;
   protected
     function GetShortCut: TShortCut; override;
   public
     constructor Create(AOwner: TGxBaseKeyboardShortCutBroker; ATrigger: TTriggerMethod;
-      AKey: Ansichar; const ADescription: string);
+      AKey: AnsiChar; const ADescription: string);
     destructor Destroy; override;
   end;
 
@@ -308,6 +310,14 @@ begin
   Result := AShortCutContainer as IGxKeyboardShortCut;
 end;
 
+function CompareTwoKeyShortcuts(Item1, Item2: Pointer): Integer;
+var
+  ShortCut1: TGxTwoKeyShortCut absolute Item1;
+  ShortCut2: TGxTwoKeyShortCut absolute Item2;
+begin
+  Result := CompareText(ShortCut1.FKey, ShortCut2.FKey);
+end;
+
 function TGxBaseKeyboardShortCutBroker.RequestTwoKeyShortCut(const ATrigger: TTriggerMethod;
   AKey: AnsiChar; const ADescription: string): IGxTwoKeyShortCut;
 var
@@ -315,6 +325,7 @@ var
 begin
   AShortCutContainer := TGxTwoKeyShortCut.Create(Self, ATrigger, AKey, ADescription);
   FTwoKeyShortCutList.Add(AShortCutContainer);
+  FTwoKeyShortCutList.Sort(CompareTwoKeyShortcuts);
   Result := AShortCutContainer as IGxTwoKeyShortCut;
 end;
 
@@ -453,20 +464,19 @@ type
   TGxKeyboardBinding = class(TNotifierObject,
                              IOTAKeyboardBinding)
   private
-    FHintWindow: THintWindow;
-    FEventHook: TMessageEventHook;
     // IOTAKeyboardBinding
     function GetBindingType: TBindingType;
     function GetDisplayName: string;
     function GetName: string;
     procedure BindKeyboard(const BindingServices: IOTAKeyBindingServices);
   private
+    FOwner: TGxNativeKeyboardShortCutBroker;
+    FHintWindow: THintWindow;
+    FEventHook: TMessageEventHook;
     procedure KeyBindingHandler(const Context: IOTAKeyContext; KeyCode: TShortCut;
       var BindingResult: TKeyBindingResult);
     procedure TwoKeyBindingHandler(const Context: IOTAKeyContext; KeyCode: TShortCut;
       var BindingResult: TKeyBindingResult);
-  private
-    FOwner: TGxNativeKeyboardShortCutBroker;
     procedure HandleApplicationMessage(var Msg: TMsg; var Handled: Boolean);
     function GetHintWindow: THintWindow;
   public
@@ -634,6 +644,29 @@ end;
 
 { TGxKeyboardBinding }
 
+//    procedure TGxKeyboardBinding.BindKeyboard(const BindingServices: IOTAKeyBindingServices);
+//    const
+//      DefaultKeyBindingsFlag = kfImplicitShift + kfImplicitModifier + kfImplicitKeypad;
+//    var
+//      GExpertsShortcut: Byte;
+//      ShiftState: TShiftState;
+//      FirstShortCut: TShortCut;
+//      SecondShortCut: TShortCut;
+//    begin
+//      GExpertsShortcut := Ord('H');
+//      ShiftState := [ssShift, ssCtrl];
+//      FirstShortCut := ShortCut(GExpertsShortcut, ShiftState);
+//      SecondShortCut := ShortCut(Ord('X'), []);
+//      BindingServices.AddKeyBinding([FirstShortCut, SecondShortCut],
+//        TwoKeyBindingHandler, nil,
+//        DefaultKeyBindingsFlag, '', '');
+//      SecondShortCut := ShortCut(Ord('F'), []);
+//      BindingServices.AddKeyBinding([FirstShortCut, SecondShortCut],
+//        TwoKeyBindingHandler, nil,
+//        DefaultKeyBindingsFlag, '', '');
+//    end;
+
+
 procedure TGxKeyboardBinding.BindKeyboard(const BindingServices: IOTAKeyBindingServices);
 const
   DefaultKeyBindingsFlag = kfImplicitShift + kfImplicitModifier + kfImplicitKeypad;
@@ -642,6 +675,9 @@ var
   KeyboardName: string;
   AShortCutItem: TGxOneKeyShortCut;
   ATwoKeyShortCut: TGxTwoKeyShortCut;
+  GExpertsShortcut: Byte;
+  ShiftState: TShiftState;
+  FirstShortCut: TShortCut;
 begin
   Assert(FOwner <> nil);
   Assert(FOwner.FShortCutList <> nil);
@@ -661,13 +697,22 @@ begin
     end;
   end;
 
-  for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
-  begin
-    ATwoKeyShortCut := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
-    if ATwoKeyShortCut.GetShortCut <> 0 then
+  if TwoKeyShortcutsPossible and ConfigInfo.EditorExpertsEnabled then
     begin
-      BindingServices.AddKeyBinding([ShortCut(Ord('H'), [ssCtrl]), ATwoKeyShortCut.GetShortCut],
-        TwoKeyBindingHandler, nil, DefaultKeyBindingsFlag, KeyboardName, '');
+    GExpertsShortcut := Ord(EditorEnhancements.GExpertsShortcut);
+    if GExpertsShortcut <> 0 then
+    begin
+      ShiftState := EditorEnhancements.GExpertsShortcutModifierSet;
+      FirstShortCut := ShortCut(GExpertsShortcut, ShiftState);
+      for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
+      begin
+        ATwoKeyShortCut := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
+        if ATwoKeyShortCut.GetShortCut <> 0 then
+        begin
+          BindingServices.AddKeyBinding([FirstShortCut, ATwoKeyShortCut.GetShortCut],
+            TwoKeyBindingHandler, Self, DefaultKeyBindingsFlag, KeyboardName, '');
+        end;
+      end;
     end;
   end;
 end;
@@ -682,7 +727,8 @@ begin
   Assert(AOwner <> nil);
   FOwner := AOwner;
 
-  FEventHook := HookApplicationOnMessage(HandleApplicationMessage);
+  if TwoKeyShortcutsPossible then
+    FEventHook := HookApplicationOnMessage(HandleApplicationMessage);
 end;
 
 destructor TGxKeyboardBinding.Destroy;
@@ -753,45 +799,52 @@ end;
 procedure TGxKeyboardBinding.HandleApplicationMessage(var Msg: TMsg; var Handled: Boolean);
 var
   r : TRect;
-  State: TKeyboardState;
   h: THintWindow;
   ctl: TWinControl;
   i: Integer;
   TheShortCut: TGxTwoKeyShortCut;
   s: string;
   MaxWidth: integer;
+  GExpertsShortcut: Integer;
 begin
-  if (Msg.message = WM_KEYDOWN) then begin
-    if Msg.wParam = Ord('H') then begin
-      GetKeyboardState(State);
-      if ((State[VK_CONTROL] and 128) <> 0)
-        and ((State[VK_SHIFT] and 128) = 0)
-        and ((State[VK_MENU] and 128) = 0) then
+  if (Msg.message = WM_KEYDOWN) then
+    begin
+    if TwoKeyShortcutsPossible and ConfigInfo.EditorExpertsEnabled and EditorEnhancements.ShowGExpertsShortcutHint then
+    begin
+      GExpertsShortcut := Ord(EditorEnhancements.GExpertsShortcut);
+      if GExpertsShortcut <> 0 then
       begin
-        if FOwner.FTwoKeyShortCutList.Count > 0 then
+        if Msg.wParam = GExpertsShortcut then
         begin
-          ctl := Screen.ActiveControl;
-          if Assigned(ctl) and (ctl.Name = 'Editor') and ctl.ClassNameIs('TEditControl') then begin
-            h := GetHintWindow;
-            s := '';
-            for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
+          if GetModifierKeyState = EditorEnhancements.GExpertsShortcutModifierSet then
+          begin
+            if FOwner.FTwoKeyShortCutList.Count > 0 then
             begin
-              TheShortCut := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
-              s := s + ShortCutToText(TheShortCut.GetShortCut) + '  ' + TheShortCut.FDescription + #13#10;
+              ctl := Screen.ActiveControl;
+              if Assigned(ctl) and (ctl.Name = 'Editor') and ctl.ClassNameIs('TEditControl') then
+              begin
+                h := GetHintWindow;
+                s := '';
+                for i := 0 to FOwner.FTwoKeyShortCutList.Count - 1 do
+                begin
+                  TheShortCut := FOwner.FTwoKeyShortCutList[i] as TGxTwoKeyShortCut;
+                  s := s + ShortCutToText(TheShortCut.GetShortCut) + '  ' + TheShortCut.FDescription + #13#10;
+                end;
+                r := ctl.ClientRect;
+                MaxWidth := r.Right - r.Left;
+                r := h.CalcHintRect(MaxWidth, s, nil);
+                r.TopLeft := ctl.ClientToScreen(r.TopLeft);
+                r.Right := r.Left + r.Right;
+                r.Bottom := r.Top + r.Bottom;
+                h.ActivateHint(r, s);
+                exit;
+              end;
             end;
-            r := ctl.ClientRect;
-            MaxWidth := r.Right - r.Left;
-            r := h.CalcHintRect(MaxWidth, s, nil);
-            r.TopLeft := ctl.ClientToScreen(r.TopLeft);
-            r.Right := r.Left + r.Right;
-            r.Bottom := r.Top + r.Bottom;
-            h.ActivateHint(r, s);
-            exit;
           end;
         end;
       end;
+      GetHintWindow.ReleaseHandle;
     end;
-    GetHintWindow.ReleaseHandle;
   end;
 end;
 
@@ -837,11 +890,20 @@ end;
 
 { TGxTwoKeyShortCut }
 
+function LoCase(ch: AnsiChar): AnsiChar;
+begin
+  Result := ch;
+  case Result of
+    'A'..'Z':  Inc(Result, Ord('a') - Ord('A'));
+  end;
+end;
+
 constructor TGxTwoKeyShortCut.Create(AOwner: TGxBaseKeyboardShortCutBroker; ATrigger: TTriggerMethod;
   AKey: Ansichar; const ADescription: string);
 begin
   inherited Create(AOwner, ATrigger);
-  FKey := AKey;
+  FKey := UpCase(AKey);
+  FShortCut := Menus.ShortCut(Ord(FKey), []);
   FDescription := ADescription;
 end;
 
@@ -853,7 +915,7 @@ end;
 
 function TGxTwoKeyShortCut.GetShortCut: TShortCut;
 begin
-  Result := ShortCut(Ord(FKey), []);
+  Result := FShortCut;
 end;
 
 initialization

@@ -83,8 +83,12 @@ type
     constructor Create(GExpertsSettings: TGExpertsSettings; const Section: string);
     function ReadBool(const Ident: string; Default: Boolean): Boolean;
     procedure WriteBool(const Ident: string; Value: Boolean);
-    function ReadInteger(const Ident: string; Default: Longint): Longint; 
+    function ReadInteger(const Ident: string; Default: Longint): Longint;
     procedure WriteInteger(const Ident: string; Value: Longint);
+    function ReadString(const Ident: string; Default: string): string;
+    procedure WriteString(const Ident: string; Value: string);
+    function ReadAnsiChar(const Ident: string; Default: AnsiChar): AnsiChar;
+    procedure WriteAnsiChar(const Ident: string; Value: AnsiChar);
     procedure LoadFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure SaveFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure ReadStrings(const List: TStrings; const ListName, Ident: string);
@@ -838,9 +842,24 @@ begin
   Result := FGExpertsSettings.ReadBool(FSection, Ident, Default);
 end;
 
+function TExpertSettings.ReadAnsiChar(const Ident: string; Default: AnsiChar): AnsiChar;
+var
+  Value: Integer;
+begin
+  Value := ReadInteger(Ident, Ord(Default));
+  if Value > 255 then
+    Value := 0;
+  Result := AnsiChar(Value);
+end;
+
 function TExpertSettings.ReadInteger(const Ident: string; Default: Integer): Longint;
 begin
   Result := FGExpertsSettings.ReadInteger(FSection, Ident, Default);
+end;
+
+function TExpertSettings.ReadString(const Ident: string; Default: string): string;
+begin
+  Result := FGExpertsSettings.ReadString(FSection, Ident, Default);
 end;
 
 procedure TExpertSettings.ReadStrings(const List: TStrings;
@@ -865,9 +884,19 @@ begin
   FGExpertsSettings.WriteBool(FSection, Ident, Value);
 end;
 
+procedure TExpertSettings.WriteAnsiChar(const Ident: string; Value: AnsiChar);
+begin
+  WriteInteger(Ident, Ord(Value));
+end;
+
 procedure TExpertSettings.WriteInteger(const Ident: string; Value: Integer);
 begin
   FGExpertsSettings.WriteInteger(FSection, Ident, Value);
+end;
+
+procedure TExpertSettings.WriteString(const Ident: string; Value: string);
+begin
+  FGExpertsSettings.WriteString(FSection, Ident, Value);
 end;
 
 procedure TExpertSettings.WriteStrings(const List: TStrings;

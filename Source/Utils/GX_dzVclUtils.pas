@@ -90,6 +90,9 @@ function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFile
 ///<summary>
 /// @returns true, if the shift key is currently pressed </summary>
 function IsShiftDown: Boolean;
+function IsCtrlDown: Boolean;
+function IsAltDown: Boolean;
+function GetModifierKeyState: TShiftState;
 
 ///<summary> Sets the control's Constraints.MinHeight und Constraints.MinWidth properties
 ///          to the control's Width and Height. </summary>
@@ -211,13 +214,13 @@ procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = 
 /// @param lv is the ListView to work on
 /// @param Idx is the index of the selected item, only valid if Result = true
 /// @returns true, if an item was selected, false otherwise </summary>
-function TListView_TryGetSelected(_lv: TListView; out _Idx: integer): boolean; overload;
+function TListView_TryGetSelected(_lv: TListView; out _Idx: Integer): Boolean; overload;
 ///<summary>
 /// Gets the selected item of the ListView
 /// @param lv is the ListView to work on
 /// @param li is the selected item, only valid if Result = true
 /// @returns true, if an item was selected, false otherwise </summary>
-function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): boolean; overload;
+function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): Boolean; overload;
 
 ///<summary> free all lv.Items[n].Data objects and then clear the items </summary>
 procedure TListView_ClearWithObjects(_lv: TListView);
@@ -320,6 +323,36 @@ var
 begin
   GetKeyboardState(State);
   Result := ((State[vk_Shift] and 128) <> 0);
+end;
+
+function IsCtrlDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[VK_CONTROL] and 128) <> 0);
+end;
+
+function IsAltDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[VK_MENU] and 128) <> 0);
+end;
+
+function GetModifierKeyState: TShiftState;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := [];
+  if ((State[vk_Shift] and 128) <> 0) then
+    Include(Result, ssShift);
+  if ((State[VK_CONTROL] and 128) <> 0) then
+    Include(Result, ssCtrl);
+  if ((State[VK_MENU] and 128) <> 0) then
+    Include(Result, ssAlt);
 end;
 
 { TDropFilesActivator }
@@ -624,19 +657,19 @@ begin
   Result.OnExecute := _OnExecute;
 end;
 
-function TListView_TryGetSelected(_lv: TListView; out _Idx: integer): boolean;
+function TListView_TryGetSelected(_lv: TListView; out _Idx: Integer): Boolean;
 begin
   _Idx := _lv.ItemIndex;
   Result := (_Idx <> -1);
 end;
 
-function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): boolean;
+function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): Boolean;
 var
-  Idx: Integer;
+  idx: Integer;
 begin
-  Result := TListView_TryGetSelected(_lv, Idx);
+  Result := TListView_TryGetSelected(_lv, idx);
   if Result then
-    _li := _lv.Items[Idx];
+    _li := _lv.Items[idx];
 end;
 
 procedure TListItems_ClearWithObjects(_li: TListItems);
@@ -673,6 +706,7 @@ begin
 end;
 
 {$IFNDEF GX_VER170_up}
+
 function StartsText(const ASubText, AText: string): Boolean;
 begin
   Result := AnsiStartsText(ASubText, AText);
@@ -693,7 +727,7 @@ begin
       for i := 0 to sl.Count - 1 do
         if StartsText(_Item, sl[i]) then begin
           Result := i;
-          Break;
+          break;
         end;
     finally
       FreeAndNil(sl);
@@ -741,9 +775,9 @@ end;
 
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
 var
-  Idx: Integer;
+  idx: Integer;
 begin
-  Result := TComboBox_GetSelectedObject(_cmb, Idx, _Obj, _FocusControl);
+  Result := TComboBox_GetSelectedObject(_cmb, idx, _Obj, _FocusControl);
 end;
 
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean;
@@ -769,13 +803,13 @@ end;
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
   out _Item: string; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
 var
-  Idx: Integer;
+  idx: Integer;
 begin
-  Idx := _cmb.ItemIndex;
-  Result := (Idx <> -1);
+  idx := _cmb.ItemIndex;
+  Result := (idx <> -1);
   if Result then begin
-    _Item := _cmb.Items[Idx];
-    _Obj := _cmb.Items.Objects[Idx];
+    _Item := _cmb.Items[idx];
+    _Obj := _cmb.Items.Objects[idx];
   end else if _FocusControl then
     _cmb.SetFocus;
 end;
@@ -810,11 +844,11 @@ end;
 function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Item: string;
   _FocusControl: Boolean = False): Boolean;
 var
-  Idx: Integer;
+  idx: Integer;
 begin
-  Result := TComboBox_GetSelected(_cmb, Idx, _FocusControl);
+  Result := TComboBox_GetSelected(_cmb, idx, _FocusControl);
   if Result then
-    _Item := _cmb.Items[Idx];
+    _Item := _cmb.Items[idx];
 end;
 
 /// <summary>
@@ -822,6 +856,7 @@ end;
 /// meant to be called like
 /// @code( TStrings_FreeAllObjects(sl).Free; ) or
 /// @code( TStrings_FreeAllObjects(sl).Clear; ) </summary>
+
 function TStrings_FreeAllObjects(_Strings: TStrings): TStrings;
 var
   i: Integer;
@@ -848,12 +883,12 @@ end;
 function TListBox_GetSelected(_lb: TCustomListbox; out _Item: string;
   _FocusControl: Boolean = False): Boolean;
 var
-  Idx: Integer;
+  idx: Integer;
 begin
-  Idx := _lb.ItemIndex;
-  Result := Idx <> -1;
+  idx := _lb.ItemIndex;
+  Result := idx <> -1;
   if Result then
-    _Item := _lb.Items[Idx]
+    _Item := _lb.Items[idx]
   else if _FocusControl then
     _lb.SetFocus;
 end;
@@ -868,12 +903,12 @@ end;
 
 function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Obj: Pointer): Boolean;
 var
-  Idx: Integer;
+  idx: Integer;
 begin
-  Idx := _lst.ItemIndex;
-  Result := Idx <> -1;
+  idx := _lst.ItemIndex;
+  Result := idx <> -1;
   if Result then
-    _Obj := _lst.Items.Objects[Idx];
+    _Obj := _lst.Items.Objects[idx];
 end;
 
 end.

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls,
-  GX_Experts, GX_GrepExpert, GX_GrepBackend, GX_BaseForm;
+  GX_Experts, GX_GrepExpert, GX_GrepBackend, GX_BaseForm, GX_KbdShortCutBroker;
 
 type
   TfmGrepSearch = class(TfmBaseForm)
@@ -61,6 +61,8 @@ type
   end;
 
   TGrepDlgExpert = class(TGX_Expert)
+  private
+    FTwoKeyShortcut: IGxTwoKeyShortCut;
   public
     constructor Create; override;
     function GetActionCaption: string; override;
@@ -138,6 +140,7 @@ begin
   inherited Create;
 
   ShortCut := Menus.ShortCut(Word('S'), [ssAlt, ssShift]);
+  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Click, 'G', StripHotkey(GetActionCaption));
 end;
 
 function TGrepDlgExpert.GetActionCaption: string;

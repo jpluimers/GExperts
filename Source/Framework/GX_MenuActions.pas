@@ -32,7 +32,8 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Windows, Classes, Graphics, ActnList, Menus,
   GX_GenericClasses, GX_ActionBroker, GX_ConfigurationInfo,
-  GX_GExperts, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils, Math;
+  GX_GExperts, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils, Math, 
+  GX_KbdShortCutBroker;
 
 // We can enable a hack / kludge to get around
 // menu shortcut an initialization issue in
@@ -53,6 +54,7 @@ type
     FAboutAction: IGxAction;
     FMoreAction: IGxAction;
     FGExpertsTopLevelMenu: TMenuItem;
+    FConfigureShortcut: IGxTwoKeyShortCut;
     procedure ConfigClick(Sender: TObject);
     procedure AboutClick(Sender: TObject);
     {$IFDEF GX_UseMenuShortCutInitializationWorkAround}
@@ -164,6 +166,8 @@ begin
     MainMenu.Items.Insert(MainMenu.Items.Count - 2, FGExpertsTopLevelMenu);
 
   Assert(FGExpertsTopLevelMenu.Count = 3);
+
+  FConfigureShortcut :=  GxKeyboardShortCutBroker.RequestTwoKeyShortCut(ConfigClick, 'X', StripHotkey(SGxConfigMenu));
 end;
 
 destructor TGXMenuActionManager.Destroy;

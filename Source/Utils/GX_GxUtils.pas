@@ -42,6 +42,7 @@ procedure GxSetDefaultFont(Control: TControl);
 function ComponentPaletteAvailable: Boolean;
 function MultilineTabDockHostPossible: Boolean;
 function EditorEnhancementsPossible: Boolean;
+function TwoKeyShortcutsPossible: Boolean;
 
 const
   GXTransparencyColor = $00FF00FF; // Defines the background of some bitmaps
@@ -165,6 +166,11 @@ begin
   {$ELSE not GX_EditorEnhancements}
   Result := False;
   {$ENDIF}
+end;
+
+function TwoKeyShortcutsPossible: Boolean;
+begin
+  Result := RunningDelphi7OrGreater;
 end;
 
 type
