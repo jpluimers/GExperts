@@ -658,13 +658,53 @@ object fmConfiguration: TfmConfiguration
           TabOrder = 3
           OnClick = chkDisableEDTEnhancementsClick
         end
-        object chk_HideNavbar: TCheckBox
+        object chkHideNavbar: TCheckBox
           Left = 16
           Top = 328
           Width = 210
           Height = 17
           Caption = 'Hide Navigation Bar (Delphi 10 up)'
           TabOrder = 2
+        end
+        object gbxShortcut: TGroupBox
+          Left = 8
+          Top = 360
+          Width = 225
+          Height = 81
+          Hint = 
+            'This is the first character of a two key shortcut to call indivi' +
+            'dual experts. Similar to the WordStar compatible (e.g. Ctrl+K + ' +
+            'I)  keyboard shortcuts.'
+          Caption = 'GExperts two key shortcut'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 3
+          object cmbGExpertsShortcut: TComboBox
+            Left = 104
+            Top = 24
+            Width = 105
+            Height = 22
+            Style = csDropDownList
+            ItemHeight = 14
+            TabOrder = 1
+          end
+          object chkShowShortcutHint: TCheckBox
+            Left = 8
+            Top = 56
+            Width = 97
+            Height = 17
+            Caption = 'Show hint'
+            TabOrder = 2
+          end
+          object cmbGExpertsShortCutModifier: TComboBox
+            Left = 8
+            Top = 24
+            Width = 89
+            Height = 22
+            Style = csDropDownList
+            ItemHeight = 14
+            TabOrder = 0
+          end
         end
       end
       object tshSuppressedMessages: TTabSheet

@@ -19,7 +19,7 @@ uses
   ComCtrls,
   CommCtrl,
   ActnList,
-  StdCtrls;
+  StdCtrls, Menus;
 
 type
   ///<summary> Ancestor to all exceptions raised in this unit. </summary>
@@ -235,6 +235,11 @@ function TActionlist_Append(_al: TActionList; _Caption: string = ''): TAction; o
 function TActionlist_Append(_al: TActionList; _Caption: string; _Shortcut: TShortCut): TAction; overload;
 function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction; overload;
 function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction; overload;
+
+///<summary>
+/// Appends a new menu item with the given Caption to the popup menu and returns it </summary>
+function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem; overload;
+
 
 implementation
 
@@ -655,6 +660,14 @@ function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNot
 begin
   Result := TActionlist_Append(_al, _Caption, _Shortcut);
   Result.OnExecute := _OnExecute;
+end;
+
+function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem;
+begin
+  Result := TMenuItem.Create(_pm);
+  Result.Caption := _Caption;
+  Result.OnClick := _OnClick;
+  _pm.Items.Add(Result);
 end;
 
 function TListView_TryGetSelected(_lv: TListView; out _Idx: Integer): Boolean;

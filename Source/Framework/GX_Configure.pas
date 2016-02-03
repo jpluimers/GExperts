@@ -103,7 +103,7 @@ type
     tmrFilter: TTimer;
     lblFilter: TLabel;
     edtFilter: TEdit;
-    chk_HideNavbar: TCheckBox;
+    chkHideNavbar: TCheckBox;
     chkEnhanceSearchPaths: TCheckBox;
     chkEnhanceToolProperties: TCheckBox;
     chkReplaceListWithMemo: TCheckBox;
@@ -115,6 +115,10 @@ type
     btnDeleteSuppressedMessage: TButton;
     btnClearSuppressedMessages: TButton;
     chkEnhanceInstallPackages: TCheckBox;
+    gbxShortcut: TGroupBox;
+    cmbGExpertsShortcut: TComboBox;
+    chkShowShortcutHint: TCheckBox;
+    cmbGExpertsShortCutModifier: TComboBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -202,7 +206,10 @@ uses
   GX_GxUtils, GX_EditorEnhancements, GX_Experts, GX_IdeEnhance,
   GX_ConfigurationInfo, GX_EditorExpertManager, GX_MessageBox,
   GX_GExperts, GX_EditorShortcut, GX_MenuActions, GX_GenericUtils, GX_IdeUtils,
-  GX_OtaUtils, GX_dzVclUtils;
+  GX_OtaUtils, GX_dzVclUtils, GX_KbdShortCutBroker;
+
+resourcestring
+  GExpertsShortcutDisabled = '<disabled>';
 
 type
   TShowOldComCtrlVersionMessage = class(TGxMsgBoxAdaptor)
@@ -222,6 +229,9 @@ end;
 // **************************************************************
 
 constructor TfmConfiguration.Create(AOwner: TComponent);
+var
+  c: Char;
+  m: TGExpertsShortcutModifier;
 begin
   inherited Create(AOwner);
 
@@ -234,6 +244,18 @@ begin
   TEdit_ActivateAutoComplete(edConfigPath, [acsFileSystem], [actSuggest]);
   TWinControl_ActivateDropFiles(edHelpFile, edHelpFileDropFiles);
   TEdit_ActivateAutoComplete(edHelpFile, [acsFileSystem], [actSuggest]);
+
+  cmbGExpertsShortCutModifier.Items.Clear;
+  for m := gsmCtrl to High(TGExpertsShortcutModifier) do
+  begin
+    cmbGExpertsShortCutModifier.Items.AddObject(
+      TEditorEnhancements.GExpertsShortcutModifierToString(m), Pointer(m));
+  end;
+
+  cmbGExpertsShortcut.Items.Clear;
+  cmbGExpertsShortcut.Items.Add(GExpertsShortcutDisabled);
+  for c := 'A' to 'Z' do
+    cmbGExpertsShortcut.Items.Add(c);
 
   pcConfig.ActivePage := tshExperts;
   LoadExperts;
@@ -424,12 +446,17 @@ end;
 
 procedure TfmConfiguration.btnOKClick(Sender: TObject);
 begin
-  SaveGeneral;
-  SaveExperts;
-  SaveIdeEnhancements;
-  SaveEditorEnhancements;
-  ConfigInfo.SaveSettings;
-  GXMenuActionManager.ArrangeMenuItems;
+  GxKeyboardShortCutBroker.BeginUpdate;
+  try
+    SaveGeneral;
+    SaveExperts;
+    SaveIdeEnhancements;
+    SaveEditorEnhancements;
+    ConfigInfo.SaveSettings;
+    GXMenuActionManager.ArrangeMenuItems;
+  finally
+    GxKeyboardShortCutBroker.EndUpdate;
+  end;
 
   ModalResult := mrOk;
 end;
@@ -618,7 +645,11 @@ begin
   chkButtons.Checked := EditorEnhancements.Buttons;
   chkEditTabButtonsFlat.Checked := EditorEnhancements.ButtonsFlat;
 
-  chk_HideNavbar.Checked := EditorEnhancements.HideNavbar;
+  chkHideNavbar.Checked := EditorEnhancements.HideNavbar;
+
+  TComboBox_SelectByObject(cmbGExpertsShortCutModifier, Ord(EditorEnhancements.GExpertsShortcutModifier));
+  TComboBox_Select(cmbGExpertsShortcut, string(EditorEnhancements.GExpertsShortcut), 0);
+  chkShowShortcutHint.Checked := EditorEnhancements.ShowGExpertsShortcutHint;
 
   Assert(EditorEnhancements.ToolBarAlign in [alTop..alRight]);
   rgAlign.ItemIndex := Ord(EditorEnhancements.ToolBarAlign) - 1;
@@ -696,6 +727,9 @@ begin
 end;
 
 procedure TfmConfiguration.SaveEditorEnhancements;
+var
+  s: String;
+  Value: integer;
 begin
   Assert(EditorEnhancements <> nil);
 
@@ -719,8 +753,26 @@ begin
   Assert(rgAlign.ItemIndex >= 0);
   EditorEnhancements.ToolBarAlign := TAlign(rgAlign.ItemIndex + 1);
 
-  {$IFOPT D+} SendDebug('Setting HideNabar to ' + BooleanText(chk_HideNavbar.Checked)); {$ENDIF}
-  EditorEnhancements.HideNavbar := chk_HideNavbar.Checked;
+  {$IFOPT D+} SendDebug('Setting HideNabar to ' + BooleanText(chkHideNavbar.Checked)); {$ENDIF}
+  EditorEnhancements.HideNavbar := chkHideNavbar.Checked;
+
+  if not TComboBox_GetSelectedObject(cmbGExpertsShortCutModifier, Value) then
+    Value := Ord(gsmCtrl);
+  EditorEnhancements.GExpertsShortcutModifier := TGExpertsShortcutModifier(Value);
+  {$IFOPT D+} SendDebug('Setting GExpertsShortcutModifier to "' +
+    TEditorEnhancements.GExpertsShortcutModifierToString(EditorEnhancements.GExpertsShortcutModifier)
+     + '"'); {$ENDIF}
+
+  if not TComboBox_GetSelected(cmbGExpertsShortcut, s) then
+    s := '';
+  {$IFOPT D+} SendDebug('Setting GExpertsShortcut to "' + s + '"'); {$ENDIF}
+  if (s <> '') and (s <> GExpertsShortcutDisabled) then
+    EditorEnhancements.GExpertsShortcut := AnsiChar(s[1])
+  else
+    EditorEnhancements.GExpertsShortcut := #0;
+
+  {$IFOPT D+} SendDebug('Setting ShowGExpertsShortcutHint to ' + BooleanText(chkShowShortcutHint.Checked )); {$ENDIF}
+  EditorEnhancements.ShowGExpertsShortcutHint := chkShowShortcutHint.Checked;
 
   {$IFOPT D+} SendDebug('Setting EditorEnhancements.Enabled to ' + BooleanText(not chkDisableEDTEnhancements.Checked)); {$ENDIF}
   EditorEnhancements.Enabled := not chkDisableEDTEnhancements.Checked;
@@ -772,6 +824,10 @@ end;
 
 procedure TfmConfiguration.HideUnsupportedIdeItems;
 begin
+  if not TwoKeyShortcutsPossible then begin
+    gbxShortcut.Visible := False;
+  end;
+
   if not MultilineTabDockHostPossible then begin
     gbxIDEMenu.Width := gbxTabDockHost.Left + gbxTabDockHost.Width - gbxIDEMenu.Left;
     gbxTabDockHost.Visible := False;
@@ -790,8 +846,10 @@ begin
   tshEditor.TabVisible := EditorEnhancementsPossible;
   gbxEditorTabs.Visible := RunningDelphi7OrLess;
 {$ifndef GX_VER300_up}
-  chk_HideNavbar.Visible := False;
+  chkHideNavbar.Visible := False;
 {$endif}
+
+  gbxShortcut.Visible := TwoKeyShortcutsPossible;
 end;
 
 procedure TfmConfiguration.chkFontEnabledClick(Sender: TObject);
