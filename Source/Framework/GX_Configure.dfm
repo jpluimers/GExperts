@@ -688,14 +688,6 @@ object fmConfiguration: TfmConfiguration
             ItemHeight = 14
             TabOrder = 1
           end
-          object chkShowShortcutHint: TCheckBox
-            Left = 8
-            Top = 56
-            Width = 97
-            Height = 17
-            Caption = 'Show hint'
-            TabOrder = 2
-          end
           object cmbGExpertsShortCutModifier: TComboBox
             Left = 8
             Top = 24

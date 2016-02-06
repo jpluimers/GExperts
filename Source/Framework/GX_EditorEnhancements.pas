@@ -32,7 +32,6 @@ type
     FMiddleButtonClose: Boolean;
     FHideNavbar: Boolean;
     FGExpertsShortcut: AnsiChar;
-    FShowGExpertsShortcutHint: boolean;
     FGExpertsShortcutModifier: TGExpertsShortcutModifier;
     procedure AddToolBar;
     procedure RemoveToolBar;
@@ -80,7 +79,6 @@ type
 
     property GExpertsShortcutModifier: TGExpertsShortcutModifier read FGExpertsShortcutModifier write SetGExpertsShortcutModifier;
     property GExpertsShortcut: AnsiChar read FGExpertsShortcut write FGExpertsShortcut;
-    property ShowGExpertsShortcutHint: boolean read FShowGExpertsShortcutHint write FShowGExpertsShortcutHint;
   end;
 
 function EditorEnhancements: TEditorEnhancements;
@@ -224,7 +222,6 @@ begin
 
   FGExpertsShortcutModifier := gsmCtrl;
   FGExpertsShortcut := 'H';
-  FShowGExpertsShortcutHint := True;
 
   FToolBarActionsList := TStringList.Create;
   InitializeGXToolBarDropdowns;
@@ -323,7 +320,6 @@ begin
 
     GExpertsShortcutModifier := TGExpertsShortcutModifier(ExpSettings.ReadInteger('GExpertsShortcutModifier', Ord(GExpertsShortcutModifier)));
     GExpertsShortcut := ExpSettings.ReadAnsiChar('GExpertsShortcut', GExpertsShortcut);
-    ShowGExpertsShortcutHint := ExpSettings.ReadBool('ShowGExpertsShortcutHint', ShowGExpertsShortcutHint);
   finally
     FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
@@ -436,7 +432,6 @@ begin
     ExpSettings.WriteInteger('ToolBarAlign', Ord(ToolBarAlign));
     ExpSettings.WriteInteger('GExpertsShortcutModifier', Ord(GExpertsShortcutModifier));
     ExpSettings.WriteAnsiChar('GExpertsShortcut', GExpertsShortcut);
-    ExpSettings.WriteBool('ShowGExpertsShortcutHint', ShowGExpertsShortcutHint);
   finally
     FreeAndNil(ExpSettings);
     FreeAndNil(Settings);

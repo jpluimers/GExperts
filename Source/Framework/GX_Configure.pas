@@ -117,7 +117,6 @@ type
     chkEnhanceInstallPackages: TCheckBox;
     gbxShortcut: TGroupBox;
     cmbGExpertsShortcut: TComboBox;
-    chkShowShortcutHint: TCheckBox;
     cmbGExpertsShortCutModifier: TComboBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
@@ -649,7 +648,6 @@ begin
 
   TComboBox_SelectByObject(cmbGExpertsShortCutModifier, Ord(EditorEnhancements.GExpertsShortcutModifier));
   TComboBox_Select(cmbGExpertsShortcut, string(EditorEnhancements.GExpertsShortcut), 0);
-  chkShowShortcutHint.Checked := EditorEnhancements.ShowGExpertsShortcutHint;
 
   Assert(EditorEnhancements.ToolBarAlign in [alTop..alRight]);
   rgAlign.ItemIndex := Ord(EditorEnhancements.ToolBarAlign) - 1;
@@ -770,9 +768,6 @@ begin
     EditorEnhancements.GExpertsShortcut := AnsiChar(s[1])
   else
     EditorEnhancements.GExpertsShortcut := #0;
-
-  {$IFOPT D+} SendDebug('Setting ShowGExpertsShortcutHint to ' + BooleanText(chkShowShortcutHint.Checked )); {$ENDIF}
-  EditorEnhancements.ShowGExpertsShortcutHint := chkShowShortcutHint.Checked;
 
   {$IFOPT D+} SendDebug('Setting EditorEnhancements.Enabled to ' + BooleanText(not chkDisableEDTEnhancements.Checked)); {$ENDIF}
   EditorEnhancements.Enabled := not chkDisableEDTEnhancements.Checked;
