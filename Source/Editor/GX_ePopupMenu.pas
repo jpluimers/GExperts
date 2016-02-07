@@ -70,6 +70,7 @@ type
   private
     FGExpertsShortcutMenu: TPopupMenu;
     FShortcuts: TStringList;
+    procedure ShowConfigForm(_Sender: TObject);
   protected
     function GetDisplayName: string; override;
     class function GetName: string; override;
@@ -145,10 +146,15 @@ begin
       end;
     end;
     TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + 'X' + ' ' + 'Configure',
-      TNotifyEvent(nil));
+      ShowConfigForm);
     pnt := ctl.ClientToScreen(Point(0, 0));
     FGExpertsShortcutMenu.Popup(pnt.X, pnt.Y);
   end;
+end;
+
+procedure TGxEditorPopupMenuExpert.ShowConfigForm(_Sender: TObject);
+begin
+  GExpertsInst.ShowConfigurationForm;
 end;
 
 function TGxEditorPopupMenuExpert.GetDisplayName: string;
