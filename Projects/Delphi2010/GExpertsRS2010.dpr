@@ -192,7 +192,10 @@ uses
   GX_dzQuicksort in '..\..\source\Utils\GX_dzQuicksort.pas',
   GX_IdeInstallPackagesEnhancer in '..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas',
   GX_IdePackageRenameDlg in '..\..\source\IDE\GX_IdePackageRenameDlg.pas' {fmIdxPackageRenameDlg},
-  GX_dzClassUtils in '..\..\Source\Utils\GX_dzClassUtils.pas';
+  GX_dzClassUtils in '..\..\Source\Utils\GX_dzClassUtils.pas',
+  GX_EventHook in '..\..\source\framework\GX_EventHook.pas',
+  GX_ePopupMenu in '..\..\Source\Editor\GX_ePopupMenu.pas' {fmEditorPopupMenuExpertConfig},
+  GX_BaseExpert in '..\..\Source\Framework\GX_BaseExpert.pas';
 
 begin
 end.
