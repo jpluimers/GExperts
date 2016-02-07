@@ -13,12 +13,12 @@ type
   private
     FDateFormat: string;
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
     procedure GetHelpString(List: TStrings); override;

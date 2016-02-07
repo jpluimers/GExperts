@@ -49,7 +49,7 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Configure; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasDesignerMenuItem: Boolean; override;
   end;
 
@@ -365,7 +365,7 @@ begin
   Result := 'ComponentsToCode';
 end;
 
-procedure TCompsToCodeExpert.Click(Sender: TObject);
+procedure TCompsToCodeExpert.Execute(Sender: TObject);
 var
   Comps: TComponentArray;
 begin

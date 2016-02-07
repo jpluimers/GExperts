@@ -104,13 +104,12 @@ type
     class procedure DisableExpertInRegistry(const ExpertName: string);
     class procedure RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
 
-    procedure Execute;
   public
+    class function GetName: string; override;
     constructor Create; override;
     destructor Destroy; override;
+    procedure Execute(Sender: TObject); override;
     function GetActionCaption: string; override;
-    class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
 
@@ -457,11 +456,6 @@ begin
   Result := 'ExpertManager'; // Do not localize.
 end;
 
-procedure TExpertManagerExpert.Click(Sender: TObject);
-begin
-  Execute;
-end;
-
 procedure TExpertManagerExpert.Execute;
 var
   Dlg: TfmExpertManager;
@@ -648,7 +642,7 @@ begin
   InitSharedResources;
   try
     ExpMgr := TExpertManagerExpert.Create;
-    ExpMgr.Execute;
+    ExpMgr.Execute(nil);
   finally
     FreeAndNil(ExpMgr);
     FreeSharedResources;

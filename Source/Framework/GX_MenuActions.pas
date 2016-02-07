@@ -54,7 +54,6 @@ type
     FAboutAction: IGxAction;
     FMoreAction: IGxAction;
     FGExpertsTopLevelMenu: TMenuItem;
-    FConfigureShortcut: IGxTwoKeyShortCut;
     procedure ConfigClick(Sender: TObject);
     procedure AboutClick(Sender: TObject);
     {$IFDEF GX_UseMenuShortCutInitializationWorkAround}
@@ -166,8 +165,6 @@ begin
     MainMenu.Items.Insert(MainMenu.Items.Count - 2, FGExpertsTopLevelMenu);
 
   Assert(FGExpertsTopLevelMenu.Count = 3);
-
-  FConfigureShortcut :=  GxKeyboardShortCutBroker.RequestTwoKeyShortCut(ConfigClick, 'X', StripHotkey(SGxConfigMenu));
 end;
 
 destructor TGXMenuActionManager.Destroy;
@@ -237,7 +234,7 @@ function TGXMenuActionManager.RequestMenuExpertAction(Expert: TGX_Expert): IGxAc
 begin
   Assert(Expert <> nil, 'Invalid nil Expert parameter for RequestMenuExpertAction');
   // Create the action.
-  Result := CreateAction(Expert.GetActionCaption, Expert.GetActionName, Expert.Click,
+  Result := CreateAction(Expert.GetActionCaption, Expert.GetActionName, Expert.Execute,
                          Expert.Bitmap, Expert.ShortCut, Expert.ExpertIndex, 0);
 end;
 

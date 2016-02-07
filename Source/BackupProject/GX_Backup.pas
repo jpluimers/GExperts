@@ -89,7 +89,7 @@ type
   public
     constructor Create; override;
 
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
@@ -1100,7 +1100,7 @@ begin
   Result := 'BackupProject'; // Do not localize.
 end;
 
-procedure TBackupExpert.Click(Sender: TObject);
+procedure TBackupExpert.Execute(Sender: TObject);
 var
   Dlg: TfmBackup;
 begin

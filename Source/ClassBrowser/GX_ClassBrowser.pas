@@ -225,7 +225,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     function IsDefaultActive: Boolean; override;
   end;
@@ -1514,7 +1514,7 @@ begin
   Result := 'ClassBrowser'; // do not localize
 end;
 
-procedure TClassExpert.Click(Sender: TObject);
+procedure TClassExpert.Execute(Sender: TObject);
 begin
   if fmClassBrowser = nil then
   begin

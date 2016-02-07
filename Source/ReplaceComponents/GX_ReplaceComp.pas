@@ -145,7 +145,7 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     class function ConfigurationKey: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     procedure Configure; override;
     procedure SetActive(New: Boolean); override;
@@ -550,7 +550,7 @@ begin
   Action.Enabled := Assigned(FormEditor) or (GxOtaGetCurrentProject <> nil);
 end;
 
-procedure TReplaceCompExpert.Click(Sender: TObject);
+procedure TReplaceCompExpert.Execute(Sender: TObject);
 resourcestring
   NoSupportError = 'Due to limitations of the IDE, Replace Components can not support VCL.NET projects.';
 begin

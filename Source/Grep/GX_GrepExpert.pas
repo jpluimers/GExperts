@@ -71,7 +71,7 @@ type
     function GetActionCaption: string; override;
     class function ConfigurationKey: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     procedure HistoryListSaveSettings(AHistoryIndex: Integer = -1); //if -1 then all
     procedure HistoryListDeleteFromSettings(AHistoryIndex: Integer = -1); //if -1 then all
@@ -219,7 +219,7 @@ begin
   Result := 'GrepResults';
 end;
 
-procedure TGrepExpert.Click(Sender: TObject);
+procedure TGrepExpert.Execute(Sender: TObject);
 begin
   SetFormIcon(fmGrepResults);
   IdeDockManager.ShowForm(fmGrepResults);

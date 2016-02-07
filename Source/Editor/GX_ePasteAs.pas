@@ -9,12 +9,12 @@ uses
 type
   TPasteAsExpert = class(TEditorExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
     procedure GetHelpString(List: TStrings); override;
@@ -22,22 +22,22 @@ type
 
   TCopyRawStringsExpert = class(TSelectionEditorExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     function ProcessSelected(Lines: TStrings): Boolean; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
   end;
 
   TConvertRawStringsExpert = class(TSelectionEditorExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     function ProcessSelected(Lines: TStrings): Boolean; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     procedure Configure; override;
     function HasConfigOptions: Boolean; override;

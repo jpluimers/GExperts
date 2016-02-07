@@ -65,7 +65,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
@@ -97,7 +97,7 @@ begin
 end;
 
 // When the menu item is clicked, open the configuration dialog
-procedure TSetComponentPropsExpert.Click(Sender: TObject);
+procedure TSetComponentPropsExpert.Execute(Sender: TObject);
 begin
   Configure;
 end;

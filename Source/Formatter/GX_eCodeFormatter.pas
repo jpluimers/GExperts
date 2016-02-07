@@ -18,16 +18,15 @@ type
   TeCodeFormatterExpert = class(TEditorExpert)
   private
     FExpert: TCodeFormatterExpert;
-    FTwoKeyShortcut: IGxTwoKeyShortCut;
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     function GetBitmapFileName: string; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   public
+    class function GetName: string; override;
     constructor Create; override;
     destructor Destroy; override;
+    function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
     procedure GetHelpString(List: TStrings); override;
@@ -55,8 +54,6 @@ begin
   FExpert := TCodeFormatterExpert.Create;
 
   ShortCut := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
-
-  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Execute, 'F', DisplayName);
 end;
 
 destructor TeCodeFormatterExpert.Destroy;

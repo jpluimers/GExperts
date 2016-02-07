@@ -26,7 +26,7 @@ uses GX_GExperts, GX_Experts;
 
 procedure TGxDesignerMenu.ExecuteVerb(Index: Integer; const List: IDesignerSelections);
 begin
-  GExpertsInst.ExpertList[Indexes[Index]].Click(Self);
+  GExpertsInst.ExpertList[Indexes[Index]].Execute(Self);
 end;
 
 function TGxDesignerMenu.GetVerb(Index: Integer): string;

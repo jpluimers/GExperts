@@ -106,7 +106,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     procedure Configure; override;
     property ExtensionList: TStrings read FExtensionList;
@@ -652,7 +652,7 @@ begin
   Result := 'CleanDirectories';
 end;
 
-procedure TCleanExpert.Click(Sender: TObject);
+procedure TCleanExpert.Execute(Sender: TObject);
 var
   Dlg: TfmCleanDirectories;
 begin

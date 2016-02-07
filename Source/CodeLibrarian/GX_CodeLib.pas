@@ -257,7 +257,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -1345,7 +1345,7 @@ begin
   Result := 'CodeLibrarian';
 end;
 
-procedure TCodeLibExpert.Click(Sender: TObject);
+procedure TCodeLibExpert.Execute(Sender: TObject);
 resourcestring
   SSetConfigPath = 'You must set the configuration path in the GExperts Options dialog for the Code Librarian to work.';
 begin

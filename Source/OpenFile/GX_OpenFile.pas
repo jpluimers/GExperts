@@ -229,7 +229,7 @@ type
     function HasMenuItem: Boolean; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Configure; override;
@@ -324,7 +324,7 @@ begin
   end;
 end;
 
-procedure TOpenFileExpert.Click(Sender: TObject);
+procedure TOpenFileExpert.Execute(Sender: TObject);
 begin
   OpenExpert(otOpenMenu);
 end;

@@ -902,7 +902,7 @@ end;
 procedure TExpertSettings.WriteStrings(const List: TStrings;
   const ListName, Ident: string);
 begin
-
+  FGExpertsSettings.WriteStrings(List, ListName, Ident);
 end;
 
 initialization

@@ -131,7 +131,7 @@ type
     constructor Create; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
     procedure Configure; override;
@@ -457,7 +457,7 @@ begin
   Result := SMenuCaption;
 end;
 
-procedure TProcedureExpert.Click(Sender: TObject);
+procedure TProcedureExpert.Execute(Sender: TObject);
 var
   FileName: string;
   TempFileName: string;

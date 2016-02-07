@@ -94,7 +94,7 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Configure; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure UpdateAction(Action: TCustomAction); override;
   end;
 
@@ -373,7 +373,7 @@ begin
   SourceExportExpert := Self;
 end;
 
-procedure TSourceExportExpert.Click(Sender: TObject);
+procedure TSourceExportExpert.Execute(Sender: TObject);
 var
   Dlg: TfmSourceExport;
 begin

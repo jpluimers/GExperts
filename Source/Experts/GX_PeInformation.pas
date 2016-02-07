@@ -120,7 +120,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -686,7 +686,7 @@ begin
   Result := 'PEInformation';
 end;
 
-procedure TPEExpert.Click(Sender: TObject);
+procedure TPEExpert.Execute(Sender: TObject);
 begin
   if fmPeInformation = nil then
     fmPeInformation := TfmPeInformation.Create(nil);

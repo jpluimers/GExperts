@@ -18,7 +18,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
   end;
 
@@ -47,7 +47,7 @@ end;
 
 { TCodeProofreaderExpert }
 
-procedure TCodeProofreaderExpert.Click(Sender: TObject);
+procedure TCodeProofreaderExpert.Execute(Sender: TObject);
 begin
   Configure;
 end;

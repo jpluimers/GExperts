@@ -171,7 +171,7 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     function BitmapFileName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function HasConfigOptions: Boolean; override;
     property StorageFile: string read GetStorageFile;
@@ -928,7 +928,7 @@ begin
   Result := 'MacroLibrary';
 end;
 
-procedure TMacroLibExpert.Click(Sender: TObject);
+procedure TMacroLibExpert.Execute(Sender: TObject);
 begin
   // If the form does not exist, create it
   if fmMacroLibrary = nil then

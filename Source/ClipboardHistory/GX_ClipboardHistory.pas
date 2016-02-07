@@ -152,7 +152,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     property MaxClip: Integer read FMaxClip write FMaxClip;
     property StorageFile: string read GetStorageFile;
@@ -902,7 +902,7 @@ begin
   Result := 'ClipboardHistory';
 end;
 
-procedure TClipExpert.Click(Sender: TObject);
+procedure TClipExpert.Execute(Sender: TObject);
 begin
   // If the form doesn't exist, create it.
   if fmClipboardHistory = nil then

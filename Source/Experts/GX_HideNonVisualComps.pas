@@ -19,14 +19,14 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     class function ConfigurationKey: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     function HasDesignerMenuItem: Boolean; override;
   end;
 
 { THideNonVisualComps }
 
-procedure THideNonVisualComps.Click(Sender: TObject);
+procedure THideNonVisualComps.Execute(Sender: TObject);
 var
   DesignForm: TCustomForm;
 begin

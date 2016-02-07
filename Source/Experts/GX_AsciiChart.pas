@@ -133,7 +133,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -533,7 +533,7 @@ end;
 
 { TASCIIExpert }
 
-procedure TASCIIExpert.Click(Sender: TObject);
+procedure TASCIIExpert.Execute(Sender: TObject);
 begin
   if fmAsciiChart = nil then
   begin

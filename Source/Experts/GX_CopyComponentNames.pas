@@ -12,7 +12,7 @@ type
     constructor Create; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     function HasDesignerMenuItem: Boolean; override;
   end;
@@ -29,7 +29,7 @@ begin
   Action.Enabled := GxOtaFormEditorHasSelectedComponent;
 end;
 
-procedure TCopyComponentNamesExpert.Click(Sender: TObject);
+procedure TCopyComponentNamesExpert.Execute(Sender: TObject);
 var
   CurrentModule: IOTAModule;
   FormEditor: IOTAFormEditor;

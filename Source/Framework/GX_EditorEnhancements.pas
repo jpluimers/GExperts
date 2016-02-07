@@ -10,8 +10,6 @@ uses
 
 type
   TConfigurationSheet = (cfgEditor, cfgToolBar, cfgEditorExperts);
-  // gsmInvalid exists only so the first entry does not have the Ord value 0
-  TGExpertsShortcutModifier = (gsmInvalid, gsmCtrl, gsmShiftCtrl, gsmShiftAlt, gsmCtrlAlt);
 
   { TEditorEnhancements needs to descend from TComponent as we install
     a Notification hook that informs the object of disappearing editor
@@ -31,8 +29,6 @@ type
     FEnabled: Boolean;
     FMiddleButtonClose: Boolean;
     FHideNavbar: Boolean;
-    FGExpertsShortcut: AnsiChar;
-    FGExpertsShortcutModifier: TGExpertsShortcutModifier;
     procedure AddToolBar;
     procedure RemoveToolBar;
     procedure EditorFormListener(EventCode: TEditFormEventCode; EditFormProxy: IGxEditFormProxy);
@@ -47,13 +43,10 @@ type
     procedure Install;
     procedure Remove;
     procedure SetHideNavbar(const _Value: Boolean);
-    procedure SetGExpertsShortcutModifier(const Value: TGExpertsShortcutModifier);
   protected
     procedure Notification(Component: TComponent; Operation: TOperation); override;
     function ConfigurationKey: string;
   public
-    class function GExpertsShortcutModifierToString(Value: TGExpertsShortcutModifier): string;
-    function GExpertsShortcutModifierSet: TShiftState;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SaveSettings;
@@ -76,9 +69,6 @@ type
     property ButtonsFlat: Boolean read FButtonsFlat write FButtonsFlat;
 
     property HideNavbar: Boolean read FHideNavbar write SetHideNavbar;
-
-    property GExpertsShortcutModifier: TGExpertsShortcutModifier read FGExpertsShortcutModifier write SetGExpertsShortcutModifier;
-    property GExpertsShortcut: AnsiChar read FGExpertsShortcut write FGExpertsShortcut;
   end;
 
 function EditorEnhancements: TEditorEnhancements;
@@ -220,9 +210,6 @@ begin
   FToolBarVisible := True;
   FToolBarAlign := alTop;
 
-  FGExpertsShortcutModifier := gsmCtrl;
-  FGExpertsShortcut := 'H';
-
   FToolBarActionsList := TStringList.Create;
   InitializeGXToolBarDropdowns;
 
@@ -254,35 +241,6 @@ end;
 function TEditorEnhancements.GetToolBarActionsList: TStrings;
 begin
   Result := FToolBarActionsList;
-end;
-
-function TEditorEnhancements.GExpertsShortcutModifierSet: TShiftState;
-begin
-  case GExpertsShortcutModifier of
-    gsmShiftCtrl: Result := [ssShift, ssCtrl];
-    gsmShiftAlt: Result := [ssShift, ssAlt];
-    gsmCtrlAlt: Result := [ssCtrl, ssAlt];
-  else // gsmCtrl, gsmInvalid
-    Result := [ssCtrl];
-  end;
-end;
-
-class function TEditorEnhancements.GExpertsShortcutModifierToString(Value: TGExpertsShortcutModifier): string;
-resourcestring
-  ShortCutModifierInvalid = '<invalid>';
-  ShortCutModifierCtrl = 'Ctrl';
-  ShortCutModifierShiftCtrl = 'Shift+Ctrl';
-  ShortCutModifierShiftAlt = 'Shift+Alt';
-  ShortCutModifierCtrlAlt = 'Ctrl+Alt';
-begin
-  case Value of
-    gsmCtrl: Result := ShortCutModifierCtrl;
-    gsmShiftCtrl: Result := ShortCutModifierShiftCtrl;
-    gsmShiftAlt: Result := ShortCutModifierShiftAlt;
-    gsmCtrlAlt: Result := ShortCutModifierCtrlAlt;
-  else // gsmInvalid:
-    Result := ShortCutModifierInvalid;
-  end;
 end;
 
 procedure TEditorEnhancements.Install;
@@ -317,9 +275,6 @@ begin
     HideNavbar := ExpSettings.ReadBool('HideNavbar', HideNavbar);
     FToolBarAlign := TAlign(ExpSettings.ReadInteger('ToolBarAlign', Ord(ToolBarAlign)));
     Assert(FToolBarAlign in [Low(TAlign)..High(TAlign)]);
-
-    GExpertsShortcutModifier := TGExpertsShortcutModifier(ExpSettings.ReadInteger('GExpertsShortcutModifier', Ord(GExpertsShortcutModifier)));
-    GExpertsShortcut := ExpSettings.ReadAnsiChar('GExpertsShortcut', GExpertsShortcut);
   finally
     FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
@@ -430,8 +385,6 @@ begin
     ExpSettings.WriteBool('ToolBarVisible', ToolBarVisible);
     ExpSettings.WriteBool('HideNavbar', HideNavbar);
     ExpSettings.WriteInteger('ToolBarAlign', Ord(ToolBarAlign));
-    ExpSettings.WriteInteger('GExpertsShortcutModifier', Ord(GExpertsShortcutModifier));
-    ExpSettings.WriteAnsiChar('GExpertsShortcut', GExpertsShortcut);
   finally
     FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
@@ -462,13 +415,6 @@ begin
     Install
   else
     Remove;
-end;
-
-procedure TEditorEnhancements.SetGExpertsShortcutModifier(const Value: TGExpertsShortcutModifier);
-begin
-  FGExpertsShortcutModifier := Value;
-  if FGExpertsShortcutModifier = gsmInvalid then
-    FGExpertsShortcutModifier := gsmCtrl;
 end;
 
 procedure TEditorEnhancements.SetHideNavbar(const _Value: Boolean);

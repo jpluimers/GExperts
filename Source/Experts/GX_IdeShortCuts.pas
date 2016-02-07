@@ -64,7 +64,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -405,7 +405,7 @@ end;
 
 { TShortCutExpert }
 
-procedure TShortCutExpert.Click(Sender: TObject);
+procedure TShortCutExpert.Execute(Sender: TObject);
 var
   Dlg: TfmIdeShortCuts;
 begin

@@ -44,34 +44,34 @@ type
 
   TCommentExpert = class(TSelectionEditorExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     function ProcessSelected(Lines: TStrings): Boolean; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure Configure; override;
     procedure GetHelpString(List: TStrings); override;
   end;
 
   TUnCommentExpert = class(TSelectionEditorExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     function ProcessSelected(Lines: TStrings): Boolean; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
   end;
 
   TSortExpert = class(TSelectionEditorExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     function ProcessSelected(Lines: TStrings): Boolean; override;
   public
+    class function GetName: string; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
   end;

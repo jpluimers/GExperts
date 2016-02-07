@@ -132,7 +132,7 @@ type
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Configure; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function IsDefaultActive: Boolean; override;
   end;
 
@@ -1044,7 +1044,7 @@ begin
   FScanEntireUnit := Settings.ReadBool(ConfigurationKey, 'ScanEntireUnit', False);
 end;
 
-procedure TDependExpert.Click(Sender: TObject);
+procedure TDependExpert.Execute(Sender: TObject);
 begin
   if fmProjDepend = nil then
   begin

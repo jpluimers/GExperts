@@ -19,7 +19,7 @@ type
     function HasConfigOptions: Boolean; override;
     function HasSubmenuItems: Boolean; override;
     procedure CreateSubMenuItems(MenuItem: TMenuItem); override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
   end;
 
 implementation
@@ -52,7 +52,7 @@ end;
 
 { TGxMenusForEditorExperts }
 
-procedure TGxMenusForEditorExperts.Click(Sender: TObject);
+procedure TGxMenusForEditorExperts.Execute(Sender: TObject);
 var
   MousePosition: TPoint;
   APopupMenu: TPopupMenu;

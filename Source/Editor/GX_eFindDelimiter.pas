@@ -24,11 +24,10 @@ type
   end;
 
   TLocateDelimiter = class(TBaseDelimiterExpert)
-  protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure DoDelimiterAction(Editor: IOTASourceEditor;
                                 Offset: Integer;
                                 SChar, EChar: TOTACharPos); override;
@@ -37,11 +36,10 @@ type
 
 type
   TMoveToDelimiter = class(TBaseDelimiterExpert)
-  protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure DoDelimiterAction(Editor: IOTASourceEditor;
                                 Offset: Integer;
                                 SChar, EChar: TOTACharPos); override;

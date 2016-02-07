@@ -109,7 +109,7 @@ type
     class function GetName: string; override;
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
   end;
 
 var
@@ -158,7 +158,7 @@ begin
   end;
 end;
 
-procedure TGxBookmarksExpert.Click(Sender: TObject);
+procedure TGxBookmarksExpert.Execute(Sender: TObject);
 begin
   if fmBookmarks = nil then begin
     fmBookmarks := TfmGxBookmarksForm.Create(nil);

@@ -24,7 +24,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
@@ -43,7 +43,7 @@ uses
 
   { TCodeFormatterExpert }
 
-procedure TGxCodeFormatterExpert.Click(Sender: TObject);
+procedure TGxCodeFormatterExpert.Execute(Sender: TObject);
 begin
   FExpert.Execute;
 end;

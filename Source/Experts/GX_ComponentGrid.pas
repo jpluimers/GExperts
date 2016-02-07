@@ -60,7 +60,7 @@ type
     constructor Create; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -180,7 +180,7 @@ begin
   Action.Enabled := GxOtaCurrentlyEditingForm;;
 end;
 
-procedure TGridExpert.Click(Sender: TObject);
+procedure TGridExpert.Execute(Sender: TObject);
 var
   Dlg: TfmComponentGrid;
 begin

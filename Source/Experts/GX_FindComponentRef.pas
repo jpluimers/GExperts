@@ -32,11 +32,10 @@ resourcestring
 type
   TFindCompRefWizard = class(TGX_Expert)
   private
-    FTwoKeyShortcut: IGxTwoKeyShortCut;
     procedure FindSelectedComponentInSource(Module: IOTAModule; FrmEditor: IOTAFormEditor);
     procedure FindSelectedComponentOnForm(Module: IOTAModule; SrcEditor: IOTASourceEditor);
   public
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     class function GetName: string; override;
     function GetDisplayName: string; override;
     function GetActionCaption: string; override;
@@ -50,7 +49,7 @@ begin
   Result := 'FindComponentReference';
 end;
 
-procedure TFindCompRefWizard.Click(Sender: TObject);
+procedure TFindCompRefWizard.Execute(Sender: TObject);
 var
   Module: IOTAModule;
   CurEditor: IOTAEditor;
@@ -145,7 +144,6 @@ constructor TFindCompRefWizard.Create;
 begin
   inherited;
   ShortCut := scCtrl + scShift + Ord('F');
-  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Click, 'C', 'Find component');
 end;
 
 function TFindCompRefWizard.GetActionCaption: string;

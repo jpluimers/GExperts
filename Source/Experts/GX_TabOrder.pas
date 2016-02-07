@@ -70,7 +70,7 @@ type
   public
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
     function HasDesignerMenuItem: Boolean; override;
   end;
@@ -182,7 +182,7 @@ begin
   Action.Enabled := GxOtaCurrentlyEditingForm;
 end;
 
-procedure TTabExpert.Click(Sender: TObject);
+procedure TTabExpert.Execute(Sender: TObject);
 begin
   ShowTabOrderForm;
 end;

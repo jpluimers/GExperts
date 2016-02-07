@@ -5,10 +5,11 @@ unit GX_Experts;
 interface
 
 uses
-  Classes, Graphics, Forms, ActnList, GX_Actions, GX_ConfigurationInfo, Menus;
+  Classes, Graphics, Forms, ActnList, Menus,
+  GX_Actions, GX_ConfigurationInfo, GX_BaseExpert;
 
 type
-  TGX_Expert = class(TObject)
+  TGX_Expert = class(TGX_BaseExpert)
   private
     FBitmap: TBitmap;
     FActive: Boolean;
@@ -38,8 +39,6 @@ type
     function GetActionCaption: string; virtual; abstract;
     // Determine if the expert action is enabled
     function GetActionEnabled: Boolean; virtual;
-    // Internal name of expert for expert identification.
-    class function GetName: string; virtual; {$IFNDEF GX_BCB} abstract; {$ENDIF}
     // Subkey used to store configuration details in the registry
     class function ConfigurationKey: string; virtual;
     // Name of action to be created for expert; by default,
@@ -48,7 +47,7 @@ type
     // Name to be displayed for the expert in the GExperts
     // *configuration* dialog; this is a different entry than
     // the action caption (GetActionCaption)
-    function GetDisplayName: string; virtual;
+    function GetDisplayName: string; override;
     // Various expert configuration items which
     // are only used during registration.
     function HasConfigOptions: Boolean; virtual; // Default = True
@@ -57,8 +56,7 @@ type
     procedure DoCreateSubMenuItems(MenuItem: TMenuItem);
     procedure CreateSubMenuItems(MenuItem: TMenuItem); virtual;
     function IsDefaultActive: Boolean; virtual; // Default = True
-    // "Executes" the expert
-    procedure Click(Sender: TObject); virtual; abstract;
+//    procedure Execute(Sender: TObject); virtual; // declared in TGX_BaseExpert
     // Do any delayed setup after the IDE is done initializing
     procedure AfterIDEInitialized; virtual;
     // Various methods that will be called

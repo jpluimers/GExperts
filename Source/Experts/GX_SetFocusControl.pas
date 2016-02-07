@@ -18,7 +18,7 @@ type
     function GetActionCaption: string; override;
     function HasConfigOptions: Boolean; override;
     function HasDesignerMenuItem: Boolean; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
   end;
 
   TLabelHack = class(TCustomLabel);
@@ -58,7 +58,7 @@ begin
   Action.Enabled := GxOtaCurrentlyEditingForm;
 end;
 
-procedure TGxSetFocusControlExpert.Click(Sender: TObject);
+procedure TGxSetFocusControlExpert.Execute(Sender: TObject);
 var
   Form: IOTAFormEditor;
   FirstControlSelected: Boolean;

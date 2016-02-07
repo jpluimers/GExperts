@@ -35,21 +35,21 @@ type
     function FindIdentAction(const Source: string; Pos: Integer;
       var FoundPos: Integer; var Ident: string): Boolean;
     procedure InternalExecute; override;
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
   end;
 
   TNextIdentExpert = class(TPrevIdentExpert)
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
   end;
 

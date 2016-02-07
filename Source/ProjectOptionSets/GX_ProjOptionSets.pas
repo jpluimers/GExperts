@@ -25,7 +25,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     property StorageFile: string read GetStorageFile;
     function HasConfigOptions: Boolean; override;
   end;
@@ -420,7 +420,7 @@ end;
 
 { TProjOptionSetsExpert }
 
-procedure TProjOptionSetsExpert.Click(Sender: TObject);
+procedure TProjOptionSetsExpert.Execute(Sender: TObject);
 begin
   if fmProjOptionSets = nil then
     fmProjOptionSets := TfmProjOptionSets.Create(nil);

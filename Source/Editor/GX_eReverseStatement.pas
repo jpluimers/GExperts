@@ -14,10 +14,10 @@ type
     function ReverseForLoop(var S: string): Boolean;
   protected
     function ProcessSelected(Lines: TStrings): Boolean; override;
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
   public
+    class function GetName: string; override;
     constructor Create; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
   end;

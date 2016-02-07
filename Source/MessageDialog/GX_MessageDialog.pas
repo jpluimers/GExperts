@@ -256,7 +256,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
   end;
 
@@ -874,7 +874,7 @@ begin
   Result := 'MessageDialog';
 end;
 
-procedure TMsgExpExpert.Click(Sender: TObject);
+procedure TMsgExpExpert.Execute(Sender: TObject);
 resourcestring
   SWrongFileType = 'This expert is for use in pas, dpr, inc, and cpp files only.';
 var

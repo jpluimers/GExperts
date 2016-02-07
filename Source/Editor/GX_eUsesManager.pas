@@ -16,16 +16,15 @@ type
     FFavoriteUnits: TStringList;
     FSingleActionMode: Boolean;
     FAvailTabIndex: Integer;
-    FTwoKeyShortcut: IGxTwoKeyShortCut;
     procedure InternalExecute;
   protected
-    function GetDisplayName: string; override;
-    class function GetName: string; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   public
+    class function GetName: string; override;
     constructor Create; override;
     destructor Destroy; override;
+    function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
     procedure Execute(Sender: TObject); override;
@@ -190,8 +189,6 @@ constructor TUsesExpert.Create;
 begin
   inherited;
   ShortCut := scShift + scAlt + Ord('U');
-
-  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Execute, 'U', GetDisplayName);
 
   FFavoriteUnits := TStringList.Create;
   LoadSettings;

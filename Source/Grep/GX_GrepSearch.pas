@@ -61,13 +61,11 @@ type
   end;
 
   TGrepDlgExpert = class(TGX_Expert)
-  private
-    FTwoKeyShortcut: IGxTwoKeyShortCut;
   public
     constructor Create; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
   end;
 
@@ -140,7 +138,6 @@ begin
   inherited Create;
 
   ShortCut := Menus.ShortCut(Word('S'), [ssAlt, ssShift]);
-  FTwoKeyShortcut := GxKeyboardShortCutBroker.RequestTwoKeyShortCut(Click, 'G', StripHotkey(GetActionCaption));
 end;
 
 function TGrepDlgExpert.GetActionCaption: string;
@@ -155,7 +152,7 @@ begin
   Result := 'GrepSearch'; // Do not localize.
 end;
 
-procedure TGrepDlgExpert.Click(Sender: TObject);
+procedure TGrepDlgExpert.Execute(Sender: TObject);
 begin
   if Assigned(fmGrepResults) then
     fmGrepResults.Execute(gssNormal)

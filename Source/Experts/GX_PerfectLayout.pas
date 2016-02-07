@@ -60,7 +60,7 @@ type
     constructor Create; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function IsDefaultActive: Boolean; override;
     property LayoutType: TLayoutType read FLayoutType write FLayoutType;
@@ -160,7 +160,7 @@ begin
   Result := 'PerfectLayout';  // Do not localize.
 end;
 
-procedure TLayoutExpert.Click(Sender: TObject);
+procedure TLayoutExpert.Execute(Sender: TObject);
 
   procedure LoadCustomLayout;
 

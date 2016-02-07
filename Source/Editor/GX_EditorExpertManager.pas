@@ -18,7 +18,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-
+    function FindExpert(const ExpertName: string; out Idx: integer): boolean;
     property EditorExpertList[const Index: Integer]: TEditorExpert read GetEditorExpert;
     property EditorExpertCount: Integer read GetEditorExpertCount;
   end;
@@ -74,6 +74,22 @@ begin
     EditorExpert.LoadSettings;
     FEditorExpertList.Add(EditorExpert);
   end;
+end;
+
+function TGxEditorExpertManager.FindExpert(const ExpertName: string; out Idx: integer): boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to EditorExpertCount - 1 do
+  begin
+    if SameText(EditorExpertList[i].GetName, ExpertName) then
+    begin
+      Idx := i;
+      Result := True;
+      Exit;
+    end;
+  end;
+  Result := False;
 end;
 
 procedure TGxEditorExpertManager.FreeEditorExperts;

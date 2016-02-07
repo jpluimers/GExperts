@@ -102,7 +102,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
@@ -318,7 +318,7 @@ begin
   end;
 end;
 
-procedure TCompRenameExpert.Click(Sender: TObject);
+procedure TCompRenameExpert.Execute(Sender: TObject);
 var
   CurrentModule: IOTAModule;
   SelCount: Integer;

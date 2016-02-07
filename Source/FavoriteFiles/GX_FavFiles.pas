@@ -224,7 +224,7 @@ type
   public
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -1555,7 +1555,7 @@ begin
   Result := 'FavoriteFiles'; // Do not localize.
 end;
 
-procedure TFilesExpert.Click(Sender: TObject);
+procedure TFilesExpert.Execute(Sender: TObject);
 begin
   if FFavoriteFiles = nil then
   begin

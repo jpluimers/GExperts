@@ -29,6 +29,9 @@ type
 
     procedure LoadEditorExperts;
     procedure FreeEditorExperts;
+
+    function FindExpert(const ExpertName: string; out Idx: Integer): boolean;
+
     property EditorExpertManager: TGxEditorExpertManager read FEditorExpertsManager;
     property ExpertList[const Index: Integer]: TGX_Expert read GetExpert;
     property ExpertCount: Integer read GetExpertCount;
@@ -230,6 +233,22 @@ end;
 procedure TGExperts.Execute;
 begin
   // Do nothing. We install menu and other items to trigger actions.
+end;
+
+function TGExperts.FindExpert(const ExpertName: string; out Idx: Integer): boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to ExpertCount - 1 do
+  begin
+    if SameText(ExpertList[i].GetName, ExpertName) then
+    begin
+      Idx := i;
+      Result := True;
+      Exit;
+    end;
+  end;
+  Result := False;
 end;
 
 procedure TGExperts.FreeEditorExperts;

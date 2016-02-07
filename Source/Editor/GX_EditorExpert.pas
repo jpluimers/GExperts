@@ -3,10 +3,11 @@ unit GX_EditorExpert;
 interface
 
 uses
-  Classes, Graphics, GX_Actions, GX_ConfigurationInfo;
+  Classes, Graphics,
+  GX_Actions, GX_ConfigurationInfo, GX_BaseExpert;
 
 type
-  TEditorExpert = class(TObject)
+  TEditorExpert = class(TGX_BaseExpert)
   private
     FBitmap: Graphics.TBitmap;
     FGxAction: IGxAction;
@@ -18,12 +19,8 @@ type
     // Return a string that will be used to present
     // the editor expert to the user, for instance
     // in configuration or selection dialogs.
-    function GetDisplayName: string; virtual;
-    // Return a string that names the editor expert.
-    // This string will be used to construct an action
-    // name and therefore must be a valid identifier
-    // name.
-    class function GetName: string; virtual;
+//    function GetDisplayName: string; virtual; // declared in TGX_BaseExpert
+    // defaults to GetName
     class function ConfigurationKey: string; virtual;
     // Return the file name of an icon associated with
     // the editor expert. Do not specify a path.
@@ -47,10 +44,16 @@ type
 
     procedure Configure; virtual;
     procedure DoExecute(Sender: TObject);
-    procedure Execute(Sender: TObject); virtual; abstract;
+//    procedure Execute(Sender: TObject); virtual;  // declared in TGX_BaseExpert
     procedure GetHelpString(List: TStrings); virtual;
     function HasConfigOptions: Boolean; virtual;
     function GetActionName: string;
+
+    // Return a string that names the editor expert.
+    // This string will be used to construct an action
+    // name and therefore must be a valid identifier
+    // name.
+//    class function GetName: string; virtual; // declared in TGX_BaseExpert
 
     // Override the InternalXXX versions in descendents to get a Settings object
     procedure LoadSettings;
@@ -150,16 +153,6 @@ begin
   inherited Destroy;
 end;
 
-function TEditorExpert.GetDisplayName: string;
-begin
-  {$IFOPT D+}
-    // Do not localize.
-    MessageDlg('The editor expert ' + Self.ClassName + ' does not supply a human-readable name',
-               mtWarning, [mbOK], 0);
-  {$ENDIF D+}
-  Result := Self.ClassName;
-end;
-
 procedure TEditorExpert.GetHelpString(List: TStrings);
 resourcestring
   SNoHelpAvailable = 'No help available.';
@@ -222,12 +215,6 @@ procedure TEditorExpert.SetShortCut(const Value: TShortCut);
 begin
   Assert(Assigned(FGxAction));
   FGxAction.ShortCut := Value;
-end;
-
-class function TEditorExpert.GetName: string;
-begin
-  {$IFOPT D+} SendDebugError('The editor expert ' + Self.ClassName + ' does not provide a Name'); {$ENDIF D+}
-  Result := Self.ClassName;
 end;
 
 class function TEditorExpert.ConfigurationKey: string;

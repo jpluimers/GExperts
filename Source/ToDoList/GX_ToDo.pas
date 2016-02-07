@@ -157,7 +157,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
     procedure Configure; override;
   end;
 
@@ -1191,7 +1191,7 @@ end;
 
 { TToDoExpert }
 
-procedure TToDoExpert.Click(Sender: TObject);
+procedure TToDoExpert.Execute(Sender: TObject);
 begin
   if fmToDo = nil then
   begin
