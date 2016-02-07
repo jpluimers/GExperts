@@ -48,16 +48,16 @@ type
     procedure Configure; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
-    procedure Click(Sender: TObject); override;
+    procedure Execute(Sender: TObject); override;
   end;
 
 { TGxSampleExpert }
 
 //*********************************************************
-//    Name: TGxSampleExpert.Click
+//    Name: TGxSampleExpert.Execute
 // Purpose: The action taken when the menu item is clicked
 //*********************************************************
-procedure TGxSampleExpert.Click(Sender: TObject);
+procedure TGxSampleExpert.Execute(Sender: TObject);
 begin
   with TfmGxSampleExpertForm.Create(nil) do
   try
