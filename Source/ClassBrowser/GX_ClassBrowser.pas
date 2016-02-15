@@ -194,6 +194,7 @@ type
     procedure ViewBrowserDetails;
     procedure SetInfoViewMode(const Value: TInfoViewMode);
     procedure FindFromNode(const Text: string; Node: TTreeNode);
+    procedure FiltersToActions;
   private
     FMethodText: TGxEnhancedEditor;
     FCodeText: TGxEnhancedEditor;
@@ -201,6 +202,7 @@ type
     procedure SetupEditorControls;
     function Images: TImageList;
     function ConfigurationKey: string;
+    procedure UpdateListFilter;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -372,11 +374,8 @@ begin
     begin
       AClassItem := ClassList.Items[i];
       Node := tvBrowse.Items.AddObject(nil, AClassItem.Name, AClassItem);
-      with Node do
-      begin
-        ImageIndex := ImageIndexClosedFolder;
-        SelectedIndex := ImageIndexOpenFolder;
-      end;
+      Node.ImageIndex := ImageIndexClosedFolder;
+      Node.SelectedIndex := ImageIndexOpenFolder;
       LoadObjects(AClassItem, Node);
     end;
   finally
@@ -558,16 +557,16 @@ begin
 end;
 
 procedure TfmClassBrowser.LoadList(OInfo: TBrowseClassInfoCollection);
-var
-  AMethod: TBrowseMethodInfoItem;
-  i: Integer;
-  ListItem: TListItem;
 
   procedure SetSubItemImage(const ListItem: TListItem; SubItem, Value: Integer);
   begin
     ListItem.SubItemImages[SubItem] := Value;
   end;
 
+var
+  AMethod: TBrowseMethodInfoItem;
+  i: Integer;
+  ListItem: TListItem;
 begin
   lvInfo.Items.BeginUpdate;
   try
@@ -1005,30 +1004,34 @@ end;
 procedure TfmClassBrowser.SaveSettings;
 var
   Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
   i: Integer;
 begin
   // Do not localize any of the following lines.
+  ExpSettings := nil;
   Settings := TGExpertsSettings.Create(ExpertClassKey);
   try
-    Settings.SaveForm(Self, ConfigurationKey + '\Window');
-    Settings.WriteInteger(ConfigurationKey + '\Window', 'Split', tvBrowse.Width);
-    Settings.WriteInteger(ConfigurationKey, 'ViewMode', Ord(FInfoViewMode));
-    Settings.WriteBool(ConfigurationKey, 'PrimitiveTop', FPrimitiveTop);
-    Settings.WriteBool(ConfigurationKey, 'StayInPackage', FStayInPackage);
-    Settings.WriteBool(ConfigurationKey, 'ParseRecursing', FParseRecursing);
-    Settings.WriteBool(ConfigurationKey, 'AutomaticallyHideBrowser', FAutomaticallyHideBrowser);
-    Settings.WriteBool(ConfigurationKey, 'UnitNames', FViewUnitNames);
-    Settings.WriteInteger(ConfigurationKey, 'ClassHierarchyFontSize', FClassHierarchyFontSize);
-    Settings.WriteInteger(ConfigurationKey, 'ClassHierarchyBoxWidth', FClassHierarchyBoxWidth);
-    Settings.WriteInteger(ConfigurationKey, 'ClassHierarchyBoxSpace', FClassHierarchyBoxSpace);
-    Settings.WriteString(ConfigurationKey, 'ClassHierarchyFont', 'Arial');
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    Settings.SaveForm(Self, AddSlash(ConfigurationKey) + 'Window');
+    Settings.WriteInteger(AddSlash(ConfigurationKey) + 'Window', 'Split', tvBrowse.Width);
+    ExpSettings.WriteInteger('ViewMode', Ord(FInfoViewMode));
+    ExpSettings.WriteBool('PrimitiveTop', FPrimitiveTop);
+    ExpSettings.WriteBool('StayInPackage', FStayInPackage);
+    ExpSettings.WriteBool('ParseRecursing', FParseRecursing);
+    ExpSettings.WriteBool('AutomaticallyHideBrowser', FAutomaticallyHideBrowser);
+    ExpSettings.WriteBool('UnitNames', FViewUnitNames);
+    ExpSettings.WriteInteger('ClassHierarchyFontSize', FClassHierarchyFontSize);
+    ExpSettings.WriteInteger('ClassHierarchyBoxWidth', FClassHierarchyBoxWidth);
+    ExpSettings.WriteInteger('ClassHierarchyBoxSpace', FClassHierarchyBoxSpace);
+    ExpSettings.WriteString('ClassHierarchyFont', 'Arial');
     for i := Low(FFilters) to High(FFilters) do
-      Settings.WriteBool(ConfigurationKey, Format('Filter%d', [i]), FFilters[i]);
+      ExpSettings.WriteBool(Format('Filter%d', [i]), FFilters[i]);
 
-    RegSaveFont(Settings, AddSlash(ConfigurationKey) + 'TreeFont', tvBrowse.Font);
-    RegSaveFont(Settings, AddSlash(ConfigurationKey) + 'ListFont', lvInfo.Font);
-    RegSaveFont(Settings, AddSlash(ConfigurationKey) + 'EditorFont', FCodeText.Font);
+    ExpSettings.SaveFont('TreeFont', tvBrowse.Font);
+    ExpSettings.SaveFont('ListFont', lvInfo.Font);
+    ExpSettings.SaveFont('EditorFont', FCodeText.Font);
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
   end;
 end;
@@ -1036,42 +1039,62 @@ end;
 procedure TfmClassBrowser.LoadSettings;
 var
   Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
   i: Integer;
 begin
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
 
   // Do not localize any of the following lines.
+  ExpSettings := nil;
   Settings := TGExpertsSettings.Create(ExpertClassKey);
   try
-    Settings.LoadForm(Self, ConfigurationKey + '\Window');
-    tvBrowse.Width := Settings.ReadInteger(ConfigurationKey + '\Window', 'Split', tvBrowse.Width);
-    if tvBrowse.Width = 0 then tvBrowse.Width := 100;
-    FInfoViewMode := TInfoViewMode(Settings.ReadInteger(ConfigurationKey, 'ViewMode', Ord(FInfoViewMode)));
-    FViewUnitNames := Settings.ReadBool(ConfigurationKey, 'UnitNames', False);
-    FClassHierarchyFontSize := Settings.ReadInteger(ConfigurationKey, 'ClassHierarchyFontSize', 8);
-    FClassHierarchyBoxWidth := Settings.ReadInteger(ConfigurationKey, 'ClassHierarchyBoxWidth', 25);
-    FClassHierarchyBoxSpace := Settings.ReadInteger(ConfigurationKey, 'ClassHierarchyBoxSpace', 10);
-    FClassHierarchyFont := Settings.ReadString(ConfigurationKey, 'ClassHierarchyFont', 'Arial');
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    Settings.LoadForm(Self, AddSlash(ConfigurationKey) + 'Window');
+    tvBrowse.Width := Settings.ReadInteger(AddSlash(ConfigurationKey) + 'Window', 'Split', tvBrowse.Width);
+    if tvBrowse.Width = 0 then
+      tvBrowse.Width := 100;
+    FInfoViewMode := TInfoViewMode(ExpSettings.ReadInteger('ViewMode', Ord(FInfoViewMode)));
+    FViewUnitNames := ExpSettings.ReadBool('UnitNames', False);
+    FClassHierarchyFontSize := ExpSettings.ReadInteger('ClassHierarchyFontSize', 8);
+    FClassHierarchyBoxWidth := ExpSettings.ReadInteger('ClassHierarchyBoxWidth', 25);
+    FClassHierarchyBoxSpace := ExpSettings.ReadInteger('ClassHierarchyBoxSpace', 10);
+    FClassHierarchyFont := ExpSettings.ReadString('ClassHierarchyFont', 'Arial');
     if IsStandAlone then
       ClassList.StoragePath := AddSlash(ExtractFilePath(Application.ExeName))
     else begin
       ClassList.StoragePath := AddSlash(ConfigInfo.ConfigPath + ClassBrowserStorageFolder);
-      FPrimitiveTop := Settings.ReadBool(ConfigurationKey, 'PrimitiveTop', FPrimitiveTop);
-      FStayInPackage := Settings.ReadBool(ConfigurationKey, 'StayInPackage', FStayInPackage);
-      FParseRecursing := Settings.ReadBool(ConfigurationKey, 'ParseRecursing', FParseRecursing);
-      FAutomaticallyHideBrowser := Settings.ReadBool(ConfigurationKey, 'AutomaticallyHideBrowser', FAutomaticallyHideBrowser);
+      FPrimitiveTop := ExpSettings.ReadBool('PrimitiveTop', FPrimitiveTop);
+      FStayInPackage := ExpSettings.ReadBool('StayInPackage', FStayInPackage);
+      FParseRecursing := ExpSettings.ReadBool('ParseRecursing', FParseRecursing);
+      FAutomaticallyHideBrowser := ExpSettings.ReadBool('AutomaticallyHideBrowser', FAutomaticallyHideBrowser);
       for i := Low(FFilters) to High(FFilters) do
-        FFilters[i] := Settings.ReadBool('Class Browser', Format('Filter%d', [i]), True);
+        FFilters[i] := ExpSettings.ReadBool(Format('Filter%d', [i]), True);
 
-      RegLoadFont(Settings, AddSlash(ConfigurationKey) + 'TreeFont', tvBrowse.Font);
-      RegLoadFont(Settings, AddSlash(ConfigurationKey) + 'ListFont', lvInfo.Font);
-      RegLoadFont(Settings, AddSlash(ConfigurationKey) + 'EditorFont', FCodeText.Font);
+      ExpSettings.LoadFont('TreeFont', tvBrowse.Font);
+      ExpSettings.LoadFont('ListFont', lvInfo.Font);
+      ExpSettings.LoadFont('EditorFont', FCodeText.Font);
       FMethodText.Font.Assign(FCodeText.Font);
     end;
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
   end;
+  FiltersToActions;
+end;
+
+procedure TfmClassBrowser.FiltersToActions;
+begin
+  actViewConstants.Checked := FFilters[0];
+  actViewMethods.Checked := FFilters[1];
+  actViewTypes.Checked := FFilters[2];
+  actViewVariables.Checked := FFilters[3];
+  actViewProperties.Checked := FFilters[4];
+  actViewPrivate.Checked:= FFilters[5];
+  actViewProtected.Checked := FFilters[6];
+  actViewPublic.Checked := FFilters[7];
+  actViewPublished.Checked := FFilters[8];
+  UpdateListFilter;
 end;
 
 procedure TfmClassBrowser.PrintClassReportBuiltIn;
@@ -1637,13 +1660,19 @@ end;
 
 procedure TfmClassBrowser.actGenericViewNewFilterExecute(Sender: TObject);
 var
-  OInfo: TBrowseClassInfoCollection;
   SendingAction: TCustomAction;
 begin
   SendingAction := Sender as TCustomAction;
   Assert(Assigned(SendingAction));
   SendingAction.Checked := not SendingAction.Checked;
 
+  UpdateListFilter;
+end;
+
+procedure TfmClassBrowser.UpdateListFilter;
+var
+  OInfo: TBrowseClassInfoCollection;
+begin
   if (tvBrowse.Selected = nil) or (tvBrowse.Selected.Level = 0) then
     Exit;
   Self.Cursor := crHourglass;
@@ -1718,36 +1747,36 @@ procedure TfmClassBrowser.actOptionsOptionsExecute(Sender: TObject);
 var
   Dlg: TfmClassOptions;
   i: Integer;
+  Tag: Integer;
+  gbxFilters: TGroupBox;
 begin
   Dlg := TfmClassOptions.Create(nil);
   try
-    with Dlg do
-    begin
-      cbTreeView.ItemIndex := cbTreeView.Items.IndexOf(tvBrowse.Font.Name);
-      cbListView.ItemIndex := cbListView.Items.IndexOf(lvInfo.Font.Name);
-      cbEditor.ItemIndex := cbEditor.Items.IndexOf(FCodeText.Font.Name);
-      udTree.Position := tvBrowse.Font.Size;
-      udList.Position := lvInfo.Font.Size;
-      udEditor.Position := FCodeText.Font.Size;
-      cbTop.Checked := FPrimitiveTop;
-      cbStayInPackage.Checked := FStayInPackage;
-      cbParseRecursing.Checked := FParseRecursing;
-      cbAutoHide.Checked := FAutomaticallyHideBrowser;
-    end;
+    Dlg.cbTreeView.ItemIndex := Dlg.cbTreeView.Items.IndexOf(tvBrowse.Font.Name);
+    Dlg.cbListView.ItemIndex := Dlg.cbListView.Items.IndexOf(lvInfo.Font.Name);
+    Dlg.cbEditor.ItemIndex := Dlg.cbEditor.Items.IndexOf(FCodeText.Font.Name);
+    Dlg.udTree.Position := tvBrowse.Font.Size;
+    Dlg.udList.Position := lvInfo.Font.Size;
+    Dlg.udEditor.Position := FCodeText.Font.Size;
+    Dlg.cbTop.Checked := FPrimitiveTop;
+    Dlg.cbStayInPackage.Checked := FStayInPackage;
+    Dlg.cbParseRecursing.Checked := FParseRecursing;
+    Dlg.cbAutoHide.Checked := FAutomaticallyHideBrowser;
     { Set Filters }
-    for i := 0 to Dlg.tshFilters.ControlCount - 1 do
-      if Dlg.tshFilters.Controls[i] is TCheckBox then
+    gbxFilters := Dlg.gbxFilters;
+    for i := 0 to gbxFilters.ControlCount - 1 do
+      if gbxFilters.Controls[i] is TCheckBox then
       begin
-        Tag := TCheckBox(Dlg.tshFilters.Controls[i]).Tag;
-        TCheckBox(Dlg.tshFilters.Controls[i]).Checked := FFilters[Tag];
+        Tag := TCheckBox(gbxFilters.Controls[i]).Tag;
+        TCheckBox(gbxFilters.Controls[i]).Checked := FFilters[Tag];
       end;
     if Dlg.ShowModal = mrOk then
     begin
-      for i := 0 to Dlg.tshFilters.ControlCount - 1 do
-        if Dlg.tshFilters.Controls[i] is TCheckBox then
+      for i := 0 to gbxFilters.ControlCount - 1 do
+        if gbxFilters.Controls[i] is TCheckBox then
         begin
-          Tag := TCheckBox(Dlg.tshFilters.Controls[i]).Tag;
-          FFilters[Tag] := TCheckBox(Dlg.tshFilters.Controls[i]).Checked;
+          Tag := TCheckBox(gbxFilters.Controls[i]).Tag;
+          FFilters[Tag] := TCheckBox(gbxFilters.Controls[i]).Checked;
         end;
       tvBrowse.Font.Name := Dlg.cbTreeView.Text;
       lvInfo.Font.Name := Dlg.cbListView.Text;
@@ -1762,6 +1791,7 @@ begin
       FParseRecursing := Dlg.cbParseRecursing.Checked;
       FAutomaticallyHideBrowser := Dlg.cbAutoHide.Checked;
       SaveSettings;
+      FiltersToActions;
     end;
   finally
     FreeAndNil(Dlg);
