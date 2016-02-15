@@ -466,10 +466,11 @@ procedure TfmConfiguration.lvEditorExpertsChange(Sender: TObject;
   Item: TListItem; Change: TItemChange);
 var
   EditorExpert: TEditorExpert;
+  Idx: integer;
 begin
   {$IFOPT D+} SendDebug('TfmConfiguration.lvEditorExpertsChange'); {$ENDIF}
 
-  if lvEditorExperts.Selected = nil then
+  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
   begin
     btnConfigure.Enabled := False;
     btnShortCut.Enabled := False;
@@ -478,7 +479,7 @@ begin
   end;
 
   Assert(Assigned(GExpertsInst.EditorExpertManager));
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[lvEditorExperts.Selected.Index];
+  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
 
   meHelp.Lines.BeginUpdate;
   try
@@ -508,25 +509,28 @@ end;
 procedure TfmConfiguration.btnConfigureClick(Sender: TObject);
 var
   EditorExpert: TEditorExpert;
+  Idx: Integer;
 begin
-  if lvEditorExperts.Selected = nil then
+  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
     Exit;
 
   Assert(Assigned(GExpertsInst.EditorExpertManager));
 
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[lvEditorExperts.Selected.Index];
+  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
   EditorExpert.Configure;
   EditorExpert.SaveSettings;
 end;
 
 procedure TfmConfiguration.btnShortCutClick(Sender: TObject);
+var
+  Idx: Integer;
 begin
-  if lvEditorExperts.Selected = nil then
+  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
     Exit;
 
   Assert(Assigned(GExpertsInst.EditorExpertManager));
 
-  ConfigureEditorExpertShortCut(GExpertsInst.EditorExpertManager.EditorExpertList[lvEditorExperts.Selected.Index])
+  ConfigureEditorExpertShortCut(GExpertsInst.EditorExpertManager.EditorExpertList[Idx])
 end;
 
 procedure TfmConfiguration.chkEditorKeyTracingClick(Sender: TObject);
@@ -542,14 +546,14 @@ var
   GxEditorExpertManager: TGxEditorExpertManager;
 begin
   {$IFOPT D+} SendDebug('TfmConfiguration.LoadEditorExperts'); {$ENDIF}
-  lvEditorExperts.Items.Clear;
-  if not Assigned(GExpertsInst.EditorExpertManager) then
-    Exit;
-
-  GxEditorExpertManager := GExpertsInst.EditorExpertManager;
-
   lvEditorExperts.Items.BeginUpdate;
   try
+    lvEditorExperts.Items.Clear;
+    if not Assigned(GExpertsInst.EditorExpertManager) then
+      Exit;
+
+    GxEditorExpertManager := GExpertsInst.EditorExpertManager;
+
     for i := 0 to GxEditorExpertManager.EditorExpertCount - 1 do
     begin
       AnExpert := GxEditorExpertManager.EditorExpertList[i];
@@ -951,13 +955,14 @@ end;
 procedure TfmConfiguration.lvEditorExpertsDblClick(Sender: TObject);
 var
   EditorExpert: TEditorExpert;
+  Idx: Integer;
 begin
-  if lvEditorExperts.Selected = nil then
+  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
     Exit;
 
   Assert(Assigned(GExpertsInst.EditorExpertManager));
 
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[lvEditorExperts.Selected.Index];
+  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
   if EditorExpert.HasConfigOptions then begin
     EditorExpert.Configure;
     EditorExpert.SaveSettings;
