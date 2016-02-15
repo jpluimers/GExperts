@@ -12,9 +12,9 @@ uses
   Controls,
   Forms,
   Dialogs,
-  GX_BaseForm,
   ComCtrls,
   StdCtrls,
+  GX_BaseForm,
   GX_BaseExpert;
 
 type
@@ -47,6 +47,7 @@ type
     procedure RemoveExpert;
     procedure AddSelectedExpert;
     procedure AddSelectedEditorExpert;
+    procedure EnableOKCancel;
   public
     constructor Create(_Owner: TComponent); override;
   end;
@@ -56,18 +57,19 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_EditorExpert,
   Menus,
+  StrUtils,
+  GX_EditorExpert,
   GX_ConfigurationInfo,
   GX_dzVclUtils,
   GX_GExperts,
   GX_EditorExpertManager,
-  GX_Experts,
-  StrUtils;
+  GX_Experts;
 
 type
   TGxEditorPopupMenuExpert = class(TEditorExpert)
   private
+    FFormHeight: integer;
     FGExpertsShortcutMenu: TPopupMenu;
     FShortcuts: TStringList;
     procedure ShowConfigForm(_Sender: TObject);
@@ -94,9 +96,11 @@ begin
   frm := TfmEditorPopupMenuExpertConfig.Create(nil);
   try
     frm.SetData(FShortcuts);
+    frm.Height := FFormHeight;
     if frm.ShowModal <> mrok then
       Exit;
     frm.GetData(FShortcuts);
+    FFormHeight := frm.Height;
   finally
     FreeAndNil(frm);
   end;
@@ -193,6 +197,7 @@ begin
   FShortcuts.Clear;
   MenuSection := ConfigurationKey + PathDelim + 'menu';
   Settings.ReadSectionValues(MenuSection, FShortcuts);
+  FFormHeight :=  Settings.ReadInteger(ConfigurationKey, 'FormHeight', FFormHeight);
 end;
 
 procedure TGxEditorPopupMenuExpert.InternalSaveSettings(Settings: TGExpertsSettings);
@@ -214,6 +219,7 @@ begin
   finally
     FreeAndNil(ExpSettings);
   end;
+  Settings.WriteInteger(ConfigurationKey, 'FormHeight', FFormHeight);
 end;
 
 { TfmEditorPopupMenuExpertConfig }
@@ -240,6 +246,12 @@ begin
     if not (Expert is TGxEditorPopupMenuExpert) then
       lb_EditorExperts.Items.AddObject(Expert.GetDisplayName, Expert);
   end;
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.EnableOKCancel;
+begin
+  b_Ok.Enabled := True;
+  b_Cancel.Enabled := True;
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.AddSelectedEditorExpert;
@@ -323,7 +335,7 @@ begin
     li := lv_Selected.Items[i];
     if Assigned(li.Data) then begin
       if TObject(li.Data) is TGX_BaseExpert then
-        _sl.Values[li.Caption] := TGX_BaseExpert(li.Data).GetName
+        _sl.Add(li.Caption + '=' + TGX_BaseExpert(li.Data).GetName);
     end;
   end;
 end;
@@ -341,6 +353,10 @@ end;
 procedure TfmEditorPopupMenuExpertConfig.lv_SelectedChange(Sender: TObject; Item: TListItem;
   Change: TItemChange);
 begin
+  case change of
+    ctState, ctText:
+      EnableOKCancel;
+  end;
   CheckForDuplicates;
 end;
 
@@ -352,8 +368,8 @@ end;
 procedure TfmEditorPopupMenuExpertConfig.lv_SelectedEdited(Sender: TObject; Item: TListItem;
   var s: string);
 begin
-  b_Ok.Enabled := True;
-  b_Cancel.Enabled := True;
+  EnableOKCancel;
+  CheckForDuplicates;
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.lv_SelectedEditing(Sender: TObject; Item: TListItem;

@@ -2,7 +2,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   Left = 0
   Top = 0
   Caption = 'Editor Popup Menu Expert Configuration'
-  ClientHeight = 241
+  ClientHeight = 297
   ClientWidth = 569
   ParentFont = False
   OldCreateOrder = True
@@ -10,7 +10,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   TextHeight = 13
   object l_DuplicateShortcuts: TLabel
     Left = 296
-    Top = 184
+    Top = 240
     Width = 132
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -27,7 +27,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Left = 0
     Top = 0
     Width = 201
-    Height = 193
+    Height = 249
     ActivePage = ts_EditorExperts
     Anchors = [akLeft, akTop, akBottom]
     TabOrder = 0
@@ -37,7 +37,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
         Left = 0
         Top = 0
         Width = 193
-        Height = 165
+        Height = 221
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
@@ -51,7 +51,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
         Left = 0
         Top = 0
         Width = 193
-        Height = 165
+        Height = 221
         Align = alClient
         ItemHeight = 13
         Sorted = True
@@ -64,7 +64,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Left = 296
     Top = 24
     Width = 265
-    Height = 153
+    Height = 209
     Anchors = [akLeft, akTop, akBottom]
     Columns = <
       item
@@ -80,13 +80,12 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     ViewStyle = vsReport
     OnChange = lv_SelectedChange
     OnDblClick = lv_SelectedDblClick
-    OnEdited = lv_SelectedEdited
     OnEditing = lv_SelectedEditing
     OnKeyDown = lv_SelectedKeyDown
   end
   object b_OK: TButton
     Left = 408
-    Top = 208
+    Top = 264
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -97,7 +96,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   end
   object b_Cancel: TButton
     Left = 488
-    Top = 208
+    Top = 264
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
