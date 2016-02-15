@@ -61,22 +61,23 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     end
   end
   object lv_Selected: TListView
-    Left = 296
+    Left = 288
     Top = 24
-    Width = 265
+    Width = 273
     Height = 209
     Anchors = [akLeft, akTop, akBottom]
     Columns = <
       item
         Caption = 'Hotkey'
+        Width = 80
       end
       item
         Caption = 'Expert'
-        Width = 200
+        Width = 175
       end>
     RowSelect = True
     SortType = stText
-    TabOrder = 1
+    TabOrder = 3
     ViewStyle = vsReport
     OnChange = lv_SelectedChange
     OnDblClick = lv_SelectedDblClick
@@ -92,7 +93,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 2
+    TabOrder = 5
   end
   object b_Cancel: TButton
     Left = 488
@@ -103,7 +104,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 3
+    TabOrder = 6
   end
   object b_Add: TButton
     Left = 208
@@ -111,7 +112,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Caption = '>> Add >>'
-    TabOrder = 4
+    TabOrder = 1
     OnClick = b_AddClick
   end
   object b_Remove: TButton
@@ -120,7 +121,16 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Caption = 'Remove <<'
-    TabOrder = 5
+    TabOrder = 2
     OnClick = b_RemoveClick
+  end
+  object b_Default: TButton
+    Left = 208
+    Top = 208
+    Width = 75
+    Height = 25
+    Caption = 'Default >>'
+    TabOrder = 4
+    OnClick = b_DefaultClick
   end
 end

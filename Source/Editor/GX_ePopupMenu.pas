@@ -30,6 +30,7 @@ type
     b_Add: TButton;
     b_Remove: TButton;
     l_DuplicateShortcuts: TLabel;
+    b_Default: TButton;
     procedure b_AddClick(Sender: TObject);
     procedure b_RemoveClick(Sender: TObject);
     procedure lb_EditorExpertsDblClick(Sender: TObject);
@@ -39,6 +40,7 @@ type
     procedure lv_SelectedDblClick(Sender: TObject);
     procedure lv_SelectedKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure lv_SelectedChange(Sender: TObject; Item: TListItem; Change: TItemChange);
+    procedure b_DefaultClick(Sender: TObject);
   private
     procedure CheckForDuplicates;
     procedure GetData(_sl: TStringList);
@@ -69,10 +71,11 @@ uses
 type
   TGxEditorPopupMenuExpert = class(TEditorExpert)
   private
-    FFormHeight: integer;
+    FFormHeight: Integer;
     FGExpertsShortcutMenu: TPopupMenu;
     FShortcuts: TStringList;
     procedure ShowConfigForm(_Sender: TObject);
+    class procedure SetDefaults(_sl: TStringList);
   protected
     function GetDisplayName: string; override;
     class function GetName: string; override;
@@ -196,8 +199,12 @@ begin
   inherited;
   FShortcuts.Clear;
   MenuSection := ConfigurationKey + PathDelim + 'menu';
-  Settings.ReadSectionValues(MenuSection, FShortcuts);
-  FFormHeight :=  Settings.ReadInteger(ConfigurationKey, 'FormHeight', FFormHeight);
+  if Settings.SectionExists(MenuSection) then begin
+    Settings.ReadSectionValues(MenuSection, FShortcuts);
+  end else begin
+    SetDefaults(FShortcuts);
+  end;
+  FFormHeight := Settings.ReadInteger(ConfigurationKey, 'FormHeight', FFormHeight);
 end;
 
 procedure TGxEditorPopupMenuExpert.InternalSaveSettings(Settings: TGExpertsSettings);
@@ -220,6 +227,26 @@ begin
     FreeAndNil(ExpSettings);
   end;
   Settings.WriteInteger(ConfigurationKey, 'FormHeight', FFormHeight);
+end;
+
+class procedure TGxEditorPopupMenuExpert.SetDefaults(_sl: TStringList);
+begin
+  _sl.Add('A=Align');
+  _sl.Add('B=BookmarksExpert');
+  _sl.Add('C=ClassBrowser');
+  _sl.Add('D=DateTime');
+  _sl.Add('E=EditorExpertsMenu');
+  _sl.Add('F=CodeFormatter');
+  _sl.Add('G=GrepSearch');
+  _sl.Add('H=ClipboardHistory');
+  _sl.Add('L=CodeLibrarian');
+  _sl.Add('M=MacroLibrary');
+  _sl.Add('O=OpenFile');
+  _sl.Add('P=ProcedureList');
+  _sl.Add('R=ReverseStatement');
+  _sl.Add('S=MessageDialog');
+  _sl.Add('T=MacroTemplates');
+  _sl.Add('U=UsesClauseMgr');
 end;
 
 { TfmEditorPopupMenuExpertConfig }
@@ -288,6 +315,19 @@ begin
   RemoveExpert;
 end;
 
+procedure TfmEditorPopupMenuExpertConfig.b_DefaultClick(Sender: TObject);
+var
+  sl: TStringList;
+begin
+  sl := TStringList.Create;
+  try
+    TGxEditorPopupMenuExpert.SetDefaults(sl);
+    SetData(sl);
+  finally
+    FreeAndNil(sl);
+  end;
+end;
+
 procedure TfmEditorPopupMenuExpertConfig.CheckForDuplicates;
 var
   i: Integer;
@@ -353,7 +393,7 @@ end;
 procedure TfmEditorPopupMenuExpertConfig.lv_SelectedChange(Sender: TObject; Item: TListItem;
   Change: TItemChange);
 begin
-  case change of
+  case Change of
     ctState, ctText:
       EnableOKCancel;
   end;
