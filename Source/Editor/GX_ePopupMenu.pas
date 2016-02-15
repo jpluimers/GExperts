@@ -136,11 +136,11 @@ begin
       if (Key <> '') then begin
         if GExpertsInst.EditorExpertManager.FindExpert(ExpName, idx) then begin
           Expert := GExpertsInst.EditorExpertManager.EditorExpertList[idx];
-          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + ExpName,
+          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
             Expert.Execute);
         end else if GExpertsInst.FindExpert(ExpName, idx) then begin
           Expert := GExpertsInst.ExpertList[idx];
-          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + ExpName,
+          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
             Expert.Execute);
         end;
       end;
