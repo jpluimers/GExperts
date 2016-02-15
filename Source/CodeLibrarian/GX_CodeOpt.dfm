@@ -1,10 +1,10 @@
 object fmCodeOptions: TfmCodeOptions
   Left = 442
   Top = 167
-  BorderStyle = bsDialog
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Code Librarian Options'
   ClientHeight = 241
-  ClientWidth = 324
+  ClientWidth = 321
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -18,38 +18,40 @@ object fmCodeOptions: TfmCodeOptions
   PixelsPerInch = 96
   TextHeight = 14
   object btnOK: TButton
-    Left = 154
-    Top = 205
-    Width = 75
+    Left = 160
+    Top = 208
+    Width = 73
     Height = 26
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 239
-    Top = 205
-    Width = 75
+    Left = 240
+    Top = 208
+    Width = 73
     Height = 26
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object pgeCodeOpt: TPageControl
-    Left = 9
-    Top = 9
+    Left = 8
+    Top = 8
     Width = 305
     Height = 185
     ActivePage = tabPaths
-    TabIndex = 0
+    Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object tabPaths: TTabSheet
       Caption = 'Paths'
       object lblStoragePath: TLabel
         Left = 8
-        Top = 15
+        Top = 16
         Width = 173
         Height = 14
         Caption = 'Code Librarian Storage Location'
@@ -59,6 +61,7 @@ object fmCodeOptions: TfmCodeOptions
         Top = 32
         Width = 21
         Height = 21
+        Anchors = [akTop, akRight]
         Caption = '...'
         TabOrder = 1
         OnClick = sbBrowseClick
@@ -68,6 +71,7 @@ object fmCodeOptions: TfmCodeOptions
         Top = 32
         Width = 259
         Height = 22
+        Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
       end
     end
