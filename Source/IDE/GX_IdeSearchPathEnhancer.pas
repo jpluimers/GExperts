@@ -22,12 +22,13 @@ type
 implementation
 
 uses
+  Windows,
   Controls,
   Menus,
   Buttons,
   ActnList,
   GX_IdeFormEnhancer,
-  GX_dzVclUtils, Windows;
+  GX_dzVclUtils;
 
 var
   gblAggressive: Boolean;
@@ -261,6 +262,8 @@ begin
         FMemo.Anchors := [akLeft, akTop, akRight, akBottom];
         FMemo.Lines.Text := FListbox.Items.Text;
         FMemo.OnChange := Self.HandleMemoChange;
+        FMemo.ScrollBars := ssBoth;
+        FMemo.WordWrap := False;
         FListbox.Visible := False;
         TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
 
@@ -341,7 +344,7 @@ end;
 
 procedure TSearchPathEnhancer.HandleMemoChange(_Sender: TObject);
 begin
-  if Assigned(FListbox)  and Assigned(FMemo) then
+  if Assigned(FListbox) and Assigned(FMemo) then
     FListbox.Items := FMemo.Lines;
 end;
 
