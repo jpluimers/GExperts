@@ -13,12 +13,19 @@ type
     function GetAlphabetical: Boolean;
     procedure SetAlphabetical(const DoAlphabetize: Boolean);
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
+    function GetHideWindowMenu: Boolean;
+    procedure SetHideWindowMenu(const Value: Boolean);
+    function GetMoveComponentMenu: Boolean;
+    procedure SetMoveComponentMenu(const Value: Boolean);
 
     function RequestMenuExpertAction(Expert: TGX_Expert): IGxAction;
     procedure ArrangeMenuItems;
+    procedure MoveMainMenuItems;
 
     property Alphabetical: Boolean read GetAlphabetical write SetAlphabetical;
     property PlaceGxMainMenuInToolsMenu: Boolean read GetPlaceGxMainMenuInToolsMenu;
+    property HideWindowMenu: Boolean read GetHideWindowMenu write SetHideWindowMenu;
+    property MoveComponentMenu: Boolean read GetMoveComponentMenu write SetMoveComponentMenu;
   end;
 
 function GXMenuActionManager: IGxMenuActionManager;
@@ -74,14 +81,23 @@ type
   protected
     // IGxMenuActionManager
     function RequestMenuExpertAction(Expert: TGX_Expert): IGxAction;
-    function GetToolsMenuItem(Main: TMainMenu; out ToolsMenuItem: TMenuItem): Boolean;
+    function GetToolsMenuItem(Items: TMenuItem; out ToolsMenuItem: TMenuItem): Boolean;
+    function GetMatchingMenuItem(Items: TMenuItem; const MenuName: string; out ItemIdx: Integer): Boolean; overload;
+    function GetMatchingMenuItem(Items: TMenuItem; const MenuName: string; out MenuItem: TMenuItem): Boolean; overload;
+    function GetHideWindowMenu: boolean;
+    procedure SetHideWindowMenu(const Value: boolean);
+    function GetMoveComponentMenu: Boolean;
+    procedure SetMoveComponentMenu(const Value: Boolean);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure ArrangeMenuItems;
+    procedure MoveMainMenuItems;
 
     property Alphabetical: Boolean read GetAlphabetical write SetAlphabetical;
     property PlaceGxMainMenuInToolsMenu: Boolean read GetPlaceGxMainMenuInToolsMenu;
+    property HideWindowMenu: boolean read GetHideWindowMenu write SetHideWindowMenu;
+    property MoveComponentMenu: Boolean read GetMoveComponentMenu write SetMoveComponentMenu;
   end;
 
 var
@@ -159,7 +175,7 @@ begin
   Assert(Assigned(MainMenu), 'MainMenu component not found');
 
   // Insert GExperts drop down menu.
-  if PlaceGxMainMenuInToolsMenu and GetToolsMenuItem(MainMenu, ToolsMenuItem) then
+  if PlaceGxMainMenuInToolsMenu and GetToolsMenuItem(MainMenu.Items, ToolsMenuItem) then
     ToolsMenuItem.Insert(0, FGExpertsTopLevelMenu)
   else
     MainMenu.Items.Insert(MainMenu.Items.Count - 2, FGExpertsTopLevelMenu);
@@ -230,6 +246,63 @@ begin
   // ArrangeMenuItems is called later
 end;
 
+function TGXMenuActionManager.GetHideWindowMenu: boolean;
+begin
+  Result := ConfigInfo.HideWindowMenu;
+end;
+
+procedure TGXMenuActionManager.SetHideWindowMenu(const Value: boolean);
+var
+  WindowMenu: TMenuItem;
+begin
+  if not GetMatchingMenuItem(GxOtaGetIdeMainMenu.Items, 'WindowsMenu', WindowMenu) then
+    Exit;
+  WindowMenu.Visible := not Value;
+  ConfigInfo.HideWindowMenu := Value;
+end;
+
+function TGXMenuActionManager.GetMoveComponentMenu: Boolean;
+begin
+  Result := ConfigInfo.MoveComponentMenu;
+end;
+
+procedure TGXMenuActionManager.SetMoveComponentMenu(const Value: Boolean);
+var
+  MainMenu: TMainMenu;
+  Idx: Integer;
+  ComponentMenu: TMenuItem;
+  ToolsMenu: TMenuItem;
+begin
+  MainMenu := GxOtaGetIdeMainMenu;
+  if not GetToolsMenuItem(MainMenu.Items, ToolsMenu) then
+    Exit;
+  if Value then
+  begin
+    if not GetMatchingMenuItem(MainMenu.Items, 'ComponentMenu', Idx) then
+      Exit;
+    ComponentMenu := MainMenu.Items[Idx];
+    MainMenu.Items.Delete(Idx);
+    // We cannot just append it because the IDE itself changes the tools menu, which might
+    // remove the Component item again. If that happens, we won't be able to retrieve it,
+    // should the user decide he wants it back in the main menu. So, we insert it at position
+    // 2, just above the divider.
+    ToolsMenu.Insert(2, ComponentMenu);
+    ConfigInfo.MoveComponentMenu := True;
+  end
+  else
+  begin
+    if not GetMatchingMenuItem(ToolsMenu, 'ComponentMenu', Idx) then
+      Exit;
+    ComponentMenu := ToolsMenu.Items[Idx];
+    ToolsMenu.Delete(Idx);
+    Idx := ToolsMenu.MenuIndex;
+    if not PlaceGxMainMenuInToolsMenu then
+      Dec(Idx);
+    MainMenu.Items.Insert(Idx, ComponentMenu);
+    ConfigInfo.MoveComponentMenu := False;
+  end;
+end;
+
 function TGXMenuActionManager.RequestMenuExpertAction(Expert: TGX_Expert): IGxAction;
 begin
   Assert(Expert <> nil, 'Invalid nil Expert parameter for RequestMenuExpertAction');
@@ -269,20 +342,36 @@ begin
   Result := ConfigInfo.PlaceGxMainMenuInToolsMenu;
 end;
 
-function TGXMenuActionManager.GetToolsMenuItem(Main: TMainMenu; out ToolsMenuItem: TMenuItem): Boolean;
+function TGXMenuActionManager.GetMatchingMenuItem(Items: TMenuItem; const MenuName: string;
+  out MenuItem: TMenuItem): Boolean;
+var
+  Idx: Integer;
+begin
+  Result := GetMatchingMenuItem(Items, MenuName, Idx);
+  if Result then
+    MenuItem := Items[Idx];
+end;
+
+function TGXMenuActionManager.GetMatchingMenuItem(Items: TMenuItem; const MenuName: string;
+  out ItemIdx: Integer): Boolean;
 var
   i: Integer;
 begin
   Result := False;
-  for i := Main.Items.Count - 1 downto 0 do
+  for i := Items.Count - 1 downto 0 do
   begin
-    if Main.Items[i].Name = 'ToolsMenu' then
+    if Items[i].Name = MenuName then
     begin
       Result := True;
-      ToolsMenuItem := Main.Items[i];
+      ItemIdx := i;
       Break;
     end;
   end;
+end;
+
+function TGXMenuActionManager.GetToolsMenuItem(Items: TMenuItem; out ToolsMenuItem: TMenuItem): Boolean;
+begin
+  Result := GetMatchingMenuItem(Items, 'ToolsMenu', ToolsMenuItem);
 end;
 
 procedure TGXMenuActionManager.ArrangeMenuItems;
@@ -365,6 +454,12 @@ begin
     if Assigned(ParentItem) then
       GExpertsInst.ExpertList[i].DoCreateSubMenuItems(ParentItem);
   end;
+end;
+
+procedure TGXMenuActionManager.MoveMainMenuItems;
+begin
+  HideWindowMenu := HideWindowMenu;
+  MoveComponentMenu := MoveComponentMenu;
 end;
 
 procedure TGXMenuActionManager.MoreActionExecute(Sender: TObject);

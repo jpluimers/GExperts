@@ -18,6 +18,8 @@ type
     procedure SetHelpFileLocation(const Value: string);
     procedure SetVclPath(const Value: string);
     procedure SetPlaceGxMainMenuInToolsMenu(const Value: Boolean);
+    procedure SetHideWindowMenu(const Value: Boolean);
+    procedure SetMoveComponentMenu(const Value: Boolean);
     function GetAlphabetizeMenu: Boolean;
     function GetConfigPath: string;
     function GetGExpertsPath: string;
@@ -27,6 +29,8 @@ type
     function GetIdeRootRegistryKey: string;
     function GetVclPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
+    function GetHideWindowMenu: Boolean;
+    function GetMoveComponentMenu: Boolean;
     function GetEnableKeyboardShortcuts: Boolean;
     function GetEnableCustomFont: Boolean;
     procedure SetEnableCustomFont(const Value: Boolean);
@@ -58,6 +62,8 @@ type
     // as a menu item in the IDE's top-level Tools main menu, or whether
     // it should be a top-level menu of its own.
     property PlaceGxMainMenuInToolsMenu: Boolean read GetPlaceGxMainMenuInToolsMenu write SetPlaceGxMainMenuInToolsMenu;
+    property HideWindowMenu: Boolean read GetHideWindowMenu write SetHideWindowMenu;
+    property MoveComponentMenu: Boolean read GetMoveComponentMenu write SetMoveComponentMenu;
     property GExpertsPath: string read GetGExpertsPath;
     property EnableKeyboardShortcuts: Boolean read GetEnableKeyboardShortcuts;
     property EnableCustomFont: Boolean read GetEnableCustomFont write SetEnableCustomFont;
@@ -168,6 +174,8 @@ type
     FEnableKeyboardShortcuts: Boolean;
     FEnableCustomFont: Boolean;
     FCustomFont: TFont;
+    FHideWindowMenu: Boolean;
+    FMoveComponentMenu: Boolean;
     procedure LoadSettings;
     function DefaultConfigPath: string;
   protected
@@ -180,6 +188,8 @@ type
     procedure SetHelpFileLocation(const Value: string);
     procedure SetVclPath(const Value: string);
     procedure SetPlaceGxMainMenuInToolsMenu(const Value: Boolean);
+    procedure SetHideWindowMenu(const Value: Boolean);
+    procedure SetMoveComponentMenu(const Value: Boolean);
     function GetAlphabetizeMenu: Boolean;
     function GetConfigPath: string;
     function GetEditorExpertsEnabled: Boolean;
@@ -189,6 +199,8 @@ type
     function GetVclPath: string;
     function GetGExpertsPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
+    function GetHideWindowMenu: Boolean;
+    function GetMoveComponentMenu: Boolean;
     function ConfigurationKey: string;
     function GetEnableKeyboardShortcuts: Boolean;
     function GetEnableCustomFont: Boolean;
@@ -461,6 +473,8 @@ begin
     FAlphabetizeMenu := Settings.ReadBool(ConfigurationKey, 'AlphabetizeMenu', True);
     FEditorExpertsEnabled := Settings.ReadBool(ConfigurationKey, 'EditorExpertsEnabled', True);
     FPlaceGxMainMenuInToolsMenu := Settings.ReadBool(ConfigurationKey, 'PlaceGxMainMenuInToolsMenu', False);
+    FHideWindowMenu := Settings.ReadBool(ConfigurationKey, 'HideWindowMenu', False);
+    FMoveComponentMenu := Settings.ReadBool(ConfigurationKey, 'MoveComponentMenu', False);
     FEnableKeyboardShortcuts := Settings.ReadBool(ConfigurationKey, 'EnableKeyboardShortcuts', True);
     FEnableCustomFont := Settings.ReadBool(ConfigurationKey, 'EnableCustomFont', False);
     Settings.LoadFont(AddSlash(ConfigurationKey) + 'CustomFont', FCustomFont);
@@ -488,6 +502,8 @@ begin
     Settings.WriteBool(ConfigurationKey, 'AlphabetizeMenu', FAlphabetizeMenu);
     Settings.WriteBool(ConfigurationKey, 'EditorExpertsEnabled', FEditorExpertsEnabled);
     Settings.WriteBool(ConfigurationKey, 'PlaceGxMainMenuInToolsMenu', FPlaceGxMainMenuInToolsMenu);
+    Settings.WriteBool(ConfigurationKey, 'HideWindowMenu', FHideWindowMenu);
+    Settings.WriteBool(ConfigurationKey, 'MoveComponentMenu', FMoveComponentMenu);
     Settings.WriteBool(ConfigurationKey, 'EditorEnhancementsEnabled', EditorEnhancements.Enabled);
     Settings.WriteBool(ConfigurationKey, 'EnableCustomFont', FEnableCustomFont);
     Settings.SaveFont(AddSlash(ConfigurationKey) + 'CustomFont', FCustomFont);
@@ -542,6 +558,16 @@ begin
   Result := FIdeRootRegistryKey;
 end;
 
+function TConfigInfo.GetMoveComponentMenu: Boolean;
+begin
+  Result := FMoveComponentMenu;
+end;
+
+procedure TConfigInfo.SetMoveComponentMenu(const Value: Boolean);
+begin
+  FMoveComponentMenu := Value;
+end;
+
 function TConfigInfo.GetVclPath: string;
 begin
   Result := FVclPath;
@@ -574,6 +600,16 @@ end;
 procedure TConfigInfo.SetPlaceGxMainMenuInToolsMenu(const Value: Boolean);
 begin
   FPlaceGxMainMenuInToolsMenu := Value;
+end;
+
+function TConfigInfo.GetHideWindowMenu: Boolean;
+begin
+  Result := FHideWindowMenu;
+end;
+
+procedure TConfigInfo.SetHideWindowMenu(const Value: Boolean);
+begin
+  FHideWindowMenu := Value;
 end;
 
 function TConfigInfo.GetGExpertsPath: string;

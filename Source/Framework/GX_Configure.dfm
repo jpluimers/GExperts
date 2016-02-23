@@ -365,7 +365,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 8
           Width = 257
-          Height = 70
+          Height = 105
           Caption = '&Menu'
           TabOrder = 0
           object chkAlphabetizeMenu: TCheckBox
@@ -383,6 +383,22 @@ object fmConfiguration: TfmConfiguration
             Height = 17
             Caption = 'Place GExperts menu under Tools'
             TabOrder = 1
+          end
+          object chkHideWindowMenu: TCheckBox
+            Left = 8
+            Top = 60
+            Width = 241
+            Height = 17
+            Caption = 'Hide Window menu'
+            TabOrder = 2
+          end
+          object chkMoveComponentMenu: TCheckBox
+            Left = 8
+            Top = 81
+            Width = 241
+            Height = 17
+            Caption = 'Move the Component menu to Tools'
+            TabOrder = 3
           end
         end
         object gbxTabDockHost: TGroupBox
@@ -412,14 +428,14 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 8
-          Top = 280
+          Top = 288
           Width = 521
-          Height = 165
+          Height = 157
           Caption = 'Component &Palette'
           TabOrder = 3
           object chkCPMultiLine: TCheckBox
             Left = 8
-            Top = 22
+            Top = 14
             Width = 505
             Height = 17
             Caption = 'Multiline tabs'
@@ -428,7 +444,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPAsButtons: TCheckBox
             Left = 8
-            Top = 79
+            Top = 71
             Width = 505
             Height = 17
             Caption = 'Show tabs as buttons'
@@ -437,7 +453,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPTabsInPopup: TCheckBox
             Left = 8
-            Top = 118
+            Top = 110
             Width = 505
             Height = 17
             Caption = 'Add popup menu/button with tab names'
@@ -446,7 +462,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPFlat: TCheckBox
             Left = 24
-            Top = 98
+            Top = 90
             Width = 489
             Height = 17
             Caption = 'Flat buttons'
@@ -454,7 +470,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPTabsInPopupAlphaSort: TCheckBox
             Left = 24
-            Top = 137
+            Top = 129
             Width = 489
             Height = 19
             Caption = 'Show tab names in alphabetical order'
@@ -462,7 +478,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPScrollOpposite: TCheckBox
             Left = 24
-            Top = 41
+            Top = 33
             Width = 489
             Height = 17
             Caption = 'Scroll &opposite'
@@ -470,7 +486,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPRaggedRight: TCheckBox
             Left = 24
-            Top = 60
+            Top = 52
             Width = 489
             Height = 17
             Caption = 'Ragged &right'
@@ -479,9 +495,9 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxIDEForms: TGroupBox
           Left = 8
-          Top = 81
+          Top = 112
           Width = 521
-          Height = 192
+          Height = 169
           Caption = 'IDE'
           TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
@@ -502,7 +518,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 162
+            Top = 142
             Width = 505
             Height = 17
             Caption = 'Show object inspector font names using the font'
@@ -510,7 +526,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
-            Top = 79
+            Top = 60
             Width = 489
             Height = 17
             Caption = 'Enable drag && drop and autocomplete for search paths'
@@ -518,7 +534,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceToolProperties: TCheckBox
             Left = 24
-            Top = 117
+            Top = 100
             Width = 489
             Height = 17
             Caption = 'Enhance Tools menu Tool Properties dialog'
@@ -526,7 +542,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkReplaceListWithMemo: TCheckBox
             Left = 40
-            Top = 98
+            Top = 81
             Width = 473
             Height = 17
             Caption = 'Replace path listbox with memo'
@@ -535,22 +551,22 @@ object fmConfiguration: TfmConfiguration
           object chkAllowResize: TCheckBox
             Left = 24
             Top = 41
-            Width = 489
+            Width = 209
             Height = 17
             Caption = 'Allow resize and remember size'
             TabOrder = 1
           end
           object chkRememberPosition: TCheckBox
-            Left = 24
-            Top = 60
-            Width = 489
+            Left = 248
+            Top = 41
+            Width = 265
             Height = 17
-            Caption = 'Remember position'
+            Caption = 'Also remember position'
             TabOrder = 2
           end
           object chkEnhanceInstallPackages: TCheckBox
             Left = 24
-            Top = 136
+            Top = 121
             Width = 489
             Height = 17
             Caption = 'Enhance Install Packages dialog with ... Explorer button'

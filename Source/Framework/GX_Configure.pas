@@ -43,6 +43,8 @@ type
     chkCPScrollOpposite: TCheckBox;
     chkCPRaggedRight: TCheckBox;
     chkAlphabetizeMenu: TCheckBox;
+    chkHideWindowMenu: TCheckBox;
+    chkMoveComponentMenu: TCheckBox;
     btnConfigureToolBar: TButton;
     chkPlaceGxMainMenuInToolsMenu: TCheckBox;
     chkMiddleButtonClose: TCheckBox;
@@ -249,6 +251,8 @@ begin
 
   chkPlaceGxMainMenuInToolsMenu.Checked := ConfigInfo.PlaceGxMainMenuInToolsMenu;
   chkAlphabetizeMenu.Checked := ConfigInfo.AlphabetizeMenu;
+  chkHideWindowMenu.Checked := ConfigInfo.HideWindowMenu;
+  chkMoveComponentMenu.Checked := ConfigInfo.MoveComponentMenu;
 
   LoadEditorEnhancements;
   chkEditorKeyTracing.Checked := GxOtaGetEditorKeyTracingEnabled;
@@ -695,6 +699,8 @@ begin
   // Menus
   ConfigInfo.PlaceGxMainMenuInToolsMenu := chkPlaceGxMainMenuInToolsMenu.Checked;
   GXMenuActionManager.Alphabetical := chkAlphabetizeMenu.Checked;
+  GXMenuActionManager.HideWindowMenu := chkHideWindowMenu.Checked;
+  GXMenuActionManager.MoveComponentMenu := chkMoveComponentMenu.Checked;
 
   // File saving
   IdeEnhancements.AutoSave := chkAutoSave.Checked;

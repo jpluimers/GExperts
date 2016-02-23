@@ -370,6 +370,7 @@ begin
     ExpertList[i].AfterIDEInitialized;
   if RunningDelphi8OrGreater then
     GxKeyboardShortCutBroker.DoUpdateKeyBindings;
+  GXMenuActionManager.MoveMainMenuItems;
 end;
 
 { TUnsupportedIDEMessage }
