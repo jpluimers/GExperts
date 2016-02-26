@@ -1002,7 +1002,21 @@ resourcestring
 
     LineNoWidth := 60;
     LineText := lbResults.Items[Index];
-    Trimmed := LeftTrimChars(LineText);
+    if ALineResult.Matches.Count > 0 then
+    begin
+      // Avoid trimming inside the first match :
+      Trimmed := 0;
+      while (Length(LineText) > Trimmed)
+        and CharInSet(LineText[Trimmed + 1], [#9, #32])
+        and (Trimmed < ALineResult.Matches[0].SPos - 1) do
+          Inc(Trimmed);
+
+      if Trimmed > 0 then
+        Delete(LineText, 1, Trimmed);
+    end
+    else
+      Trimmed := LeftTrimChars(LineText);
+
     PrevMatchEnd := 0;
 
     // Paint first match line up to first match character

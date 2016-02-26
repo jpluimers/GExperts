@@ -5,7 +5,7 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  SysUtils, Classes, RegExpr, GX_GenericUtils, GX_OtaUtils, StrUtils;
+  SysUtils, Classes, RegExpr, GX_GenericUtils, GX_CodeFormatterUnicode, GX_OtaUtils;
 
 type
   TFoundEvent = procedure(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString) of object;
@@ -20,7 +20,14 @@ type
     FWholeWord: Boolean;
     FRegularExpression: Boolean;
     FFileName: string;
+    FNoCode: Boolean;
+    FNoStrings: Boolean;
     FNoComments: Boolean;
+    FIsPascalSourceFile: Boolean;
+    FSectionInterface: Boolean;
+    FSectionInitialization: Boolean;
+    FSectionImplementation: Boolean;
+    FSectionFinalization: Boolean;
     procedure SearchLineRegEx(LineStr: string; LineNo: Integer);
     procedure SearchLineRaw(LineStr: string; LineNo: Integer);
     procedure SetFileName(const Value: string);
@@ -30,7 +37,14 @@ type
     destructor Destroy; override;
     property Pattern: TGXUnicodeString read FPattern write FPattern;
     property OnFound: TFoundEvent read FOnFound write FOnFound;
+    property NoCode: Boolean read FNoCode write FNoCode;
+    property NoStrings: Boolean read FNoStrings write FNoStrings;
     property NoComments: Boolean read FNoComments write FNoComments;
+    property IsPascalSourceFile: Boolean read FIsPascalSourceFile write FIsPascalSourceFile;
+    property SectionInterface: Boolean read FSectionInterface write FSectionInterface;
+    property SectionImplementation: Boolean read FSectionImplementation write FSectionImplementation;
+    property SectionInitialization: Boolean read FSectionInitialization write FSectionInitialization;
+    property SectionFinalization: Boolean read FSectionFinalization write FSectionFinalization;
     property CaseSensitive: Boolean read FCaseSensitive write FCaseSensitive;
     property RegularExpression: Boolean read FRegularExpression write FRegularExpression;
     property WholeWord: Boolean read FWholeWord write FWholeWord;
@@ -40,7 +54,8 @@ type
 
 implementation
 
-{ TODO : The space replacement for comments needs to use a different, more obscure character such as ÷©®¡™‡|~‰±°•? so that we don't match as many false-positives when searcing for spaces }
+const
+  CReplacementChar: TGXUnicodeChar = #1; // don't match false-positives when searcing for spaces
 
 { TSearcher }
 
@@ -74,77 +89,59 @@ begin
   inherited;
 end;
 
+type
+  TCodeFragment = (
+    cfCode,
+    cfLineComment, // This type of comment, ends on newline.
+    cfCurlyComment, // {...newlines...}
+    cfBlockComment, // (*...newlines...*)
+    cfString, // = '...'
+    // cfEndOfCode, TODO : Switch to this after usEnd
+    cfEndOfComment, // Last char of comment; Either #10, ')' or '}'
+    cfEndOfString // Last char of string; Always '
+    );
+  TCodeFragments = set of TCodeFragment;
+
+  TUnitSection = (
+    usStart,
+    usInterface, usImplementation, usInitialization, usFinalization,
+    usEnd);
+  TUnitSections = set of TUnitSection;
+
+const
+  CodeFragments = [cfCode];
+  StringFragments = [cfString, cfEndOfString];
+  CommentFragments = [cfLineComment, cfCurlyComment, cfBlockComment, cfEndOfComment];
+  CSections: array [TUnitSection] of string = (
+    '',
+    'interface', 'implementation', 'initialization', 'finalization',
+    'end.');
+
 procedure TSearcher.Execute;
 var
   i, index, index2: Integer;
-  iParen, iCurly, iTick, iSlash : Integer;
-  bInCurlyComment, bInParenComment, bInTick: Boolean;
-  s, sTick: string;
+  UnitSectionsToSkip: TUnitSections;
+  CodeFragmentsToSkip: TCodeFragments;
+  ActiveSection: TUnitSection;
+  ActiveCodeFragment: TCodeFragment;
+  s: TGXUnicodeString;
 
-  procedure RemoveTicks;
-  var
-    idx : Integer;
+  function _TrySwitchToSection(const aNextSection: TUnitSection): Boolean;
   begin
-    // Now remove all comments in the line.
-    bInTick := False;
-    for idx := 1 to Length(s) do
-    begin
-      // If we run into a comment block, we need to stop removing the string literals.
-      if ((not bInTick) and ((idx = iParen) or (idx = iCurly) or (idx = iSlash))) then
-      begin
-        break;
-      end;
+    if ActiveSection < aNextSection then
+      if Length(s) >= index + Length(CSections[aNextSection]) then
+        if StrLIComp(@(s[index]), CSections[aNextSection], Length(CSections[aNextSection])) = 0 then
+          if (aNextSection = usEnd) or (not IsCharIdentifier(s[index + Length(CSections[aNextSection])])) then
+          begin
+            ActiveSection := aNextSection;
+            Result := True;
+            Exit;
+          end;
 
-      // To here we're checking each character and removing whatever string literals we find.
-      if s[idx] = #39 then
-      begin
-        bInTick := not bInTick; // comment was toggled
-        s[idx] := ' '; // replace with a space
-        sTick[idx] := #39; // save string literal
-      end
-      else if bInTick then
-      begin
-        sTick[idx] := s[idx]; // remember literal
-        s[idx] := ' '; // replace with a space
-      end;
-    end;
-  end;
+    Result := False;
+  end; // _TrySwitchToSection
 
-  procedure RemoveComments(sStart, sEnd: string);
-  begin
-    // Now we need to check if the curly comment or the parenthesis comment has started.
-    index := pos(sStart, s);
-
-    // Did we end this type of comment in the same line?
-    index2 := pos(sEnd, Copy(s, index + Length(sStart), Length(s)));
-
-    if (index2 > 0) then
-    begin
-      // add the first index and position where real code would start again
-      index2 := index2 + index + Length(sEnd) + Length(sStart) - 1;
-      // replace with just spaces
-      s := Copy(s, 1, index - 1) + DupeString(' ', index2 - index) + Copy(s, index2, Length(s));
-
-      // Look for another.
-      index := pos(sStart, s);
-    end
-    else
-    begin
-      // s starts a comment but doesn't end it.
-      s := Copy(s, 1, index - 1);
-
-      if SameText(sStart, '{') then
-      begin
-        bInCurlyComment := True;
-      end
-      else // if SameText(sStart, '(*') then
-      begin
-        bInParenComment := True;
-      end;
-    end;
-  end;
-
-begin
+begin // Execute
   if not Assigned(FData) then
     raise Exception.Create('Data to search not provided');
   if IsEmpty(Pattern) then
@@ -157,136 +154,117 @@ begin
     FRegEx.Compile;
   end;
 
-  bInCurlyComment := False;
-  bInParenComment := False;
+  UnitSectionsToSkip := [];
+  if IsPascalSourceFile then
+  begin
+    // Determine which sections must be skipped :
+    if not SectionInterface then Include(UnitSectionsToSkip, usInterface);
+    if not SectionImplementation then Include(UnitSectionsToSkip, usImplementation);
+    if not SectionInitialization then Include(UnitSectionsToSkip, usInitialization);
+    if not SectionFinalization then Include(UnitSectionsToSkip, usFinalization);
+  end;
 
+  // Determine which code fragments must be skipped :
+  CodeFragmentsToSkip := [];
+  if NoCode then CodeFragmentsToSkip := CodeFragmentsToSkip + CodeFragments;
+  if NoStrings then CodeFragmentsToSkip := CodeFragmentsToSkip + StringFragments;
+  if NoComments then CodeFragmentsToSkip := CodeFragmentsToSkip + CommentFragments;
+
+  ActiveSection := usStart;
+  ActiveCodeFragment := cfCode;
   for i := 0 to FData.Count - 1 do
   begin
-    // Ensure we are not updating the original line by creating a unique copy.
+    // Read the input line, skip if empty.
     s := FData[i];
-    UniqueString(s);
-    // This string will store the string literals for adding back in once the parsing is done.
-    sTick := DupeString(' ', Length(s));
+    if s = EmptyString then
+      Continue;
 
-    if NoComments then
+    if (UnitSectionsToSkip <> []) or (CodeFragmentsToSkip <> []) then
     begin
-      { Because of all the different ways of commenting, as well as the quote marks
-        this is a fairly difficult task.  There is likely a better way to handle this,
-        but this way seems to work! PRG Jan.11.2012 cantak@gmail.com }
+      Assert(Length(s) > 0);
+      // On each new line, switch line comment mode back to code :
+      if ActiveCodeFragment = cfLineComment then
+        ActiveCodeFragment := cfCode;
 
-      // First, if we are already in a type of comment, we need to see if we left it.
-      if (bInCurlyComment) then
-      begin
-        index := pos('}', s);
+      s := s + CReplacementChar; // Extend the input line to avoid out of bounds errors.
+      index := 1;
+      // This (and prior) code scans Delphi syntax. TODO : Handle IsC and IsDFM syntax too.
+      repeat
+        Assert(s[index] <> #10, 'unexpected linefeed');
+        Assert(s[index] <> #13, 'unexpected carriage return');
 
-        // If we found it, replace with empty space:
-        // End of a comment line} CODE MAYBE
-        //     [ spaces ]         CODE MAYBE
-        if (index > 0) then
-        begin
-          s := DupeString(' ', i) + Copy(s, i + 1, Length(s));
-          bInCurlyComment := False;
-        end;
-      end
-      else if (bInParenComment) then
-      begin
-        index := pos('*)', s);
-        if (index > 0) then
-        begin
-          s := DupeString(' ', i + 1) + Copy(s, i + 2, Length(s));
-          bInParenComment := False;
-        end;
-      end;
+        index2 := index + 1;
+        case ActiveCodeFragment of
+          cfLineComment: ; // skip everything, active fragment switches back to code on the next line
+          cfCurlyComment: if s[index] = '}' then ActiveCodeFragment := cfEndOfComment;
+          cfBlockComment:
+            if s[index] = '*' then
+              if s[index2] = ')' then
+              begin
+                Inc(index2); // skip both closing characters
+                ActiveCodeFragment := cfEndOfComment;
+              end;
+          cfString: // already seen one '
+            if s[index] = #39 then
+              // Is this single quote followed by another?
+              if s[index2] = #39 then
+                Inc(index2) // skip double-escaped single quote character
+              else
+                ActiveCodeFragment := cfEndOfString;
+        else // cfCode, cfEndOfString, cfEndOfComment:
+          ActiveCodeFragment := cfCode;
+          case s[index] of
+            #39: ActiveCodeFragment := cfString;
+            '{': ActiveCodeFragment := cfCurlyComment;
+            '/': if s[index2] = '/' then ActiveCodeFragment := cfLineComment;
+            '(': if s[index2] = '*' then ActiveCodeFragment := cfBlockComment;
+          end; // case s[index]
+        end; // case ActiveCodeFragment
 
-      if ((bInCurlyComment) or (bInParenComment)) then
-      begin
-        // The whole line is irrelevant, and we don't even need the spacers anymore.
-        // No search will be performed.
-        s := EmptyStr;
-      end;
+        // Do we need to detect unit section-changes?
+        if UnitSectionsToSkip <> [] then
+          if ActiveCodeFragment = cfCode then
+            if ActiveSection < usEnd then
+              // Is this the start of an identifier (looking back in the UNALTERED line)?
+              if (index = 1)
+              or ((not IsCharIdentifier(FData[i][index - 1])) and (FData[i][index - 1] <> '&')) then
+                if _TrySwitchToSection(usInterface)
+                or _TrySwitchToSection(usImplementation)
+                or _TrySwitchToSection(usInitialization)
+                or _TrySwitchToSection(usFinalization)
+                or _TrySwitchToSection(usEnd) then
+                  // When detected, step over the activated section keyword :
+                  Inc(index2, Length(CSections[ActiveSection]) - 1);
 
-      // Here's the conundrum.   We can have one line with mixed { comments{* <-- see here!
-      // The double pipes eliminate to the end of the line, UNLESS they themselves are comments
-      // caused from an earlier curly or paren/star combo.  Tick marks may make the comment
-      // starters and stoppers irrelevant too.  So we always need to handle the FIRST
-      // one in the line, and move on from there.
-      iParen := pos('(*', s);
-      iCurly := pos('{', s);
-      iTick := pos(#39, s);
-      iSlash := pos('//', s);
-
-      // While any of these exists, we need to process the first one only.
-      while ((iParen > 0) or (iCurly > 0) or (iTick > 0) or (iSlash > 0)) do
-      begin
-        if ((iParen > 0) and
-            ((iParen < iCurly) or (iCurly = 0)) and
-            ((iParen < iTick) or (iTick = 0)) and
-            ((iParen < iSlash) or (iSlash = 0))) then
-        begin
-          // Parenthesis is first
-          RemoveComments('(*', '*)');
-        end
-        // We already confirmed the parenthesis is not first to here.
-        else if ((iCurly > 0) and
-                 ((iCurly < iTick) or (iTick = 0)) and
-                 ((iCurly < iSlash) or (iSlash = 0))) then
-        begin
-          RemoveComments('{', '}');
-        end
-        // Curly and parenthesis are NOT first to here
-        else if ((iTick > 0) and
-                 ((iTick < iSlash) or (iSlash = 0))) then
-        begin
-          RemoveTicks;
-        end
-        // Since the only possibility left is slash, we should hit it now
-        else if (iSlash > 0) then
-        begin
-          s := Copy(s, 1, iSlash - 1);
-        end
+        // Lastly, put a CReplacementChar over fragments and sections that must not be searched :
+        if (ActiveSection in UnitSectionsToSkip)
+        or (ActiveCodeFragment in CodeFragmentsToSkip) then
+          repeat
+            s[index] := CReplacementChar;
+            Inc(index);
+          until index = index2
         else
-        begin
-          // This begin/end block is only here to make sure there's no infinite
-          // loop about to happen.  Should not be possible to hit.
-          Assert(False);
-        end;
+          index := index2;
+      until index >= Length(s); // Stop at the extra character we added
 
-        // Reassign these for the line.
-        iParen := pos('(*', s);
-        iCurly := pos('{', s);
-        iTick := pos(#39, s);
-        iSlash := pos('//', s);
-      end;
+      // To here, s has had all content removed that must not be searched.
+      // For the search, we trim all trailing CReplacementChar's out of s.
+      while (index > 0) and (s[index] = CReplacementChar) do
+        Dec(index);
 
-      // To here, s has had all string literals removed (only for parsing out comment
-      // blocks. It's also had all comment blocks removed.  Add the string literals back.
-      // Increase the length of s to its original size so the loop below does not fail.
-      s := Copy(s + DupeString(' ', Length(sTick)), 1, Length(sTick));
-      for index := 1 to Length(sTick) do
-      begin
-        if sTick[index] <> ' ' then
-        begin
-          s[index] := sTick[index];
-        end;
-      end;
+      // If s is empty we skip the search.
+      if index = 0 then
+        Continue;
 
-      // Finally for the final parsing, and the search, we can shrink ending
-      // spaces out of s.
-      index := Length(s);
-      while ((index > 0) and (s[index] = ' ')) do Dec(index);
-      s := Copy(s, 1, index);
+      SetLength(s, index);
     end;
 
-    // if s is empty we were entirely in a comment and we needed to skip this.
-    if s <> EmptyStr then
-    begin
-      if RegularExpression then
-        SearchLineRegEx(s, i)
-      else
-        SearchLineRaw(s, i);
-    end;
-  end;
-end;
+    if RegularExpression then
+      SearchLineRegEx(s, i)
+    else
+      SearchLineRaw(s, i);
+  end; // for i FData
+end; // Execute
 
 procedure TSearcher.SearchLineRaw(LineStr: string; LineNo: Integer);
 var

@@ -14,7 +14,6 @@ type
     cbText: TComboBox;
     gbxOptions: TGroupBox;
     cbCaseSensitive: TCheckBox;
-    cbNoComments: TCheckBox;
     cbForms: TCheckBox;
     gbxWhere: TGroupBox;
     rbAllProjFiles: TRadioButton;
@@ -38,6 +37,16 @@ type
     cbExcludedDirs: TComboBox;
     lblExcludeDirs: TLabel;
     cbSQLFiles: TCheckBox;
+    gbxContentTypes: TGroupBox;
+    cbGrepCode: TCheckBox;
+    cbGrepStrings: TCheckBox;
+    cbGrepComments: TCheckBox;
+    gbxUnitSections: TGroupBox;
+    cbSectionInterface: TCheckBox;
+    cbSectionImplementation: TCheckBox;
+    cbSectionInitialization: TCheckBox;
+    cbSectionFinalization: TCheckBox;
+    btnOptions: TButton;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -46,6 +55,7 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure btnOptionsClick(Sender: TObject);
   private
     FGrepExpert: TGrepExpert;
     procedure EnableDirectoryControls(New: Boolean);
@@ -88,6 +98,15 @@ begin
   Temp := cbDirectory.Text;
   if GetDirectory(Temp) then
     cbDirectory.Text := Temp;
+end;
+
+procedure TfmGrepSearch.btnOptionsClick(Sender: TObject);
+var
+  UseCurrentIdent: Boolean;
+begin
+  UseCurrentIdent := GrepExpert.GrepUseCurrentIdent;
+  if TfmGrepOptions.Execute(UseCurrentIdent) then
+    GrepExpert.GrepUseCurrentIdent := UseCurrentIdent;
 end;
 
 procedure TfmGrepSearch.EnableDirectoryControls(New: Boolean);
@@ -162,8 +181,8 @@ end;
 
 procedure TGrepDlgExpert.Configure;
 var
-  Dialog: TfmGrepOptions;
   GrepExpert: TGrepExpert;
+  UseCurrentIdent: Boolean;
 begin
   if not Assigned(fmGrepResults) then
     raise Exception.Create(SGrepResultsNotActive);
@@ -171,16 +190,9 @@ begin
   GrepExpert := fmGrepResults.GrepExpert;
   Assert(Assigned(GrepExpert));
 
-  Dialog := TfmGrepOptions.Create(nil);
-  try
-    Dialog.chkGrepUseCurrentIdent.Checked := GrepExpert.GrepUseCurrentIdent;
-    if Dialog.ShowModal = mrOk then
-    begin
-      GrepExpert.GrepUseCurrentIdent := Dialog.chkGrepUseCurrentIdent.Checked;
-    end;
-  finally
-    FreeAndNil(Dialog);
-  end;
+  UseCurrentIdent := GrepExpert.GrepUseCurrentIdent;
+  if TfmGrepOptions.Execute(UseCurrentIdent) then
+    GrepExpert.GrepUseCurrentIdent := UseCurrentIdent;
 end;
 
 procedure TfmGrepSearch.btnOKClick(Sender: TObject);
@@ -264,7 +276,13 @@ begin
   AddMRUString(cbExcludedDirs.Text, FGrepExpert.ExcludedDirsList, False, True);
 
   FGrepExpert.GrepCaseSensitive := cbCaseSensitive.Checked;
-  FGrepExpert.GrepComments := not cbNoComments.Checked;
+  FGrepExpert.GrepCode := cbGrepCode.Checked;
+  FGrepExpert.GrepComments := cbGrepComments.Checked;
+  FGrepExpert.GrepStrings := cbGrepStrings.Checked;
+  FGrepExpert.GrepFinalization := cbSectionFinalization.Checked;
+  FGrepExpert.GrepImplementation := cbSectionImplementation.Checked;
+  FGrepExpert.GrepInitialization := cbSectionInitialization.Checked;
+  FGrepExpert.GrepInterface := cbSectionInterface.Checked;
   FGrepExpert.GrepForms := cbForms.Checked;
   FGrepExpert.GrepSQLFiles := cbSQLFiles.Checked;
   FGrepExpert.GrepSub := cbInclude.Checked;
@@ -341,7 +359,13 @@ begin
   rbResults.Enabled := fmGrepResults.lbResults.Count > 0;
 
   cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
-  cbNoComments.Checked := not FGrepExpert.GrepComments;
+  cbGrepCode.Checked := FGrepExpert.GrepCode;
+  cbGrepComments.Checked := FGrepExpert.GrepComments;
+  cbGrepStrings.Checked := FGrepExpert.GrepStrings;
+  cbSectionFinalization.Checked := FGrepExpert.GrepFinalization;
+  cbSectionImplementation.Checked := FGrepExpert.GrepImplementation;
+  cbSectionInitialization.Checked := FGrepExpert.GrepInitialization;
+  cbSectionInterface.Checked := FGrepExpert.GrepInterface;
   cbForms.Checked := FGrepExpert.GrepForms;
   cbSQLFiles.Checked := FGrepExpert.GrepSQLFiles;
   cbInclude.Checked := FGrepExpert.GrepSub;
@@ -409,7 +433,13 @@ end;
 
 procedure TfmGrepSearch.RetrieveSettings(var Value: TGrepSettings);
 begin
-  Value.IncludeComments := not cbNoComments.Checked;
+  Value.IncludeComments := cbGrepComments.Checked;
+  Value.IncludeCode := cbGrepCode.Checked;
+  Value.IncludeStrings := cbGrepStrings.Checked;
+  Value.SectionInterface := cbSectionInterface.Checked;
+  Value.SectionImplementation := cbSectionImplementation.Checked;
+  Value.SectionInitialization := cbSectionInitialization.Checked;
+  Value.SectionFinalization := cbSectionFinalization.Checked;
   Value.CaseSensitive := cbCaseSensitive.Checked;
   Value.WholeWord := cbWholeWord.Checked;
   Value.RegEx := cbRegEx.Checked;
@@ -443,7 +473,13 @@ end;
 
 procedure TfmGrepSearch.AdjustSettings(Value: TGrepSettings);
 begin
-  cbNoComments.Checked := not Value.IncludeComments;
+  cbGrepComments.Checked := Value.IncludeComments;
+  cbGrepCode.Checked := Value.IncludeCode;
+  cbGrepStrings.Checked := Value.IncludeStrings;
+  cbSectionInterface.Checked := Value.SectionInterface;
+  cbSectionImplementation.Checked := Value.SectionImplementation;
+  cbSectionInitialization.Checked := Value.SectionInitialization;
+  cbSectionFinalization.Checked := Value.SectionFinalization;
   cbCaseSensitive.Checked := Value.CaseSensitive;
   cbWholeWord.Checked := Value.WholeWord;
   cbRegEx.Checked := Value.RegEx;

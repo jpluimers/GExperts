@@ -3,8 +3,8 @@ object fmGrepSearch: TfmGrepSearch
   Top = 189
   BorderStyle = bsDialog
   Caption = 'Grep Search'
-  ClientHeight = 366
-  ClientWidth = 486
+  ClientHeight = 473
+  ClientWidth = 489
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object fmGrepSearch: TfmGrepSearch
   Position = poScreenCenter
   Scaled = False
   DesignSize = (
-    486
-    366)
+    489
+    473)
   PixelsPerInch = 96
   TextHeight = 14
   object lblFind: TLabel
@@ -32,7 +32,7 @@ object fmGrepSearch: TfmGrepSearch
   object cbText: TComboBox
     Left = 85
     Top = 8
-    Width = 394
+    Width = 397
     Height = 22
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 15
@@ -54,14 +54,6 @@ object fmGrepSearch: TfmGrepSearch
       Height = 17
       Caption = '&Case sensitive'
       TabOrder = 0
-    end
-    object cbNoComments: TCheckBox
-      Left = 10
-      Top = 119
-      Width = 200
-      Height = 17
-      Caption = '&Ignore Delphi comments'
-      TabOrder = 5
     end
     object cbForms: TCheckBox
       Left = 10
@@ -99,7 +91,7 @@ object fmGrepSearch: TfmGrepSearch
   object gbxWhere: TGroupBox
     Left = 252
     Top = 40
-    Width = 227
+    Width = 230
     Height = 145
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Where'
@@ -161,16 +153,89 @@ object fmGrepSearch: TfmGrepSearch
       OnClick = rbDirectoriesClick
     end
   end
-  object gbxDirectories: TGroupBox
+  object gbxContentTypes: TGroupBox
     Left = 8
     Top = 192
-    Width = 471
+    Width = 227
+    Height = 102
+    Caption = 'Content types'
+    TabOrder = 3
+    object cbGrepCode: TCheckBox
+      Left = 10
+      Top = 18
+      Width = 200
+      Height = 17
+      Caption = 'Grep code'
+      TabOrder = 0
+    end
+    object cbGrepStrings: TCheckBox
+      Left = 10
+      Top = 38
+      Width = 200
+      Height = 17
+      Caption = 'Grep strings'
+      TabOrder = 1
+    end
+    object cbGrepComments: TCheckBox
+      Left = 10
+      Top = 58
+      Width = 200
+      Height = 17
+      Caption = 'Grep comments'
+      TabOrder = 2
+    end
+  end
+  object gbxUnitSections: TGroupBox
+    Left = 252
+    Top = 192
+    Width = 229
+    Height = 102
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Unit sections'
+    TabOrder = 4
+    object cbSectionInterface: TCheckBox
+      Left = 10
+      Top = 18
+      Width = 200
+      Height = 17
+      Caption = 'Interface'
+      TabOrder = 0
+    end
+    object cbSectionImplementation: TCheckBox
+      Left = 10
+      Top = 38
+      Width = 200
+      Height = 17
+      Caption = 'Implementation'
+      TabOrder = 1
+    end
+    object cbSectionInitialization: TCheckBox
+      Left = 10
+      Top = 58
+      Width = 200
+      Height = 17
+      Caption = 'Initialization'
+      TabOrder = 2
+    end
+    object cbSectionFinalization: TCheckBox
+      Left = 10
+      Top = 78
+      Width = 200
+      Height = 17
+      Caption = 'Finalization'
+      TabOrder = 3
+    end
+  end
+  object gbxDirectories: TGroupBox
+    Left = 8
+    Top = 300
+    Width = 474
     Height = 133
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Directory Search'
-    TabOrder = 3
+    TabOrder = 5
     DesignSize = (
-      471
+      474
       133)
     object lblMasks: TLabel
       Left = 25
@@ -202,7 +267,7 @@ object fmGrepSearch: TfmGrepSearch
     object cbMasks: TComboBox
       Left = 84
       Top = 80
-      Width = 352
+      Width = 355
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
@@ -213,7 +278,7 @@ object fmGrepSearch: TfmGrepSearch
     object cbInclude: TCheckBox
       Left = 84
       Top = 106
-      Width = 376
+      Width = 379
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Search su&bdirectories'
@@ -222,7 +287,7 @@ object fmGrepSearch: TfmGrepSearch
     object cbDirectory: TComboBox
       Left = 84
       Top = 22
-      Width = 352
+      Width = 355
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
@@ -232,7 +297,7 @@ object fmGrepSearch: TfmGrepSearch
       OnKeyDown = ComboKeyDown
     end
     object btnBrowse: TButton
-      Left = 437
+      Left = 440
       Top = 22
       Width = 20
       Height = 20
@@ -248,7 +313,7 @@ object fmGrepSearch: TfmGrepSearch
     object cbExcludedDirs: TComboBox
       Left = 84
       Top = 51
-      Width = 352
+      Width = 355
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
@@ -259,35 +324,45 @@ object fmGrepSearch: TfmGrepSearch
     end
   end
   object btnOK: TButton
-    Left = 244
-    Top = 334
+    Left = 248
+    Top = 440
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
-    TabOrder = 4
+    TabOrder = 6
     OnClick = btnOKClick
   end
   object btnCancel: TButton
-    Left = 324
-    Top = 334
+    Left = 328
+    Top = 440
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 5
+    TabOrder = 7
   end
   object btnHelp: TButton
-    Left = 404
-    Top = 334
+    Left = 408
+    Top = 440
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    Caption = '&Help'
-    TabOrder = 6
+    Caption = 'Help'
+    TabOrder = 8
     OnClick = btnHelpClick
+  end
+  object btnOptions: TButton
+    Left = 8
+    Top = 440
+    Width = 75
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'Options'
+    TabOrder = 9
+    OnClick = btnOptionsClick
   end
 end

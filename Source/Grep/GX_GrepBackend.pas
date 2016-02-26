@@ -53,6 +53,12 @@ type
   // Saved grep settings (used for refresh)
   TGrepSettings = record
     IncludeComments: Boolean;
+    IncludeCode: Boolean;
+    IncludeStrings: Boolean;
+    SectionInterface: Boolean;
+    SectionImplementation: Boolean;
+    SectionInitialization: Boolean;
+    SectionFinalization: Boolean;
     CaseSensitive: Boolean;
     WholeWord: Boolean;
     RegEx: Boolean;
@@ -579,6 +585,12 @@ begin
     try
       FSearcher.OnFound := FoundIt;
       FSearcher.NoComments := not FGrepSettings.IncludeComments;
+      FSearcher.NoCode := not FGrepSettings.IncludeCode;
+      FSearcher.NoStrings := not FGrepSettings.IncludeStrings;
+      FSearcher.SectionInterface := FGrepSettings.SectionInterface;
+      FSearcher.SectionImplementation := FGrepSettings.SectionImplementation;
+      FSearcher.SectionInitialization := FGrepSettings.SectionInitialization;
+      FSearcher.SectionFinalization := FGrepSettings.SectionFinalization;
       FSearcher.CaseSensitive := FGrepSettings.CaseSensitive;
       FSearcher.WholeWord := FGrepSettings.WholeWord;
       FSearcher.RegularExpression := FGrepSettings.RegEx;
@@ -667,7 +679,6 @@ end;
 
 procedure TGrepSearchRunner.ExecuteSearchOnFile(const FileName: string; Context: TGrepSearchContext; FromProject: Boolean);
 var
-  TmpNoComments: Boolean;
   ContextString: string;
 begin
   Assert(Assigned(FDupeFileList));
@@ -681,12 +692,9 @@ begin
       // Because we can search directories and multiple extensions, and because the
       // ignore comments option is ignored with anything non Delphi, we may need to
       // turn it off temporarily, depending on what is searched for.
-      TmpNoComments := FSearcher.NoComments;
-      FSearcher.NoComments := ((FSearcher.NoComments) and (IsPascalSourceFile(FileName)));
+      FSearcher.IsPascalSourceFile := IsPascalSourceFile(FileName);
 
       FSearcher.Execute;
-
-      FSearcher.NoComments := TmpNoComments;
     except
       on E: Exception do
       begin

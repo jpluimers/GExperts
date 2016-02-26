@@ -525,7 +525,7 @@ begin
     FGrepExpandIfMatches := ExpSettings.ReadInteger('ExpandIfMatches', 150);
     FGrepExpandFew := ExpSettings.ReadBool('ExpandFew', False);
     FGrepExpandFewLines := ExpSettings.ReadInteger('ExpandFewLines', 20);
-    FGrepWholeWord := ExpSettings.ReadBool('Whole Word', False);
+    FGrepWholeWord := ExpSettings.ReadBool('Whole Word', True);
     FGrepMiddle := ExpSettings.ReadBool('Middle', True);
     FAutoHide := ExpSettings.ReadBool('AutoHide', False);
     FGrepRegEx := ExpSettings.ReadBool('RegEx', False);

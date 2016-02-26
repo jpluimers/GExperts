@@ -3,7 +3,7 @@ unit GX_GrepOptions;
 interface
 
 uses
-  Classes, Controls, StdCtrls, Forms, GX_BaseForm;
+  SysUtils, Classes, Controls, StdCtrls, Forms, GX_BaseForm;
 
 type
   TfmGrepOptions = class(TfmBaseForm)
@@ -11,10 +11,30 @@ type
     btnOK: TButton;
     btnCancel: TButton;
     chkGrepUseCurrentIdent: TCheckBox;
+  public
+    class function Execute(UseCurrentIdent: Boolean): Boolean;
   end;
 
 implementation
 
 {$R *.dfm}
+
+{ TfmGrepOptions }
+
+class function TfmGrepOptions.Execute(UseCurrentIdent: Boolean): Boolean;
+var
+  Dlg: TfmGrepOptions;
+begin
+  Dlg := TfmGrepOptions.Create(nil);
+  try
+    Dlg.chkGrepUseCurrentIdent.Checked := UseCurrentIdent;
+    if Dlg.ShowModal = mrOk then
+    begin
+      UseCurrentIdent := Dlg.chkGrepUseCurrentIdent.Checked;
+    end;
+  finally
+    FreeAndNil(Dlg);
+  end;
+end;
 
 end.
