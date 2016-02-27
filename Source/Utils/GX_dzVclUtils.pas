@@ -240,6 +240,16 @@ function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNot
 /// Appends a new menu item with the given Caption to the popup menu and returns it </summary>
 function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem; overload;
 
+{$IFNDEF DELPHI2009_UP}
+//Delphi 2009 introduced TCustomButton as the common Ancestor of TButton and TBitBtn.
+type
+  TCustomButton = TButton;
+{$ENDIF}
+
+///<summary>
+/// Adds a drowdown menu to a button which automatically gets opened when the user clicks on
+/// the button. The button's OnClick event gets changed by this. </summary>
+procedure TButton_AddDropdownMenu(_btn: TCustomButton; _pm: TPopupMenu);
 
 implementation
 
@@ -922,6 +932,49 @@ begin
   Result := idx <> -1;
   if Result then
     _Obj := _lst.Items.Objects[idx];
+end;
+
+type
+  TButtonPopupMenuLink = class(TComponent)
+  private
+    FBtn: TCustomButton;
+    FMenu: TPopupMenu;
+    FLastClose: DWORD;
+  public
+    constructor Create(_btn: TCustomButton; _pm: TPopupMenu); reintroduce;
+    procedure doOnButtonClick(_Sender: TObject);
+  end;
+
+{ TButtonPopupMenuLink }
+
+type
+  TCustomButtonHack = class(TCustomButton)
+  end;
+
+constructor TButtonPopupMenuLink.Create(_btn: TCustomButton; _pm: TPopupMenu);
+begin
+  inherited Create(_btn);
+  FBtn := _btn;
+  FMenu := _pm;
+  FMenu.PopupComponent := FBtn;
+  TCustomButtonHack(FBtn).OnClick := Self.doOnButtonClick;
+end;
+
+procedure TButtonPopupMenuLink.doOnButtonClick(_Sender: TObject);
+var
+  Pt: TPoint;
+begin
+  if GetTickCount - FLastClose > 100 then begin
+    Pt := FBtn.ClientToScreen(Point(0, FBtn.ClientHeight));
+    FMenu.Popup(Pt.X, Pt.Y);
+    { Note: PopupMenu.Popup does not return until the menu is closed }
+    FLastClose := GetTickCount;
+  end;
+end;
+
+procedure TButton_AddDropdownMenu(_btn: TCustomButton; _pm: TPopupMenu);
+begin
+  TButtonPopupMenuLink.Create(_btn, _pm);
 end;
 
 end.
