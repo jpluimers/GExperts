@@ -9,7 +9,7 @@
 /// has no objection.
 /// @Peter: If you read this, please contact me through
 /// http://blog.dummzeuch.de or https://plus.google.com/108684844040122144755 </summary>
-unit uAutoTodoHandler;
+unit GX_uAutoTodoHandler;
 
 interface
 

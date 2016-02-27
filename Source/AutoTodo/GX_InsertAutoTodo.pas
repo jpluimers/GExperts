@@ -11,7 +11,8 @@ unit GX_InsertAutoTodo;
 interface
 
 uses
-  GX_Experts, SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, GX_BaseForm, Menus;
+  SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, Menus,
+  GX_BaseForm, GX_Experts;
 
 type
   tfmInsertAutoTodoForm = class(TfmBaseForm)
@@ -37,8 +38,9 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Registry, GX_GExperts, GX_ConfigurationInfo, uAutoTodoHandler, GX_dzVclUtils, 
-  ToolsAPI, GX_OtaUtils, GX_GenericUtils;
+  Registry, ToolsAPI,
+  GX_GExperts, GX_ConfigurationInfo, GX_uAutoTodoHandler, GX_dzVclUtils,
+  GX_OtaUtils, GX_GenericUtils;
 
 type
   EAutoTodo = class(Exception);
