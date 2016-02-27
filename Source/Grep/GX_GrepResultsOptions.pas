@@ -1,3 +1,5 @@
+{Search history author: (ERT) Ferenc Kiffer, Hungary <kifferferenc@yahoo.com>}
+
 unit GX_GrepResultsOptions;
 
 interface
@@ -23,8 +25,6 @@ type
     edtContextLines: TEdit;
     udContextLines: TUpDown;
     gbxHistoryList: TGroupBox;
-    chkSaveHistoryListSize: TCheckBox;
-    chkSaveContextSize: TCheckBox;
     gbxListColors: TGroupBox;
     pnlListMatchTextColor: TPanel;
     chkDefaultListColors: TCheckBox;
@@ -45,6 +45,25 @@ type
     eExpandFewLines: TEdit;
     rbSaveToRegistry: TRadioButton;
     rbSaveToIniFile: TRadioButton;
+    chkFileListDeleteAfterDays: TCheckBox;
+    eDeleteAfterDays: TEdit;
+    lblSaveOption: TLabel;
+    cbxSearchSaveOptionDefaultValue: TComboBox;
+    lblOnlySaveParamsAction: TLabel;
+    cbxOnlySaveParamsAction: TComboBox;
+    lblHistoryListDefaultPage: TLabel;
+    cbxHistoryListDefaultPage: TComboBox;
+    chkAdvanced: TCheckBox;
+    chkQuickRefreshMode: TCheckBox;
+    chkEmptyMoveToParams: TCheckBox;
+    chkSaveContextFixedHeight: TCheckBox;
+    cbxOpenSaveOptionDefaultValue: TComboBox;
+    lblSearchSaveOption: TLabel;
+    lblOpenSaveOption: TLabel;
+    chkHistoryPagesTabMultiLine: TCheckBox;
+    eHistoryPagesTabWidth: TEdit;
+    lblHistoryPagesTabWidth: TLabel;
+    chkMouseWheelMoveItemIndex: TCheckBox;
     procedure pnlContextFontClick(Sender: TObject);
     procedure pnlContextMatchFontColorClick(Sender: TObject);
     procedure pnlListFontClick(Sender: TObject);
@@ -54,6 +73,9 @@ type
     procedure chkDefaultListColorsClick(Sender: TObject);
     procedure chkGrepExpandClick(Sender: TObject);
     procedure chkGrepSaveHistoryListItemsClick(Sender: TObject);
+    procedure chkAdvancedClick(Sender: TObject);
+    procedure chkFileListDeleteAfterDaysClick(Sender: TObject);
+    procedure chkHistoryPagesTabMultiLineClick(Sender: TObject);
   private
     FExpandsChanging: Boolean;
   end;
@@ -63,6 +85,31 @@ implementation
 uses Graphics;
 
 {$R *.dfm}
+
+procedure TfmGrepResultsOptions.chkAdvancedClick(Sender: TObject);
+var
+  IsAdvanced: Boolean;
+begin
+  IsAdvanced := chkAdvanced.Checked;
+  rbSaveToRegistry.Visible := IsAdvanced;
+  rbSaveToIniFile.Visible := IsAdvanced;
+  chkEmptyMoveToParams.Visible := IsAdvanced;
+  chkGrepExpandIf.Visible := IsAdvanced;
+  chkGrepExpandFew.Visible := IsAdvanced;
+  lblExpandIfMatches.Visible := IsAdvanced;
+  lblExpandIfFiles.Visible := IsAdvanced;
+  lblExpandFewLines.Visible := IsAdvanced;
+  eExpandIfMatches.Visible := IsAdvanced;
+  eExpandIfFiles.Visible := IsAdvanced;
+  eExpandFewLines.Visible := IsAdvanced;
+  chkSaveContextFixedHeight.Visible := IsAdvanced;
+  chkHistoryPagesTabMultiLine.Visible := IsAdvanced;
+  lblHistoryPagesTabWidth.Visible := IsAdvanced;
+  eHistoryPagesTabWidth.Visible := IsAdvanced;
+  chkMouseWheelMoveItemIndex.Visible := IsAdvanced;
+
+  chkQuickRefreshMode.Visible := IsAdvanced;
+end;
 
 procedure TfmGrepResultsOptions.pnlListFontClick(Sender: TObject);
 var
@@ -196,6 +243,16 @@ procedure TfmGrepResultsOptions.chkGrepSaveHistoryListItemsClick(Sender: TObject
 begin
   rbSaveToIniFile.Enabled := chkGrepSaveHistoryListItems.Checked;
   rbSaveToRegistry.Enabled := chkGrepSaveHistoryListItems.Checked;
+end;
+
+procedure TfmGrepResultsOptions.chkHistoryPagesTabMultiLineClick(Sender: TObject);
+begin
+  eHistoryPagesTabWidth.Enabled := not chkHistoryPagesTabMultiLine.Checked;
+end;
+
+procedure TfmGrepResultsOptions.chkFileListDeleteAfterDaysClick(Sender: TObject);
+begin
+  eDeleteAfterDays.Enabled := chkFileListDeleteAfterDays.Checked;
 end;
 
 end.

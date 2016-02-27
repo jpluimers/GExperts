@@ -5,22 +5,21 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Classes,
-  Controls;
+  Classes, Controls, GX_GrepBackend;
 
 type
   TGrepOutputMode = (grPrint, grCopy, grFile);
   TSaveToFileMode = (sfPrintToFile, sfSaveToLoadable, sfBoth);
 
-procedure PrintGrepResults(Owner: TWinControl; Results: TStrings; Where: TGrepOutputMode; AFileName: String = '');
-procedure SaveGrepResultsToLoadableFile(Owner: TWinControl; Results: TObject; AMode: TSaveToFileMode;
-  AIniVersion: Integer; AFileName: String = '');
+procedure SaveGrepResultsToFile(Owner: TWinControl; Results: TGrepHistoryList; AIniVersion: Integer;
+  ASaveAll: Boolean; AMode: TSaveToFileMode; Where: TGrepOutputMode = grFile;
+  AFileName: String = ''; ASplitCount: Integer = -1);
 
 implementation
 
 uses
-  GX_GrepBackend, GX_GenericUtils,
-  SysUtils, Graphics, ComCtrls, Dialogs, IniFiles;
+  GX_GenericUtils,
+  SysUtils, Graphics, ComCtrls, Dialogs, IniFiles, StrUtils, GX_GrepProgress;
 
 function OpenSaveDialog(var AFileName: String): Boolean;
 var
@@ -52,8 +51,8 @@ begin
     RichEdit.Lines.SaveToFile(AFileName);
 end;
 
-procedure PrintGeneric(Owner: TWinControl; Results: TStrings; Where: TGrepOutputMode;
-  AFileName: String; DoSaveDialog: Boolean);
+procedure PrintGeneric(Owner: TWinControl; Results: TGrepHistorySortableList; Where: TGrepOutputMode;
+  AFileName: String; DoSaveDialog, ASaveAll: Boolean; ASplitCount: Integer);
 var
   RichEdit: TRichEdit;
 
@@ -117,26 +116,31 @@ begin
     RichEdit.Clear;
     RichEdit.Lines.BeginUpdate;
     try
-      if Results.Objects[0] is TFileResult then
-        PrintResults(Results)
-      else if Results.Objects[0] is TGrepHistoryListItem then
+      for I := 0 to Results.Count-1 do
       begin
-        for I := 0 to Results.Count-1 do
+        HistoryItem := Results.Items[I];
+
+        if not ASaveAll and not HistoryItem.Checked then
+          Continue;
+
+        if RichEdit.Lines.Count > 0 then
         begin
-          if RichEdit.Lines.Count > 0 then
-          begin
-            RichEdit.Lines.Add('');  // space between file AResults
-            RichEdit.Lines.Add('');
-          end ;
+          RichEdit.Lines.Add('');  // space between file AResults
+          RichEdit.Lines.Add('');
+        end ;
 
-          HistoryItem := TGrepHistoryListItem(Results.Objects[I]);
+        RichEdit.SelAttributes.Style := [fsBold, fsUnderline];
+        RichEdit.Lines.Add(HistoryItem.SearchText);
+        RichEdit.SelAttributes.Style := [];
 
-          RichEdit.SelAttributes.Style := [fsBold, fsUnderline];
-          RichEdit.Lines.Add(HistoryItem.GrepSettings.Pattern);
-          RichEdit.SelAttributes.Style := [];
+        PrintResults(HistoryItem.ResultList);
 
-          PrintResults(HistoryItem.ResultList);
-        end;
+        if ASplitCount > 0 then
+        begin
+          Dec(ASplitCount);
+          if ASplitCount = 0 then
+            Break;
+        end ;
       end;
     finally
       RichEdit.Lines.EndUpdate;
@@ -155,44 +159,48 @@ begin
   end;
 end;
 
-procedure PrintGrepResults(Owner: TWinControl; Results: TStrings; Where: TGrepOutputMode;
-  AFileName: String);
-begin
-  PrintGeneric(Owner, Results, Where, AFileName, True);
-end;
-
-procedure SaveGrepResultsToLoadableFile(Owner: TWinControl; Results: TObject; AMode: TSaveToFileMode;
-  AIniVersion: Integer; AFileName: String);
+procedure SaveGrepResultsToFile(Owner: TWinControl; Results: TGrepHistoryList; AIniVersion: Integer;
+  ASaveAll: Boolean; AMode: TSaveToFileMode; Where: TGrepOutputMode; AFileName: String; ASplitCount: Integer);
 var
   AIni: TGrepIniFile;
+  AFileNameExt, AFileNameForSave: String;
+  AFileIndex: Integer;
 begin
-  if not OpenSaveDialog(AFileName) then
+  if (Where = grFile) and not OpenSaveDialog(AFileName) then
     Exit;
 
-  if AMode <> sfSaveToLoadable then
-    if Results is TGrepHistoryList then
-      PrintGeneric(Owner, TGrepHistoryList(Results), grFile, AFileName, False)
-    else if Results is TGrepHistoryListItem then
-      PrintGeneric(Owner, TGrepHistoryListItem(Results).ResultList, grFile, AFileName, False);
+  TfmGrepProgress.Start;
 
-  if AMode = sfPrintToFile then
-    Exit;
+  AFileNameExt := ExtractFileExt(AFileName);
+  AFileName := ChangeFileExt(AFileName, '');
 
-  if (AMode <> sfBoth) and FileExists(AFileName) then
-    DeleteFile(AFileName);
+  AFileIndex := 0;
+  repeat
+    AFileNameForSave := AFileName + IfThen(AFileIndex > 0, IntToStr(AFileIndex), '') + AFileNameExt;
 
-  AIni := TGrepIniFile.Create(AFileName);
-  try
-    if Results is TGrepHistoryList then
-      TGrepHistoryList(Results).SaveToSettings(AIni, AIniVersion, ifmSingle, '')
-    else if Results is TGrepHistoryListItem then
-    begin
-      AIni.WriteInteger(TGrepHistoryList.KeyName, 'IniVersion', AIniVersion);
-      TGrepHistoryListItem(Results).WriteToIni(AIni, AIniVersion, ifmSingle, TGrepHistoryListItem.SubKeyNameHistory);
+    TfmGrepProgress.Progressing(AFileNameForSave);
+    if AMode <> sfSaveToLoadable then
+      PrintGeneric(Owner, Results.HistoryList, Where, AFileName, False, ASaveAll, ASplitCount);
+
+    if AMode <> sfSaveToLoadable then
+      TfmGrepProgress.Progressed;
+
+    if AMode = sfPrintToFile then
+      Exit;
+
+    if (AMode <> sfBoth) and FileExists(AFileNameForSave) then
+      DeleteFile(AFileNameForSave);
+
+    AIni := TGrepIniFile.Create(AFileNameForSave);
+    try
+      Results.SaveToSettings(AIni, AIniVersion, ifmSingle, '', ASaveAll, False, False, 0, ASplitCount);
+    finally
+      AIni.Free;
     end;
-  finally
-    AIni.Free;
-  end;
+    TfmGrepProgress.Progressed;
+
+    Inc(AFileIndex);
+  until not Results.AnyChecked;
 end;
 
 end.

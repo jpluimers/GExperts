@@ -7,12 +7,15 @@ unit GX_GrepResults;
 interface
 
 uses
-  Windows, Classes, Graphics, Controls, Forms,
-  StdCtrls, ExtCtrls, GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, ComCtrls,
-  Menus, DropSource, GX_IdeDock, ActnList, Dialogs,
-  ToolWin, Actions;
+  Windows, Classes, Graphics, Controls, Forms, ActnList, Dialogs, StdCtrls, ExtCtrls, ToolWin,
+  ComCtrls, Menus, Actions,
+  DropSource, GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, GX_IdeDock, GX_GrepSearch;
 
 type
+  TPageIndexType = (pitClickedEntryKeyIndex, pitTopKeyIndex, pitClickedEntryItemIndex, pitTopItemIndex);
+  TPageSavedIndexType = Low(TPageIndexType)..pitTopKeyIndex;
+  TPageIndexes = array[TPageIndexType] of Integer;
+
   TfmGrepResults = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
     lbResults: TListBox;
@@ -73,7 +76,6 @@ type
     actFileCopy: TAction;
     mitFileSave: TMenuItem;
     mitFileCopy: TMenuItem;
-    mitFileSep6: TMenuItem;
     mitView: TMenuItem;
     mitViewSep3: TMenuItem;
     actViewToolBar: TAction;
@@ -98,13 +100,10 @@ type
     actHistoryView: TAction;
     actHistoryDelete: TAction;
     actHistoryRefresh: TAction;
-    actHistorySave: TAction;
     miHistoryView: TMenuItem;
     miHistoryRefresh: TMenuItem;
     mitHistorySep2: TMenuItem;
     miHistoryDelete: TMenuItem;
-    mitHistorySep3: TMenuItem;
-    miHistorySave: TMenuItem;
     mitHistorySep1: TMenuItem;
     miHistoryItemName: TMenuItem;
     actViewShowHistoryList: TAction;
@@ -112,24 +111,14 @@ type
     miViewShowHistoryList: TMenuItem;
     mitViewSep2: TMenuItem;
     miViewShowFullFilename: TMenuItem;
-    actHistoryDeleteAll: TAction;
-    actHistorySaveAll: TAction;
+    actHistoryDeleteSelected: TAction;
     pmContextMenu: TPopupMenu;
     actContextSelSearch: TAction;
     miContextSearchSelectedText: TMenuItem;
     actHistorySearch: TAction;
     miHistorySearch: TMenuItem;
-    actHistoryPrintToFile: TAction;
-    actHistorySavePrint: TAction;
-    actHistoryPrintAllToFile: TAction;
-    actHistorySavePrintAll: TAction;
-    miHistoryPrintToFile: TMenuItem;
-    miHistorySavePrint: TMenuItem;
     mitFileSep2: TMenuItem;
     mitFileSep4: TMenuItem;
-    miFileSaveAll: TMenuItem;
-    miFilePrintAllToFile: TMenuItem;
-    miFileSavePrintAllToFile: TMenuItem;
     actFilePrintToFile: TAction;
     actFileSavePrint: TAction;
     actFileOpen: TAction;
@@ -138,13 +127,59 @@ type
     mitFileOpen: TMenuItem;
     mitFileSep3: TMenuItem;
     OpenDialog: TOpenDialog;
-    actHistoryRefreshAll: TAction;
+    actHistoryRefreshSelected: TAction;
     mitFileSep5: TMenuItem;
-    miFileRefreshAll: TMenuItem;
-    actHistoryModifySearchOptions: TAction;
-    miHistoryModifySearchOptions: TMenuItem;
-    mitFileDeleteAll: TMenuItem;
+    miFileRefreshSelected: TMenuItem;
+    actHistoryModifySearchSettings: TAction;
+    miHistoryModifySearchSettings: TMenuItem;
+    tbnSep8: TToolButton;
+    tbnShowFullFilename: TToolButton;
+    mitFileDeleteSelected: TMenuItem;
     mitFileSep7: TMenuItem;
+    miHistorySettings: TMenuItem;
+    miSettingsCurrentFile: TMenuItem;
+    miSettingsAllFilesInProjectGroup: TMenuItem;
+    miSettingsAllFilesInProject: TMenuItem;
+    miSettingsOpenProjectFiles: TMenuItem;
+    miSettingsDirectories: TMenuItem;
+    miSettingsPreviousSearchResultFiles: TMenuItem;
+    miSettingsCaseSensitive: TMenuItem;
+    miSettingsWholeWord: TMenuItem;
+    miSettingsSearchFormFiles: TMenuItem;
+    miSettingsSearchSQLFiles: TMenuItem;
+    miSettingsRegularExpression: TMenuItem;
+    miSettingsDirectoriesData: TMenuItem;
+    miSettingsExcludeDirs: TMenuItem;
+    miSettingsFileMasks: TMenuItem;
+    miSettingsSearchSubDirectories: TMenuItem;
+    tcHistoryListPage: TTabControl;
+    actHistorySort: TAction;
+    miSettingsSaveOption: TMenuItem;
+    miSettingsSep1: TMenuItem;
+    miSettingsSep2: TMenuItem;
+    miSettingsSep3: TMenuItem;
+    actHistoryModifySaveOptions: TAction;
+    mitFileSep6: TMenuItem;
+    mitFileModifySaveOptions: TMenuItem;
+    miHistoryLastSearchTime: TMenuItem;
+    actViewShowIndent: TAction;
+    miViewShowIndent: TMenuItem;
+    tbnShowLineIndent: TToolButton;
+    mitHistorySep3: TMenuItem;
+    miHistorySort: TMenuItem;
+    actHistorySearchInHistory: TAction;
+    mitFileSearhInHistory: TMenuItem;
+    miSettingsSep4: TMenuItem;
+    miSettingsGrepCode: TMenuItem;
+    miSettingsGrepStrings: TMenuItem;
+    miSettingsGrepComments: TMenuItem;
+    miSettingsSectionInterface: TMenuItem;
+    miSettingsSectionImplementation: TMenuItem;
+    miSettingsSectionInitialization: TMenuItem;
+    miSettingsSectionFinalization: TMenuItem;
+    miSettingsSepDir: TMenuItem;
+    tbnSearchInHistory: TToolButton;
+    tbnSep9: TToolButton;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);
@@ -182,17 +217,27 @@ type
     procedure actHistoryRefreshExecute(Sender: TObject);
     procedure lbHistoryListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure lbHistoryListDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-    procedure actHistorySaveExecute(Sender: TObject);
     procedure actHistoryDeleteExecute(Sender: TObject);
     procedure actViewShowHistoryListExecute(Sender: TObject);
     procedure actViewShowFullFilenameExecute(Sender: TObject);
     procedure actContextSelSearchExecute(Sender: TObject);
-    procedure actHistoryDeleteAllExecute(Sender: TObject);
-    procedure actHistorySaveAllExecute(Sender: TObject);
+    procedure actHistoryDeleteSelectedExecute(Sender: TObject);
     procedure actFileOpenExecute(Sender: TObject);
-    procedure actHistoryRefreshAllExecute(Sender: TObject);
+    procedure actHistoryRefreshSelectedExecute(Sender: TObject);
     procedure lbHistoryListDblClick(Sender: TObject);
     procedure actHistoryUpdate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure tcHistoryListPageChange(Sender: TObject);
+    procedure actHistorySortExecute(Sender: TObject);
+    procedure lbHistoryListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
+      Y: Integer);
+    procedure actHistoryModifySaveOptionsExecute(Sender: TObject);
+    procedure actViewShowIndentExecute(Sender: TObject);
+    procedure miHistoryItemNameClick(Sender: TObject);
+    procedure lbHistoryListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure actHistorySearchInHistoryExecute(Sender: TObject);
+    procedure SplitterHistoryListMoved(Sender: TObject);
+    procedure reContextContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
   private
     FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
@@ -204,11 +249,28 @@ type
     FShowContext: Boolean;
     FDoSearchReplace: Boolean;
     FShowFullFilename: Boolean;
+    FShowLineIndent: Boolean;
     FShowHistoryList: Boolean;
     FLoadContextHeight: Integer;
+    FLoadContextHeightPercent: Integer;
     FLoadHistoryListWidth: Integer;
+    FLoadHistoryListPage: Integer;
     FContextSearchText: string;
-    FHistoryListClickedEntry: Integer;
+    FPageIndexes: array[TGrepHistoryListMode] of TPageIndexes;
+    FSavedLastSearchTimeCaption: String;
+    FSavedSaveOptionCaption: String;
+    FSavedDirectoriesDataCaption: String;
+    FSavedExcludeDirsCaption: String;
+    FSavedFileMasksCaption: String;
+    FHistoryMousePos: TPoint;
+    FSelectedCount: Integer;
+    FSaveSplitCount: Integer;
+    FEmbeddedGrepSearch: TfmGrepSearch;
+    FNewSortMode: TGrepHistorySort;
+    FNewSortDesc: Boolean;
+    FSearchInClearSearchList: Boolean;
+    FSaveItemEmptyCaption: String;
+    FSaveSortCaption: String;
     procedure SetStayOnTop(Value: Boolean);
     procedure RefreshContextLines;
     procedure SetShowContext(Value: Boolean);
@@ -236,6 +298,16 @@ type
     procedure ViewHistoryListItems(AIndex: Integer; AUsedExpandState: Boolean);
     procedure SetShowHistoryList(const Value: Boolean);
     procedure SetShowFullFilename(const Value: Boolean);
+    procedure SetShowLineIndent(const Value: Boolean);
+    procedure RefreshHistoryView(DoUpdateIndex: Boolean);
+    procedure SetHistoryListMode(ANewMode: TGrepHistoryListMode; DoRefresh, DoSaveIndex, DoUpdateIndex: Boolean;
+      AddIf: Boolean = False; AConditionMode: TGrepHistoryListMode = hlmSettings);
+    function  GetSavedHistoryIndex: Integer;
+    procedure SetSavedHistoryIndexes(AIndex: Integer);
+    function  HistoryListSelect(ASelectType: TGrepSelectType; ACaption: String): TGrepSelectResult;
+    procedure ClearResultsData;
+    procedure DoEmbeddedSearch(Sender: TObject);
+    procedure UpdateHistoryPagesOptions;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
@@ -245,12 +317,14 @@ type
     GrepExpert: TGrepExpert;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Execute(AState: TGrepSearchState);
+    procedure InitGrepSettings(AGrepSettings: TGrepSettings);
+    function  Execute(AState: TGrepSearchState): Boolean;
     procedure UpdateFromSettings;
     procedure InternalSaveSettings(Settings: TGExpertsSettings);
     property StayOnTop: Boolean read GetStayOnTop write SetStayOnTop;
     property ShowContext: Boolean read FShowContext write SetShowContext;
     property ShowFullFilename: Boolean read FShowFullFilename write SetShowFullFilename;
+    property ShowLineIndent: Boolean read FShowLineIndent write SetShowLineIndent;
     property ShowHistoryList: Boolean read FShowHistoryList write SetShowHistoryList;
     property DoSearchReplace: Boolean read FDoSearchReplace write FDoSearchReplace;
     property ContextSearchText: string read FContextSearchText;
@@ -266,13 +340,21 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF D+}
-  SysUtils, Messages, ToolsAPI,
-  GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_GrepPrinting, GX_GrepSearch,
-  GX_GExperts, GX_SharedImages, GX_Replace, GX_GrepReplace,
-  GX_MessageBox, GX_IdeUtils, Math, StrUtils, IniFiles;
+  SysUtils, Messages, ToolsAPI, Math, StrUtils, IniFiles, TypInfo, Contnrs, Clipbrd, DateUtils,
+  GX_GExperts, GX_SharedImages, GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_IdeUtils, GX_MessageBox,
+  GX_GrepPrinting, GX_Replace, GX_GrepReplace, GX_GrepSelect,
+  GX_GrepProgress;
 
 resourcestring
   SGrepReplaceStats = 'Replaced %d occurrence(s) in %.2f seconds';
+
+const  //do not localize
+  cKeyPageIndexType: array[TPageSavedIndexType] of String = ('Last', 'Top');
+  cKeyPageIndexMode: array[TGrepHistoryListMode] of String = (
+    'ViewedResultsItem',
+    'ViewedSettingsItem',
+    'ViewedItem',
+    'ViewedSearchItems');
 
 type
   TShowUnicodeReplaceMessage = class(TGxMsgBoxAdaptor)
@@ -281,12 +363,12 @@ type
     function ShouldShow: Boolean; override;
   end;
 
-  TGxResultRefreshAllQuestion = class(TGxQuestionBoxAdaptor)
+  TGxResultRefreshSelectedQuestion = class(TGxQuestionBoxAdaptor)
   protected
     function GetMessage: string; override;
   end;
 
-  TGxResultDeleteAllQuestion = class(TGxQuestionBoxAdaptor)
+  TGxResultDeleteSelectedQuestion = class(TGxQuestionBoxAdaptor)
   protected
     function GetMessage: string; override;
   end;
@@ -320,21 +402,54 @@ begin
   Result := RunningDelphi8OrGreater;
 end;
 
-{ TGxResultRefreshAllQuestion }
+{ TGxResultRefreshSelectedQuestion }
 
-function TGxResultRefreshAllQuestion.GetMessage: string;
+function TGxResultRefreshSelectedQuestion.GetMessage: string;
 begin
-  Result := 'Are you sure you want to refresh all search history item lists?';
+  if FData = 'A' then
+    Result := 'Are you sure you want to refresh all search history item lists?'
+  else
+    Result := 'Are you sure you want to refresh selected search history item lists?';
 end;
 
-{ TGxResultDeleteAllQuestion }
+{ TGxResultDeleteSelectedQuestion }
 
-function TGxResultDeleteAllQuestion.GetMessage: string;
+function TGxResultDeleteSelectedQuestion.GetMessage: string;
 begin
-  Result := 'Are you sure you want to delete all search history items?';
+  if FData = 'A' then
+    Result := 'Are you sure you want to delete all search history items?'
+  else
+    Result := 'Are you sure you want to delete selected search history items?';
 end;
 
 { TfmGrepResults }
+
+procedure TfmGrepResults.FormCreate(Sender: TObject);
+begin
+  FSavedLastSearchTimeCaption := miHistoryLastSearchTime.Caption;
+  FSavedSaveOptionCaption := miSettingsSaveOption.Caption;
+  FSavedDirectoriesDataCaption := miSettingsDirectoriesData.Caption;
+  FSavedExcludeDirsCaption := miSettingsExcludeDirs.Caption;
+  FSavedFileMasksCaption := miSettingsFileMasks.Caption;
+  FSaveItemEmptyCaption := miHistoryItemName.Caption;
+  FSaveSortCaption := miHistorySort.Caption;
+end;
+
+procedure TfmGrepResults.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #27 then
+  begin
+    if FSearchInProgress then
+      Self.Abort
+    else
+    begin
+      if IsStandAlone then
+        ModalResult := mrCancel
+      else
+        Hide;
+    end;
+  end;
+end;
 
 procedure TfmGrepResults.StartFileSearch(Sender: TObject; const FileName: string);
 resourcestring
@@ -353,7 +468,7 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.Execute(AState: TGrepSearchState);
+function TfmGrepResults.Execute(AState: TGrepSearchState): Boolean;
 resourcestring
   SGrepActive = 'A Grep search is currently active; either abort it or wait until it is finished.';
   SGrepSearchStats = 'Searched %d files in %.2f seconds for "%s"';
@@ -363,20 +478,23 @@ var
   MatchesFound: Cardinal;
   Cursor: IInterface;
   ResultFiles: TStringList;
-  i : Integer;
-  AHistoryIndex : Integer;
-  ATopIndex: Integer;
+  I : Integer;
+  AItemIndex, ATopIndex : Integer;
 begin
+  Result := False;
   if FSearchInProgress then
     raise Exception.Create(SGrepActive);
 
-  if (AState in [gssNormal, gssSearchAgain, gssSearchModifyOptions]) or not FGrepSettings.CanRefresh then
+  if (AState in [gssNormal, gssSearchAgain, gssModifySearchSettings]) or not FGrepSettings.CanRefresh then
     if not QueryUserForGrepOptions(AState) then
       Exit;
 
-  if AState = gssSearchModifyOptions then
+  Result := True;
+
+  if AState = gssModifySearchSettings then
   begin
     GrepExpert.HistoryList.UpdateGrepSettings(FGrepSettings);
+    lbHistoryList.Refresh;
     Exit;
   end;
 
@@ -399,6 +517,7 @@ begin
     Cursor := TempHourGlassCursor;
 
     FSearcher := TGrepSearchRunner.Create(FGrepSettings, lbResults.Items, ResultFiles);
+
     try
       FSearcher.OnSearchFile := StartFileSearch;
       FSearchInProgress := True;
@@ -418,17 +537,102 @@ begin
   lbResults.Sorted := True;  // There is no Sort method
   lbResults.Sorted := False;
 
-  ATopIndex := lbHistoryList.TopIndex;
-  AHistoryIndex := GrepExpert.HistoryList.AddItem(FGrepSettings, lbResults.Items);
+  if GrepExpert.HistoryList.ListMode = hlmSettings then
+    SetSavedHistoryIndexes(lbHistoryList.ItemIndex + 1);
 
+  SetHistoryListMode(hlmResults, False, False, False, True);
+
+  AItemIndex := GrepExpert.HistoryList.AddItem(FGrepSettings, lbResults.Items, TimeStart);
+  GrepExpert.HistoryListSaveSettings(AItemIndex);
+
+  ATopIndex := lbHistoryList.TopIndex;
   lbHistoryList.Count := GrepExpert.HistoryList.Count;
-  lbHistoryList.ItemIndex := AHistoryIndex;
-  if (ATopIndex < lbHistoryList.Count) and (AHistoryIndex < lbHistoryList.Count-1) then
+  lbHistoryList.ItemIndex := AItemIndex;
+  if (ATopIndex < lbHistoryList.Count) and (AItemIndex < lbHistoryList.Count-1) then
     lbHistoryList.TopIndex := ATopIndex;
+  SetSavedHistoryIndexes(AItemIndex);
+
+  lbHistoryList.Refresh;
 
   RefreshInformation(MatchesFound, GrepExpert.GrepExpandAll, False, True);
 
-  GrepExpert.HistoryListSaveSettings(AHistoryIndex);
+  if Assigned(FEmbeddedGrepSearch) then
+    FEmbeddedGrepSearch.Hide;
+end;
+
+procedure TfmGrepResults.RefreshHistoryView(DoUpdateIndex: Boolean);
+begin
+  lbHistoryList.Items.BeginUpdate;
+  try
+    lbHistoryList.Count := GrepExpert.HistoryList.Count;
+//    lbHistoryList.Refresh;
+    if DoUpdateIndex then
+      GetSavedHistoryIndex;
+  finally
+    lbHistoryList.Items.EndUpdate;
+  end;
+end;
+
+procedure TfmGrepResults.SetHistoryListMode(ANewMode: TGrepHistoryListMode;
+  DoRefresh, DoSaveIndex, DoUpdateIndex, AddIf: Boolean; AConditionMode: TGrepHistoryListMode);
+begin
+  if not AddIf or (GrepExpert.HistoryList.ListMode = AConditionMode) then
+  begin
+    if DoSaveIndex then
+      SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
+    GrepExpert.HistoryList.ListMode := ANewMode;
+    tcHistoryListPage.TabIndex := Integer(ANewMode);
+    if DoRefresh then
+      RefreshHistoryView(DoUpdateIndex);
+  end;
+end;
+
+function TfmGrepResults.GetSavedHistoryIndex: Integer;
+var
+  APageIndexes: TPageIndexes;
+  ATopIndex: Integer;
+begin
+  APageIndexes := FPageIndexes[GrepExpert.HistoryList.ListMode];
+  Result := GrepExpert.HistoryList.ItemIndexByKeyIndex(APageIndexes[pitClickedEntryKeyIndex]);
+  if Result = -1 then
+    Result := APageIndexes[pitClickedEntryItemIndex];
+  ATopIndex := GrepExpert.HistoryList.ItemIndexByKeyIndex(APageIndexes[pitTopKeyIndex]);
+  if ATopIndex = -1 then
+    ATopIndex := APageIndexes[pitTopItemIndex];
+
+  if Result <> -1 then
+    lbHistoryList.ItemIndex := Result
+  else
+  begin
+    lbHistoryList.ItemIndex := lbHistoryList.Count-1;
+    Result := lbHistoryList.ItemIndex;
+  end;
+  if (ATopIndex <> -1) and (ATopIndex <= Result) then
+    lbHistoryList.TopIndex := ATopIndex;
+
+  ViewHistoryListItems(lbHistoryList.ItemIndex, True);
+end;
+
+procedure TfmGrepResults.SetSavedHistoryIndexes(AIndex: Integer);
+var
+  AItem: TGrepHistoryListItem;
+  APageIndexes: TPageIndexes;
+begin
+  APageIndexes[pitClickedEntryItemIndex] := AIndex;
+  AItem := GrepExpert.HistoryList.Items[AIndex];
+  if Assigned(AItem) then
+    APageIndexes[pitClickedEntryKeyIndex] := AItem.KeyIndex
+  else
+    APageIndexes[pitClickedEntryKeyIndex] := -1;
+
+  APageIndexes[pitClickedEntryItemIndex] := lbHistoryList.TopIndex;
+  AItem := GrepExpert.HistoryList.Items[lbHistoryList.TopIndex];
+  if Assigned(AItem) then
+    APageIndexes[pitTopKeyIndex] := AItem.KeyIndex
+  else
+    APageIndexes[pitTopKeyIndex] := -1;
+
+  FPageIndexes[GrepExpert.HistoryList.ListMode] := APageIndexes;
 end;
 
 procedure TfmGrepResults.RefreshInformation(AMatchesFound: Integer; ADoExpand, AUSedExpandState, ASetExpandState: Boolean);
@@ -466,6 +670,15 @@ begin
     MatchString := MatchString + ' ' + Format(SFiles, [FilesHit]);
 
   SetMatchString(MatchString);
+end;
+
+procedure TfmGrepResults.tcHistoryListPageChange(Sender: TObject);
+var
+  ANewMode: TGrepHistoryListMode;
+begin
+  ANewMode := TGrepHistoryListMode(tcHistoryListPage.TabIndex);
+  if GrepExpert.HistoryList.ListMode <> ANewMode then
+    SetHistoryListMode(ANewMode, True, True, True);
 end;
 
 procedure TfmGrepResults.ClearResultsListbox;
@@ -523,13 +736,22 @@ end;
 procedure TfmGrepResults.FormResize(Sender: TObject);
 begin
   ResizeStatusBar;
+  if Assigned(FEmbeddedGrepSearch) then
+    FEmbeddedGrepSearch.EmbeddedUpdatePos;
   lbResults.Refresh;
+end;
+
+procedure TfmGrepResults.InitGrepSettings(AGrepSettings: TGrepSettings);
+begin
+  FGrepSettings := AGrepSettings;
 end;
 
 procedure TfmGrepResults.InternalSaveSettings(Settings: TGExpertsSettings);
 var
   WindowSettings: TExpertSettings;
   Percent: integer;
+  IM: TGrepHistoryListMode;
+  IT: TPageIndexType;
 begin
   WindowSettings := Settings.CreateExpertSettings(ConfigWindowKey);
   try
@@ -538,18 +760,25 @@ begin
     WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
     WindowSettings.WriteBool('ShowContext', ShowContext);
     WindowSettings.WriteBool('ShowHistoryList', ShowHistoryList);
-    if GrepExpert.ContextSaveSize then
+
+    if GrepExpert.ContextSaveFixedHeight then
+      WindowSettings.WriteInteger('ContextHeight', reContext.Height)
+    else
     begin
       Percent := (reContext.Height * 100) div ClientHeight;
       WindowSettings.WriteInteger('ContextHeightPercent', Percent);
-      Settings.DeleteKey(ConfigWindowKey, 'ContextHeight');
     end;
-    if GrepExpert.HistoryListSaveSize then
-      WindowSettings.WriteInteger('HistoryListWidth', lbHistoryList.Width);
+
+    WindowSettings.WriteInteger('HistoryListWidth', lbHistoryList.Width);
 
     WindowSettings.WriteBool('ShowFullFilename', ShowFullFilename);
+    WindowSettings.WriteBool('ShowLineIndent', ShowLineIndent);
 
-    WindowSettings.WriteInteger('LastViewedItem', FHistoryListClickedEntry);
+    for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
+      for IT := Low(TPageSavedIndexType) to High(TPageSavedIndexType) do
+        WindowSettings.WriteInteger(cKeyPageIndexType[IT] + cKeyPageIndexMode[IM], FPageIndexes[IM, IT]);
+
+    WindowSettings.WriteInteger('HistoryListPage', tcHistoryListPage.TabIndex);
   finally
     WindowSettings.Free;
   end;
@@ -573,6 +802,8 @@ var
   WindowSettings: TExpertSettings;
   Settings: TGExpertsSettings;
   AHistoryIniVersion: Integer;
+  IM: TGrepHistoryListMode;
+  IT: TPageIndexType;
 begin
   // Do not localize any of the below strings.
   WindowSettings := nil;
@@ -586,7 +817,10 @@ begin
     StayOnTop := WindowSettings.ReadBool('OnTop', True);
     ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible);
     ShowContext := WindowSettings.ReadBool('ShowContext', True);
-    FHistoryListClickedEntry := WindowSettings.ReadInteger('LastViewedItem', FHistoryListClickedEntry);
+
+    for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
+      for IT := Low(TPageSavedIndexType) to High(TPageSavedIndexType) do
+        FPageIndexes[IM, IT] := WindowSettings.ReadInteger(cKeyPageIndexType[IT] + cKeyPageIndexMode[IM], FPageIndexes[IM, IT]);
 
     if AHistoryIniVersion = 0 then
     begin
@@ -600,21 +834,20 @@ begin
     end;
 
     if WindowSettings.ValueExists('ContextHeightPercent') then
-    begin
-      FLoadContextHeight := WindowSettings.ReadInteger('ContextHeightPercent', 20);
-    end
+      FLoadContextHeightPercent := WindowSettings.ReadInteger('ContextHeightPercent', 20)
     else
-    begin
-      if Settings.ValueExists(ConfigWindowKey, 'ContextHeight') then
-        FLoadContextHeight := WindowSettings.ReadInteger('ContextHeight', reContext.Height)
-      else
-        FLoadContextHeight := pnlMain.Height - ToolBar.Height - SplitterContext.Height -
-          WindowSettings.ReadInteger('ResultsHeight', lbResults.Height);
-      // negative means this is an absoulte pixel value rather than a percent value
-      FLoadContextHeight := -FLoadContextHeight;
-    end;
+      FLoadContextHeightPercent := -1;
+
+    if WindowSettings.ValueExists('ContextHeight') then
+      FLoadContextHeight := WindowSettings.ReadInteger('ContextHeight', reContext.Height)
+    else
+      FLoadContextHeight := pnlMain.Height - ToolBar.Height - SplitterContext.Height -
+        WindowSettings.ReadInteger('ResultsHeight', lbResults.Height);
 
     ShowFullFilename := WindowSettings.ReadBool('ShowFullFilename', False);
+    ShowLineIndent := WindowSettings.ReadBool('ShowLineIndent', False);
+
+    FLoadHistoryListPage := WindowSettings.ReadInteger('HistoryListPage', tcHistoryListPage.TabIndex);
   finally
     FreeAndNil(WindowSettings);
     FreeAndNil(Settings);
@@ -623,29 +856,42 @@ end;
 
 procedure TfmGrepResults.UpdateFromSettings;
 begin
+  FEmbeddedGrepSearch := TfmGrepSearch.Create(pnlMain);
+  FEmbeddedGrepSearch.EmbeddedInit(lbResults, DoEmbeddedSearch);
+
   GrepExpert.HistoryList.Enabled := ShowHistoryList;
-  if GrepExpert.ContextSaveSize then
+  if not GrepExpert.ContextSaveFixedHeight and (FLoadContextHeightPercent > 0) then
+    reContext.Height := (ClientHeight * FLoadContextHeightPercent) div 100
+  else
+    reContext.Height := FLoadContextHeight;
+
+  if GrepExpert.GrepSaveHistoryListItems and FShowHistoryList then
   begin
-    if FLoadContextHeight < 0 then
-      reContext.Height := -FLoadContextHeight
-    else
-      reContext.Height := (ClientHeight * FLoadContextHeight) div 100;
-  end;
-  if GrepExpert.HistoryListSaveSize then
+    UpdateHistoryPagesOptions;
+
     lbHistoryList.Width := FLoadHistoryListWidth;
-  if GrepExpert.GrepSaveHistoryListItems and FShowHistoryList and (GrepExpert.HistoryList.Count > 0) then
-  begin
-    lbHistoryList.Count := GrepExpert.HistoryList.Count;
-    if FHistoryListClickedEntry <> -1 then
-      lbHistoryList.ItemIndex := FHistoryListClickedEntry
-    else
-      lbHistoryList.ItemIndex := lbHistoryList.Count-1;
-    ViewHistoryListItems(lbHistoryList.ItemIndex, True);
+    if GrepExpert.GrepHistoryListDefaultPage < tcHistoryListPage.Tabs.Count then
+      FLoadHistoryListPage := GrepExpert.GrepHistoryListDefaultPage;
+    SetHistoryListMode(TGrepHistoryListMode(FLoadHistoryListPage), True, False, True);
+    SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
   end;
 end;
 
-procedure TfmGrepResults.lbResultsClick(Sender: TObject);
+procedure TfmGrepResults.UpdateHistoryPagesOptions;
 begin
+  tcHistoryListPage.MultiLine := GrepExpert.GrepHistoryPagesTabMultiline;
+  if not GrepExpert.GrepHistoryPagesTabMultiline then
+    tcHistoryListPage.TabWidth := GrepExpert.GrepHistoryPagesTabWidth;
+end;
+
+procedure TfmGrepResults.lbResultsClick(Sender: TObject);
+var
+  AItem: TGrepHistoryListItem;
+begin
+  AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex];
+  if Assigned(AItem) and AItem.IsOnlySaveSettings then
+    Exit;
+
   RefreshContextLines;
 end;
 
@@ -865,22 +1111,6 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.FormKeyPress(Sender: TObject; var Key: Char);
-begin
-  if Key = #27 then
-  begin
-    if FSearchInProgress then
-      Self.Abort
-    else
-    begin
-      if IsStandAlone then
-        ModalResult := mrCancel
-      else
-        Hide;
-    end;
-  end;
-end;
-
 procedure TfmGrepResults.ResizeListBox;
 begin
   lbResults.Canvas.Font.Assign(lbResults.Font);
@@ -1002,20 +1232,26 @@ resourcestring
 
     LineNoWidth := 60;
     LineText := lbResults.Items[Index];
-    if ALineResult.Matches.Count > 0 then
-    begin
-      // Avoid trimming inside the first match :
-      Trimmed := 0;
-      while (Length(LineText) > Trimmed)
-        and CharInSet(LineText[Trimmed + 1], [#9, #32])
-        and (Trimmed < ALineResult.Matches[0].SPos - 1) do
-          Inc(Trimmed);
 
-      if Trimmed > 0 then
-        Delete(LineText, 1, Trimmed);
+    if not FShowLineIndent then
+    begin
+      if ALineResult.Matches.Count > 0 then
+      begin
+        // Avoid trimming inside the first match :
+        Trimmed := 0;
+        while (Length(LineText) > Trimmed)
+          and CharInSet(LineText[Trimmed + 1], [#9, #32])
+          and (Trimmed < ALineResult.Matches[0].SPos - 1) do
+            Inc(Trimmed);
+
+        if Trimmed > 0 then
+          Delete(LineText, 1, Trimmed);
+      end
+      else
+        Trimmed := LeftTrimChars(LineText);
     end
     else
-      Trimmed := LeftTrimChars(LineText);
+      Trimmed := 0;
 
     PrevMatchEnd := 0;
 
@@ -1046,9 +1282,20 @@ resourcestring
     end;
   end;
 
+  procedure PaintOnlySaveSettings;
+  begin
+    ResultsCanvas.Brush.Color := clWindow;
+    ResultsCanvas.Font.Color := clWindowText;
+    ResultsCanvas.FillRect(Rect);
+
+    ResultsCanvas.TextOut(Rect.Left + 3, Rect.Top + 1, lbResults.Items[Index]);
+  end;
+
 begin
   ResultsCanvas := lbResults.Canvas;
-  if lbResults.Items.Objects[Index] is TFileResult then
+  if not Assigned(lbResults.Items.Objects[Index]) then
+    PaintOnlySaveSettings
+  else if lbResults.Items.Objects[Index] is TFileResult then
     PaintFileHeader
   else
     PaintLineMatch;
@@ -1084,63 +1331,108 @@ begin
 end;
 
 procedure TfmGrepResults.actFilePrintExecute(Sender: TObject);
+var
+  AItem: TGrepHistoryListItem;
 begin
-  PrintGrepResults(Self, lbResults.Items, grPrint);
+  if (lbHistoryList.ItemIndex = -1) or (lbHistoryList.Count = 0) then
+    Exit;
+
+  AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex];
+  if not AItem.IsOnlySaveSettings then
+  begin
+    GrepExpert.HistoryList.ClearAllChecked;
+    AItem.Checked := True;
+    SaveGrepResultsToFile(Self, GrepExpert.HistoryList, GrepExpert.HistoryIniVersion, False,
+      sfPrintToFile, grPrint);
+  end;
 end;
 
 procedure TfmGrepResults.actFileCopyExecute(Sender: TObject);
+var
+  AItem: TGrepHistoryListItem;
 begin
   if reContext.Focused and (reContext.SelLength > 0) then
-    reContext.CopyToClipboard
-  else
-    PrintGrepResults(Self, lbResults.Items, grCopy);
+  begin
+    reContext.CopyToClipboard;
+    Exit;
+  end;
+
+  if (lbHistoryList.ItemIndex = -1) or (lbHistoryList.Count = 0) then
+    Exit;
+
+  AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex];
+  if not AItem.IsOnlySaveSettings then
+  begin
+    GrepExpert.HistoryList.ClearAllChecked;
+    AItem.Checked := True;
+    SaveGrepResultsToFile(Self, GrepExpert.HistoryList, GrepExpert.HistoryIniVersion, False,
+      sfPrintToFile, grCopy);
+  end;
 end;
 
 procedure TfmGrepResults.actFileOpenExecute(Sender: TObject);
+resourcestring
+  rsOpenCaption = 'Select the items for open';   //Open saved Search History
 var
+  ASelResult: TGrepSelectResult;
   AIni: TGrepIniFile;
-  AIndex: Integer;
+  frmSelect: TfmGrepSelect;
+  AOpenHistoryList: TGrepHistoryList;
+  AItemIndex: Integer;
+  AClearList, AOverwriteItem, AOnlyIfNewer: Boolean;
 begin
   if not OpenDialog.Execute then
     Exit;
 
-  AIni := TGrepIniFile.Create(OpenDialog.FileName);
+  AOpenHistoryList := TGrepHistoryList.Create;
   try
-    if AIni.SectionExists(TGrepHistoryList.KeyName) then
-    begin
-      if not GrepExpert.HistoryList.LoadFromSettings(FGrepSettings, AIni, GrepExpert.HistoryIniVersion, ifmSingle, '', True) then
-        MessageDlg('Could not read history list', mtWarning, [mbOK], 0);
-    end
-    else if AIni.SectionExists(TGrepHistoryListItem.SubKeyNameHistory) then
-    begin
-      AIndex := GrepExpert.HistoryList.LoadItemFromIni(FGrepSettings, AIni, GrepExpert.HistoryIniVersion);
-      if AIndex = -1 then
-        MessageDlg('Could not read history list from file!', mtWarning, [mbOK], 0)
+    AOpenHistoryList.ListMode := hlmAll;
+
+    AIni := TGrepIniFile.Create(OpenDialog.FileName);
+    try
+      if AIni.SectionExists(TGrepHistoryListItem.SubKeyNameHistory) then //without numbers
+        AOpenHistoryList.LoadItemFromIni(FGrepSettings, AIni, GrepExpert.HistoryIniVersion, GrepExpert.OpenSaveOption, GrepExpert.HistoryList)
       else
-        ViewHistoryListItems(AIndex, True);
+        AOpenHistoryList.LoadFromSettings(FGrepSettings, AIni, GrepExpert.HistoryIniVersion, ifmSingle, '', GrepExpert.OpenSaveOption, GrepExpert.HistoryList);
+    finally
+      AIni.Free;
     end;
+
+    if AOpenHistoryList.Count = 0 then
+    begin
+      MessageDlg('Could not read history list from file!', mtWarning, [mbOK], 0);
+      Exit;
+    end;
+
+    frmSelect := TfmGrepSelect.Create(Self);
+    try
+      frmSelect.Init(AOpenHistoryList, gstOpen, rsOpenCaption);
+      ASelResult := frmSelect.Execute;
+      AClearList := frmSelect.cbOpenClear.Checked;
+      AOverwriteItem := frmSelect.cbOpenOverwrite.Checked;
+      AOnlyIfNewer := frmSelect.cbOpenOnlyIfNewer.Checked;
+    finally
+      frmSelect.Free;
+    end;
+
+    if ASelResult = gsrNoSelection then
+      Exit;
+
+    SetHistoryListMode(hlmResults, False, True, False, True);
+
+    //"copy to"
+    AItemIndex := GrepExpert.HistoryList.MoveItems(AOpenHistoryList, AClearList, AOverwriteItem, AOnlyIfNewer);
+
+    RefreshHistoryView(False);
+
+    lbHistoryList.ItemIndex := AItemIndex;
+
+    lbHistoryList.Refresh;
+
+    ViewHistoryListItems(AItemIndex, False);
   finally
-    AIni.Free;
+    AOpenHistoryList.Free;
   end;
-end;
-
-procedure TfmGrepResults.actFileSaveExecute(Sender: TObject);
-var
-  AItem: TGrepHistoryListItem;
-  AMode: TSaveToFileMode;
-begin
-  AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex];
-  if not Assigned(AItem) then
-    Exit;
-
-  if Sender = actFilePrintToFile then
-    AMode := sfPrintToFile
-  else if Sender = actFileSavePrint then
-    AMode := sfBoth
-  else
-    AMode := sfSaveToLoadable;
-
-  SaveGrepResultsToLoadableFile(Self, AItem, AMode, GrepExpert.HistoryIniVersion, 'GxGrep.' + FGrepSettings.Pattern);
 end;
 
 procedure TfmGrepResults.actViewStayOnTopExecute(Sender: TObject);
@@ -1203,6 +1495,9 @@ var
   i: Integer;
   LFileResult: TFileResult;
 begin
+  if (lbResults.Items.Count > 0) and not Assigned(lbResults.Items.Objects[0]) then
+    Exit;
+
   lbResults.Items.BeginUpdate;
   try
     RefreshContextLines;
@@ -1293,9 +1588,14 @@ begin
 end;
 
 constructor TfmGrepResults.Create(AOwner: TComponent);
+var
+  IM: TGrepHistoryListMode;
+  IT: TPageIndexType;
 begin
   inherited;
-  FHistoryListClickedEntry := -1;
+  for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
+    for IT := Low(TPageIndexType) to High(TPageIndexType) do
+      FPageIndexes[IM, IT] := -1;
 
   SetToolbarGradient(ToolBar);
 
@@ -1315,6 +1615,8 @@ begin
     FormStyle := fsNormal;
     BorderStyle := bsSizeable;
   end;
+
+  FEmbeddedGrepSearch := nil;
 end;
 
 destructor TfmGrepResults.Destroy;
@@ -1335,32 +1637,41 @@ end;
 
 procedure TfmGrepResults.ActionsUpdate(Action: TBasicAction; var Handled: Boolean);
 var
-  HaveItems: Boolean;
-  Processing: Boolean;
+  HaveItems, Processing, AIsOnlySaveSettings: Boolean;
+  AItem: TGrepHistoryListItem;
 begin
-  HaveItems := (lbResults.Items.Count > 0);
+  if lbHistoryList.ItemIndex <> -1 then
+    AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex]
+  else
+    AItem := nil;
+  AIsOnlySaveSettings := Assigned(AItem) and AItem.IsOnlySaveSettings;
+
+  HaveItems := (lbResults.Items.Count > 0) and not AIsOnlySaveSettings;
   Processing := DoingSearchOrReplace;
   actFileSearch.Enabled := not Processing;
-  actFileRefresh.Enabled := not Processing;
   actViewOptions.Enabled := not Processing;
   actViewStayOnTop.Enabled := not Processing;
   actFilePrint.Enabled := not Processing and HaveItems;
-  actFileSave.Enabled := not Processing and HaveItems;
   actFileCopy.Enabled := not Processing and HaveItems;
   actListGotoSelected.Enabled := not Processing and HaveItems;
   actListGotoSelectedAndClose.Enabled := not Processing and HaveItems;
   actListContract.Enabled := not Processing and HaveItems;
   actListExpand.Enabled := not Processing and HaveItems;
   actFileAbort.Enabled := Processing;
+  actReplaceAll.Enabled := not Processing and HaveItems;
+  actReplaceSelected.Enabled := not Processing and HaveItems;
+  actViewShowFullFilename.Enabled := not Processing and not AIsOnlySaveSettings;
+  actViewShowIndent.Enabled := not Processing and not AIsOnlySaveSettings;
+
+  actViewStayOnTop.Visible := IsStandAlone;
+  tbnSep6.Visible := actViewStayOnTop.Visible;
+
   actViewStayOnTop.Checked := StayOnTop;
   actViewShowContext.Checked := ShowContext;
   actViewToolBar.Checked := ToolBar.Visible;
-  actReplaceSelected.Enabled := not Processing and HaveItems;
-  actReplaceAll.Enabled := not Processing and HaveItems;
-  actViewStayOnTop.Visible := IsStandAlone;
   actViewShowHistoryList.Checked := ShowHistoryList;
   actViewShowFullFilename.Checked := ShowFullFilename;
-  tbnSep6.Visible := actViewStayOnTop.Visible;
+  actViewShowIndent.Checked := ShowLineIndent;
 end;
 
 function TfmGrepResults.ShowModalForm(Dlg: TCustomForm): TModalResult;
@@ -1415,6 +1726,7 @@ begin
   AssignSettingsToForm;
   ResizeListBox;
   RefreshContextLines;
+  UpdateHistoryPagesOptions;
   lbHistoryList.Refresh;
 end;
 
@@ -1529,7 +1841,7 @@ end;
 function TfmGrepResults.QueryUserForGrepOptions(AState: TGrepSearchState): Boolean;
 resourcestring
   rsSearchAgainCaption = 'Grep Search Again';
-  rsSearchModifyOptionCaption = 'Grep Search Modify Options';
+  rsModifySearchSettingsCaption = 'Grep Modify Search Parameters';
 var
   Dlg: TfmGrepSearch;
 begin
@@ -1538,16 +1850,16 @@ begin
   try
     case AState of
       gssSearchAgain: Dlg.Caption := rsSearchAgainCaption;
-      gssSearchModifyOptions: Dlg.Caption := rsSearchModifyOptionCaption;
+      gssModifySearchSettings: Dlg.Caption := rsModifySearchSettingsCaption;
     end;
-    if AState in [gssSearchAgain, gssSearchModifyOptions] then
+    if AState in [gssSearchAgain, gssModifySearchSettings] then
       Dlg.AdjustSettings(FGrepSettings);
     if ShowModalForm(Dlg) <> mrOk then
       Exit;
     FGrepSettings.CanRefresh := True;
     SetMatchString('');
     Dlg.RetrieveSettings(FGrepSettings);
-    if AState <> gssSearchModifyOptions then
+    if AState <> gssModifySearchSettings then
       Dlg.GrepExpert.SaveSettings;
     Result := True;
   finally
@@ -1619,6 +1931,15 @@ begin
   end;
 end;
 
+procedure TfmGrepResults.SetShowLineIndent(const Value: Boolean);
+begin
+  if FShowLineIndent <> Value then
+  begin
+    FShowLineIndent := Value;
+    lbResults.Refresh;
+  end;
+end;
+
 procedure TfmGrepResults.actListGotoSelectedAndCloseExecute(Sender: TObject);
 begin
   GotoHighlightedListEntry;
@@ -1635,21 +1956,22 @@ begin
   ShowFullFilename := not ShowFullFilename;
 end;
 
+procedure TfmGrepResults.actViewShowIndentExecute(Sender: TObject);
+begin
+  ShowLineIndent := not ShowLineIndent;
+end;
+
 procedure TfmGrepResults.ViewHistoryListItems(AIndex: Integer; AUsedExpandState: Boolean);
 var
   AHistoryItem: TGrepHistoryListItem;
 begin
-  FHistoryListClickedEntry := AIndex;
+  ClearResultsData;
+  SetSavedHistoryIndexes(AIndex);
   if AIndex <> -1 then
   begin
     AHistoryItem := GrepExpert.HistoryList.Items[AIndex];
     if Assigned(AHistoryItem) then
     begin
-      reContext.Clear;
-      ContractList(False);
-      SetStatusString('');
-      SetMatchString('');
-      ClearResultsListbox;
       AHistoryItem.View(lbResults.Items);
       RefreshInformation(AHistoryItem.TotalMatchCount, True, AUsedExpandState, False);
       FGrepSettings := AHistoryItem.GrepSettings;
@@ -1664,6 +1986,9 @@ end;
 
 procedure TfmGrepResults.lbHistoryListDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
   State: TOwnerDrawState);
+const
+  c2ndRowTop: Integer = 13;
+  cMatchesLeft: Integer = 10;
 var
   AItem: TGrepHistoryListItem;
 begin
@@ -1688,25 +2013,159 @@ begin
   lbHistoryList.Canvas.FillRect(Rect);
 
   lbHistoryList.Canvas.TextOut(Rect.Left + 1, Rect.Top + 1, lbHistoryList.Items[Index]);
-  lbHistoryList.Canvas.TextOut(Rect.Left + 10, Rect.Top + 12, Format('%d in %d', [AItem.TotalMatchCount, AItem.ResultList.Count]));
+
+  if AItem.GrepSettings.SaveOption = gsoNoSave then
+    lbHistoryList.Canvas.TextOut(Rect.Left + 1, Rect.Top + c2ndRowTop, '!!')
+  else if AItem.GrepSettings.SaveOption = gsoOnlySaveSettings then
+    lbHistoryList.Canvas.TextOut(Rect.Left + 1, Rect.Top + c2ndRowTop, '*');
+
+  if AItem.IsOnlySaveSettings then
+    lbHistoryList.Canvas.TextOut(Rect.Left + cMatchesLeft, Rect.Top + c2ndRowTop,
+      Format('(%d in %d)', [AItem.TotalMatchCount, AItem.FileCount]))
+  else
+    lbHistoryList.Canvas.TextOut(Rect.Left + cMatchesLeft, Rect.Top + c2ndRowTop,
+      Format('%d in %d', [AItem.TotalMatchCount, AItem.ResultList.Count]));
+end;
+
+procedure TfmGrepResults.lbHistoryListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  AIndex, APage: Integer;
+  AItem: TGrepHistoryListItem;
+  ADoSearch: Boolean;
+begin
+  AIndex := lbHistoryList.ItemIndex;
+  APage := lbHistoryList.Height div lbHistoryList.ItemHeight;
+  ADoSearch := False;
+  if Key = VK_UP then
+    Dec(AIndex)
+  else if Key = VK_DOWN then
+    Inc(AIndex)
+  else if Key = VK_HOME then
+    AIndex := 0
+  else if Key = VK_END then
+    AIndex := lbHistoryList.Count-1
+  else if Key = VK_PRIOR then
+    Dec(AIndex, APage)
+  else if Key = VK_NEXT then
+    Inc(AIndex, APage)
+  else if Key = VK_RETURN then
+    ADoSearch := True
+  else if Key <> VK_SPACE then
+    Exit;
+
+  Key := 0;
+
+  if AIndex < 0 then
+    AIndex := 0
+  else if AIndex >= lbHistoryList.Count then
+    AIndex := lbHistoryList.Count-1;
+
+  lbHistoryList.ItemIndex := AIndex;
+  ViewHistoryListItems(AIndex, True);
+
+  AItem := GrepExpert.HistoryList.Items[AIndex];
+  if AItem.IsOnlySaveSettings and
+    ( TGrepOnlySaveSettingsAction(GrepExpert.GrepOnlySaveParamsAction) = gossaShowEmbeddedSearch )
+  then
+  begin
+    if ADoSearch then
+      DoEmbeddedSearch(nil)
+    else
+    begin
+      FEmbeddedGrepSearch.AdjustSettings(AItem.GrepSettings);
+      FEmbeddedGrepSearch.EmbeddedShow;
+    end;
+  end;
+end;
+
+procedure TfmGrepResults.lbHistoryListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  FHistoryMousePos.X := X;
+  FHistoryMousePos.Y := Y;
+
+  if (GrepExpert.HistoryList.ListMode = hlmSearch) and (lbHistoryList.Count = 0) then
+    actHistorySearchInHistory.Execute;
 end;
 
 procedure TfmGrepResults.lbHistoryListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 var
   ClickedEntry: Integer;
+  AItem: TGrepHistoryListItem;
 begin
   if Button = mbLeft then
   begin
     ClickedEntry := lbHistoryList.ItemAtPos(Point(X, Y), True);
     if ClickedEntry <> -1 then
-      ViewHistoryListItems(ClickedEntry, True);
+    begin
+      AItem := GrepExpert.HistoryList.Items[ClickedEntry];
+      if AItem.IsOnlySaveSettings then
+        case TGrepOnlySaveSettingsAction(GrepExpert.GrepOnlySaveParamsAction) of
+          gossaShowSearchWindow:
+          begin
+            ViewHistoryListItems(ClickedEntry, False);
+            pmHistoryMenu.Tag := ClickedEntry;
+            actHistorySearch.Execute;
+          end ;
+          gossaShowEmbeddedSearch:
+          begin
+            ViewHistoryListItems(ClickedEntry, False);
+            FEmbeddedGrepSearch.AdjustSettings(AItem.GrepSettings);
+            FEmbeddedGrepSearch.EmbeddedShow;
+          end;
+          gossaAutoRefresh:
+          begin
+            pmHistoryMenu.Tag := ClickedEntry;
+            actHistoryRefresh.Execute;
+          end;
+          //Auto refresh when double click
+          gossaAutoRefreshDouble: Exit;
+        else //Empty list
+          ViewHistoryListItems(ClickedEntry, True);
+        end
+      else
+        ViewHistoryListItems(ClickedEntry, True);
+    end;
+  end;
+end;
+
+procedure TfmGrepResults.lbHistoryListDblClick(Sender: TObject);
+var
+  ClickedEntry: Integer;
+  AItem: TGrepHistoryListItem;
+begin
+  ClickedEntry := lbHistoryList.ItemAtPos(FHistoryMousePos, True);
+  if ClickedEntry <> -1 then
+  begin
+    AItem := GrepExpert.HistoryList.Items[ClickedEntry];
+    if AItem.IsOnlySaveSettings then
+      case TGrepOnlySaveSettingsAction(GrepExpert.GrepOnlySaveParamsAction) of
+        //Auto refresh when double click
+        gossaAutoRefreshDouble:
+        begin
+          pmHistoryMenu.Tag := ClickedEntry;
+          actHistoryRefresh.Execute;
+        end;
+      end;
   end;
 end;
 
 procedure TfmGrepResults.lbHistoryListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+resourcestring
+  rsItemCaptionFormat = 'Search text = %s';
+  rsItemCaptionHint = 'Click for copy search text';
+  rsSortUnsorted = 'Unsorted';
+  rsSortKeyIndex = 'by keyindex';
+  rsSortSearchText = 'by search text';
+  rsSortSearchTime = 'by last search time';
+  rsSortDesc = 'descending';
+const
+  cSortTexts: array[TGrepHistorySort] of String = (rsSortUnsorted, rsSortKeyIndex, rsSortSearchText, rsSortSearchTime, '');
 var
   AIndex: Integer;
+  AItem: TGrepHistoryListItem;
+  IsDirectorySettings: Boolean;
 begin
   AIndex := lbHistoryList.ItemAtPos(MousePos, True);
   if AIndex = -1 then
@@ -1716,22 +2175,103 @@ begin
 
   if AIndex = -1 then
   begin
-    miHistoryItemName.Caption := '[Search text=---]';
+    miHistoryItemName.Caption := FSaveItemEmptyCaption;
+    miHistoryItemName.Enabled := False;
+    miHistoryItemName.Hint := '';
+    miHistorySettings.Visible := False;
+    miHistoryLastSearchTime.Visible := False;
     Exit;
   end;
 
-  miHistoryItemName.Caption := Format('[Search text=%s]', [lbHistoryList.Items[AIndex]]);
+  AItem := GrepExpert.HistoryList.Items[AIndex];
+  miHistoryItemName.Caption := Format(rsItemCaptionFormat, [lbHistoryList.Items[AIndex]]);
+  miHistoryItemName.Hint := rsItemCaptionHint;
+
+  miHistoryLastSearchTime.Caption := Format('%s = %s',
+    [FSavedLastSearchTimeCaption, DateTimeToStr(AItem.LastSearchTime)]);
+  actHistorySort.Caption := FSaveSortCaption + Format(' (%s%s)',
+    [cSortTexts[GrepExpert.HistoryList.SortMode], IfThen(GrepExpert.HistoryList.SortDesc, ' ' + rsSortDesc)]);
+
+  miHistorySettings.Visible := True;
+
+  miSettingsSaveOption.Caption := Format('%s = %s',
+    [FSavedSaveOptionCaption, SaveOptionText(AItem.GrepSettingsSaveOption)]);
+
+  miSettingsCurrentFile.Checked := AItem.GrepSettings.GrepAction = gaCurrentOnlyGrep;
+  miSettingsAllFilesInProjectGroup.Checked := AItem.GrepSettings.GrepAction = gaProjGroupGrep;
+  miSettingsAllFilesInProject.Checked := AItem.GrepSettings.GrepAction = gaProjGrep;
+  miSettingsOpenProjectFiles.Checked := AItem.GrepSettings.GrepAction = gaOpenFilesGrep;
+  miSettingsPreviousSearchResultFiles.Checked := AItem.GrepSettings.GrepAction = gaResults;
+
+  IsDirectorySettings := AItem.GrepSettings.GrepAction = gaDirGrep;
+  miSettingsDirectories.Checked := IsDirectorySettings;
+  miSettingsSepDir.Visible := IsDirectorySettings;
+  miSettingsDirectoriesData.Visible := IsDirectorySettings;
+  miSettingsDirectoriesData.Checked := AItem.GrepSettings.Directories <> '';
+  miSettingsDirectoriesData.Caption := Format('%s = %s', [FSavedDirectoriesDataCaption, AItem.GrepSettings.Directories]);
+  miSettingsExcludeDirs.Visible := IsDirectorySettings;
+  miSettingsExcludeDirs.Checked := AItem.GrepSettings.ExcludedDirs <> '';
+  miSettingsExcludeDirs.Caption := Format('%s = %s', [FSavedExcludeDirsCaption, AItem.GrepSettings.ExcludedDirs]);
+  miSettingsFileMasks.Visible := IsDirectorySettings;
+  miSettingsFileMasks.Checked := AItem.GrepSettings.Mask <> '';
+  miSettingsFileMasks.Caption := Format('%s = %s', [FSavedFileMasksCaption, AItem.GrepSettings.Mask]);
+  miSettingsSearchSubDirectories.Visible := IsDirectorySettings;
+  miSettingsSearchSubDirectories.Checked := AItem.GrepSettings.IncludeSubdirs;
+
+  miSettingsCaseSensitive.Checked := AItem.GrepSettings.CaseSensitive;
+  miSettingsWholeWord.Checked := AItem.GrepSettings.WholeWord;
+  miSettingsSearchFormFiles.Checked := AItem.GrepSettings.IncludeForms;
+  miSettingsSearchSQLFiles.Checked := AItem.GrepSettings.IncludeSQLs;
+  miSettingsRegularExpression.Checked := AItem.GrepSettings.RegEx;
+
+  miSettingsGrepCode.Checked := AItem.GrepSettings.IncludeCode;
+  miSettingsGrepStrings.Checked := AItem.GrepSettings.IncludeStrings;
+  miSettingsGrepComments.Checked := AItem.GrepSettings.IncludeComments;
+
+  miSettingsSectionInterface.Checked := AItem.GrepSettings.SectionInterface;
+  miSettingsSectionImplementation.Checked := AItem.GrepSettings.SectionImplementation;
+  miSettingsSectionInitialization.Checked := AItem.GrepSettings.SectionInitialization;
+  miSettingsSectionFinalization.Checked := AItem.GrepSettings.SectionFinalization;
 end;
 
-procedure TfmGrepResults.lbHistoryListDblClick(Sender: TObject);
+procedure TfmGrepResults.actHistoryUpdate(Sender: TObject);
+var
+  AAction: TAction;
 begin
-//
+  AAction := Sender as TAction;
+  AAction.Enabled := not DoingSearchOrReplace and (lbHistoryList.Count > 0) and
+    ( (AAction.Tag = 1) or (GrepExpert.HistoryList.ListMode <> hlmSettings) );
+end;
+
+procedure TfmGrepResults.miHistoryItemNameClick(Sender: TObject);
+var
+  AItem: TGrepHistoryListItem;
+begin
+  AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
+  if Assigned(AItem) then
+    Clipboard.AsText := AItem.SearchText;
 end;
 
 procedure TfmGrepResults.actHistoryViewExecute(Sender: TObject);
 begin
   lbHistoryList.ItemIndex := pmHistoryMenu.Tag;
   ViewHistoryListItems(lbHistoryList.ItemIndex, True);
+end;
+
+procedure TfmGrepResults.DoEmbeddedSearch(Sender: TObject);
+var
+  AItem: TGrepHistoryListItem;
+begin
+  AItem := GrepExpert.HistoryList.Items[lbHistoryList.ItemIndex];
+  if not Assigned(AItem) then
+    Exit;
+
+  FGrepSettings.CanRefresh := True;
+  SetMatchString('');
+  FEmbeddedGrepSearch.RetrieveSettings(FGrepSettings);
+  FEmbeddedGrepSearch.GrepExpert.SaveSettings;
+  FEmbeddedGrepSearch.Hide;
+  Execute(gssSearchEmbedded);
 end;
 
 procedure TfmGrepResults.actHistoryRefreshExecute(Sender: TObject);
@@ -1749,36 +2289,83 @@ begin
     actFileRefresh.Execute
   else if Sender = actHistorySearch then
   begin
-    Execute(gssSearchAgain);
-    RefreshContextLines;
+    if Execute(gssSearchAgain) then
+      RefreshContextLines;
   end
-  else if Sender = actHistoryModifySearchOptions then
+  else if Sender = actHistoryModifySearchSettings then
   begin
     try
-      Execute(gssSearchModifyOptions);
+      Execute(gssModifySearchSettings);
     finally
       FGrepSettings := ASaveSettings;
     end;
   end;
 end;
 
-procedure TfmGrepResults.actHistorySaveExecute(Sender: TObject);
+procedure TfmGrepResults.actFileSaveExecute(Sender: TObject);
+resourcestring
+  rsSaveAllCaption = 'Select the items for save';
+  rsSaveProgress = 'Grep save progress';
+  rsPrintAllCaption = 'Select the items for print to file';
+  rsPrintProgress = 'Grep print to file progress';
+  rsSavePrintAllCaption = 'Select the items for save & print';
+  rsSavePrintProgress = 'Grep save & print progress';
+const
+  cSelectTypeByMode: array[TSaveToFileMode] of TGrepSelectType = (gstPrint, gstSave, gstSavePrint);
+  cModeCaption: array[TSaveToFileMode] of string = (rsPrintAllCaption, rsSaveAllCaption, rsSavePrintAllCaption);
+  cModeProgress: array[TSaveToFileMode] of string = (rsPrintProgress, rsSaveProgress, rsSavePrintProgress);
 var
-  AItem: TGrepHistoryListItem;
   AMode: TSaveToFileMode;
+  ASelResult: TGrepSelectResult;
+  AFileCount, ASplitCount: Integer;
 begin
-  AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
-  if not Assigned(AItem) then
+  if lbHistoryList.Count = 0 then
     Exit;
 
-  if Sender = actHistoryPrintToFile then
+ if Sender = actFilePrintToFile then
     AMode := sfPrintToFile
-  else if Sender = actHistorySavePrint then
+  else if Sender = actFileSavePrint then
     AMode := sfBoth
   else
     AMode := sfSaveToLoadable;
 
-  SaveGrepResultsToLoadableFile(Self, AItem, AMode, GrepExpert.HistoryIniVersion, 'GxGrep.' + AItem.GrepSettings.Pattern);
+  ASelResult := HistoryListSelect(cSelectTypeByMode[AMode], cModeCaption[AMode]);
+
+  if ASelResult = gsrNoSelection then
+    Exit;
+
+  if FSaveSplitCount > 0 then
+  begin
+    AFileCount := (FSelectedCount div FSaveSplitCount) + 1;
+    ASplitCount := FSaveSplitCount;
+  end
+  else
+  begin
+    AFileCount := 1;
+    ASplitCount := FSelectedCount;
+  end;
+  if AMode = sfBoth then
+    AFileCount := 2 * AFileCount;
+
+  fmGrepProgress := TfmGrepProgress.Create(Self);
+  try
+    fmGrepProgress.Init(cModeProgress[AMode], AFileCount, ASplitCount);
+    SaveGrepResultsToFile(Self, GrepExpert.HistoryList, GrepExpert.HistoryIniVersion,
+      ASelResult = gsrSelectAll, AMode, grFile, 'GxGrep.' + TGrepHistoryList.KeyName, FSaveSplitCount);
+  finally
+    FreeAndNil(fmGrepProgress);
+  end;
+end;
+
+procedure TfmGrepResults.ClearResultsData;
+begin
+  if Assigned(FEmbeddedGrepSearch) then
+    FEmbeddedGrepSearch.Hide;
+  reContext.Clear;
+  ContractList(False);
+  SetStatusString('');
+  SetMatchString('');
+  ClearResultsListbox;
 end;
 
 procedure TfmGrepResults.actHistoryDeleteExecute(Sender: TObject);
@@ -1792,17 +2379,10 @@ begin
 
   IsCurrent := AIndex = lbHistoryList.ItemIndex;
   if IsCurrent then
-  begin
-    reContext.Clear;
-    ContractList(False);
-    SetStatusString('');
-    SetMatchString('');
-    ClearResultsListbox;
-  end;
+    ClearResultsData;
 
-  GrepExpert.HistoryListDeleteFromSettings(AIndex);
+  GrepExpert.HistoryListDeleteFromSettings(delOneItem, AIndex);
 
-  GrepExpert.HistoryList.Items[AIndex].Free;
   GrepExpert.HistoryList.Delete(AIndex);
 
   ATopIndex := lbHistoryList.TopIndex;
@@ -1819,50 +2399,123 @@ begin
   end ;
 end;
 
-procedure TfmGrepResults.actHistoryDeleteAllExecute(Sender: TObject);
-begin
-  if (lbHistoryList.Count = 0) or ( ShowGxMessageBox(TGxResultDeleteAllQuestion) <> mrYes )  then
-    Exit;
-
-  GrepExpert.HistoryListDeleteFromSettings;
-
-  reContext.Clear;
-  ContractList(False);
-  SetStatusString('');
-  SetMatchString('');
-  ClearResultsListbox;
-
-  lbHistoryList.Count := 0;
-  GrepExpert.HistoryList.Clear;
-end;
-
-procedure TfmGrepResults.actHistorySaveAllExecute(Sender: TObject);
+procedure TfmGrepResults.actHistoryDeleteSelectedExecute(Sender: TObject);
+resourcestring
+  rsDeleteSelectedCaption = 'Select the items for delete';
+const
+  cSelResult2DelMode: array[gsrSelectItems..gsrSelectAll] of TGrepDeleteMode = (delSelected, delAll);
 var
-  AMode: TSaveToFileMode;
+  ASelResult: TGrepSelectResult;
 begin
   if lbHistoryList.Count = 0 then
     Exit;
 
-  if Sender = actHistoryPrintAllToFile then
-    AMode := sfPrintToFile
-  else if Sender = actHistorySavePrintAll then
-    AMode := sfBoth
-  else
-    AMode := sfSaveToLoadable;
+  ASelResult := HistoryListSelect(gstDelete, rsDeleteSelectedCaption);
 
-  SaveGrepResultsToLoadableFile(Self, GrepExpert.HistoryList, AMode, GrepExpert.HistoryIniVersion, 'GxGrep.' + TGrepHistoryList.KeyName);
-end;
+  if (ASelResult = gsrSelectAll) and (GrepExpert.HistoryList.ListMode <> hlmAll) then
+    ASelResult := gsrSelectItems;
 
-procedure TfmGrepResults.actHistoryRefreshAllExecute(Sender: TObject);
-begin
-  if (lbHistoryList.Count = 0) or ( ShowGxMessageBox(TGxResultRefreshAllQuestion) <> mrYes ) then
+  if (ASelResult = gsrNoSelection) or
+    (ShowGxMessageBox(TGxResultDeleteSelectedQuestion, IfThen(ASelResult = gsrSelectAll, 'A')) <> mrYes)
+  then
     Exit;
 
-  lbHistoryList.ItemIndex := 0;
-  Execute(gssRefreshAll);
+  GrepExpert.HistoryListDeleteFromSettings(cSelResult2DelMode[ASelResult]);
 
-  ViewHistoryListItems(lbHistoryList.ItemIndex, True);
-  RefreshContextLines;
+  if ASelResult = gsrSelectAll then
+  begin
+    ClearResultsData;
+    lbHistoryList.Count := 0;
+    GrepExpert.HistoryList.Clear;
+  end
+  else
+  begin
+    GrepExpert.HistoryList.DeleteSelected;
+    lbHistoryList.Count := GrepExpert.HistoryList.Count;
+    lbHistoryList.ItemIndex := lbHistoryList.Count - 1;
+    ViewHistoryListItems(lbHistoryList.ItemIndex, True);
+  end;
+end;
+
+procedure TfmGrepResults.actHistoryModifySaveOptionsExecute(Sender: TObject);
+resourcestring
+  rsSaveOptionAllCaption = 'Select the items for modify save option';
+var
+  ASelResult: TGrepSelectResult;
+begin
+  if lbHistoryList.Count = 0 then
+    Exit;
+
+  ASelResult := HistoryListSelect(gstSaveOptions, rsSaveOptionAllCaption);
+  if ASelResult <> gsrNoSelection then
+    lbHistoryList.Refresh;
+end;
+
+//Commented, because its not yet work
+procedure TfmGrepResults.actHistoryRefreshSelectedExecute(Sender: TObject);
+//resourcestring
+//  rsRefreshSelectedCaption = 'Choose refreshed items';
+//var
+//  ASelResult: TGrepSelectResult;
+begin
+//  if lbHistoryList.Count = 0 then
+    Exit;
+
+//  ASelResult := HistoryListSelect(gstRefresh, rsRefreshSelectedCaption);
+//
+//  if (ASelResult = gsrNoSelection) or
+//    ( ShowGxMessageBox(TGxResultRefreshSelectedQuestion//, IfThen(ASelResult = gsrSelectAll, 'A')) <> mrYes )
+//  then
+//    Exit;
+//
+//  lbHistoryList.ItemIndex := 0;
+//  if ASelResult = gsrSelectAll then
+//    Execute(gssRefreshAll)
+//  else
+//    Execute(gssRefreshSelected);
+//
+//  ViewHistoryListItems(lbHistoryList.ItemIndex, True);
+//  RefreshContextLines;
+end;
+
+procedure TfmGrepResults.actHistorySortExecute(Sender: TObject);
+resourcestring
+  rsSortCaption = 'Sort history items';
+var
+  ASelResult: TGrepSelectResult;
+begin
+  if lbHistoryList.Count = 0 then
+    Exit;
+
+  ASelResult := HistoryListSelect(gstSort, rsSortCaption);
+  if ASelResult <> gsrNoSelection then
+  begin
+    SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
+    GrepExpert.HistoryList.SortWithOptions(FNewSortMode, FNewSortDesc);
+    GetSavedHistoryIndex;
+    lbHistoryList.Refresh;
+  end ;
+end;
+
+procedure TfmGrepResults.actHistorySearchInHistoryExecute(Sender: TObject);
+resourcestring
+  rsSearchInCaption = 'Search in the history list';
+var
+  ASelResult: TGrepSelectResult;
+begin
+  ASelResult := HistoryListSelect(gstSearchInHistory, rsSearchInCaption);
+  if ASelResult <> gsrNoSelection then
+  begin
+    SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
+    GrepExpert.HistoryList.UpdateSearchList(FSearchInClearSearchList);
+    SetHistoryListMode(hlmSearch, True, False, True);
+    GrepExpert.HistoryListSaveSearchListSettings;
+  end ;
+end;
+
+procedure TfmGrepResults.reContextContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+begin
+  actContextSelSearch.Enabled := reContext.SelText <> '';
 end;
 
 procedure TfmGrepResults.actContextSelSearchExecute(Sender: TObject);
@@ -1872,9 +2525,44 @@ begin
   FContextSearchText := '';
 end;
 
-procedure TfmGrepResults.actHistoryUpdate(Sender: TObject);
+function TfmGrepResults.HistoryListSelect(ASelectType: TGrepSelectType; ACaption: String): TGrepSelectResult;
+var
+  frmSelect: TfmGrepSelect;
 begin
-  (Sender as TAction).Enabled := lbHistoryList.Count > 0;
+  frmSelect := TfmGrepSelect.Create(Self);
+  try
+    FSaveSplitCount := -1;
+    FNewSortMode := ghsUnsorted;
+    FNewSortDesc := False;
+    FSearchInClearSearchList := True;
+
+    frmSelect.Init(GrepExpert.HistoryList, ASelectType, ACaption);
+    Result := frmSelect.Execute;
+    FSelectedCount := frmSelect.SelectedCount;
+
+    case ASelectType of
+      gstSave:
+        if frmSelect.cbSaveSplitToMoreFiles.Checked then
+          FSaveSplitCount := StrToIntDef(frmSelect.eSaveSplitCount.Text, -1);
+      gstSort:
+      begin
+        FNewSortMode := frmSelect.SortMode;
+        FNewSortDesc := frmSelect.SortDesc;
+      end;
+      gstSearchInHistory:
+        FSearchInClearSearchList := frmSelect.cbSearchInClearSearchList.Checked;
+//      gstDelete:
+//        FDeleteSelectedMoveToParamsPage := frmSelect.cbMoveToParamsPage.Checked;
+    end;
+  finally
+    frmSelect.Free;
+  end;
+end;
+
+procedure TfmGrepResults.SplitterHistoryListMoved(Sender: TObject);
+begin
+  if Assigned(FEmbeddedGrepSearch) then
+    FEmbeddedGrepSearch.EmbeddedUpdatePos;
 end;
 
 end.

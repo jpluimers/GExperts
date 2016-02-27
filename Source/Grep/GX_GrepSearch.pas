@@ -5,7 +5,7 @@ unit GX_GrepSearch;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls,
+  Classes, Controls, Forms, StdCtrls, ExtCtrls,
   GX_Experts, GX_GrepExpert, GX_GrepBackend, GX_BaseForm, GX_KbdShortCutBroker;
 
 type
@@ -47,6 +47,8 @@ type
     cbSectionInitialization: TCheckBox;
     cbSectionFinalization: TCheckBox;
     btnOptions: TButton;
+    rgSaveOption: TRadioGroup;
+    btnSearch: TButton;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -55,16 +57,30 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
     procedure btnOptionsClick(Sender: TObject);
   private
     FGrepExpert: TGrepExpert;
+    FEmbedded: Boolean;
+    FCheckedWhere: Boolean;
+    FEmbeddedHolder: TWinControl;
+    FSaveWidth: Integer;
+    FSaveOptionsGroupWidth: Integer;
+    FSaveWhereGroupWidth: Integer;
+    FSaveWhereGroupLeft: Integer;
     procedure EnableDirectoryControls(New: Boolean);
     procedure LoadFormSettings;
     procedure SaveFormSettings;
     procedure UpdateMRUs;
     procedure cbDirectoryOnDropFiles(_Sender: TObject; _Files: TStrings);
+    procedure CheckEnabledWhereControls;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure EmbeddedInit(AHolderControl: TWinControl; ASearchEvent: TNotifyEvent);
+    procedure EmbeddedUpdatePos;
+    procedure EmbeddedShow;
+    procedure EmbeddedSetHeights;
     procedure RetrieveSettings(var Value: TGrepSettings);
     procedure AdjustSettings(Value: TGrepSettings);
     property GrepExpert: TGrepExpert read FGrepExpert;
@@ -90,6 +106,10 @@ uses
 
 resourcestring
   SGrepResultsNotActive = 'The Grep Results window is not active';
+
+const
+  cEmbeddedLeft = 2;
+  cEmbeddedTop = 55;
 
 procedure TfmGrepSearch.btnBrowseClick(Sender: TObject);
 var
@@ -251,10 +271,21 @@ end;
 constructor TfmGrepSearch.Create(AOwner: TComponent);
 begin
   inherited;
+  FEmbedded := False;
+  FEmbeddedHolder := nil;
 
   TWinControl_ActivateDropFiles(cbDirectory, cbDirectoryOnDropFiles);
 
   LoadFormSettings;
+  FCheckedWhere := True;
+end;
+
+procedure TfmGrepSearch.FormCreate(Sender: TObject);
+begin
+  FSaveWidth := Width;
+  FSaveOptionsGroupWidth := gbxOptions.Width;
+  FSaveWhereGroupWidth := gbxWhere.Width;
+  FSaveWhereGroupLeft := gbxWhere.Left;
 end;
 
 procedure TfmGrepSearch.cbDirectoryOnDropFiles(_Sender: TObject; _Files: TStrings);
@@ -288,6 +319,8 @@ begin
   FGrepExpert.GrepSub := cbInclude.Checked;
   FGrepExpert.GrepWholeWord := cbWholeWord.Checked;
   FGrepExpert.GrepRegEx := cbRegEx.Checked;
+
+  FGrepExpert.GrepSaveOption := TGrepSaveOption(rgSaveOption.ItemIndex);
 
   if rbCurrentOnly.Checked then
     FGrepExpert.GrepSearch := 0
@@ -371,6 +404,9 @@ begin
   cbInclude.Checked := FGrepExpert.GrepSub;
   cbWholeWord.Checked := FGrepExpert.GrepWholeWord;
   cbRegEx.Checked := FGrepExpert.GrepRegEx;
+
+  rgSaveOption.ItemIndex := Integer(FGrepExpert.SaveOption);
+
   case FGrepExpert.GrepSearch of
     0: rbCurrentOnly.Checked := True;
     1: rbAllProjFiles.Checked := True;
@@ -397,9 +433,17 @@ begin
     cbExcludedDirs.Text := cbExcludedDirs.Items[0];
 
   if not IsStandAlone then
-  begin
     SetDefaultSearchPattern;
 
+  CheckEnabledWhereControls;
+
+  EnableDirectoryControls(rbDirectories.Checked);
+end;
+
+procedure TfmGrepSearch.CheckEnabledWhereControls;
+begin
+  if not IsStandAlone then
+  begin
     if Trim(GxOtaGetCurrentProjectName) = '' then
     begin
       rbAllProjFiles.Enabled := False;
@@ -427,8 +471,6 @@ begin
     rbAllProjFiles.Enabled := False;
     rbCurrentOnly.Enabled := False;
   end;
-
-  EnableDirectoryControls(rbDirectories.Checked);
 end;
 
 procedure TfmGrepSearch.RetrieveSettings(var Value: TGrepSettings);
@@ -446,6 +488,7 @@ begin
   Value.Pattern := cbText.Text;
   Value.IncludeForms := cbForms.Checked;
   Value.IncludeSQLs := cbSQLFiles.Checked;
+  Value.SaveOption := TGrepSaveOption(rgSaveOption.ItemIndex);
   Value.Mask := '';
   Value.Directories := '';
   Value.ExcludedDirs := '';
@@ -487,6 +530,8 @@ begin
   cbText.SelectAll;
   cbForms.Checked := Value.IncludeForms;
   cbSQLFiles.Checked := Value.IncludeSQLs;
+
+  rgSaveOption.ItemIndex := Integer(Value.SaveOption);
 
   cbMasks.Text := '';
   cbDirectory.Text := '';
@@ -542,6 +587,140 @@ begin
   FGrepExpert.DirList.Assign(cbDirectory.Items);
   FGrepExpert.MaskList.Assign(cbMasks.Items);
   FGrepExpert.ExcludedDirsList.Assign(cbExcludedDirs.Items);
+end;
+
+procedure TfmGrepSearch.EmbeddedInit(AHolderControl: TWinControl; ASearchEvent: TNotifyEvent);
+begin
+  FEmbedded := True;
+  FEmbeddedHolder := AHolderControl;
+  //.Left + 2, lbResults.Top + 55, lbResults.Width - 4
+
+  Parent := TWinControl(Owner);
+  Height := ClientHeight;
+  BorderIcons := [];
+  BorderStyle := bsNone; //ToolWindow;
+  Position := poDesigned;
+  FormStyle := fsStayOnTop;
+
+  btnSearch.Left := btnOptions.Left;
+  EmbeddedSetHeights;
+  EmbeddedUpdatePos;
+
+  btnOK.Visible := False;
+  btnCancel.Visible := False;
+  btnOptions.Visible := False;
+
+  btnSearch.Visible := True;
+  btnSearch.OnClick := ASearchEvent;
+
+  FCheckedWhere := False;
+end;
+
+procedure TfmGrepSearch.EmbeddedSetHeights;
+
+  function MoveTo(ATopDelta: Integer; AMainCtrl: TControl; AItemsDelta: Integer; AItems: array of TControl): Integer;
+  var
+    I, ADelta: Integer;
+  begin
+    AMainCtrl.Top := AMainCtrl.Top - ATopDelta;
+    Result := 0;
+    for I := 0 to High(AItems) do
+    begin
+      if AItemsDelta > 0 then
+      begin
+        ADelta := (I+1) * AItemsDelta;
+        Inc(Result, ADelta div 2);
+      end
+      else
+        ADelta := ATopDelta;
+      AItems[I].Top := AItems[I].Top - ADelta;
+    end;
+    if High(AItems) = -1 then
+      Inc(Result, AItemsDelta);
+    if AItemsDelta > 0 then
+      AMainCtrl.Height := AMainCtrl.Height - Result;
+    Inc(Result, ATopDelta);
+  end;
+
+var
+  LHS: Integer;  // LastHeightsSum
+begin
+  MoveTo(5, cbText, 0, [lblFind]);
+
+         MoveTo(10, gbxOptions, 3, [cbCaseSensitive, cbWholeWord, cbForms, cbSQLFiles, cbRegEx]);
+  LHS := MoveTo(10, gbxWhere, 5, [rbCurrentOnly, rbAllProjGroupFiles, rbAllProjFiles, rbOpenFiles, rbDirectories, rbResults]);
+         gbxWhere.Height := gbxWhere.Height + 13;
+         gbxOptions.Height := gbxWhere.Height;
+
+         MoveTo(-5 + LHS, gbxContentTypes, 3, [cbGrepCode, cbGrepStrings, cbGrepComments]);
+  LHS := MoveTo(-5 + LHS, gbxUnitSections, 3, [cbSectionInterface, cbSectionImplementation, cbSectionInitialization, cbSectionFinalization]);
+         gbxContentTypes.Height := gbxUnitSections.Height;
+
+  LHS := MoveTo(4 + LHS, gbxDirectories, 5, [cbDirectory, cbExcludedDirs, cbMasks, cbInclude]);
+         lblDirectory.Top := cbDirectory.Top;
+         btnBrowse.Top := cbDirectory.Top;
+         lblExcludeDirs.Top := cbExcludedDirs.Top;
+         lblMasks.Top := cbMasks.Top;
+
+  LHS := MoveTo(5 + LHS, rgSaveOption, 15, []);
+
+  Height := Height - LHS - 3;
+end;
+
+procedure TfmGrepSearch.EmbeddedUpdatePos;
+const
+  cMinWidth = 382;
+  cWhereWidthCorrection = 5; //???
+var
+  ADelta, ADeltaLeft, ADeltaRight, AWidth: Integer;
+begin
+  Left := FEmbeddedHolder.Left + cEmbeddedLeft;
+  Top := FEmbeddedHolder.Top + cEmbeddedTop;
+
+  AWidth := FEmbeddedHolder.Width - 4;
+  if AWidth >= FSaveWidth then
+    Exit;
+
+  AWidth := Max(AWidth, cMinWidth);
+  gbxWhere.Anchors := [akTop, akLeft];
+  gbxUnitSections.Anchors := [akTop, akLeft];
+
+  ADelta := FSaveWidth - AWidth;
+  ADeltaLeft := ADelta div 2;
+  ADeltaRight := ADelta - ADeltaLeft;
+  Width := AWidth;
+
+  gbxOptions.Width := FSaveOptionsGroupWidth - ADeltaLeft;
+  gbxContentTypes.Width := FSaveOptionsGroupWidth - ADeltaLeft;
+  gbxWhere.Left := FSaveWhereGroupLeft - ADeltaLeft;
+  gbxWhere.Width := FSaveWhereGroupWidth - ADeltaRight + cWhereWidthCorrection;
+  gbxUnitSections.Left := FSaveWhereGroupLeft - ADeltaLeft;
+  gbxUnitSections.Width := FSaveWhereGroupWidth - ADeltaRight + cWhereWidthCorrection;
+end;
+
+procedure TfmGrepSearch.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  inherited;
+  if FEmbedded then
+    Action := caHide;
+end;
+
+procedure TfmGrepSearch.EmbeddedShow;
+begin
+  if not FEmbedded then
+    Exit;
+
+  if not FCheckedWhere then
+  begin
+    FCheckedWhere := True;
+    CheckEnabledWhereControls;
+  end;
+
+  if not Visible then
+    EmbeddedUpdatePos;
+
+  Show;
+  BringToFront;
 end;
 
 initialization

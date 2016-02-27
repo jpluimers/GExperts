@@ -10,6 +10,7 @@ inherited fmGrepResults: TfmGrepResults
   Menu = MainMenu
   Position = poScreenCenter
   ShowHint = True
+  OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnResize = FormResize
   OnShow = FormShow
@@ -36,25 +37,25 @@ inherited fmGrepResults: TfmGrepResults
       MinSize = 20
     end
     object SplitterHistoryList: TSplitter
-      Left = 139
-      Top = 24
+      Left = 147
+      Top = 22
       Width = 8
-      Height = 550
-      Cursor = crHSplit
+      Height = 552
       AutoSnap = False
       Beveled = True
       MinSize = 20
       Visible = False
+      OnMoved = SplitterHistoryListMoved
     end
     object lbResults: TListBox
-      Left = 147
-      Top = 24
-      Width = 476
-      Height = 550
+      Left = 155
+      Top = 22
+      Width = 468
+      Height = 552
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
-      TabOrder = 0
+      TabOrder = 2
       OnClick = lbResultsClick
       OnDblClick = actListGotoSelectedExecute
       OnDrawItem = lbResultsDrawItem
@@ -68,14 +69,13 @@ inherited fmGrepResults: TfmGrepResults
       Left = 0
       Top = 0
       Width = 623
-      Height = 24
+      Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
-      Flat = True
       Images = dmSharedImages.Images
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 2
+      TabOrder = 0
       Wrapable = False
       object tbnSearch: TToolButton
         Left = 0
@@ -106,78 +106,107 @@ inherited fmGrepResults: TfmGrepResults
         ImageIndex = 3
         Style = tbsSeparator
       end
-      object tbnGoto: TToolButton
+      object tbnSearchInHistory: TToolButton
         Left = 85
+        Top = 0
+        Action = actHistorySearchInHistory
+      end
+      object tbnSep9: TToolButton
+        Left = 108
+        Top = 0
+        Width = 8
+        ImageIndex = 1
+        Style = tbsSeparator
+      end
+      object tbnGoto: TToolButton
+        Left = 116
         Top = 0
         Action = actListGotoSelected
       end
       object tbnSep3: TToolButton
-        Left = 108
+        Left = 139
         Top = 0
         Width = 8
         ImageIndex = 4
         Style = tbsSeparator
       end
       object tbnPrint: TToolButton
-        Left = 116
+        Left = 147
         Top = 0
         Action = actFilePrint
       end
       object tbnSep4: TToolButton
-        Left = 139
+        Left = 170
         Top = 0
         Width = 8
         ImageIndex = 5
         Style = tbsSeparator
       end
       object tbnContract: TToolButton
-        Left = 147
+        Left = 178
         Top = 0
         Action = actListContract
       end
       object tbnExpand: TToolButton
-        Left = 170
+        Left = 201
         Top = 0
         Action = actListExpand
       end
       object tbnSep5: TToolButton
-        Left = 193
+        Left = 224
         Top = 0
         Width = 8
         ImageIndex = 8
         Style = tbsSeparator
       end
+      object tbnShowFullFilename: TToolButton
+        Left = 232
+        Top = 0
+        Action = actViewShowFullFilename
+      end
+      object tbnShowLineIndent: TToolButton
+        Left = 255
+        Top = 0
+        Action = actViewShowIndent
+      end
+      object tbnSep8: TToolButton
+        Left = 278
+        Top = 0
+        Width = 8
+        ImageIndex = 1
+        Style = tbsSeparator
+      end
       object tbnReplaceSelected: TToolButton
-        Left = 201
+        Left = 286
         Top = 0
         Action = actReplaceSelected
       end
       object tbnReplaceAll: TToolButton
-        Left = 224
+        Left = 309
         Top = 0
         Action = actReplaceAll
       end
       object tbnSep6: TToolButton
-        Left = 247
+        Left = 332
         Top = 0
         Width = 8
         ImageIndex = 9
         Style = tbsSeparator
       end
       object tbnStayOnTop: TToolButton
-        Left = 255
+        Left = 340
         Top = 0
         Action = actViewStayOnTop
       end
       object tbnSep7: TToolButton
-        Left = 278
+        Left = 363
         Top = 0
         Width = 8
         ImageIndex = 2
         Style = tbsSeparator
       end
       object tbnHelp: TToolButton
-        Left = 286
+        Left = 371
         Top = 0
         Action = actHelpHelp
       end
@@ -188,7 +217,7 @@ inherited fmGrepResults: TfmGrepResults
       Width = 623
       Height = 88
       Align = alBottom
-      Font.Charset = ANSI_CHARSET
+      Font.Charset = EASTEUROPE_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
       Font.Name = 'Tahoma'
@@ -197,31 +226,49 @@ inherited fmGrepResults: TfmGrepResults
       PopupMenu = pmContextMenu
       ReadOnly = True
       ScrollBars = ssBoth
-      TabOrder = 1
-      WordWrap = False
-    end
-    object lbHistoryList: TListBox
-      Left = 0
-      Top = 24
-      Width = 139
-      Height = 550
-      Style = lbVirtualOwnerDraw
-      Align = alLeft
-      Font.Charset = ANSI_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ItemHeight = 25
-      ParentFont = False
-      PopupMenu = pmHistoryMenu
       TabOrder = 3
-      Visible = False
-      OnContextPopup = lbHistoryListContextPopup
-      OnData = lbHistoryListData
-      OnDblClick = lbHistoryListDblClick
-      OnDrawItem = lbHistoryListDrawItem
-      OnMouseUp = lbHistoryListMouseUp
+      WordWrap = False
+      OnContextPopup = reContextContextPopup
+    end
+    object tcHistoryListPage: TTabControl
+      Left = 0
+      Top = 22
+      Width = 147
+      Height = 552
+      Align = alLeft
+      TabOrder = 1
+      Tabs.Strings = (
+        'Results'
+        'Params'
+        'All'
+        'Search')
+      TabIndex = 0
+      OnChange = tcHistoryListPageChange
+      object lbHistoryList: TListBox
+        Left = 4
+        Top = 25
+        Width = 139
+        Height = 523
+        Style = lbVirtualOwnerDraw
+        Align = alClient
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ItemHeight = 26
+        ParentFont = False
+        PopupMenu = pmHistoryMenu
+        TabOrder = 0
+        Visible = False
+        OnContextPopup = lbHistoryListContextPopup
+        OnData = lbHistoryListData
+        OnDblClick = lbHistoryListDblClick
+        OnDrawItem = lbHistoryListDrawItem
+        OnKeyDown = lbHistoryListKeyDown
+        OnMouseDown = lbHistoryListMouseDown
+        OnMouseUp = lbHistoryListMouseUp
+      end
     end
   end
   object StatusBar: TStatusBar
@@ -237,13 +284,12 @@ inherited fmGrepResults: TfmGrepResults
         Width = 60
       end>
     ParentFont = True
-    SimplePanel = False
     UseSystemFont = False
   end
   object MainMenu: TMainMenu
     Images = dmSharedImages.Images
-    Left = 16
-    Top = 40
+    Left = 248
+    Top = 32
     object mitFile: TMenuItem
       Caption = '&File'
       Left = 522
@@ -292,26 +338,23 @@ inherited fmGrepResults: TfmGrepResults
       object mitFileSep4: TMenuItem
         Caption = '-'
       end
-      object miFileRefreshAll: TMenuItem
-        Action = actHistoryRefreshAll
+      object miFileRefreshSelected: TMenuItem
+        Action = actHistoryRefreshSelected
       end
       object mitFileSep5: TMenuItem
         Caption = '-'
       end
-      object miFileSaveAll: TMenuItem
-        Action = actHistorySaveAll
-      end
-      object miFilePrintAllToFile: TMenuItem
-        Action = actHistoryPrintAllToFile
-      end
-      object miFileSavePrintAllToFile: TMenuItem
-        Action = actHistorySavePrintAll
+      object mitFileDeleteSelected: TMenuItem
+        Action = actHistoryDeleteSelected
       end
       object mitFileSep6: TMenuItem
         Caption = '-'
       end
-      object mitFileDeleteAll: TMenuItem
-        Action = actHistoryDeleteAll
+      object mitFileModifySaveOptions: TMenuItem
+        Action = actHistoryModifySaveOptions
+      end
+      object mitFileSearhInHistory: TMenuItem
+        Action = actHistorySearchInHistory
       end
       object mitFileSep7: TMenuItem
         Caption = '-'
@@ -377,6 +420,9 @@ inherited fmGrepResults: TfmGrepResults
       object miViewShowFullFilename: TMenuItem
         Action = actViewShowFullFilename
       end
+      object miViewShowIndent: TMenuItem
+        Action = actViewShowIndent
+      end
       object mitViewSep3: TMenuItem
         Caption = '-'
       end
@@ -439,6 +485,7 @@ inherited fmGrepResults: TfmGrepResults
       OnExecute = actFileSearchExecute
     end
     object actFileRefresh: TAction
+      Tag = 1
       Category = 'File'
       Caption = '&Refresh'
       Hint = 'Refresh search'
@@ -532,6 +579,7 @@ inherited fmGrepResults: TfmGrepResults
       OnExecute = actShowMatchContextExecute
     end
     object actFileSave: TAction
+      Tag = 1
       Category = 'File'
       Caption = '&Save...'
       Hint = 'Save loadable results to file...'
@@ -600,6 +648,7 @@ inherited fmGrepResults: TfmGrepResults
       OnUpdate = actHistoryUpdate
     end
     object actHistoryDelete: TAction
+      Tag = 1
       Category = 'History'
       Caption = 'Delete'
       ImageIndex = 11
@@ -607,6 +656,7 @@ inherited fmGrepResults: TfmGrepResults
       OnUpdate = actHistoryUpdate
     end
     object actHistoryRefresh: TAction
+      Tag = 1
       Category = 'History'
       Caption = 'Refresh'
       ImageIndex = 34
@@ -614,22 +664,16 @@ inherited fmGrepResults: TfmGrepResults
       OnUpdate = actHistoryUpdate
     end
     object actHistorySearch: TAction
+      Tag = 1
       Category = 'History'
       Caption = 'Search...'
       OnExecute = actHistoryRefreshExecute
       OnUpdate = actHistoryUpdate
     end
-    object actHistoryModifySearchOptions: TAction
+    object actHistoryModifySearchSettings: TAction
       Category = 'History'
-      Caption = 'Modify search options...'
+      Caption = 'Modify search parameters...'
       OnExecute = actHistoryRefreshExecute
-      OnUpdate = actHistoryUpdate
-    end
-    object actHistorySave: TAction
-      Category = 'History'
-      Caption = 'Save...'
-      ImageIndex = 31
-      OnExecute = actHistorySaveExecute
       OnUpdate = actHistoryUpdate
     end
     object actViewShowHistoryList: TAction
@@ -642,52 +686,22 @@ inherited fmGrepResults: TfmGrepResults
       Category = 'View'
       Caption = 'Show full filename'
       Hint = 'Show full or relative filename'
+      ImageIndex = 79
       OnExecute = actViewShowFullFilenameExecute
     end
-    object actHistoryPrintToFile: TAction
+    object actHistoryDeleteSelected: TAction
+      Tag = 1
       Category = 'History'
-      Caption = 'Print to file...'
-      ImageIndex = 3
-      OnExecute = actHistorySaveExecute
-      OnUpdate = actHistoryUpdate
-    end
-    object actHistorySavePrint: TAction
-      Category = 'History'
-      Caption = 'Save && Print...'
-      OnExecute = actHistorySaveExecute
-      OnUpdate = actHistoryUpdate
-    end
-    object actHistoryDeleteAll: TAction
-      Category = 'History'
-      Caption = 'Delete all'
+      Caption = 'Delete items'
       ImageIndex = 11
-      OnExecute = actHistoryDeleteAllExecute
-      OnUpdate = actHistoryUpdate
-    end
-    object actHistorySaveAll: TAction
-      Category = 'History'
-      Caption = 'Save all...'
-      ImageIndex = 31
-      OnExecute = actHistorySaveAllExecute
+      OnExecute = actHistoryDeleteSelectedExecute
       OnUpdate = actHistoryUpdate
     end
     object actContextSelSearch: TAction
       Category = 'Context'
       Caption = 'Search selected text...'
+      ImageIndex = 34
       OnExecute = actContextSelSearchExecute
-    end
-    object actHistoryPrintAllToFile: TAction
-      Category = 'History'
-      Caption = 'Print all to file...'
-      ImageIndex = 3
-      OnExecute = actHistorySaveAllExecute
-      OnUpdate = actHistoryUpdate
-    end
-    object actHistorySavePrintAll: TAction
-      Category = 'History'
-      Caption = 'Save && Print all to file...'
-      OnExecute = actHistorySaveAllExecute
-      OnUpdate = actHistoryUpdate
     end
     object actFileOpen: TAction
       Category = 'File'
@@ -696,19 +710,141 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 1
       OnExecute = actFileOpenExecute
     end
-    object actHistoryRefreshAll: TAction
+    object actHistoryRefreshSelected: TAction
+      Tag = 1
       Category = 'History'
-      Caption = 'Refresh all'
+      Caption = 'Refresh items'
       ImageIndex = 34
-      OnExecute = actHistoryRefreshAllExecute
+      Visible = False
+      OnExecute = actHistoryRefreshSelectedExecute
       OnUpdate = actHistoryUpdate
+    end
+    object actHistoryModifySaveOptions: TAction
+      Category = 'History'
+      Caption = 'Modify save options'
+      OnExecute = actHistoryModifySaveOptionsExecute
+      OnUpdate = actHistoryUpdate
+    end
+    object actHistorySort: TAction
+      Tag = 1
+      Category = 'History'
+      Caption = 'Sort'
+      OnExecute = actHistorySortExecute
+      OnUpdate = actHistoryUpdate
+    end
+    object actViewShowIndent: TAction
+      Category = 'View'
+      Caption = 'Show indent'
+      Hint = 'Show line indent in results list'
+      ImageIndex = 80
+      OnExecute = actViewShowIndentExecute
+    end
+    object actHistorySearchInHistory: TAction
+      Category = 'History'
+      Caption = 'Search in history'
+      Hint = 'Search in the all history list'
+      ImageIndex = 81
+      OnExecute = actHistorySearchInHistoryExecute
     end
   end
   object pmHistoryMenu: TPopupMenu
+    Images = dmSharedImages.Images
     Left = 16
     Top = 160
     object miHistoryItemName: TMenuItem
       Caption = '[Search text=---]'
+      OnClick = miHistoryItemNameClick
+    end
+    object miHistoryLastSearchTime: TMenuItem
+      Caption = 'Last search time'
+    end
+    object miHistorySettings: TMenuItem
+      Caption = 'Parameters info'
+      ImageIndex = 76
+      object miSettingsSaveOption: TMenuItem
+        Caption = 'Save option'
+      end
+      object miSettingsSep1: TMenuItem
+        Caption = '-'
+      end
+      object miSettingsCurrentFile: TMenuItem
+        Caption = 'Current file'
+      end
+      object miSettingsAllFilesInProjectGroup: TMenuItem
+        Caption = 'All files in project group'
+      end
+      object miSettingsAllFilesInProject: TMenuItem
+        Caption = 'All files in project'
+      end
+      object miSettingsOpenProjectFiles: TMenuItem
+        Caption = 'Open project files'
+      end
+      object miSettingsDirectories: TMenuItem
+        Caption = 'Directories'
+      end
+      object miSettingsPreviousSearchResultFiles: TMenuItem
+        Caption = 'Previous search result files'
+      end
+      object miSettingsSepDir: TMenuItem
+        Caption = '-'
+      end
+      object miSettingsDirectoriesData: TMenuItem
+        Caption = 'Directories'
+      end
+      object miSettingsExcludeDirs: TMenuItem
+        Caption = 'Exclude Dirs'
+      end
+      object miSettingsFileMasks: TMenuItem
+        Caption = 'File masks'
+      end
+      object miSettingsSearchSubDirectories: TMenuItem
+        Caption = 'Search subdirectories'
+      end
+      object miSettingsSep2: TMenuItem
+        Caption = '-'
+      end
+      object miSettingsCaseSensitive: TMenuItem
+        Caption = 'Case sensitive'
+      end
+      object miSettingsWholeWord: TMenuItem
+        Caption = 'Whole word'
+      end
+      object miSettingsSearchFormFiles: TMenuItem
+        Caption = 'Search form files'
+      end
+      object miSettingsSearchSQLFiles: TMenuItem
+        Caption = 'Search SQL files'
+      end
+      object miSettingsRegularExpression: TMenuItem
+        Caption = 'Regular expression'
+      end
+      object miSettingsSep3: TMenuItem
+        Caption = '-'
+      end
+      object miSettingsGrepCode: TMenuItem
+        Caption = 'Grep code'
+      end
+      object miSettingsGrepStrings: TMenuItem
+        Caption = 'Grep strings'
+      end
+      object miSettingsGrepComments: TMenuItem
+        Caption = 'Grep comments'
+      end
+      object miSettingsSep4: TMenuItem
+        Caption = '-'
+      end
+      object miSettingsSectionInterface: TMenuItem
+        Caption = 'Interface'
+      end
+      object miSettingsSectionImplementation: TMenuItem
+        Caption = 'Implementation'
+      end
+      object miSettingsSectionInitialization: TMenuItem
+        Caption = 'Initialization'
+      end
+      object miSettingsSectionFinalization: TMenuItem
+        Caption = 'Finalization'
+      end
     end
     object mitHistorySep1: TMenuItem
       Caption = '-'
@@ -722,8 +858,8 @@ inherited fmGrepResults: TfmGrepResults
     object miHistorySearch: TMenuItem
       Action = actHistorySearch
     end
-    object miHistoryModifySearchOptions: TMenuItem
-      Action = actHistoryModifySearchOptions
+    object miHistoryModifySearchSettings: TMenuItem
+      Action = actHistoryModifySearchSettings
     end
     object mitHistorySep2: TMenuItem
       Caption = '-'
@@ -734,17 +870,12 @@ inherited fmGrepResults: TfmGrepResults
     object mitHistorySep3: TMenuItem
       Caption = '-'
     end
-    object miHistorySave: TMenuItem
-      Action = actHistorySave
-    end
-    object miHistoryPrintToFile: TMenuItem
-      Action = actHistoryPrintToFile
-    end
-    object miHistorySavePrint: TMenuItem
-      Action = actHistorySavePrint
+    object miHistorySort: TMenuItem
+      Action = actHistorySort
     end
   end
   object pmContextMenu: TPopupMenu
+    Images = dmSharedImages.Images
     Left = 16
     Top = 592
     object miContextSearchSelectedText: TMenuItem
