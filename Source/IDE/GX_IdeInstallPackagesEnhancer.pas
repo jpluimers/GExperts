@@ -205,9 +205,12 @@ procedure TInstallPackagesEnhancer.EnhanceForm(_Form: TCustomForm; _BtnParent: T
   _AddBtn: TButton; _FilenamePanel: TPanel);
 resourcestring
   rcSelectAModule = 'Open an explorer window with this package selected.';
+const
+  ExplorerButtonName = 'GXExplorerButton';
 var
 //  RenameBtn: TButton;
   SelectBtn: TButton;
+  cmp: TComponent;
 begin
 // Unfortunately renaming packages (see b_RenameClick method) does not work.
 // So we don't add the Rename button.
@@ -221,8 +224,12 @@ begin
 //  RenameBtn.TabOrder := _AddBtn.TabOrder;
 //  RenameBtn.OnClick := b_RenameClick;
 
+  cmp := _FilenamePanel.FindComponent(ExplorerButtonName);
+  if Assigned(cmp) then
+    exit; // the button already exists
+
   SelectBtn := TButton.Create(_FilenamePanel);
-  SelectBtn.Name := '';
+  SelectBtn.Name := ExplorerButtonName;
   SelectBtn.Parent := _FilenamePanel;
   SelectBtn.Width := _FilenamePanel.ClientHeight;
   SelectBtn.Caption := '...';
