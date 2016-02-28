@@ -1,7 +1,7 @@
 These are some executables and scripts used in Building
 the experimental GExpert versions.
 
-The scripts are written by myself.
+The scripts are written by myself (twm)
 
 The executables are:
 * 7z.exe -> Part of 7Zip http://www.7-zip.org/
