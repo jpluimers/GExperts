@@ -3,6 +3,8 @@ inherited fmGrepSelect: TfmGrepSelect
   Caption = 'Select'
   ClientHeight = 534
   ClientWidth = 790
+  ParentFont = False
+  Font.Charset = ANSI_CHARSET
   ShowHint = True
   OnCreate = FormCreate
   PixelsPerInch = 96
@@ -45,8 +47,14 @@ inherited fmGrepSelect: TfmGrepSelect
         Tag = 11
         Width = 150
       end>
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
     ReadOnly = True
     RowSelect = True
+    ParentFont = False
     SortType = stData
     TabOrder = 0
     ViewStyle = vsReport
@@ -94,6 +102,12 @@ inherited fmGrepSelect: TfmGrepSelect
       Height = 25
       Hint = 'Check first found items or all items'
       Caption = 'Check found / all'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 0
       OnClick = btnSelectClick
     end
@@ -133,9 +147,9 @@ inherited fmGrepSelect: TfmGrepSelect
       object lblSaveOption: TLabel
         Left = 5
         Top = 8
-        Width = 113
+        Width = 204
         Height = 13
-        Caption = 'Save option new value:'
+        Caption = 'Save option new value (when IDE closing):'
       end
       object cbxSaveOptionValue: TComboBox
         Left = 34
@@ -218,7 +232,7 @@ inherited fmGrepSelect: TfmGrepSelect
       BorderStyle = bsSingle
       TabOrder = 4
       object lblSearch: TLabel
-        Left = 11
+        Left = 8
         Top = 8
         Width = 37
         Height = 13
@@ -226,14 +240,14 @@ inherited fmGrepSelect: TfmGrepSelect
         FocusControl = eSearch
       end
       object lblSearchSaveOption: TLabel
-        Left = 11
-        Top = 36
-        Width = 96
+        Left = 8
+        Top = 33
+        Width = 110
         Height = 13
-        Caption = 'Search save option:'
+        Caption = 'Save option for search:'
       end
       object eSearch: TEdit
-        Left = 57
+        Left = 73
         Top = 5
         Width = 261
         Height = 21
@@ -241,8 +255,8 @@ inherited fmGrepSelect: TfmGrepSelect
         OnChange = eSearchChange
       end
       object cbSearchSaveOption: TComboBox
-        Left = 124
-        Top = 33
+        Left = 140
+        Top = 30
         Width = 194
         Height = 21
         Style = csDropDownList
@@ -258,8 +272,8 @@ inherited fmGrepSelect: TfmGrepSelect
           'All')
       end
       object cbCheckedMoveToTop: TCheckBox
-        Left = 390
-        Top = 4
+        Left = 414
+        Top = 2
         Width = 163
         Height = 17
         Caption = 'Checked move to top'
@@ -269,7 +283,7 @@ inherited fmGrepSelect: TfmGrepSelect
         OnClick = cbCheckedMoveToTopClick
       end
       object cbSearchInChecked: TCheckBox
-        Left = 390
+        Left = 414
         Top = 20
         Width = 163
         Height = 17
@@ -278,7 +292,7 @@ inherited fmGrepSelect: TfmGrepSelect
         OnClick = cbSearchInCheckedClick
       end
       object cbShowNotFound: TCheckBox
-        Left = 390
+        Left = 414
         Top = 37
         Width = 163
         Height = 17
@@ -287,7 +301,7 @@ inherited fmGrepSelect: TfmGrepSelect
         OnClick = cbShowNotFoundClick
       end
       object btnClearSearch: TBitBtn
-        Left = 328
+        Left = 344
         Top = 3
         Width = 26
         Height = 25
@@ -314,7 +328,7 @@ inherited fmGrepSelect: TfmGrepSelect
         NumGlyphs = 2
       end
       object btnRefreshSearch: TBitBtn
-        Left = 356
+        Left = 372
         Top = 3
         Width = 26
         Height = 25
@@ -366,7 +380,7 @@ inherited fmGrepSelect: TfmGrepSelect
       object lblSaveSplitCount: TLabel
         Left = 27
         Top = 30
-        Width = 54
+        Width = 53
         Height = 13
         Caption = 'Split count:'
         Enabled = False
@@ -431,22 +445,38 @@ inherited fmGrepSelect: TfmGrepSelect
       end
     end
     object pnlSortButtons: TPanel
-      Left = 375
+      Left = 329
       Top = 90
-      Width = 295
+      Width = 340
       Height = 60
       Anchors = [akRight, akBottom]
       BevelOuter = bvNone
       Color = clBtnShadow
       TabOrder = 11
+      object lblQuickSortButtons: TLabel
+        Left = 7
+        Top = 10
+        Width = 41
+        Height = 43
+        Alignment = taCenter
+        AutoSize = False
+        Caption = 'Quick sort buttons'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindow
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
       object btnSortSearchTextAsc: TButton
         Tag = 2
-        Left = 11
+        Left = 56
         Top = 5
         Width = 90
         Height = 25
         Caption = 'Search text'
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
@@ -458,12 +488,12 @@ inherited fmGrepSelect: TfmGrepSelect
       end
       object btnSortSearchTextDesc: TButton
         Tag = 2
-        Left = 11
+        Left = 56
         Top = 32
         Width = 90
         Height = 25
         Caption = 'Text desc'
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
@@ -475,12 +505,12 @@ inherited fmGrepSelect: TfmGrepSelect
       end
       object btnSortTimeAsc: TButton
         Tag = 3
-        Left = 103
+        Left = 148
         Top = 5
         Width = 90
         Height = 25
         Caption = 'Last time'
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
@@ -492,12 +522,12 @@ inherited fmGrepSelect: TfmGrepSelect
       end
       object btnSortTimeDesc: TButton
         Tag = 3
-        Left = 103
+        Left = 148
         Top = 32
         Width = 90
         Height = 25
         Caption = 'Time desc'
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
@@ -509,12 +539,12 @@ inherited fmGrepSelect: TfmGrepSelect
       end
       object btnSortKeyIndexAsc: TButton
         Tag = 1
-        Left = 195
+        Left = 240
         Top = 5
         Width = 90
         Height = 25
         Caption = 'Key index'
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'
@@ -526,12 +556,12 @@ inherited fmGrepSelect: TfmGrepSelect
       end
       object btnSortKeyIndexDesc: TButton
         Tag = 1
-        Left = 195
+        Left = 240
         Top = 32
         Width = 90
         Height = 25
         Caption = 'Key idx desc'
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
         Font.Name = 'Tahoma'

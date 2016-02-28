@@ -64,6 +64,7 @@ type
     eHistoryPagesTabWidth: TEdit;
     lblHistoryPagesTabWidth: TLabel;
     chkMouseWheelMoveItemIndex: TCheckBox;
+    lblWhenIDEClosing: TLabel;
     procedure pnlContextFontClick(Sender: TObject);
     procedure pnlContextMatchFontColorClick(Sender: TObject);
     procedure pnlListFontClick(Sender: TObject);

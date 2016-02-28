@@ -15,6 +15,7 @@ object fmGrepSearch: TfmGrepSearch
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
+  ShowHint = True
   OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (
@@ -402,8 +403,9 @@ object fmGrepSearch: TfmGrepSearch
     Top = 439
     Width = 471
     Height = 86
+    Hint = 'History item will show on the RESULTS page.'
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Save option'
+    Caption = 'Save option (when IDE closing)'
     ItemIndex = 1
     Items.Strings = (
       'Save parameters and results'
@@ -412,7 +414,7 @@ object fmGrepSearch: TfmGrepSearch
     TabOrder = 10
   end
   object btnSearch: TButton
-    Left = 88
+    Left = 89
     Top = 530
     Width = 75
     Height = 25

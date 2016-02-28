@@ -262,16 +262,16 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     object lblSaveOption: TLabel
       Left = 8
       Top = 187
-      Width = 143
+      Width = 162
       Height = 14
-      Caption = 'Save option default value:'
+      Caption = 'Save option default value for:'
     end
     object lblOnlySaveParamsAction: TLabel
       Left = 8
       Top = 252
-      Width = 158
+      Width = 275
       Height = 14
-      Caption = 'Only save parameters action:'
+      Caption = '"Only save parameters" action when click on item:'
     end
     object lblHistoryListDefaultPage: TLabel
       Left = 8
@@ -303,9 +303,16 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Height = 14
       Caption = 'Tab width:'
     end
+    object lblWhenIDEClosing: TLabel
+      Left = 8
+      Top = 55
+      Width = 247
+      Height = 14
+      Caption = 'Actions when IDE closing and storing history:'
+    end
     object chkGrepSaveHistoryListItems: TCheckBox
       Left = 8
-      Top = 24
+      Top = 16
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -315,7 +322,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object rbSaveToRegistry: TRadioButton
       Left = 153
-      Top = 42
+      Top = 34
       Width = 113
       Height = 17
       Caption = 'To Registry'
@@ -325,7 +332,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object rbSaveToIniFile: TRadioButton
       Left = 33
-      Top = 42
+      Top = 34
       Width = 113
       Height = 17
       Caption = 'To IniFile'
@@ -336,8 +343,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Visible = False
     end
     object chkFileListDeleteAfterDays: TCheckBox
-      Left = 8
-      Top = 63
+      Left = 21
+      Top = 72
       Width = 250
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -346,8 +353,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       OnClick = chkFileListDeleteAfterDaysClick
     end
     object eDeleteAfterDays: TEdit
-      Left = 265
-      Top = 60
+      Left = 273
+      Top = 70
       Width = 33
       Height = 22
       TabOrder = 4
@@ -390,6 +397,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 202
       Height = 22
       Style = csDropDownList
+      ItemHeight = 14
       TabOrder = 7
       Items.Strings = (
         'Results'
@@ -400,7 +408,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     end
     object chkQuickRefreshMode: TCheckBox
       Left = 8
-      Top = 112
+      Top = 116
       Width = 305
       Height = 17
       Anchors = [akLeft, akTop, akRight]
@@ -409,9 +417,9 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       TabOrder = 6
     end
     object chkEmptyMoveToParams: TCheckBox
-      Left = 9
-      Top = 86
-      Width = 304
+      Left = 21
+      Top = 91
+      Width = 250
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'If results is empty, move to Params page'
@@ -424,9 +432,9 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 202
       Height = 22
       Style = csDropDownList
-      ItemIndex = 1
+      ItemIndex = 2
       TabOrder = 10
-      Text = 'Only save parameters'
+      Text = 'No save (temp)'
       Items.Strings = (
         'Save parameters and results'
         'Only save parameters'

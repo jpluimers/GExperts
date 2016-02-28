@@ -56,6 +56,7 @@ type
     btnMoveUp: TButton;
     btnMoveDown: TButton;
     pnlSortMoves: TPanel;
+    lblQuickSortButtons: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure btnSelectClick(Sender: TObject);
     procedure lvHistoryListColumnClick(Sender: TObject; Column: TListColumn);

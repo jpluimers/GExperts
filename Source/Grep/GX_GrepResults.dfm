@@ -2,7 +2,7 @@ inherited fmGrepResults: TfmGrepResults
   Left = 324
   Top = 243
   ActiveControl = lbResults
-  Caption = 'Grep Results'
+  Caption = 'Grep Results [%s page]'
   ClientHeight = 689
   ClientWidth = 623
   DefaultMonitor = dmDesktop
@@ -38,9 +38,10 @@ inherited fmGrepResults: TfmGrepResults
     end
     object SplitterHistoryList: TSplitter
       Left = 147
-      Top = 22
+      Top = 26
       Width = 8
-      Height = 552
+      Height = 548
+      Cursor = crHSplit
       AutoSnap = False
       Beveled = True
       MinSize = 20
@@ -49,9 +50,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbResults: TListBox
       Left = 155
-      Top = 22
+      Top = 26
       Width = 468
-      Height = 552
+      Height = 548
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -69,7 +70,7 @@ inherited fmGrepResults: TfmGrepResults
       Left = 0
       Top = 0
       Width = 623
-      Height = 22
+      Height = 26
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
       Images = dmSharedImages.Images
@@ -232,9 +233,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object tcHistoryListPage: TTabControl
       Left = 0
-      Top = 22
+      Top = 26
       Width = 147
-      Height = 552
+      Height = 548
       Align = alLeft
       TabOrder = 1
       Tabs.Strings = (
@@ -248,7 +249,7 @@ inherited fmGrepResults: TfmGrepResults
         Left = 4
         Top = 25
         Width = 139
-        Height = 523
+        Height = 519
         Style = lbVirtualOwnerDraw
         Align = alClient
         Font.Charset = ANSI_CHARSET
@@ -762,7 +763,7 @@ inherited fmGrepResults: TfmGrepResults
       Caption = 'Parameters info'
       ImageIndex = 76
       object miSettingsSaveOption: TMenuItem
-        Caption = 'Save option'
+        Caption = 'Save option (when IDE closing)'
       end
       object miSettingsSep1: TMenuItem
         Caption = '-'

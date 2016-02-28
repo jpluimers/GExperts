@@ -196,7 +196,7 @@ begin
 
   FNumContextLines := 2;
   FAutoHide := False;
-  
+
   FHistoryList := TGrepHistoryList.Create;
 
   FGrepAdvancedOptions := False;
@@ -209,6 +209,7 @@ begin
   FGrepExpandFewLines := 20;
   FGrepUseCurrentIdent := False;
   FGrepSaveHistoryListItems := 0;
+  FGrepHistoryPagesTabMultiline := True;
 
   FGrepSaveOption := gsoOnlySaveSettings;
   FGrepSaveOptionDefaultValue := Integer(gsoOnlySaveSettings);
@@ -378,11 +379,11 @@ begin
       GrepHistoryListDefaultPage := Dialog.cbxHistoryListDefaultPage.ItemIndex;
       GrepQuickRefresh := Dialog.chkQuickRefreshMode.Checked;
 
-      GrepHistoryPagesTabMultiline := GrepAdvancedOptions and Dialog.chkHistoryPagesTabMultiLine.Checked;
       if GrepAdvancedOptions then
-        GrepHistoryPagesTabWidth := StrToIntDef(Dialog.eHistoryPagesTabWidth.Text, GrepHistoryPagesTabWidth)
-      else
-        GrepHistoryPagesTabWidth := 0;
+      begin
+        GrepHistoryPagesTabMultiline := Dialog.chkHistoryPagesTabMultiLine.Checked;
+        GrepHistoryPagesTabWidth := StrToIntDef(Dialog.eHistoryPagesTabWidth.Text, GrepHistoryPagesTabWidth);
+      end;
 
       GrepMouseWheelPrevNextMatch := GrepAdvancedOptions and Dialog.chkMouseWheelMoveItemIndex.Checked;
 

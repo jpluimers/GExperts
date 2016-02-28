@@ -271,6 +271,7 @@ type
     FSearchInClearSearchList: Boolean;
     FSaveItemEmptyCaption: String;
     FSaveSortCaption: String;
+    FSavedFormCaption: String;
     procedure SetStayOnTop(Value: Boolean);
     procedure RefreshContextLines;
     procedure SetShowContext(Value: Boolean);
@@ -426,6 +427,7 @@ end;
 
 procedure TfmGrepResults.FormCreate(Sender: TObject);
 begin
+  FSavedFormCaption := Caption;
   FSavedLastSearchTimeCaption := miHistoryLastSearchTime.Caption;
   FSavedSaveOptionCaption := miSettingsSaveOption.Caption;
   FSavedDirectoriesDataCaption := miSettingsDirectoriesData.Caption;
@@ -582,6 +584,7 @@ begin
       SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
     GrepExpert.HistoryList.ListMode := ANewMode;
     tcHistoryListPage.TabIndex := Integer(ANewMode);
+    Caption := Format(FSavedFormCaption, [tcHistoryListPage.Tabs[Integer(ANewMode)]]);
     if DoRefresh then
       RefreshHistoryView(DoUpdateIndex);
   end;
@@ -865,15 +868,17 @@ begin
   else
     reContext.Height := FLoadContextHeight;
 
-  if GrepExpert.GrepSaveHistoryListItems and FShowHistoryList then
+  if FShowHistoryList then
   begin
     UpdateHistoryPagesOptions;
-
-    lbHistoryList.Width := FLoadHistoryListWidth;
-    if GrepExpert.GrepHistoryListDefaultPage < tcHistoryListPage.Tabs.Count then
-      FLoadHistoryListPage := GrepExpert.GrepHistoryListDefaultPage;
-    SetHistoryListMode(TGrepHistoryListMode(FLoadHistoryListPage), True, False, True);
-    SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
+    if GrepExpert.GrepSaveHistoryListItems then
+    begin
+      lbHistoryList.Width := FLoadHistoryListWidth;
+      if GrepExpert.GrepHistoryListDefaultPage < tcHistoryListPage.Tabs.Count then
+        FLoadHistoryListPage := GrepExpert.GrepHistoryListDefaultPage;
+      SetHistoryListMode(TGrepHistoryListMode(FLoadHistoryListPage), True, False, True);
+      SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
+    end;
   end;
 end;
 
