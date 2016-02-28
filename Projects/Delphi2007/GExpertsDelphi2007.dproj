@@ -19,9 +19,9 @@
     <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
     <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
     <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
-    <DCC_DcuOutput>dcu</DCC_DcuOutput>
-    <DCC_ObjOutput>dcu</DCC_ObjOutput>
-    <DCC_HppOutput>dcu</DCC_HppOutput>
+    <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+    <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
+    <DCC_HppOutput>.\dcu</DCC_HppOutput>
     <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_UnitSearchPath>
     <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
     <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ObjPath>
@@ -32,9 +32,9 @@
     <Version>7.0</Version>
     <DCC_Define>DEBUG</DCC_Define>
     <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
-    <DCC_DcuOutput>..\..\dcu\delphi2007</DCC_DcuOutput>
-    <DCC_ObjOutput>..\..\dcu\delphi2007</DCC_ObjOutput>
-    <DCC_HppOutput>..\..\dcu\delphi2007</DCC_HppOutput>
+    <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+    <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
+    <DCC_HppOutput>.\dcu</DCC_HppOutput>
     <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_UnitSearchPath>
     <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
     <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ObjPath>
@@ -46,6 +46,7 @@
     <DCC_MapFile>3</DCC_MapFile>
     <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
     <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
+    <DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=ActnList</DCC_UnitAlias>
   </PropertyGroup>
   <ProjectExtensions>
     <Borland.Personality>Delphi.Personality</Borland.Personality>
@@ -122,6 +123,13 @@
     <RcCompile Include="..\..\images\GXIcons.rc">
       <Form>..\..\images\GXIcons.res</Form>
     </RcCompile>
+    <DCCReference Include="..\..\Source\AutoTodo\GX_AutoTodoDone.pas">
+      <Form>fmAutoTodoDone</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\AutoTodo\GX_InsertAutoTodo.pas">
+      <Form>fmInsertAutoTodoForm</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas" />
     <DCCReference Include="..\..\source\BackupProject\GX_Backup.pas">
       <Form>fmBackup</Form>
     </DCCReference>
@@ -208,6 +216,9 @@
     <DCCReference Include="..\..\source\Editor\GX_eFindDelimiter.pas" />
     <DCCReference Include="..\..\source\Editor\GX_ePasteAs.pas">
       <Form>fmPasteAsConfig</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\Editor\GX_ePopupMenu.pas">
+      <Form>fmEditorPopupMenuExpertConfig</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\Editor\GX_ePrevNextIdentifier.pas" />
     <DCCReference Include="..\..\source\Editor\GX_eReverseStatement.pas" />
@@ -298,6 +309,7 @@
     </DCCReference>
     <DCCReference Include="..\..\source\Framework\GX_ActionBroker.pas" />
     <DCCReference Include="..\..\source\Framework\GX_Actions.pas" />
+    <DCCReference Include="..\..\Source\Framework\GX_BaseExpert.pas" />
     <DCCReference Include="..\..\source\Framework\GX_BaseForm.pas">
       <Form>fmBaseForm</Form>
     </DCCReference>
@@ -317,6 +329,7 @@
       <Form>fmEditorShortcut</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\Framework\GX_EditReader.pas" />
+    <DCCReference Include="..\..\source\framework\GX_EventHook.pas" />
     <DCCReference Include="..\..\source\Framework\GX_Experts.pas" />
     <DCCReference Include="..\..\source\Framework\GX_FeedbackWizard.pas">
       <Form>fmFeedbackWizard</Form>
@@ -351,6 +364,9 @@
       <Form>fmGrepOptions</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\Grep\GX_GrepPrinting.pas" />
+    <DCCReference Include="..\..\Source\Grep\GX_GrepProgress.pas">
+      <Form>fmGrepProgress</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\Grep\GX_GrepRegExSearch.pas" />
     <DCCReference Include="..\..\source\Grep\GX_GrepReplace.pas">
       <Form>fmGrepReplace</Form>
@@ -363,6 +379,9 @@
     </DCCReference>
     <DCCReference Include="..\..\source\Grep\GX_GrepSearch.pas">
       <Form>fmGrepSearch</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\Grep\GX_GrepSelect.pas">
+      <Form>fmGrepSelect</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\Grep\GX_Replace.pas" />
     <DCCReference Include="..\..\source\IDEDocking\GX_IdeDock.pas">
