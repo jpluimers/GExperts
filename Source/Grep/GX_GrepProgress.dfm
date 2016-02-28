@@ -28,8 +28,6 @@ inherited fmGrepProgress: TfmGrepProgress
     Top = 8
     Width = 324
     Height = 25
-    Style = pbstMarquee
-    MarqueeInterval = 1
     TabOrder = 0
   end
   object ProgressBarDetail: TProgressBar
@@ -37,8 +35,6 @@ inherited fmGrepProgress: TfmGrepProgress
     Top = 55
     Width = 324
     Height = 25
-    Style = pbstMarquee
-    MarqueeInterval = 1
     TabOrder = 1
   end
 end
