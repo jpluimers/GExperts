@@ -438,7 +438,6 @@ inherited fmGrepSelect: TfmGrepSelect
       Anchors = [akRight, akBottom]
       BevelOuter = bvNone
       Color = clBtnShadow
-      ParentBackground = False
       TabOrder = 11
       object btnSortSearchTextAsc: TButton
         Tag = 2
