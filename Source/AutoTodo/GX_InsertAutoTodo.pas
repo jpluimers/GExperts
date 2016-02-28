@@ -16,8 +16,8 @@ uses
 
 type
   tfmInsertAutoTodoForm = class(TfmBaseForm)
-    btnOK: TButton;
-    btnCancel: TButton;
+    b_OK: TButton;
+    b_Cancel: TButton;
     l_Username: TLabel;
     ed_Username: TEdit;
     l_TextToInsert: TLabel;
@@ -25,9 +25,12 @@ type
     b_Placeholder: TButton;
     m_TextToInsert: TMemo;
     pm_Placeholders: TPopupMenu;
+    chk_ShowDoneDialog: TCheckBox;
     procedure b_ResetTextToInsertClick(Sender: TObject);
   private
     procedure mi_PlaceholderClick(Sender: TObject);
+    procedure SetData(const AUsername, ATextToInsert: string; ADoneDialogEnabled: boolean);
+    procedure GetData(var AUsername, ATextToInsert: string; var ADoneDialogEnabled: boolean);
   public
     constructor Create(Owner: TComponent); override;
   end;
@@ -38,9 +41,9 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Registry, ToolsAPI,
+  Registry, Actions, ToolsAPI,
   GX_GExperts, GX_ConfigurationInfo, GX_uAutoTodoHandler, GX_dzVclUtils,
-  GX_OtaUtils, GX_GenericUtils;
+  GX_OtaUtils, GX_GenericUtils, GX_AutoTodoDone;
 
 type
   EAutoTodo = class(Exception);
@@ -50,8 +53,12 @@ type
   private
     FUsername: string;
     FTextToInsert: string;
+    FDoneDialogEnabled: Boolean;
   protected
+    procedure UpdateAction(Action: TCustomAction); override;
     procedure SetActive(New: Boolean); override;
+    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -60,8 +67,6 @@ type
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
     procedure Configure; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
     procedure Execute(Sender: TObject); override;
   end;
 
@@ -98,34 +103,44 @@ begin
 
     TextLength := Length(s);
 
-    Handler := nil;
     Patches := TStringList.Create;
     try
       Handler := TAutoTodoHandler.Create;
+      try
+        if FUsername = '*' then
+          Handler.TodoUser := Handler.GetWindowsUser
+        else
+          Handler.TodoUser := FUsername;
+        Handler.TextToInsert := FTextToInsert;
 
-      if FUsername = '*' then
-        Handler.TodoUser := Handler.GetWindowsUser
-      else
-        Handler.TodoUser := FUsername;
-      Handler.TextToInsert := FTextToInsert;
-
-      Handler.Execute(s, Patches);
-
-      Writer := SourceEditor.CreateUndoableWriter;
-
-      CurPos := 0;
-      for i := 0 to Patches.Count - 1 do begin
-        PatchPos := Integer(Patches.Objects[i]);
-        if PatchPos > CurPos then begin
-          Writer.CopyTo(PatchPos);
-          CurPos := PatchPos;
-        end;
-        Writer.Insert(PChar(Patches[i]));
+        Handler.Execute(s, Patches);
+      finally
+        FreeAndNil(Handler);
       end;
-      if CurPos < TextLength then
-        Writer.CopyTo(TextLength);
+
+      if Patches.Count > 0 then begin
+        Writer := SourceEditor.CreateUndoableWriter;
+
+        CurPos := 0;
+        for i := 0 to Patches.Count - 1 do begin
+          PatchPos := Integer(Patches.Objects[i]);
+          if PatchPos > CurPos then begin
+            Writer.CopyTo(PatchPos);
+            CurPos := PatchPos;
+          end;
+          Writer.Insert(PChar(Patches[i]));
+        end;
+        if CurPos < TextLength then
+          Writer.CopyTo(TextLength);
+      end;
+
+      if FDoneDialogEnabled then begin
+        if TfmAutoTodoDone.Execute(Patches.Count) then begin
+          FDoneDialogEnabled := False;
+          SaveSettings;
+        end;
+      end;
     finally
-      FreeAndNil(Handler);
       FreeAndNil(Patches);
     end;
 end;
@@ -136,13 +151,11 @@ var
 begin
   frm := tfmInsertAutoTodoForm.Create(nil);
   try
-    frm.ed_Username.Text := FUsername;
-    frm.m_TextToInsert.Lines.Text := FTextToInsert;
+    frm.SetData(FUsername, FTextToInsert, FDoneDialogEnabled);
     if frm.ShowModal = mrOk then
     begin
-      FUsername := frm.ed_Username.Text;
-      FTextToInsert := frm.m_TextToInsert.Lines.Text;
-      SaveSettings;
+     frm.GetData(FUsername, FTextToInsert, FDoneDialogEnabled);
+     SaveSettings;
     end;
   finally
     frm.Free;
@@ -155,6 +168,7 @@ begin
 
   FUsername := '*'; // '*' means 'use Windows username'
   FTextToInsert := TAutoTodoHandler.GetDefaultTextToInsert;
+  FDoneDialogEnabled := True;
 
   // we do not want a shortcut
   // ShortCut := Menus.ShortCut(Word('Z'), [ssCtrl, ssShift, ssAlt]);
@@ -193,6 +207,7 @@ begin
   inherited;
   FUsername := Settings.ReadString(ConfigurationKey, 'Username', FUsername);
   FTextToInsert := Settings.ReadString(ConfigurationKey, 'TextToInsert', FTextToInsert);
+  FDoneDialogEnabled := Settings.ReadBool(ConfigurationKey, 'DoneDialogEnabled', FDoneDialogEnabled);
 end;
 
 procedure TGxInsertAutoTodoExpert.InternalSaveSettings(Settings: TGExpertsSettings);
@@ -200,12 +215,20 @@ begin
   inherited;
   Settings.WriteString(ConfigurationKey, 'Username', FUsername);
   Settings.WriteString(ConfigurationKey, 'TextToInsert', FTextToInsert);
+  Settings.WriteBool(ConfigurationKey, 'DoneDialogEnabled', FDoneDialogEnabled);
 end;
 
 procedure TGxInsertAutoTodoExpert.SetActive(New: Boolean);
 begin
   inherited SetActive(New);
   // nothing else to do
+end;
+
+procedure TGxInsertAutoTodoExpert.UpdateAction(Action: TCustomAction);
+const
+  SAllowableFileExtensions = '.pas;.dpr;.inc';
+begin
+  Action.Enabled := FileMatchesExtensions(GxOtaGetCurrentSourceFile, SAllowableFileExtensions);
 end;
 
 { tfmInsertAutoTodoForm }
@@ -229,6 +252,22 @@ begin
 
   TControl_SetMinConstraints(Self);
   Constraints.MaxHeight := Height;
+end;
+
+procedure tfmInsertAutoTodoForm.GetData(var AUsername, ATextToInsert: string;
+  var ADoneDialogEnabled: boolean);
+begin
+  AUsername := ed_Username.Text;
+  ATextToInsert := m_TextToInsert.Lines.Text;
+  ADoneDialogEnabled := chk_ShowDoneDialog.Checked;
+end;
+
+procedure tfmInsertAutoTodoForm.SetData(const AUsername, ATextToInsert: string;
+  ADoneDialogEnabled: boolean);
+begin
+  ed_Username.Text := AUsername;
+  m_TextToInsert.Lines.Text := ATextToInsert;
+  chk_ShowDoneDialog.Checked := ADoneDialogEnabled;
 end;
 
 procedure tfmInsertAutoTodoForm.b_ResetTextToInsertClick(Sender: TObject);

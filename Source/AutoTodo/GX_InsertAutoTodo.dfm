@@ -31,7 +31,7 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
     Height = 14
     Caption = 'Text to insert (include comment markers if required!)'
   end
-  object btnOK: TButton
+  object b_OK: TButton
     Left = 504
     Top = 128
     Width = 75
@@ -40,9 +40,9 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 5
   end
-  object btnCancel: TButton
+  object b_Cancel: TButton
     Left = 584
     Top = 128
     Width = 75
@@ -51,14 +51,14 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 1
+    TabOrder = 6
   end
   object ed_Username: TEdit
     Left = 8
     Top = 24
     Width = 249
     Height = 22
-    TabOrder = 2
+    TabOrder = 0
   end
   object b_ResetTextToInsert: TButton
     Left = 496
@@ -67,7 +67,7 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
     Height = 25
     Anchors = [akTop, akRight]
     Caption = 'Reset'
-    TabOrder = 3
+    TabOrder = 1
     OnClick = b_ResetTextToInsertClick
   end
   object b_Placeholder: TButton
@@ -77,7 +77,7 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
     Height = 25
     Anchors = [akTop, akRight]
     Caption = 'Placeholders'
-    TabOrder = 4
+    TabOrder = 2
   end
   object m_TextToInsert: TMemo
     Left = 8
@@ -85,7 +85,15 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
     Width = 649
     Height = 41
     Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 5
+    TabOrder = 3
+  end
+  object chk_ShowDoneDialog: TCheckBox
+    Left = 8
+    Top = 128
+    Width = 249
+    Height = 17
+    Caption = 'Show done dialog'
+    TabOrder = 4
   end
   object pm_Placeholders: TPopupMenu
     Left = 448
