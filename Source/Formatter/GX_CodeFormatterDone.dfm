@@ -17,14 +17,14 @@ object fmCodeFormatterDone: TfmCodeFormatterDone
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object l_Blurb: TLabel
     Left = 8
     Top = 8
     Width = 141
     Height = 13
     Caption = 'The file has been reformatted.'
   end
-  object Label2: TLabel
+  object l_Twice: TLabel
     Left = 8
     Top = 32
     Width = 278
@@ -34,9 +34,9 @@ object fmCodeFormatterDone: TfmCodeFormatterDone
   object chk_DontShowAgain: TCheckBox
     Left = 8
     Top = 64
-    Width = 185
+    Width = 217
     Height = 17
-    Caption = 'do not show this message again'
+    Caption = 'Do not show this message again.'
     TabOrder = 0
   end
   object b_Ok: TButton
@@ -44,6 +44,7 @@ object fmCodeFormatterDone: TfmCodeFormatterDone
     Top = 56
     Width = 75
     Height = 25
+    Cancel = True
     Caption = 'OK'
     Default = True
     ModalResult = 1

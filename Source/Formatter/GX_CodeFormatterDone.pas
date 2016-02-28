@@ -23,9 +23,9 @@ uses
 
 type
   TfmCodeFormatterDone = class(TForm)
-    Label1: TLabel;
+    l_Blurb: TLabel;
     chk_DontShowAgain: TCheckBox;
-    Label2: TLabel;
+    l_Twice: TLabel;
     b_Ok: TButton;
   private
   public
