@@ -684,7 +684,7 @@ begin
     FGrepFinalization := ExpSettings.ReadBool('Finalization', True);
     FGrepForms := ExpSettings.ReadBool('Forms', False);
     FGrepSQLFiles := ExpSettings.ReadBool('SQLFiles', False);
-    FGrepSearch := ExpSettings.ReadInteger('Search', 0);
+    FGrepSearch := ExpSettings.ReadInteger('Search', 1);
     FGrepSub := ExpSettings.ReadBool('SubDirectories', True);
     FGrepExpandAll := ExpSettings.ReadBool('ExpandAll', False);
     FGrepExpandIf := ExpSettings.ReadBool('ExpandIf', False);
