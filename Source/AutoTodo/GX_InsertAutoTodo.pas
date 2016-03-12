@@ -41,7 +41,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Registry, Actions, ToolsAPI,
+  Registry, Actions, ActnList, ToolsAPI, Types,
   GX_GExperts, GX_ConfigurationInfo, GX_uAutoTodoHandler, GX_dzVclUtils,
   GX_OtaUtils, GX_GenericUtils, GX_AutoTodoDone;
 
@@ -70,9 +70,63 @@ type
     procedure Execute(Sender: TObject); override;
   end;
 
+type
+  TOffsetToCursorPos = class
+  private
+    FOffsets: array of integer;
+  public
+    constructor Create(_sl: TGXUnicodeStringList);
+    function CalcCursorPos(_Offset: integer): TPoint;
+  end;
+
+
+{ TOffsetToCursorPos }
+
+constructor TOffsetToCursorPos.Create(_sl: TGXUnicodeStringList);
+var
+  cnt: integer;
+  i: Integer;
+  CrLfLen: integer;
+  Ofs: Integer;
+begin
+  inherited Create;
+{$IFDEF GX_VER190_up}
+  CrLfLen := Length(_sl.LineBreak);
+{$ELSE}
+  // Delphi < 2007 does not have the LineBreak property
+  CrLfLen := 2;
+{$ENDIF}
+  cnt := _sl.Count;
+  SetLength(FOffsets, cnt);
+  Ofs := 1;
+  for i := 0 to _sl.Count - 1 do begin
+    FOffsets[i] := Ofs;
+    Inc(Ofs, Length(_sl[i]) + CrLfLen);
+  end;
+end;
+
+function TOffsetToCursorPos.CalcCursorPos(_Offset: integer): TPoint;
+var
+  i: integer;
+begin
+  i := 0;
+  while (i < Length(FOffsets)) and (_Offset >= FOffsets[i]) do begin
+    Inc(i);
+  end;
+  Result.Y := i - 1;
+  Result.X := _Offset - FOffsets[Result.Y] + 1;
+end;
+
 { TGxInsertAutoTodoExpert }
 
 procedure TGxInsertAutoTodoExpert.Execute(Sender: TObject);
+
+  function PointToCharPos(_Pnt: TPoint): TOTACharPos;
+  begin
+    Result.Line :=_Pnt.Y + 1;
+    Result.CharIndex := _Pnt.X;
+  end;
+
 resourcestring
   str_NoEditor = 'No source editor';
   str_UnsupportedFileTypeS = 'Unsupported file type: %s';
@@ -83,11 +137,16 @@ var
   Handler: TAutoTodoHandler;
   Patches: TStringList;
   Writer: IOTAEditWriter;
-  s: WideString;
+  Lines: TGXUnicodeStringList;
+  Source: TGXUnicodeString;
   i: Integer;
   CurPos: Integer;
   PatchPos: Integer;
   TextLength: Integer;
+  OffsToCP: TOffsetToCursorPos;
+  cp: TPoint;
+  EditView: IOTAEditView;
+  Offset: Integer;
 begin
     SourceEditor := GxOtaGetCurrentSourceEditor;
     if not Assigned(SourceEditor) then
@@ -96,52 +155,76 @@ begin
     if not (IsPascalSourceFile(FileName) or IsDelphiPackage(FileName) or FileMatchesExtension(FileName, '.tpl')) then
       raise EAutoTodo.CreateFmt(str_UnsupportedFileTypeS, [ExtractFileName(FileName)]);
 
-    if not GxOtaGetActiveEditorTextAsUnicodeString(s, False) then
-      raise EAutoTodo.CreateFmt(str_UnableToGetContentsS, [FileName]);
-    if s = '' then
-      exit;
-
-    TextLength := Length(s);
-
-    Patches := TStringList.Create;
+    Lines := TGXUnicodeStringList.Create;
     try
-      Handler := TAutoTodoHandler.Create;
+      if not GxOtaGetActiveEditorText(Lines, false) then
+        raise EAutoTodo.CreateFmt(str_UnableToGetContentsS, [FileName]);
+      Source := Lines.Text;
+      if Source = '' then
+        exit;
+
+      TextLength := Length(Source);
+
+      Patches := TStringList.Create;
       try
-        if FUsername = '*' then
-          Handler.TodoUser := Handler.GetWindowsUser
-        else
-          Handler.TodoUser := FUsername;
-        Handler.TextToInsert := FTextToInsert;
+        Handler := TAutoTodoHandler.Create;
+        try
+          if FUsername = '*' then
+            Handler.TodoUser := Handler.GetWindowsUser
+          else
+            Handler.TodoUser := FUsername;
+          Handler.TextToInsert := FTextToInsert;
 
-        Handler.Execute(s, Patches);
-      finally
-        FreeAndNil(Handler);
-      end;
+          Handler.Execute(Source, Patches);
+        finally
+          FreeAndNil(Handler);
+        end;
 
-      if Patches.Count > 0 then begin
-        Writer := SourceEditor.CreateUndoableWriter;
+        if Patches.Count > 0 then begin
+          EditView := GxOtaGetTopMostEditView(SourceEditor);
+          OffsToCP := TOffsetToCursorPos.Create(Lines);
+          try
+//            for i := Patches.Count - 1 downto 0 do
+//              Insert(Patches[i], Source, Integer(Patches.Objects[i]) + 1);
 
-        CurPos := 0;
-        for i := 0 to Patches.Count - 1 do begin
-          PatchPos := Integer(Patches.Objects[i]);
-          if PatchPos > CurPos then begin
-            Writer.CopyTo(PatchPos);
-            CurPos := PatchPos;
+            // due to the IDE using UTF-8 we need to convert PatchPos to line and offset
+            // and then convert line and offset to the Offset into the edit buffer
+            for i := 0 to Patches.Count - 1 do begin
+              PatchPos := Integer(Patches.Objects[i]);
+              cp := OffsToCP.CalcCursorPos(PatchPos);
+              Offset := EditView.CharPosToPos(PointToCharPos(cp));
+              Patches.Objects[i] := Pointer(Offset);
+            end;
+          finally
+            FreeAndNil(OffsToCP);
           end;
-          Writer.Insert(PChar(Patches[i]));
-        end;
-        if CurPos < TextLength then
-          Writer.CopyTo(TextLength);
-      end;
+          EditView := nil;
 
-      if FDoneDialogEnabled then begin
-        if TfmAutoTodoDone.Execute(Patches.Count) then begin
-          FDoneDialogEnabled := False;
-          SaveSettings;
+          Writer := SourceEditor.CreateUndoableWriter;
+          CurPos := 0;
+          for i := 0 to Patches.Count - 1 do begin
+            PatchPos := Integer(Patches.Objects[i]);
+            if PatchPos > CurPos then begin
+              Writer.CopyTo(PatchPos);
+              CurPos := PatchPos;
+            end;
+            Writer.Insert(PAnsiChar(ConvertToIDEEditorString(Patches[i])));
+          end;
+          if CurPos < TextLength then
+            Writer.CopyTo(TextLength);
         end;
+
+        if FDoneDialogEnabled then begin
+          if TfmAutoTodoDone.Execute(Patches.Count) then begin
+            FDoneDialogEnabled := False;
+            SaveSettings;
+          end;
+        end;
+      finally
+        FreeAndNil(Patches);
       end;
     finally
-      FreeAndNil(Patches);
+      FreeAndNil(Lines);
     end;
 end;
 
