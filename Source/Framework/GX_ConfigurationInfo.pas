@@ -95,6 +95,8 @@ type
     procedure WriteString(const Ident: string; Value: string);
     function ReadAnsiChar(const Ident: string; Default: AnsiChar): AnsiChar;
     procedure WriteAnsiChar(const Ident: string; Value: AnsiChar);
+    function ReadEnumerated(const Ident: string; TypeInfo: PTypeInfo; Default: Longint): Longint;
+    procedure WriteEnumerated(const Ident: string; TypeInfo: PTypeInfo; Value: Longint);
     procedure LoadFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure SaveFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure ReadStrings(const List: TStrings; const ListName, Ident: string);
@@ -878,6 +880,12 @@ begin
   Result := FGExpertsSettings.ReadBool(FSection, Ident, Default);
 end;
 
+function TExpertSettings.ReadEnumerated(const Ident: string; TypeInfo: PTypeInfo;
+  Default: Integer): Longint;
+begin
+  Result := FGExpertsSettings.ReadEnumerated(FSection, Ident, TypeInfo, Default);
+end;
+
 function TExpertSettings.ReadAnsiChar(const Ident: string; Default: AnsiChar): AnsiChar;
 var
   Value: Integer;
@@ -918,6 +926,12 @@ end;
 procedure TExpertSettings.WriteBool(const Ident: string; Value: Boolean);
 begin
   FGExpertsSettings.WriteBool(FSection, Ident, Value);
+end;
+
+procedure TExpertSettings.WriteEnumerated(const Ident: string; TypeInfo: PTypeInfo;
+  Value: Integer);
+begin
+  FGExpertsSettings.WriteEnumerated(FSection, Ident, TypeInfo, Value);
 end;
 
 procedure TExpertSettings.WriteAnsiChar(const Ident: string; Value: AnsiChar);

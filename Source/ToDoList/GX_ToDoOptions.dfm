@@ -4,7 +4,7 @@ object fmToDoOptions: TfmToDoOptions
   ActiveControl = lstTokens
   BorderStyle = bsDialog
   Caption = 'To Do Options'
-  ClientHeight = 293
+  ClientHeight = 329
   ClientWidth = 542
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -19,20 +19,20 @@ object fmToDoOptions: TfmToDoOptions
   OnShow = FormShow
   DesignSize = (
     542
-    293)
+    329)
   PixelsPerInch = 96
   TextHeight = 14
   object gbxTokens: TGroupBox
     Left = 8
     Top = 6
     Width = 233
-    Height = 279
+    Height = 315
     Anchors = [akLeft, akTop, akBottom]
     Caption = 'To Do Tokens'
     TabOrder = 0
     DesignSize = (
       233
-      279)
+      315)
     object lblPriority: TLabel
       Left = 131
       Top = 185
@@ -53,7 +53,7 @@ object fmToDoOptions: TfmToDoOptions
       Left = 8
       Top = 19
       Width = 118
-      Height = 251
+      Height = 287
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 14
       Sorted = True
@@ -108,25 +108,25 @@ object fmToDoOptions: TfmToDoOptions
   end
   object btnOK: TButton
     Left = 308
-    Top = 260
+    Top = 296
     Width = 80
     Height = 26
     Anchors = [akLeft, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 3
+    TabOrder = 4
   end
   object btnCancel: TButton
     Left = 400
-    Top = 260
+    Top = 296
     Width = 80
     Height = 26
     Anchors = [akLeft, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 5
   end
   object gbxOptions: TGroupBox
     Left = 251
@@ -253,5 +253,24 @@ object fmToDoOptions: TfmToDoOptions
       TabStop = True
       OnClick = radScanDirClick
     end
+  end
+  object btnFont: TButton
+    Left = 256
+    Top = 256
+    Width = 137
+    Height = 33
+    Caption = 'Font'
+    TabOrder = 3
+    OnClick = btnFontClick
+  end
+  object TheFontDialog: TFontDialog
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Options = [fdForceFontExist]
+    Left = 168
+    Top = 256
   end
 end

@@ -7,7 +7,7 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Classes, Controls, StdCtrls, Forms, GX_BaseForm;
+  Classes, Controls, StdCtrls, Forms, GX_BaseForm, Dialogs;
 
 type
   TfmToDoOptions = class(TfmBaseForm)
@@ -34,6 +34,8 @@ type
     radScanOpen: TRadioButton;
     radScanDir: TRadioButton;
     radScanProjGroup: TRadioButton;
+    TheFontDialog: TFontDialog;
+    btnFont: TButton;
     procedure btnInsertClick(Sender: TObject);
     procedure btnRemoveClick(Sender: TObject);
     procedure btnApplyClick(Sender: TObject);
@@ -44,6 +46,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure radScanDirClick(Sender: TObject);
     procedure btnBrowseClick(Sender: TObject);
+    procedure btnFontClick(Sender: TObject);
   private
     procedure UpdateButtonState;
     procedure DirEnable(New: Boolean);
@@ -57,7 +60,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_GenericUtils, GX_ToDo, GX_dzVclUtils, Dialogs, Graphics, SysUtils;
+  GX_GenericUtils, GX_ToDo, GX_dzVclUtils, Graphics, SysUtils;
 
 procedure TfmToDoOptions.UpdateButtonState;
 var
@@ -145,6 +148,13 @@ begin
       Items.Delete(ItemIndex);
     end;
   UpdateButtonState;
+end;
+
+procedure TfmToDoOptions.btnFontClick(Sender: TObject);
+begin
+  TheFontDialog.Font := btnFont.Font;
+  if TheFontDialog.Execute then
+    btnFont.Font := TheFontDialog.Font;
 end;
 
 procedure TfmToDoOptions.btnApplyClick(Sender: TObject);

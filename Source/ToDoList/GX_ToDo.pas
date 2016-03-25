@@ -6,7 +6,7 @@ interface
 
 uses Forms, Messages, Classes, ActnList, Menus, ImgList,
   Controls, ComCtrls, ToolWin, ToolsAPI,
-  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo;
+  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, Graphics;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
@@ -148,6 +148,7 @@ type
     FAddMessage: Boolean;
     FHideOnGoto: Boolean;
     FDirectoryHistoryList: TDirList;
+    FFont: TFont;
   protected
     procedure SetActive(New: Boolean); override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
@@ -171,7 +172,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Dialogs, Clipbrd, Graphics, Windows,
+  SysUtils, Dialogs, Clipbrd, Windows,
   mPasLex, mwBCBTokenList,
   GX_GxUtils, GX_GenericUtils, GX_EditReader,
   GX_ToDoOptions, GX_SharedImages, Math;
@@ -1196,6 +1197,7 @@ begin
   if fmToDo = nil then
   begin
     fmToDo := TfmToDo.Create(nil);
+    fmToDo.lvToDo.Font.Assign(FFont);
   end;
   IdeDockManager.ShowForm(fmToDo);
 end;
@@ -1205,14 +1207,24 @@ end;
  copies harder. }
 procedure TToDoExpert.Configure;
 var
-  Dlg: TfmToDoOptions;
   TodoListOptionsUnchanged: Boolean;
+
+  function HasChanged(Value: boolean): boolean;
+  begin
+    Result := not Value;
+    if Result then
+      TodoListOptionsUnchanged := False;
+  end;
+
+var
+  Dlg: TfmToDoOptions;
   OldScanType: TToDoScanType;
 begin
   TodoListOptionsUnchanged := True;
 
   Dlg := TfmToDoOptions.Create(nil);
   try
+    FTokenList.Sort;
     Dlg.lstTokens.Items.Assign(FTokenList);
     Dlg.cbShowTokens.Checked := FShowTokens;
     Dlg.cbAddMessage.Checked := FAddMessage;
@@ -1230,30 +1242,23 @@ begin
     end;
     Dlg.chkInclude.Checked := FRecurseDirScan;
     Dlg.cboDirectories.Text := FDirsToScan;
+    Dlg.btnFont.Font := FFont;
 
     if Dlg.ShowModal = mrOk then
     begin
       // Add directory to FDirectoryHistoryList
       AddMRUString(Dlg.cboDirectories.Text, FDirectoryHistoryList, True);
 
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        FTokenList.Equals(Dlg.lstTokens.Items);
-      FTokenList.Assign(Dlg.lstTokens.Items);
-
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        (FShowTokens = Dlg.cbShowTokens.Checked);
-      FShowTokens := Dlg.cbShowTokens.Checked;
-
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        (FAddMessage = Dlg.cbAddMessage.Checked);
-      FAddMessage := Dlg.cbAddMessage.Checked;
-
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        (FHideOnGoto = Dlg.cbHideOnGoto.Checked);
-      FHideOnGoto := Dlg.cbHideOnGoto.Checked;
+      if HasChanged(FTokenList.Equals(Dlg.lstTokens.Items)) then
+        FTokenList.Assign(Dlg.lstTokens.Items);
+      if HasChanged(FShowTokens = Dlg.cbShowTokens.Checked) then
+        FShowTokens := Dlg.cbShowTokens.Checked;
+      if HasChanged(FAddMessage = Dlg.cbAddMessage.Checked) then
+        FAddMessage := Dlg.cbAddMessage.Checked;
+      if HasChanged(FHideOnGoto = Dlg.cbHideOnGoto.Checked) then
+        FHideOnGoto := Dlg.cbHideOnGoto.Checked;
 
       OldScanType := FScanType;
-
       if Dlg.radScanProj.Checked then
         FScanType := tstProject
       else if Dlg.radScanProjGroup.Checked then
@@ -1264,17 +1269,16 @@ begin
       else
       if Dlg.radScanDir.Checked then
         FScanType := tstDirectory;
+      HasChanged(FScanType = OldScanType);
 
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        (FScanType = OldScanType);
+      if HasChanged(FRecurseDirScan = Dlg.chkInclude.Checked) then
+        FRecurseDirScan := Dlg.chkInclude.Checked;
+      if HasChanged(SameFileName(FDirsToScan, Dlg.cboDirectories.Text)) then
+        FDirsToScan := Dlg.cboDirectories.Text;
 
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        (FRecurseDirScan = Dlg.chkInclude.Checked);
-      FRecurseDirScan := Dlg.chkInclude.Checked;
-
-      TodoListOptionsUnchanged := TodoListOptionsUnchanged and
-        SameFileName(FDirsToScan, Dlg.cboDirectories.Text);
-      FDirsToScan := Dlg.cboDirectories.Text;
+      FFont.Assign(Dlg.btnFont.Font);
+      if Assigned(fmTodo) then
+        fmTodo.lvTodo.Font := FFont;
 
       SaveSettings;
     end;
@@ -1298,10 +1302,17 @@ begin
   FHideOnGoto := True;
   FScanType := tstProject;
   FDirectoryHistoryList := TDirList.Create;
+
+  FFont := TFont.Create;
+  FFont.Name := 'Tahoma';
+  FFont.Size := 9;
+  FFont.Style := [];
+  FFont.Color := clBlack;
 end;
 
 destructor TToDoExpert.Destroy;
 begin
+  FreeAndNil(FFont);
   FreeAndNil(fmToDo);
   FreeAndNil(FDirectoryHistoryList);
   FreeAndNil(FTokenList);
@@ -1325,18 +1336,27 @@ end;
 procedure TToDoExpert.InternalLoadSettings(Settings: TGExpertsSettings);
 var
   Key: string;
+  ExpSettings: TExpertSettings;
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize
   Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
   FTokenList.LoadFromRegistry(Key);
   FDirectoryHistoryList.LoadFromRegistry(Key);
-  FShowTokens := Settings.ReadBool(ConfigurationKey, 'ShowTokens', False);
-  FAddMessage := Settings.ReadBool(ConfigurationKey, 'AddMessage', False);
-  FHideOnGoto := Settings.ReadBool(ConfigurationKey, 'HideOnGoto', False);
-  FScanType := TToDoScanType(Settings.ReadEnumerated('ToDo', 'ScanType', TypeInfo(TToDoScanType), Ord(tstProject)));
-  fDirsToScan := Settings.ReadString(ConfigurationKey, 'DirToScan', '');
-  fRecurseDirScan := Settings.ReadBool(ConfigurationKey, 'RecurseDirScan', False);
+
+  ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+  try
+    FShowTokens := ExpSettings.ReadBool('ShowTokens', False);
+    FAddMessage := ExpSettings.ReadBool('AddMessage', False);
+    FHideOnGoto := ExpSettings.ReadBool('HideOnGoto', False);
+    FScanType := TToDoScanType(ExpSettings.ReadEnumerated('ScanType', TypeInfo(TToDoScanType), Ord(tstProject)));
+    fDirsToScan := ExpSettings.ReadString('DirToScan', '');
+    fRecurseDirScan := ExpSettings.ReadBool('RecurseDirScan', False);
+    ExpSettings.LoadFont('Font', FFont); 
+  finally
+    FreeAndNil(ExpSettings);
+  end;
+
   if Active then
     IdeDockManager.RegisterDockableForm(TfmToDo, fmToDo, 'fmToDo');
 end;
@@ -1344,18 +1364,26 @@ end;
 procedure TToDoExpert.InternalSaveSettings(Settings: TGExpertsSettings);
 var
   Key: string;
+  ExpSettings: TExpertSettings;
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize
   Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
   FTokenList.SaveToRegistry(Key);
   FDirectoryHistoryList.SaveToRegistry(Key);
-  Settings.WriteBool(ConfigurationKey, 'ShowTokens', FShowTokens);
-  Settings.WriteBool(ConfigurationKey, 'AddMessage', FAddMessage);
-  Settings.WriteBool(ConfigurationKey, 'HideOnGoto', FHideOnGoto);
-  Settings.WriteEnumerated(ConfigurationKey, 'ScanType', TypeInfo(TToDoScanType), Ord(FScanType));
-  Settings.WriteString(ConfigurationKey, 'DirToScan', FDirsToScan);
-  Settings.WriteBool(ConfigurationKey, 'RecurseDirScan', FRecurseDirScan);
+
+  ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+  try
+    ExpSettings.WriteBool('ShowTokens', FShowTokens);
+    ExpSettings.WriteBool('AddMessage', FAddMessage);
+    ExpSettings.WriteBool('HideOnGoto', FHideOnGoto);
+    ExpSettings.WriteEnumerated('ScanType', TypeInfo(TToDoScanType), Ord(FScanType));
+    ExpSettings.WriteString('DirToScan', FDirsToScan);
+    ExpSettings.WriteBool('RecurseDirScan', FRecurseDirScan);
+    ExpSettings.SaveFont('Font', FFont);
+  finally
+    FreeAndNil(ExpSettings);
+  end;
 end;
 
 procedure TToDoExpert.SetActive(New: Boolean);
