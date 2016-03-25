@@ -69,7 +69,8 @@ uses
 constructor TPasteAsExpert.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scShift + Ord('V');
+  { TODO -oanyone : this shortcut conflicts with the Declare Variable refactoring }
+  //  ShortCut := scCtrl + scShift + Ord('V');
 end;
 
 function TPasteAsExpert.GetDisplayName: string;
@@ -181,7 +182,8 @@ end;
 constructor TConvertRawStringsExpert.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scShift + Ord('R');
+  { TODO -oanyone : this shortcut conflicts with the Record Macro shortcut }
+  // ShortCut := scCtrl + scShift + Ord('R');
 end;
 
 function TConvertRawStringsExpert.GetDisplayName: string;
