@@ -97,11 +97,14 @@ type
     procedure WriteAnsiChar(const Ident: string; Value: AnsiChar);
     function ReadEnumerated(const Ident: string; TypeInfo: PTypeInfo; Default: Longint): Longint;
     procedure WriteEnumerated(const Ident: string; TypeInfo: PTypeInfo; Value: Longint);
+    procedure EraseSection(const Section: string);
+    procedure ReadSection(const Section: string; Strings: TStrings); 
     procedure LoadFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure SaveFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure ReadStrings(const List: TStrings; const ListName, Ident: string);
     procedure WriteStrings(const List: TStrings; const ListName, Ident: string);
     function ValueExists(const Ident: string): Boolean;
+    function CreateExpertSettings(const Section: string): TExpertSettings;
   end;
 
   TGExpertsSettings = class(TGExpertsBaseSettings)
@@ -869,6 +872,16 @@ begin
   FSection := Section;
 end;
 
+function TExpertSettings.CreateExpertSettings(const Section: string): TExpertSettings;
+begin
+  Result := TExpertSettings.Create(FGExpertsSettings, FSection + '\' + Section);
+end;
+
+procedure TExpertSettings.EraseSection(const Section: string);
+begin
+  FGExpertsSettings.EraseSection(FSection + '\' + Section);
+end;
+
 procedure TExpertSettings.LoadFont(const FontName: string; const Font: TFont;
   Flags: TGXFontFlags);
 begin
@@ -899,6 +912,11 @@ end;
 function TExpertSettings.ReadInteger(const Ident: string; Default: Integer): Longint;
 begin
   Result := FGExpertsSettings.ReadInteger(FSection, Ident, Default);
+end;
+
+procedure TExpertSettings.ReadSection(const Section: string; Strings: TStrings);
+begin
+  FGExpertsSettings.ReadSection(FSection + '\' + Section, Strings);
 end;
 
 function TExpertSettings.ReadString(const Ident: string; Default: string): string;

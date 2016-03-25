@@ -39,16 +39,16 @@ type
 
   TTokenList = class(TStringList)
   private
-    procedure LoadFromRegistry(const KeyName: string);
-    procedure SaveToRegistry(const KeyName: string);
+    procedure LoadFromSettings(ExpSettings: TExpertSettings);
+    procedure SaveToSettings(ExpSettings: TExpertSettings);
     procedure AddToken(const Token: string; Priority: TToDoPriority);
   public
     destructor Destroy; override;
   end;
 
   TDirList = class(TStringList)
-    procedure LoadFromRegistry(const KeyName: string);
-    procedure SaveToRegistry(const KeyName: string);
+    procedure LoadFromSettings(ExpSettings: TExpertSettings);
+    procedure SaveToSettings(ExpSettings: TExpertSettings);
   end;
 
   TToDoInfo = class(TObject)
@@ -192,7 +192,7 @@ type
 
 { TTokenList }
 
-procedure TTokenList.LoadFromRegistry(const KeyName: string);
+procedure TTokenList.LoadFromSettings(ExpSettings: TExpertSettings);
 resourcestring
   SWhiteSpaceWarning = 'GExperts found the "%s" To Do List token with leading and/or trailing spaces.' + sLineBreak +
     sLineBreak +
@@ -210,61 +210,57 @@ var
   TokenInfo: TTokenInfo;
   TempTokenText: string;
 begin
-  // Do not localize any of the following.
-  with TGExpertsSettings.Create(KeyName) do
-  try
-    ReadSection('Tokens', Self);
-    for i := 0 to Count - 1 do
-    begin
-      // Sanity checks of tokens
-      TempTokenText := Self[i];
-      if TempTokenText <> Trim(TempTokenText) then
-      begin
-        MessageDlg(Format(SWhiteSpaceWarning, [TempTokenText]), mtWarning, [mbOK], 0);
-        TempTokenText := Trim(TempTokenText);
-      end;
+  ExpSettings.ReadSection('Tokens', Self);
 
-      if (Length(TempTokenText) > 0) and (TempTokenText[1] = '$') then
-      begin
-        MessageDlg(Format(SLeadingDollarWarning, [TempTokenText]), mtWarning, [mbOK], 0);
-      end;
-
-      TokenInfo := TTokenInfo.Create;
-      TokenInfo.Token := Self[i];
-      TokenInfo.Priority := TToDoPriority(ReadInteger('Tokens', TokenInfo.Token, 1));
-      Objects[i] := TokenInfo;
-    end;
-    if Count = 0 then
+  for i := 0 to Count - 1 do
+  begin
+    // Sanity checks of tokens
+    TempTokenText := Self[i];
+    if TempTokenText <> Trim(TempTokenText) then
     begin
-      // No tokens found, create a default list of tokens
-      AddToken('TODO', tpNormal);
-      AddToken('#ToDo1', tpHigh);
-      AddToken('#ToDo2', tpNormal);
-      AddToken('#ToDo3', tpLow);
-      AddToken('TODO 1', tpCritical);
-      AddToken('TODO 2', tpHigh);
-      AddToken('TODO 3', tpNormal);
-      AddToken('TODO 4', tpLow);
-      AddToken('TODO 5', tpLowest);
-      AddToken('DONE', tpDone);
+      MessageDlg(Format(SWhiteSpaceWarning, [TempTokenText]), mtWarning, [mbOK], 0);
+      TempTokenText := Trim(TempTokenText);
     end;
-  finally
-    Free;
+
+    if (Length(TempTokenText) > 0) and (TempTokenText[1] = '$') then
+    begin
+      MessageDlg(Format(SLeadingDollarWarning, [TempTokenText]), mtWarning, [mbOK], 0);
+    end;
+
+    TokenInfo := TTokenInfo.Create;
+    TokenInfo.Token := Self[i];
+    TokenInfo.Priority := TToDoPriority(ExpSettings.ReadInteger('Tokens\' + TokenInfo.Token, 1));
+    Objects[i] := TokenInfo;
+  end;
+  if Count = 0 then
+  begin
+    // No tokens found, create a default list of tokens
+    AddToken('TODO', tpNormal);
+    AddToken('#ToDo1', tpHigh);
+    AddToken('#ToDo2', tpNormal);
+    AddToken('#ToDo3', tpLow);
+    AddToken('TODO 1', tpCritical);
+    AddToken('TODO 2', tpHigh);
+    AddToken('TODO 3', tpNormal);
+    AddToken('TODO 4', tpLow);
+    AddToken('TODO 5', tpLowest);
+    AddToken('DONE', tpDone);
   end;
 end;
 
-procedure TTokenList.SaveToRegistry(const KeyName: string);
+procedure TTokenList.SaveToSettings(ExpSettings: TExpertSettings);
 var
   i: Integer;
+  ListSettings: TExpertSettings;
 begin
   // Do not localize any of the below items.
-  with TGExpertsSettings.Create(KeyName) do
+  ExpSettings.EraseSection('Tokens');
+  ListSettings := ExpSettings.CreateExpertSettings('Tokens');
   try
-    EraseSection('Tokens');
     for i := 0 to Count - 1 do
-      WriteInteger('Tokens', Self[i], Ord(TTokenInfo(Objects[i]).Priority));
+      ListSettings.WriteInteger(Self[i], Ord(TTokenInfo(Objects[i]).Priority));
   finally
-    Free;
+    FreeAndNil(ListSettings);
   end;
 end;
 
@@ -1340,12 +1336,12 @@ var
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize
-  Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
-  FTokenList.LoadFromRegistry(Key);
-  FDirectoryHistoryList.LoadFromRegistry(Key);
-
   ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
   try
+    Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
+    FTokenList.LoadFromSettings(ExpSettings);
+    FDirectoryHistoryList.LoadFromSettings(ExpSettings);
+
     FShowTokens := ExpSettings.ReadBool('ShowTokens', False);
     FAddMessage := ExpSettings.ReadBool('AddMessage', False);
     FHideOnGoto := ExpSettings.ReadBool('HideOnGoto', False);
@@ -1367,13 +1363,13 @@ var
   ExpSettings: TExpertSettings;
 begin
   inherited InternalSaveSettings(Settings);
-  // Do not localize
-  Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
-  FTokenList.SaveToRegistry(Key);
-  FDirectoryHistoryList.SaveToRegistry(Key);
 
   ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
   try
+    // Do not localize
+    Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
+    FTokenList.SaveToSettings(ExpSettings);
+    FDirectoryHistoryList.SaveToSettings(ExpSettings);
     ExpSettings.WriteBool('ShowTokens', FShowTokens);
     ExpSettings.WriteBool('AddMessage', FAddMessage);
     ExpSettings.WriteBool('HideOnGoto', FHideOnGoto);
@@ -1400,28 +1396,24 @@ end;
 
 { TDirList }
 
-procedure TDirList.LoadFromRegistry(const KeyName: string);
+procedure TDirList.LoadFromSettings(ExpSettings: TExpertSettings);
 begin
-  with TGExpertsSettings.Create(KeyName) do
-  try
-    ReadSection('DirList', Self); // Do not localize.
-  finally
-    Free;
-  end;
+  ExpSettings.ReadSection('DirList', Self);
 end;
 
-procedure TDirList.SaveToRegistry(const KeyName: string);
+procedure TDirList.SaveToSettings(ExpSettings: TExpertSettings);
 var
   i: Integer;
+  ListSettings: TExpertSettings;
 begin
   // Do not localize any of the below items.
-  with TGExpertsSettings.Create(KeyName) do
+  ExpSettings.EraseSection('DirList');
+  ListSettings := ExpSettings.CreateExpertSettings('DirList');
   try
-    EraseSection('DirList');
     for i := 0 to Count - 1 do
-      WriteString('DirList', Self[i], '');
+      ListSettings.WriteString(Self[i], '');
   finally
-    Free;
+    FreeAndNil(ListSettings);
   end;
 end;
 
