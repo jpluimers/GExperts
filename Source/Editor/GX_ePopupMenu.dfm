@@ -2,15 +2,15 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   Left = 0
   Top = 0
   Caption = 'Editor Popup Menu Expert Configuration'
-  ClientHeight = 297
-  ClientWidth = 569
+  ClientHeight = 313
+  ClientWidth = 577
   ParentFont = False
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   object l_DuplicateShortcuts: TLabel
-    Left = 296
-    Top = 240
+    Left = 304
+    Top = 256
     Width = 132
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -24,8 +24,8 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Visible = False
   end
   object pc_Main: TPageControl
-    Left = 0
-    Top = 0
+    Left = 8
+    Top = 8
     Width = 201
     Height = 249
     ActivePage = ts_EditorExperts
@@ -61,10 +61,10 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     end
   end
   object lv_Selected: TListView
-    Left = 288
-    Top = 24
+    Left = 296
+    Top = 32
     Width = 273
-    Height = 209
+    Height = 217
     Anchors = [akLeft, akTop, akBottom]
     Columns = <
       item
@@ -85,8 +85,8 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     OnKeyDown = lv_SelectedKeyDown
   end
   object b_OK: TButton
-    Left = 408
-    Top = 264
+    Left = 416
+    Top = 280
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -96,8 +96,8 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     TabOrder = 5
   end
   object b_Cancel: TButton
-    Left = 488
-    Top = 264
+    Left = 496
+    Top = 280
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -107,7 +107,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     TabOrder = 6
   end
   object b_Add: TButton
-    Left = 208
+    Left = 216
     Top = 40
     Width = 75
     Height = 25
@@ -116,7 +116,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     OnClick = b_AddClick
   end
   object b_Remove: TButton
-    Left = 208
+    Left = 216
     Top = 80
     Width = 75
     Height = 25
@@ -125,7 +125,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     OnClick = b_RemoveClick
   end
   object b_Default: TButton
-    Left = 208
+    Left = 216
     Top = 208
     Width = 75
     Height = 25
