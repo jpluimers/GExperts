@@ -31,6 +31,7 @@ type
     b_Remove: TButton;
     l_DuplicateShortcuts: TLabel;
     b_Default: TButton;
+    b_ClearShortcut: TButton;
     procedure b_AddClick(Sender: TObject);
     procedure b_RemoveClick(Sender: TObject);
     procedure lb_EditorExpertsDblClick(Sender: TObject);
@@ -41,6 +42,7 @@ type
     procedure lv_SelectedKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure lv_SelectedChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure b_DefaultClick(Sender: TObject);
+    procedure b_ClearShortcutClick(Sender: TObject);
   private
     procedure CheckForDuplicates;
     procedure GetData(_sl: TStringList);
@@ -66,7 +68,8 @@ uses
   GX_dzVclUtils,
   GX_GExperts,
   GX_EditorExpertManager,
-  GX_Experts;
+  GX_Experts,
+  GX_MessageBox;
 
 type
   TGxEditorPopupMenuExpert = class(TEditorExpert)
@@ -140,7 +143,7 @@ begin
     for i := 0 to FShortcuts.Count - 1 do begin
       Key := FShortcuts.Names[i];
       ExpName := FShortcuts.Values[Key];
-      if (Key <> '') then begin
+      if (Key <> '') and (Key <> 'X') then begin
         if GExpertsInst.EditorExpertManager.FindExpert(ExpName, idx) then begin
           Expert := GExpertsInst.EditorExpertManager.EditorExpertList[idx];
           TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
@@ -247,6 +250,7 @@ begin
   _sl.Add('S=MessageDialog');
   _sl.Add('T=MacroTemplates');
   _sl.Add('U=UsesClauseMgr');
+  _sl.Add('X=Configure');
 end;
 
 { TfmEditorPopupMenuExpertConfig }
@@ -308,6 +312,42 @@ begin
   end else begin
     AddSelectedEditorExpert;
   end;
+end;
+
+// ---------------------------------------------
+
+type
+  TClearIndividualShortcutMessage = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+{ TClearIndividualShortcutMessage }
+
+function TClearIndividualShortcutMessage.GetMessage: string;
+resourcestring
+  SClearIndividualShortcut =
+    'This will remove the shortcut assigned to the individual expert. So this expert can ' +
+    'only be called via the GExperts main menu and via this editor menu. ' +
+    'Do you want to clear the shortcut?';
+begin
+  Result := SClearIndividualShortcut;
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.b_ClearShortcutClick(Sender: TObject);
+var
+  li: TListItem;
+  Ex: TGX_BaseExpert;
+begin
+  if ShowGxMessageBox(TClearIndividualShortcutMessage) <> mrYes then
+    Exit;
+  if not TListView_TryGetSelected(lv_Selected, li) then
+    Exit;
+  Ex := TGX_BaseExpert(li.Data);
+  if Ex is TGX_Expert then
+    TGX_Expert(Ex).ShortCut := 0
+  else if Ex is TEditorExpert then
+    TEditorExpert(Ex).ShortCut := 0;
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.b_RemoveClick(Sender: TObject);

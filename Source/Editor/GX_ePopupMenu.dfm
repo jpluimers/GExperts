@@ -77,7 +77,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
       end>
     RowSelect = True
     SortType = stText
-    TabOrder = 3
+    TabOrder = 4
     ViewStyle = vsReport
     OnChange = lv_SelectedChange
     OnDblClick = lv_SelectedDblClick
@@ -93,7 +93,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 5
+    TabOrder = 6
   end
   object b_Cancel: TButton
     Left = 496
@@ -104,7 +104,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 6
+    TabOrder = 7
   end
   object b_Add: TButton
     Left = 216
@@ -130,7 +130,17 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Caption = 'Default >>'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = b_DefaultClick
+  end
+  object b_ClearShortcut: TButton
+    Left = 296
+    Top = 280
+    Width = 115
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'Clear Shortcut'
+    TabOrder = 5
+    OnClick = b_ClearShortcutClick
   end
 end
