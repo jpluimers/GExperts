@@ -59,6 +59,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure Configure; override;
+    function GetDefaultShortCut: TShortCut; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
@@ -74,7 +75,6 @@ var
 constructor TAlignExpert.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scAlt + Ord('Z');
   FTokens := TStringList.Create;
   AlignExpertInst := Self;
 end;
@@ -106,6 +106,11 @@ begin
   finally
     FreeAndNil(Dlg);
   end;
+end;
+
+function TAlignExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + Ord('Z');
 end;
 
 function TAlignExpert.GetDisplayName: string;

@@ -29,6 +29,7 @@ type
     function GetNoSelectionMode: TNoSelectionMode; override;
   public
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
   end;
@@ -38,8 +39,12 @@ type
 constructor TChangeCaseExpert.Create;
 begin
   inherited;
-  ShortCut := scShift + scAlt + Ord('C');
   FLastSelection := 0;
+end;
+
+function TChangeCaseExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scShift + scAlt + Ord('C');
 end;
 
 function TChangeCaseExpert.GetDisplayName: string;

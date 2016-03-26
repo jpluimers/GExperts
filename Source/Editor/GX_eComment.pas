@@ -50,6 +50,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure Configure; override;
     procedure GetHelpString(List: TStrings); override;
@@ -61,6 +62,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
@@ -149,12 +151,15 @@ begin
 end;
 
 constructor TCommentExpert.Create;
+begin
+  inherited Create;
+end;
+
+function TCommentExpert.GetDefaultShortCut: TShortCut;
 const
   VK_OEM_PERIOD = $BE; // '.' any country
 begin
-  inherited Create;
-
-  ShortCut := scCtrl + scAlt + VK_OEM_PERIOD;
+  Result := scCtrl + scAlt + VK_OEM_PERIOD;
 end;
 
 function TCommentExpert.GetDisplayName: string;
@@ -295,12 +300,15 @@ end;
 { TUncommentExpert }
 
 constructor TUnCommentExpert.Create;
+begin
+  inherited Create;
+end;
+
+function TUnCommentExpert.GetDefaultShortCut: TShortCut;
 const
   VK_OEM_COMMA = $BC; // ',' any country
 begin
-  inherited Create;
-
-  ShortCut := scCtrl + scAlt + VK_OEM_COMMA;
+  Result := scCtrl + scAlt + VK_OEM_COMMA;
 end;
 
 function TUnCommentExpert.GetDisplayName: string;

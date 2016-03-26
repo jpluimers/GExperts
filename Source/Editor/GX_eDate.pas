@@ -18,6 +18,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
@@ -57,7 +58,6 @@ end;
 constructor TDateExpert.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scAlt + Ord('A');
   FDateFormat := {$IFDEF GX_VER220_up}FormatSettings.{$ENDIF}ShortDateFormat;
 end;
 
@@ -74,6 +74,11 @@ begin
       InsertString := SInvalidDateTimeFormat;
   end;
   GxOtaInsertLineIntoEditor(InsertString);
+end;
+
+function TDateExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + Ord('A');
 end;
 
 function TDateExpert.GetDisplayName: string;

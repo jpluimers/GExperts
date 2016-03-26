@@ -27,6 +27,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure DoDelimiterAction(Editor: IOTASourceEditor;
                                 Offset: Integer;
@@ -39,6 +40,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure DoDelimiterAction(Editor: IOTASourceEditor;
                                 Offset: Integer;
@@ -643,7 +645,6 @@ end;
 constructor TMoveToDelimiter.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scAlt + VK_RIGHT;
   ThreeDelimiters := True;
 end;
 
@@ -664,6 +665,11 @@ begin
   EditView.CursorPos := EditPos;
   EditView.MoveViewToCursor;
   EditView.Paint;
+end;
+
+function TMoveToDelimiter.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + VK_RIGHT;
 end;
 
 function TMoveToDelimiter.GetDisplayName: string;
@@ -689,7 +695,6 @@ end;
 constructor TLocateDelimiter.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scAlt + VK_LEFT;
   ThreeDelimiters := False;
 end;
 
@@ -707,6 +712,11 @@ begin
     GxOtaSelectBlock(Editor, SChar, EChar)
   else
     GxOtaSelectBlock(Editor, EChar, SChar);
+end;
+
+function TLocateDelimiter.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + VK_LEFT;
 end;
 
 function TLocateDelimiter.GetDisplayName: string;

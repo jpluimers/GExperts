@@ -83,6 +83,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure ShowModal;
+    function GetDefaultShortCut: TShortCut; override;
     function GetActionCaption: string; override;
     class function ConfigurationKey: string; override;
     class function GetName: string; override;
@@ -225,7 +226,6 @@ begin
 
   FHistoryIniVersion := 0;
 
-  ShortCut := Menus.ShortCut(Word('R'), [ssCtrl, ssAlt]);
   fmGrepResults := TfmGrepResults.Create(nil);
   SetFormIcon(fmGrepResults);
   if not IsStandAlone then
@@ -259,6 +259,11 @@ resourcestring
   SMenuCaption = 'Grep &Results';
 begin
   Result := SMenuCaption;
+end;
+
+function TGrepExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Word('R'), [ssCtrl, ssAlt]);
 end;
 
 class function TGrepExpert.GetName: string;

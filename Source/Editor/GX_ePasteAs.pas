@@ -26,6 +26,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
@@ -137,7 +138,11 @@ end;
 constructor TCopyRawStringsExpert.Create;
 begin
   inherited Create;
-  ShortCut := scCtrl + scAlt + Ord('C');
+end;
+
+function TCopyRawStringsExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + Ord('C');
 end;
 
 function TCopyRawStringsExpert.GetDisplayName: string;

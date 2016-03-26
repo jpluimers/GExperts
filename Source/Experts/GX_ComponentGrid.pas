@@ -196,8 +196,6 @@ end;
 constructor TGridExpert.Create;
 begin
   inherited Create;
-
-  ShortCut := 0;
 end;
 
 function TGridExpert.GetActionCaption: string;

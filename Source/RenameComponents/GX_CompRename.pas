@@ -105,6 +105,7 @@ type
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function GetActionCaption: string; override;
+    function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
     function HasConfigOptions: Boolean; override;
     procedure SetActive(New: Boolean); override;
@@ -406,7 +407,6 @@ begin
   FTimer.Enabled := False;
   FTimer.Interval := 100;
   FTimer.OnTimer := DoOnTimer;
-  ShortCut := Menus.ShortCut(VK_F2, [ssShift]);
   AddNotifier;
 end;
 
@@ -688,6 +688,11 @@ function TCompRenameExpert.GetClassRenameRule(ClassName: WideString): WideString
 begin
   Assert(Assigned(FRenameRuleList));
   Result := FRenameRuleList.Values[ClassName];
+end;
+
+function TCompRenameExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(VK_F2, [ssShift]);
 end;
 
 class function TCompRenameExpert.GetName: string;

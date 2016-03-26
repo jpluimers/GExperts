@@ -15,10 +15,11 @@ type
     FActive: Boolean;
     FShortCut: TShortCut;
     FAction: IGxAction;
-    procedure SetShortCut(Value: TShortCut);
     function GetBitmap: TBitmap;
     procedure ActionOnUpdate(Sender: TObject);
   protected
+    procedure SetShortCut(Value: TShortCut); override;
+    function GetShortCut: TShortCut; override;
     function GetExpertIndex: Integer;
     function BitmapFileName: string; virtual;
     procedure SetFormIcon(Form: TForm);
@@ -82,7 +83,7 @@ type
     // have to .Assign the bitmap to get a permanent copy.
     property Bitmap: Graphics.TBitmap read GetBitmap;
     // Keyboard shortcut associated with the expert
-    property ShortCut: TShortCut read FShortCut write SetShortCut;
+    property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;
 
   TGX_ExpertClass = class of TGX_Expert;
@@ -124,7 +125,7 @@ begin
 
   // Don't set Active to True.
   // Instead override IsDefaultActive and let LoadSettings do it
-  FShortCut := 0;
+  FShortCut := GetDefaultShortCut;
 end;
 
 procedure TGX_Expert.CreateSubMenuItems(MenuItem: TMenuItem);
@@ -274,6 +275,11 @@ begin
 
   if Assigned(FAction) then
     FAction.OnUpdate := ActionOnUpdate;
+end;
+
+function TGX_Expert.GetShortCut: TShortCut;
+begin
+  Result := FShortCut;
 end;
 
 procedure TGX_Expert.SetShortCut(Value: TShortCut);

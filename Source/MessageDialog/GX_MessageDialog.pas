@@ -255,6 +255,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     function GetActionCaption: string; override;
+    function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
@@ -852,7 +853,6 @@ end;
 constructor TMsgExpExpert.Create;
 begin
   inherited;
-  ShortCut := Menus.ShortCut(Ord('D'), [ssCtrl, ssShift]);
   FSettings := TMessageDialogSettings.Create;
 end;
 
@@ -867,6 +867,11 @@ resourcestring
   SMenuCaption = '&Message Dialog...';
 begin
   Result := SMenuCaption;
+end;
+
+function TMsgExpExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Ord('D'), [ssCtrl, ssShift]);
 end;
 
 class function TMsgExpExpert.GetName: string;

@@ -130,6 +130,7 @@ type
   public
     constructor Create; override;
     function GetActionCaption: string; override;
+    function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
@@ -447,7 +448,6 @@ end;
 constructor TProcedureExpert.Create;
 begin
   inherited;
-  ShortCut := Menus.ShortCut(Word('G'), [ssCtrl]);
 end;
 
 function TProcedureExpert.GetActionCaption: string;
@@ -455,6 +455,11 @@ resourcestring
   SMenuCaption = '&Procedure List...';
 begin
   Result := SMenuCaption;
+end;
+
+function TProcedureExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Word('G'), [ssCtrl]);
 end;
 
 procedure TProcedureExpert.Execute(Sender: TObject);

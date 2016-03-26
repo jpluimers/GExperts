@@ -58,6 +58,7 @@ type
     class function FormsConfigurationKey: string;
   public
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
@@ -145,7 +146,6 @@ end;
 constructor TLayoutExpert.Create;
 begin
   inherited Create;
-  ShortCut := Menus.ShortCut(Word('L'), [ssCtrl, ssShift]);
 end;
 
 function TLayoutExpert.GetActionCaption: string;
@@ -153,6 +153,11 @@ resourcestring
   SMenuCaption = 'Perfect La&yout';
 begin
   Result := SMenuCaption;
+end;
+
+function TLayoutExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Word('L'), [ssCtrl, ssShift]);
 end;
 
 class function TLayoutExpert.GetName: string;

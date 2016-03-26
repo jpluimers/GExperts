@@ -12,10 +12,10 @@ type
     FBitmap: Graphics.TBitmap;
     FGxAction: IGxAction;
     FActionName: string;
-    function GetShortCut: TShortCut;
-    procedure SetShortCut(const Value: TShortCut);
     function GetOptionsBaseRegistryKey: string;
   protected
+    function GetShortCut: TShortCut; override;
+    procedure SetShortCut(Value: TShortCut); override;
     // Return a string that will be used to present
     // the editor expert to the user, for instance
     // in configuration or selection dialogs.
@@ -59,7 +59,6 @@ type
     procedure LoadSettings;
     procedure SaveSettings;
 
-    property ShortCut: TShortCut read GetShortCut write SetShortCut;
     property OptionsBaseRegistryKey: string read GetOptionsBaseRegistryKey;
     property DisplayName: string read GetDisplayName;
   end;
@@ -142,6 +141,8 @@ begin
   FGxAction.OnExecute := Self.DoExecute;
   FGxAction.Caption := DisplayName;
   FGxAction.OnUpdate := ActionOnUpdate;
+
+  ShortCut := GetDefaultShortCut;
 end;
 
 destructor TEditorExpert.Destroy;
@@ -211,7 +212,7 @@ begin
   end;
 end;
 
-procedure TEditorExpert.SetShortCut(const Value: TShortCut);
+procedure TEditorExpert.SetShortCut(Value: TShortCut);
 begin
   Assert(Assigned(FGxAction));
   FGxAction.ShortCut := Value;

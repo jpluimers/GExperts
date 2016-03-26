@@ -2,8 +2,14 @@ unit GX_BaseExpert;
 
 interface
 
+uses
+  Classes;
+
 type
   TGX_BaseExpert = class(TObject)
+  protected
+    function GetShortCut: TShortCut; virtual; abstract;
+    procedure SetShortCut(Value: TShortCut); virtual; abstract;
   public
     // Internal name of expert for expert identification.
     class function GetName: string; virtual;
@@ -12,6 +18,8 @@ type
     // the action caption (GetActionCaption)
     function GetDisplayName: string; virtual;
     procedure Execute(Sender: TObject); virtual; abstract;
+    function GetDefaultShortCut: TShortCut; virtual;
+    property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;
 
 implementation
@@ -21,6 +29,11 @@ uses
   SysUtils;
 
 { TGX_BaseExpert }
+
+function TGX_BaseExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := 0;
+end;
 
 function TGX_BaseExpert.GetDisplayName: string;
 begin

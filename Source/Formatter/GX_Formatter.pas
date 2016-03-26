@@ -1,5 +1,5 @@
 // the code formatter expert as a regular expert
-// Original Author:     Thomas Mueller (http://www.dummzeuch.de)
+// Original Author:     Thomas Mueller (http://blog.dummzeuch.de)
 unit GX_Formatter;
 
 {$I GX_CondDefine.inc}
@@ -26,6 +26,7 @@ type
     destructor Destroy; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
     function HasConfigOptions: Boolean; override;
@@ -58,8 +59,6 @@ begin
   inherited Create;
 
   FExpert := TCodeFormatterExpert.Create;
-
-  ShortCut := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
 end;
 
 destructor TGxCodeFormatterExpert.Destroy;
@@ -73,6 +72,11 @@ resourcestring
   SMenuCaption = 'Code &Formatter';
 begin
   Result := SMenuCaption;
+end;
+
+function TGxCodeFormatterExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
 end;
 
 class function TGxCodeFormatterExpert.GetName: string;

@@ -77,6 +77,7 @@ type
     destructor Destroy; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     class function GetName: string; override;
     procedure GetHelpString(List: TStrings); override;
@@ -326,7 +327,6 @@ constructor TMacroTemplatesExpert.Create;
 begin
   Assert(GlobalExpandMacroExpert = nil, 'Expand Macro Expert already created!');
   inherited Create;
-  ShortCut := scShift + scAlt + Ord('T');
 
   RegisterExpandMacroExpert(Self);
   RegisterProgrammerInfoProc(Self.GetProgrammerInfo);
@@ -895,6 +895,11 @@ begin
   VInfo.FullName := FSettings.ProgrammerName;
   VInfo.Initials := FSettings.ProgrammerInitials;
   Result := True;
+end;
+
+function TMacroTemplatesExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scShift + scAlt + Ord('T');
 end;
 
 function TMacroTemplatesExpert.GetDisplayName: string;

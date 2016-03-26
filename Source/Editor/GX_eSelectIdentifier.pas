@@ -13,6 +13,7 @@ type
     class function GetName: string; override;
   public
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
     procedure Execute(Sender: TObject); override;
@@ -23,12 +24,16 @@ type
 constructor TSelectIdentifierExpert.Create;
 begin
   inherited;
-  ShortCut := scShift + scAlt + Ord('I');
 end;
 
 procedure TSelectIdentifierExpert.Execute(Sender: TObject);
 begin
   GxOtaSelectCurrentIdent(GxOtaGetCurrentSourceEditor);
+end;
+
+function TSelectIdentifierExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scShift + scAlt + Ord('I');
 end;
 
 function TSelectIdentifierExpert.GetDisplayName: string;

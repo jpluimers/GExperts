@@ -1,5 +1,5 @@
 // the code formatter expert as an editor expert
-// Original Author:     Thomas Mueller (http://www.dummzeuch.de)
+// Original Author:     Thomas Mueller (http://blog.dummzeuch.de)
 unit GX_eCodeFormatter;
 
 {$I GX_CondDefine.inc}
@@ -26,6 +26,7 @@ type
     class function GetName: string; override;
     constructor Create; override;
     destructor Destroy; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
@@ -52,8 +53,6 @@ begin
   inherited Create;
 
   FExpert := TCodeFormatterExpert.Create;
-
-  ShortCut := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
 end;
 
 destructor TeCodeFormatterExpert.Destroy;
@@ -70,6 +69,11 @@ end;
 function TeCodeFormatterExpert.GetBitmapFileName: string;
 begin
   Result := 'TCodeFormatterExpert';
+end;
+
+function TeCodeFormatterExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
 end;
 
 function TeCodeFormatterExpert.GetDisplayName: string;

@@ -127,7 +127,6 @@ type
     procedure lvEditorExpertsChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure btnConfigureClick(Sender: TObject);
     procedure btnShortCutClick(Sender: TObject);
-    procedure EditShortCutClick(Sender: TObject);
     procedure chkDisableAllEditorExpertsClick(Sender: TObject);
     procedure chkFontEnabledClick(Sender: TObject);
     procedure btnFontClick(Sender: TObject);
@@ -165,7 +164,7 @@ type
     FThumbSize: Integer;
     procedure HideUnsupportedIdeItems;
     procedure HideUnsupportedEditorItems;
-    procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert);
+    procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
     procedure LoadExperts;
     procedure SaveExperts;
 
@@ -528,13 +527,14 @@ end;
 procedure TfmConfiguration.btnShortCutClick(Sender: TObject);
 var
   Idx: Integer;
+  EditorExpert: TEditorExpert;
 begin
   if not TListView_TryGetSelected(lvEditorExperts, Idx) then
     Exit;
 
   Assert(Assigned(GExpertsInst.EditorExpertManager));
-
-  ConfigureEditorExpertShortCut(GExpertsInst.EditorExpertManager.EditorExpertList[Idx])
+  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
+  ConfigureEditorExpertShortCut(EditorExpert, Idx);
 end;
 
 procedure TfmConfiguration.chkEditorKeyTracingClick(Sender: TObject);
@@ -974,7 +974,7 @@ begin
     EditorExpert.SaveSettings;
   end
   else
-    ConfigureEditorExpertShortCut(EditorExpert);
+    ConfigureEditorExpertShortCut(EditorExpert, Idx);
 end;
 
 { TShowOldComCtrlVersionMessage }
@@ -993,50 +993,18 @@ begin
   Result := GetComCtlVersion <= ComCtlVersionIE401;
 end;
 
-procedure TfmConfiguration.ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert);
+procedure TfmConfiguration.ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
+var
+  Shortcut: TShortCut;
 begin
   Assert(Assigned(EditorExpert));
-  with TfmEditorShortcut.Create(nil) do
+
+  Shortcut := EditorExpert.ShortCut;
+  if TfmEditorShortcut.Execute(Self, EditorExpert.DisplayName, Shortcut, EditorExpert.GetDefaultShortCut) then
   begin
-    try
-      hkyShortCut.HotKey := EditorExpert.ShortCut;
-      gbxShortCut.Caption := EditorExpert.DisplayName;
-
-      if ShowModal = mrOk then
-      begin
-        EditorExpert.ShortCut := hkyShortCut.HotKey;
-        EditorExpert.SaveSettings;
-
-        with lvEditorExperts do
-        begin
-          Items[Selected.Index].Caption := EditorExpert.DisplayName;
-          Items[Selected.Index].SubItems[0] := ShortCutToText(EditorExpert.ShortCut);
-        end;
-      end;
-    finally
-      Free;
-    end;
-  end;
-end;
-
-procedure TfmConfiguration.EditShortCutClick(Sender: TObject);
-var
-  AExpert: TGX_Expert;
-begin
-  AExpert := GExpertsInst.ExpertList[(Sender as TEdit).Tag];
-  with TfmEditorShortcut.Create(nil) do
-  begin
-    try
-      hkyShortCut.HotKey := TextToShortCut((Sender as TEdit).Text);
-      gbxShortCut.Caption := AExpert.GetDisplayName;
-      if ShowModal = mrOk then
-      begin
-        (Sender as TEdit).Text := ShortCutToText(hkyShortCut.HotKey);
-        AExpert.ShortCut := hkyShortCut.HotKey;
-      end;
-    finally
-      Free;
-    end;
+    EditorExpert.ShortCut := Shortcut;
+    EditorExpert.SaveSettings;
+    lvEditorExperts.Items[Idx].SubItems[0] := ShortCutToText(ShortCut);
   end;
 end;
 

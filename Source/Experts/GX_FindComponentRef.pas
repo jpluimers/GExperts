@@ -37,6 +37,7 @@ type
   public
     procedure Execute(Sender: TObject); override;
     class function GetName: string; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     function GetActionCaption: string; override;
     function HasConfigOptions: Boolean; override;
@@ -143,7 +144,11 @@ end;
 constructor TFindCompRefWizard.Create;
 begin
   inherited;
-  ShortCut := scCtrl + scShift + Ord('F');
+end;
+
+function TFindCompRefWizard.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scShift + Ord('F');
 end;
 
 function TFindCompRefWizard.GetActionCaption: string;

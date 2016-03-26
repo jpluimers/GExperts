@@ -87,6 +87,7 @@ type
     destructor Destroy; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
+    function GetDefaultShortCut: TShortCut; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
@@ -115,7 +116,6 @@ end;
 constructor TGxEditorPopupMenuExpert.Create;
 begin
   inherited;
-  ShortCut := scCtrl + Ord('H');
   FShortcuts := TStringList.Create;
 end;
 
@@ -165,6 +165,11 @@ end;
 procedure TGxEditorPopupMenuExpert.ShowConfigForm(_Sender: TObject);
 begin
   GExpertsInst.ShowConfigurationForm;
+end;
+
+function TGxEditorPopupMenuExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + Ord('H');
 end;
 
 function TGxEditorPopupMenuExpert.GetDisplayName: string;
@@ -344,10 +349,7 @@ begin
   if not TListView_TryGetSelected(lv_Selected, li) then
     Exit;
   Ex := TGX_BaseExpert(li.Data);
-  if Ex is TGX_Expert then
-    TGX_Expert(Ex).ShortCut := 0
-  else if Ex is TEditorExpert then
-    TEditorExpert(Ex).ShortCut := 0;
+  Ex.ShortCut := 0
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.b_RemoveClick(Sender: TObject);

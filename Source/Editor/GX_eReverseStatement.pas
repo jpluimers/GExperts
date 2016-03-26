@@ -17,6 +17,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
@@ -32,7 +33,11 @@ uses
 constructor TReverseStatementExpert.Create;
 begin
   inherited Create;
-  ShortCut := scAlt + scShift + ord('R');
+end;
+
+function TReverseStatementExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scAlt + scShift + Ord('R');
 end;
 
 function TReverseStatementExpert.GetDisplayName: string;

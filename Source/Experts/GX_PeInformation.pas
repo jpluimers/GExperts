@@ -649,7 +649,6 @@ end;
 constructor TPEExpert.Create;
 begin
   inherited Create;
-  ShortCut := 0;
   PeExpert := Self;
 end;
 

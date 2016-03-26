@@ -24,6 +24,7 @@ type
     class function GetName: string; override;
     constructor Create; override;
     destructor Destroy; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
     function HasConfigOptions: Boolean; override;
@@ -188,8 +189,6 @@ uses
 constructor TUsesExpert.Create;
 begin
   inherited;
-  ShortCut := scShift + scAlt + Ord('U');
-
   FFavoriteUnits := TStringList.Create;
   LoadSettings;
 end;
@@ -204,6 +203,11 @@ end;
 procedure TUsesExpert.Execute(Sender: TObject);
 begin
   InternalExecute;
+end;
+
+function TUsesExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scShift + scAlt + Ord('U');
 end;
 
 function TUsesExpert.GetDisplayName: string;

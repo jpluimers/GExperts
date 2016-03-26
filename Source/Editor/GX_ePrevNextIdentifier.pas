@@ -40,6 +40,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
   end;
@@ -49,6 +50,7 @@ type
   public
     class function GetName: string; override;
     constructor Create; override;
+    function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure GetHelpString(List: TStrings); override;
   end;
@@ -216,8 +218,6 @@ constructor TPrevIdentExpert.Create;
 begin
   inherited Create;
   Previous := True;
-  if Self.ClassName = 'TPrevIdentExpert' then
-    ShortCut := scCtrl + scAlt + VK_UP;
 end;
 
 procedure TPrevIdentExpert.InternalExecute;
@@ -240,6 +240,11 @@ end;
 procedure TPrevIdentExpert.GetHelpString(List: TStrings);
 begin
   List.Text := Format(SIdentHelpString, ['previous']);
+end;
+
+function TPrevIdentExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + VK_UP;
 end;
 
 function TPrevIdentExpert.GetDisplayName: string;
@@ -272,7 +277,11 @@ constructor TNextIdentExpert.Create;
 begin
   inherited Create;
   Previous := False;
-  ShortCut := scCtrl + scAlt + VK_DOWN;
+end;
+
+function TNextIdentExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := scCtrl + scAlt + VK_DOWN;
 end;
 
 function TNextIdentExpert.GetDisplayName: string;

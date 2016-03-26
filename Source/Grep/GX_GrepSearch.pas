@@ -90,6 +90,7 @@ type
   public
     constructor Create; override;
     function GetActionCaption: string; override;
+    function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
@@ -175,8 +176,6 @@ end;
 constructor TGrepDlgExpert.Create;
 begin
   inherited Create;
-
-  ShortCut := Menus.ShortCut(Word('S'), [ssAlt, ssShift]);
 end;
 
 function TGrepDlgExpert.GetActionCaption: string;
@@ -184,6 +183,11 @@ resourcestring
   SActionCaption = '&Grep Search...';
 begin
   Result := SActionCaption;
+end;
+
+function TGrepDlgExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Word('S'), [ssAlt, ssShift]);
 end;
 
 class function TGrepDlgExpert.GetName: string;
