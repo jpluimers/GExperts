@@ -121,6 +121,7 @@ end;
 
 destructor TGxEditorPopupMenuExpert.Destroy;
 begin
+  FreeAndNil(FGExpertsShortcutMenu);
   FreeAndNil(FShortcuts);
   inherited;
 end;
