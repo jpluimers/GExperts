@@ -2631,19 +2631,16 @@ function GetScreenWorkArea(const Form: TCustomForm = nil): TRect;
 var
   Monitor: TMonitor;
 begin
-   Result.Top := Screen.DesktopTop;
-   Result.Left := Screen.DesktopLeft;
-   Result.Right := Screen.DesktopWidth;
-   Result.Bottom := Screen.DesktopHeight;
-
    if Assigned(Form) then
    begin
      Monitor := Screen.MonitorFromWindow(Form.Handle, mdNearest);
      if Assigned(Monitor) then
+     begin
        Result := Monitor.WorkareaRect;
-   end
-   else
-     SystemParametersInfo(SPI_GETWORKAREA, 0, @Result, 0);
+       Exit; //==>
+     end;
+   end;
+   Result := Screen.WorkAreaRect;
 end;
 
 procedure EnsureFormVisible(const Form: TCustomForm);
