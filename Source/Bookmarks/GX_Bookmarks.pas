@@ -220,7 +220,9 @@ begin
   Result := False;
   _SourceEditor := GxOtaGetCurrentSourceEditor;
   if not Assigned(_SourceEditor) then
-    Exit;
+    Exit; //==>
+  if _SourceEditor.EditViewCount = 0 then
+    Exit; //==>
   _EditView := _SourceEditor.GetEditView(0);
   Result := Assigned(_EditView);
 end;
