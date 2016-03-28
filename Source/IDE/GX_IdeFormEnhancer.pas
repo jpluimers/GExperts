@@ -594,7 +594,7 @@ begin
 
   // hook Screen.OnActiveFormChange using the method describe here:
   // http://blog.dummzeuch.de/safe-event-hooking-for-delphi-ide-plugins/
-  FScreenActiveFormChangeHook := HookScreenActiveFormChange(ScreenActiveFormChange);
+  FScreenActiveFormChangeHook := TScreenActiveFormChangeHook.Install(ScreenActiveFormChange);
 
   // hook Screen.OnActiveControlChange
   HookActiveControlChanged;
@@ -606,10 +606,10 @@ var
 begin
   // unhook first, to be sure none of these hooks is being called after we freed our lists
   if Assigned(FScreenActiveControlChangeHook) then
-    UnhookScreenActiveControlChange(FScreenActiveControlChangeHook);
+    TScreenActiveControlChangeHook.Remove(FScreenActiveControlChangeHook);
 
   if Assigned(FScreenActiveFormChangeHook) then
-    UnhookScreenActiveFormChange(FScreenActiveFormChangeHook);
+    TScreenActiveFormChangeHook.Remove(FScreenActiveFormChangeHook);
 
   if Assigned(FControlChangeCallbacks) then begin
     for i := 0 to FControlChangeCallbacks.Count - 1 do
@@ -637,8 +637,8 @@ end;
 procedure TFormChangeManager.HookActiveControlChanged;
 begin
   if Assigned(FScreenActiveControlChangeHook) then
-    UnhookScreenActiveControlChange(FScreenActiveControlChangeHook);
-  FScreenActiveControlChangeHook := HookScreenActiveControlChange(ScreenActiveControlChange)
+    TScreenActiveControlChangeHook.Remove(FScreenActiveControlChangeHook);
+  FScreenActiveControlChangeHook := TScreenActiveControlChangeHook.Install(ScreenActiveControlChange)
 end;
 
 function TFormChangeManager.FindManagedForm(Form: TCustomForm; var ManagedForm: TManagedForm): Boolean;
