@@ -545,7 +545,7 @@ object fmConfiguration: TfmConfiguration
             Top = 81
             Width = 473
             Height = 17
-            Caption = 'Replace path listbox with memo'
+            Caption = 'Add a memo for direct editing'
             TabOrder = 4
           end
           object chkAllowResize: TCheckBox
