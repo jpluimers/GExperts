@@ -226,7 +226,6 @@ type
     procedure actHistoryRefreshSelectedExecute(Sender: TObject);
     procedure lbHistoryListDblClick(Sender: TObject);
     procedure actHistoryUpdate(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure tcHistoryListPageChange(Sender: TObject);
     procedure actHistorySortExecute(Sender: TObject);
     procedure lbHistoryListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
@@ -424,18 +423,6 @@ begin
 end;
 
 { TfmGrepResults }
-
-procedure TfmGrepResults.FormCreate(Sender: TObject);
-begin
-  FSavedFormCaption := Caption;
-  FSavedLastSearchTimeCaption := miHistoryLastSearchTime.Caption;
-  FSavedSaveOptionCaption := miSettingsSaveOption.Caption;
-  FSavedDirectoriesDataCaption := miSettingsDirectoriesData.Caption;
-  FSavedExcludeDirsCaption := miSettingsExcludeDirs.Caption;
-  FSavedFileMasksCaption := miSettingsFileMasks.Caption;
-  FSaveItemEmptyCaption := miHistoryItemName.Caption;
-  FSaveSortCaption := miHistorySort.Caption;
-end;
 
 procedure TfmGrepResults.FormKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -1622,6 +1609,15 @@ begin
   end;
 
   FEmbeddedGrepSearch := nil;
+
+  FSavedFormCaption := Caption;
+  FSavedLastSearchTimeCaption := miHistoryLastSearchTime.Caption;
+  FSavedSaveOptionCaption := miSettingsSaveOption.Caption;
+  FSavedDirectoriesDataCaption := miSettingsDirectoriesData.Caption;
+  FSavedExcludeDirsCaption := miSettingsExcludeDirs.Caption;
+  FSavedFileMasksCaption := miSettingsFileMasks.Caption;
+  FSaveItemEmptyCaption := miHistoryItemName.Caption;
+  FSaveSortCaption := miHistorySort.Caption;
 end;
 
 destructor TfmGrepResults.Destroy;

@@ -10,7 +10,6 @@ inherited fmGrepResults: TfmGrepResults
   Menu = MainMenu
   Position = poScreenCenter
   ShowHint = True
-  OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnResize = FormResize
   OnShow = FormShow
