@@ -117,15 +117,17 @@ end;
 procedure TSearchPathEnhancer.HandleFilesDropped(_Sender: TObject; _Files: TStrings);
 var
   frm: TCustomForm;
-  ed: TEdit;
 begin
   frm := Screen.ActiveCustomForm;
   if not IsSearchPathForm(frm) then
     Exit;
-  if not TryGetElementEdit(frm, ed) then
-    Exit;
 
-  ed.Text := _Files[0];
+  if _Sender is TEdit then
+    TEdit(_Sender).Text := _Files[0]
+  else if _Sender is TMemo then
+    TMemo(_Sender).Lines.AddStrings(_Files)
+  else if _Sender is TListbox then
+    TListbox(_Sender).Items.AddStrings(_Files);
 end;
 
 function TSearchPathEnhancer.TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
