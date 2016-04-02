@@ -27,6 +27,7 @@ uses
   Menus,
   Buttons,
   ActnList,
+  ComCtrls,
   GX_IdeFormEnhancer,
   GX_dzVclUtils;
 
@@ -40,11 +41,20 @@ type
     FIsAutocompleteEnabled: Boolean;
     FListbox: TListbox;
     FMemo: TMemo;
+
+    FPageControl: TPageControl;
+    FTabSheetList: TTabSheet;
+    FTabSheetMemo: TTabSheet;
+
     FEdit: TEdit;
     FUpClick: TNotifyEvent;
     FDownClick: TNotifyEvent;
     FUpBtn: TBitBtn;
     FDownBtn: TBitBtn;
+    FDeleteButton: TButton;
+    FDeleteInvalidButton: TButton;
+    FReplaceButton: TButton;
+    FAddButton: TButton;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
     ///<summary>
     /// frm can be nil </summary>
@@ -55,6 +65,7 @@ type
     procedure HandleUpButton(_Sender: TObject);
     procedure HandleDownButton(_Sender: TObject);
     procedure HandleAddBtn(_Sender: TObject);
+    procedure PageControlChanging(_Sender: TObject; var AllowChange: Boolean);
     //procedure HandleReplaceBtn(_Sender: TObject);
   public
     constructor Create;
@@ -137,7 +148,7 @@ type
 const
   SearchPathDialogClassArr: TSearchPathDialogClassArr = (
     'TInheritedListEditDlg', 'TInheritedListEditDlg', 'TOrderedListEditDlg'
-  );
+    );
 
 {$IFDEF GX_VER220_up}
 // Delphi XE and up
@@ -176,6 +187,7 @@ begin
   end;
   if not Result then
     Exit;
+  Result := False;
   if not SameText(_Form.Name, SearchPathDialogName) then
     Exit;
   if not SameText(_Form.Caption, SearchPathDialogCaption)
@@ -196,7 +208,7 @@ var
     cmp := _Form.FindComponent(_BtnName);
     Result := Assigned(cmp) and (cmp is TBitBtn);
     if Result then
-      _btn := cmp as TBitBtn;
+      _Btn := cmp as TBitBtn;
   end;
 
   function TryFindButton(const _BtnName: string; out _Btn: TButton): Boolean;
@@ -206,13 +218,33 @@ var
     cmp := _Form.FindComponent(_BtnName);
     Result := Assigned(cmp) and (cmp is TButton);
     if Result then
-      _btn := cmp as TButton;
+      _Btn := cmp as TButton
+    else
+      _Btn := nil;
+  end;
+
+  procedure AssignActionToButton(const _BtnName: string; const _Caption: string;
+    _OnExecute: TNotifyEvent; _Shortcut: TShortCut; out _Btn: TBitBtn; out _OnClick: TNotifyEvent);
+  var
+    act: TAction;
+  begin
+    // Unfortunately we can't just assign the button's OnClick event to the
+    // OnExecute event of the action because Delphi apparently assigns the
+    // same event to both buttons and then checks which one was pressed
+    // by inspecting the Sender parameter. So, instead we save the OnClick
+    // event, assign our own event to OnExecute and there call the original
+    // OnClick event with the original Sender parameter.
+    if TryFindBitBtn(_BtnName, _Btn) then begin
+      _OnClick := _Btn.OnClick;
+      act := TActionlist_Append(TheActionList, '', _OnExecute, _Shortcut);
+      act.Hint := _Caption;
+      _Btn.Action := act;
+      _Btn.ShowHint := True;
+    end;
   end;
 
 var
   cmp: TComponent;
-  act_Up: TAction;
-  act_Down: TAction;
   btn: TButton;
 begin
   FListbox := nil;
@@ -229,63 +261,59 @@ begin
     TWinControl_ActivateDropFiles(FEdit, HandleFilesDropped);
 
     cmp := _Form.FindComponent('CreationList');
-    if Assigned(cmp) and (cmp is TListBox) then begin
-      FListbox := TListBox(cmp);
+    if Assigned(cmp) and (cmp is TListbox) then begin
+      FListbox := TListbox(cmp);
 
-      TheActionList := TActionList.Create(_Form);
-      TheActionList.Name := 'TheActionList';
+      if gblAggressive then begin
+        TheActionList := TActionList.Create(_Form);
+        TheActionList.Name := 'TheActionList';
 
-      // Assign shortcuts to the Up/Down buttons via actions
-      if TryFindBitBtn('UpButton', FUpBtn) then begin
-        // Unfortunately we can't just assign the button's OnClick event to the
-        // OnExecute event of the action because Delphi apparently assigns the
-        // same event to both buttons and then checks which one was pressed
-        // by inspecting the Sender parameter. So, instead we save the OnClick
-        // event, assign our own event to OnExecute and there call the original
-        // OnClick event with the original Sender parameter.
-        FUpClick := FUpBtn.OnClick;
-        act_Up := TActionlist_Append(TheActionList, '', HandleUpButton, ShortCut(VK_UP, [ssCtrl]));
-        FUpBtn.Action := act_Up;
-      end;
-      if TryFindBitBtn('DownButton', FDownBtn) then begin
-        FDownClick := FDownBtn.OnClick;
-        act_Down := TActionlist_Append(TheActionList, '', HandleDownButton, ShortCut(VK_DOWN, [ssCtrl]));
-        FDownBtn.Action := act_Down;
-      end;
+        // Assign shortcuts to the Up/Down buttons via actions
+        AssignActionToButton('UpButton', 'Move Up', HandleUpButton, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
+        AssignActionToButton('DownButton', 'Move Down', HandleDownButton, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
 
-      if not gblAggressive then begin
         TWinControl_ActivateDropFiles(FListbox, HandleFilesDropped);
-      end else begin
+        FPageControl := TPageControl.Create(_Form);
+        FTabSheetList := TTabSheet.Create(_Form);
+        FTabSheetMemo := TTabSheet.Create(_Form);
+        FPageControl.Name := 'pc_PathList';
+        FPageControl.Parent := _Form;
+        FPageControl.BoundsRect := FListbox.BoundsRect;
+        FPageControl.Anchors := [akLeft, akTop, akRight, akBottom];
+        FPageControl.TabPosition := tpBottom;
+        FPageControl.ActivePage := FTabSheetList;
+        FPageControl.OnChanging := PageControlChanging;
+        FTabSheetList.Name := 'ts_List';
+        FTabSheetList.Parent := FPageControl;
+        FTabSheetList.PageControl := FPageControl;
+        FTabSheetList.Caption := 'List';
+
+        FTabSheetMemo.Name := 'ts_Memo';
+        FTabSheetMemo.Parent := FPageControl;
+        FTabSheetMemo.PageControl := FPageControl;
+        FTabSheetMemo.Caption := 'Memo';
+
         FMemo := TMemo.Create(_Form);
-        FMemo.Parent := _Form;
-        FMemo.BoundsRect := FListbox.BoundsRect;
-        FMemo.Anchors := [akLeft, akTop, akRight, akBottom];
+        FMemo.Parent := FTabSheetMemo;
+        FMemo.Align := alClient;
         FMemo.Lines.Text := FListbox.Items.Text;
         FMemo.OnChange := Self.HandleMemoChange;
         FMemo.ScrollBars := ssBoth;
         FMemo.WordWrap := False;
-        FListbox.Visible := False;
+
+        FListbox.Parent := FTabSheetList;
+        FListbox.Align := alClient;
+
         TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
 
-        if TryFindButton('DeleteButton', btn) then begin
-          // Does it still make sense to have a delete button?
-          btn.Enabled := False;
+        TryFindButton('DeleteButton', FDeleteButton);
+        TryFindButton('DeleteInvalidBtn', FDeleteInvalidButton);
+        if TryFindButton('AddButton', FAddButton) then begin
+          FAddButton.OnClick := HandleAddBtn;
         end;
-        if TryFindButton('DeleteInvalidBtn', btn) then begin
-          // todo: Figure out a way to implement this button
-          // Maybe call the original event and copy the new listbox
-          // content over to the memo?
-          btn.Enabled := False;
-        end;
-        if TryFindButton('AddButton', btn) then begin
-          btn.OnClick := HandleAddBtn;
-        end;
-        if TryFindButton('ReplaceButton', btn) then begin
-          // Until I have figured out how to sensibly mark the current line in the memo
-          // so the user knows what he is about to replace, I'll disable this button.
-          btn.Enabled := False;
-          btn.OnClick := nil; // HandleReplaceBtn;
-        end;
+        TryFindButton('ReplaceButton', FReplaceButton);
+        if TryFindButton('OkButton', btn) then
+          btn.Caption := '&OK';
       end;
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
@@ -294,18 +322,41 @@ begin
   end;
 end;
 
+procedure TSearchPathEnhancer.PageControlChanging(_Sender: TObject; var AllowChange: Boolean);
+
+  procedure TrySetButtonVisibility(_Btn: TButton; _Visible: Boolean);
+  begin
+    if Assigned(_Btn) then
+      _Btn.Visible := _Visible;
+  end;
+
+begin
+  if FPageControl.ActivePage = FTabSheetList then begin
+    FMemo.Lines.Text := FListbox.Items.Text;
+    FMemo.CaretPos := Point(FMemo.CaretPos.X, FListbox.ItemIndex);
+    TrySetButtonVisibility(FDeleteButton, False);
+    TrySetButtonVisibility(FDeleteInvalidButton, False);
+    TrySetButtonVisibility(FReplaceButton, False);
+  end else begin
+    FListbox.ItemIndex := FMemo.CaretPos.Y;
+    TrySetButtonVisibility(FDeleteButton, True);
+    TrySetButtonVisibility(FDeleteInvalidButton, True);
+    TrySetButtonVisibility(FReplaceButton, True);
+  end;
+end;
+
 procedure TSearchPathEnhancer.HandleUpButton(_Sender: TObject);
 var
   LineIdx: Integer;
   Pos: TPoint;
 begin
-  if Assigned(FMemo) then begin
+  if FPageControl.ActivePage = FTabSheetMemo then begin
     Pos := FMemo.CaretPos;
     LineIdx := Pos.Y;
     if LineIdx > 0 then
-      FMemo.Lines.Exchange(LineIdx-1, LineIdx);
+      FMemo.Lines.Exchange(LineIdx - 1, LineIdx);
     FMemo.SetFocus;
-    Pos.Y := Pos.Y -1 ;
+    Pos.Y := Pos.Y - 1;
     FMemo.CaretPos := Pos;
   end else
     FUpClick(FUpBtn);
@@ -315,7 +366,7 @@ procedure TSearchPathEnhancer.HandleDownButton(_Sender: TObject);
 var
   LineIdx: Integer;
 begin
-  if Assigned(FMemo) then begin
+  if FPageControl.ActivePage = FTabSheetMemo then begin
     LineIdx := FMemo.CaretPos.Y;
     if LineIdx < FMemo.Lines.Count - 1 then
       FMemo.Lines.Exchange(LineIdx, LineIdx + 1);
@@ -326,8 +377,11 @@ end;
 
 procedure TSearchPathEnhancer.HandleAddBtn(_Sender: TObject);
 begin
-  if Assigned(FMemo) then
+  if FPageControl.ActivePage = FTabSheetMemo then begin
     FMemo.Lines.Add(FEdit.Text);
+  end else begin
+    FListbox.Items.Add(FEdit.Text);
+  end;
 end;
 
 {
