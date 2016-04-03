@@ -29,7 +29,9 @@ uses
   ActnList,
   ComCtrls,
   GX_IdeFormEnhancer,
-  GX_dzVclUtils;
+  GX_dzVclUtils,
+  GX_dzFileUtils,
+  StrUtils;
 
 var
   gblAggressive: Boolean;
@@ -55,6 +57,7 @@ type
     FDeleteInvalidButton: TButton;
     FReplaceButton: TButton;
     FAddButton: TButton;
+    FDeleteInvalidHandler: TNotifyEvent;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
     ///<summary>
     /// frm can be nil </summary>
@@ -66,6 +69,7 @@ type
     procedure HandleDownButton(_Sender: TObject);
     procedure HandleAddBtn(_Sender: TObject);
     procedure PageControlChanging(_Sender: TObject; var AllowChange: Boolean);
+    procedure HandleDeleteInvalid(_Sender: TObject);
     //procedure HandleReplaceBtn(_Sender: TObject);
   public
     constructor Create;
@@ -285,6 +289,7 @@ begin
         FPageControl.TabPosition := tpBottom;
         FPageControl.ActivePage := FTabSheetList;
         FPageControl.OnChanging := PageControlChanging;
+
         FTabSheetList.Name := 'ts_List';
         FTabSheetList.Parent := FPageControl;
         FTabSheetList.PageControl := FPageControl;
@@ -308,12 +313,16 @@ begin
 
         TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
 
-        TryFindButton('DeleteButton', FDeleteButton);
-        TryFindButton('DeleteInvalidBtn', FDeleteInvalidButton);
         if TryFindButton('AddButton', FAddButton) then begin
           FAddButton.OnClick := HandleAddBtn;
         end;
         TryFindButton('ReplaceButton', FReplaceButton);
+        TryFindButton('DeleteButton', FDeleteButton);
+        if TryFindButton('DeleteInvalidBtn', FDeleteInvalidButton) then begin
+          FDeleteInvalidHandler := FReplaceButton.OnClick;
+          FReplaceButton.OnClick := HandleDeleteInvalid;
+        end;
+
         if TryFindButton('OkButton', btn) then
           btn.Caption := '&OK';
       end;
@@ -321,6 +330,44 @@ begin
       if cmp is TLabel then
         TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
     end;
+  end;
+end;
+
+procedure TSearchPathEnhancer.HandleDeleteInvalid(_Sender: TObject);
+var
+  Dirs: TStringList;
+  i: Integer;
+  RecurseIdx: Integer;
+begin
+  if FPageControl.ActivePage = FTabSheetList then begin
+    if Assigned(FDeleteInvalidHandler) then begin
+//      MessageBox(0, 'delete invalid', '', MB_ICONINFORMATION or MB_OK);
+      FDeleteInvalidHandler(_Sender);
+    end;
+  end else begin
+    if FEdit.Text = '' then
+      Exit;
+    Dirs := TStringList.Create;
+    try
+      TSimpleDirEnumerator.EnumDirsOnly(FEdit.Text + '\*', Dirs, True);
+      for i := Dirs.Count - 1 downto 0 do begin
+        if StartsStr('.', Dirs[i]) then
+          Dirs.Delete(i);
+      end;
+      RecurseIdx := 0;
+      while RecurseIdx < Dirs.Count do begin
+        TSimpleDirEnumerator.EnumDirsOnly(Dirs[RecurseIdx] + '\*', Dirs, True);
+        for i := Dirs.Count - 1 downto 0 do begin
+          if StartsStr('.', Dirs[i]) then
+            Dirs.Delete(i);
+        end;
+        Inc(RecurseIdx);
+      end;
+      FMemo.Lines.AddStrings(Dirs);
+    finally
+      FreeAndNil(Dirs);
+    end;
+    MessageBox(0, 'add recursive', '', MB_ICONINFORMATION or MB_OK);
   end;
 end;
 
@@ -337,12 +384,18 @@ begin
     FMemo.Lines.Text := FListbox.Items.Text;
     FMemo.CaretPos := Point(FMemo.CaretPos.X, FListbox.ItemIndex);
     TrySetButtonVisibility(FDeleteButton, False);
-    TrySetButtonVisibility(FDeleteInvalidButton, False);
+    if Assigned(FDeleteInvalidButton) then begin
+      FDeleteInvalidButton.Caption := 'Add Recursive';
+      FDeleteInvalidButton.OnClick := HandleDeleteInvalid;
+    end;
     TrySetButtonVisibility(FReplaceButton, False);
   end else begin
     FListbox.ItemIndex := FMemo.CaretPos.Y;
     TrySetButtonVisibility(FDeleteButton, True);
-    TrySetButtonVisibility(FDeleteInvalidButton, True);
+    if Assigned(FDeleteInvalidButton) then begin
+      FDeleteInvalidButton.Caption := 'Delete Invalid &Paths';
+      FDeleteInvalidButton.OnClick := HandleDeleteInvalid;
+    end;
     TrySetButtonVisibility(FReplaceButton, True);
   end;
 end;
