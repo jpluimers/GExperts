@@ -27,11 +27,12 @@ uses
   Menus,
   Buttons,
   ActnList,
+  StrUtils,
   ComCtrls,
   GX_IdeFormEnhancer,
   GX_dzVclUtils,
   GX_dzFileUtils,
-  StrUtils;
+  GX_OtaUtils;
 
 var
   gblAggressive: Boolean;
@@ -53,11 +54,13 @@ type
     FDownClick: TNotifyEvent;
     FUpBtn: TBitBtn;
     FDownBtn: TBitBtn;
-    FDeleteButton: TButton;
-    FDeleteInvalidButton: TButton;
-    FReplaceButton: TButton;
-    FAddButton: TButton;
-    FDeleteInvalidHandler: TNotifyEvent;
+    FDeleteBtn: TButton;
+    FDeleteInvalidBtn: TButton;
+    FReplaceBtn: TButton;
+    FAddBtn: TButton;
+    FMakeRelativeBtn: TButton;
+    FMakeAbsoluteBtn: TButton;
+    FAddRecursiveBtn: TButton;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
     ///<summary>
     /// frm can be nil </summary>
@@ -65,12 +68,13 @@ type
     function IsSearchPathForm(_Form: TCustomForm): Boolean;
     function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
     procedure HandleMemoChange(_Sender: TObject);
-    procedure HandleUpButton(_Sender: TObject);
-    procedure HandleDownButton(_Sender: TObject);
-    procedure HandleAddBtn(_Sender: TObject);
+    procedure UpBtnClick(_Sender: TObject);
+    procedure DownBtnClick(_Sender: TObject);
+    procedure AddBtnClick(_Sender: TObject);
     procedure PageControlChanging(_Sender: TObject; var AllowChange: Boolean);
-    procedure HandleDeleteInvalid(_Sender: TObject);
-    //procedure HandleReplaceBtn(_Sender: TObject);
+    procedure MakeRelativeBtnClick(_Sender: TObject);
+    procedure MakeAbsoluteBtnClick(_Sender: TObject);
+    procedure AddRecursiveBtnClick(_Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -275,8 +279,8 @@ begin
         TheActionList.Name := 'TheActionList';
 
         // Assign shortcuts to the Up/Down buttons via actions
-        AssignActionToButton('UpButton', 'Move Up', HandleUpButton, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
-        AssignActionToButton('DownButton', 'Move Down', HandleDownButton, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
+        AssignActionToButton('UpButton', 'Move Up', UpBtnClick, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
+        AssignActionToButton('DownButton', 'Move Down', DownBtnClick, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
 
         TWinControl_ActivateDropFiles(FListbox, HandleFilesDropped);
         FPageControl := TPageControl.Create(_Form);
@@ -313,14 +317,38 @@ begin
 
         TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
 
-        if TryFindButton('AddButton', FAddButton) then begin
-          FAddButton.OnClick := HandleAddBtn;
+        if TryFindButton('AddButton', FAddBtn) then begin
+          FAddBtn.OnClick := AddBtnClick;
         end;
-        TryFindButton('ReplaceButton', FReplaceButton);
-        TryFindButton('DeleteButton', FDeleteButton);
-        if TryFindButton('DeleteInvalidBtn', FDeleteInvalidButton) then begin
-          FDeleteInvalidHandler := FReplaceButton.OnClick;
-          FReplaceButton.OnClick := HandleDeleteInvalid;
+        if TryFindButton('ReplaceButton', FReplaceBtn) then begin
+          FMakeRelativeBtn := TButton.Create(_Form);
+          FMakeRelativeBtn.Name := 'MakeRelativeBtn';
+          FMakeRelativeBtn.Parent := FReplaceBtn.Parent;
+          FMakeRelativeBtn.BoundsRect := FReplaceBtn.BoundsRect;
+          FMakeRelativeBtn.Anchors := [akRight, akBottom];
+          FMakeRelativeBtn.Caption := 'Make Relative';
+          FMakeRelativeBtn.Visible := False;
+          FMakeRelativeBtn.OnClick := MakeRelativeBtnClick;
+        end;
+        if TryFindButton('DeleteButton', FDeleteBtn) then begin
+          FMakeAbsoluteBtn := TButton.Create(_Form);
+          FMakeAbsoluteBtn.Name := 'MakeAbsoluteBtn';
+          FMakeAbsoluteBtn.Parent := FDeleteBtn.Parent;
+          FMakeAbsoluteBtn.BoundsRect := FDeleteBtn.BoundsRect;
+          FMakeAbsoluteBtn.Anchors := [akRight, akBottom];
+          FMakeAbsoluteBtn.Caption := 'Make Absolute';
+          FMakeAbsoluteBtn.Visible := False;
+          FMakeAbsoluteBtn.OnClick := MakeAbsoluteBtnClick;
+        end;
+        if TryFindButton('DeleteInvalidBtn', FDeleteInvalidBtn) then begin
+          FAddRecursiveBtn := TButton.Create(_Form);
+          FAddRecursiveBtn.Name := 'AddRecursiveBtn';
+          FAddRecursiveBtn.Parent := FDeleteInvalidBtn.Parent;
+          FAddRecursiveBtn.BoundsRect := FDeleteInvalidBtn.BoundsRect;
+          FAddRecursiveBtn.Anchors := [akRight, akBottom];
+          FAddRecursiveBtn.Caption := 'Add Recursive';
+          FAddRecursiveBtn.Visible := False;
+          FAddRecursiveBtn.OnClick := AddRecursiveBtnClick;
         end;
 
         if TryFindButton('OkButton', btn) then
@@ -333,41 +361,81 @@ begin
   end;
 end;
 
-procedure TSearchPathEnhancer.HandleDeleteInvalid(_Sender: TObject);
+procedure TSearchPathEnhancer.MakeAbsoluteBtnClick(_Sender: TObject);
+var
+  i: Integer;
+  ProjectFile: string;
+  ProjectDir: string;
+  AbsoluteDir: string;
+  RelativeDir: string;
+begin
+  ProjectFile := GxOtaGetCurrentProjectFileName(True);
+  if ProjectFile = '' then
+    Exit; //==>
+  ProjectDir := ExtractFilePath(ProjectFile);
+  FMemo.Lines.BeginUpdate;
+  try
+    for i := 0 to FMemo.Lines.Count - 1 do begin
+      RelativeDir := FMemo.Lines[i];
+      AbsoluteDir := ExpandFileName(IncludeTrailingPathDelimiter(ProjectDir) + RelativeDir);
+      FMemo.Lines[i] := AbsoluteDir;
+    end;
+  finally
+    FMemo.Lines.EndUpdate;
+  end;
+end;
+
+procedure TSearchPathEnhancer.MakeRelativeBtnClick(_Sender: TObject);
+var
+  i: Integer;
+  ProjectFile: string;
+  ProjectDir: string;
+  AbsoluteDir: string;
+  RelativeDir: string;
+begin
+  ProjectFile := GxOtaGetCurrentProjectFileName(True);
+  if ProjectFile = '' then
+    Exit; //==>
+  ProjectDir := ExtractFilePath(ProjectFile);
+  FMemo.Lines.BeginUpdate;
+  try
+    for i := 0 to FMemo.Lines.Count - 1 do begin
+      AbsoluteDir := FMemo.Lines[i];
+      RelativeDir := ExtractRelativePath(IncludeTrailingPathDelimiter(ProjectDir), AbsoluteDir);
+      FMemo.Lines[i] := RelativeDir;
+    end;
+  finally
+    FMemo.Lines.EndUpdate;
+  end;
+end;
+
+procedure TSearchPathEnhancer.AddRecursiveBtnClick(_Sender: TObject);
 var
   Dirs: TStringList;
   i: Integer;
   RecurseIdx: Integer;
 begin
-  if FPageControl.ActivePage = FTabSheetList then begin
-    if Assigned(FDeleteInvalidHandler) then begin
-//      MessageBox(0, 'delete invalid', '', MB_ICONINFORMATION or MB_OK);
-      FDeleteInvalidHandler(_Sender);
+  if FEdit.Text = '' then
+    Exit;
+  Dirs := TStringList.Create;
+  try
+    TSimpleDirEnumerator.EnumDirsOnly(FEdit.Text + '\*', Dirs, True);
+    for i := Dirs.Count - 1 downto 0 do begin
+      if StartsStr('.', Dirs[i]) then
+        Dirs.Delete(i);
     end;
-  end else begin
-    if FEdit.Text = '' then
-      Exit;
-    Dirs := TStringList.Create;
-    try
-      TSimpleDirEnumerator.EnumDirsOnly(FEdit.Text + '\*', Dirs, True);
+    RecurseIdx := 0;
+    while RecurseIdx < Dirs.Count do begin
+      TSimpleDirEnumerator.EnumDirsOnly(Dirs[RecurseIdx] + '\*', Dirs, True);
       for i := Dirs.Count - 1 downto 0 do begin
         if StartsStr('.', Dirs[i]) then
           Dirs.Delete(i);
       end;
-      RecurseIdx := 0;
-      while RecurseIdx < Dirs.Count do begin
-        TSimpleDirEnumerator.EnumDirsOnly(Dirs[RecurseIdx] + '\*', Dirs, True);
-        for i := Dirs.Count - 1 downto 0 do begin
-          if StartsStr('.', Dirs[i]) then
-            Dirs.Delete(i);
-        end;
-        Inc(RecurseIdx);
-      end;
-      FMemo.Lines.AddStrings(Dirs);
-    finally
-      FreeAndNil(Dirs);
+      Inc(RecurseIdx);
     end;
-    MessageBox(0, 'add recursive', '', MB_ICONINFORMATION or MB_OK);
+    FMemo.Lines.AddStrings(Dirs);
+  finally
+    FreeAndNil(Dirs);
   end;
 end;
 
@@ -379,28 +447,25 @@ procedure TSearchPathEnhancer.PageControlChanging(_Sender: TObject; var AllowCha
       _Btn.Visible := _Visible;
   end;
 
+var
+  SwitchingToMemo: Boolean;
 begin
-  if FPageControl.ActivePage = FTabSheetList then begin
+  SwitchingToMemo := FPageControl.ActivePage = FTabSheetList;
+  if SwitchingToMemo then begin
     FMemo.Lines.Text := FListbox.Items.Text;
     FMemo.CaretPos := Point(FMemo.CaretPos.X, FListbox.ItemIndex);
-    TrySetButtonVisibility(FDeleteButton, False);
-    if Assigned(FDeleteInvalidButton) then begin
-      FDeleteInvalidButton.Caption := 'Add Recursive';
-      FDeleteInvalidButton.OnClick := HandleDeleteInvalid;
-    end;
-    TrySetButtonVisibility(FReplaceButton, False);
   end else begin
     FListbox.ItemIndex := FMemo.CaretPos.Y;
-    TrySetButtonVisibility(FDeleteButton, True);
-    if Assigned(FDeleteInvalidButton) then begin
-      FDeleteInvalidButton.Caption := 'Delete Invalid &Paths';
-      FDeleteInvalidButton.OnClick := HandleDeleteInvalid;
-    end;
-    TrySetButtonVisibility(FReplaceButton, True);
   end;
+  TrySetButtonVisibility(FDeleteBtn, not SwitchingToMemo);
+  TrySetButtonVisibility(FMakeAbsoluteBtn, SwitchingToMemo);
+  TrySetButtonVisibility(FDeleteInvalidBtn, not SwitchingToMemo);
+  TrySetButtonVisibility(FAddRecursiveBtn, SwitchingToMemo);
+  TrySetButtonVisibility(FReplaceBtn, not SwitchingToMemo);
+  TrySetButtonVisibility(FMakeRelativeBtn, SwitchingToMemo);
 end;
 
-procedure TSearchPathEnhancer.HandleUpButton(_Sender: TObject);
+procedure TSearchPathEnhancer.UpBtnClick(_Sender: TObject);
 var
   LineIdx: Integer;
   Pos: TPoint;
@@ -417,7 +482,7 @@ begin
     FUpClick(FUpBtn);
 end;
 
-procedure TSearchPathEnhancer.HandleDownButton(_Sender: TObject);
+procedure TSearchPathEnhancer.DownBtnClick(_Sender: TObject);
 var
   LineIdx: Integer;
 begin
@@ -430,7 +495,7 @@ begin
     FDownClick(FDownBtn);
 end;
 
-procedure TSearchPathEnhancer.HandleAddBtn(_Sender: TObject);
+procedure TSearchPathEnhancer.AddBtnClick(_Sender: TObject);
 begin
   if FPageControl.ActivePage = FTabSheetMemo then begin
     FMemo.Lines.Add(FEdit.Text);
@@ -438,18 +503,6 @@ begin
     FListbox.Items.Add(FEdit.Text);
   end;
 end;
-
-{
-procedure TSearchPathEnhancer.HandleReplaceBtn(_Sender: TObject);
-var
-  LineIdx: Integer;
-begin
-  if Assigned(FMemo) then begin
-    LineIdx := FMemo.CaretPos.Y;
-    FMemo.Lines[LineIdx] := FEdit.Text;
-  end;
-end;
-}
 
 procedure TSearchPathEnhancer.HandleMemoChange(_Sender: TObject);
 begin
