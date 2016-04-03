@@ -1,3 +1,5 @@
+/// <summary>
+/// This is an extract from u_dzVclUtils in dzlib http://blog.dummzeuch.de/dzlib/ </summary>
 unit GX_dzVclUtils;
 
 interface

@@ -1,6 +1,7 @@
 {: This unit implements a Quicksort procedure that can
    be used to sort anything as well as a binary sarch
    function.
+   This is u_dzQuicksort in dzlib http://blog.dummzeuch.de/dzlib/
    @author(Thomas Mueller http://www.dummzeuch.de)
 }
 

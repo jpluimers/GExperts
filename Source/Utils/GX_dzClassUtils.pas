@@ -1,3 +1,5 @@
+/// <summary>
+/// This is an extract from u_dzClassUtils in dzlib http://blog.dummzeuch.de/dzlib/ </summary>
 unit GX_dzClassUtils;
 
 {$I GX_CondDefine.inc}
