@@ -21,7 +21,8 @@ uses
   ComCtrls,
   CommCtrl,
   ActnList,
-  StdCtrls, Menus;
+  StdCtrls,
+  Menus;
 
 type
   ///<summary> Ancestor to all exceptions raised in this unit. </summary>
@@ -334,44 +335,6 @@ type
     destructor Destroy; override;
   end;
 
-function IsShiftDown: Boolean;
-var
-  State: TKeyboardState;
-begin
-  GetKeyboardState(State);
-  Result := ((State[vk_Shift] and 128) <> 0);
-end;
-
-function IsCtrlDown: Boolean;
-var
-  State: TKeyboardState;
-begin
-  GetKeyboardState(State);
-  Result := ((State[VK_CONTROL] and 128) <> 0);
-end;
-
-function IsAltDown: Boolean;
-var
-  State: TKeyboardState;
-begin
-  GetKeyboardState(State);
-  Result := ((State[VK_MENU] and 128) <> 0);
-end;
-
-function GetModifierKeyState: TShiftState;
-var
-  State: TKeyboardState;
-begin
-  GetKeyboardState(State);
-  Result := [];
-  if ((State[vk_Shift] and 128) <> 0) then
-    Include(Result, ssShift);
-  if ((State[VK_CONTROL] and 128) <> 0) then
-    Include(Result, ssCtrl);
-  if ((State[VK_MENU] and 128) <> 0) then
-    Include(Result, ssAlt);
-end;
-
 { TDropFilesActivator }
 
 constructor TDropFilesActivator.Create(_WinControl: TWinControl; _Callback: TOnFilesDropped);
@@ -394,10 +357,46 @@ begin
     FCallback(FCtrl, _st);
 end;
 
+function CheckAdmin(out _IsAdmin: Boolean): Boolean; forward;
+
+// This allows dropping files to an elevated program from applications that don't run elevated
+// e.g. from normal Windows Explorer windows.
+procedure AllowDropFilesForAdmin(_Handle: HWND);
+const
+  MSGFLT_ALLOW = 1;
+  WM_COPYGLOBALDATA = 73;
+type
+  TChangeWindowMessageFilterEx = function(Handle: HWND; msg: Cardinal; dwFlag: Word; _PassNilHere: Pointer): BOOL; stdcall;
+var
+  ChangeWindowMessageFilterEx: TChangeWindowMessageFilterEx;
+  User32Handle: THandle;
+  Ptr: TFarProc;
+  WinHandle: HWND;
+begin
+  User32Handle := SafeLoadLibrary('user32.dll');
+  if User32Handle > 0 then begin
+    Ptr := GetProcAddress(User32Handle, 'ChangeWindowMessageFilterEx');
+    if Assigned(Ptr) then begin
+      @ChangeWindowMessageFilterEx := Ptr;
+      WinHandle := _Handle;
+      // We don't care whether it worked. If it didn't, we can't do a thing about it.
+      ChangeWindowMessageFilterEx(WinHandle, WM_DROPFILES, MSGFLT_ALLOW, nil);
+      ChangeWindowMessageFilterEx(WinHandle, WM_COPYGLOBALDATA, MSGFLT_ALLOW, nil);
+      ChangeWindowMessageFilterEx(WinHandle, WM_COPYDATA, MSGFLT_ALLOW, nil);
+    end;
+    FreeLibrary(User32Handle);
+  end;
+end;
+
+
 procedure TDropFilesActivator.WmNcCreate;
+var
+  IsAdmin: Boolean;
 begin
   inherited;
   DragAcceptFiles(FCtrl.Handle, True);
+  if CheckAdmin(IsAdmin) and IsAdmin then
+    AllowDropFilesForAdmin(FCtrl.Handle);
 end;
 
 procedure TDropFilesActivator.WmNcDestroy;
@@ -977,6 +976,97 @@ end;
 procedure TButton_AddDropdownMenu(_btn: TCustomButton; _pm: TPopupMenu);
 begin
   TButtonPopupMenuLink.Create(_btn, _pm);
+end;
+
+function IsShiftDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[vk_Shift] and 128) <> 0);
+end;
+
+function IsCtrlDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[VK_CONTROL] and 128) <> 0);
+end;
+
+function IsAltDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[VK_MENU] and 128) <> 0);
+end;
+
+function GetModifierKeyState: TShiftState;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := [];
+  if ((State[vk_Shift] and 128) <> 0) then
+    Include(Result, ssShift);
+  if ((State[VK_CONTROL] and 128) <> 0) then
+    Include(Result, ssCtrl);
+  if ((State[VK_MENU] and 128) <> 0) then
+    Include(Result, ssAlt);
+end;
+
+// taken from:
+// http://forum.delphi-treff.de/index.php/Thread/28987-IsAdmin-Funktion-von-Win2k-bis-Vista-7-UAC/?postID=209851#post209851
+
+function CheckAdmin(out _IsAdmin: Boolean): Boolean;
+type
+  TIsUserAnAdminFunc = function(): BOOL; stdcall;
+const
+  ADVAPI32DLL = 'ADVAPI32.dll';
+  SHELL32DLL = 'shell32.dll';
+  SECURITY_NT_AUTHORITY: TSIDIdentifierAuthority = (Value: (0, 0, 0, 0, 0, 5));
+  SECURITY_BUILTIN_DOMAIN_RID = $00000020;
+  DOMAIN_ALIAS_RID_ADMINS = $00000220;
+  SE_GROUP_ENABLED = 4;
+var
+  CheckTokenMembership: function(TokenHandle: THandle; SidToCheck: PSID;
+    out IsMember: Boolean): Boolean; stdcall;
+  lib: Cardinal;
+  Sid: PSID;
+  IsUserAnAdminFunc: TIsUserAnAdminFunc;
+begin
+  Result := False;
+  _IsAdmin := False;
+  if (Win32MajorVersion = 5) and (Win32MinorVersion = 0) then begin
+    // Windows 2000
+    lib := GetModuleHandle(ADVAPI32DLL);
+    if lib = 0 then
+      LoadLibrary(ADVAPI32DLL);
+    @CheckTokenMembership := GetProcAddress(lib, 'CheckTokenMembership');
+    if Assigned(CheckTokenMembership) then begin
+      Result := True;
+      if AllocateAndInitializeSid(SECURITY_NT_AUTHORITY, 2,
+        SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,
+        0, 0, 0, 0, 0, 0, Sid) then begin
+        _IsAdmin := CheckTokenMembership(THandle(nil), Sid, Result);
+        FreeSid(Sid);
+      end;
+    end;
+  end else if Win32MajorVersion >= 5 then begin
+    // XP or above
+    lib := LoadLibraryA(SHELL32DLL);
+    try
+      if lib <> 0 then begin
+        @IsUserAnAdminFunc := GetProcAddress(lib, 'IsUserAnAdmin');
+        Result := Assigned(@IsUserAnAdminFunc);
+        if Result then
+          _IsAdmin := IsUserAnAdminFunc();
+      end;
+    finally
+      FreeLibrary(lib);
+    end;
+  end;
 end;
 
 end.
