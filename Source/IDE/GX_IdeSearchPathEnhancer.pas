@@ -11,6 +11,17 @@ uses
   Forms;
 
 type
+  ///<summary>
+  /// defines the strings used to identify the search path edit dialog </summary>
+  TSearchPathDlgStrings = record
+    DialogClass: string;
+    DialogName: string;
+    DialogCaptionEn: string;
+    DialogCaptionFr: string;
+    DialogCaptionDe: string;
+  end;
+
+type
   TGxIdeSearchPathEnhancer = class
   public
     class function GetEnabled: Boolean; // static;
@@ -75,6 +86,7 @@ type
     procedure MakeRelativeBtnClick(_Sender: TObject);
     procedure MakeAbsoluteBtnClick(_Sender: TObject);
     procedure AddRecursiveBtnClick(_Sender: TObject);
+    function MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -153,58 +165,111 @@ begin
   Result := True;
 end;
 
-type
-  TSearchPathDialogClassArr = array[0..2] of string;
-const
-  SearchPathDialogClassArr: TSearchPathDialogClassArr = (
-    'TInheritedListEditDlg', 'TInheritedListEditDlg', 'TOrderedListEditDlg'
-    );
+//  SearchPathDialogClassArr: TSearchPathDialogClassArr = (
+//    'TInheritedListEditDlg', 'TInheritedListEditDlg', 'TOrderedListEditDlg'
 
+{$IFDEF GX_VER300_up}
+// Delphi 10 and up
+const
+  ProjectSearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TInheritedListEditDlg';
+    DialogName: 'InheritedListEditDlg';
+    DialogCaptionEn: 'Search Path';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
+const
+  LibrarySearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TOrderedListEditDlg';
+    DialogName: 'OrderedListEditDlg';
+    DialogCaptionEn: 'Directories';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
+{$ELSE GX_VER300_up}
 {$IFDEF GX_VER220_up}
 // Delphi XE and up
 const
-  SearchPathDialogName = 'InheritedListEditDlg';
-  SearchPathDialogCaption = 'Search Path';
-  SearchPathDialogCaptionFR = 'Chemin de recherche';
-  SearchPathDialogCaptionDE = 'Verzeichnisse';
+  ProjectSearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TInheritedListEditDlg';
+    DialogName: 'InheritedListEditDlg';
+    DialogCaptionEn: 'Search Path';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
+const
+  LibrarySearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TOrderedListEditDlg';
+    DialogName: 'OrderedListEditDlg';
+    DialogCaptionEn: 'Directories';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
 {$ELSE GX_VER220_up}
 {$IFDEF GX_VER200_up}
 // Delphi 2009 and up
 const
-  SearchPathDialogName = 'InheritedListEditDlg';
-  SearchPathDialogCaption = 'Search path';
-  SearchPathDialogCaptionFR = 'Chemin de recherche';
-  SearchPathDialogCaptionDE = 'Verzeichnisse';
+  ProjectSearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TInheritedListEditDlg';
+    DialogName: 'InheritedListEditDlg';
+    DialogCaptionEn: 'Search Path';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
+const
+  LibrarySearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TOrderedListEditDlg';
+    DialogName: 'OrderedListEditDlg';
+    DialogCaptionEn: 'Directories';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
 {$ELSE GX_VER200_up}
 // Delphi 2007 and earlier
 const
-  SearchPathDialogName = 'OrderedListEditDlg';
-  SearchPathDialogCaption = 'Directories';
-  SearchPathDialogCaptionFR = 'Chemin de recherche';
-  SearchPathDialogCaptionDE = 'Verzeichnisse';
+  ProjectSearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TOrderedListEditDlg';
+    DialogName: 'OrderedListEditDlg';
+    DialogCaptionEn: 'Search Path';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
+const
+  LibrarySearchPathDlg: TSearchPathDlgStrings = (
+    DialogClass: 'TOrderedListEditDlg';
+    DialogName: 'OrderedListEditDlg';
+    DialogCaptionEn: 'Directories';
+    DialogCaptionFr: 'Chemin de recherche';
+    DialogCaptionDe: 'Verzeichnisse';
+    );
 {$ENDIF GX_VER200_up}
 {$ENDIF GX_VER220_up}
+{$ENDIF GX_VER300_up}
 
-function TSearchPathEnhancer.IsSearchPathForm(_Form: TCustomForm): Boolean;
-var
-  i: Integer;
+function TSearchPathEnhancer.MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
 begin
   Result := False;
-  if not Assigned(_Form) then
-    Exit;
-  for i := Low(SearchPathDialogClassArr) to High(SearchPathDialogClassArr) do begin
-    Result := Result or SameText(_Form.ClassName, SearchPathDialogClassArr[i]);
-  end;
-  if not Result then
-    Exit;
-  Result := False;
-  if not SameText(_Form.Name, SearchPathDialogName) then
-    Exit;
-  if not SameText(_Form.Caption, SearchPathDialogCaption)
-    and not SameText(_Form.Caption, SearchPathDialogCaptionFR)
-    and not SameText(_Form.Caption, SearchPathDialogCaptionDE) then
+  if not SameText(_Form.ClassName, _Strings.DialogClass) then
+    Exit; //==>
+  if not SameText(_Form.Name, _Strings.DialogName) then
+    Exit; //==>
+  if not SameText(_Form.Caption, _Strings.DialogCaptionEn)
+    and not SameText(_Form.Caption, _Strings.DialogCaptionFr)
+    and not SameText(_Form.Caption, _Strings.DialogCaptionDe) then
     Exit;
   Result := True;
+end;
+
+function TSearchPathEnhancer.IsSearchPathForm(_Form: TCustomForm): Boolean;
+begin
+  if Assigned(_Form) then begin
+    Result := True;
+    if MatchesDlg(_Form, ProjectSearchPathDlg) then
+      Exit; //==>
+    if MatchesDlg(_Form, LibrarySearchPathDlg) then
+      Exit; //==>
+  end;
+  Result := False;
 end;
 
 procedure TSearchPathEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
@@ -421,14 +486,14 @@ begin
   try
     TSimpleDirEnumerator.EnumDirsOnly(FEdit.Text + '\*', Dirs, True);
     for i := Dirs.Count - 1 downto 0 do begin
-      if StartsStr('.', Dirs[i]) then
+      if AnsiStartsStr('.', Dirs[i]) then
         Dirs.Delete(i);
     end;
     RecurseIdx := 0;
     while RecurseIdx < Dirs.Count do begin
       TSimpleDirEnumerator.EnumDirsOnly(Dirs[RecurseIdx] + '\*', Dirs, True);
       for i := Dirs.Count - 1 downto 0 do begin
-        if StartsStr('.', Dirs[i]) then
+        if AnsiStartsStr('.', Dirs[i]) then
           Dirs.Delete(i);
       end;
       Inc(RecurseIdx);
