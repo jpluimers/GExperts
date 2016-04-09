@@ -30,7 +30,6 @@ const
 
 type
   TFileInfoRec = record
-  public
     Filename: string;
     Size: Int64;
     Timestamp: TDateTime;
