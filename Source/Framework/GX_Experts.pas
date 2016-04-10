@@ -15,9 +15,9 @@ type
     FActive: Boolean;
     FShortCut: TShortCut;
     FAction: IGxAction;
-    function GetBitmap: TBitmap;
     procedure ActionOnUpdate(Sender: TObject);
   protected
+    function GetBitmap: TBitmap; override;
     procedure SetShortCut(Value: TShortCut); override;
     function GetShortCut: TShortCut; override;
     function GetExpertIndex: Integer;

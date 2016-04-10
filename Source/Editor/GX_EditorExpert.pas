@@ -32,7 +32,7 @@ type
     // signals that no icon file is available.
     function GetBitmapFileName: string; virtual;
     // Get a reference to the bitmap for menu items, buttons, etc.
-    function GetBitmap: Graphics.TBitmap;
+    function GetBitmap: Graphics.TBitmap; override;
     // Overrride to load any configuration settings
     procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
     // Overrride to save any configuration settings

@@ -3,13 +3,14 @@ unit GX_BaseExpert;
 interface
 
 uses
-  Classes;
+  Classes, Graphics;
 
 type
   TGX_BaseExpert = class(TObject)
   protected
     function GetShortCut: TShortCut; virtual; abstract;
     procedure SetShortCut(Value: TShortCut); virtual; abstract;
+    function GetBitmap: Graphics.TBitmap; virtual; abstract;
   public
     // Internal name of expert for expert identification.
     class function GetName: string; virtual;
