@@ -243,6 +243,12 @@ function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNot
 /// Appends a new menu item with the given Caption to the popup menu and returns it </summary>
 function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem; overload;
 
+function TPopupMenu_FindMenuItem(_pm: TPopupMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
+
+function TMainMenu_FindMenuItem(_mnu: TMainMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
+
+function TMenuItem_FindMenuItem(_mi: TMenuItem; const _Name: string; out _miFound: TMenuItem): Boolean;
+
 {$IFNDEF DELPHI2009_UP}
 //Delphi 2009 introduced TCustomButton as the common Ancestor of TButton and TBitBtn.
 type
@@ -388,7 +394,6 @@ begin
   end;
 end;
 
-
 procedure TDropFilesActivator.WmNcCreate;
 var
   IsAdmin: Boolean;
@@ -512,7 +517,7 @@ const
 
   SHACF_VIRTUAL_NAMESPACE = $00000040;
 
-function SHAutoComplete(hwndEdit: HWnd; dwFlags: DWORD): HResult; stdcall; external 'Shlwapi.dll';
+function SHAutoComplete(hwndEdit: HWND; dwFlags: DWORD): HResult; stdcall; external 'Shlwapi.dll';
 
 function TEdit_SetAutocomplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): Boolean;
@@ -575,7 +580,7 @@ end;
 // This and the calling function IsAutoSuggstionDropdownVisible are taken from mghie's answer on
 // http://stackoverflow.com/a/9228954/49925
 
-function EnumThreadWindowsProc(AWnd: HWnd; AParam: LParam): BOOL; stdcall;
+function EnumThreadWindowsProc(AWnd: HWND; AParam: LParam): BOOL; stdcall;
 var
   WndClassName: string;
   FoundAndVisiblePtr: PInteger;
@@ -679,6 +684,36 @@ begin
   Result.Caption := _Caption;
   Result.OnClick := _OnClick;
   _pm.Items.Add(Result);
+end;
+
+function TPopupMenu_FindMenuItem(_pm: TPopupMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
+begin
+  Result := TMenuItem_FindMenuItem(_pm.Items, _Name, _miFound);
+end;
+
+function TMainMenu_FindMenuItem(_mnu: TMainMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
+begin
+  Result := TMenuItem_FindMenuItem(_mnu.Items, _Name, _miFound);
+end;
+
+function TMenuItem_FindMenuItem(_mi: TMenuItem; const _Name: string; out _miFound: TMenuItem): Boolean;
+var
+  i: Integer;
+  mi: TMenuItem;
+begin
+  for i := 0 to _mi.Count - 1 do begin
+    mi := _mi.Items[i];
+    if mi.Name = _Name then begin
+      _miFound := mi;
+      Result := True;
+      Exit; //==>
+    end;
+    if TMenuItem_FindMenuItem(mi, _Name, _miFound) then begin
+      Result := True;
+      Exit; //==>
+    end;
+  end;
+  Result := False;
 end;
 
 function TListView_TryGetSelected(_lv: TListView; out _Idx: Integer): Boolean;

@@ -37,7 +37,9 @@ type
     // by each expert to provide required registration
     // information.
     // Caption of a menu item entry.
-    function GetActionCaption: string; virtual; abstract;
+    // Defaults to GetName (we don't want any abstract methods),
+    // but descendants should override this method.
+    function GetActionCaption: string; virtual;
     // Determine if the expert action is enabled
     function GetActionEnabled: Boolean; virtual;
     // Subkey used to store configuration details in the registry
@@ -47,7 +49,9 @@ type
     function GetActionName: string;
     // Name to be displayed for the expert in the GExperts
     // *configuration* dialog; this is a different entry than
-    // the action caption (GetActionCaption)
+    // the action caption (GetActionCaption) but by default
+    // it calls GetActionCaption and removes any Hotkey characters and '...'
+    // This is probably OK for most experts.
     function GetDisplayName: string; override;
     // Various expert configuration items which
     // are only used during registration.
@@ -380,6 +384,11 @@ end;
 function TGX_Expert.HasDesignerMenuItem: Boolean;
 begin
   Result := False;
+end;
+
+function TGX_Expert.GetActionCaption: string;
+begin
+  Result := GetName;
 end;
 
 function TGX_Expert.GetActionEnabled: Boolean;
