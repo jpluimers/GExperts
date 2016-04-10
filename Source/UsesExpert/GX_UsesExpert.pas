@@ -1,4 +1,4 @@
-unit GX_eUsesManager;
+unit GX_UsesExpert;
 
 interface
 
@@ -6,17 +6,20 @@ interface
 
 uses
   Classes, Controls, Forms, Menus, ComCtrls,
-  ExtCtrls, ActnList, Dialogs, StdCtrls,
-  GX_ConfigurationInfo, GX_EditorExpert, GX_GenericUtils, GX_BaseForm, 
+  ExtCtrls, ActnList, Actions, Dialogs, StdCtrls,
+  GX_ConfigurationInfo, GX_Experts, GX_GenericUtils, GX_BaseForm,
   GX_KbdShortCutBroker;
 
 type
-  TUsesExpert = class(TEditorExpert)
+  TUsesExpert = class(TGX_Expert)
   private
     FFavoriteUnits: TStringList;
     FSingleActionMode: Boolean;
     FAvailTabIndex: Integer;
+    FReplaceFileUseUnit: Boolean;
+    FOrigFileAddUnitExecute: TNotifyEvent;
     procedure InternalExecute;
+    function FindAction(out _Action: TBasicAction): Boolean;
   protected
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
@@ -24,9 +27,13 @@ type
     class function GetName: string; override;
     constructor Create; override;
     destructor Destroy; override;
+    // Do any delayed setup after the IDE is done initializing
+    procedure AfterIDEInitialized; override;
+    // Various methods that will be called
+    // at appropriate times
+    procedure Configure; override;
     function GetDefaultShortCut: TShortCut; override;
-    function GetDisplayName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetActionCaption: string; override;
     function HasConfigOptions: Boolean; override;
     procedure Execute(Sender: TObject); override;
   end;
@@ -173,14 +180,15 @@ type
     FCommonUnits: TStringList;
     FFavoriteUnits: TStringList;
     FSearchPathUnits: TStringList;
-    UsesExpert: TUsesExpert;
+    FUsesExpert: TUsesExpert;
   end;
 
 implementation
 
 uses
   SysUtils, Messages, Windows, Graphics, ToolsAPI,
-  GX_OtaUtils, GX_IdeUtils, GX_UsesManager;
+  GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils,
+  GX_UsesExpertOptions;
 
 {$R *.dfm}
 
@@ -194,10 +202,48 @@ begin
 end;
 
 destructor TUsesExpert.Destroy;
+var
+  act: TBasicAction;
 begin
   SaveSettings;
+
+  if Assigned(FOrigFileAddUnitExecute) then
+    if FindAction(act) then
+      act.OnExecute := FOrigFileAddUnitExecute;
+
   FreeAndNil(FFavoriteUnits);
   inherited;
+end;
+
+procedure TUsesExpert.AfterIDEInitialized;
+var
+  act: TBasicAction;
+begin
+  inherited;
+
+  if FReplaceFileUseUnit then begin
+    if FindAction(act) then begin
+      FOrigFileAddUnitExecute := act.OnExecute;
+      act.OnExecute := Self.Execute;
+    end;
+  end;
+end;
+
+function TUsesExpert.FindAction(out _Action: TBasicAction): Boolean;
+var
+  MainMenu: TMainMenu;
+  mi: TMenuItem;
+begin
+  Result := False;
+  MainMenu := GxOtaGetIdeMainMenu;
+  if not Assigned(MainMenu) then
+    Exit;
+  if not TMainMenu_FindMenuItem(MainMenu, 'FileUseUnitItem', mi) or not Assigned(mi.Action) then
+    Exit;
+  if mi.Action.Name = 'FileUseUnitCommand' then begin
+    _Action := mi.Action;
+    Result := True;
+  end;
 end;
 
 procedure TUsesExpert.Execute(Sender: TObject);
@@ -210,30 +256,30 @@ begin
   Result := scShift + scAlt + Ord('U');
 end;
 
-function TUsesExpert.GetDisplayName: string;
+function TUsesExpert.GetActionCaption: string;
 resourcestring
-  SUsesExpert = 'Uses Clause Manager';
+  SUsesExpert = '&Uses Clause Manager ...';
 begin
   Result := SUsesExpert;
 end;
 
-procedure TUsesExpert.GetHelpString(List: TStrings);
-resourcestring
-  SUsesExpertHelp =
-    '  This expert is designed to help you manage the uses clauses of your Delphi files.  ' +
-    'You can delete and move units between the interface and implementation sections of ' +
-    'the file you are editing using the buttons or drag and drop.  You can also add units from:'#13 +
-    '  - The effective search path (project root, project search paths, IDE library paths)'#13 +
-    '  - The current project'#13 +
-    '  - Delphi''s common VCL/RTL units'#13 +
-    '  - A user-defined favorite units list'#13 +
-    '  The filter control allows case-insensitive filtering of the available unit lists.'#13 +
-    '  There is a "Single action/quick add mode" checkbox that automatically closes ' +
-    'the form when you perform an action on a uses clause or automatically adds the ' +
-    'selected units to the active uses clause when the OK button is selected.';
-begin
-  List.Text := SUsesExpertHelp;
-end;
+//procedure TUsesExpert.GetHelpString(List: TStrings);
+//resourcestring
+//  SUsesExpertHelp =
+//    '  This expert is designed to help you manage the uses clauses of your Delphi files.  ' +
+//    'You can delete and move units between the interface and implementation sections of ' +
+//    'the file you are editing using the buttons or drag and drop.  You can also add units from:'#13 +
+//    '  - The effective search path (project root, project search paths, IDE library paths)'#13 +
+//    '  - The current project'#13 +
+//    '  - Delphi''s common VCL/RTL units'#13 +
+//    '  - A user-defined favorite units list'#13 +
+//    '  The filter control allows case-insensitive filtering of the available unit lists.'#13 +
+//    '  There is a "Single action/quick add mode" checkbox that automatically closes ' +
+//    'the form when you perform an action on a uses clause or automatically adds the ' +
+//    'selected units to the active uses clause when the OK button is selected.';
+//begin
+//  List.Text := SUsesExpertHelp;
+//end;
 
 class function TUsesExpert.GetName: string;
 begin
@@ -242,7 +288,29 @@ end;
 
 function TUsesExpert.HasConfigOptions: Boolean;
 begin
-  Result := False;
+  Result := True;
+end;
+
+procedure TUsesExpert.Configure;
+var
+  act: TBasicAction;
+  Found: boolean;
+begin
+  Found := FindAction(act);
+  if TfmUsesExpertOptions.Execute(Application, Found, FSingleActionMode, FReplaceFileUseUnit) then begin
+    SaveSettings;
+    if Found then begin
+      if FReplaceFileUseUnit then begin
+        if not Assigned(FOrigFileAddUnitExecute) then begin
+          FOrigFileAddUnitExecute := act.OnExecute;
+          act.OnExecute := Execute;
+        end;
+      end else begin
+        act.OnExecute := FOrigFileAddUnitExecute;
+        FOrigFileAddUnitExecute := nil;
+      end;
+    end;
+  end;
 end;
 
 procedure TUsesExpert.InternalExecute;
@@ -253,12 +321,12 @@ begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
   Form := TfmUsesManager.Create(Application);
   try
-    Bitmap := GetBitmap;
-    if Assigned(Bitmap) then
-      ConvertBitmapToIcon(Bitmap, Form.Icon);
+//    Bitmap := GetBitmap;
+//    if Assigned(Bitmap) then
+//      ConvertBitmapToIcon(Bitmap, Form.Icon);
 
     Form.FFavoriteUnits.Assign(FFavoriteUnits);
-    Form.UsesExpert := Self;
+    Form.FUsesExpert := Self;
     Form.chkSingleActionMode.Checked := FSingleActionMode;
     if (FAvailTabIndex >= 0) and (FAvailTabIndex < Form.pcUnits.PageCount) then
       Form.pcUnits.ActivePageIndex := FAvailTabIndex;
@@ -278,6 +346,7 @@ begin
   inherited;
   FFavoriteUnits.CommaText := Settings.ReadString(ConfigurationKey, 'Favorites', '');
   FSingleActionMode := Settings.ReadBool(ConfigurationKey, 'SingleActionMode', False);
+  FReplaceFileUseUnit := Settings.ReadBool(ConfigurationKey, 'ReplaceFileUseUnit', False);
   FAvailTabIndex := Settings.ReadInteger(ConfigurationKey, 'AvailTabIndex', 0);
 end;
 
@@ -286,6 +355,7 @@ begin
   inherited;
   Settings.WriteString(ConfigurationKey, 'Favorites', FFavoriteUnits.CommaText);
   Settings.WriteBool(ConfigurationKey, 'SingleActionMode', FSingleActionMode);
+  Settings.WriteBool(ConfigurationKey, 'ReplaceFileUseUnit', FReplaceFileUseUnit);
   Settings.WriteInteger(ConfigurationKey, 'AvailTabIndex', FAvailTabIndex);
 end;
 
@@ -944,6 +1014,6 @@ begin
 end;
 
 initialization
-  RegisterEditorExpert(TUsesExpert);
+  RegisterGX_Expert(TUsesExpert);
 end.
 
