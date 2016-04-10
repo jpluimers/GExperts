@@ -23,6 +23,7 @@ type
   protected
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    function BitmapFileName: string; override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -286,6 +287,11 @@ begin
   Result := 'UsesClauseMgr';
 end;
 
+function TUsesExpert.BitmapFileName: string;
+begin
+  Result := ClassName;
+end;
+
 function TUsesExpert.HasConfigOptions: Boolean;
 begin
   Result := True;
@@ -321,9 +327,9 @@ begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
   Form := TfmUsesManager.Create(Application);
   try
-//    Bitmap := GetBitmap;
-//    if Assigned(Bitmap) then
-//      ConvertBitmapToIcon(Bitmap, Form.Icon);
+    Bitmap := GetBitmap;
+    if Assigned(Bitmap) then
+      ConvertBitmapToIcon(Bitmap, Form.Icon);
 
     Form.FFavoriteUnits.Assign(FFavoriteUnits);
     Form.FUsesExpert := Self;
