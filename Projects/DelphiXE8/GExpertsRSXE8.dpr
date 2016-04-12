@@ -51,7 +51,8 @@ uses
   GX_eReverseStatement in '..\..\source\Editor\GX_eReverseStatement.pas',
   GX_eSelectIdentifier in '..\..\source\Editor\GX_eSelectIdentifier.pas',
   GX_eSelectionEditorExpert in '..\..\source\Editor\GX_eSelectionEditorExpert.pas',
-  GX_eUsesManager in '..\..\source\Editor\GX_eUsesManager.pas' {fmUsesManager},
+  GX_UsesExpert in '..\..\source\UsesExpert\GX_UsesExpert.pas' {fmUsesManager},
+  GX_UsesExpertOptions in '..\..\Source\UsesExpert\GX_UsesExpertOptions.pas' {fmUsesExpertOptions},
   GX_ePopupMenu in '..\..\Source\Editor\GX_ePopupMenu.pas' {fmEditorPopupMenuExpertConfig},
   GX_EditorChangeServices in '..\..\source\Framework\GX_EditorChangeServices.pas',
   GX_EditorEnhancements in '..\..\source\Framework\GX_EditorEnhancements.pas',
@@ -84,6 +85,8 @@ uses
   GX_GrepResults in '..\..\source\Grep\GX_GrepResults.pas' {fmGrepResults},
   GX_GrepResultsOptions in '..\..\source\Grep\GX_GrepResultsOptions.pas' {fmGrepResultsOptions},
   GX_GrepSearch in '..\..\source\Grep\GX_GrepSearch.pas' {fmGrepSearch},
+  GX_GrepProgress in '..\..\Source\Grep\GX_GrepProgress.pas' {fmGrepProgress},
+  GX_GrepSelect in '..\..\Source\Grep\GX_GrepSelect.pas' {fmGrepSelect},
   GX_GxUtils in '..\..\source\Utils\GX_GxUtils.pas',
   GX_HideNonVisualComps in '..\..\source\Experts\GX_HideNonVisualComps.pas',
   GX_IconMessageBox in '..\..\source\Framework\GX_IconMessageBox.pas',
@@ -198,9 +201,8 @@ uses
   GX_EventHook in '..\..\source\framework\GX_EventHook.pas',
   GX_BaseExpert in '..\..\Source\Framework\GX_BaseExpert.pas',
   GX_uAutoTodoHandler in '..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas',
-  GX_GrepProgress in '..\..\Source\Grep\GX_GrepProgress.pas' {fmGrepProgress},
-  GX_GrepSelect in '..\..\Source\Grep\GX_GrepSelect.pas' {fmGrepSelect},
-  GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone};
+  GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone},
+  GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas';
 
 begin
 end.

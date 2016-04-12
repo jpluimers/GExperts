@@ -85,6 +85,8 @@ uses
   GX_GrepResults in '..\..\source\Grep\GX_GrepResults.pas' {fmGrepResults},
   GX_GrepResultsOptions in '..\..\source\Grep\GX_GrepResultsOptions.pas' {fmGrepResultsOptions},
   GX_GrepSearch in '..\..\source\Grep\GX_GrepSearch.pas' {fmGrepSearch},
+  GX_GrepProgress in '..\..\Source\Grep\GX_GrepProgress.pas' {fmGrepProgress},
+  GX_GrepSelect in '..\..\Source\Grep\GX_GrepSelect.pas' {fmGrepSelect},
   GX_GxUtils in '..\..\source\Utils\GX_GxUtils.pas',
   GX_HideNonVisualComps in '..\..\source\Experts\GX_HideNonVisualComps.pas',
   GX_IconMessageBox in '..\..\source\Framework\GX_IconMessageBox.pas',
@@ -199,8 +201,6 @@ uses
   GX_EventHook in '..\..\source\framework\GX_EventHook.pas',
   GX_BaseExpert in '..\..\Source\Framework\GX_BaseExpert.pas',
   GX_uAutoTodoHandler in '..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas',
-  GX_GrepProgress in '..\..\Source\Grep\GX_GrepProgress.pas' {fmGrepProgress},
-  GX_GrepSelect in '..\..\Source\Grep\GX_GrepSelect.pas' {fmGrepSelect},
   GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone},
   GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas';
 

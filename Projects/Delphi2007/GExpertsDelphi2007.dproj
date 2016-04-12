@@ -121,7 +121,7 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <RcCompile Include="..\..\images\GXIcons.rc">
-      <Form>..\..\images\GXIcons.res</Form>
+      <Form>'..\..\images\GXIcons.res'</Form>
     </RcCompile>
     <DCCReference Include="..\..\Source\AutoTodo\GX_AutoTodoDone.pas">
       <Form>fmAutoTodoDone</Form>

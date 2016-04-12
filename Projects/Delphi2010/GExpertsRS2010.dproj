@@ -172,8 +172,11 @@
 			<DCCReference Include="..\..\source\Editor\GX_eReverseStatement.pas"/>
 			<DCCReference Include="..\..\source\Editor\GX_eSelectIdentifier.pas"/>
 			<DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas"/>
-			<DCCReference Include="..\..\source\Editor\GX_eUsesManager.pas">
+			<DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
 				<Form>fmUsesManager</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpertOptions.pas">
+				<Form>fmUsesExpertOptions</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\Editor\GX_ePopupMenu.pas">
 				<Form>fmEditorPopupMenuExpertConfig</Form>
@@ -232,6 +235,12 @@
 			</DCCReference>
 			<DCCReference Include="..\..\source\Grep\GX_GrepSearch.pas">
 				<Form>fmGrepSearch</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\Grep\GX_GrepProgress.pas">
+				<Form>fmGrepProgress</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\Grep\GX_GrepSelect.pas">
+				<Form>fmGrepSelect</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\source\Utils\GX_GxUtils.pas"/>
 			<DCCReference Include="..\..\source\Experts\GX_HideNonVisualComps.pas"/>
@@ -438,15 +447,10 @@
 			<DCCReference Include="..\..\source\framework\GX_EventHook.pas"/>
 			<DCCReference Include="..\..\Source\Framework\GX_BaseExpert.pas"/>
 			<DCCReference Include="..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas"/>
-			<DCCReference Include="..\..\Source\Grep\GX_GrepProgress.pas">
-				<Form>fmGrepProgress</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\Source\Grep\GX_GrepSelect.pas">
-				<Form>fmGrepSelect</Form>
-			</DCCReference>
 			<DCCReference Include="..\..\Source\AutoTodo\GX_AutoTodoDone.pas">
 				<Form>fmAutoTodoDone</Form>
 			</DCCReference>
+			<DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
