@@ -51,7 +51,8 @@ uses
   GX_eReverseStatement in '..\..\source\Editor\GX_eReverseStatement.pas',
   GX_eSelectIdentifier in '..\..\source\Editor\GX_eSelectIdentifier.pas',
   GX_eSelectionEditorExpert in '..\..\source\Editor\GX_eSelectionEditorExpert.pas',
-  GX_eUsesManager in '..\..\source\Editor\GX_eUsesManager.pas' {fmUsesManager},
+  GX_UsesExpert in '..\..\source\UsesExpert\GX_UsesExpert.pas' {fmUsesManager},
+  GX_UsesExpertOptions in '..\..\Source\UsesExpert\GX_UsesExpertOptions.pas' {fmUsesExpertOptions},
   GX_ePopupMenu in '..\..\Source\Editor\GX_ePopupMenu.pas' {fmEditorPopupMenuExpertConfig},
   GX_EditorChangeServices in '..\..\source\Framework\GX_EditorChangeServices.pas',
   GX_EditorEnhancements in '..\..\source\Framework\GX_EditorEnhancements.pas',
@@ -200,7 +201,8 @@ uses
   GX_uAutoTodoHandler in '..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas',
   GX_GrepProgress in '..\..\Source\Grep\GX_GrepProgress.pas' {fmGrepProgress},
   GX_GrepSelect in '..\..\Source\Grep\GX_GrepSelect.pas' {fmGrepSelect},
-  GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone};
+  GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone},
+  GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas';
 
 begin
 end.

@@ -224,9 +224,6 @@
     <DCCReference Include="..\..\source\Editor\GX_eReverseStatement.pas" />
     <DCCReference Include="..\..\source\Editor\GX_eSelectIdentifier.pas" />
     <DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas" />
-    <DCCReference Include="..\..\source\Editor\GX_eUsesManager.pas">
-      <Form>fmUsesManager</Form>
-    </DCCReference>
     <DCCReference Include="..\..\source\Editor\GX_MenusForEditorExpert.pas" />
     <DCCReference Include="..\..\source\Experts\GX_AsciiChart.pas">
       <Form>fmAsciiChart</Form>
@@ -495,8 +492,15 @@
     <DCCReference Include="..\..\source\ToDoList\GX_ToDoOptions.pas">
       <Form>fmToDoOptions</Form>
     </DCCReference>
+    <DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
+      <Form>fmUsesManager</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpertOptions.pas">
+      <Form>fmUsesExpertOptions</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\Utils\GX_BookmarkList.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzClassUtils.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzQuicksort.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzVclUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_GenericClasses.pas" />
