@@ -453,6 +453,8 @@ object fmUsesManager: TfmUsesManager
             Width = 75
             Height = 25
             Action = actUsesDelete
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
           end
           object btnImplMoveToIntf: TButton
@@ -494,22 +496,22 @@ object fmUsesManager: TfmUsesManager
     object chkSingleActionMode: TCheckBox
       Left = 8
       Top = 9
-      Width = 318
+      Width = 233
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Single action/quic&k add mode'
       TabOrder = 0
     end
     object pnlButtonsRight: TPanel
-      Left = 409
+      Left = 272
       Top = 0
-      Width = 186
+      Width = 323
       Height = 37
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 1
       object btnCancel: TButton
-        Left = 105
+        Left = 241
         Top = 4
         Width = 75
         Height = 25
@@ -519,7 +521,7 @@ object fmUsesManager: TfmUsesManager
         TabOrder = 1
       end
       object btnOK: TButton
-        Left = 21
+        Left = 157
         Top = 4
         Width = 75
         Height = 25
@@ -529,6 +531,16 @@ object fmUsesManager: TfmUsesManager
         ModalResult = 1
         TabOrder = 0
         OnClick = btnOKClick
+      end
+      object btnOpen: TButton
+        Left = 8
+        Top = 4
+        Width = 75
+        Height = 25
+        Action = actOpenUnit
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
       end
     end
   end
@@ -548,14 +560,15 @@ object fmUsesManager: TfmUsesManager
     object mitIntfSep1: TMenuItem
       Caption = '-'
     end
+    object mitUsesOpenUnit: TMenuItem
+      Action = actOpenUnit
+    end
     object mitUsesAddToFavorites: TMenuItem
       Action = actUsesAddToFavorites
     end
-    object mitUsesOpenUnit: TMenuItem
-      Action = actUsesOpenUnit
-    end
   end
   object pmuAvail: TPopupMenu
+    OnPopup = pmuAvailPopup
     Left = 296
     Top = 80
     object mitAvailAddToIntf: TMenuItem
@@ -568,8 +581,7 @@ object fmUsesManager: TfmUsesManager
       Caption = '-'
     end
     object mitAvailOpenUnit: TMenuItem
-      Action = actAvailOpenUnit
-      ShortCut = 16463
+      Action = actOpenUnit
     end
     object mitAvailSep2: TMenuItem
       Caption = '-'
@@ -594,6 +606,7 @@ object fmUsesManager: TfmUsesManager
     Top = 56
     object actUsesDelete: TAction
       Caption = '&Delete'
+      Hint = 'Delete unit from uses list (Double Click)'
       ImageIndex = 42
       ShortCut = 46
       OnExecute = acUsesDeleteExecute
@@ -632,15 +645,12 @@ object fmUsesManager: TfmUsesManager
       ShortCut = 16464
       OnExecute = actAvailAddToImplExecute
     end
-    object actUsesOpenUnit: TAction
+    object actOpenUnit: TAction
       Caption = 'Open Unit'
+      Hint = 'Open selected unit (Ctrl+Double Click)'
       ImageIndex = 1
-      OnExecute = actUsesOpenUnitExecute
-    end
-    object actAvailOpenUnit: TAction
-      Caption = 'Open Unit'
-      ImageIndex = 1
-      OnExecute = actAvailOpenUnitExecute
+      ShortCut = 16463
+      OnExecute = actOpenUnitExecute
     end
     object actUsesAddToFavorites: TAction
       Caption = 'Add to Favorites'

@@ -96,7 +96,7 @@ type
     btnIntfDelete: TButton;
     btnIntfMoveToImpl: TButton;
     actImplMoveToIntf: TAction;
-    actUsesOpenUnit: TAction;
+    actOpenUnit: TAction;
     tabSearchPath: TTabSheet;
     pnlSearchPathFooter: TPanel;
     btnSearchPathAddToIntf: TButton;
@@ -110,7 +110,6 @@ type
     mitAvailDelFromFav: TMenuItem;
     mitAvailSep1: TMenuItem;
     chkSingleActionMode: TCheckBox;
-    actAvailOpenUnit: TAction;
     mitAvailSep2: TMenuItem;
     mitAvailOpenUnit: TMenuItem;
     actUsesAddToFavorites: TAction;
@@ -121,6 +120,7 @@ type
     pnlButtonsRight: TPanel;
     btnCancel: TButton;
     btnOK: TButton;
+    btnOpen: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -140,14 +140,14 @@ type
       State: TDragState; var Accept: Boolean);
     procedure lbxAvailDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure lbxImplementationDblClick(Sender: TObject);
-    procedure actUsesOpenUnitExecute(Sender: TObject);
+    procedure actOpenUnitExecute(Sender: TObject);
     procedure lbxAvailDblClick(Sender: TObject);
     procedure edtFilterChange(Sender: TObject);
     procedure edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure actAvailOpenUnitExecute(Sender: TObject);
     procedure actUsesAddToFavoritesExecute(Sender: TObject);
+    procedure pmuAvailPopup(Sender: TObject);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -176,6 +176,8 @@ type
     procedure SelectFirstItemInLists;
     procedure SaveChanges;
     procedure CloseIfInSingleActionMode;
+    function GetLbxForOpen: TListBox;
+    procedure OpenSelectedUnit(ListBox: TListBox);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -473,6 +475,15 @@ begin
   GxOtaOpenFileFromPath(FileName);
 end;
 
+procedure TfmUsesManager.pmuAvailPopup(Sender: TObject);
+begin
+  inherited;
+  if pcUses.ActivePage= tabInterface then
+    mitAvailAddToIntf.Default := True
+  else
+    mitAvailAddToImpl.Default := True;
+end;
+
 procedure TfmUsesManager.AddListToImplSection(ListBox: TObject; RemoveFromInterface: Boolean);
 var
   i: Integer;
@@ -549,24 +560,32 @@ end;
 
 procedure TfmUsesManager.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
 var
+  AvailableSourceListBox: TListBox;
   ActiveLBHasSelection: Boolean;
+  UsesSourceListBox: TListBox;
+  UsesIsInterface: Boolean;
 begin
-  ActiveLBHasSelection := HaveSelectedItem(GetAvailableSourceListBox);
-  actUsesDelete.Enabled := HaveSelectedItem(GetUsesSourceListBox);
+  AvailableSourceListBox := GetAvailableSourceListBox;
+  UsesSourceListBox := GetUsesSourceListBox;
+  ActiveLBHasSelection := HaveSelectedItem(AvailableSourceListBox);
+  UsesIsInterface := (pcUses.ActivePage = tabInterface);
+
+  actUsesDelete.Enabled := HaveSelectedItem(UsesSourceListBox);
   actUsesAddToFavorites.Enabled := actUsesDelete.Enabled;
-  actIntfMoveToImpl.Enabled := HaveSelectedItem(lbxInterface) and (pcUses.ActivePage = tabInterface);
-  actImplMoveToIntf.Enabled := HaveSelectedItem(lbxImplementation) and (pcUses.ActivePage = tabImplementation);
-  actUsesOpenUnit.Enabled := HaveSelectedItem(GetUsesSourceListBox);
+  actIntfMoveToImpl.Enabled := HaveSelectedItem(lbxInterface) and UsesIsInterface;
+  actImplMoveToIntf.Enabled := HaveSelectedItem(lbxImplementation) and not UsesIsInterface;
+
   actAvailAddToImpl.Enabled := ActiveLBHasSelection;
   actAvailAddToIntf.Enabled := ActiveLBHasSelection;
   actFavAdd.Enabled := ActiveLBHasSelection or (pcUnits.ActivePage = tabFavorite);
-  actAvailOpenUnit.Enabled := ActiveLBHasSelection;
   actFavDelete.Enabled := HaveSelectedItem(lbxFavorite);
-  actFavDelete.Visible := GetAvailableSourceListBox = lbxFavorite;
+  actFavDelete.Visible := AvailableSourceListBox = lbxFavorite;
   if (ActiveControl = lbxInterface) or (ActiveControl = lbxImplementation) then
     actUsesDelete.ShortCut := VK_DELETE
   else
     actUsesDelete.ShortCut := 0;
+
+  actOpenUnit.Enabled := HaveSelectedItem(GetLbxForOpen);
 end;
 
 function TfmUsesManager.HaveSelectedItem(ListBox: TListBox): Boolean;
@@ -715,12 +734,18 @@ end;
 
 procedure TfmUsesManager.lbxInterfaceDblClick(Sender: TObject);
 begin
-  DeleteItemIndex(lbxInterface, True);
+  if IsCtrlDown then
+    OpenSelectedUnit(lbxInterface)
+  else
+    DeleteItemIndex(lbxInterface, True);
 end;
 
 procedure TfmUsesManager.lbxImplementationDblClick(Sender: TObject);
 begin
-  DeleteItemIndex(lbxImplementation, False);
+  if IsCtrlDown then
+    OpenSelectedUnit(lbxImplementation)
+  else
+    DeleteItemIndex(lbxImplementation, False);
 end;
 
 procedure TfmUsesManager.DeleteItemIndex(ListBox: TListBox; FromInterface: Boolean);
@@ -751,13 +776,29 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.actUsesOpenUnitExecute(Sender: TObject);
-var
-  Src: TListBox;
+function TfmUsesManager.GetLbxForOpen: TListBox;
 begin
-  Src := GetUsesSourceListBox;
-  if Src.ItemIndex > -1 then
-    OpenUnit(Src.Items[Src.ItemIndex]);
+  if ActiveControl = lbxImplementation then
+    Result := lbxImplementation
+  else if ActiveControl = lbxImplementation then
+    Result := lbxImplementation
+  else
+    Result := GetAvailableSourceListBox;
+end;
+
+procedure TfmUsesManager.OpenSelectedUnit(ListBox: TListBox);
+var
+  UnitName: string;
+begin
+  if TListBox_GetSelected(ListBox, UnitName) then begin
+    OpenUnit(UnitName);
+    ModalResult := mrCancel;
+  end;
+end;
+
+procedure TfmUsesManager.actOpenUnitExecute(Sender: TObject);
+begin
+  OpenSelectedUnit(GetLbxForOpen);
 end;
 
 function TfmUsesManager.GetUsesSourceListBox: TListBox;
@@ -773,14 +814,19 @@ end;
 procedure TfmUsesManager.lbxAvailDblClick(Sender: TObject);
 var
   Src: TListBox;
+  UnitName: string;
 begin
   Src := GetAvailableSourceListBox;
-  if Src.ItemIndex > -1 then
-  begin
-    if GetUsesSourceListBox = lbxImplementation then
-      AddToImplSection(Src.Items[Src.ItemIndex], False)
-    else
-      AddToIntfSection(Src.Items[Src.ItemIndex]);
+  if TListBox_GetSelected(Src, UnitName) then begin
+    if IsCtrlDown then begin
+      OpenUnit(UnitName);
+      ModalResult := mrCancel;
+    end else begin
+      if GetUsesSourceListBox = lbxImplementation then
+        AddToImplSection(UnitName, False)
+      else
+        AddToIntfSection(UnitName);
+    end;
   end;
 end;
 
@@ -992,16 +1038,6 @@ end;
 procedure TfmUsesManager.FormShow(Sender: TObject);
 begin
   FilterVisibleUnits;
-end;
-
-procedure TfmUsesManager.actAvailOpenUnitExecute(Sender: TObject);
-var
-  Src: TListBox;
-begin
-  Src := GetAvailableSourceListBox;
-  if Src.ItemIndex > -1 then
-    OpenUnit(Src.Items[Src.ItemIndex]);
-  ModalResult := mrCancel;
 end;
 
 procedure TfmUsesManager.actUsesAddToFavoritesExecute(Sender: TObject);
