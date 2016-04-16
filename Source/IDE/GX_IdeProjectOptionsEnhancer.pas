@@ -1,5 +1,7 @@
 unit GX_IdeProjectOptionsEnhancer;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
@@ -16,6 +18,7 @@ implementation
 
 uses
   Classes,
+  Messages,
   Controls,
   StdCtrls,
   ExtCtrls,
@@ -26,22 +29,25 @@ uses
 type
   TComboboxDropHandler = class(TComponent)
   private
-    FCmb: TCustomComboBox;
+    // In Delphi 8-2007 the "Comboboxes" do not descend from TCustomComboBox. The only ancestor
+    // that is a standard control is TWinControl, everything else is only available in the
+    // IDE.
+    FCmb: TWinControl;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
-    class function GenerateName(_cmb: TCustomComboBox): string;
+    class function GenerateName(_cmb: TWinControl): string;
   public
     constructor Create(_Owner: TComponent); override;
-    class function IsAlreadyHooked(_cmb: TCustomComboBox): Boolean;
+    class function IsAlreadyHooked(_cmb: TWinControl): Boolean;
   end;
 
   { TComboboxDropHandler }
 
-class function TComboboxDropHandler.GenerateName(_cmb: TCustomComboBox): string;
+class function TComboboxDropHandler.GenerateName(_cmb: TWinControl): string;
 begin
   Result := _cmb.Name + '_FilesDropHandler';
 end;
 
-class function TComboboxDropHandler.IsAlreadyHooked(_cmb: TCustomComboBox): Boolean;
+class function TComboboxDropHandler.IsAlreadyHooked(_cmb: TWinControl): Boolean;
 begin
   Result := _cmb.FindComponent(GenerateName(_cmb)) <> nil;
 end;
@@ -49,14 +55,32 @@ end;
 constructor TComboboxDropHandler.Create(_Owner: TComponent);
 begin
   inherited Create(_Owner);
-  FCmb := _Owner as TCustomComboBox;
+  FCmb := _Owner as TWinControl;
   Name := GenerateName(FCmb);
   TWinControl_ActivateDropFiles(FCmb, HandleFilesDropped);
 end;
 
-procedure TComboboxDropHandler.HandleFilesDropped(_Sender: TObject; _Files: TStrings);
+procedure TComboboxDropHandler.HandleFilesDropped(_Sender: TObject; _Files:
+  TStrings);
+// Since in Delphi 8-2007 FCmb is not a TCustomCombobBox, we cannot just typecast it
+// but must send it the appropriate messages ourself. Just to complicate matters,
+// we must pass the filename as a WideString.
+type
+{$IFDEF GX_VER160_up}
+  PThisChar = PWideString;
+  ThisString = WideString;
+{$ELSE}
+  // Delphi 6/7
+  PThisChar = PChar;
+  ThisString = string;
+{$ENDIF}
+
+var
+  s: ThisString;
 begin
-  TCombobox(FCmb).Text := _Files[0];
+  s := _Files[0];
+  FCmb.Perform(WM_SETTEXT, 0, Integer(PThisChar(s)));
+  FCmb.Perform(CM_TEXTCHANGED, 0, 0);
 end;
 
 type
@@ -68,11 +92,13 @@ type
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
-//    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
-    function TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: Integer;
-      const _Name: string; out _cmb: TCustomCombobox): Boolean;
-    function TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): Boolean;
-//    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
+    //    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
+    function TryFindHistoryComboBox(_SettingsControl: TWinControl; _GrpBoxIdx:
+      Integer;
+      const _Name: string; out _cmb: TWinControl): Boolean;
+    function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl:
+      TWinControl): Boolean;
+    //    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -81,7 +107,7 @@ type
 var
   TheProjectOptionsEnhancer: TProjectOptionsEnhancer = nil;
 
-{ TGxIdeProjectOptionsEnhancer }
+  { TGxIdeProjectOptionsEnhancer }
 
 class function TGxIdeProjectOptionsEnhancer.GetEnabled: Boolean;
 begin
@@ -124,84 +150,167 @@ end;
 //  end;
 //end;
 
-function TProjectOptionsEnhancer.TryGetSettingsPanel(_Form: TCustomForm; out _pnl: TPanel): Boolean;
+function CheckControl(_Parent: TWinControl; _Idx: Integer; const _ClassName:
+  string;
+  out _AsWinCtrl: TWinControl): Boolean;
 var
   Ctrl: TControl;
+  i: Integer;
+begin
+  Result := False;
+  if _Idx = -1 then begin
+    for i := 0 to _Parent.ControlCount - 1 do begin
+      Ctrl := _Parent.Controls[i];
+      if Ctrl.ClassName = _ClassName then begin
+        _AsWinCtrl := TWinControl(Ctrl);
+        Result := true;
+      end;
+    end;
+  end else begin
+    if _Parent.ControlCount <= _Idx then
+      Exit;
+    Ctrl := _Parent.Controls[_Idx];
+    if Ctrl.ClassName <> _ClassName then
+      Exit;
+    _AsWinCtrl := TWinControl(Ctrl);
+    Result := true;
+  end;
+end;
+
+function TProjectOptionsEnhancer.TryGetSettingsControl(_Form: TCustomForm;
+  out _SettingsControl: TWinControl): Boolean;
+var
+  wctrl: TWinControl;
+begin
+  Result := False;
+{$IFDEF GX_VER180_up} // Delphi 2006 (BDS 3)
+  if not CheckControl(_Form, 3, 'TPanel', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, 1, 'TPropertySheetControl', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, -1, 'TDebuggerLocalPage', wctrl) then
+    Exit;
+  _SettingsControl := wctrl;
+  // in Delphi 10 there is an additional TPanel that contains the group boxes
+  if CheckControl(wctrl, 2, 'TPanel', wctrl) then
+    _SettingsControl := wctrl;
+  Result := true;
+{$ELSE}{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+  if not CheckControl(_Form, 2, 'TPanel', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, 1, 'TPropertySheetControl', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, -1, 'TDebuggerLocalPage', wctrl) then
+    Exit;
+  _SettingsControl := wctrl;
+  // in Delphi 10 there is an additional TPanel that contains the group boxes
+  if CheckControl(wctrl, 2, 'TPanel', wctrl) then
+    _SettingsControl := wctrl;
+  Result := true;
+{$ELSE}{$IFDEF GX_VER140_up} // Delphi 6
+  if not CheckControl(_Form, 1, 'TPageControl', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, 0, 'TTabSheet', wctrl) then
+    Exit;
+  _SettingsControl := wctrl;
+  Result := true;
+{$ENDIF}{$ENDIF}{$ENDIF}
+end;
+
+function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsControl:
+  TWinControl;
+  _GrpBoxIdx: Integer; const _Name: string; out _cmb: TWinControl): Boolean;
+var
   wctrl: TWinControl;
 begin
   Result := False;
 
-  if _Form.ControlCount < 4 then
+  if not CheckControl(_SettingsControl, _GrpBoxIdx, 'TGroupBox', wctrl) then
     Exit;
-  Ctrl := _Form.Controls[3];
-  if Ctrl.ClassName <> 'TPanel' then
+  if not CheckControl(wctrl, 0, 'THistoryPropComboBox', wctrl) or (wctrl.Name <>
+    _Name) then
     Exit;
-  wctrl := TWinControl(Ctrl);
-
-  if wctrl.ControlCount < 2 then
-    Exit;
-  Ctrl := wctrl.Controls[1];
-  if Ctrl.ClassName <> 'TPropertySheetControl' then
-    Exit;
-  wctrl := TWinControl(Ctrl);
-
-  if wctrl.ControlCount < 1 then
-    Exit;
-  Ctrl := wctrl.Controls[0];
-  if Ctrl.ClassName <> 'TDebuggerLocalPage' then
-    Exit;
-  wctrl := TWinControl(Ctrl);
-
-  if wctrl.ControlCount < 3 then
-    Exit;
-  Ctrl := wctrl.Controls[2];
-  if Ctrl.ClassName <> 'TPanel' then
-    Exit;
-  _pnl := TPanel(Ctrl);
+  _cmb := wctrl;
   Result := true;
 end;
 
-function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsPanel: TPanel; _GrpBoxIdx: Integer;
-  const _Name: string; out _cmb: TCustomCombobox): Boolean;
-var
-  Ctrl: TControl;
-  wctrl: TWinControl;
-begin
-  Result := False;
+type
+  TInputComboNamesArr = array[0..3] of string;
+  TInputComboIndexArr = array[0..3] of Integer;
+const
+  // The names of the controls haven't changed, but their type
+  // and the index of the containing GroupBoxes, so we need to specify them by
+  // Delphi version, reduced a bit because it didn't change every time
+  INPUT_COMBO_NAMES: TInputComboNamesArr = (
+    'HostAppInput', 'ParamInput', 'CWDInput', 'SourcePathInput');
+  INPUT_COMBO_INDEXES: TInputComboIndexArr = (
+{$IFDEF GX_VER230_up} // RAD Studio XE 2 (17; BDS 9)
+    0, 1, 2, 3
+{$ELSE}{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
+    1, 2, 3, 5
+{$ELSE}{$IFDEF GX_VER210_up} // RAD Studio 2010 (15; BDS 7)
+    0, 1, 2, 4
+{$ELSE}{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+    0, 1, 2, 5
+{$ELSE}{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+    0, 1, 2, -1
+{$ELSE}{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
+    - 1, -1, -1, -1 // I have no idea, probably the same as Delphi 2005
+{$ELSE}{$IFDEF GX_VER150_up} // Delphi 7
+    0, 1, 6, -1
+{$ELSE}{$IFDEF GX_VER140_up} // Delphi 6
+    0, 1, -1, -1
+{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
+    );
 
-  if _SettingsPanel.ControlCount < _GrpBoxIdx + 1 then
-    Exit;
-  Ctrl := _SettingsPanel.Controls[_GrpBoxIdx];
-  if Ctrl.ClassName <> 'TGroupBox' then
-    Exit;
-  wctrl := TWinControl(Ctrl);
+{$IFDEF GX_VER230_up} // RAD Studio XE 2 (17; BDS 9)
+  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
+  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
+{$ELSE}{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
+  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
+  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
+{$ELSE}{$IFDEF GX_VER210_up} // RAD Studio 2010 (15; BDS 7)
+  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
+  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
+{$ELSE}{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
+  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
+{$ELSE}{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+  RUN_PARAMS_DIALOG_CLASS = 'TProjectOptionsDialog';
+  RUN_PARAMS_DIALOG_NAME = 'ProjectOptionsDialog';
+{$ELSE}{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  RUN_PARAMS_DIALOG_CLASS = 'TProjectOptionsDialog';
+  RUN_PARAMS_DIALOG_NAME = 'ProjectOptionsDialog';
+{$ELSE}{$IFDEF GX_VER150_up} // Delphi 7
+  RUN_PARAMS_DIALOG_CLASS = 'TRunParamsDlg';
+  RUN_PARAMS_DIALOG_NAME = 'RunParamsDlg';
+{$ELSE}{$IFDEF GX_VER140_up} // Delphi 6
+  RUN_PARAMS_DIALOG_CLASS = 'TRunParamsDlg';
+  RUN_PARAMS_DIALOG_NAME = 'RunParamsDlg';
+{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
 
-  if wctrl.ControlCount < 1 then
-    Exit;
-  Ctrl := wctrl.Controls[0];
-  if (Ctrl.ClassName <> 'THistoryPropComboBox') or (Ctrl.Name <> _Name) then
-    Exit;
-  _cmb := Ctrl as TCustomComboBox;
-  Result := true;
-end;
+procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form:
+  TCustomForm);
 
-procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-
-  function TryHookCombo(_SettingsPanel: TPanel; _Index: Integer; const _Name: string): Boolean;
+  function TryHookCombo(_SettingsPanel: TWinControl; _Index: Integer; const
+    _Name: string): Boolean;
   var
-    cmb: TCustomComboBox;
+    cmb: TWinControl;
   begin
     Result := False;
+    if _Index < 0 then
+      Exit;
     if TryFindHistoryComboBox(_SettingsPanel, _Index, _Name, cmb) then begin
       if not TComboboxDropHandler.IsAlreadyHooked(cmb) then begin
         TComboboxDropHandler.Create(cmb);
-        Result := True;
+        Result := true;
       end;
     end;
   end;
 
 var
-  SettingsPanel: TPanel;
+  i: Integer;
+  SettingsControl: TWinControl;
 begin
   if not IsProjectOptionsForm(_Form) then begin
     if Assigned(FControlCallbackHandle) then begin
@@ -211,22 +320,22 @@ begin
     Exit;
   end;
 
-//  FControlCallbackHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
-  if not TryGetSettingsPanel(_Form, SettingsPanel) then
-    exit;
+  //  FControlCallbackHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
+  if not TryGetSettingsControl(_Form, SettingsControl) then
+    Exit;
 
-  TryHookCombo(SettingsPanel, 0, 'HostAppInput');
-  TryHookCombo(SettingsPanel, 2, 'CWDInput');
-  TryHookCombo(SettingsPanel, 3, 'SourcePathInput');
+  for i := 0 to 3 do
+    TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[i], INPUT_COMBO_NAMES[i]);
 end;
 
-function TProjectOptionsEnhancer.IsProjectOptionsForm(_Form: TCustomForm): Boolean;
+function TProjectOptionsEnhancer.IsProjectOptionsForm(_Form: TCustomForm):
+  Boolean;
 begin
-  Result := (_Form.ClassName = 'TDelphiProjectOptionsDialog') and (_Form.Name = 'DelphiProjectOptionsDialog');
+  Result := (_Form.ClassName = RUN_PARAMS_DIALOG_CLASS) and (_Form.Name =
+    RUN_PARAMS_DIALOG_NAME);
 end;
 
 initialization
 finalization
   TGxIdeProjectOptionsEnhancer.SetEnabled(False);
 end.
-
