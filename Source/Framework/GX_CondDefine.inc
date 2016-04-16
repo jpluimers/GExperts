@@ -49,6 +49,7 @@
               {$DEFINE GX_VER185_up}  // Delphi 2007 (11; BDS 4)
             {$ENDIF}
             {$IF CompilerVersion >= 19}
+              {$DEFINE GX_VER185_up}  // Delphi 2007 (11; BDS 4)
               {$DEFINE GX_VER190_up}  // Delphi .NET 2007 (12; BDS 5)
               {$IF CompilerVersion >= 20}
                 {$DEFINE GX_VER200_up}  // RAD Studio 2009 (14; BDS 6)
