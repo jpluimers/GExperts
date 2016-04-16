@@ -36,6 +36,7 @@ type
     function GetDisplayName: string; virtual;
     procedure Execute(Sender: TObject); virtual; abstract;
     function GetDefaultShortCut: TShortCut; virtual;
+    function HasConfigOptions: Boolean; virtual;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;
 
@@ -98,6 +99,11 @@ class function TGX_BaseExpert.GetName: string;
 begin
   {$IFOPT D+} SendDebugError('The expert ' + Self.ClassName + ' does not provide a Name'); {$ENDIF D+}
   Result := Self.ClassName;
+end;
+
+function TGX_BaseExpert.HasConfigOptions: Boolean;
+begin
+  Result := True;
 end;
 
 end.

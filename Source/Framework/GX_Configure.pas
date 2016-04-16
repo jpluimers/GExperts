@@ -562,7 +562,7 @@ begin
     begin
       AnExpert := GxEditorExpertManager.EditorExpertList[i];
       ListItem := lvEditorExperts.Items.Add;
-      ListItem.Caption := AnExpert.DisplayName;
+      ListItem.Caption := AnExpert.GetDisplayName;
       ListItem.SubItems.Add(ShortCutToText(AnExpert.ShortCut));
     end;
   finally
@@ -1000,7 +1000,7 @@ begin
   Assert(Assigned(EditorExpert));
 
   Shortcut := EditorExpert.ShortCut;
-  if TfmEditorShortcut.Execute(Self, EditorExpert.DisplayName, Shortcut, EditorExpert.GetDefaultShortCut) then
+  if TfmEditorShortcut.Execute(Self, EditorExpert.GetDisplayName, Shortcut, EditorExpert.GetDefaultShortCut) then
   begin
     EditorExpert.ShortCut := Shortcut;
     EditorExpert.SaveSettings;

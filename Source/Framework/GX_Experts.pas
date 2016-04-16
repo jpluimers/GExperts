@@ -50,9 +50,6 @@ type
     // it calls GetActionCaption and removes any Hotkey characters and '...'
     // This is probably OK for most experts.
     function GetDisplayName: string; override;
-    // Various expert configuration items which
-    // are only used during registration.
-    function HasConfigOptions: Boolean; virtual; // Default = True
     function HasMenuItem: Boolean; virtual; // Default = True
     function HasDesignerMenuItem: Boolean; virtual; // Default = False
     procedure DoCreateSubMenuItems(MenuItem: TMenuItem);
@@ -152,11 +149,6 @@ begin
   Result := MaxInt - 10000;
   if ExpertIndexLookup.Find(ClassName, Index) then
     Result := Integer(ExpertIndexLookup.Objects[Index]);
-end;
-
-function TGX_Expert.HasConfigOptions: Boolean;
-begin
-  Result := True;
 end;
 
 function TGX_Expert.HasMenuItem: Boolean;

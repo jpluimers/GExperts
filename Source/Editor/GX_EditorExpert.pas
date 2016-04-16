@@ -36,7 +36,6 @@ type
     procedure DoExecute(Sender: TObject);
 //    procedure Execute(Sender: TObject); virtual;  // declared in TGX_BaseExpert
     procedure GetHelpString(List: TStrings); virtual;
-    function HasConfigOptions: Boolean; virtual;
     function GetActionName: string;
 
     // Return a string that names the editor expert.
@@ -50,7 +49,6 @@ type
     procedure SaveSettings;
 
     property OptionsBaseRegistryKey: string read GetOptionsBaseRegistryKey;
-    property DisplayName: string read GetDisplayName;
   end;
 
   TEditorExpertClass = class of TEditorExpert;
@@ -129,7 +127,7 @@ begin
 
   FGxAction := GxActionBroker.RequestAction(FActionName, GetBitmap);
   FGxAction.OnExecute := Self.DoExecute;
-  FGxAction.Caption := DisplayName;
+  FGxAction.Caption := GetDisplayName;
   FGxAction.OnUpdate := ActionOnUpdate;
 
   ShortCut := GetDefaultShortCut;
@@ -159,11 +157,6 @@ function TEditorExpert.GetShortCut: TShortCut;
 begin
   Assert(Assigned(FGxAction));
   Result := FGxAction.ShortCut
-end;
-
-function TEditorExpert.HasConfigOptions: Boolean;
-begin
-  Result := True;
 end;
 
 procedure TEditorExpert.InternalLoadSettings;
