@@ -170,7 +170,7 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
-    function BitmapFileName: string; override;
+    function GetBitmapFileName: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function HasConfigOptions: Boolean; override;
@@ -952,7 +952,7 @@ begin
     fmMacroLibrary := TfmMacroLibrary.Create(nil);
 end;
 
-function TMacroLibExpert.BitmapFileName: string;
+function TMacroLibExpert.GetBitmapFileName: string;
 begin
   Result := 'MacroLibrary'; // Do not localize.
 end;

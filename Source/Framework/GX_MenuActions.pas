@@ -308,7 +308,7 @@ begin
   Assert(Expert <> nil, 'Invalid nil Expert parameter for RequestMenuExpertAction');
   // Create the action.
   Result := CreateAction(Expert.GetActionCaption, Expert.GetActionName, Expert.Execute,
-                         Expert.Bitmap, Expert.ShortCut, Expert.ExpertIndex, 0);
+                         Expert.GetBitmap, Expert.ShortCut, Expert.ExpertIndex, 0);
 end;
 
 // Create an action and add it to the GExperts menu.

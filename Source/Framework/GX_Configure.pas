@@ -334,7 +334,7 @@ begin
     begin
       Parent := Panel;
       SetBounds(imgExpert.Left, imgExpert.Top, imgExpert.Width, imgExpert.Height);
-      Picture.Bitmap.Assign(AnExpert.Bitmap);
+      Picture.Bitmap.Assign(AnExpert.GetBitmap);
       Transparent := True;
       Center := True;
       Stretch := False;

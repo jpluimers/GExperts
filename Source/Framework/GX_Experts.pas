@@ -11,17 +11,14 @@ uses
 type
   TGX_Expert = class(TGX_BaseExpert)
   private
-    FBitmap: TBitmap;
     FActive: Boolean;
     FShortCut: TShortCut;
     FAction: IGxAction;
     procedure ActionOnUpdate(Sender: TObject);
   protected
-    function GetBitmap: TBitmap; override;
     procedure SetShortCut(Value: TShortCut); override;
     function GetShortCut: TShortCut; override;
     function GetExpertIndex: Integer;
-    function BitmapFileName: string; virtual;
     procedure SetFormIcon(Form: TForm);
     procedure SetActive(New: Boolean); virtual;
     procedure UpdateAction(Action: TCustomAction); virtual;
@@ -82,10 +79,6 @@ type
     // Index of expert; used to determine a "historic"
     // menu item order in the GExperts menu item.
     property ExpertIndex: Integer read GetExpertIndex;
-    // Bitmap associated with the expert; note that this
-    // bitmap is loaded and unloaded on demand; you will
-    // have to .Assign the bitmap to get a permanent copy.
-    property Bitmap: Graphics.TBitmap read GetBitmap;
     // Keyboard shortcut associated with the expert
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;
@@ -143,8 +136,6 @@ begin
   // destruction inside SetActive
   Active := False;
 
-  FreeAndNil(FBitmap);
-
   inherited Destroy;
 end;
 
@@ -163,32 +154,6 @@ begin
     Result := Integer(ExpertIndexLookup.Objects[Index]);
 end;
 
-function TGX_Expert.GetBitmap: Graphics.TBitmap;
-var
-  BitmapFile: string;
-begin
-  if not Assigned(FBitmap) then
-  begin
-    // Locate an icon for the expert and load it
-    // if it exists.
-    BitmapFile := BitmapFileName;
-    if BitmapFile <> '' then
-    begin
-      if not GxLoadBitmapForExpert(BitmapFile, FBitmap) then
-      begin
-        {$IFOPT D+} SendDebug('Missing bitmap ' + BitmapFile + ' for ' + Self.ClassName); {$ENDIF}
-        ShowGxMessageBox(TShowMissingIconMessage, ChangeFileExt(BitmapFile, '.bmp'));
-      end;
-    end
-    else
-    begin
-      {$IFOPT D+} SendDebugError('Bitmap name missing for expert ' + Self.ClassName); {$ENDIF D+}
-    end;
-  end;
-
-  Result := FBitmap;
-end;
-
 function TGX_Expert.HasConfigOptions: Boolean;
 begin
   Result := True;
@@ -202,11 +167,6 @@ end;
 function TGX_Expert.HasSubmenuItems: Boolean;
 begin
   Result := False;
-end;
-
-function TGX_Expert.BitmapFileName: string;
-begin
-  Result := GetName;
 end;
 
 function TGX_Expert.IsDefaultActive: Boolean;
@@ -375,10 +335,13 @@ begin
 end;
 
 procedure TGX_Expert.SetFormIcon(Form: TForm);
+var
+  bmp: TBitmap;
 begin
   Assert(Assigned(Form));
-  if Assigned(Bitmap) then
-    ConvertBitmapToIcon(Bitmap, Form.Icon);
+  bmp := GetBitmap;
+  if Assigned(bmp) then
+    ConvertBitmapToIcon(bmp, Form.Icon);
 end;
 
 function TGX_Expert.HasDesignerMenuItem: Boolean;

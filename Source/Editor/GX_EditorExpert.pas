@@ -9,7 +9,6 @@ uses
 type
   TEditorExpert = class(TGX_BaseExpert)
   private
-    FBitmap: Graphics.TBitmap;
     FGxAction: IGxAction;
     FActionName: string;
     function GetOptionsBaseRegistryKey: string;
@@ -22,17 +21,8 @@ type
 //    function GetDisplayName: string; virtual; // declared in TGX_BaseExpert
     // defaults to GetName
     class function ConfigurationKey: string; virtual;
-    // Return the file name of an icon associated with
-    // the editor expert. Do not specify a path.
-    // This file must reside in the "Icons" folder
-    // which is located off the main GExperts
-    // configuration directory.
-    //
-    // It is possible to return an empty string. This
-    // signals that no icon file is available.
-    function GetBitmapFileName: string; virtual;
-    // Get a reference to the bitmap for menu items, buttons, etc.
-    function GetBitmap: Graphics.TBitmap; override;
+    // defaults to ClassName
+    function GetBitmapFileName: string; override;
     // Overrride to load any configuration settings
     procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
     // Overrride to save any configuration settings
@@ -149,8 +139,6 @@ destructor TEditorExpert.Destroy;
 begin
   FGxAction := nil; // Clear out interface reference.
 
-  FreeAndNil(FBitmap);
-
   inherited Destroy;
 end;
 
@@ -231,35 +219,9 @@ begin
   Result := PrivateEditorExpertClassList;
 end;
 
-function TEditorExpert.GetBitmap: Graphics.TBitmap;
-var
-  BitmapFile: string;
-begin
-  if not Assigned(FBitmap) then
-  begin
-    // Locate and load the bitmap for the expert if it exists.
-    BitmapFile := GetBitmapFileName;
-    if BitmapFile <> '' then
-    begin
-      if not GxLoadBitmapForExpert(BitmapFile, FBitmap) then
-      begin
-        {$IFOPT D+} SendDebugError('Missing bitmap ' + BitmapFile + ' for ' + Self.ClassName); {$ENDIF}
-        ShowGxMessageBox(TShowMissingIconMessage, ChangeFileExt(BitmapFile, '.bmp'));
-        GetBitmapFileName;
-      end;
-    end
-    else
-    begin
-      {$IFOPT D+} SendDebugError('Bitmap missing for expert ' + Self.ClassName); {$ENDIF D+}
-    end;
-  end;
-
-  Result := FBitmap;
-end;
-
 function TEditorExpert.GetBitmapFileName: string;
 begin
-  Result := Self.ClassName;
+  Result := ClassName;
 end;
 
 function TEditorExpert.GetActionName: string;
