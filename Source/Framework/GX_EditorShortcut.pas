@@ -25,7 +25,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Menus;
+  Menus, GX_dzVclUtils;
 
 { TfmEditorShortcut }
 
@@ -38,11 +38,11 @@ begin
   try
     fm.FDefault := Default;
     fm.gbxShortCut.Caption := Expert;
-    fm.hkyShortCut.HotKey := ShortCut;
+    THotkey_SetHotkey(fm.hkyShortCut, ShortCut);
     fm.btnDefault.Caption := ShortCutToText(Default);
     Result := (fm.ShowModal = mrOk);
     if Result then
-      ShortCut := fm.hkyShortCut.HotKey;
+      ShortCut := THotkey_GetHotkey(fm.hkyShortCut);
   finally
     fm.Free;
   end;
