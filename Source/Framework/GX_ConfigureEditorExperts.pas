@@ -30,6 +30,8 @@ type
     btnEnableAll: TButton;
     btnDisableAll: TButton;
     btnClear: TButton;
+    btnClearAll: TButton;
+    btnSetAllDefault: TButton;
     procedure edtFilterChange(Sender: TObject);
     procedure btnEnableAllClick(Sender: TObject);
     procedure btnDisableAllClick(Sender: TObject);
@@ -38,6 +40,8 @@ type
       var Handled: Boolean);
     procedure FrameMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint;
       var Handled: Boolean);
+    procedure btnClearAllClick(Sender: TObject);
+    procedure btnSetAllDefaultClick(Sender: TObject);
   private
     FThumbSize: Integer;
     FExperts: TList;
@@ -56,8 +60,10 @@ implementation
 {$R *.dfm}
 
 uses
+  Menus,
   GX_GenericUtils,
-  GX_BaseExpert;
+  GX_BaseExpert,
+  GX_dzVclUtils;
 
 type
   THintImage = class(TImage)
@@ -123,6 +129,33 @@ begin
   SetAllEnabled(True);
 end;
 
+procedure TfrConfigureEditorExperts.btnClearAllClick(Sender: TObject);
+var
+  i: Integer;
+  AControl: TControl;
+begin
+  for i := 0 to sbxExperts.ComponentCount - 1 do begin
+    AControl := sbxExperts.Components[i] as TControl;
+    if AControl is THotKey then
+      (AControl as THotKey).HotKey := 0;
+  end;
+end;
+
+procedure TfrConfigureEditorExperts.btnSetAllDefaultClick(Sender: TObject);
+var
+  i: Integer;
+  AControl: TControl;
+  AnExpert: TGX_BaseExpert;
+begin
+  for i := 0 to sbxExperts.ComponentCount - 1 do begin
+    AControl := sbxExperts.Components[i] as TControl;
+    if AControl is THotKey then begin
+      AnExpert := FExperts[AControl.Tag];
+      (AControl as THotKey).HotKey := AnExpert.GetDefaultShortCut;
+    end;
+  end;
+end;
+
 procedure TfrConfigureEditorExperts.ConfigureExpertClick(_Sender: TObject);
 var
   AnExpert: TGX_BaseExpert;
@@ -170,19 +203,21 @@ begin
     img.Stretch := False;
     img.Hint := AnExpert.GetHelpString;
     img.ShowHint := True;
+    img.Tag := i;
 
     chk := TCheckBox.Create(sbxExperts);
     chk.Parent := pnl;
     chk.SetBounds(chkExpert.Left, chkExpert.Top, chkExpert.Width, chkExpert.Height);
     chk.Caption := AnExpert.GetDisplayName;
-//    chk.Checked := AnExpert.Active;
+    chk.Checked := AnExpert.Active;
     chk.Tag := i;
 
     hk := THotKey.Create(sbxExperts);
     hk.Parent := pnl;
     hk.SetBounds(edtExpert.Left, edtExpert.Top, edtExpert.Width, edtExpert.Height);
-    hk.HotKey := AnExpert.ShortCut;
-//    hk.Visible := AnExpert.HasMenuItem;
+
+    THotkey_SetHotkey(hk, AnExpert.ShortCut);
+    hk.Visible := AnExpert.CanHaveHotkey;
     hk.Tag := i;
 
     if AnExpert.HasConfigOptions then begin
@@ -211,7 +246,7 @@ begin
 
     AnExpert := FExperts[AControl.Tag];
     if AControl is TCheckBox then
-//      AnExpert.Active := TCheckBox(AControl).Checked
+      AnExpert.Active := TCheckBox(AControl).Checked
     else if AControl is THotKey then
       AnExpert.ShortCut := THotKey(AControl).HotKey;
   end;

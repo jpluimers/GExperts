@@ -1,7 +1,7 @@
 object frConfigureEditorExperts: TfrConfigureEditorExperts
   Left = 0
   Top = 0
-  Width = 596
+  Width = 599
   Height = 223
   TabOrder = 0
   OnMouseWheelDown = FrameMouseWheelDown
@@ -9,14 +9,11 @@ object frConfigureEditorExperts: TfrConfigureEditorExperts
   object pnlExpertsFilter: TPanel
     Left = 0
     Top = 0
-    Width = 596
+    Width = 599
     Height = 41
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    DesignSize = (
-      596
-      41)
     object lblFilter: TLabel
       Left = 11
       Top = 12
@@ -29,9 +26,8 @@ object frConfigureEditorExperts: TfrConfigureEditorExperts
     object edtFilter: TEdit
       Left = 42
       Top = 8
-      Width = 359
+      Width = 199
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       OnChange = edtFilterChange
     end
@@ -40,7 +36,6 @@ object frConfigureEditorExperts: TfrConfigureEditorExperts
       Top = 6
       Width = 75
       Height = 25
-      Anchors = [akTop, akRight]
       Caption = 'Enable All'
       TabOrder = 2
       OnClick = btnEnableAllClick
@@ -50,17 +45,15 @@ object frConfigureEditorExperts: TfrConfigureEditorExperts
       Top = 6
       Width = 75
       Height = 25
-      Anchors = [akTop, akRight]
       Caption = 'Disable All'
       TabOrder = 3
       OnClick = btnDisableAllClick
     end
     object btnClear: TButton
-      Left = 401
+      Left = 236
       Top = 8
       Width = 21
       Height = 21
-      Anchors = [akTop, akRight]
       Caption = 'X'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBtnText
@@ -71,11 +64,29 @@ object frConfigureEditorExperts: TfrConfigureEditorExperts
       TabOrder = 1
       OnClick = btnClearClick
     end
+    object btnClearAll: TButton
+      Left = 264
+      Top = 6
+      Width = 75
+      Height = 25
+      Caption = 'Clear All'
+      TabOrder = 4
+      OnClick = btnClearAllClick
+    end
+    object btnSetAllDefault: TButton
+      Left = 344
+      Top = 6
+      Width = 81
+      Height = 25
+      Caption = 'Set to default'
+      TabOrder = 5
+      OnClick = btnSetAllDefaultClick
+    end
   end
   object sbxExperts: TScrollBox
     Left = 0
     Top = 41
-    Width = 596
+    Width = 599
     Height = 182
     VertScrollBar.Increment = 40
     VertScrollBar.Range = 920
