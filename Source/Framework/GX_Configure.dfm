@@ -43,6 +43,10 @@ object fmConfiguration: TfmConfiguration
       object tshExperts: TTabSheet
         Caption = 'Experts'
       end
+      object tshEditorExperts: TTabSheet
+        Caption = 'Editor Experts'
+        ImageIndex = 7
+      end
       object tshGeneral: TTabSheet
         Caption = 'General'
         object pnlGeneral: TPanel
@@ -178,103 +182,6 @@ object fmConfiguration: TfmConfiguration
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 2
-          end
-        end
-      end
-      object tshEditorExpertsNew: TTabSheet
-        Caption = 'Editor Experts (new)'
-        ImageIndex = 7
-      end
-      object tshEditorExperts: TTabSheet
-        Caption = 'Editor Experts'
-        object pnlExperts: TPanel
-          Left = 0
-          Top = 0
-          Width = 591
-          Height = 435
-          Align = alClient
-          BevelOuter = bvNone
-          BorderWidth = 8
-          TabOrder = 0
-          object gbxKeyboard: TGroupBox
-            Left = 8
-            Top = 8
-            Width = 575
-            Height = 419
-            Align = alClient
-            Caption = 'Editor Experts'
-            TabOrder = 0
-            DesignSize = (
-              575
-              419)
-            object btnConfigure: TButton
-              Left = 488
-              Top = 80
-              Width = 77
-              Height = 26
-              Anchors = [akTop, akRight]
-              Caption = '&Configure'
-              Enabled = False
-              TabOrder = 2
-              OnClick = btnConfigureClick
-            end
-            object btnShortcut: TButton
-              Left = 488
-              Top = 116
-              Width = 77
-              Height = 26
-              Anchors = [akTop, akRight]
-              Caption = '&Shortcut'
-              Enabled = False
-              TabOrder = 3
-              OnClick = btnShortcutClick
-            end
-            object meHelp: TMemo
-              Left = 10
-              Top = 309
-              Width = 555
-              Height = 100
-              TabStop = False
-              Anchors = [akLeft, akRight, akBottom]
-              Color = clInfoBk
-              ReadOnly = True
-              ScrollBars = ssVertical
-              TabOrder = 4
-            end
-            object chkDisableAllEditorExperts: TCheckBox
-              Left = 488
-              Top = 22
-              Width = 84
-              Height = 21
-              Anchors = [akTop, akRight]
-              Caption = '&Disable all'
-              TabOrder = 1
-              OnClick = chkDisableAllEditorExpertsClick
-            end
-            object lvEditorExperts: TListView
-              Left = 10
-              Top = 22
-              Width = 470
-              Height = 281
-              Anchors = [akLeft, akTop, akRight, akBottom]
-              Columns = <
-                item
-                  AutoSize = True
-                  Caption = 'Expert'
-                end
-                item
-                  Caption = 'Shortcut'
-                  Width = 130
-                end>
-              ColumnClick = False
-              HideSelection = False
-              ReadOnly = True
-              RowSelect = True
-              TabOrder = 0
-              ViewStyle = vsReport
-              OnChange = lvEditorExpertsChange
-              OnDblClick = lvEditorExpertsDblClick
-            end
           end
         end
       end

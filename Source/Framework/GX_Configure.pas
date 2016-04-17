@@ -74,13 +74,6 @@ type
     btnCancel: TButton;
     btnOK: TButton;
     dlgFont: TFontDialog;
-    pnlExperts: TPanel;
-    gbxKeyboard: TGroupBox;
-    btnConfigure: TButton;
-    btnShortcut: TButton;
-    meHelp: TMemo;
-    chkDisableAllEditorExperts: TCheckBox;
-    lvEditorExperts: TListView;
     pnlGeneral: TPanel;
     gbxLocations: TGroupBox;
     lblVCL: TLabel;
@@ -108,7 +101,6 @@ type
     btnDeleteSuppressedMessage: TButton;
     btnClearSuppressedMessages: TButton;
     chkEnhanceInstallPackages: TCheckBox;
-    tshEditorExpertsNew: TTabSheet;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -116,10 +108,6 @@ type
     procedure sbHelpFileClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
-    procedure lvEditorExpertsChange(Sender: TObject; Item: TListItem; Change: TItemChange);
-    procedure btnConfigureClick(Sender: TObject);
-    procedure btnShortCutClick(Sender: TObject);
-    procedure chkDisableAllEditorExpertsClick(Sender: TObject);
     procedure chkFontEnabledClick(Sender: TObject);
     procedure btnFontClick(Sender: TObject);
     procedure chkDisableEDTEnhancementsClick(Sender: TObject);
@@ -132,7 +120,6 @@ type
     procedure chkMultiLineTabDockHostClick(Sender: TObject);
     procedure btnConfigureToolBarClick(Sender: TObject);
     procedure pcConfigChange(Sender: TObject);
-    procedure lvEditorExpertsDblClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnEumerateActionsClick(Sender: TObject);
     procedure btnGetFontsClick(Sender: TObject);
@@ -149,7 +136,6 @@ type
     FConfigExpertsFrame: TfrConfigureExperts;
     procedure HideUnsupportedIdeItems;
     procedure HideUnsupportedEditorItems;
-    procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
 
     procedure LoadGeneral;
     procedure SaveGeneral;
@@ -159,10 +145,6 @@ type
 
     procedure LoadEditorEnhancements;
     procedure SaveEditorEnhancements;
-
-    // Editor experts save themselves automatically
-    // hence there is no SaveEditorExperts method
-    procedure LoadEditorExperts;
 
     procedure LoadSuppressedMessages;
 
@@ -225,7 +207,7 @@ begin
 
   FConfigEditorExpertsFrame := TfrConfigureExperts.Create(Self);
   FConfigEditorExpertsFrame.Name := '';
-  FConfigEditorExpertsFrame.Parent := tshEditorExpertsNew;
+  FConfigEditorExpertsFrame.Parent := tshEditorExperts;
   FConfigEditorExpertsFrame.Align := alClient;
   FConfigEditorExpertsFrame.Init(GExpertsInst.EditorExpertManager.GetExpertList);
 
@@ -238,9 +220,6 @@ begin
   ActiveControl := FConfigExpertsFrame.edtFilter;
 
   LoadGeneral;
-
-  LoadEditorExperts;
-  chkDisableAllEditorExperts.Checked := not ConfigInfo.EditorExpertsEnabled;
 
   LoadIdeEnhancements;
 
@@ -369,36 +348,6 @@ begin
     GxContextHelp(Self, 12);
 end;
 
-procedure TfmConfiguration.lvEditorExpertsChange(Sender: TObject;
-  Item: TListItem; Change: TItemChange);
-var
-  EditorExpert: TEditorExpert;
-  Idx: integer;
-begin
-  {$IFOPT D+} SendDebug('TfmConfiguration.lvEditorExpertsChange'); {$ENDIF}
-
-  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
-  begin
-    btnConfigure.Enabled := False;
-    btnShortCut.Enabled := False;
-    meHelp.Clear;
-    Exit;
-  end;
-
-  Assert(Assigned(GExpertsInst.EditorExpertManager));
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
-
-  meHelp.Lines.BeginUpdate;
-  try
-    meHelp.Lines.Text := EditorExpert.GetHelpString;
-  finally
-    meHelp.SelStart := 0;
-    meHelp.Lines.EndUpdate;
-    btnConfigure.Enabled := EditorExpert.HasConfigOptions;
-    btnShortCut.Enabled := True;
-  end;
-end;
-
 procedure TfmConfiguration.btnClearSuppressedMessagesClick(Sender: TObject);
 var
   Settings: TGExpertsSettings;
@@ -412,65 +361,9 @@ begin
   LoadSuppressedMessages;
 end;
 
-procedure TfmConfiguration.btnConfigureClick(Sender: TObject);
-var
-  EditorExpert: TEditorExpert;
-  Idx: Integer;
-begin
-  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
-    Exit;
-
-  Assert(Assigned(GExpertsInst.EditorExpertManager));
-
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
-  EditorExpert.Configure;
-  EditorExpert.SaveSettings;
-end;
-
-procedure TfmConfiguration.btnShortCutClick(Sender: TObject);
-var
-  Idx: Integer;
-  EditorExpert: TEditorExpert;
-begin
-  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
-    Exit;
-
-  Assert(Assigned(GExpertsInst.EditorExpertManager));
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
-  ConfigureEditorExpertShortCut(EditorExpert, Idx);
-end;
-
 procedure TfmConfiguration.chkEditorKeyTracingClick(Sender: TObject);
 begin
   GxOtaSetEditorKeyTracingEnabled(chkEditorKeyTracing.Checked);
-end;
-
-procedure TfmConfiguration.LoadEditorExperts;
-var
-  i: Integer;
-  AnExpert: TEditorExpert;
-  ListItem: TListItem;
-  GxEditorExpertManager: TGxEditorExpertManager;
-begin
-  {$IFOPT D+} SendDebug('TfmConfiguration.LoadEditorExperts'); {$ENDIF}
-  lvEditorExperts.Items.BeginUpdate;
-  try
-    lvEditorExperts.Items.Clear;
-    if not Assigned(GExpertsInst.EditorExpertManager) then
-      Exit;
-
-    GxEditorExpertManager := GExpertsInst.EditorExpertManager;
-
-    for i := 0 to GxEditorExpertManager.EditorExpertCount - 1 do
-    begin
-      AnExpert := GxEditorExpertManager.EditorExpertList[i];
-      ListItem := lvEditorExperts.Items.Add;
-      ListItem.Caption := AnExpert.GetDisplayName;
-      ListItem.SubItems.Add(ShortCutToText(AnExpert.ShortCut));
-    end;
-  finally
-    lvEditorExperts.Items.EndUpdate;
-  end;
 end;
 
 procedure TfmConfiguration.LoadIdeEnhancements;
@@ -652,34 +545,6 @@ begin
   EditorEnhancements.ApplyToolbarSettings;
 end;
 
-procedure TfmConfiguration.chkDisableAllEditorExpertsClick(Sender: TObject);
-var
-  Enable: Boolean;
-begin
-  Enable := not chkDisableAllEditorExperts.Checked;
-  meHelp.Lines.Clear;
-  if not Enable then
-  begin
-    {$IFOPT D+} SendDebug('Freeing editor experts from the configuration dialog'); {$ENDIF}
-    GExpertsInst.FreeEditorExperts;
-  end
-  else
-  begin
-    {$IFOPT D+} SendDebug('Loading editor experts from the configuration dialog'); {$ENDIF}
-    GExpertsInst.LoadEditorExperts;
-  end;
-  lvEditorExperts.Enabled := Enable;
-  ConfigInfo.EditorExpertsEnabled := Enable;
-  btnShortCut.Enabled := Enable;
-  btnConfigure.Enabled := Enable;
-  if Enable then
-    LoadEditorExperts
-  else
-    lvEditorExperts.Items.Clear;
-  if Enable and (lvEditorExperts.Items.Count > 0) then
-    lvEditorExperts.Items[0].Selected := True;
-end;
-
 procedure TfmConfiguration.chkDisableEDTEnhancementsClick(Sender: TObject);
 var
   EnableState: Boolean;
@@ -832,34 +697,9 @@ end;
 
 procedure TfmConfiguration.pcConfigChange(Sender: TObject);
 begin
-  // This forces the columns to size correctly with "Large Fonts"
-  if pcConfig.ActivePage = tshEditorExperts then
-  begin
-    lvEditorExperts.Width := lvEditorExperts.Width + 1;
-    lvEditorExperts.Width := lvEditorExperts.Width - 1;
-  end;
   // Warn if the user has an old common controls DLL
   if pcConfig.ActivePage = tshEditor then
     ShowGxMessageBox(TShowOldComCtrlVersionMessage);
-end;
-
-procedure TfmConfiguration.lvEditorExpertsDblClick(Sender: TObject);
-var
-  EditorExpert: TEditorExpert;
-  Idx: Integer;
-begin
-  if not TListView_TryGetSelected(lvEditorExperts, Idx) then
-    Exit;
-
-  Assert(Assigned(GExpertsInst.EditorExpertManager));
-
-  EditorExpert := GExpertsInst.EditorExpertManager.EditorExpertList[Idx];
-  if EditorExpert.HasConfigOptions then begin
-    EditorExpert.Configure;
-    EditorExpert.SaveSettings;
-  end
-  else
-    ConfigureEditorExpertShortCut(EditorExpert, Idx);
 end;
 
 { TShowOldComCtrlVersionMessage }
@@ -876,21 +716,6 @@ end;
 function TShowOldComCtrlVersionMessage.ShouldShow: Boolean;
 begin
   Result := GetComCtlVersion <= ComCtlVersionIE401;
-end;
-
-procedure TfmConfiguration.ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
-var
-  Shortcut: TShortCut;
-begin
-  Assert(Assigned(EditorExpert));
-
-  Shortcut := EditorExpert.ShortCut;
-  if TfmEditorShortcut.Execute(Self, EditorExpert.GetDisplayName, Shortcut, EditorExpert.GetDefaultShortCut) then
-  begin
-    EditorExpert.ShortCut := Shortcut;
-    EditorExpert.SaveSettings;
-    lvEditorExperts.Items[Idx].SubItems[0] := ShortCutToText(ShortCut);
-  end;
 end;
 
 procedure TfmConfiguration.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
