@@ -97,6 +97,14 @@ function IsCtrlDown: Boolean;
 function IsAltDown: Boolean;
 function GetModifierKeyState: TShiftState;
 
+///<summary>
+/// This prevents the THotKey component to wrongly display Ctrl+Left as Ctrl+NUM4 </summary>
+procedure THotkey_SetHotkey(_hk: THotKey; _ShortCut: TShortCut);
+///<summary>
+/// This is the reverse of the above, at least in theory, because the Delphi VCL does not
+/// distinguish between Ctrl+Left and Ctrl+NUM4 </summary>
+function THotkey_GetHotkey(_hk: THotKey): TShortCut;
+
 ///<summary> Sets the control's Constraints.MinHeight und Constraints.MinWidth properties
 ///          to the control's Width and Height. </summary>
 procedure TControl_SetMinConstraints(_Control: TControl);
@@ -235,9 +243,9 @@ procedure TListItems_ClearWithObjects(_li: TListItems);
 /// and optionally Shortcut and OnExecute event.
 /// @returns the new action </summary>
 function TActionlist_Append(_al: TActionList; _Caption: string = ''): TAction; overload;
-function TActionlist_Append(_al: TActionList; _Caption: string; _Shortcut: TShortCut): TAction; overload;
+function TActionlist_Append(_al: TActionList; _Caption: string; _ShortCut: TShortCut): TAction; overload;
 function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction; overload;
-function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction; overload;
+function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction; overload;
 
 ///<summary>
 /// Appends a new menu item with the given Caption to the popup menu and returns it </summary>
@@ -372,7 +380,7 @@ const
   MSGFLT_ALLOW = 1;
   WM_COPYGLOBALDATA = 73;
 type
-  TChangeWindowMessageFilterEx = function(Handle: HWND; msg: Cardinal; dwFlag: Word; _PassNilHere: Pointer): BOOL; stdcall;
+  TChangeWindowMessageFilterEx = function(Handle: HWND; Msg: Cardinal; dwFlag: Word; _PassNilHere: Pointer): BOOL; stdcall;
 var
   ChangeWindowMessageFilterEx: TChangeWindowMessageFilterEx;
   User32Handle: THandle;
@@ -660,10 +668,10 @@ begin
   Result.Caption := _Caption;
 end;
 
-function TActionlist_Append(_al: TActionList; _Caption: string; _Shortcut: TShortCut): TAction;
+function TActionlist_Append(_al: TActionList; _Caption: string; _ShortCut: TShortCut): TAction;
 begin
   Result := TActionlist_Append(_al, _Caption);
-  Result.ShortCut := _Shortcut;
+  Result.ShortCut := _ShortCut;
 end;
 
 function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction;
@@ -672,9 +680,9 @@ begin
   Result.OnExecute := _OnExecute;
 end;
 
-function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction;
+function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction;
 begin
-  Result := TActionlist_Append(_al, _Caption, _Shortcut);
+  Result := TActionlist_Append(_al, _Caption, _ShortCut);
   Result.OnExecute := _OnExecute;
 end;
 
@@ -1100,6 +1108,65 @@ begin
       end;
     finally
       FreeLibrary(lib);
+    end;
+  end;
+end;
+
+type
+  TExtKeyArr = array[0..13] of Word;
+const
+  EXT_KEYS: TExtKeyArr = (VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN,
+    VK_PRIOR, VK_NEXT, VK_HOME, VK_END, VK_INSERT, VK_DELETE,
+    VK_NUMLOCK, VK_PAUSE, VK_PRINT,
+    VK_DIVIDE
+    );
+  STD_KEYS: TExtKeyArr = (VK_NUMPAD4, VK_NUMPAD6, VK_NUMPAD8, VK_NUMPAD2,
+    VK_NUMPAD9, VK_NUMPAD3, VK_NUMPAD7, VK_NUMPAD1, VK_NUMPAD0, VK_DECIMAL,
+    VK_NUMLOCK, VK_PAUSE, VK_PRINT,
+    Ord('/'));
+
+procedure THotkey_SetHotkey(_hk: THotKey; _ShortCut: TShortCut);
+var
+  Key: Word;
+  Shift: TShiftState;
+begin
+  ShortCutToKey(_ShortCut, Key, Shift);
+  _hk.HotKey := _ShortCut;
+  // If it is an "extended" key, we need to set the hkExt flag in Modifiers
+  // Extended keys are
+  // * left/right/up/down cursor keys
+  // * PageUp/Down, Home/End, Delete/Insert keys
+  // * Numlock, Break and Print keys
+  // * Divide and Enter key (there is no special key code for Enter, so we have to ignore it
+  if Key in [VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN,
+    VK_PRIOR, VK_NEXT, VK_HOME, VK_END, VK_INSERT, VK_DELETE,
+    VK_NUMLOCK, VK_PAUSE, VK_PRINT,
+    VK_DIVIDE] then
+    _hk.Modifiers := _hk.Modifiers + [hkExt];
+end;
+
+function THotkey_GetHotkey(_hk: THotKey): TShortCut;
+var
+  Key: Word;
+  Shift: TShiftState;
+  i: Integer;
+begin
+  Result := _hk.HotKey;
+  ShortCutToKey(Result, Key, Shift);
+
+  if hkExt in _hk.Modifiers then begin
+    for i := Low(STD_KEYS) to High(STD_KEYS) do begin
+      if Key = STD_KEYS[i] then begin
+        Key := EXT_KEYS[i];
+        break;
+      end;
+    end;
+  end else begin
+    for i := Low(EXT_KEYS) to High(EXT_KEYS) do begin
+      if Key = EXT_KEYS[i] then begin
+        Key := STD_KEYS[i];
+        break;
+      end;
     end;
   end;
 end;
