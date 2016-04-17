@@ -2,7 +2,6 @@ object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
   ActiveControl = edtFilter
-  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
   ClientHeight = 531
@@ -42,7 +41,6 @@ object fmConfiguration: TfmConfiguration
       Align = alClient
       HotTrack = True
       MultiLine = True
-      TabIndex = 0
       TabOrder = 0
       OnChange = pcConfigChange
       object tshExperts: TTabSheet
@@ -113,8 +111,6 @@ object fmConfiguration: TfmConfiguration
               Width = 171
               Height = 22
               HotKey = 32833
-              InvalidKeys = [hcNone, hcShift]
-              Modifiers = [hkAlt]
               TabOrder = 1
             end
             object btnExpert: TButton
@@ -876,7 +872,6 @@ object fmConfiguration: TfmConfiguration
             Max = 1000
             Position = 1
             TabOrder = 2
-            Wrap = False
           end
         end
         object btnEditView: TButton

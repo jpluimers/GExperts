@@ -1,4 +1,4 @@
-object frConfigureEditorExperts: TfrConfigureEditorExperts
+object frConfigureExperts: TfrConfigureExperts
   Left = 0
   Top = 0
   Width = 599

@@ -1,4 +1,4 @@
-unit GX_ConfigureEditorExperts;
+unit GX_ConfigureExperts;
 
 interface
 
@@ -17,7 +17,7 @@ uses
   ExtCtrls;
 
 type
-  TfrConfigureEditorExperts = class(TFrame)
+  TfrConfigureExperts = class(TFrame)
     pnlExpertsFilter: TPanel;
     lblFilter: TLabel;
     edtFilter: TEdit;
@@ -84,24 +84,24 @@ end;
 
 { TfrConfigureEditorExperts }
 
-constructor TfrConfigureEditorExperts.Create(_Owner: TComponent);
+constructor TfrConfigureExperts.Create(_Owner: TComponent);
 begin
   inherited;
   FExperts := TList.Create;
 end;
 
-destructor TfrConfigureEditorExperts.Destroy;
+destructor TfrConfigureExperts.Destroy;
 begin
   FreeAndNil(FExperts);
   inherited;
 end;
 
-procedure TfrConfigureEditorExperts.edtFilterChange(Sender: TObject);
+procedure TfrConfigureExperts.edtFilterChange(Sender: TObject);
 begin
   FilterVisibleExperts;
 end;
 
-procedure TfrConfigureEditorExperts.SetAllEnabled(_Value: Boolean);
+procedure TfrConfigureExperts.SetAllEnabled(_Value: Boolean);
 var
   i: Integer;
   AControl: TControl;
@@ -113,23 +113,23 @@ begin
   end;
 end;
 
-procedure TfrConfigureEditorExperts.btnClearClick(Sender: TObject);
+procedure TfrConfigureExperts.btnClearClick(Sender: TObject);
 begin
   edtFilter.Text := '';
   edtFilter.SetFocus;
 end;
 
-procedure TfrConfigureEditorExperts.btnDisableAllClick(Sender: TObject);
+procedure TfrConfigureExperts.btnDisableAllClick(Sender: TObject);
 begin
   SetAllEnabled(False);
 end;
 
-procedure TfrConfigureEditorExperts.btnEnableAllClick(Sender: TObject);
+procedure TfrConfigureExperts.btnEnableAllClick(Sender: TObject);
 begin
   SetAllEnabled(True);
 end;
 
-procedure TfrConfigureEditorExperts.btnClearAllClick(Sender: TObject);
+procedure TfrConfigureExperts.btnClearAllClick(Sender: TObject);
 var
   i: Integer;
   AControl: TControl;
@@ -141,7 +141,7 @@ begin
   end;
 end;
 
-procedure TfrConfigureEditorExperts.btnSetAllDefaultClick(Sender: TObject);
+procedure TfrConfigureExperts.btnSetAllDefaultClick(Sender: TObject);
 var
   i: Integer;
   AControl: TControl;
@@ -156,7 +156,7 @@ begin
   end;
 end;
 
-procedure TfrConfigureEditorExperts.ConfigureExpertClick(_Sender: TObject);
+procedure TfrConfigureExperts.ConfigureExpertClick(_Sender: TObject);
 var
   AnExpert: TGX_BaseExpert;
   Idx: Integer;
@@ -166,7 +166,7 @@ begin
   AnExpert.Configure;
 end;
 
-procedure TfrConfigureEditorExperts.Init(_Experts: TList);
+procedure TfrConfigureExperts.Init(_Experts: TList);
 resourcestring
   SConfigureButtonCaption = 'Configure...';
 var
@@ -235,7 +235,7 @@ begin
   pnlExpertLayout.Visible := False;
 end;
 
-procedure TfrConfigureEditorExperts.SaveExperts;
+procedure TfrConfigureExperts.SaveExperts;
 var
   AControl: TControl;
   AnExpert: TGX_BaseExpert;
@@ -256,21 +256,21 @@ begin
   end;
 end;
 
-procedure TfrConfigureEditorExperts.FrameMouseWheelDown(Sender: TObject; Shift: TShiftState;
+procedure TfrConfigureExperts.FrameMouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
   sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize;
   Handled := True;
 end;
 
-procedure TfrConfigureEditorExperts.FrameMouseWheelUp(Sender: TObject; Shift: TShiftState;
+procedure TfrConfigureExperts.FrameMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
   sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position - FThumbSize;
   Handled := True;
 end;
 
-procedure TfrConfigureEditorExperts.FilterVisibleExperts;
+procedure TfrConfigureExperts.FilterVisibleExperts;
 var
   Panel: TPanel;
   CheckBox: TCheckBox;

@@ -7,7 +7,7 @@ interface
 uses
   Windows, Classes, Graphics, Controls, Forms, Dialogs, Menus,
   StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert, GX_BaseForm, 
-  GX_ConfigureEditorExperts;
+  GX_ConfigureExperts;
 
 type
   TfmConfiguration = class(TfmBaseForm)
@@ -164,7 +164,7 @@ type
     FOIFont: TFont;
     FCPFont: TFont;
     FThumbSize: Integer;
-    FConfigEditorExpertsFrame: TfrConfigureEditorExperts;
+    FConfigEditorExpertsFrame: TfrConfigureExperts;
     procedure HideUnsupportedIdeItems;
     procedure HideUnsupportedEditorItems;
     procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
@@ -244,7 +244,7 @@ begin
 
   pcConfig.ActivePage := tshExperts;
 
-  FConfigEditorExpertsFrame := TfrConfigureEditorExperts.Create(Self);
+  FConfigEditorExpertsFrame := TfrConfigureExperts.Create(Self);
   FConfigEditorExpertsFrame.Parent := tshEditorExpertsNew;
   FConfigEditorExpertsFrame.Align := alClient;
   FConfigEditorExpertsFrame.Init(GExpertsInst.EditorExpertManager.GetExpertList);
