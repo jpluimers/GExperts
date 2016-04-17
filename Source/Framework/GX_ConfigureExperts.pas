@@ -130,10 +130,15 @@ begin
 end;
 
 procedure TfrConfigureExperts.btnClearAllClick(Sender: TObject);
+resourcestring
+  SWarning = 'This will clear the keyboard shortcuts of all experts.'#13#10
+    + 'Are you sure you want to do that?';
 var
   i: Integer;
   AControl: TControl;
 begin
+  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0)  then
+    Exit; //==>
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
     if AControl is THotKey then
@@ -142,11 +147,16 @@ begin
 end;
 
 procedure TfrConfigureExperts.btnSetAllDefaultClick(Sender: TObject);
+resourcestring
+  SWarning = 'This will set the keyboard shortcuts of all experts to their defaults.'#13#10
+    + 'Are you sure you want to do that?';
 var
   i: Integer;
   AControl: TControl;
   AnExpert: TGX_BaseExpert;
 begin
+  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0)  then
+    Exit; //==>
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
     if AControl is THotKey then begin
