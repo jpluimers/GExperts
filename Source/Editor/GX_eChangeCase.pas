@@ -30,7 +30,7 @@ type
   public
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -54,13 +54,13 @@ begin
   Result := SChangeCaseName;
 end;
 
-procedure TChangeCaseExpert.GetHelpString(List: TStrings);
+function TChangeCaseExpert.GetHelpString: string;
 resourcestring
   SChangeCaseHelp = '  This expert changes the character case for the selected block of ' +
     'text in the editor.  To use it, select any number of lines in the IDE code editor and ' +
     'activate this expert.';
 begin
-  List.Text := SChangeCaseHelp;
+  Result := SChangeCaseHelp;
 end;
 
 class function TChangeCaseExpert.GetName: string;

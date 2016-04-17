@@ -30,7 +30,7 @@ type
     function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -81,7 +81,7 @@ begin
   Result := 'Code Formatter';
 end;
 
-procedure TeCodeFormatterExpert.GetHelpString(List: TStrings);
+function TeCodeFormatterExpert.GetHelpString: string;
 resourcestring
   SFormatterHelp =
     'This expert is the source code formatter formerly known as ' +
@@ -103,7 +103,7 @@ resourcestring
     'After doing this <YourName> can be used as <configname> as ' +
     'described above.';
 begin
-  List.Text := SFormatterHelp;
+  Result := SFormatterHelp;
 end;
 
 class function TeCodeFormatterExpert.GetName: string;

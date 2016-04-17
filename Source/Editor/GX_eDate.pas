@@ -22,7 +22,7 @@ type
     function GetDisplayName: string; override;
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     property DateFormat: string read FDateFormat write FDateFormat;
   end;
 
@@ -88,7 +88,7 @@ begin
   Result := SDateExpertName;
 end;
 
-procedure TDateExpert.GetHelpString(List: TStrings);
+function TDateExpert.GetHelpString: string;
 resourcestring
   SDateExpertHelp =
     '  This expert inserts the current date/time at the cursor position in ' +
@@ -96,7 +96,7 @@ resourcestring
     'using standard VCL date format specifiers.  See the FormatDateTime ' +
     'help topic in the VCL documentation for full details.';
 begin
-  List.Text := SDateExpertHelp;
+  Result := SDateExpertHelp;
 end;
 
 class function TDateExpert.GetName: string;

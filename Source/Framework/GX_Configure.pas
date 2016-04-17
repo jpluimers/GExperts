@@ -6,7 +6,8 @@ interface
 
 uses
   Windows, Classes, Graphics, Controls, Forms, Dialogs, Menus,
-  StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert, GX_BaseForm;
+  StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert, GX_BaseForm, 
+  GX_ConfigureEditorExperts;
 
 type
   TfmConfiguration = class(TfmBaseForm)
@@ -117,6 +118,7 @@ type
     btnDeleteSuppressedMessage: TButton;
     btnClearSuppressedMessages: TButton;
     chkEnhanceInstallPackages: TCheckBox;
+    tshEditorExpertsNew: TTabSheet;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -136,7 +138,7 @@ type
     procedure chkCPTabsInPopupClick(Sender: TObject);
     procedure chkCPMultiLineClick(Sender: TObject);
 
-    procedure ConfigureEditorExpertClick(Sender: TObject);
+    procedure ConfigureExpertClick(Sender: TObject);
     procedure chkButtonsClick(Sender: TObject);
     procedure chkEditorToolBarClick(Sender: TObject);
     procedure chkMultiLineTabDockHostClick(Sender: TObject);
@@ -162,6 +164,7 @@ type
     FOIFont: TFont;
     FCPFont: TFont;
     FThumbSize: Integer;
+    FConfigEditorExpertsFrame: TfrConfigureEditorExperts;
     procedure HideUnsupportedIdeItems;
     procedure HideUnsupportedEditorItems;
     procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
@@ -240,6 +243,11 @@ begin
   TEdit_ActivateAutoComplete(edHelpFile, [acsFileSystem], [actSuggest]);
 
   pcConfig.ActivePage := tshExperts;
+
+  FConfigEditorExpertsFrame := TfrConfigureEditorExperts.Create(Self);
+  FConfigEditorExpertsFrame.Parent := tshEditorExpertsNew;
+  FConfigEditorExpertsFrame.Align := alClient;
+
   LoadExperts;
   LoadGeneral;
 
@@ -365,7 +373,7 @@ begin
         Parent := Panel;
         Caption := SConfigureButtonCaption;
         SetBounds(btnExpert.Left, btnExpert.Top, btnExpert.Width, btnExpert.Height);
-        OnClick := ConfigureEditorExpertClick;
+        OnClick := ConfigureExpertClick;
         Tag := i;
       end;
     end;
@@ -434,6 +442,7 @@ begin
   try
     SaveGeneral;
     SaveExperts;
+    FConfigEditorExpertsFrame.SaveExperts;
     SaveIdeEnhancements;
     SaveEditorEnhancements;
     ConfigInfo.SaveSettings;
@@ -460,7 +469,7 @@ begin
     GxContextHelp(Self, 12);
 end;
 
-procedure TfmConfiguration.ConfigureEditorExpertClick(Sender: TObject);
+procedure TfmConfiguration.ConfigureExpertClick(Sender: TObject);
 begin
   GExpertsInst.ExpertList[(Sender as TButton).Tag].Configure;
 end;
@@ -486,8 +495,7 @@ begin
 
   meHelp.Lines.BeginUpdate;
   try
-    meHelp.Lines.Clear;
-    EditorExpert.GetHelpString(meHelp.Lines);
+    meHelp.Lines.Text := EditorExpert.GetHelpString;
   finally
     meHelp.SelStart := 0;
     meHelp.Lines.EndUpdate;

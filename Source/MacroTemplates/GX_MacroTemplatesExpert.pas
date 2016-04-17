@@ -80,7 +80,7 @@ type
     function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     class function GetName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
 
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
@@ -732,9 +732,9 @@ begin
     Result := GetTemplateFromUser(ATemplateName, FMacroFile);
 end;
 
-procedure TMacroTemplatesExpert.GetHelpString(List: TStrings);
+function TMacroTemplatesExpert.GetHelpString: string;
 begin
-  List.Text := '  This expert expands templates that can include %-delimited macros.  ' +
+  Result := '  This expert expands templates that can include %-delimited macros.  ' +
     'It can be used in similar way to the IDE code templates, but is much more powerful because you can define custom shortcuts, insert positions, and include text-replacement macros.  ' +
     'The supported macros are available via the context menu in the template editor.  See the help file for more complete documentation.';
 end;

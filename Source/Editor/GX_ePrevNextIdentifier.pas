@@ -42,7 +42,7 @@ type
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
   end;
 
   TNextIdentExpert = class(TPrevIdentExpert)
@@ -52,7 +52,7 @@ type
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
   end;
 
   TfmPrevNextConfig = class(TfmBaseForm)
@@ -237,9 +237,9 @@ begin
   Result := FindIdentAtPos(Source, Pos, Previous, FoundPos, Ident);
 end;
 
-procedure TPrevIdentExpert.GetHelpString(List: TStrings);
+function TPrevIdentExpert.GetHelpString: string;
 begin
-  List.Text := Format(SIdentHelpString, ['previous']);
+  Result := Format(SIdentHelpString, ['previous']);
 end;
 
 function TPrevIdentExpert.GetDefaultShortCut: TShortCut;
@@ -289,9 +289,9 @@ begin
   Result := 'Next Identifier Reference';
 end;
 
-procedure TNextIdentExpert.GetHelpString(List: TStrings);
+function TNextIdentExpert.GetHelpString: string;
 begin
-  List.Text := Format(SIdentHelpString, ['next']);
+  Result := Format(SIdentHelpString, ['next']);
 end;
 
 class function TNextIdentExpert.GetName: string;

@@ -14,7 +14,7 @@ type
   public
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
     procedure Execute(Sender: TObject); override;
   end;
@@ -43,11 +43,11 @@ begin
   Result := SSelectIdentName;
 end;
 
-procedure TSelectIdentifierExpert.GetHelpString(List: TStrings);
+function TSelectIdentifierExpert.GetHelpString: string;
 resourcestring
   SSelectIdentHelp = '  This expert selects the identifier under the edit cursor.';
 begin
-  List.Text := SSelectIdentHelp;
+  Result := SSelectIdentHelp;
 end;
 
 class function TSelectIdentifierExpert.GetName: string;

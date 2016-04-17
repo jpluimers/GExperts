@@ -32,7 +32,7 @@ type
     procedure DoDelimiterAction(Editor: IOTASourceEditor;
                                 Offset: Integer;
                                 SChar, EChar: TOTACharPos); override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
   end;
 
 type
@@ -45,7 +45,7 @@ type
     procedure DoDelimiterAction(Editor: IOTASourceEditor;
                                 Offset: Integer;
                                 SChar, EChar: TOTACharPos); override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
   end;
 
 implementation
@@ -679,9 +679,9 @@ begin
   Result := SMoveToExpertName;
 end;
 
-procedure TMoveToDelimiter.GetHelpString(List: TStrings);
+function TMoveToDelimiter.GetHelpString: string;
 begin
-  List.Text := SDelimiterHelpPrefix + SDelimiterMoveToMessage +
+  Result := SDelimiterHelpPrefix + SDelimiterMoveToMessage +
     SDelimiterHelpSuffix + SDelimiterUsage;
 end;
 
@@ -726,9 +726,9 @@ begin
   Result := SLocateDelimiterName;
 end;
 
-procedure TLocateDelimiter.GetHelpString(List: TStrings);
+function TLocateDelimiter.GetHelpString: string;
 begin
-  List.Text := SDelimiterHelpPrefix + SDelimiterLocateMessage +
+  Result := SDelimiterHelpPrefix + SDelimiterLocateMessage +
     SDelimiterHelpSuffix + SDelimiterUsage;
 end;
 

@@ -88,7 +88,7 @@ type
     procedure Configure; override;
     procedure Execute(Sender: TObject); override;
     function GetDefaultShortCut: TShortCut; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
@@ -180,13 +180,13 @@ begin
   Result := SDisplayName;
 end;
 
-procedure TGxEditorPopupMenuExpert.GetHelpString(List: TStrings);
+function TGxEditorPopupMenuExpert.GetHelpString: string;
 resourcestring
   SGxEditorPopupMenuExpertHelp =
     'Adds a new shortcut to the editor that shows a configurable popup menu ' +
     'as an alternative to the GExperts main menu.';
 begin
-  List.Text := SGxEditorPopupMenuExpertHelp;
+  Result := SGxEditorPopupMenuExpertHelp;
 end;
 
 class function TGxEditorPopupMenuExpert.GetName: string;

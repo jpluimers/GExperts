@@ -19,7 +19,7 @@ type
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -47,7 +47,7 @@ begin
   Result := SReverseStatementName;
 end;
 
-procedure TReverseStatementExpert.GetHelpString(List: TStrings);
+function TReverseStatementExpert.GetHelpString: string;
 resourcestring
   SReverseStatementHelp =
     '  This expert reverses all assignment statements and the loop direction of ' +
@@ -57,7 +57,7 @@ resourcestring
     '  This expert supports both Delphi and C++ assignments, but only Delphi for loops. ' +
     'It expects all reversible statements to be contained on a single line.';
 begin
-  List.Text := SReverseStatementHelp;
+  Result := SReverseStatementHelp;
 end;
 
 class function TReverseStatementExpert.GetName: string;

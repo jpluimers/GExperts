@@ -77,7 +77,7 @@ object fmConfiguration: TfmConfiguration
           Left = 0
           Top = 41
           Width = 591
-          Height = 413
+          Height = 394
           VertScrollBar.Increment = 40
           VertScrollBar.Range = 920
           VertScrollBar.Tracking = True
@@ -134,7 +134,7 @@ object fmConfiguration: TfmConfiguration
           Left = 0
           Top = 0
           Width = 591
-          Height = 454
+          Height = 435
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -266,13 +266,17 @@ object fmConfiguration: TfmConfiguration
           end
         end
       end
+      object tshEditorExpertsNew: TTabSheet
+        Caption = 'Editor Experts (new)'
+        ImageIndex = 7
+      end
       object tshEditorExperts: TTabSheet
         Caption = 'Editor Experts'
         object pnlExperts: TPanel
           Left = 0
           Top = 0
           Width = 591
-          Height = 454
+          Height = 435
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -281,13 +285,13 @@ object fmConfiguration: TfmConfiguration
             Left = 8
             Top = 8
             Width = 575
-            Height = 438
+            Height = 419
             Align = alClient
             Caption = 'Editor Experts'
             TabOrder = 0
             DesignSize = (
               575
-              438)
+              419)
             object btnConfigure: TButton
               Left = 488
               Top = 80
@@ -312,7 +316,7 @@ object fmConfiguration: TfmConfiguration
             end
             object meHelp: TMemo
               Left = 10
-              Top = 328
+              Top = 309
               Width = 555
               Height = 100
               TabStop = False
@@ -336,7 +340,7 @@ object fmConfiguration: TfmConfiguration
               Left = 10
               Top = 22
               Width = 470
-              Height = 300
+              Height = 281
               Anchors = [akLeft, akTop, akRight, akBottom]
               Columns = <
                 item
@@ -688,23 +692,23 @@ object fmConfiguration: TfmConfiguration
         ImageIndex = 6
         DesignSize = (
           591
-          454)
+          435)
         object gbSuppressedMessages: TGroupBox
           Left = 8
           Top = 8
           Width = 433
-          Height = 433
+          Height = 414
           Anchors = [akLeft, akTop, akBottom]
           Caption = 'Suppressed Messages'
           TabOrder = 0
           DesignSize = (
             433
-            433)
+            414)
           object lbSuppressedMesages: TListBox
             Left = 8
             Top = 24
             Width = 321
-            Height = 401
+            Height = 382
             Anchors = [akLeft, akTop, akBottom]
             ItemHeight = 14
             TabOrder = 0

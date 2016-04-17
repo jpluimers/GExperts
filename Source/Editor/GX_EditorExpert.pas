@@ -35,7 +35,7 @@ type
     procedure Configure; virtual;
     procedure DoExecute(Sender: TObject);
 //    procedure Execute(Sender: TObject); virtual;  // declared in TGX_BaseExpert
-    procedure GetHelpString(List: TStrings); virtual;
+    function GetHelpString: string; virtual;
     function GetActionName: string;
 
     // Return a string that names the editor expert.
@@ -140,12 +140,11 @@ begin
   inherited Destroy;
 end;
 
-procedure TEditorExpert.GetHelpString(List: TStrings);
+function TEditorExpert.GetHelpString: string;
 resourcestring
   SNoHelpAvailable = 'No help available.';
 begin
-  Assert(Assigned(List));
-  List.Text := SNoHelpAvailable;
+  Result := SNoHelpAvailable;
 end;
 
 function TEditorExpert.GetOptionsBaseRegistryKey: string;

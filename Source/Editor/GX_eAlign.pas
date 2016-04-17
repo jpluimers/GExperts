@@ -60,7 +60,7 @@ type
     destructor Destroy; override;
     procedure Configure; override;
     function GetDefaultShortCut: TShortCut; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
@@ -120,7 +120,7 @@ begin
   Result := SAlignName;
 end;
 
-procedure TAlignExpert.GetHelpString(List: TStrings);
+function TAlignExpert.GetHelpString: string;
 resourcestring
   SAlignHelp =
     '  This expert aligns the text of the selected lines at the first occurrence of a chosen token in each line.  To use it, select a block of code in the code editor and activate this expert.  '+
@@ -129,7 +129,7 @@ resourcestring
     'In the "Align at first token" mode, the first located token is used to determine the alignment column.  In this second mode, any line whose token prefix is longer than the position of the first token will not be modified.' + sLineBreak +
     '  You can configure the list of tokens to align on as well as the minimum number of space characters that must precede a token that is being aligned.';
 begin
-  List.Text := SAlignHelp;
+  Result := SAlignHelp;
 end;
 
 class function TAlignExpert.GetName: string;

@@ -53,7 +53,7 @@ type
     function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
     procedure Configure; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
   end;
 
   TUnCommentExpert = class(TSelectionEditorExpert)
@@ -64,7 +64,7 @@ type
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
     function GetDisplayName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -74,7 +74,7 @@ type
   public
     class function GetName: string; override;
     function GetDisplayName: string; override;
-    procedure GetHelpString(List: TStrings); override;
+    function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
   end;
 
@@ -169,7 +169,7 @@ begin
   Result := SCommentName;
 end;
 
-procedure TCommentExpert.GetHelpString(List: TStrings);
+function TCommentExpert.GetHelpString: string;
 resourcestring
   SCommentHelp =
     '  This expert comments out a selected block of code. ' +
@@ -178,7 +178,7 @@ resourcestring
     sLineBreak +
     '  You can configure this expert to use different comment styles.';
 begin
-  List.Text := SCommentHelp;
+  Result := SCommentHelp;
 end;
 
 class function TCommentExpert.GetName: string;
@@ -318,7 +318,7 @@ begin
   Result := SUncommentName;
 end;
 
-procedure TUnCommentExpert.GetHelpString(List: TStrings);
+function TUnCommentExpert.GetHelpString: string;
 resourcestring
   SUncommentHelp = '  This expert uncomments a selected block of code.  ' +
     'To use it, select a block in the IDE code editor and ' +
@@ -327,7 +327,7 @@ resourcestring
     '  Uncommenting is performed using the comment style that ' +
     'you selected for the Comment Code editor expert.';
 begin
-  List.Text := SUncommentHelp;
+  Result := SUncommentHelp;
 end;
 
 class function TUnCommentExpert.GetName: string;
@@ -463,13 +463,13 @@ begin
   Result := SSortName;
 end;
 
-procedure TSortExpert.GetHelpString(List: TStrings);
+function TSortExpert.GetHelpString: string;
 resourcestring
   SSortHelp = '  This expert sorts the lines in a selected block of code.  ' +
     'To use it, select several lines in the IDE code editor and ' +
     'activate this expert.';
 begin
-  List.Text := SSortHelp;
+  Result := SSortHelp;
 end;
 
 class function TSortExpert.GetName: string;
