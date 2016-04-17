@@ -247,6 +247,7 @@ begin
   FConfigEditorExpertsFrame := TfrConfigureEditorExperts.Create(Self);
   FConfigEditorExpertsFrame.Parent := tshEditorExpertsNew;
   FConfigEditorExpertsFrame.Align := alClient;
+  FConfigEditorExpertsFrame.Init(GExpertsInst.EditorExpertManager.GetExpertList);
 
   LoadExperts;
   LoadGeneral;

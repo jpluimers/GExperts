@@ -24,9 +24,13 @@ type
     procedure UpdateAction(Action: TCustomAction); virtual;
     function HasSubmenuItems: Boolean; virtual; // Default = False
     // See LoadSettings
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
+    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     // See SaveSettings
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); virtual;
+    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    // you usually don't need to override this
+    procedure LoadActiveAndShortCut(Settings: TGExpertsSettings); override;
+    // you usually don't need to override this
+    procedure SaveActiveAndShortCut(Settings: TGExpertsSettings); override;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -58,15 +62,6 @@ type
 //    procedure Execute(Sender: TObject); virtual; // declared in TGX_BaseExpert
     // Do any delayed setup after the IDE is done initializing
     procedure AfterIDEInitialized; virtual;
-    // Various methods that will be called
-    // at appropriate times
-    procedure Configure; virtual;
-    // Request to the expert to (re)load all its serialized state; calls InternalLoadSettings
-    // Note: This is called *automatically* by the framework.
-    procedure LoadSettings;
-    // Saves expert data; calls InternalSaveSettings
-    // NOT called automatically by the framework.
-    procedure SaveSettings;
     // Update the action state
     procedure DoUpdateAction;
 
@@ -102,13 +97,6 @@ uses
 procedure TGX_Expert.ActionOnUpdate(Sender: TObject);
 begin
   DoUpdateAction;
-end;
-
-procedure TGX_Expert.Configure;
-resourcestring
-  SNoConfigOptions = 'No configuration for this expert is available.';
-begin
-  MessageDlg(SNoConfigOptions, mtInformation, [mbOK], 0);
 end;
 
 // Note: Don't call LoadSettings in Create.  This is done for you
@@ -180,38 +168,20 @@ const
   ShortCutIdent = 'ExpertShortcuts'; // Do not localize.
   EnabledIdent = 'EnabledExperts'; // Do not localize.
 
-procedure TGX_Expert.LoadSettings;
-var
-  Settings: TGExpertsSettings;
+procedure TGX_Expert.LoadActiveAndShortCut(Settings: TGExpertsSettings); 
 begin
-  Settings := TGExpertsSettings.Create;
-  try
-    // Do not put these two Settings.xxx lines in InternalLoadSettings,
-    // since a descendant might forget to call 'inherited'
-    ShortCut := Settings.ReadInteger(ShortCutIdent, GetName, ShortCut);
-    Active := Settings.ReadBool(EnabledIdent, GetName, IsDefaultActive);
-
-    InternalLoadSettings(Settings);
-  finally
-    FreeAndNil(Settings);
-  end;
+  // Do not put these two Settings.xxx lines in InternalLoadSettings,
+  // since a descendant might forget to call 'inherited'
+  ShortCut := Settings.ReadInteger(ShortCutIdent, GetName, ShortCut);
+  Active := Settings.ReadBool(EnabledIdent, GetName, IsDefaultActive);
 end;
 
-procedure TGX_Expert.SaveSettings;
-var
-  Settings: TGExpertsSettings;
+procedure TGX_Expert.SaveActiveAndShortCut(Settings: TGExpertsSettings);
 begin
-  Settings := TGExpertsSettings.Create;
-  try
-    // Do not put these two Settings.xxx lines in InternalSaveSettings,
-    // since a descendant might forget to call 'inherited'
-    Settings.WriteBool(EnabledIdent, GetName, Active);
-    Settings.WriteInteger(ShortCutIdent, GetName, ShortCut);
-
-    InternalSaveSettings(Settings);
-  finally
-    FreeAndNil(Settings);
-  end;
+  // Do not put these two Settings.xxx lines in InternalSaveSettings,
+  // since a descendant might forget to call 'inherited'
+  Settings.WriteBool(EnabledIdent, GetName, Active);
+  Settings.WriteInteger(ShortCutIdent, GetName, ShortCut);
 end;
 
 procedure TGX_Expert.SetActive(New: Boolean);

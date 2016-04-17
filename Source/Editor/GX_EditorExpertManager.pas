@@ -5,7 +5,7 @@ unit GX_EditorExpertManager;
 interface
 
 uses
-  Contnrs, GX_GenericClasses, GX_EditorExpert;
+  Classes, Contnrs, GX_GenericClasses, GX_EditorExpert;
 
 type
   TGxEditorExpertManager = class(TObject)
@@ -19,6 +19,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function FindExpert(const ExpertName: string; out Idx: integer): boolean;
+    function GetExpertList: TList;
     property EditorExpertList[const Index: Integer]: TEditorExpert read GetEditorExpert;
     property EditorExpertCount: Integer read GetEditorExpertCount;
   end;
@@ -61,6 +62,11 @@ begin
   Result := FEditorExpertList.Count;
 end;
 
+
+function TGxEditorExpertManager.GetExpertList: TList;
+begin
+  Result := FEditorExpertList;
+end;
 
 procedure TGxEditorExpertManager.LoadEditorExperts;
 var

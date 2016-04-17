@@ -43,6 +43,7 @@ type
     procedure DoAfterIDEInitialized(Sender: TObject);
 
     function GetSharedImages: TImageList;
+    function GetExpertList: TList;
   end;
 
 function GExpertsInst(ForceValid: Boolean = False): TGExperts;
@@ -264,6 +265,11 @@ end;
 function TGExperts.GetExpertCount: Integer;
 begin
   Result := FExpertList.Count;
+end;
+
+function TGExperts.GetExpertList: TList;
+begin
+  Result := FExpertList;
 end;
 
 function TGExperts.GetIDString: string;

@@ -11,7 +11,6 @@ type
   private
     FGxAction: IGxAction;
     FActionName: string;
-    function GetOptionsBaseRegistryKey: string;
   protected
     function GetShortCut: TShortCut; override;
     procedure SetShortCut(Value: TShortCut); override;
@@ -23,19 +22,17 @@ type
     class function ConfigurationKey: string; virtual;
     // defaults to ClassName
     function GetBitmapFileName: string; override;
-    // Overrride to load any configuration settings
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
-    // Overrride to save any configuration settings
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); virtual;
+    // you usually don't need to override this
+    procedure LoadActiveAndShortCut(Settings: TGExpertsSettings); override;
+    // you usually don't need to override this
+    procedure SaveActiveAndShortCut(Settings: TGExpertsSettings); override;
     procedure ActionOnUpdate(Sender: TObject);
   public
     constructor Create; virtual;
     destructor Destroy; override;
 
-    procedure Configure; virtual;
     procedure DoExecute(Sender: TObject);
 //    procedure Execute(Sender: TObject); virtual;  // declared in TGX_BaseExpert
-    function GetHelpString: string; virtual;
     function GetActionName: string;
 
     // Return a string that names the editor expert.
@@ -44,11 +41,8 @@ type
     // name.
 //    class function GetName: string; virtual; // declared in TGX_BaseExpert
 
-    // Override the InternalXXX versions in descendents to get a Settings object
-    procedure LoadSettings;
-    procedure SaveSettings;
-
-    property OptionsBaseRegistryKey: string read GetOptionsBaseRegistryKey;
+    // you usually don't need to override this
+    function GetOptionsBaseRegistryKey: string; override;
   end;
 
   TEditorExpertClass = class of TEditorExpert;
@@ -107,13 +101,6 @@ end;
 
 { TEditorExpert }
 
-procedure TEditorExpert.Configure;
-resourcestring
-  SNoConfigurationOptions = 'There are no configuration options for this expert.';
-begin
-  MessageDlg(SNoConfigurationOptions, mtInformation, [mbOK], 0);
-end;
-
 constructor TEditorExpert.Create;
 const
   EditorExpertPrefix = 'EditorExpert'; // Do not localize.
@@ -140,13 +127,6 @@ begin
   inherited Destroy;
 end;
 
-function TEditorExpert.GetHelpString: string;
-resourcestring
-  SNoHelpAvailable = 'No help available.';
-begin
-  Result := SNoHelpAvailable;
-end;
-
 function TEditorExpert.GetOptionsBaseRegistryKey: string;
 begin
   Result := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + 'EditorExperts'; // Do not localize.
@@ -158,38 +138,18 @@ begin
   Result := FGxAction.ShortCut
 end;
 
-procedure TEditorExpert.InternalLoadSettings;
+procedure TEditorExpert.LoadActiveAndShortCut(Settings: TGExpertsSettings);
 begin
+  inherited;
   ShortCut := Settings.ReadInteger(GetName, 'ShortCut', ShortCut);
+  // todo: load Active
 end;
 
-procedure TEditorExpert.LoadSettings;
-var
-  Settings: TGExpertsSettings;
+procedure TEditorExpert.SaveActiveAndShortCut(Settings: TGExpertsSettings);
 begin
-  Settings := TGExpertsSettings.Create(OptionsBaseRegistryKey);
-  try
-    InternalLoadSettings(Settings);
-  finally
-    FreeAndNil(Settings);
-  end;
-end;
-
-procedure TEditorExpert.InternalSaveSettings;
-begin
+  inherited;
   Settings.WriteInteger(ConfigurationKey, 'ShortCut', ShortCut);
-end;
-
-procedure TEditorExpert.SaveSettings;
-var
-  Settings: TGExpertsSettings;
-begin
-  Settings := TGExpertsSettings.Create(OptionsBaseRegistryKey);
-  try
-    InternalSaveSettings(Settings);
-  finally
-    FreeAndNil(Settings);
-  end;
+  // todo: save Active
 end;
 
 procedure TEditorExpert.SetShortCut(Value: TShortCut);

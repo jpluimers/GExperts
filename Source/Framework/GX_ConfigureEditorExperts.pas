@@ -40,12 +40,14 @@ type
       var Handled: Boolean);
   private
     FThumbSize: Integer;
-    procedure LoadExperts;
+    FExperts: TList;
     procedure ConfigureExpertClick(_Sender: TObject);
     procedure FilterVisibleExperts;
     procedure SetAllEnabled(_Value: Boolean);
   public
     constructor Create(_Owner: TComponent); override;
+    destructor Destroy; override;
+    procedure Init(_Experts: TList);
     procedure SaveExperts;
   end;
 
@@ -54,11 +56,8 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_BaseExpert,
-  GX_GExperts,
-  GX_EditorExpertManager,
   GX_GenericUtils,
-  GX_EditorExpert;
+  GX_BaseExpert;
 
 type
   THintImage = class(TImage)
@@ -82,7 +81,13 @@ end;
 constructor TfrConfigureEditorExperts.Create(_Owner: TComponent);
 begin
   inherited;
-  LoadExperts;
+  FExperts := TList.Create;
+end;
+
+destructor TfrConfigureEditorExperts.Destroy;
+begin
+  FreeAndNil(FExperts);
+  inherited;
 end;
 
 procedure TfrConfigureEditorExperts.edtFilterChange(Sender: TObject);
@@ -119,31 +124,36 @@ begin
 end;
 
 procedure TfrConfigureEditorExperts.ConfigureExpertClick(_Sender: TObject);
+var
+  AnExpert: TGX_BaseExpert;
+  Idx: Integer;
 begin
-  GExpertsInst.EditorExpertManager.EditorExpertList[(_Sender as TButton).Tag].Configure;
+  Idx := (_Sender as TButton).Tag;
+  AnExpert := FExperts[Idx];
+  AnExpert.Configure;
 end;
 
-procedure TfrConfigureEditorExperts.LoadExperts;
+procedure TfrConfigureEditorExperts.Init(_Experts: TList);
 resourcestring
   SConfigureButtonCaption = 'Configure...';
 var
   i: Integer;
-  AnExpert: TEditorExpert;
+  AnExpert: TGX_BaseExpert;
   RowWidth: Integer;
   RowHeight: Integer;
-  ExpManager: TGxEditorExpertManager;
   pnl: TPanel;
   img: TImage;
   chk: TCheckBox;
   hk: THotKey;
   btn: TButton;
 begin
+  FExperts.Assign(_Experts);
+
   RowWidth := sbxExperts.Width * 3;
   RowHeight := pnlExpertLayout.Height;
   FThumbSize := RowHeight;
-  ExpManager := GExpertsInst.EditorExpertManager;
-  for i := 0 to ExpManager.EditorExpertCount - 1 do begin
-    AnExpert := ExpManager.EditorExpertList[i];
+  for i := 0 to FExperts.Count - 1 do begin
+    AnExpert := FExperts[i];
 
     pnl := TPanel.Create(Self);
     pnl.Parent := sbxExperts;
@@ -186,7 +196,7 @@ begin
       end;
     end;
   end;
-  sbxExperts.VertScrollBar.Range := ExpManager.EditorExpertCount * RowHeight;
+  sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight;
   pnlExpertLayout.Visible := False;
 end;
 
@@ -195,21 +205,20 @@ var
   AControl: TControl;
   AnExpert: TGX_BaseExpert;
   i: Integer;
-  ExpManager: TGxEditorExpertManager;
 begin
-  ExpManager := GExpertsInst.EditorExpertManager;
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
 
-    AnExpert := ExpManager.EditorExpertList[AControl.Tag];
+    AnExpert := FExperts[AControl.Tag];
     if AControl is TCheckBox then
 //      AnExpert.Active := TCheckBox(AControl).Checked
     else if AControl is THotKey then
       AnExpert.ShortCut := THotKey(AControl).HotKey;
   end;
 
-  for i := 0 to ExpManager.EditorExpertCount - 1 do
-    ExpManager.EditorExpertList[i].SaveSettings;
+  for i := 0 to FExperts.Count - 1 do begin
+    TGX_BaseExpert(FExperts[i]).SaveSettings;
+  end;
 end;
 
 procedure TfrConfigureEditorExperts.FrameMouseWheelDown(Sender: TObject; Shift: TShiftState;
