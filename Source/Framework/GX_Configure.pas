@@ -16,7 +16,6 @@ type
     pcConfig: TPageControl;
     tshExperts: TTabSheet;
     tshGeneral: TTabSheet;
-    sbxExperts: TScrollBox;
     dlgHelpFile: TOpenDialog;
     tshIDE: TTabSheet;
     tshEditorExperts: TTabSheet;
@@ -97,15 +96,6 @@ type
     chkUseCustomFont: TCheckBox;
     btnCustomFont: TButton;
     pnlGeneralSpacer: TPanel;
-    pnlExpertLayout: TPanel;
-    imgExpert: TImage;
-    chkExpert: TCheckBox;
-    edtExpert: THotKey;
-    btnExpert: TButton;
-    pnlExpertsFilter: TPanel;
-    tmrFilter: TTimer;
-    lblFilter: TLabel;
-    edtFilter: TEdit;
     chkHideNavbar: TCheckBox;
     chkEnhanceSearchPaths: TCheckBox;
     chkEnhanceToolProperties: TCheckBox;
@@ -137,15 +127,9 @@ type
     procedure chkCPAsButtonsClick(Sender: TObject);
     procedure chkCPTabsInPopupClick(Sender: TObject);
     procedure chkCPMultiLineClick(Sender: TObject);
-
-    procedure ConfigureExpertClick(Sender: TObject);
     procedure chkButtonsClick(Sender: TObject);
     procedure chkEditorToolBarClick(Sender: TObject);
     procedure chkMultiLineTabDockHostClick(Sender: TObject);
-    procedure sbxExpertsMouseWheelDown(Sender: TObject; Shift: TShiftState;
-      MousePos: TPoint; var Handled: Boolean);
-    procedure sbxExpertsMouseWheelUp(Sender: TObject; Shift: TShiftState;
-      MousePos: TPoint; var Handled: Boolean);
     procedure btnConfigureToolBarClick(Sender: TObject);
     procedure pcConfigChange(Sender: TObject);
     procedure lvEditorExpertsDblClick(Sender: TObject);
@@ -155,21 +139,17 @@ type
     procedure btnAppBuilderClick(Sender: TObject);
     procedure btnEditViewClick(Sender: TObject);
     procedure btnCustomFontClick(Sender: TObject);
-    procedure tmrFilterTimer(Sender: TObject);
-    procedure edtFilterChange(Sender: TObject);
     procedure chkEnhanceDialogsClick(Sender: TObject);
     procedure btnDeleteSuppressedMessageClick(Sender: TObject);
     procedure btnClearSuppressedMessagesClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
-    FThumbSize: Integer;
     FConfigEditorExpertsFrame: TfrConfigureExperts;
+    FConfigExpertsFrame: TfrConfigureExperts;
     procedure HideUnsupportedIdeItems;
     procedure HideUnsupportedEditorItems;
     procedure ConfigureEditorExpertShortCut(EditorExpert: TEditorExpert; Idx: Integer);
-    procedure LoadExperts;
-    procedure SaveExperts;
 
     procedure LoadGeneral;
     procedure SaveGeneral;
@@ -186,7 +166,6 @@ type
 
     procedure LoadSuppressedMessages;
 
-    procedure FilterVisibleExperts;
     procedure edVCLPathOnDropFiles(_Sender: TObject; _Files: TStrings);
     procedure edConfigPathDropFiles(_Sender: TObject; _Files: TStrings);
     procedure edHelpFileDropFiles(_Sender: TObject; _Files: TStrings);
@@ -245,11 +224,19 @@ begin
   pcConfig.ActivePage := tshExperts;
 
   FConfigEditorExpertsFrame := TfrConfigureExperts.Create(Self);
+  FConfigEditorExpertsFrame.Name := '';
   FConfigEditorExpertsFrame.Parent := tshEditorExpertsNew;
   FConfigEditorExpertsFrame.Align := alClient;
   FConfigEditorExpertsFrame.Init(GExpertsInst.EditorExpertManager.GetExpertList);
 
-  LoadExperts;
+  FConfigExpertsFrame := TfrConfigureExperts.Create(Self);
+  FConfigExpertsFrame.Name := '';
+  FConfigExpertsFrame.Parent := tshExperts;
+  FConfigExpertsFrame.Align := alClient;
+  FConfigExpertsFrame.Init(GExpertsInst.GetExpertList);
+
+  ActiveControl := FConfigExpertsFrame.edtFilter;
+
   LoadGeneral;
 
   LoadEditorExperts;
@@ -316,94 +303,6 @@ begin
   ConfigInfo.UpdateScreenForms;
 end;
 
-procedure TfmConfiguration.LoadExperts;
-resourcestring
-  SConfigureButtonCaption = 'Configure...';
-var
-  Panel: TPanel;
-  i: Integer;
-  AnExpert: TGX_Expert;
-  RowWidth: Integer;
-  RowHeight: Integer;
-begin
-  RowWidth := sbxExperts.Width * 3;
-  RowHeight := pnlExpertLayout.Height;
-  FThumbSize := RowHeight;
-  for i := 0 to GExpertsInst.ExpertCount - 1 do
-  begin
-    Panel := TPanel.Create(Self);
-    Panel.Parent := sbxExperts;
-    Panel.SetBounds(0, i * RowHeight, RowWidth, RowHeight);
-    Panel.Tag := i;
-    Panel.FullRepaint := False;
-
-    AnExpert := GExpertsInst.ExpertList[i];
-
-    with TImage.Create(Self) do
-    begin
-      Parent := Panel;
-      SetBounds(imgExpert.Left, imgExpert.Top, imgExpert.Width, imgExpert.Height);
-      Picture.Bitmap.Assign(AnExpert.GetBitmap);
-      Transparent := True;
-      Center := True;
-      Stretch := False;
-    end;
-
-    with TCheckBox.Create(sbxExperts) do
-    begin
-      Parent := Panel;
-      SetBounds(chkExpert.Left, chkExpert.Top, chkExpert.Width, chkExpert.Height);
-      Caption := AnExpert.GetDisplayName;
-      Checked := AnExpert.Active;
-      Tag := i;
-    end;
-
-    with THotKey.Create(sbxExperts) do
-    begin
-      Parent := Panel;
-      SetBounds(edtExpert.Left, edtExpert.Top, edtExpert.Width, edtExpert.Height);
-      HotKey := AnExpert.ShortCut;
-      Visible := AnExpert.HasMenuItem;
-      Tag := i;
-    end;
-
-    if AnExpert.HasConfigOptions then
-    begin
-      with TButton.Create(Self) do
-      begin
-        Parent := Panel;
-        Caption := SConfigureButtonCaption;
-        SetBounds(btnExpert.Left, btnExpert.Top, btnExpert.Width, btnExpert.Height);
-        OnClick := ConfigureExpertClick;
-        Tag := i;
-      end;
-    end;
-  end;
-  sbxExperts.VertScrollBar.Range := GExpertsInst.ExpertCount * RowHeight;
-  pnlExpertLayout.Visible := False;
-end;
-
-procedure TfmConfiguration.SaveExperts;
-var
-  AControl: TControl;
-  AnExpert: TGX_Expert;
-  i: Integer;
-begin
-  for i := 0 to sbxExperts.ComponentCount - 1 do
-  begin
-    AControl := sbxExperts.Components[i] as TControl;
-
-    AnExpert := GExpertsInst.ExpertList[AControl.Tag];
-    if AControl is TCheckBox then
-      AnExpert.Active := TCheckBox(AControl).Checked
-    else if AControl is THotKey then
-      AnExpert.ShortCut := THotKey(AControl).HotKey;
-  end;
-
-  for i := 0 to GExpertsInst.ExpertCount - 1 do
-    GExpertsInst.ExpertList[i].SaveSettings;
-end;
-
 procedure TfmConfiguration.sbVCLDirClick(Sender: TObject);
 var
   TempString: string;
@@ -442,7 +341,7 @@ begin
   GxKeyboardShortCutBroker.BeginUpdate;
   try
     SaveGeneral;
-    SaveExperts;
+    FConfigExpertsFrame.SaveExperts;
     FConfigEditorExpertsFrame.SaveExperts;
     SaveIdeEnhancements;
     SaveEditorEnhancements;
@@ -468,11 +367,6 @@ begin
     GxContextHelp(Self, 35)
   else
     GxContextHelp(Self, 12);
-end;
-
-procedure TfmConfiguration.ConfigureExpertClick(Sender: TObject);
-begin
-  GExpertsInst.ExpertList[(Sender as TButton).Tag].Configure;
 end;
 
 procedure TfmConfiguration.lvEditorExpertsChange(Sender: TObject;
@@ -921,24 +815,6 @@ begin
   chkDefaultMultiLineTabDockHost.Enabled := EnableState;
 end;
 
-procedure TfmConfiguration.sbxExpertsMouseWheelDown(Sender: TObject;
-  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-begin
-  if pcConfig.ActivePage = tshExperts then begin
-    sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize;
-    Handled := True;
-  end;
-end;
-
-procedure TfmConfiguration.sbxExpertsMouseWheelUp(Sender: TObject;
-  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-begin
-  if pcConfig.ActivePage = tshExperts then begin
-    sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position - FThumbSize;
-    Handled := True;
-  end;
-end;
-
 procedure TfmConfiguration.btnConfigureToolBarClick(Sender: TObject);
 begin
   EditorEnhancements.ShowToolBarConfigurationDialog;
@@ -1015,55 +891,6 @@ begin
     EditorExpert.SaveSettings;
     lvEditorExperts.Items[Idx].SubItems[0] := ShortCutToText(ShortCut);
   end;
-end;
-
-procedure TfmConfiguration.edtFilterChange(Sender: TObject);
-begin
-  tmrFilter.Enabled := False;
-  tmrFilter.Enabled := True;
-end;
-
-procedure TfmConfiguration.tmrFilterTimer(Sender: TObject);
-begin
-  FilterVisibleExperts;
-  tmrFilter.Enabled := False;
-end;
-
-procedure TfmConfiguration.FilterVisibleExperts;
-var
-  Panel: TPanel;
-  CheckBox: TCheckBox;
-  i, CurrTop: Integer;
-  SubText: string;
-begin
-  sbxExperts.VertScrollBar.Position := 0;
-  SubText := Trim(edtFilter.Text);
-  if SubText = '' then
-    for i := 0 to sbxExperts.ControlCount - 1 do
-    begin
-      Panel := sbxExperts.Controls[i] as TPanel;
-      if Panel <> pnlExpertLayout then
-        Panel.Visible := True;
-    end
-  else
-    for i := 0 to sbxExperts.ControlCount - 1 do
-    begin
-      Panel := sbxExperts.Controls[i] as TPanel;
-      CheckBox := Panel.Controls[1] as TCheckBox;
-      Panel.Visible := StrContains(SubText, CheckBox.Caption, False) and (Panel <> pnlExpertLayout);
-    end;
-
-  CurrTop := 0;
-  for i := 0 to sbxExperts.ControlCount - 1 do
-  begin
-    Panel := sbxExperts.Controls[i] as TPanel;
-    if Panel.Visible then
-    begin
-      Panel.Top := CurrTop;
-      Inc(CurrTop, Panel.Height);
-    end;
-  end;
-  sbxExperts.VertScrollBar.Range := CurrTop;
 end;
 
 procedure TfmConfiguration.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

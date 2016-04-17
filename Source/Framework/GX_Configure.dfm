@@ -1,7 +1,6 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  ActiveControl = edtFilter
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
   ClientHeight = 531
@@ -18,8 +17,6 @@ object fmConfiguration: TfmConfiguration
   OldCreateOrder = True
   Scaled = False
   OnKeyDown = FormKeyDown
-  OnMouseWheelDown = sbxExpertsMouseWheelDown
-  OnMouseWheelUp = sbxExpertsMouseWheelUp
   PixelsPerInch = 96
   TextHeight = 14
   object pnlMain: TPanel
@@ -45,84 +42,6 @@ object fmConfiguration: TfmConfiguration
       OnChange = pcConfigChange
       object tshExperts: TTabSheet
         Caption = 'Experts'
-        object pnlExpertsFilter: TPanel
-          Left = 0
-          Top = 0
-          Width = 591
-          Height = 41
-          Align = alTop
-          BevelOuter = bvNone
-          TabOrder = 0
-          object lblFilter: TLabel
-            Left = 17
-            Top = 12
-            Width = 26
-            Height = 14
-            Alignment = taRightJustify
-            Caption = '&Filter'
-            FocusControl = edtFilter
-          end
-          object edtFilter: TEdit
-            Left = 50
-            Top = 8
-            Width = 390
-            Height = 22
-            TabOrder = 0
-            OnChange = edtFilterChange
-          end
-        end
-        object sbxExperts: TScrollBox
-          Left = 0
-          Top = 41
-          Width = 591
-          Height = 394
-          VertScrollBar.Increment = 40
-          VertScrollBar.Range = 920
-          VertScrollBar.Tracking = True
-          Align = alClient
-          AutoScroll = False
-          TabOrder = 1
-          object pnlExpertLayout: TPanel
-            Left = 0
-            Top = 0
-            Width = 572
-            Height = 40
-            TabOrder = 0
-            object imgExpert: TImage
-              Left = 4
-              Top = 4
-              Width = 32
-              Height = 32
-              Center = True
-              Proportional = True
-              Transparent = True
-            end
-            object chkExpert: TCheckBox
-              Left = 40
-              Top = 12
-              Width = 222
-              Height = 17
-              Caption = 'Set Component Properties'
-              TabOrder = 0
-            end
-            object edtExpert: THotKey
-              Left = 267
-              Top = 10
-              Width = 171
-              Height = 22
-              HotKey = 32833
-              TabOrder = 1
-            end
-            object btnExpert: TButton
-              Left = 455
-              Top = 8
-              Width = 98
-              Height = 25
-              Caption = 'Configure...'
-              TabOrder = 2
-            end
-          end
-        end
       end
       object tshGeneral: TTabSheet
         Caption = 'General'
@@ -972,12 +891,5 @@ object fmConfiguration: TfmConfiguration
     Options = []
     Left = 420
     Top = 364
-  end
-  object tmrFilter: TTimer
-    Enabled = False
-    Interval = 10
-    OnTimer = tmrFilterTimer
-    Left = 352
-    Top = 392
   end
 end
