@@ -10,7 +10,9 @@ type
   private
     FBitmap: TBitmap;
   protected
+    FActive: Boolean;
     function GetShortCut: TShortCut; virtual; abstract;
+    procedure SetActive(New: Boolean); virtual;
     procedure SetShortCut(Value: TShortCut); virtual; abstract;
     // Return the file name of an icon associated with
     // the expert. Do not specify a path.
@@ -49,6 +51,9 @@ type
     procedure LoadSettings;
     procedure SaveSettings;
     function GetOptionsBaseRegistryKey: string; virtual;
+    function CanHaveHotkey: boolean; virtual; abstract;
+    // Is expert active?
+    property Active: Boolean read FActive write SetActive;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;
 
@@ -181,6 +186,11 @@ begin
   finally
     FreeAndNil(Settings);
   end;
+end;
+
+procedure TGX_BaseExpert.SetActive(New: Boolean);
+begin
+  FActive := New;
 end;
 
 end.

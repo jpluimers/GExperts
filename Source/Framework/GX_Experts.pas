@@ -11,7 +11,6 @@ uses
 type
   TGX_Expert = class(TGX_BaseExpert)
   private
-    FActive: Boolean;
     FShortCut: TShortCut;
     FAction: IGxAction;
     procedure ActionOnUpdate(Sender: TObject);
@@ -20,7 +19,7 @@ type
     function GetShortCut: TShortCut; override;
     function GetExpertIndex: Integer;
     procedure SetFormIcon(Form: TForm);
-    procedure SetActive(New: Boolean); virtual;
+    procedure SetActive(New: Boolean); override;
     procedure UpdateAction(Action: TCustomAction); virtual;
     function HasSubmenuItems: Boolean; virtual; // Default = False
     // See LoadSettings
@@ -65,9 +64,7 @@ type
     // Update the action state
     procedure DoUpdateAction;
 
-    // Various state information:
-    // Is expert active?
-    property Active: Boolean read FActive write SetActive;
+    function CanHaveHotkey: boolean; override;
     // Index of expert; used to determine a "historic"
     // menu item order in the GExperts menu item.
     property ExpertIndex: Integer read GetExpertIndex;
@@ -337,6 +334,11 @@ function TGX_Expert.GetDisplayName: string;
 begin
   Result := StringReplace(GetActionCaption, '...', '', [rfReplaceAll]);
   Result := StripHotkey(Result);
+end;
+
+function TGX_Expert.CanHaveHotkey: boolean;
+begin
+  Result := HasMenuItem;
 end;
 
 class function TGX_Expert.ConfigurationKey: string;

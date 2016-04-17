@@ -41,6 +41,7 @@ type
     // name.
 //    class function GetName: string; virtual; // declared in TGX_BaseExpert
 
+    function CanHaveHotkey: boolean; override;
     // you usually don't need to override this
     function GetOptionsBaseRegistryKey: string; override;
   end;
@@ -156,6 +157,11 @@ procedure TEditorExpert.SetShortCut(Value: TShortCut);
 begin
   Assert(Assigned(FGxAction));
   FGxAction.ShortCut := Value;
+end;
+
+function TEditorExpert.CanHaveHotkey: boolean;
+begin
+  Result := True;
 end;
 
 class function TEditorExpert.ConfigurationKey: string;
