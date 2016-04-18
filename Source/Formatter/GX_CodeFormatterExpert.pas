@@ -20,7 +20,6 @@ type
   TCodeFormatterExpert = class
   private
     FEngine: TCodeFormatterEngine;
-    function ShowDoneDialog(ShowDone: Boolean): boolean;
     function GetSettingsName(FileName: string; FullText: TGXUnicodeStringList): string;
   protected
   public
@@ -47,8 +46,8 @@ uses
   GX_CodeFormatterBreakpoints,
   GX_CodeFormatterDefaultSettings,
   GX_CodeFormatterConfigHandler,
-  GX_CodeFormatterDone,
-  GX_CodeFormatterSettings;
+  GX_CodeFormatterSettings,
+  GX_MessageBox;
 
 procedure XSendDebug(const Msg: string);
 begin
@@ -145,7 +144,7 @@ function TCodeFormatterExpert.GetSettingsName(FileName: string; FullText: TGXUni
       Result := '';
   end;
 
-  function GetSettingNameFor(_Precedence: TConfigPrecedenceEnum; out _Name: string): boolean;
+  function GetSettingNameFor(_Precedence: TConfigPrecedenceEnum; out _Name: string): Boolean;
   begin
     case _Precedence of
       cpDirective: begin
@@ -158,7 +157,7 @@ function TCodeFormatterExpert.GetSettingsName(FileName: string; FullText: TGXUni
         end;
       cpMyConfig: begin
           _Name := '';
-          Result := true;
+          Result := True;
         end else
       Result := False;
     end;
@@ -173,6 +172,21 @@ begin
   Result := '';
 end;
 
+type
+  TCodeFormatterDone = class(TGxMsgBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+{ TCodeFormatterDone }
+
+function TCodeFormatterDone.GetMessage: string;
+resourcestring
+  str_FileHasBeenFormatted = 'The file has been reformatted.';
+begin
+  Result := str_FileHasBeenFormatted;
+end;
+
 procedure TCodeFormatterExpert.Execute;
 resourcestring
   str_NoEditor = 'No source editor';
@@ -185,7 +199,7 @@ var
   FullText: TGXUnicodeStringList;
   Bookmarks: TBookmarkHandler;
   Breakpoints: TBreakpointHandler;
-  i: integer;
+  i: Integer;
   TempSettings: TCodeFormatterSettings;
   OrigSettings: TCodeFormatterEngineSettings;
   SettingsName: string;
@@ -233,7 +247,7 @@ begin
           Bookmarks.RestoreItems;
           for i := 0 to SourceEditor.EditViewCount - 1 do
             SourceEditor.EditViews[i].Paint;
-          FEngine.Settings.ShowDoneDialog := ShowDoneDialog(FEngine.Settings.ShowDoneDialog);
+          ShowGxMessageBox(TCodeFormatterDone);
         end;
       end else
         XSendDebug('Ignoring request, no settings name available');
@@ -265,22 +279,6 @@ var
 begin
   Writer := TGxConfigWrapper.Create(Settings, ConfigurationKey);
   TCodeFormatterConfigHandler.WriteSettings(Writer, FEngine.Settings);
-end;
-
-function TCodeFormatterExpert.ShowDoneDialog(ShowDone: Boolean): boolean;
-var
-  DoneForm: TfmCodeFormatterDone;
-begin
-  Result := ShowDone;
-  if not Result then
-    exit;
-  DoneForm := TfmCodeFormatterDone.Create(nil);
-  try
-    DoneForm.ShowModal;
-    Result := not DoneForm.chk_DontShowAgain.Checked;
-  finally
-    DoneForm.Free;
-  end;
 end;
 
 function TCodeFormatterExpert.FormatFile(const _FileName: string): Boolean;
@@ -321,7 +319,7 @@ begin
         // add an empty line to be compatible with running in the IDE
         FullText.Add('');
         FullText.SaveToFile(_FileName);
-        FEngine.Settings.ShowDoneDialog := ShowDoneDialog(FEngine.Settings.ShowDoneDialog);
+        ShowGxMessageBox(TCodeFormatterDone);
       end else begin
         XSendDebug('Nothing changed');
       end;
@@ -337,4 +335,3 @@ begin
 end;
 
 end.
-
