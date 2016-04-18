@@ -142,8 +142,6 @@ var
   cps: set of TConfigPrecedenceEnum;
   cp: TConfigPrecedenceEnum;
 begin
-  _Settings.ShowDoneDialog := _Reader.ReadBool('ShowDoneDialog', True);
-
   _Settings.UseCapitalizationFile := _Reader.ReadBool('UseCapitalizationFile', False);
   _Settings.CapitalizationFile := _Reader.ReadString('CapitalizationFile', '');
   _Settings.CapNames.Clear;
@@ -291,7 +289,6 @@ begin
   _Writer.WriteInteger('Precedence2', Ord(_Settings.ConfigPrecedence[2]));
   _Writer.WriteInteger('Precedence3', Ord(_Settings.ConfigPrecedence[3]));
 
-  _Writer.WriteBool('ShowDoneDialog', _Settings.ShowDoneDialog);
   _Writer.WriteBool('UseCapitalizationFile', _Settings.UseCapitalizationFile);
   _Writer.WriteString('CapitalizationFile', string(_Settings.CapitalizationFile));
 

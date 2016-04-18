@@ -165,7 +165,6 @@ type
     property AlignVarPos: Byte read FSettings.AlignVarPos;
     property AlignVar: Boolean read FSettings.AlignVar;
     // settings for the wizard
-    property ShowDoneDialog: Boolean read FShowDoneDialog write FShowDoneDialog;
     property CapitalizationFile: string read FCapFile write FCapFile;
     property UseCapitalizationFile: Boolean read FUseCapFile write FUseCapFile;
   end;

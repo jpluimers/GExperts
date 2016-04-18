@@ -550,14 +550,6 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
     end
     object ts_Misc: TTabSheet
       Caption = 'Misc.'
-      object chk_ShowDone: TCheckBox
-        Left = 16
-        Top = 200
-        Width = 377
-        Height = 17
-        Caption = 'Show confirmation dialog when complete'
-        TabOrder = 2
-      end
       object grp_ConfigPrecedence: TGroupBox
         Left = 8
         Top = 88

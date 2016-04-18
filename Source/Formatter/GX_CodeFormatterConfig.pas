@@ -105,7 +105,6 @@ type
     b_Help: TButton;
     b_Ok: TButton;
     b_Cancel: TButton;
-    chk_ShowDone: TCheckBox;
     pm_Extra: TPopupMenu;
     mi_ResetTo: TMenuItem;
     mi_ResetToDefault: TMenuItem;
@@ -382,7 +381,6 @@ var
   i: Integer;
   Idx: Integer;
 begin
-  _Settings.ShowDoneDialog := chk_ShowDone.Checked;
   _Settings.UseCapitalizationFile := rb_CapitalizationInFile.Checked;
   _Settings.CapitalizationFile := ed_CapitalizationFile.Text;
   _Settings.CapNames.Assign(FCapitalization);
@@ -486,7 +484,6 @@ var
   cp: TConfigPrecedenceEnum;
   PrecedenceSet: set of TConfigPrecedenceEnum;
 begin
-  chk_ShowDone.Checked := _Settings.ShowDoneDialog;
   rb_CapitalizationInFile.Checked := _Settings.UseCapitalizationFile;
   ed_CapitalizationFile.Text := string(_Settings.CapitalizationFile);
   FCapitalization.Assign(_Settings.CapNames);
