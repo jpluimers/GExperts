@@ -37,7 +37,7 @@ object frConfigureExperts: TfrConfigureExperts
       Width = 75
       Height = 25
       Caption = 'Enable All'
-      TabOrder = 2
+      TabOrder = 4
       OnClick = btnEnableAllClick
     end
     object btnDisableAll: TButton
@@ -46,7 +46,7 @@ object frConfigureExperts: TfrConfigureExperts
       Width = 75
       Height = 25
       Caption = 'Disable All'
-      TabOrder = 3
+      TabOrder = 5
       OnClick = btnDisableAllClick
     end
     object btnClear: TButton
@@ -70,7 +70,7 @@ object frConfigureExperts: TfrConfigureExperts
       Width = 75
       Height = 25
       Caption = 'Clear All'
-      TabOrder = 4
+      TabOrder = 2
       OnClick = btnClearAllClick
     end
     object btnSetAllDefault: TButton
@@ -79,7 +79,7 @@ object frConfigureExperts: TfrConfigureExperts
       Width = 81
       Height = 25
       Caption = 'Set to default'
-      TabOrder = 5
+      TabOrder = 3
       OnClick = btnSetAllDefaultClick
     end
   end
@@ -120,17 +120,25 @@ object frConfigureExperts: TfrConfigureExperts
       object edtExpert: THotKey
         Left = 267
         Top = 10
-        Width = 171
+        Width = 142
         Height = 22
         HotKey = 32833
         TabOrder = 1
       end
       object btnExpert: TButton
-        Left = 455
+        Left = 463
         Top = 8
         Width = 98
         Height = 25
         Caption = 'Configure...'
+        TabOrder = 3
+      end
+      object btnDefault: TButton
+        Left = 408
+        Top = 8
+        Width = 49
+        Height = 25
+        Caption = 'Default'
         TabOrder = 2
       end
     end

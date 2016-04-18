@@ -32,6 +32,7 @@ type
     btnClear: TButton;
     btnClearAll: TButton;
     btnSetAllDefault: TButton;
+    btnDefault: TButton;
     procedure edtFilterChange(Sender: TObject);
     procedure btnEnableAllClick(Sender: TObject);
     procedure btnDisableAllClick(Sender: TObject);
@@ -48,6 +49,7 @@ type
     procedure ConfigureExpertClick(_Sender: TObject);
     procedure FilterVisibleExperts;
     procedure SetAllEnabled(_Value: Boolean);
+    procedure SetDefaultShortcutClick(_Sender: TObject);
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -101,6 +103,53 @@ begin
   FilterVisibleExperts;
 end;
 
+function TryGetControl(_Owner: TControl; _CtrlClass: TControlClass; out _ctrl: TControl): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := 0 to _Owner.ComponentCount - 1 do begin
+    _ctrl := _Owner.Components[i] as TControl;
+    if _ctrl is _CtrlClass then begin
+      Result := True;
+      Exit;
+    end;
+  end;
+end;
+
+function GetCheckbox(_Pnl: TPanel): TCheckBox;
+resourcestring
+  STR_NO_CHECKBOX = 'No checkbox found.';
+begin
+  if not TryGetControl(_Pnl, TCheckBox, TControl(Result)) then
+    raise Exception.Create(STR_NO_CHECKBOX);
+end;
+
+function GetHotkeyCtrl(_Pnl: TPanel): THotKey;
+resourcestring
+  STR_NO_HOTKEY = 'No hotkey control found.';
+begin
+  if not TryGetControl(_Pnl, THotKey, TControl(Result)) then
+    raise Exception.Create(STR_NO_HOTKEY);
+end;
+
+function GetPanel(_sbx: TScrollBox; _Tag: Integer): TPanel;
+resourcestring
+  STR_NO_PANEL = 'No panel found.';
+var
+  i: Integer;
+  ctrl: TControl;
+begin
+  for i := 0 to _sbx.ComponentCount - 1 do begin
+    ctrl := _sbx.Components[i] as TControl;
+    if (ctrl.Tag = _Tag) and (ctrl is TPanel) then begin
+      Result := ctrl as TPanel;
+      Exit;
+    end;
+  end;
+  raise Exception.Create(STR_NO_PANEL);
+end;
+
 procedure TfrConfigureExperts.SetAllEnabled(_Value: Boolean);
 var
   i: Integer;
@@ -108,8 +157,8 @@ var
 begin
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
-    if AControl is TCheckBox then
-      (AControl as TCheckBox).Checked := _Value;
+    if AControl is TPanel then
+      GetCheckbox(AControl as TPanel).Checked := _Value;
   end;
 end;
 
@@ -137,12 +186,12 @@ var
   i: Integer;
   AControl: TControl;
 begin
-  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0)  then
+  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) then
     Exit; //==>
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
-    if AControl is THotKey then
-      (AControl as THotKey).HotKey := 0;
+    if AControl is TPanel then
+      GetHotkeyCtrl(AControl as TPanel).HotKey := 0;
   end;
 end;
 
@@ -155,13 +204,13 @@ var
   AControl: TControl;
   AnExpert: TGX_BaseExpert;
 begin
-  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0)  then
+  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) then
     Exit; //==>
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
-    if AControl is THotKey then begin
+    if AControl is TPanel then begin
       AnExpert := FExperts[AControl.Tag];
-      (AControl as THotKey).HotKey := AnExpert.GetDefaultShortCut;
+      GetHotkeyCtrl(AControl as TPanel).HotKey := AnExpert.GetDefaultShortCut;
     end;
   end;
 end;
@@ -174,6 +223,16 @@ begin
   Idx := (_Sender as TButton).Tag;
   AnExpert := FExperts[Idx];
   AnExpert.Configure;
+end;
+
+procedure TfrConfigureExperts.SetDefaultShortcutClick(_Sender: TObject);
+var
+  AnExpert: TGX_BaseExpert;
+  Idx: Integer;
+begin
+  Idx := (_Sender as TButton).Tag;
+  AnExpert := FExperts[Idx];
+  GetHotkeyCtrl(GetPanel(sbxExperts, Idx)).HotKey := AnExpert.GetDefaultShortCut;
 end;
 
 procedure TfrConfigureExperts.Init(_Experts: TList);
@@ -198,15 +257,15 @@ begin
   for i := 0 to FExperts.Count - 1 do begin
     AnExpert := FExperts[i];
 
-    pnl := TPanel.Create(Self);
+    pnl := TPanel.Create(sbxExperts);
     pnl.Parent := sbxExperts;
     pnl.SetBounds(0, i * RowHeight, RowWidth, RowHeight);
     pnl.Tag := i;
     pnl.FullRepaint := False;
 
-    img := THintImage.Create(Self);
+    img := THintImage.Create(pnl);
     img.Parent := pnl;
-    img.SetBounds(imgExpert.Left, imgExpert.Top, imgExpert.Width, imgExpert.Height);
+    img.BoundsRect := imgExpert.BoundsRect;
     img.Picture.Bitmap.Assign(AnExpert.GetBitmap);
     img.Transparent := True;
     img.Center := True;
@@ -215,30 +274,39 @@ begin
     img.ShowHint := True;
     img.Tag := i;
 
-    chk := TCheckBox.Create(sbxExperts);
+    chk := TCheckBox.Create(pnl);
     chk.Parent := pnl;
-    chk.SetBounds(chkExpert.Left, chkExpert.Top, chkExpert.Width, chkExpert.Height);
+    chk.BoundsRect := chkExpert.BoundsRect;
     chk.Caption := AnExpert.GetDisplayName;
     chk.Checked := AnExpert.Active;
     chk.Tag := i;
 
-    hk := THotKey.Create(sbxExperts);
+    hk := THotKey.Create(pnl);
     hk.Parent := pnl;
-    hk.SetBounds(edtExpert.Left, edtExpert.Top, edtExpert.Width, edtExpert.Height);
-
+    hk.BoundsRect := edtExpert.BoundsRect;
     THotkey_SetHotkey(hk, AnExpert.ShortCut);
     hk.Visible := AnExpert.CanHaveHotkey;
     hk.Tag := i;
 
+    btn := TButton.Create(pnl);
+    btn.Parent := pnl;
+    btn.BoundsRect := btnDefault.BoundsRect;
+    btn.Caption := 'Default';
+    if AnExpert.GetDefaultShortCut <> 0 then begin
+      btn.Hint := ShortCutToText(AnExpert.GetDefaultShortCut);
+      btn.ShowHint := True;
+      btn.OnClick := SetDefaultShortcutClick;
+    end else
+      btn.Enabled := False;
+    btn.Tag := i;
+
     if AnExpert.HasConfigOptions then begin
-      btn := TButton.Create(Self);
-      with TButton.Create(Self) do begin
-        btn.Parent := pnl;
-        btn.Caption := SConfigureButtonCaption;
-        btn.SetBounds(btnExpert.Left, btnExpert.Top, btnExpert.Width, btnExpert.Height);
-        btn.OnClick := ConfigureExpertClick;
-        btn.Tag := i;
-      end;
+      btn := TButton.Create(pnl);
+      btn.Parent := pnl;
+      btn.Caption := SConfigureButtonCaption;
+      btn.BoundsRect := btnExpert.BoundsRect;
+      btn.OnClick := ConfigureExpertClick;
+      btn.Tag := i;
     end;
   end;
   sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight;
@@ -250,15 +318,16 @@ var
   AControl: TControl;
   AnExpert: TGX_BaseExpert;
   i: Integer;
+  pnl: TPanel;
 begin
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
-
-    AnExpert := FExperts[AControl.Tag];
-    if AControl is TCheckBox then
-      AnExpert.Active := TCheckBox(AControl).Checked
-    else if AControl is THotKey then
-      AnExpert.ShortCut := THotKey(AControl).HotKey;
+    if AControl is TPanel then begin
+      AnExpert := FExperts[AControl.Tag];
+      pnl := AControl as TPanel;
+      AnExpert.Active := GetCheckbox(pnl).Checked;
+      AnExpert.ShortCut := GetHotkeyCtrl(pnl).HotKey;
+    end;
   end;
 
   for i := 0 to FExperts.Count - 1 do begin
@@ -289,26 +358,23 @@ var
 begin
   sbxExperts.VertScrollBar.Position := 0;
   SubText := Trim(edtFilter.Text);
-  if SubText = '' then
-    for i := 0 to sbxExperts.ControlCount - 1 do begin
-      Panel := sbxExperts.Controls[i] as TPanel;
-      if Panel <> pnlExpertLayout then
-        Panel.Visible := True;
-    end else
-    for i := 0 to sbxExperts.ControlCount - 1 do begin
-      Panel := sbxExperts.Controls[i] as TPanel;
-      CheckBox := Panel.Controls[1] as TCheckBox;
-      Panel.Visible := StrContains(SubText, CheckBox.Caption, False) and (Panel <> pnlExpertLayout);
-    end;
-
   CurrTop := 0;
   for i := 0 to sbxExperts.ControlCount - 1 do begin
     Panel := sbxExperts.Controls[i] as TPanel;
+    if Panel <> pnlExpertLayout then begin
+      if SubText = '' then
+        Panel.Visible := True
+      else begin
+        CheckBox := Panel.Controls[1] as TCheckBox;
+        Panel.Visible := StrContains(SubText, CheckBox.Caption, False);
+      end;
+    end;
     if Panel.Visible then begin
       Panel.Top := CurrTop;
       Inc(CurrTop, Panel.Height);
     end;
   end;
+
   sbxExperts.VertScrollBar.Range := CurrTop;
 end;
 
