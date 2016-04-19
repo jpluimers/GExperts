@@ -7,9 +7,7 @@ interface
 uses
   Classes, Controls, Forms, ActnList, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, Messages,
-  {$IFDEF GX_VER240_up}
-  System.Actions,
-  {$ENDIF GX_VER240_up}
+  Actions,
   GX_OpenFileConfig, GX_BaseForm;
 
 const
