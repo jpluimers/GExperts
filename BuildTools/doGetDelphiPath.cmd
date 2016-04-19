@@ -66,6 +66,10 @@ goto DelphiEndCase
 :DelphiXX10Seattle
 :Delphi10Seattle
   call :ReadReg Embarcadero\BDS\17.0
+:Delphi101
+:DelphiXX101Berlin
+:Delphi101Berlin
+  call :ReadReg Embarcadero\BDS\18.0
 :DelphiEndCase
 
 echo DelphiPath: "%DelphiPath%"

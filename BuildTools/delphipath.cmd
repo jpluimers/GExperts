@@ -63,6 +63,8 @@ goto DelphiEndCase
   goto :eof
 :Delphi10Seattle
   call :ReadReg Embarcadero\BDS\17.0
+:Delphi101Berlin
+  call :ReadReg Embarcadero\BDS\18.0
 :DelphiEndCase
 
 echo DelphiPath: "%DelphiPath%"
