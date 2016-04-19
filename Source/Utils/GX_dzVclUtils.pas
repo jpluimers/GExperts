@@ -242,10 +242,10 @@ procedure TListItems_ClearWithObjects(_li: TListItems);
 /// Append a new action to the given action list, assign Caption
 /// and optionally Shortcut and OnExecute event.
 /// @returns the new action </summary>
-function TActionlist_Append(_al: TActionList; _Caption: string = ''): TAction; overload;
-function TActionlist_Append(_al: TActionList; _Caption: string; _ShortCut: TShortCut): TAction; overload;
-function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction; overload;
-function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction; overload;
+function TActionlist_Append(_al: TActionList; const _Caption: string = ''): TAction; overload;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _ShortCut: TShortCut): TAction; overload;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent): TAction; overload;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction; overload;
 
 ///<summary>
 /// Appends a new menu item with the given Caption to the popup menu and returns it </summary>
@@ -660,7 +660,7 @@ begin
     TListView_ResizeColumn(_lv.Columns[i], _Options);
 end;
 
-function TActionlist_Append(_al: TActionList; _Caption: string = ''): TAction;
+function TActionlist_Append(_al: TActionList; const _Caption: string = ''): TAction;
 begin
   Result := TAction.Create(_al);
   Result.Name := '';
@@ -668,19 +668,19 @@ begin
   Result.Caption := _Caption;
 end;
 
-function TActionlist_Append(_al: TActionList; _Caption: string; _ShortCut: TShortCut): TAction;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _ShortCut: TShortCut): TAction;
 begin
   Result := TActionlist_Append(_al, _Caption);
   Result.ShortCut := _ShortCut;
 end;
 
-function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent): TAction;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent): TAction;
 begin
   Result := TActionlist_Append(_al, _Caption);
   Result.OnExecute := _OnExecute;
 end;
 
-function TActionlist_Append(_al: TActionList; _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction;
 begin
   Result := TActionlist_Append(_al, _Caption, _ShortCut);
   Result.OnExecute := _OnExecute;
