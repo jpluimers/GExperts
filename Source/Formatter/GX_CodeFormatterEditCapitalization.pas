@@ -196,7 +196,7 @@ begin
     end;
     if (AnAction = acCommentOut) then begin
       lb_Items.Sorted := False;
-      lb_Items.Sorted := True; //Combination forces reorder
+      lb_Items.Sorted := True; //fi:W508 - Combination forces reorder
     end;
   end;
 end;
