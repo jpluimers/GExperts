@@ -2440,7 +2440,9 @@ begin
   else if RunningBDS2006OrGreater and GxOtaCurrentProjectIsNativeCpp then
     Result := GxOtaGetIdeEnvironmentString('CppBrowsingPath')
   else if (not RunningBDS2006OrGreater) or GxOtaCurrentProjectIsNativeDelphi then
-    Result := GxOtaGetIdeEnvironmentString('BrowsingPath');
+    Result := GxOtaGetIdeEnvironmentString('BrowsingPath')
+  else
+    Result := '';
 end;
 
 procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
