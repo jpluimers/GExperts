@@ -169,9 +169,6 @@ uses
   GX_GExperts, GX_EditorShortcut, GX_MenuActions, GX_GenericUtils, GX_IdeUtils,
   GX_OtaUtils, GX_dzVclUtils, GX_KbdShortCutBroker;
 
-resourcestring
-  GExpertsShortcutDisabled = '<disabled>';
-
 type
   TShowOldComCtrlVersionMessage = class(TGxMsgBoxAdaptor)
   protected
