@@ -27,7 +27,7 @@ type
     procedure SetReservedType(_rType: TReservedType); virtual;
     procedure SetSpace(_Space: TSpaceSet; _State: Boolean); virtual;
     {: @returns the object's content }
-    function GetString: TGXUnicodeString; virtual; abstract;
+    function GetContent: TGXUnicodeString; virtual; abstract;
     (*: changes " // <comment>" to "{//<comment>}" used for preventing a
       begin
         moved from the next line to become commented out
@@ -36,8 +36,8 @@ type
     function ChangeComment(_CommChar: char): Boolean;
     function GetExpression(out _Expression: TGXUnicodeString): Boolean; virtual;
     procedure SetExpression(const _Expression: TGXUnicodeString); virtual;
-    procedure SetCase(_Case: TCase); virtual;
-    function GetCase: TCase; virtual;
+    procedure SetExpressionCase(_Case: TCase); virtual;
+    function GetExpressionCase: TCase; virtual;
     procedure SetOptions(_Options: TTokenOptions); virtual;
     function GetOptions: TTokenOptions; virtual;
     procedure AddOption(_Option: TTokenOption);
@@ -45,10 +45,10 @@ type
 
     function GetForDebug: TGXUnicodeString; virtual;
 
-    property ExpressionCase: TCase read GetCase write SetCase;
+    property ExpressionCase: TCase read GetExpressionCase write SetExpressionCase;
     property ReservedType: TReservedType read GetReservedType write SetReservedType;
     property WordType: TWordType read GetWordType;
-    property Content: TGXUnicodeString read GetString;
+    property Content: TGXUnicodeString read GetContent;
     property Options: TTokenOptions read GetOptions write SetOptions;
   end;
 
@@ -69,7 +69,7 @@ type
     function GetForDebug: TGXUnicodeString; override;
 
     {: @returns a TGXUnicodeString with FNoOfSpaces spaces }
-    function GetString: TGXUnicodeString; override;
+    function GetContent: TGXUnicodeString; override;
     property NoOfSpaces: Integer read FNoOfSpaces write FNoOfSpaces;
     property OldNoOfSpaces: Integer read FOldNoOfSpaces write FOldNoOfSpaces;
     property Wrapped: Boolean read FWrapped write FWrapped;
@@ -90,14 +90,14 @@ type
     procedure SetReservedType(_ReservedType: TReservedType); override;
     function Space(_Space: TSpace): Boolean; override;
     {: @returns <spaces><the expression><spaces> }
-    function GetString: TGXUnicodeString; override;
+    function GetContent: TGXUnicodeString; override;
     procedure GetLength(var _Length: Integer); override;
     function GetWordType: TWordType; override;
     function GetReservedType: TReservedType; override;
     function GetExpression(out _Expression: TGXUnicodeString): Boolean; override;
     procedure SetExpression(const _Value: TGXUnicodeString); override;
-    procedure SetCase(_Value: TCase); override;
-    function GetCase: TCase; override;
+    procedure SetExpressionCase(_Value: TCase); override;
+    function GetExpressionCase: TCase; override;
     procedure SetOptions(_Value: TTokenOptions); override;
     function GetOptions: TTokenOptions; override;
     function GetForDebug: TGXUnicodeString; override;
@@ -112,7 +112,7 @@ type
     // Note: As a side effect, this adjusts FNoOfspaces
     procedure GetLength(var _Length: Integer); override;
     {: @returns <spaces><the expression><spaces> }
-    function GetString: TGXUnicodeString; override;
+    function GetContent: TGXUnicodeString; override;
     property NoOfSpaces: byte read FNoOfSpaces write FNoOfSpaces;
   end;
 
@@ -153,11 +153,11 @@ procedure TPascalToken.SetOptions(_Options: TTokenOptions);
 begin
 end;
 
-procedure TPascalToken.SetCase(_Case: TCase);
+procedure TPascalToken.SetExpressionCase(_Case: TCase);
 begin
 end;
 
-function TPascalToken.GetCase: TCase;
+function TPascalToken.GetExpressionCase: TCase;
 begin
   Result := rfUnchanged;
 end;
@@ -378,12 +378,12 @@ begin
     FSpaceType := FSpaceType - _Space
 end;
 
-procedure TExpression.SetCase(_Value: TCase);
+procedure TExpression.SetExpressionCase(_Value: TCase);
 begin
   FCaseType := _Value;
 end;
 
-function TExpression.GetCase: TCase;
+function TExpression.GetExpressionCase: TCase;
 begin
   Result := FCaseType;
 end;
@@ -393,7 +393,7 @@ begin
   FReservedType := _ReservedType;
 end;
 
-function TExpression.GetString: TGXUnicodeString;
+function TExpression.GetContent: TGXUnicodeString;
 begin
   if Space(spBefore) then
     Result := GX_CodeFormatterTypes.Space
@@ -423,7 +423,7 @@ end;
 
 { TLineFeed }
 
-function TLineFeed.GetString: TGXUnicodeString;
+function TLineFeed.GetContent: TGXUnicodeString;
 var
   Len: Integer;
 begin
@@ -513,14 +513,14 @@ begin
   inherited GetLength(_Length);
 end;
 
-function TAlignExpression.GetString: TGXUnicodeString;
+function TAlignExpression.GetContent: TGXUnicodeString;
 begin
   if (FNoOfSpaces > 0) then
     Result := StringOfChar(GX_CodeFormatterTypes.Space, FNoOfSpaces)
   else
     Result := '';
 
-  Result := Result + inherited GetString;
+  Result := Result + inherited GetContent;
 end;
 
 end.

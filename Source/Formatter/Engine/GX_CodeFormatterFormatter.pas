@@ -272,7 +272,7 @@ begin
 
   { append space after : , ; }
   if (wType = wtHexNumber) and Settings.UpperNumbers then
-    _CurrentToken.SetCase(rfUpperCase);
+    _CurrentToken.SetExpressionCase(rfUpperCase);
 
   { delimiter between 2 words (necessary) }
 
@@ -1354,9 +1354,9 @@ begin { procedure TCodeFormatterFormatter.doExecute; }
     FIsInInterfacePart := False;
     NTmp := 0;
     PrevOldNspaces := -1;
+    // the StackStack is used to preserve indenting over IFDEF/ELSE/ENDIF statements
+    FStackStack := TCodeFormatterStack.Create;
     try
-      // the StackStack is used to preserve indenting over IFDEF/ELSE/ENDIF statements
-      FStackStack := TCodeFormatterStack.Create;
       FTokenIdx := 0;
       while GetToken(FTokenIdx, FCurrentToken) do begin
         CheckIndent;

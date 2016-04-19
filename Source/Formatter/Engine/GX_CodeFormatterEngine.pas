@@ -127,7 +127,7 @@ begin
   Token := _Tokens[_TokenNo];
 
   repeat
-    Result := Result + Token.GetString;
+    Result := Result + Token.GetContent;
     Inc(_TokenNo);
 
     if _TokenNo >= _Tokens.Count then
