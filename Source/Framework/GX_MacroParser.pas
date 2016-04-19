@@ -929,6 +929,7 @@ var
 begin
   FParseSource := DoParseSource;
   ParamListStart := 0;
+  Result := '';
   i := 1;
   while i <= Length(RawString) do
   begin
