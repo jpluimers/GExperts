@@ -364,7 +364,6 @@ var
 begin
   Assert(Assigned(FormEditor));
 
-  CompList := nil;
   FileName := '';
   try
     try
@@ -378,6 +377,7 @@ begin
       end;
     end;
 
+    CompList := nil;
     Context := SFileProc;
     try
       FormInfo := TFormInfo.Create(FController, FormEditor);
