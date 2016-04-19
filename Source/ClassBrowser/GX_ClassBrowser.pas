@@ -603,7 +603,6 @@ end;
 
 function TfmClassBrowser.GetMethodString(M: TBrowseMethodInfoItem): string;
 begin
-  Result := '';
   Result := IntToStr(Ord(M.MethodDeclare)) + #9 + IntToStr(Ord(M.MethodType)) + #9 +
             IntToStr(Ord(M.cVirtual)) + #9 + IntToStr(Ord(M.cAbstract)) + #9 +
             IntToStr(Ord(M.cOverride)) + #9 + FilterTab(M.DName);
