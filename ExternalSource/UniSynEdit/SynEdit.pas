@@ -10559,7 +10559,9 @@ var
 begin
   { Return the word under the mouse }
   if GetPositionOfMouse(Point) then        // if point is valid
-    Result := Self.GetWordAtRowCol(Point); // return the point at the mouse position
+    Result := Self.GetWordAtRowCol(Point) // return the point at the mouse position
+  else
+    Result := '';
 end;
 
 function TCustomSynEdit.CharIndexToRowCol(Index: Integer): TBufferCoord;
