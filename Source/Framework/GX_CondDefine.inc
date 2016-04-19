@@ -73,6 +73,9 @@
                                   {$DEFINE GX_VER290_up}  // RAD Studio XE 8 (23; BDS 16)
                                   {$IF CompilerVersion >= 30}
                                     {$DEFINE GX_VER300_up}  // RAD Studio 10 Seattle (24; BDS 17)
+                                    {$IF CompilerVersion >= 31}
+                                      {$DEFINE GX_VER310_up}  // RAD Studio 10.1 Berlin (25; BDS 18)
+                                    {$IFEND}
                                   {$IFEND}
                                 {$IFEND}
                               {$IFEND}

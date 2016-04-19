@@ -185,7 +185,16 @@ const
     IDEEnglishName = 'RAD Studio 10';
     CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\17.0';
     ClassBrowserStorageFolder = 'Classes.RADStudio10';
-  {$ENDIF VER290}
+  {$ENDIF VER300}
+
+  {$IFDEF VER310} // Delphi/RAD Studio 10.1 Berlin
+    GExpertsDll = 'GExpertsRS101.dll';
+    TTabDockHostFormClassContainer = 'designide240.bpl';
+    MajorVersionNumberChar = '24';
+    IDEEnglishName = 'RAD Studio 10.1';
+    CompilerDefinedProductRegistryKey = CompanyRegPrefix + 'BDS\18.0';
+    ClassBrowserStorageFolder = 'Classes.RADStudio10.1';
+  {$ENDIF VER300}
 
 implementation
 
