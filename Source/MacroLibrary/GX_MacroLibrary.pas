@@ -211,7 +211,6 @@ const
 
 resourcestring
   SMacroLibCaption = 'Macro &Library';
-  SMacroName = 'Macro name';
 
 const
   UnknownName = 'Unknown';
