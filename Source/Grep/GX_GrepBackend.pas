@@ -1806,6 +1806,7 @@ end;
 function TGrepHistoryList.SearchHistoryItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItem): Integer;
 begin
   AHistoryItem := nil;
+  Result := 0;
   for Result := 0 to HistoryList.Count - 1 do
   begin
     AHistoryItem := HistoryItems[Result];
