@@ -780,8 +780,8 @@ function TfmUsesManager.GetLbxForOpen: TListBox;
 begin
   if ActiveControl = lbxImplementation then
     Result := lbxImplementation
-  else if ActiveControl = lbxImplementation then
-    Result := lbxImplementation
+  else if ActiveControl = lbxInterface then
+    Result := lbxInterface
   else
     Result := GetAvailableSourceListBox;
 end;
