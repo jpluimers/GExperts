@@ -514,23 +514,23 @@ object fmConfiguration: TfmConfiguration
         ImageIndex = 6
         DesignSize = (
           591
-          435)
+          454)
         object gbSuppressedMessages: TGroupBox
           Left = 8
           Top = 8
           Width = 433
-          Height = 414
+          Height = 433
           Anchors = [akLeft, akTop, akBottom]
           Caption = 'Suppressed Messages'
           TabOrder = 0
           DesignSize = (
             433
-            414)
+            433)
           object lbSuppressedMesages: TListBox
             Left = 8
             Top = 24
             Width = 321
-            Height = 382
+            Height = 401
             Anchors = [akLeft, akTop, akBottom]
             ItemHeight = 14
             TabOrder = 0
