@@ -411,9 +411,6 @@
 			</DCCReference>
 			<DCCReference Include="..\..\source\formatter\GX_CodeFormatterConfigHandler.pas"/>
 			<DCCReference Include="..\..\source\formatter\GX_CodeFormatterDefaultSettings.pas"/>
-			<DCCReference Include="..\..\source\formatter\GX_CodeFormatterDone.pas">
-				<Form>fmCodeFormatterDone</Form>
-			</DCCReference>
 			<DCCReference Include="..\..\source\formatter\GX_CodeFormatterEditCapitalization.pas">
 				<Form>fmCodeFormatterEditCapitalization</Form>
 			</DCCReference>
@@ -456,6 +453,10 @@
 				<Form>fmAutoTodoDone</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas"/>
+			<DCCReference Include="..\..\Source\Framework\GX_ConfigureExperts.pas">
+				<Form>frConfigureExperts</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
