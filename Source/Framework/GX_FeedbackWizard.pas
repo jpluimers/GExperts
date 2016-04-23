@@ -475,7 +475,7 @@ end;
 
 procedure TfmFeedbackWizard.btnEmailClick(Sender: TObject);
 var
-  Execute: string;
+  ExecFilename: string;
   Address: string;
   Subject: string;
   Body: string;
@@ -492,9 +492,9 @@ begin
     Body := SFillInReminderPaste;
 
   // Do not localize the lines below.
-  Execute := Format('mailto:%s?Subject=%s&Body=%s', [Address, Subject, Body]);
-  Execute := StringReplace(Execute, ' ', '%20', [rfReplaceAll]);
-  ShellExecute(Self.Handle, 'open', PChar(Execute), nil, PChar(ExtractFilePath(application.ExeName)), SW_SHOWNORMAL);
+  ExecFilename := Format('mailto:%s?Subject=%s&Body=%s', [Address, Subject, Body]);
+  ExecFilename := StringReplace(ExecFilename, ' ', '%20', [rfReplaceAll]);
+  ShellExecute(Self.Handle, 'open', PChar(ExecFilename), nil, PChar(ExtractFilePath(application.ExeName)), SW_SHOWNORMAL);
 end;
 
 procedure TfmFeedbackWizard.btnCopyClick(Sender: TObject);
