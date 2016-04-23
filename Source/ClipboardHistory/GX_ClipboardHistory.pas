@@ -855,7 +855,7 @@ begin
           FDataList.Delete(ItemCount);
         end;
         lvClip.Selected := nil;
-        lvClip.Selected := lvClip.Items[0]; //FI:508 - assigning to TListView.Selected has side effects
+        lvClip.Selected := lvClip.Items[0]; //FI:W508 - assigning to TListView.Selected has side effects
         lvClip.ItemFocused := lvClip.Selected;
 
         TListView_Resize(lvClip);
