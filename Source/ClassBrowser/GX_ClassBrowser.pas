@@ -891,9 +891,9 @@ end;
 procedure TfmClassBrowser.ClickInheritancePanel(Sender: TObject);
 //var
 //  Panel: TPanel;
-begin
+begin //FI:W519
   // Panel := Sender as TPanel;
-  // Jump to the class declaration, or treeview node?
+  { TODO -oAnyone : Jump to the class declaration, or treeview node? }
 end;
 
 procedure TfmClassBrowser.DrawInheritance;
@@ -1354,7 +1354,7 @@ begin
   x := PR_OffsetX;
   y := PR_OffsetY;
   st := '';
-  for i := 1 to BoxSize do
+  for i := 1 to BoxSize do //FI:W528
     st := st + 'W';
   BoxW := ACanvas.TextWidth(st) + 8;
   BoxH := ACanvas.TextHeight(st) + 8;
@@ -1502,7 +1502,7 @@ begin
   if New <> Active then
   begin
     inherited SetActive(New);
-    if New then
+    if New then //FI:W505
       // Nothing to do here.
     else
     begin
