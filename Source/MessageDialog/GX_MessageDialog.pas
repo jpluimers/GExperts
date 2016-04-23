@@ -1062,8 +1062,7 @@ function TCppMessageDialogBuilder.GetCode: string;
     GxOtaGetCurrentLineData(StartOffset, Column, LineNo);
 
     Result := Format('switch (%s) {' + sLineBreak, [Condition]);
-    for i := 1 to Column do
-      Indent := Indent + ' ';
+    Indent := Indent + StringOfChar(' ', Column);
 
     for i := 0 to FunctionResults.Count - 1 do
     begin
@@ -1155,8 +1154,7 @@ function TPascalMessageDialogBuilder.GetCode: string;
     GxOtaGetCurrentLineData(StartOffset, Column, LineNo);
 
     Result := Format('case %s of' + sLineBreak, [Condition]);
-    for i := 1 to Column do
-      Indent := Indent + ' ';
+    Indent := Indent + StringOfChar(' ', Column);
 
     for i := 0 to FunctionResults.Count - 1 do
       Result := Result + Format('%s  %s: ;' + sLineBreak, [Indent, FunctionResults[i]]);
