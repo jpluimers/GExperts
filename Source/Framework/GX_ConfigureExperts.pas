@@ -285,7 +285,7 @@ begin
     hk.Parent := pnl;
     hk.BoundsRect := edtExpert.BoundsRect;
     THotkey_SetHotkey(hk, AnExpert.ShortCut);
-    hk.Visible := AnExpert.CanHaveHotkey;
+    hk.Visible := AnExpert.CanHaveShortCut;
     hk.Tag := i;
 
     btn := TButton.Create(pnl);

@@ -28,31 +28,51 @@ type
     procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
     // Overrride to save any configuration settings
     procedure InternalSaveSettings(Settings: TGExpertsSettings); virtual;
+    // do nothing, overridden by TGX_Expert and TEditorExpert because
+    // theses settings are "traditionally" stored differently.
     procedure LoadActiveAndShortCut(Settings: TGExpertsSettings); virtual;
+    // do nothing, overridden by TGX_Expert and TEditorExpert because
+    // theses settings are "traditionally" stored differently.
     procedure SaveActiveAndShortCut(Settings: TGExpertsSettings); virtual;
   public
     // Internal name of expert for expert identification.
     class function GetName: string; virtual;
     destructor Destroy; override;
+    function CanHaveShortCut: boolean; virtual; abstract;
+    // displays a dialog saying there are no configuration options
+    // see also HasConfigOptions
     procedure Configure; virtual;
+    procedure Execute(Sender: TObject); virtual; abstract;
     // Get a reference to the bitmap for menu items, buttons, etc.
     // Note that this bitmap is loaded and unloaded on demand;
     // you will have to .Assign the bitmap to get a permanent copy.
     function GetBitmap: Graphics.TBitmap; virtual;
     // Name to be displayed for the expert in the GExperts
-    // *configuration* dialog; this is a different entry than
-    // the action caption (GetActionCaption)
+    // *configuration* dialog; this mithgt be different from
+    // the action caption (GetActionCaption) but is the default
+    // for that as well.
     function GetDisplayName: string; virtual;
+    // Describes the purpose of the expert. Displayed
+    // as hint if the user points the mouse on the expert's icon
+    // in the configuration dialog.
     function GetHelpString: string; virtual;
-    procedure Execute(Sender: TObject); virtual; abstract;
+    // Returns 0, meaning: No default shortcut
     function GetDefaultShortCut: TShortCut; virtual;
+    // Returns true, see also Configure
     function HasConfigOptions: Boolean; virtual;
-    // Override the InternalXXX versions in descendents to get a Settings object
+    // Creates a Settings object and passes it to
+    // the virtual methods
+    // LoadActiveAndShortCut and InternalLoadSettings
+    // override InternalLoadSettings to actually load the settings.
     procedure LoadSettings;
+    // Creates a Settings object and passes it to
+    // the virtual methods
+    // SaveActiveAndShortCut and InternalSaveSettings
+    // override InternalSaveSettings to actually save the settings.
     procedure SaveSettings;
+    // Returns an empty string, overridden by TGX_Expert and TEditorExpert
+    // to return the correct values.
     function GetOptionsBaseRegistryKey: string; virtual;
-    function CanHaveHotkey: boolean; virtual; abstract;
-    // Is expert active?
     property Active: Boolean read FActive write SetActive;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;

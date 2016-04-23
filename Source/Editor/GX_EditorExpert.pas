@@ -14,11 +14,6 @@ type
   protected
     function GetShortCut: TShortCut; override;
     procedure SetShortCut(Value: TShortCut); override;
-    // Return a string that will be used to present
-    // the editor expert to the user, for instance
-    // in configuration or selection dialogs.
-//    function GetDisplayName: string; virtual; // declared in TGX_BaseExpert
-    // defaults to GetName
     class function ConfigurationKey: string; virtual;
     // defaults to ClassName
     function GetBitmapFileName: string; override;
@@ -30,18 +25,10 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-
+    // returns true
+    function CanHaveShortCut: boolean; override;
     procedure DoExecute(Sender: TObject);
-//    procedure Execute(Sender: TObject); virtual;  // declared in TGX_BaseExpert
     function GetActionName: string;
-
-    // Return a string that names the editor expert.
-    // This string will be used to construct an action
-    // name and therefore must be a valid identifier
-    // name.
-//    class function GetName: string; virtual; // declared in TGX_BaseExpert
-
-    function CanHaveHotkey: boolean; override;
     // you usually don't need to override this
     function GetOptionsBaseRegistryKey: string; override;
   end;
@@ -159,7 +146,7 @@ begin
   FGxAction.ShortCut := Value;
 end;
 
-function TEditorExpert.CanHaveHotkey: boolean;
+function TEditorExpert.CanHaveShortCut: boolean;
 begin
   Result := True;
 end;

@@ -21,7 +21,8 @@ type
     procedure SetFormIcon(Form: TForm);
     procedure SetActive(New: Boolean); override;
     procedure UpdateAction(Action: TCustomAction); virtual;
-    function HasSubmenuItems: Boolean; virtual; // Default = False
+    // Defaults to False
+    function HasSubmenuItems: Boolean; virtual;
     // See LoadSettings
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     // See SaveSettings
@@ -53,18 +54,21 @@ type
     // it calls GetActionCaption and removes any Hotkey characters and '...'
     // This is probably OK for most experts.
     function GetDisplayName: string; override;
-    function HasMenuItem: Boolean; virtual; // Default = True
-    function HasDesignerMenuItem: Boolean; virtual; // Default = False
+    // Defaults to True
+    function HasMenuItem: Boolean; virtual;
+    // Defaults to False
+    function HasDesignerMenuItem: Boolean; virtual;
     procedure DoCreateSubMenuItems(MenuItem: TMenuItem);
     procedure CreateSubMenuItems(MenuItem: TMenuItem); virtual;
-    function IsDefaultActive: Boolean; virtual; // Default = True
+    // Defaults to True
+    function IsDefaultActive: Boolean; virtual;
 //    procedure Execute(Sender: TObject); virtual; // declared in TGX_BaseExpert
     // Do any delayed setup after the IDE is done initializing
     procedure AfterIDEInitialized; virtual;
     // Update the action state
     procedure DoUpdateAction;
-
-    function CanHaveHotkey: boolean; override;
+    // returns true
+    function CanHaveShortCut: boolean; override;
     // Index of expert; used to determine a "historic"
     // menu item order in the GExperts menu item.
     property ExpertIndex: Integer read GetExpertIndex;
@@ -336,7 +340,7 @@ begin
   Result := StripHotkey(Result);
 end;
 
-function TGX_Expert.CanHaveHotkey: boolean;
+function TGX_Expert.CanHaveShortCut: boolean;
 begin
   Result := HasMenuItem;
 end;
