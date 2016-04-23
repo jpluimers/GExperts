@@ -38,7 +38,7 @@ type
   public
     destructor Destroy; override;
     procedure Clear; override;
-    function  GetStyle(AFileName: String): TExtensionStyle;
+    function  GetStyle(const AFileName: String): TExtensionStyle;
     procedure CopyStyles(AFromStyles: TCommentStyles);
   end;
 
@@ -63,16 +63,6 @@ type
     class function GetName: string; override;
     constructor Create; override;
     function GetDefaultShortCut: TShortCut; override;
-    function GetDisplayName: string; override;
-    function GetHelpString: string; override;
-    function HasConfigOptions: Boolean; override;
-  end;
-
-  TSortExpert = class(TSelectionEditorExpert)
-  protected
-    function ProcessSelected(Lines: TStrings): Boolean; override;
-  public
-    class function GetName: string; override;
     function GetDisplayName: string; override;
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
@@ -454,64 +444,6 @@ begin
   Result := True;
 end;
 
-{ TSortExpert }
-
-function TSortExpert.GetDisplayName: string;
-resourcestring
-  SSortName = 'Sort Selected Lines';
-begin
-  Result := SSortName;
-end;
-
-function TSortExpert.GetHelpString: string;
-resourcestring
-  SSortHelp = '  This expert sorts the lines in a selected block of code.  ' +
-    'To use it, select several lines in the IDE code editor and ' +
-    'activate this expert.';
-begin
-  Result := SSortHelp;
-end;
-
-class function TSortExpert.GetName: string;
-begin
-  Result := 'SortLines';
-end;
-
-function TSortExpert.HasConfigOptions: Boolean;
-begin
-  Result := False;
-end;
-
-function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
-var
-  TrimList, SortedList: TStringList;
-  i: Integer;
-begin
-  Result := False;
-  if Lines.Count > 1 then
-  begin
-   // The trim mess here is so we can ignore whitespace when sorting
-    TrimList := TStringList.Create;
-    try
-      SortedList := TStringList.Create;
-      try
-        for i := 0 to Lines.Count - 1 do
-          TrimList.AddObject(TrimLeft(Lines[i]), TObject(i));
-        TrimList.Sort;
-        for i := 0 to TrimList.Count - 1 do
-          SortedList.Add(Lines[Integer(TrimList.Objects[i])]);
-        Lines.Clear;
-        Lines.AddStrings(SortedList);
-      finally
-        FreeAndNil(SortedList);
-      end;
-    finally
-      FreeAndNil(TrimList);
-    end;
-    Result := True;
-  end;
-end;
-
 { TExtensionStyle }
 
 constructor TExtensionStyle.Create;
@@ -544,7 +476,7 @@ begin
   inherited Clear;
 end;
 
-function TCommentStyles.GetStyle(AFileName: String): TExtensionStyle;
+function TCommentStyles.GetStyle(const AFileName: String): TExtensionStyle;
 var
   I: Integer;
   AExt: String;
@@ -691,7 +623,6 @@ initialization
   Styles := TCommentStyles.Create;
   RegisterEditorExpert(TCommentExpert);
   RegisterEditorExpert(TUnCommentExpert);
-  RegisterEditorExpert(TSortExpert);
 
 finalization
   Styles.Free;
