@@ -104,9 +104,9 @@ function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
 
   function StripPrefix(const _Prefix: string; var _Line: string): boolean;
   begin
-    Result := StartsText(_Prefix, _Line);
+    Result := AnsiStartsText(_Prefix, _Line);
     if Result then
-      _Line := Copy(_Line, Length(_Prefix));
+      _Line := Copy(_Line, Length(_Prefix), 255);
   end;
 
 var
