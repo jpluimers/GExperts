@@ -524,7 +524,7 @@ begin
   SetStatusString(Format(SGrepSearchStats, [FilesSearched, (Now - TimeStart) * 24*60*60, FGrepSettings.Pattern]));
 
   lbResults.Sorted := True;  // There is no Sort method
-  lbResults.Sorted := False;
+  lbResults.Sorted := False; //FI:W508 - sort once but do not keep sorted
 
   if GrepExpert.HistoryList.ListMode = hlmSettings then
     SetSavedHistoryIndexes(lbHistoryList.ItemIndex + 1);

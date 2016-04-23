@@ -139,7 +139,7 @@ begin
           else
             FPosList.AddObject(SInterfaceUsesName, TObject(FParser.TokenPos));
         end;
-    else
+    else // FI:W506
       // Ignore the token
     end;
     FParser.NextNoJunk;

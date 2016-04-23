@@ -360,7 +360,7 @@ begin
   finally
     ListView.SortType := stText;
     ListView.Items.EndUpdate;
-    tvFolders.Selected := tvFolders.Selected;
+    tvFolders.Selected := tvFolders.Selected; //FI:W503 - Assignment has side effects
   end;
 end;
 
@@ -1040,7 +1040,7 @@ begin
   if Assigned(LItem) then
   begin
     ListView.Selected := nil;
-    ListView.Selected := LItem;
+    ListView.Selected := LItem; //FI:W508 - Assignment has side effects
     ListView.ItemFocused := LItem;
     ListView.Selected.MakeVisible(False);
   end;

@@ -369,7 +369,7 @@ end;
 procedure TfmProcedureList.edtMethodsChange(Sender: TObject);
 begin
   tmrFilter.Enabled := False;
-  tmrFilter.Enabled := True;
+  tmrFilter.Enabled := True; //FI:W508 - stop and restart timer on key press
 end;
 
 procedure TfmProcedureList.tmrFilterTimer(Sender: TObject);
@@ -771,7 +771,7 @@ procedure TfmProcedureList.lvProcsCompare(Sender: TObject; Item1,
     i: Integer;
   begin
     Result := Value;
-    for i := Length(Value) to 5 do
+    for i := Length(Value) to 5 do //FI:W528
       Result := ' ' + Result;
   end;
 

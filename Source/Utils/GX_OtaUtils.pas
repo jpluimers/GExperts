@@ -2019,7 +2019,7 @@ begin
       ElideActions.UnElideAllBlocks;
 end;
 {$ELSE}
-begin
+begin //FI:W519
 end;
 {$ENDIF}
 
@@ -2035,7 +2035,7 @@ begin
       ElideActions.UnElideNearestBlock;
 end;
 {$ELSE}
-begin
+begin //FI:W519
 end;
 {$ENDIF}
 

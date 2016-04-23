@@ -9,7 +9,7 @@ uses
   Graphics, Classes, TypInfo, Forms, ComCtrls;
 
 type
-  IConfigInfo = interface(IUnknown)
+  IConfigInfo = interface(IUnknown) //FI:W523 - we don't need a GUID
     procedure SaveSettings;
     procedure SetAlphabetizeMenu(const Value: Boolean);
     procedure SetConfigPath(const Value: string);

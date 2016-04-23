@@ -1774,7 +1774,7 @@ end;
 
 function TGrepHistoryList.GetItems(AIndex: Integer): TGrepHistoryListItem;
 begin
-  Result := FHistoryList[FListMode].Items[AIndex];
+  Result := FHistoryList[FListMode].Items[AIndex]; //FI:W517 - false positive
 end;
 
 function TGrepHistoryList.HistoryItemByKeyIndex(AKeyIndex: Integer): TGrepHistoryListItem;
@@ -1806,7 +1806,6 @@ end;
 function TGrepHistoryList.SearchHistoryItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItem): Integer;
 begin
   AHistoryItem := nil;
-  Result := 0;
   for Result := 0 to HistoryList.Count - 1 do
   begin
     AHistoryItem := HistoryItems[Result];

@@ -882,7 +882,7 @@ begin
       Result := SUnknownNameResult;
   end
   else if ReplaceByLibraries(OldStVar, Result) then
-    Result := Result // Just to complete the if-else statement
+    Result := Result //FI:W503 - Just to complete the if-else statement
   else
     // If there is input string macro, format: %INPUTVAR,VarName,<caption>%
     // it can can be used later using %VarName%

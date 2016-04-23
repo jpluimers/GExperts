@@ -248,7 +248,7 @@ begin
           end;
         end;
       *)
-    else
+    else //FI:W506
       // Nothing.
     end;
 

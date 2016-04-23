@@ -287,7 +287,7 @@ begin
       chkUseShortCut.Checked := False;
       hkShortCut.Enabled := False;
       hkShortCut.HotKey := 0;
-      hkShortCut.HotKey := ClickedItem.ShortCut;
+      hkShortCut.HotKey := ClickedItem.ShortCut; //FI:W508 - Assignment has side effects
     end;
   finally
     chkUseShortCut.OnClick := chkUseShortCutClick;

@@ -243,7 +243,7 @@ begin
 end;
 
 procedure TImportExport.Update(Item: TCollectionItem);
-begin
+begin //FI:W519
    {Nothing for now}
 end;
 
@@ -506,7 +506,7 @@ begin
   try
     FExportList.Capacity := MaxExports;
     FStream.Position := Longint(ExportInfo.AddressOfNameOrdinals) - Delta;
-    for j := 0 to MaxExports-1 do
+    for j := 0 to MaxExports-1 do //FI:W528
     begin
       FStream.ReadBuffer(Ordinal, SizeOf(Ordinal));
       FExportList.Add(#9 + IntToNum(Ordinal + ExportInfo.Base) + #9);

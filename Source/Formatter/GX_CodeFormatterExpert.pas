@@ -50,7 +50,7 @@ uses
   GX_MessageBox;
 
 procedure XSendDebug(const Msg: string);
-begin
+begin //FI:W519
 {$IFOPT D+}SendDebug('GXFormatter: ' + Msg);
 {$ENDIF}
 end;

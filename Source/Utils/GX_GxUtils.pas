@@ -100,7 +100,7 @@ begin
     TargetBitmap := Graphics.TBitmap.Create;
     TargetBitmap.LoadFromResourceName(HInstance, ResName);
     Result := True;
-  except
+  except //FI:W501
     // Swallow exceptions and report the failure
   end;
 end;
@@ -124,7 +124,7 @@ begin
 
       Result := True;
     end;
-  except
+  except //FI:W501
     // Swallow exceptions and report the failure
   end;
 end;

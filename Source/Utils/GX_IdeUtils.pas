@@ -385,7 +385,7 @@ begin
 end;
 
 procedure SetNonModalFormPopupMode(Form: TCustomForm);
-begin
+begin //FI:W519
   {$IFDEF GX_VER160_up}
   if Assigned(Form) then
     Form.PopupMode := pmExplicit;
@@ -393,7 +393,7 @@ begin
 end;
 
 procedure SetModalFormPopupMode(Form: TCustomForm);
-begin
+begin //FI:W519
   {$IFDEF GX_VER160_up}
   if Assigned(Form) then
     Form.PopupMode := pmAuto;

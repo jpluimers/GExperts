@@ -1963,7 +1963,7 @@ begin
   end;
 
   // Pad := '';
-  for i := 0 to StringLength - Length(AString) do
+  for i := 0 to StringLength - Length(AString) do //FI:W528
     Pad := Pad + ' ';
   Result := Result + Pad;
 end;
@@ -2217,7 +2217,7 @@ begin
       try
         Control.SetFocus;
         Result := True;
-      except
+      except //FI:W501
         // Ignore focus errors
       end;
     end;
@@ -2432,7 +2432,7 @@ begin
 end;
 
 procedure SetToolBarGradient(ToolBar: TToolBar; Enabled: Boolean);
-begin
+begin //FI:W519
   {$IFDEF GX_VER180_up}
   if Enabled then
     Toolbar.DrawingStyle := dsGradient
@@ -2512,7 +2512,7 @@ begin
 end;
 
 procedure SetParentBackgroundValue(Panel: TCustomPanel; Value: Boolean);
-begin
+begin //FI:W519
   {$IFDEF GX_VER150_up} // Delphi 7+
   Assert(Assigned(Panel));
   Panel.ParentBackground := Value;
@@ -2520,7 +2520,7 @@ begin
 end;
 
 procedure SetParentBackgroundValue(GroupBox: TGroupBox; Value: Boolean);
-begin
+begin //FI:W519
   {$IFDEF GX_VER150_up} // Delphi 7+
   Assert(Assigned(GroupBox));
   GroupBox.ParentBackground := Value;
@@ -2584,7 +2584,7 @@ procedure OutputComponentList(const StartComponent: TComponent; Owned: Boolean);
           {$IFOPT D+} SendDebugFmt('%s: %s  Top: %d  Left: %d  Height: %d  Width: %d  Visible: %d  ParentClass: %s  ParentParent: %s  Properties: %s', [AControl.Name, AControl.ClassName, AControl.Top, AControl.Left, AControl.Height, AControl.Width, Ord(AControl.Visible), AControl.ClassType.ClassParent.ClassName, AControl.ClassType.ClassParent.ClassParent.ClassName, GetComponentProperties(AControl)]); {$ENDIF}
           OutputChildren(AControl);
         end;
-      finally
+      finally //FI:W502
         {$IFOPT D+} SendUnIndent; {$ENDIF}
       end;
     end;
@@ -3860,7 +3860,7 @@ begin
 end;
 
 procedure GxLogException(const E: Exception; const Msg: string);
-begin
+begin //FI:W519
   {$IFDEF GX_DEBUGLOG}
   GxAddExceptionToLog(E, Msg);
   {$ENDIF GX_DEBUGLOG}
@@ -4298,7 +4298,7 @@ begin
   Result := Default;
   try
     Result := IsoStringToDateTime(DateTime);
-  except
+  except //FI:W501
   end;
 end;
 

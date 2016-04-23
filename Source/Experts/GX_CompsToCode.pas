@@ -740,7 +740,7 @@ var
       if CFmtWith = '' then
         Indent := CFmtIndent
       else
-        Indent := CFmtIndent + CFmtIndent;
+        Indent := CFmtIndent + CFmtIndent; //FI:W510
 
       if ccBinaryComment in ccOptions then
         Log(impl, Indent + CFmtBinaryCmt, [propName])

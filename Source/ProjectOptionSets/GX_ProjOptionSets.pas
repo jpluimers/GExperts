@@ -477,7 +477,7 @@ begin
   if New <> Active then
   begin
     inherited SetActive(New);
-    if New then
+    if New then //FI:W505
       // Nothing to initialize here
     else
       FreeAndNil(fmProjOptionSets)
@@ -1653,7 +1653,7 @@ begin
 end;
 
 procedure TfmProjOptionSets.mniModifyPrjOptionValuesClick(Sender: TObject);
-begin
+begin //FI:W519
   // This event is assignned at runtime to an internal IDE event handler
 end;
 

@@ -458,8 +458,8 @@ end;
 
 procedure TGXMenuActionManager.MoveMainMenuItems;
 begin
-  HideWindowMenu := HideWindowMenu;
-  MoveComponentMenu := MoveComponentMenu;
+  HideWindowMenu := HideWindowMenu; //FI:W503 - Assignment has side effects
+  MoveComponentMenu := MoveComponentMenu; //FI:W503 - Assignment has side effects
 end;
 
 procedure TGXMenuActionManager.MoreActionExecute(Sender: TObject);

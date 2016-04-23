@@ -376,7 +376,7 @@ var
 begin
   Result := FPrevLine;
 
-  for LineIdx := 0 to _NLines - 1 do begin
+  for LineIdx := 0 to _NLines - 1 do begin //FI:W528
     Result := TLineFeed.Create(0, Settings.SpacePerIndent);
     Result.SetIndent(FStack.nIndent);
     NextToken := GetToken(_AtIndex);

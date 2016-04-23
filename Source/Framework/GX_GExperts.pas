@@ -232,7 +232,7 @@ begin
 end;
 
 procedure TGExperts.Execute;
-begin
+begin //FI:W519
   // Do nothing. We install menu and other items to trigger actions.
 end;
 
@@ -347,7 +347,7 @@ begin
   for i := 0 to GetExpertCount - 1 do
   begin
     Expert := GetExpert(i);
-    Expert.ShortCut := Expert.ShortCut;
+    Expert.ShortCut := Expert.ShortCut; //FI:W503 - Assignment has side effects
   end;
 end;
 

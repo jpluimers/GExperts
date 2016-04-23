@@ -513,7 +513,7 @@ end;
 procedure TfmGrepSelect.eSearchChange(Sender: TObject);
 begin
   tmrSearchInFilter.Enabled := False;
-  tmrSearchInFilter.Enabled := True;
+  tmrSearchInFilter.Enabled := True; //FI:W508 - stop and restart the timer on key press
 end;
 
 procedure TfmGrepSelect.tmrSearchInFilterTimer(Sender: TObject);

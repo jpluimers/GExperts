@@ -19,7 +19,7 @@ const
   FORMATTER_CONFIG_PREFIX = 'FormatterSettings-';
 
 type
-  IConfigReader = interface
+  IConfigReader = interface //FI:W523 - we don't need a GUID
     function ReadBool(const _Name: string; _Default: Boolean): Boolean;
     function ReadInteger(const _Name: string; _Default: Integer): Integer;
     function ReadString(const _Name, _Default: string): string;
@@ -27,7 +27,7 @@ type
   end;
 
 type
-  IConfigWriter = interface
+  IConfigWriter = interface //FI:W523 - we don't need a GUID
     procedure WriteBool(const _Name: string; _Value: Boolean);
     procedure WriteInteger(const _Name: string; _Value: Integer);
     procedure WriteString(const _Name: string; const _Value: string);
@@ -295,7 +295,7 @@ begin
   if _Settings.UseCapitalizationFile and (_Settings.CapitalizationFile <> '') then begin
     try
       _Settings.CapNames.SaveToFile(string(_Settings.CapitalizationFile));
-    except
+    except //FI:W501
         // ignore, file might be readonly
     end;
   end else
