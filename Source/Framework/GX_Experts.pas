@@ -23,10 +23,6 @@ type
     procedure UpdateAction(Action: TCustomAction); virtual;
     // Defaults to False
     function HasSubmenuItems: Boolean; virtual;
-    // See LoadSettings
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    // See SaveSettings
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
     // you usually don't need to override this
     procedure LoadActiveAndShortCut(Settings: TGExpertsSettings); override;
     // you usually don't need to override this
@@ -153,16 +149,6 @@ end;
 function TGX_Expert.IsDefaultActive: Boolean;
 begin
   Result := True;
-end;
-
-procedure TGX_Expert.InternalLoadSettings(Settings: TGExpertsSettings);
-begin
-  // Empty base routine to allow the safe usage of "inherited" in descendants
-end;
-
-procedure TGX_Expert.InternalSaveSettings(Settings: TGExpertsSettings);
-begin
-  // Empty base routine to allow the safe usage of "inherited" in descendants
 end;
 
 const
