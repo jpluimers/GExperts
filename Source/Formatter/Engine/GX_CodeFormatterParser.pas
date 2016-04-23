@@ -582,10 +582,7 @@ begin
 
   SetString(_Dest, FirstNonSpace, PCharDiff(P, FirstNonSpace));
 
-  if P^ = #0 then
-    _Source := P
-  else
-    _Source := P;
+  _Source := P;
 end;
 
 { TIdentifiersList }
