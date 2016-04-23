@@ -380,6 +380,7 @@ begin
     CompList := nil;
     Context := SFileProc;
     try
+      CompList := nil;
       FormInfo := TFormInfo.Create(FController, FormEditor);
       try
         CompList := TStringList.Create;
@@ -392,8 +393,8 @@ begin
         FormInfo.ReplaceComponents(CompList, cbReplace.Text);
         Context := SFileFreeInfo;
       finally
-        FreeAndNil(FormInfo);
         FreeAndNil(CompList);
+        FreeAndNil(FormInfo);
       end;
     except
       on e: Exception do
