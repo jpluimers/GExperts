@@ -337,7 +337,7 @@ begin
   end;
 end;
 {$ELSE not GX_VER170_up}
-begin
+begin //fi:W519
 end;
 {$ENDIF not GX_VER170_up}
 

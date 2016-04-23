@@ -574,7 +574,7 @@ begin
   if New <> Active then
   begin
     inherited SetActive(New);
-    if New then
+    if New then //FI:W505
       // Nothing to initialize here.
     else
       FreeAndNil(fmAsciiChart);
