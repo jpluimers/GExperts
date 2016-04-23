@@ -60,7 +60,7 @@ begin
 end;
 
 procedure TGxDesignerMenu.RequiresUnits(Proc: TGetStrProc);
-begin
+begin // FI:W519
   // Nothing
 end;
 

@@ -295,12 +295,12 @@ begin
 end;
 
 procedure TCompRenameNotifier.NewModuleOpened(const Module: IOTAModule);
-begin
+begin // FI:W519
   // Nothing
 end;
 
 procedure TCompRenameNotifier.SourceEditorModified(const SourceEditor: IOTASourceEditor);
-begin
+begin // FI:W519
   // Nothing
 end;
 
@@ -673,7 +673,7 @@ begin
 end;
 
 procedure TCompRenameExpert.FormEditorModified(const FormEditor: IOTAFormEditor);
-begin
+begin // FI:W519
   // Nothing
 end;
 

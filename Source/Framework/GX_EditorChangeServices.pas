@@ -531,7 +531,7 @@ begin
   case NotifyCode of
     ofnFileOpened:
       InstallModuleNotifier(FileName);
-  else // case
+  else // case  // FI:W506
     // Do nothing
   end;
 end;

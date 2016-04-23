@@ -855,7 +855,7 @@ begin
           FDataList.Delete(ItemCount);
         end;
         lvClip.Selected := nil;
-        lvClip.Selected := lvClip.Items[0];
+        lvClip.Selected := lvClip.Items[0]; //FI:508 - assigning to TListView.Selected has side effects
         lvClip.ItemFocused := lvClip.Selected;
 
         TListView_Resize(lvClip);
@@ -971,7 +971,7 @@ begin
   if New <> Active then
   begin
     inherited SetActive(New);
-    if New then
+    if New then //FI:W505
       // Nothing to initialize here
     else
       FreeAndNil(fmClipboardHistory);

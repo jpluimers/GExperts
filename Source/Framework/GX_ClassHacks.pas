@@ -54,7 +54,7 @@ var
     Inc(PImageNtHeaders(SectionHeader));
     Result := False;
 
-    for i := 0 to NtHeader.FileHeader.NumberOfSections - 1 do
+    for i := 0 to NtHeader.FileHeader.NumberOfSections - 1 do //FI:W528
     begin
       if StrLIComp(PChar(@SectionHeader^.Name), PChar(ASectionName), IMAGE_SIZEOF_SHORT_NAME) = 0 then
       begin

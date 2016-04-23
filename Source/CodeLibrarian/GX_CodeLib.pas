@@ -1319,7 +1319,7 @@ begin
   if New <> Active then
   begin
     inherited SetActive(New);
-    if New then
+    if New then //FI:W505
     else
     begin
       if Assigned(FCodeLibForm) then
