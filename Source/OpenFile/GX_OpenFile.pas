@@ -225,8 +225,8 @@ type
     destructor Destroy; override;
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(ASettings: TGExpertsSettings); override;
+    procedure InternalSaveSettings(ASettings: TGExpertsSettings); override;
     procedure Execute(Sender: TObject); override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
@@ -297,16 +297,16 @@ begin
   Result := True;
 end;
 
-procedure TOpenFileExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TOpenFileExpert.InternalLoadSettings(ASettings: TGExpertsSettings);
 begin
   inherited;
-  Self.Settings.LoadFromRegistry(Settings);
+  Self.Settings.LoadFromRegistry(ASettings);
 end;
 
-procedure TOpenFileExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TOpenFileExpert.InternalSaveSettings(ASettings: TGExpertsSettings);
 begin
   inherited;
-  Self.Settings.SaveToRegistry(Settings);
+  Self.Settings.SaveToRegistry(ASettings);
   HijackIDEActions;
 end;
 
@@ -785,7 +785,7 @@ end;
 procedure TfmOpenFile.edtFilterChange(Sender: TObject);
 begin
   tmrFilter.Enabled := False;
-  tmrFilter.Enabled := True;
+  tmrFilter.Enabled := True; //FI:W508 - stop and restart timer on key press
 end;
 
 procedure TfmOpenFile.tmrFilterTimer(Sender: TObject);
@@ -1097,31 +1097,31 @@ end;
 
 procedure TfmOpenFile.LoadSettings;
 var
-  Settings: TGExpertsSettings;
+  GExSettings: TGExpertsSettings;
 begin
   // do not localize
-  Settings := TGExpertsSettings.Create;
+  GExSettings := TGExpertsSettings.Create;
   try
-    Settings.LoadForm(Self, ConfigurationKey + '\Window');
-    FFileColumnWidth := Settings.ReadInteger(ConfigurationKey, 'FileColumnWidth', lvSearchPath.Columns[0].Width);
+    GExSettings.LoadForm(Self, ConfigurationKey + '\Window');
+    FFileColumnWidth := GExSettings.ReadInteger(ConfigurationKey, 'FileColumnWidth', lvSearchPath.Columns[0].Width);
   finally
-    FreeAndNil(Settings);
+    FreeAndNil(GExSettings);
   end;
   EnsureFormVisible(Self);
 end;
 
 procedure TfmOpenFile.SaveSettings;
 var
-  Settings: TGExpertsSettings;
+  GExSettings: TGExpertsSettings;
 begin
   // do not localize
-  Settings := TGExpertsSettings.Create;
+  GExSettings := TGExpertsSettings.Create;
   try
-    Settings.SaveForm(Self, ConfigurationKey + '\Window');
+    GExSettings.SaveForm(Self, ConfigurationKey + '\Window');
     if Assigned(CurrentListView) then
-      Settings.WriteInteger(ConfigurationKey, 'FileColumnWidth', CurrentListView.Columns[0].Width);
+      GExSettings.WriteInteger(ConfigurationKey, 'FileColumnWidth', CurrentListView.Columns[0].Width);
   finally
-    FreeAndNil(Settings);
+    FreeAndNil(GExSettings);
   end;
 end;
 
