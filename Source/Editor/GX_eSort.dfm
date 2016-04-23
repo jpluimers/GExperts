@@ -20,7 +20,7 @@ inherited fmeSortConfig: TfmeSortConfig
     Top = 40
     Width = 209
     Height = 25
-    Caption = 'Sort &Dscending'
+    Caption = 'Sort &Descending'
     ModalResult = 7
     TabOrder = 1
   end
