@@ -15,11 +15,11 @@ type
     lblProgressText: TLabel;
   private
   public
-    procedure Init(ACaption: String; AMax, ADetailMax: Integer);
+    procedure Init(const ACaption: String; AMax, ADetailMax: Integer);
     class procedure Start;
-    class procedure Progressing(AStepText: String);
+    class procedure Progressing(const AStepText: String);
     class procedure Progressed;
-    class procedure ProgressingDetail(AStepDetailText: String);
+    class procedure ProgressingDetail(const AStepDetailText: String);
     class procedure ProgressedDetail;
   end;
 
@@ -32,7 +32,7 @@ implementation
 
 { TfmGrepProgress }
 
-procedure TfmGrepProgress.Init(ACaption: String; AMax, ADetailMax: Integer);
+procedure TfmGrepProgress.Init(const ACaption: String; AMax, ADetailMax: Integer);
 begin
   Caption := ACaption;
   Progress.Min := 0;
@@ -57,7 +57,7 @@ begin
     fmGrepProgress.Show;
 end;
 
-class procedure TfmGrepProgress.Progressing(AStepText: String);
+class procedure TfmGrepProgress.Progressing(const AStepText: String);
 begin
   if not Assigned(fmGrepProgress) then
     Exit;
@@ -73,7 +73,7 @@ begin
 //  Sleep(400);
 end;
 
-class procedure TfmGrepProgress.ProgressingDetail(AStepDetailText: String);
+class procedure TfmGrepProgress.ProgressingDetail(const AStepDetailText: String);
 begin
   if not Assigned(fmGrepProgress) then
     Exit;

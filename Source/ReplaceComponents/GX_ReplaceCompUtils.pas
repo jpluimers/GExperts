@@ -23,7 +23,7 @@ type
   end;
 
 function GetPropertyList(ClassInfo: PTypeInfo): TPropInfoList;
-procedure GetPropertyNames(AClassName: string; Items: TStrings);
+procedure GetPropertyNames(const AClassName: string; Items: TStrings);
 function ClassLevel(SearchForClass, TestClass: TClass): Integer;
 function IsStoredProperty(Instance: TObject; APropInfo: PPropInfo): Boolean;
 function IsDefaultPropertyValue(Instance: TObject; APropInfo: PPropInfo): Boolean;
@@ -31,7 +31,7 @@ function IsDefaultPropertyValue(Instance: TObject; APropInfo: PPropInfo): Boolea
 function FlatLine(const AText: string): string;
 function EscapeStr(const AStr: string; AEscapeChar: Char): string;
 function CSVAddItem(const ALine, AItem: string; ASepChar: Char = ','; AQuoteChar: Char = '"'): string;
-function ExtractToken(var VStr: string; Delimiter: string): string;
+function ExtractToken(var VStr: string; const Delimiter: string): string;
 
 implementation
 
@@ -75,7 +75,7 @@ begin
     Result := ALine+ASepChar+sItem;
 end;
 
-function ExtractToken(var VStr: string; Delimiter: string): string;
+function ExtractToken(var VStr: string; const Delimiter: string): string;
 var
   Idx: Integer;
 begin
@@ -120,7 +120,7 @@ begin
   end;
 end;
 
-procedure GetPropertyNames(AClassName: string; Items: TStrings);
+procedure GetPropertyNames(const AClassName: string; Items: TStrings);
 var
   ClassPtr: TPersistentClass;
   PropertyList: TPropInfoList;

@@ -156,10 +156,10 @@ type
     procedure DeleteFromFavorites(Item: TListItem);
     function GetActivePageIndex: Integer;
     procedure SetActivePageIndex(Value: Integer);
-    procedure DoOpenFile(FileName: string);
+    procedure DoOpenFile(const AFileName: string);
     function CurrentFileType: TFileType;
     procedure UMRefreshList(var Msg: TMessage); message UM_REFRESHLIST;
-    procedure AddFavoriteFile(FileName: string);
+    procedure AddFavoriteFile(const AFileName: string);
     function MakeFileName(Item: TListItem): string;
     function GetMatchAnywhere: Boolean;
     procedure SetMatchAnywhere(Value: Boolean);
@@ -978,10 +978,10 @@ begin
   end;
 end;
 
-procedure TfmOpenFile.DoOpenFile(FileName: string);
+procedure TfmOpenFile.DoOpenFile(const AFileName: string);
 begin
   Self.Hide;
-  GxOtaOpenFileOrForm(FileName);
+  GxOtaOpenFileOrForm(AFileName);
   ModalResult := mrOK;
 end;
 
@@ -1024,10 +1024,10 @@ begin
     CurrentListView.Width := CurrentListView.Width - 1;
 end;
 
-procedure TfmOpenFile.AddFavoriteFile(FileName: string);
+procedure TfmOpenFile.AddFavoriteFile(const AFileName: string);
 begin
-  if Trim(FileName) <> '' then
-    EnsureStringInList(CurrentFileType.Favorites, FileName);
+  if Trim(AFileName) <> '' then
+    EnsureStringInList(CurrentFileType.Favorites, AFileName);
 end;
 
 procedure TfmOpenFile.actHelpExecute(Sender: TObject);

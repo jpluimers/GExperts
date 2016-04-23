@@ -23,8 +23,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure SaveToFile(FileName: string);
-    procedure LoadFromFile(FileName: string);
+    procedure SaveToFile(const FileName: string);
+    procedure LoadFromFile(const FileName: string);
     procedure SaveToXML(Node: IXMLElement);
     procedure LoadFromXML(Node: IXMLElement);
     property TimeStamp: TDateTime read FTimeStamp write FTimeStamp;
@@ -228,7 +228,7 @@ begin
     Str := Str + Format('%2.2x', [Buffer]);
 end;
 
-procedure DecodeString(Str: string; Stream: TStream);
+procedure DecodeString(const Str: string; Stream: TStream);
 var
   Buffer: Byte;
   HexStr: string;
@@ -264,7 +264,7 @@ begin
   Result := FStream;
 end;
 
-procedure TMacroInfo.LoadFromFile(FileName: string);
+procedure TMacroInfo.LoadFromFile(const FileName: string);
 var
   Doc: IXMLDocument;
 begin
@@ -312,7 +312,7 @@ begin
   end;
 end;
 
-procedure TMacroInfo.SaveToFile(FileName: string);
+procedure TMacroInfo.SaveToFile(const FileName: string);
 var
   Doc: IXMLDocument;
   Root: IXMLElement;

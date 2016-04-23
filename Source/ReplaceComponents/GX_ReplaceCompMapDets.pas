@@ -83,7 +83,7 @@ type
     procedure FillClassList(List: TStrings);
     procedure TrySetCombo(Combo: TComboBox; const Value: string);
     procedure UpdateNavBar;
-    procedure LoadProps(AClassName: string; Items: TStrings);
+    procedure LoadProps(const AClassName: string; Items: TStrings);
     procedure SaveItem;
     procedure ShowError(const Msg: string);
     procedure ValidateItem;
@@ -274,7 +274,7 @@ begin
 end;
 
 
-procedure TfmReplaceCompMapDets.LoadProps(AClassName: string; Items: TStrings);
+procedure TfmReplaceCompMapDets.LoadProps(const AClassName: string; Items: TStrings);
 begin
   if Trim(AClassName) = '' then
     Items.Clear

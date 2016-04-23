@@ -35,7 +35,7 @@ type
   end;
 
 // Returns the index of the selected macro
-function GetTemplateFromUser(ATemplateName: string; MacroFile: TMacroFile): Integer;
+function GetTemplateFromUser(const ATemplateName: string; MacroFile: TMacroFile): Integer;
 
 implementation
 
@@ -46,7 +46,7 @@ uses
 
 {$R *.dfm}
 
-function GetTemplateFromUser(ATemplateName: string; MacroFile: TMacroFile): Integer;
+function GetTemplateFromUser(const ATemplateName: string; MacroFile: TMacroFile): Integer;
 begin
   Assert(Assigned(MacroFile));
 

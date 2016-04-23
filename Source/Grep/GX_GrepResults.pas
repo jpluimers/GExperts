@@ -304,7 +304,7 @@ type
       AddIf: Boolean = False; AConditionMode: TGrepHistoryListMode = hlmSettings);
     function  GetSavedHistoryIndex: Integer;
     procedure SetSavedHistoryIndexes(AIndex: Integer);
-    function  HistoryListSelect(ASelectType: TGrepSelectType; ACaption: String): TGrepSelectResult;
+    function  HistoryListSelect(ASelectType: TGrepSelectType; const ACaption: string): TGrepSelectResult;
     procedure ClearResultsData;
     procedure DoEmbeddedSearch(Sender: TObject);
     procedure UpdateHistoryPagesOptions;
@@ -2526,7 +2526,7 @@ begin
   FContextSearchText := '';
 end;
 
-function TfmGrepResults.HistoryListSelect(ASelectType: TGrepSelectType; ACaption: String): TGrepSelectResult;
+function TfmGrepResults.HistoryListSelect(ASelectType: TGrepSelectType; const ACaption: string): TGrepSelectResult;
 var
   frmSelect: TfmGrepSelect;
 begin

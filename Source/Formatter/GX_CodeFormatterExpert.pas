@@ -20,7 +20,7 @@ type
   TCodeFormatterExpert = class
   private
     FEngine: TCodeFormatterEngine;
-    function GetSettingsName(FileName: string; FullText: TGXUnicodeStringList): string;
+    function GetSettingsName(const AFileName: string; FullText: TGXUnicodeStringList): string;
   protected
   public
     constructor Create;
@@ -95,7 +95,7 @@ begin
   end;
 end;
 
-function TCodeFormatterExpert.GetSettingsName(FileName: string; FullText: TGXUnicodeStringList): string;
+function TCodeFormatterExpert.GetSettingsName(const AFileName: string; FullText: TGXUnicodeStringList): string;
 
   function GetFromConfigFile: string;
   var
@@ -105,7 +105,7 @@ function TCodeFormatterExpert.GetSettingsName(FileName: string; FullText: TGXUni
     i: Integer;
   begin
     Result := '';
-    Path := AddSlash(ExtractFilePath(ExpandFileName(FileName)));
+    Path := AddSlash(ExtractFilePath(ExpandFileName(AFileName)));
     ConfigFileName := Path + 'GXFormatter.ini'; // Do not localize.
     IniFile := TIniFile.Create(ConfigFileName);
     try
@@ -115,7 +115,7 @@ function TCodeFormatterExpert.GetSettingsName(FileName: string; FullText: TGXUni
         IniFile.ReadSection('FileSettings', ConfiguredFileNames);
         for i := 0 to Pred(ConfiguredFileNames.Count) do begin
           ConfiguredFileName := ConfiguredFileNames[i];
-          if FileNameMatches(ExtractFileName(FileName), Path + ConfiguredFileName) then begin
+          if FileNameMatches(ExtractFileName(AFileName), Path + ConfiguredFileName) then begin
             Result := IniFile.ReadString('FileSettings', ConfiguredFileName, '');
             XSendDebug(Format('Settings "%s" from rule %s in %s', [Result, ConfiguredFileName, ConfigFileName]));
             Break;

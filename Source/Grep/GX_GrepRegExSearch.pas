@@ -28,8 +28,8 @@ type
     FSectionInitialization: Boolean;
     FSectionImplementation: Boolean;
     FSectionFinalization: Boolean;
-    procedure SearchLineRegEx(LineStr: string; LineNo: Integer);
-    procedure SearchLineRaw(LineStr: string; LineNo: Integer);
+    procedure SearchLineRegEx(const LineStr: string; LineNo: Integer);
+    procedure SearchLineRaw(const LineStr: string; LineNo: Integer);
     procedure SetFileName(const Value: string);
     function CheckWholeWord(Line: TGXUnicodeString; StartCol, EndCol: Integer): Boolean;
   public
@@ -266,7 +266,7 @@ begin // Execute
   end; // for i FData
 end; // Execute
 
-procedure TSearcher.SearchLineRaw(LineStr: string; LineNo: Integer);
+procedure TSearcher.SearchLineRaw(const LineStr: string; LineNo: Integer);
 var
   StartCol: Integer;
   EndCol: Integer;
@@ -307,7 +307,7 @@ begin
   end;
 end;
 
-procedure TSearcher.SearchLineRegEx(LineStr: string; LineNo: Integer);
+procedure TSearcher.SearchLineRegEx(const LineStr: string; LineNo: Integer);
 var
   StartCol: Integer;
   EndCol: Integer;

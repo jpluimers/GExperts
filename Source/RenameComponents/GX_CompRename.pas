@@ -87,9 +87,9 @@ type
     FFormEditor: IOTAFormEditor;
     function DoRename(const Component: IOTAComponent; UseRules: Boolean): TModalResult;
   protected
-    procedure AddNewClass(ClassName: WideString);
+    procedure AddNewClass(const AClassName: WideString);
     procedure DoOnTimer(Sender: TObject);
-    function GetClassRenameRule(ClassName: WideString): WideString;
+    function GetClassRenameRule(const AClassName: WideString): WideString;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
     procedure ComponentRenamed(const FormEditor: IOTAFormEditor;
@@ -306,15 +306,15 @@ end;
 
 { TCompRenameExpert }
 
-procedure TCompRenameExpert.AddNewClass(ClassName: WideString);
+procedure TCompRenameExpert.AddNewClass(const AClassName: WideString);
 begin
   Assert(Assigned(FRenameRuleList));
 
   // Classname already in list?
-  if FRenameRuleList.IndexOfName(ClassName) < 0 then
+  if FRenameRuleList.IndexOfName(AClassName) < 0 then
   begin
     // No -> add "TClass=Class" as new entry
-    FRenameRuleList.Add(ClassName+'='+Copy(ClassName, 2, Length(ClassName)-1));
+    FRenameRuleList.Add(AClassName+'='+Copy(AClassName, 2, Length(AClassName)-1));
     SaveSettings;
   end;
 end;
@@ -684,10 +684,10 @@ begin
   Result := SMenuCaption;
 end;
 
-function TCompRenameExpert.GetClassRenameRule(ClassName: WideString): WideString;
+function TCompRenameExpert.GetClassRenameRule(const AClassName: WideString): WideString;
 begin
   Assert(Assigned(FRenameRuleList));
-  Result := FRenameRuleList.Values[ClassName];
+  Result := FRenameRuleList.Values[AClassName];
 end;
 
 function TCompRenameExpert.GetDefaultShortCut: TShortCut;

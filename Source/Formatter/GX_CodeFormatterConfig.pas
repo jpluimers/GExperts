@@ -162,7 +162,7 @@ type
     procedure FormToEngineSettings(var _Settings: TCodeFormatterEngineSettings);
     procedure FormToSettings(_Settings: TCodeFormatterSettings);
     procedure FillPreview;
-    procedure AddSpaceRow(_RowNo: Integer; _StrCol1, _StrCol2: string;
+    procedure AddSpaceRow(_RowNo: Integer; const _StrCol1, _StrCol2: string;
       _Space: TSpaceSet);
     function GetSpaceItem(_Idx: Integer): TSpaceSet;
     procedure SetDefault(_Which: string);
@@ -282,7 +282,7 @@ begin
   lb_PrecedenceClick(lb_Precedence);
 end;
 
-procedure TfmCodeFormatterConfig.AddSpaceRow(_RowNo: Integer; _StrCol1, _StrCol2: string;
+procedure TfmCodeFormatterConfig.AddSpaceRow(_RowNo: Integer; const _StrCol1, _StrCol2: string;
   _Space: TSpaceSet);
 
   procedure SetColText(_Col: Integer; const _s: string; _Offset: Integer = 4);

@@ -17,7 +17,7 @@ type
     procedure Reload; override;
   end;
 
-  TInsertTemplateEvent = procedure(Sender: TObject; ACode: string) of object;
+  TInsertTemplateEvent = procedure(Sender: TObject; const ACode: string) of object;
 
   TTemplateShortCut = class
   protected
@@ -43,15 +43,15 @@ type
     FShortCuts: TList;
     FExpandNotifier: IMacroExpandNotifier;
     procedure AddUsesToUnit(ATemplateObject: TMacroObject);
-    function AddLeadingSpaces(AString: string;
+    function AddLeadingSpaces(const AString: string;
       ASpacesCount: Integer; AInsertCol: Integer): string;
-    function PrefixLines(Lines, Prefix: string; AStartLine: Integer = 1): string;
+    function PrefixLines(const Lines, Prefix: string; AStartLine: Integer = 1): string;
     function PrepareWhitePrefix(AInsertCol: Integer): string;
     procedure PrepareNewCursorPos(var VTemplateText: string;
       AInsertPos: TOTAEditPos; var VNewPos: TOTAEditPos; ConsiderPipe: Boolean);
     procedure ClearTemplShortCuts;
-    procedure AddTemplShortCut(AName: string; AShortCut: TShortCut);
-    procedure TemplateActionExecute(Sender: TObject; ACode: string);
+    procedure AddTemplShortCut(const AName: string; AShortCut: TShortCut);
+    procedure TemplateActionExecute(Sender: TObject; const ACode: string);
     function OffsetToEditPos(AOffset: Integer): TOTAEditPos;
     procedure PrepareTemplateText(var VText: string;
       ACurrentPos: TOTAEditPos; AAfterLen: Integer;
@@ -61,15 +61,15 @@ type
     procedure RemoveExpandNotifier;
     procedure ConfigAutoExpand;
   protected
-    function GetTemplate(ATemplateName: string; APromptForUnknown: Boolean = True): Integer;
+    function GetTemplate(const ATemplateName: string; APromptForUnknown: Boolean = True): Integer;
     procedure SetNewCursorPos(ANewEditPos: TOTAEditPos);
-    function CalculateNewCursorPos(AString: string; ACursorPos: TOTAEditPos): TOTAEditPos;
+    function CalculateNewCursorPos(const AString: string; ACursorPos: TOTAEditPos): TOTAEditPos;
     procedure CalculateInsertPos(AInsertOption: TTemplateInsertPos;
       var VInsertOffset: Integer; var VInsertPos: TOTAEditPos);
     function GetProgrammerInfo(var VInfo: TProgrammerInfo): Boolean;
     function CharPosToEditPos(ACharPos: TOTACharPos): TOTAEditPos;
     procedure LoadTemplates;
-    procedure ExpandTemplate(AForcedCode: string = '');
+    procedure ExpandTemplate(const AForcedCode: string = '');
     procedure CreateDefaultTemplates;
     procedure SetAutoExpandActive(Value: Boolean);
   public
@@ -269,7 +269,7 @@ begin
 end;
 
 // Replaces a template in editor's buffer with a given template code
-procedure InsertTemplateIntoEditor(ATemplateName, ATemplateCode: string;
+procedure InsertTemplateIntoEditor(const ATemplateName, ATemplateCode: string;
   ATemplateOffset, AInsertOffset: Integer);
 var
   CodeLen: Integer;
@@ -408,7 +408,7 @@ begin
   end;
 end;
 
-procedure TMacroTemplatesExpert.AddTemplShortCut(AName: string; AShortCut: TShortCut);
+procedure TMacroTemplatesExpert.AddTemplShortCut(const AName: string; AShortCut: TShortCut);
 const
   EditorExpertPrefix = 'EditorExpert';   // Do not localize.
   TemplateActionPrefix = 'Macro template: ';
@@ -435,7 +435,7 @@ begin
   FShortCuts.Add(NewShortCut);
 end;
 
-procedure TMacroTemplatesExpert.TemplateActionExecute(Sender: TObject; ACode: string);
+procedure TMacroTemplatesExpert.TemplateActionExecute(Sender: TObject; const ACode: string);
 begin
   ExpandTemplate(ACode);
 end;
@@ -465,7 +465,7 @@ begin
       Result[Idx] := ' ';
 end;
 
-function TMacroTemplatesExpert.AddLeadingSpaces(AString: string;
+function TMacroTemplatesExpert.AddLeadingSpaces(const AString: string;
   ASpacesCount: Integer; AInsertCol: Integer): string;
 var
   WhiteString: string;
@@ -480,7 +480,7 @@ begin
   Result := PrefixLines(AString, WhiteString);
 end;
 
-function TMacroTemplatesExpert.PrefixLines(Lines, Prefix: string; AStartLine: Integer): string;
+function TMacroTemplatesExpert.PrefixLines(const Lines, Prefix: string; AStartLine: Integer): string;
 var
   LastEOLFound: Boolean;
   i: Integer;
@@ -606,7 +606,7 @@ begin
   ExpandTemplate;
 end;
 
-procedure TMacroTemplatesExpert.ExpandTemplate(AForcedCode: string);
+procedure TMacroTemplatesExpert.ExpandTemplate(const AForcedCode: string);
 var
   TemplateName: string;
   TemplateText: string;
@@ -724,7 +724,7 @@ begin
   end;
 end;
 
-function TMacroTemplatesExpert.GetTemplate(ATemplateName: string;
+function TMacroTemplatesExpert.GetTemplate(const ATemplateName: string;
   APromptForUnknown: Boolean): Integer;
 begin
   Result := FMacroFile.IndexOf(ATemplateName);
@@ -814,7 +814,7 @@ end;
 
 // Calculate the new cursor postition using the old cursor
 // position and position cursor marker "|" in AString
-function TMacroTemplatesExpert.CalculateNewCursorPos(AString: string;
+function TMacroTemplatesExpert.CalculateNewCursorPos(const AString: string;
   ACursorPos: TOTAEditPos): TOTAEditPos;
 var
   i: Integer;

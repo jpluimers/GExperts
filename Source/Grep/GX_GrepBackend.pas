@@ -101,8 +101,8 @@ type
 
     constructor Create(Collection: TCollection); override;
     function Length: Integer;
-    procedure LoadFromIni(AIni: TCustomIniFile; ASection, ASubKey: String);
-    procedure WriteToIni(AIni: TCustomIniFile; ASection, ASubKey: String);
+    procedure LoadFromIni(AIni: TCustomIniFile; const ASection, ASubKey: String);
+    procedure WriteToIni(AIni: TCustomIniFile; const ASection, ASubKey: String);
 
     property SPos: Integer read FSPos write FSPos;
     property EPos: Integer read FEPos write FEPos;
@@ -134,8 +134,8 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function Add: TMatchResult;
-    procedure LoadFromIni(AIni: TCustomIniFile; ASection: String);
-    procedure WriteToIni(AIni: TCustomIniFile; ASection: String);
+    procedure LoadFromIni(AIni: TCustomIniFile; const ASection: String);
+    procedure WriteToIni(AIni: TCustomIniFile; const ASection: String);
 
     property Line: string read FLine write FLine;
     property LineNo: Integer read FLineNo write FLineNo; // 1-based
@@ -163,8 +163,8 @@ type
     constructor Create;
     function  Add: TLineResult;
     procedure GetMatchesOnLine(Line: Integer; var Matches: TMatchArray);
-    function  LoadFromIni(AIni: TCustomIniFile; ASection: String): Boolean;
-    procedure WriteToIni(AIni: TCustomIniFile; ASection: String);
+    function  LoadFromIni(AIni: TCustomIniFile; const ASection: String): Boolean;
+    procedure WriteToIni(AIni: TCustomIniFile; const ASection: String);
 
     property Expanded: Boolean read FExpanded write FExpanded;
     property ExpandState: Boolean read FExpandState write FExpandState;
@@ -211,8 +211,8 @@ type
     procedure View(AResultList: TStrings);
     procedure Update(AGrepSettings: TGrepSettings; DoClearResults, DoClearMatchCount: Boolean);
 
-    procedure LoadFromIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; ASection: String);
-    procedure WriteToIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; ASection: String);
+    procedure LoadFromIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; const ASection: String);
+    procedure WriteToIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; const ASection: String);
     procedure RemoveFromSettings(AIni: TCustomIniFile; const BaseKey: String);
 
     property SearchText: String read GetSearchText;
@@ -286,7 +286,7 @@ type
     procedure DeleteItem(AItem: TGrepHistoryListItem; DoFree: Boolean = True; ACheckListMode: Boolean = True);
     function  SearchHistoryItem(AGrepSettings: TGrepSettings; var AHistoryItem: TGrepHistoryListItem): Integer;
     function  GetNextIndex: Integer;
-    procedure WriteOrders(const AIni: TCustomIniFile; Key: String; AIndex: Integer; AItem: TGrepHistoryListItem; AOnlySearchList: Boolean);
+    procedure WriteOrders(const AIni: TCustomIniFile; const Key: String; AIndex: Integer; AItem: TGrepHistoryListItem; AOnlySearchList: Boolean);
 
     function  SubKeyNameGrepHistory(AKeyIndex: Integer): String; overload;
     function GetSortDesc: Boolean;
@@ -330,7 +330,7 @@ type
 
     procedure RemoveFromSettings(const AIni: TCustomIniFile; const BaseKey: String; ADelMode: TGrepDeleteMode;
       AItemIndex: Integer);
-    procedure DeleteINIFiles(AMainINIFileName: String; ADelMode: TGrepDeleteMode; AIniVersion, AItemIndex: Integer);
+    procedure DeleteINIFiles(const AMainINIFileName: String; ADelMode: TGrepDeleteMode; AIniVersion, AItemIndex: Integer);
 
     procedure ClearAllChecked;
     function  AnyChecked: Boolean;
@@ -945,14 +945,14 @@ begin
   Result := EPos - SPos + 1;
 end;
 
-procedure TMatchResult.LoadFromIni(AIni: TCustomIniFile; ASection, ASubKey: String);
+procedure TMatchResult.LoadFromIni(AIni: TCustomIniFile; const ASection, ASubKey: String);
 begin
   SPos := AIni.ReadInteger(ASection, ASubKey + 'SPos', SPos);
   EPos := AIni.ReadInteger(ASection, ASubKey + 'EPos', EPos);
   ShowBold := AIni.ReadBool(ASection, ASubKey + 'ShowBold', ShowBold);
 end;
 
-procedure TMatchResult.WriteToIni(AIni: TCustomIniFile; ASection, ASubKey: String);
+procedure TMatchResult.WriteToIni(AIni: TCustomIniFile; const ASection, ASubKey: String);
 begin
   AIni.WriteInteger(ASection, ASubKey + 'SPos', SPos);
   AIni.WriteInteger(ASection, ASubKey + 'EPos', EPos);
@@ -1009,7 +1009,7 @@ begin
   Result := Matches.Add;
 end;
 
-procedure TLineResult.LoadFromIni(AIni: TCustomIniFile; ASection: String);
+procedure TLineResult.LoadFromIni(AIni: TCustomIniFile; const ASection: String);
 var
   I, ACount: Integer;
   ASubKey: String;
@@ -1026,7 +1026,7 @@ begin
     Add.LoadFromIni(AIni, ASection, Format('%s%d', [ASubKey, I]));
 end;
 
-procedure TLineResult.WriteToIni(AIni: TCustomIniFile; ASection: String);
+procedure TLineResult.WriteToIni(AIni: TCustomIniFile; const ASection: String);
 var
   I: Integer;
   ASubKey: String;
@@ -1094,7 +1094,7 @@ begin
   end;
 end;
 
-function TFileResult.LoadFromIni(AIni: TCustomIniFile; ASection: String): Boolean;
+function TFileResult.LoadFromIni(AIni: TCustomIniFile; const ASection: String): Boolean;
 var
   I, ACount: Integer;
   ASubKey: String;
@@ -1119,7 +1119,7 @@ begin
   Result := True;
 end;
 
-procedure TFileResult.WriteToIni(AIni: TCustomIniFile; ASection: String);
+procedure TFileResult.WriteToIni(AIni: TCustomIniFile; const ASection: String);
 var
   I: Integer;
   ASubKey: String;
@@ -1245,7 +1245,7 @@ begin
     FreeAndNil(AIni);
 end;
 
-procedure TGrepHistoryListItem.LoadFromIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; ASection: String);
+procedure TGrepHistoryListItem.LoadFromIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode; const ASection: String);
 var
   I, ACount: Integer;
   ASubKey, APattern: String;
@@ -1342,7 +1342,7 @@ begin
 end;
 
 procedure TGrepHistoryListItem.WriteToIni(AIni: TCustomIniFile; AIniVersion: Integer; AIniMode: TIniFileMode;
-  ASection: String);
+  const ASection: String);
 var
   I: Integer;
   ASubKey: String;
@@ -2141,7 +2141,7 @@ begin
     Result := RI;
 end;
 
-procedure TGrepHistoryList.WriteOrders(const AIni: TCustomIniFile; Key: String; AIndex: Integer; AItem: TGrepHistoryListItem; AOnlySearchList: Boolean);
+procedure TGrepHistoryList.WriteOrders(const AIni: TCustomIniFile; const Key: String; AIndex: Integer; AItem: TGrepHistoryListItem; AOnlySearchList: Boolean);
 const
   cOrderFormat = '%5.5d';
 var
@@ -2342,7 +2342,7 @@ begin
   AIni.UpdateFile;
 end;
 
-procedure TGrepHistoryList.DeleteINIFiles(AMainINIFileName: String; ADelMode: TGrepDeleteMode; AIniVersion, AItemIndex: Integer);
+procedure TGrepHistoryList.DeleteINIFiles(const AMainINIFileName: String; ADelMode: TGrepDeleteMode; AIniVersion, AItemIndex: Integer);
 
   procedure ItemDeleteINIFiles(Settings: TCustomIniFile; AHistoryItem: TGrepHistoryListItem; AConfigPath, AExt: String);
   begin

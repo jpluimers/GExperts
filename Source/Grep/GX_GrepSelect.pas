@@ -97,7 +97,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(AHistoryList: TGrepHistoryList; ASelectType: TGrepSelectType; ACaption: String);
+    procedure Init(AHistoryList: TGrepHistoryList; ASelectType: TGrepSelectType; const ACaption: String);
     function  Execute: TGrepSelectResult;
     property SelectedCount: Integer read FSelectedCount;
     property SortMode: TGrepHistorySort read FSortMode;
@@ -177,7 +177,7 @@ begin
   end;
 end;
 
-procedure TfmGrepSelect.Init(AHistoryList: TGrepHistoryList; ASelectType: TGrepSelectType; ACaption: String);
+procedure TfmGrepSelect.Init(AHistoryList: TGrepHistoryList; ASelectType: TGrepSelectType; const ACaption: String);
 resourcestring
   rsDeleteText = 'Delete';
   rsTextSave = 'Save';

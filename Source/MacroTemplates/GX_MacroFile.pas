@@ -31,7 +31,7 @@ type
     procedure SetPrivUnits(const Value: TStringList);
     procedure SetPubUnits(const Value: TStringList);
   public
-    constructor Create(AName: string);
+    constructor Create(const AName: string);
     destructor Destroy; override;
     procedure Assign(ASource: TMacroObject);
     property Name: string read FName write FName;
@@ -50,7 +50,7 @@ type
     procedure Clear; override;
     destructor Destroy; override;
 
-    function CreateTemplate(AName: string): TMacroObject;
+    function CreateTemplate(const AName: string): TMacroObject;
     procedure Remove(ATemplate: TMacroObject);
 
     property Templates[Index: Integer]: TMacroObject read GetTemplate; default;
@@ -64,16 +64,16 @@ type
     function GetMacroItem(Index: Integer): TMacroObject;
     function GetMacroCount: Integer;
   public
-    constructor Create(AFileName: string = '');
+    constructor Create(const AFileName: string = '');
     destructor Destroy; override;
 
     procedure Clear;
     procedure LoadFromFile;
-    procedure SaveToFile(AFilename: string);
+    procedure SaveToFile(const AFilename: string);
 
     function AddMacro(AMacroObject: TMacroObject): TMacroObject;
     procedure RemoveMacro(AMacroObject: TMacroObject);
-    function IndexOf(AObjectName: string): Integer;
+    function IndexOf(const AObjectName: string): Integer;
 
     property MacroCount: Integer read GetMacroCount;
     property MacroItems[Index: Integer]: TMacroObject read GetMacroItem; default;
@@ -111,7 +111,7 @@ begin
   FShortCut := ASource.ShortCut;
 end;
 
-constructor TMacroObject.Create(AName: string);
+constructor TMacroObject.Create(const AName: string);
 begin
   inherited Create;
   FName := AName;
@@ -139,7 +139,7 @@ end;
 
 { TMacroFile }
 
-constructor TMacroFile.Create(AFileName: string);
+constructor TMacroFile.Create(const AFileName: string);
 begin
   inherited Create;
   FTemplateList := TTemplateList.Create;
@@ -169,7 +169,7 @@ begin
   Result := TMacroObject(FTemplateList[Index]);
 end;
 
-function TMacroFile.IndexOf(AObjectName: string): Integer;
+function TMacroFile.IndexOf(const AObjectName: string): Integer;
 var
   i: Integer;
 begin
@@ -253,7 +253,7 @@ begin
   end;
 end;
 
-procedure TMacroFile.SaveToFile(AFilename: string);
+procedure TMacroFile.SaveToFile(const AFilename: string);
 var
   Doc: IXMLDocument;
   Root: IXMLElement;
@@ -321,7 +321,7 @@ begin
   Result := TMacroObject(inherited Items[Index]);
 end;
 
-function TTemplateList.CreateTemplate(AName: string): TMacroObject;
+function TTemplateList.CreateTemplate(const AName: string): TMacroObject;
 begin
   Result := TMacroObject.Create(AName);
   Add(Result);

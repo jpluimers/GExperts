@@ -47,10 +47,10 @@ type
 
     function Add(AObject: TObject): Integer;
     function AddWithCode(const ACode: string; AObject: TObject): Integer;
-    function IndexOf(ACode: string): Integer;
-    function FindObject(ACode: string): TObject;
+    function IndexOf(const ACode: string): Integer;
+    function FindObject(const ACode: string): TObject;
     function Count: Integer;
-    function ObjectByCode(ACode: string): TObject;
+    function ObjectByCode(const ACode: string): TObject;
     procedure ForEach(AHandler: TGxListEntryHandler; AData: TObject = nil); virtual;
 
     property Items[Index: Integer]: TObject read GetItem; default;
@@ -143,7 +143,7 @@ begin
   Result := '';
 end;
 
-function TGxObjectDictionary.IndexOf(ACode: string): Integer;
+function TGxObjectDictionary.IndexOf(const ACode: string): Integer;
 begin
   Result := FList.IndexOf(ACode);
 end;
@@ -162,7 +162,7 @@ begin
   Result := FList.Objects[Index];
 end;
 
-function TGxObjectDictionary.ObjectByCode(ACode: string): TObject;
+function TGxObjectDictionary.ObjectByCode(const ACode: string): TObject;
 resourcestring
   SObjNF = 'Object with code "%s" not found';
 var
@@ -174,7 +174,7 @@ begin
   Result := FList.Objects[Idx];  
 end;
 
-function TGxObjectDictionary.FindObject(ACode: string): TObject;
+function TGxObjectDictionary.FindObject(const ACode: string): TObject;
 var
   Idx: Integer;
 begin

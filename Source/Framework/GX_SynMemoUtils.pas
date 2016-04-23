@@ -25,7 +25,7 @@ uses
   SysUtils, ToolsAPI, GX_OtaUtils, Graphics;
 
 {$IFDEF SYNEDIT}
-procedure GxGetIDEHighLigherSettings(Highlighter: TSynCustomHighlighter; Prefer: string);
+procedure GxGetIDEHighLigherSettings(Highlighter: TSynCustomHighlighter; const Prefer: string);
 var
   Elements: TStrings;
   PreferIndex: Integer;

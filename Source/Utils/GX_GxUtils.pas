@@ -29,7 +29,7 @@ procedure ShowNoPackagesError;
 // if loading was successful ; False otherwise with TargetBitmap
 // being undefined.
 function GxLoadBitmapForExpert(const BitmapFile: string; var TargetBitmap: Graphics.TBitmap): Boolean;
-function GxLoadBitmapFromResource(ResName: string; var TargetBitmap: Graphics.TBitmap): Boolean;
+function GxLoadBitmapFromResource(const ResName: string; var TargetBitmap: Graphics.TBitmap): Boolean;
 function GxLoadBitmapFromFile(FileName: string; var TargetBitmap: Graphics.TBitmap): Boolean;
 
 procedure GxContextHelp(const HelpOwner: TWinControl; const ContextID: Integer);
@@ -92,7 +92,7 @@ begin
     FreeAndNil(TargetBitmap);
 end;
 
-function GxLoadBitmapFromResource(ResName: string; var TargetBitmap: Graphics.TBitmap): Boolean;
+function GxLoadBitmapFromResource(const ResName: string; var TargetBitmap: Graphics.TBitmap): Boolean;
 begin
   Result := False;
   try

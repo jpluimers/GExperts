@@ -91,8 +91,8 @@ type
     procedure WriteBool(const Ident: string; Value: Boolean);
     function ReadInteger(const Ident: string; Default: Longint): Longint;
     procedure WriteInteger(const Ident: string; Value: Longint);
-    function ReadString(const Ident: string; Default: string): string;
-    procedure WriteString(const Ident: string; Value: string);
+    function ReadString(const Ident: string; const Default: string): string;
+    procedure WriteString(const Ident: string; const Value: string);
     function ReadAnsiChar(const Ident: string; Default: AnsiChar): AnsiChar;
     procedure WriteAnsiChar(const Ident: string; Value: AnsiChar);
     function ReadEnumerated(const Ident: string; TypeInfo: PTypeInfo; Default: Longint): Longint;
@@ -119,9 +119,9 @@ type
     procedure WriteStrings(const List: TStrings; const Section, Ident: string);
     function ReadEnumerated(const Section, Ident: string; TypeInfo: PTypeInfo; Default: Longint): Longint;
     procedure WriteEnumerated(const Section, Ident: string; TypeInfo: PTypeInfo; Value: Longint);
-    procedure SaveForm(Form: TCustomForm; Section: string = '';
+    procedure SaveForm(Form: TCustomForm; const Section: string = '';
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
-    procedure LoadForm(Form: TCustomForm; Section: string = '';
+    procedure LoadForm(Form: TCustomForm; const Section: string = '';
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
     constructor Create(const FileName: string = '');
     function CreateExpertSettings(const Section: string): TExpertSettings;
@@ -803,7 +803,7 @@ begin
   WriteInteger(Section, Ident, Value);
 end;
 
-procedure TGExpertsSettings.LoadForm(Form: TCustomForm; Section: string; FormSaveFlags: TFormSaveFlags);
+procedure TGExpertsSettings.LoadForm(Form: TCustomForm; const Section: string; FormSaveFlags: TFormSaveFlags);
 var
   StorageSection: string;
 begin
@@ -829,7 +829,7 @@ begin
   end;
 end;
 
-procedure TGExpertsSettings.SaveForm(Form: TCustomForm; Section: string;
+procedure TGExpertsSettings.SaveForm(Form: TCustomForm; const Section: string;
   FormSaveFlags: TFormSaveFlags);
 var
   StorageSection: string;
@@ -919,7 +919,7 @@ begin
   FGExpertsSettings.ReadSection(FSection + '\' + Section, Strings);
 end;
 
-function TExpertSettings.ReadString(const Ident: string; Default: string): string;
+function TExpertSettings.ReadString(const Ident: string; const Default: string): string;
 begin
   Result := FGExpertsSettings.ReadString(FSection, Ident, Default);
 end;
@@ -962,7 +962,7 @@ begin
   FGExpertsSettings.WriteInteger(FSection, Ident, Value);
 end;
 
-procedure TExpertSettings.WriteString(const Ident: string; Value: string);
+procedure TExpertSettings.WriteString(const Ident: string; const Value: string);
 begin
   FGExpertsSettings.WriteString(FSection, Ident, Value);
 end;

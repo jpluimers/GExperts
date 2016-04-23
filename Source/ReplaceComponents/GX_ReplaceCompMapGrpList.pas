@@ -50,7 +50,7 @@ type
     procedure GetSelectedGroups(GroupList: TStringList);
     procedure ExecEditGroup(const GroupName: string);
     procedure ShowError(const Msg: string);
-    procedure ValidateNewName(OldName, NewName: string);
+    procedure ValidateNewName(const OldName, NewName: string);
     function LocateGroup(const GroupName: string): Boolean;
     procedure ExecExportTo(const FileName: string);
     function ConfigurationKey: string;
@@ -255,7 +255,7 @@ begin
   ExecEditGroup(SelectedGroupName);
 end;
 
-procedure TfmReplaceCompMapGrpList.ValidateNewName(OldName, NewName: string);
+procedure TfmReplaceCompMapGrpList.ValidateNewName(const OldName, NewName: string);
 resourcestring
   SNameNonUnique = 'Name "%s" is not unique!';
   SNameRequired = 'Name of group can not be empty!';

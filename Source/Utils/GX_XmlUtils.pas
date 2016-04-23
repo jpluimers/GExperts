@@ -10,8 +10,8 @@ function CreateOrLoadFileToDom(const FileName, FileDescription: string;
 procedure AddXMLHeader(Doc: IXMLDocument);
 function GetChildNodeOfType(Node: IXMLNode; NodeType: TNodeType): IXMLNode;
 function GetCDataSectionTextOrNodeText(Node: IXMLNode): string;
-function EscapeCDataText(Text: string): string;
-function UnEscapeCDataText(Text: string): string;
+function EscapeCDataText(const AText: string): string;
+function UnEscapeCDataText(const AText: string): string;
 
 implementation
 
@@ -111,14 +111,14 @@ const
   CDataEndMarker = ']]>';
   CDataEndMarkerEscape = '&GXCDataEndSectionEscape;';
 
-function EscapeCDataText(Text: string): string;
+function EscapeCDataText(const AText: string): string;
 begin
-  Result := StringReplace(Text, CDataEndMarker, CDataEndMarkerEscape, [rfReplaceAll]);
+  Result := StringReplace(AText, CDataEndMarker, CDataEndMarkerEscape, [rfReplaceAll]);
 end;
 
-function UnEscapeCDataText(Text: string): string;
+function UnEscapeCDataText(const AText: string): string;
 begin
-  Result := StringReplace(Text, CDataEndMarkerEscape, CDataEndMarker, [rfReplaceAll]);
+  Result := StringReplace(AText, CDataEndMarkerEscape, CDataEndMarker, [rfReplaceAll]);
 end;
 
 end.

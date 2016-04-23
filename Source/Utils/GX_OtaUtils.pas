@@ -87,7 +87,7 @@ function GxOtaGetActiveEditorTextAsUnicodeString(var Text: TGXUnicodeString; Use
 function GxOtaGetCurrentIdent: string;
 
 // Replace the source editor's text with the passed text
-procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
+procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; const AText: string);
 procedure GxOtaReplaceEditorTextWithUnicodeString(SourceEditor: IOTASourceEditor; Text: TGXUnicodeString);
 
 // Returns current line from edit buffer
@@ -1906,7 +1906,7 @@ begin
 end;
 *)
 
-procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; Text: string);
+procedure GxOtaReplaceEditorText(SourceEditor: IOTASourceEditor; const AText: string);
 var
   Writer: IOTAEditWriter;
 begin
@@ -1915,7 +1915,7 @@ begin
   if not Assigned(Writer) then
     raise Exception.Create('No edit writer');
   Writer.DeleteTo(MaxLongint);
-  Writer.Insert(PAnsiChar(ConvertToIDEEditorString(Text)));
+  Writer.Insert(PAnsiChar(ConvertToIDEEditorString(AText)));
   Writer := nil;
 end;
 

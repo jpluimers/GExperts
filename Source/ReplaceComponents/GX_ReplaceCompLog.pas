@@ -57,7 +57,7 @@ type
     procedure SaveAsXML(const AFileName: string);
   public
     constructor Create(Owner: TComponent; ConfigData: TReplaceCompData;
-      SourceClassName, DestClassName: string; LogEvents: TCompRepEventList); reintroduce;
+      const SourceClassName, DestClassName: string; LogEvents: TCompRepEventList); reintroduce;
   end;
 
 implementation
@@ -71,7 +71,7 @@ uses
 
 constructor TfmReplaceCompLog.Create(Owner: TComponent;
   ConfigData: TReplaceCompData;
-  SourceClassName, DestClassName: string; LogEvents: TCompRepEventList);
+  const SourceClassName, DestClassName: string; LogEvents: TCompRepEventList);
 begin
   inherited Create(Owner);
   FConfigData := ConfigData;

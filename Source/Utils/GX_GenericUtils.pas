@@ -186,7 +186,7 @@ procedure AnsiStrTok(const Source, Delimiter: string; Dest: TStrings);
 function GetQuotedToken(const Str: string): string;
 
 // Expand tabs into spaces.  The input should be a single line.
-function ExpandTabsInLine(AText: string; ATabSize: Integer): string;
+function ExpandTabsInLine(const AText: string; ATabSize: Integer): string;
 
 // Find the line with the minimal space indent, ignoring empty lines.
 // Note: This does not expand tabs, so the lines must be pre-expanded.
@@ -266,15 +266,15 @@ function SentenceCase(const S: string): string;
 function TitleCase(const S: string): string;
 
 // Get the index of the first alphebetic character in the string
-function FirstAlphaInString(S: string): Integer;
+function FirstAlphaInString(const S: string): Integer;
 
 // Parse a string like TClass1.TClass2.MethodName into parts
-procedure DecomposeClassMethodString(S: string; var MethodName, ClassName, NestedClasses: string);
-function GetMethodName(S: string): string;
+procedure DecomposeClassMethodString(const S: string; var MethodName, ClassName, NestedClasses: string);
+function GetMethodName(const S: string): string;
 
 // Add an item to the top of a MRU string list.  Can optionally strip
 // off a trailing path delimiter.
-procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean = False); overload;
+procedure AddMRUString(const Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean = False); overload;
 procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean;
   MaxListCount, MaxTextLength: Integer; AllowBlank: Boolean = False); overload;
 // Delete a string from a string list
@@ -315,7 +315,7 @@ function GXPathRelativePathTo(out APath: string; const AFrom, ATo: string;
 function SafeChangeDirectory(const NewDir: string): Boolean;
 
 // Return a complete file name with a path given a directory/file name
-function BuildFileName(Path, FileName: string): string;
+function BuildFileName(const Path, FileName: string): string;
 
 // Returns AString padded with white space if
 // StringLength > Length(AString).
@@ -326,7 +326,7 @@ function GetPaddedString(const AString: string; const StringLength: Integer): st
 function LastCharPos(const S: string; C: Char): Integer;
 
 // Get character at some position or #0 for invalid positions
-function StrCharAt(S: string; Pos: Integer): Char;
+function StrCharAt(const S: string; Pos: Integer): Char;
 
 // Returns the size of any EOL character(s) at a given position (0 if none)
 function EOLSizeAtPos(const S: string; Pos: Integer): Integer;
@@ -338,13 +338,13 @@ function EOLSizeAtPos(const S: string; Pos: Integer): Integer;
 function SourceDifferentApartFromTrailingLineBreak(const OrigSource, NewSource: TGXUnicodeString): Boolean;
 
 // Returns True if S string contains an EOL on the end
-function HasTrailingEOL(S: string): Boolean;
+function HasTrailingEOL(const S: string): Boolean;
 
 // Remove the last EOL character from a string
 // EOL can be one or two characters long
 // Useful for processing strings read from memo controls
 procedure RemoveLastEOL(var S: string);
-function RemoveTrailingEOL(S: string): string;
+function RemoveTrailingEOL(const S: string): string;
 
 // Return the last line of a multiline string (embedded CR or LF)
 function LastLineOf(const S: string): string;
@@ -668,7 +668,7 @@ function FindTextIdent(Id: string; const Source: string;
 ///   LinePosToCharPos(Point(5, 1), '12345') = 5
 ///   LinePosToCharPos(Point(1, 2), '12345'#13#10'6789') = 8
 /// </summary>
-function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
+function LinePosToCharPos(LinePos: TPoint; const Text: string): Integer;
 
 ///<symmary>
 /// Converts a character position into line position (X/Y), so that
@@ -678,7 +678,7 @@ function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
 ///   CharPosToLinePos(5, '12345') = Point(5, 1)
 ///   CharPosToLinePos(8, '12345'#13#10'6789') = Point(1, 2)
 /// </summary>
-function CharPosToLinePos(CharPos: Integer; Text: string): TPoint;
+function CharPosToLinePos(CharPos: Integer; const Text: string): TPoint;
 
 // Convert a Windows message number into a string description
 function MessageName(Msg: Longint): string;
@@ -688,8 +688,8 @@ function IsoDateTimeToStr(DateTime: TDateTime): string;
 function IsoStringToDateTime(const ISODateTime: string): TDateTime;
 function IsoStringToDateTimeDef(const DateTime: string; Default: TDateTime): TDateTime;
 
-function GetFirstCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
-function GetLastCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+function GetFirstCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+function GetLastCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 
 type
   TFileFindThread = class(TThread)
@@ -1196,7 +1196,7 @@ begin
   Result := Trim(Result);
 end;
 
-function ExpandTabsInLine(AText: string; ATabSize: Integer): string;
+function ExpandTabsInLine(const AText: string; ATabSize: Integer): string;
 var
   i: Integer;
   ResultLen, SpaceLen: Integer;
@@ -1583,7 +1583,7 @@ begin
   Result := Str[1];
 end;
 
-function FirstAlphaInString(S: string): Integer;
+function FirstAlphaInString(const S: string): Integer;
 var
   i: Integer;
 begin
@@ -1598,7 +1598,7 @@ begin
   end;
 end;
 
-procedure DecomposeClassMethodString(S: string; var MethodName, ClassName, NestedClasses: string);
+procedure DecomposeClassMethodString(const S: string; var MethodName, ClassName, NestedClasses: string);
 var
   TempStr: string;
   Identifiers: TStringList;
@@ -1638,7 +1638,7 @@ begin
   end;
 end;
 
-function GetMethodName(S: string): string;
+function GetMethodName(const S: string): string;
 var
   MethodName, ClassName, NestedClasses: string;
 begin
@@ -1745,7 +1745,7 @@ begin
     List.Delete(List.Count - 1);
 end;
 
-procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean);
+procedure AddMRUString(const Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean; AllowBlank: Boolean);
 begin
   AddMRUString(Text, List, DeleteTrailingDelimiter, 20, 300, AllowBlank);
 end;
@@ -1930,7 +1930,7 @@ end;
 {$ENDIF}
 {$UNDEF IPlusOn}
 
-function BuildFileName(Path, FileName: string): string;
+function BuildFileName(const Path, FileName: string): string;
 var
   FileNameHasDelimiter: Boolean;
   PathHasDelimiter: Boolean;
@@ -1978,7 +1978,7 @@ begin
   Result := i;
 end;
 
-function StrCharAt(S: string; Pos: Integer): Char;
+function StrCharAt(const S: string; Pos: Integer): Char;
 begin
   if (Pos >= 1) and (Pos <= Length(S)) then
     Result := S[Pos]
@@ -2027,7 +2027,7 @@ begin
     Result := True;
 end;
 
-function HasTrailingEOL(S: string): Boolean;
+function HasTrailingEOL(const S: string): Boolean;
 begin
   Result := (EOLSizeAtPos(S, Length(S)) > 0);
 end;
@@ -2052,7 +2052,7 @@ begin
   end;
 end;
 
-function RemoveTrailingEOL(S: string): string;
+function RemoveTrailingEOL(const S: string): string;
 begin
   Result := S;
   RemoveLastEOL(Result);
@@ -3987,7 +3987,7 @@ begin
       end;
 end;
 
-function LinePosToCharPos(LinePos: TPoint; Text: string): Integer;
+function LinePosToCharPos(LinePos: TPoint; const Text: string): Integer;
 var
   Offset: Integer;
   LineIdx: Integer;
@@ -4011,7 +4011,7 @@ begin
   end;
 end;
 
-function CharPosToLinePos(CharPos: Integer; Text: string): TPoint;
+function CharPosToLinePos(CharPos: Integer; const Text: string): TPoint;
 var
   sl: TStringList;
   LineIdx: Integer;
@@ -4302,7 +4302,7 @@ begin
   end;
 end;
 
-function GetFirstCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+function GetFirstCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 begin
   for Result := 1 to Length(AText) do
     if CharInSet(AText[Result], AChars) = SearchThis then
@@ -4310,7 +4310,7 @@ begin
   Result := 0;
 end;
 
-function GetLastCharPos(AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
+function GetLastCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 begin
   for Result := Length(AText) downto 1 do
     if CharInSet(AText[Result], AChars) = SearchThis then

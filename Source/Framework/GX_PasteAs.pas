@@ -19,8 +19,8 @@ type
   protected
   public
     constructor Create;
-    procedure LoadSettings(Settings: TGExpertsSettings; AConfigKey: String);
-    procedure SaveSettings(Settings: TGExpertsSettings; AConfigKey: String);
+    procedure LoadSettings(Settings: TGExpertsSettings; const AConfigKey: String);
+    procedure SaveSettings(Settings: TGExpertsSettings; const AConfigKey: String);
     procedure ConvertToCode(ALines: TStrings; AOnlyUpdateLines: Boolean);
     procedure ExtractRawStrings(ALines: TStrings; ADoAddBaseIndent: Boolean);
     function  ExecuteConfig(AConfigExpert: TEditorExpert; ForceShow: Boolean): Boolean;
@@ -64,7 +64,7 @@ begin
     AList.AddObject(cPasteAsTypeText[AType], TObject(Integer(AType)));
 end;
 
-procedure TPasteAsHandler.LoadSettings(Settings: TGExpertsSettings; AConfigKey: String);
+procedure TPasteAsHandler.LoadSettings(Settings: TGExpertsSettings; const AConfigKey: String);
 begin
   PasteAsType := TPasteAsType(Settings.ReadEnumerated(AConfigKey, 'PasteAsType', TypeInfo(TPasteAsType), Ord(paStringArray)));
   CreateQuotedString := Settings.ReadBool(AConfigKey, 'CreateQuotedString', True);
@@ -72,7 +72,7 @@ begin
   ShowOptions := Settings.ReadBool(AConfigKey, 'ShowOptions', True);
 end;
 
-procedure TPasteAsHandler.SaveSettings(Settings: TGExpertsSettings; AConfigKey: String);
+procedure TPasteAsHandler.SaveSettings(Settings: TGExpertsSettings; const AConfigKey: String);
 begin
   Settings.WriteEnumerated(AConfigKey, 'PasteAsType', TypeInfo(TPasteAsType), Ord(FPasteAsType));
   Settings.WriteBool(AConfigKey, 'CreateQuotedString', FCreateQuotedString);

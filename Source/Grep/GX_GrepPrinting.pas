@@ -44,7 +44,7 @@ begin
   end;
 end;
 
-procedure SaveResults(RichEdit: TRichEdit; AFileName: String; DoSaveDialog: Boolean);
+procedure SaveResults(RichEdit: TRichEdit; AFileName: string; DoSaveDialog: Boolean);
 begin
   RichEdit.PlainText := True;
   if not DoSaveDialog or OpenSaveDialog(AFileName) then
@@ -52,7 +52,7 @@ begin
 end;
 
 procedure PrintGeneric(Owner: TWinControl; Results: TGrepHistorySortableList; Where: TGrepOutputMode;
-  AFileName: String; DoSaveDialog, ASaveAll: Boolean; ASplitCount: Integer);
+  const AFileName: string; DoSaveDialog, ASaveAll: Boolean; ASplitCount: Integer);
 var
   RichEdit: TRichEdit;
 

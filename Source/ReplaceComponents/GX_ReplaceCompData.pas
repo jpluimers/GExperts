@@ -32,7 +32,7 @@ type
     function Add(const SourceClassName, DestClassName: string;
       const SourcePropName, DestPropName: string;
       DisabledFlag, BiDirFlag: Boolean;
-      UseConstValue: Boolean; ConstValue: string;
+      UseConstValue: Boolean; const ConstValue: string;
       LogValuesEnabled: Boolean;
       LogOnlyDefValuesEnabled: Boolean): TCompRepMapItem;
 
@@ -116,11 +116,11 @@ type
     function GetXmlFileName: string;
     procedure LoadError(const E: Exception);
     procedure LoadMapGroup(const Doc: IXMLDocument; const MapGroupNode: IXMLNode);
-    function GetNodeProperty(const ANode: IXMLNode; const APropName: string; ADefaultValue: string = ''): string;
+    function GetNodeProperty(const ANode: IXMLNode; const APropName: string; const ADefaultValue: string = ''): string;
     function AddMapGroup(const MapGroupName: string): TCompRepMapGroupItem;
     procedure LoadMapItem(const MapItemNode: IXMLNode; MapGroup: TCompRepMapGroupItem);
     procedure SaveMapGroup(const Doc: IXMLDocument; const MapGroupNode: IXMLNode; MapGroupItem: TCompRepMapGroupItem);
-    function GetNodeAttrib(const ANode: IXMLNode; const APropName: string; ADefaultValue: string = ''): string;
+    function GetNodeAttrib(const ANode: IXMLNode; const APropName: string; const ADefaultValue: string = ''): string;
     function GetNodeBoolProperty(const ANode: IXMLNode; const APropName: string; ADefaultValue: Boolean): Boolean;
     procedure LoadDefaultPropertyMaps;
   protected
@@ -153,7 +153,7 @@ type
     function IsError: Boolean;
     function ObjectText: string;
     function FlatText: string;
-    function FormatEventAsText(Template: string): string;
+    function FormatEventAsText(const ATemplate: string): string;
     function EventType: string;
   end;
 
@@ -337,7 +337,7 @@ end;
 
 function TCompRepMapGroupItem.Add(const SourceClassName, DestClassName,
   SourcePropName, DestPropName: string; DisabledFlag, BiDirFlag: Boolean;
-  UseConstValue: Boolean; ConstValue: string; LogValuesEnabled: Boolean;
+  UseConstValue: Boolean; const ConstValue: string; LogValuesEnabled: Boolean;
   LogOnlyDefValuesEnabled: Boolean): TCompRepMapItem;
 begin
   Result := TCompRepMapItem.Create;
@@ -450,7 +450,7 @@ begin
 end;
 
 function TReplaceCompData.GetNodeProperty(const ANode: IXMLNode;
-  const APropName: string; ADefaultValue: string): string;
+  const APropName: string; const ADefaultValue: string): string;
 var
   ChildNode: IXMLNode;
 begin
@@ -473,7 +473,7 @@ end;
 
 
 function TReplaceCompData.GetNodeAttrib(const ANode: IXMLNode;
-  const APropName: string; ADefaultValue: string): string;
+  const APropName: string; const ADefaultValue: string): string;
 var
   ChildNode: IXMLNode;
 begin
@@ -818,13 +818,13 @@ begin
     Result := SNone;
 end;
 
-function TCompRepEvent.FormatEventAsText(Template: string): string;
+function TCompRepEvent.FormatEventAsText(const ATemplate: string): string;
 resourcestring
   SErrorLayout = 'Error: %ErrorClass%'+#10;
 var
   ErrorPart: string;
 begin
-  Result := Template;
+  Result := ATemplate;
   Result := StringReplace(Result, '%When%', DateTimeToStr(Self.When), [rfReplaceAll, rfIgnoreCase]);
 
   if Self.IsError then
