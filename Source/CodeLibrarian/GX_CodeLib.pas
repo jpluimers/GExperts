@@ -1034,7 +1034,7 @@ end;
 procedure TfmCodeLib.ActionsUpdate(Action: TBasicAction; var Handled: Boolean);
 var
   HaveEditorSelection: Boolean;
-  HaveSelectedNode: Boolean;
+  lHaveSelectedNode: Boolean;
   SnippetIsSelected: Boolean;
   i: Integer;
 begin
@@ -1043,15 +1043,15 @@ begin
   actEditCopy.Enabled := HaveEditorSelection;
   actEditPaste.Enabled := (Clipboard.HasFormat(CF_TEXT) and (not FCodeText.ReadOnly));
 
-  HaveSelectedNode  := tvTopics.Selected <> nil;
-  SnippetIsSelected := HaveSelectedNode and IsCodeSnippet(tvTopics.Selected);
+  lHaveSelectedNode  := HaveSelectedNode;
+  SnippetIsSelected := lHaveSelectedNode and IsCodeSnippet(tvTopics.Selected);
 
   actEditPasteToIde.Enabled := SnippetIsSelected and not IsStandalone;
   actEditCopyFromIde.Enabled := SnippetIsSelected and not IsStandalone;
-  actDelete.Enabled := HaveSelectedNode;
-  actEditRename.Enabled := HaveSelectedNode;
+  actDelete.Enabled := lHaveSelectedNode;
+  actEditRename.Enabled := lHaveSelectedNode;
 
-  if not HaveSelectedNode then
+  if not lHaveSelectedNode then
   begin
     actMakeRoot.Enabled := False;
     actNewSnippet.Enabled := False;
@@ -1550,6 +1550,7 @@ end;
 procedure TGXStorageFile.SaveStorage;
 begin
   //FStorage.Save;
+  { TODO -oAnyone -ccheck : Is this commented out on purpose? Or did somebody forget to reenable this code? }
 end;
 
 procedure TGXStorageFile.SetAttribute(const AttrName: TGXUnicodeString; const Value: Integer);
