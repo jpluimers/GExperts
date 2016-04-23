@@ -33,18 +33,33 @@ uses
   Registry, Menus, GX_GExperts, GX_ConfigurationInfo;
 
 type
+  ///<summary>
+  /// Use this sample editor expert as a starting point for your own expert.
+  /// Do not forget to rename the unit and the class(es).
+  /// Many of the methods are optional and you can omit them if the default
+  /// behaviour is suitable for your expert. </summary>
   TGxSampleExpert = class(TGX_Expert)
   private
     FSomeData: string;
   protected
     procedure SetActive(New: Boolean); override;
   public
+    // optional, defaults to ClassName
+    class function GetName: string; override;
+    // optional, defauls to true
+    function CanHaveShortCut: boolean; override;
     constructor Create; override;
     destructor Destroy; override;
     function GetActionCaption: string; override;
-    class function GetName: string; override;
+    // optional, defaults to no shortcut
+    function GetDefaultShortCut: TShortCut; override;
+    // optional, but recommended
+    function GetHelpString: string; override;
+    // optional, defaults to true
     function HasConfigOptions: Boolean; override;
+    // optional, defaults to true
     function HasMenuItem: Boolean; override;
+    // optional if HasConfigOptions returns false
     procedure Configure; override;
     procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
@@ -73,6 +88,21 @@ begin
 end;
 
 //*********************************************************
+//    Name: TGxSampleExpert.CanHaveShortCut
+// Purpose: Determines whether this expert can have a
+//          hotkey assigned to it
+//    Note: If it returns false, no hotkey configuration
+//          control is shown in the configuratoin dialog.
+//          If your expert can have a hotkey, you can
+//          simply delete this function, since the
+//          inherited funtion already returns true.
+//*********************************************************
+function TGxSampleExpert.CanHaveShortCut: boolean;
+begin
+  Result := True;
+end;
+
+//*********************************************************
 //    Name: TGxSampleExpert.Configure
 // Purpose: Action taken when user clicks the Configure
 //          button on the Experts tab of menu item GExperts/
@@ -91,9 +121,6 @@ begin
 
   // Assign a default value to your data
   FSomeData := 'Sample Data';
-
-  // If desired, assign a default menu item shortcut
-  ShortCut := Menus.ShortCut(Word('Z'), [ssCtrl, ssShift, ssAlt]);
 
   // Saved settings are loaded automatically for you by the ancestor
   // via the virtual LoadSettings method
@@ -118,9 +145,53 @@ begin
 end;
 
 //*********************************************************
+//    Name: TGxSampleExpert.GetDefaultShortCut
+// Purpose: The default shortcut to call your expert.
+//   Notes: It is perfectly fine not to assign a default
+//          shortcut and let the expert be called via
+//          the menu only. The user can always assign
+//          a shortcut to it in the configuration dialog.
+//          Available shortcuts have become a very rare
+//          resource in the Delphi IDE.
+//          The value of ShortCut is touchy, use the ShortCut
+//          button on the Editor Experts tab of menu item
+//          GExperts/GExperts Configuration... on an existing
+//          editor expert to see if you can use a specific
+//          combination for your expert.
+//*********************************************************
+function TGxSampleExpert.GetDefaultShortCut: TShortCut;
+begin
+  // If desired, assign a default menu item shortcut
+  Result := Menus.ShortCut(Word('Z'), [ssCtrl, ssShift, ssAlt]);
+end;
+
+//*********************************************************
+//    Name: TGxSampleExpert.GetHelpString
+// Purpose: To provide your text on what this expert
+//          does to the expert description hint that is shown
+//          when the user puts the mouse over the expert's icon
+//          in the configuration dialog.
+//*********************************************************
+function TGxSampleExpert.GetHelpString: string;
+resourcestring
+  SSampleExpertHelp =
+    'This is the text that will appear in the explanation hint on the ' +
+    'Editor tab of menu item GExperts/GExperts Configuration...' + sLineBreak +
+    sLineBreak +
+    'You can allow the text to wrap automatically, or you can force your ' +
+    'own line breaks, or both.';
+begin
+  Result := SSampleExpertHelp;
+end;
+
+//*********************************************************
 //    Name: TGxSampleExpert.GetName
 // Purpose: Used to determine the unique keyword used to
-// save the active state and shortcut into the registry
+//          save the active state and shortcut into the registry
+//    Note: The inherited implementation returns the
+//          expert's class name. This is usually fine
+//          as long as it is unique within GExperts.
+//          Feel free to omit this method from your expert.
 //*********************************************************
 class function TGxSampleExpert.GetName: string;
 begin
@@ -130,7 +201,7 @@ end;
 //*********************************************************
 //    Name: TGxSampleExpert.HasConfigOptions
 // Purpose: This expert should have a configure button in
-// 	the configuration dialog
+// 	        the configuration dialog
 //*********************************************************
 function TGxSampleExpert.HasConfigOptions: Boolean;
 begin
