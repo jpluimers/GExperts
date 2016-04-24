@@ -178,6 +178,9 @@ type
     procedure CloseIfInSingleActionMode;
     function GetLbxForOpen: TListBox;
     procedure OpenSelectedUnit(ListBox: TListBox);
+    procedure lbxInterfaceFilesDropped(_Sender: TObject; _Files: TStrings);
+    procedure lbxImplementationFilesDropped(_Sender: TObject; _Files: TStrings);
+    procedure lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -432,6 +435,10 @@ begin
   GetCommonFiles;
   GetProjectFiles;
   ReadUsesList;
+
+  TWinControl_ActivateDropFiles(lbxInterface, lbxInterfaceFilesDropped);
+  TWinControl_ActivateDropFiles(lbxImplementation, lbxImplementationFilesDropped);
+  TWinControl_ActivateDropFiles(lbxFavorite, lbxFavoriteFilesDropped);
 end;
 
 procedure TfmUsesManager.FormDestroy(Sender: TObject);
@@ -444,6 +451,40 @@ begin
   FreeAndNil(FCommonUnits);
   FreeAndNil(FFavoriteUnits);
   FreeAndNil(FSearchPathUnits);
+end;
+
+procedure TfmUsesManager.lbxInterfaceFilesDropped(_Sender: TObject; _Files: TStrings);
+var
+  i: Integer;
+  s: string;
+begin
+  for i := 0 to _Files.Count - 1 do begin
+    s := _Files[i];
+    AddToIntfSection(ChangeFileExt(ExtractFileName(s), ''));
+  end;
+end;
+
+procedure TfmUsesManager.lbxImplementationFilesDropped(_Sender: TObject; _Files: TStrings);
+var
+  i: Integer;
+  s: string;
+begin
+  for i := 0 to _Files.Count - 1 do begin
+    s := _Files[i];
+    AddToImplSection(ChangeFileExt(ExtractFileName(s), ''), True);
+  end;
+end;
+
+
+procedure TfmUsesManager.lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
+var
+  i: Integer;
+  s: string;
+begin
+  for i := 0 to _Files.Count - 1 do begin
+    s := _Files[i];
+    AddToFavorites(ChangeFileExt(ExtractFileName(s), ''));
+  end;
 end;
 
 procedure TfmUsesManager.AddListToIntfSection(ListBox: TObject);
