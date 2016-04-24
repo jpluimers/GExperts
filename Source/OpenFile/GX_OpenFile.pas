@@ -7,7 +7,7 @@ interface
 uses
   Classes, Controls, Forms, ActnList, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, Messages,
-  Actions,
+  
   GX_OpenFileConfig, GX_BaseForm;
 
 const
@@ -174,6 +174,7 @@ type
     procedure CopyColumns(Source: TListView);
     procedure ResizeListViewColumns;
     procedure SetCurrentListView(const Value: TListView);
+    procedure lvFavoriteFilesDropped(Sender: TObject; Files: TStrings);
     property CurrentListView: TListView read FCurrentListView write SetCurrentListView;
   public
     property ActivePageIndex: Integer read GetActivePageIndex write SetActivePageIndex;
@@ -189,7 +190,7 @@ implementation
 uses
   SysUtils, Menus, Graphics, Windows, ToolsAPI,
   GX_IdeUtils, GX_SharedImages, GX_Experts, GX_ConfigurationInfo, GX_OtaUtils,
-  GX_GxUtils;
+  GX_GxUtils, GX_dzVclUtils;
 
 resourcestring
   SOpenUnitMenuName = 'OpenFile';
@@ -646,6 +647,21 @@ begin
   lvCommon.DoubleBuffered := True;
   lvProjects.DoubleBuffered := True;
   lvRecent.DoubleBuffered := True;
+
+  TWinControl_ActivateDropFiles(lvFavorite, lvFavoriteFilesDropped);
+end;
+
+procedure TfmOpenFile.lvFavoriteFilesDropped(Sender: TObject; Files: TStrings);
+var
+  i: Integer;
+  fn: string;
+begin
+  for i := 0 to Files.Count - 1 do begin
+    fn := Files[i];
+    if FileExists(fn) then
+      AddFavoriteFile(fn);
+  end;
+  FilterVisibleUnits;
 end;
 
 procedure TfmOpenFile.SearchPathReady;
