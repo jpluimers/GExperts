@@ -246,7 +246,7 @@ begin
   Form := TfmOpenFile.Create(nil);
   try
     Form.ActivePageIndex := Settings.LastTabIndex;
-    Form.Caption := StripHotkey(GetActionCaption);
+    Form.Caption := 'GExperts ' + StripHotkey(GetActionCaption);
     Form.LoadSettings;
 
     case OpenFileType of
