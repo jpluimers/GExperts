@@ -177,6 +177,9 @@
 			<DCCReference Include="..\..\source\Editor\GX_eReverseStatement.pas"/>
 			<DCCReference Include="..\..\source\Editor\GX_eSelectIdentifier.pas"/>
 			<DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas"/>
+			<DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
+				<Form>fmeSortConfig</Form>
+			</DCCReference>
 			<DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
 				<Form>fmUsesManager</Form>
 			</DCCReference>
