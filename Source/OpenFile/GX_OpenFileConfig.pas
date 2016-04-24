@@ -139,6 +139,7 @@ type
     procedure SaveSettings(Settings: TOpenFileSettings);
     function GetFileTypes: TFileTypes;
     function IDEOverride: TIDEOverride;
+    procedure lbxDirectoryListFilesDropped(Sender: TObject; Files: TStrings);
   public
     class function ExecuteWithSettings(Settings: TOpenFileSettings): Boolean;
     property FileTypes: TFileTypes read GetFileTypes;
@@ -147,7 +148,7 @@ type
 implementation
 
 uses
-  SysUtils, Dialogs, GX_GenericUtils, GX_GxUtils;
+  SysUtils, Dialogs, GX_GenericUtils, GX_GxUtils, GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -415,6 +416,21 @@ end;
 
 { TfmOpenFileConfig }
 
+procedure TfmOpenFileConfig.lbxDirectoryListFilesDropped(Sender: TObject; Files: TStrings);
+var
+  i: integer;
+  s: string;
+begin
+  for i := 0 to Files.Count - 1 do begin
+    s := Files[i];
+    while (s <> '') and not DirectoryExists(s) do begin
+      s := ExtractFileDir(s);
+    end;
+    if s <> '' then
+      EnsureStringInList(lbxDirectoryList.Items, AddSlash(s))
+  end;
+end;
+
 function TfmOpenFileConfig.GetFileTypes: TFileTypes;
 begin
   Assert(Assigned(FSettings));
@@ -595,6 +611,7 @@ begin
   SetParentBackgroundValue(gbxCustomDirectory, True);
   SetParentBackgroundValue(gbxGeneralSettings, True);
   SetParentBackgroundValue(gbxIDEMenuItems, True);
+  TWinControl_ActivateDropFiles(lbxDirectoryList, lbxDirectoryListFilesDropped)
 end;
 
 procedure TfmOpenFileConfig.SaveSettings(Settings: TOpenFileSettings);
