@@ -81,7 +81,8 @@ uses
   GX_ConfigurationInfo, GX_GenericUtils;
 
 const
-  CodeViewKey = 'CodeView';
+  CodeViewFontKey = 'CodeViewFont';
+  DialogFontKey = 'DialogFont';
 
 constructor TProcedureListOptions.Create;
 begin
@@ -131,8 +132,8 @@ begin
     FCodeViewAlignment := GetCodeViewAlignment(Settings.ReadString(ConfigurationKey, 'ProcedureAlignment', 'Right'));
     FAlignmentChanged := Settings.ReadBool(ConfigurationKey, 'AlignmentChanged', False);
     FSortOnColumn := Settings.ReadInteger(ConfigurationKey, 'SortColumn', FSortOnColumn);
-    RegLoadFont(Settings, ConfigurationKey, FDialogFont);
-    RegLoadFont(Settings, AddSlash(ConfigurationKey) + CodeViewKey, FCodeViewFont);
+    Settings.LoadFont(AddSlash(ConfigurationKey) + DialogFontKey, FDialogFont);
+    Settings.LoadFont(AddSlash(ConfigurationKey) + CodeViewFontKey, FCodeViewFont);
     FSearchAll := Settings.ReadBool(ConfigurationKey, 'SearchAll', True);
     FSearchClassName := Settings.ReadBool(ConfigurationKey, 'SearchClassName', True);
     FObjectNameVisible := Settings.ReadBool(ConfigurationKey, 'ShowObjectName', True);
@@ -171,8 +172,8 @@ begin
     Settings.WriteInteger(ConfigurationKey, 'ProcedureWidth', FCodeViewWidth);
     Settings.WriteInteger(ConfigurationKey, 'ProcedureHeight', FCodeViewHeight);
     Settings.WriteString(ConfigurationKey, 'ProcedureAlignment', GetAlignmentString(FCodeViewAlignment));
-    RegSaveFont(Settings, ConfigurationKey, FDialogFont);
-    RegSaveFont(Settings, AddSlash(ConfigurationKey) + CodeViewKey, FCodeViewFont);
+    Settings.SaveFont(AddSlash(ConfigurationKey) + DialogFontKey, FDialogFont);
+    Settings.SaveFont(AddSlash(ConfigurationKey) + CodeViewFontKey, FCodeViewFont);
     Settings.WriteBool(ConfigurationKey, 'ShowProcedureBody', FCodeViewVisible);
     Settings.WriteBool(ConfigurationKey, 'AlignmentChanged', FAlignmentChanged);
     Settings.WriteBool(ConfigurationKey, 'ShowObjectName', FObjectNameVisible);

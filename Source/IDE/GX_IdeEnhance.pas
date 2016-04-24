@@ -249,92 +249,90 @@ begin
 
   // do not localize any of the below items
   Settings := TGExpertsSettings.Create;
-  with Settings do
-    try
-      EnhanceIDEForms := ReadBool(ConfigurationKey, 'EnhanceIDEForms', False);
-      IdeFormsAllowResize := ReadBool(ConfigurationKey, 'IdeFormsAllowResize', False);
-      IdeFormsRememberPosition := ReadBool(ConfigurationKey, 'IdeFormsRememberPosition', False);
-      EnhanceSearchPath := ReadBool(ConfigurationKey, 'EnhanceSearchPath', False);
-      EnhanceSearchPathAggressive := ReadBool(ConfigurationKey, 'EnhanceSearchPathAggressive', False);
-      EnhanceToolProperties := ReadBool(ConfigurationKey, 'EnhanceToolProperties', False);
-      EnhanceInstallPackages := ReadBool(ConfigurationKey, 'EnhanceInstallPackages', False);
+  try
+    EnhanceIDEForms := Settings.ReadBool(ConfigurationKey, 'EnhanceIDEForms', False);
+    IdeFormsAllowResize := Settings.ReadBool(ConfigurationKey, 'IdeFormsAllowResize', False);
+    IdeFormsRememberPosition := Settings.ReadBool(ConfigurationKey, 'IdeFormsRememberPosition', False);
+    EnhanceSearchPath := Settings.ReadBool(ConfigurationKey, 'EnhanceSearchPath', False);
+    EnhanceSearchPathAggressive := Settings.ReadBool(ConfigurationKey, 'EnhanceSearchPathAggressive', False);
+    EnhanceToolProperties := Settings.ReadBool(ConfigurationKey, 'EnhanceToolProperties', False);
+    EnhanceInstallPackages := Settings.ReadBool(ConfigurationKey, 'EnhanceInstallPackages', False);
 
-      // File saving
-      AutoSave := ReadBool(ConfigurationKey, 'AutoSave', False);
-      AutoSaveInterval := ReadInteger(ConfigurationKey, 'AutoSaveInterval', 5);
-      // Fonts
-      Key := AddSlash(ConfigurationKey);
-      RegLoadFont(Settings, Key + 'OIFont', OIFont);
-      OIFontEnabled := ReadBool(ConfigurationKey, 'EnableOIFont', False);
-      OICustomFontNames := ReadBool(ConfigurationKey, 'OICustomFontNames', False);
+    // File saving
+    AutoSave := Settings.ReadBool(ConfigurationKey, 'AutoSave', False);
+    AutoSaveInterval := Settings.ReadInteger(ConfigurationKey, 'AutoSaveInterval', 5);
+    // Fonts
+    Key := AddSlash(ConfigurationKey);
+    Settings.LoadFont(Key + 'OIFont', OIFont);
+    OIFontEnabled := Settings.ReadBool(ConfigurationKey, 'EnableOIFont', False);
+    OICustomFontNames := Settings.ReadBool(ConfigurationKey, 'OICustomFontNames', False);
 
-      // Component palette
-      CPFontEnabled := ReadBool(ConfigurationKey, 'EnableCPFont', False);
-      RegLoadFont(Settings, Key + 'CPFont', CPFont);
-      CPMultiLine := ReadBool(ConfigurationKey, 'CPMultiLine', False);
-      CPScrollOpposite := ReadBool(ConfigurationKey, 'CPScrollOpposite', False);
-      CPRaggedRight := ReadBool(ConfigurationKey, 'CPRaggedRight', False);
-      CPFlatButtons := ReadBool(ConfigurationKey, 'CPFlatButtons', False);
-      CPAsButtons := ReadBool(ConfigurationKey, 'CPAsButtons', False);
-      CPTabsInPopup := ReadBool(ConfigurationKey, 'CPTabsInPopup', False);
-      CPTabsInPopupAlphaSort := ReadBool(ConfigurationKey, 'CPTabsInPopupAlphaSort', False);
-      CPHotTracking := ReadBool(ConfigurationKey, 'CPHotTracking', False);
+    // Component palette
+    CPFontEnabled := Settings.ReadBool(ConfigurationKey, 'EnableCPFont', False);
+    Settings.LoadFont(Key + 'CPFont', CPFont);
+    CPMultiLine := Settings.ReadBool(ConfigurationKey, 'CPMultiLine', False);
+    CPScrollOpposite := Settings.ReadBool(ConfigurationKey, 'CPScrollOpposite', False);
+    CPRaggedRight := Settings.ReadBool(ConfigurationKey, 'CPRaggedRight', False);
+    CPFlatButtons := Settings.ReadBool(ConfigurationKey, 'CPFlatButtons', False);
+    CPAsButtons := Settings.ReadBool(ConfigurationKey, 'CPAsButtons', False);
+    CPTabsInPopup := Settings.ReadBool(ConfigurationKey, 'CPTabsInPopup', False);
+    CPTabsInPopupAlphaSort := Settings.ReadBool(ConfigurationKey, 'CPTabsInPopupAlphaSort', False);
+    CPHotTracking := Settings.ReadBool(ConfigurationKey, 'CPHotTracking', False);
 
-      // MultiLine tab dock host
-      MultiLineTabDockHost := ReadBool(ConfigurationKey, 'MultiLineTabDockHost', False);
-      DefaultMultiLineTabDockHost := ReadBool(ConfigurationKey, 'DefaultMultiLineTabDockHost', True);
-    finally
-      FreeAndNil(Settings);
-    end;
+    // MultiLine tab dock host
+    MultiLineTabDockHost := Settings.ReadBool(ConfigurationKey, 'MultiLineTabDockHost', False);
+    DefaultMultiLineTabDockHost := Settings.ReadBool(ConfigurationKey, 'DefaultMultiLineTabDockHost', True);
+  finally
+    FreeAndNil(Settings);
+  end;
 end;
 
 procedure TIdeEnhancements.SaveSettings;
 var
   Settings: TGExpertsSettings;
-  Key: string;
+  KeyBS: string;
 begin
   Assert(ConfigInfo <> nil, 'No ConfigInfo found');
 
   // do not localize any of the below items
   Settings := TGExpertsSettings.Create;
-  with Settings do
-    try
-      WriteBool(ConfigurationKey, 'EnhanceIDEForms', EnhanceIDEForms);
-      WriteBool(ConfigurationKey, 'IdeFormsAllowResize', IdeFormsAllowResize);
-      WriteBool(ConfigurationKey, 'IdeFormsRememberPosition', IdeFormsRememberPosition);
-      WriteBool(ConfigurationKey, 'EnhanceSearchPath', EnhanceSearchPath);
-      WriteBool(ConfigurationKey, 'EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
-      WriteBool(ConfigurationKey, 'EnhanceToolProperties', EnhanceToolProperties);
-      WriteBool(ConfigurationKey, 'EnhanceInstallPackages', EnhanceInstallPackages);
+  try
+    Settings.WriteBool(ConfigurationKey, 'EnhanceIDEForms', EnhanceIDEForms);
+    Settings.WriteBool(ConfigurationKey, 'IdeFormsAllowResize', IdeFormsAllowResize);
+    Settings.WriteBool(ConfigurationKey, 'IdeFormsRememberPosition', IdeFormsRememberPosition);
+    Settings.WriteBool(ConfigurationKey, 'EnhanceSearchPath', EnhanceSearchPath);
+    Settings.WriteBool(ConfigurationKey, 'EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
+    Settings.WriteBool(ConfigurationKey, 'EnhanceToolProperties', EnhanceToolProperties);
+    Settings.WriteBool(ConfigurationKey, 'EnhanceInstallPackages', EnhanceInstallPackages);
 
-      // File saving
-      WriteBool(ConfigurationKey, 'AutoSave', AutoSave);
-      WriteInteger(ConfigurationKey, 'AutoSaveInterval', AutoSaveInterval);
-      // Fonts
-      WriteBool(ConfigurationKey, 'EnableOIFont', OIFontEnabled);
-      WriteBool(ConfigurationKey, 'OICustomFontNames', OICustomFontNames);
+    // File saving
+    Settings.WriteBool(ConfigurationKey, 'AutoSave', AutoSave);
+    Settings.WriteInteger(ConfigurationKey, 'AutoSaveInterval', AutoSaveInterval);
+    // Fonts
+    Settings.WriteBool(ConfigurationKey, 'EnableOIFont', OIFontEnabled);
+    Settings.WriteBool(ConfigurationKey, 'OICustomFontNames', OICustomFontNames);
 
-      Key := AddSlash(ConfigurationKey);
-      RegSaveFont(Settings, Key + 'OIFont', OIFont);
+    KeyBS := AddSlash(ConfigurationKey);
+    Settings.SaveFont(KeyBS + 'OIFont', OIFont);
 
-      // Component palette
-      RegSaveFont(Settings, Key + 'CPFont', CPFont);
-      WriteBool(ConfigurationKey, 'EnableCPFont', CPFontEnabled);
-      WriteBool(ConfigurationKey, 'CPTabsInPopupAlphaSort', CPTabsInPopupAlphaSort);
-      WriteBool(ConfigurationKey, 'CPTabsInPopup', CPTabsInPopup);
-      WriteBool(ConfigurationKey, 'CPMultiLine', CPMultiLine);
-      WriteBool(ConfigurationKey, 'CPScrollOpposite', CPScrollOpposite);
-      WriteBool(ConfigurationKey, 'CPRaggedRight', CPRaggedRight);
-      WriteBool(ConfigurationKey, 'CPHotTracking', CPHotTracking);
-      WriteBool(ConfigurationKey, 'CPAsButtons', CPAsButtons);
-      WriteBool(ConfigurationKey, 'CPFlatButtons', CPFlatButtons);
+    // Component palette
+    Settings.SaveFont(KeyBS + 'CPFont', CPFont);
+    Settings.WriteBool(ConfigurationKey, 'EnableCPFont', CPFontEnabled);
+    Settings.WriteBool(ConfigurationKey, 'CPTabsInPopupAlphaSort', CPTabsInPopupAlphaSort);
+    Settings.WriteBool(ConfigurationKey, 'CPTabsInPopup', CPTabsInPopup);
+    Settings.WriteBool(ConfigurationKey, 'CPMultiLine', CPMultiLine);
+    Settings.WriteBool(ConfigurationKey, 'CPScrollOpposite', CPScrollOpposite);
+    Settings.WriteBool(ConfigurationKey, 'CPRaggedRight', CPRaggedRight);
+    Settings.WriteBool(ConfigurationKey, 'CPHotTracking', CPHotTracking);
+    Settings.WriteBool(ConfigurationKey, 'CPAsButtons', CPAsButtons);
+    Settings.WriteBool(ConfigurationKey, 'CPFlatButtons', CPFlatButtons);
 
-      // MultiLine tab dock host
-      WriteBool(ConfigurationKey, 'MultiLineTabDockHost', MultiLineTabDockHost);
-      WriteBool(ConfigurationKey, 'DefaultMultiLineTabDockHost', DefaultMultiLineTabDockHost);
-    finally
-      FreeAndNil(Settings);
-    end;
+    // MultiLine tab dock host
+    Settings.WriteBool(ConfigurationKey, 'MultiLineTabDockHost', MultiLineTabDockHost);
+    Settings.WriteBool(ConfigurationKey, 'DefaultMultiLineTabDockHost', DefaultMultiLineTabDockHost);
+  finally
+    FreeAndNil(Settings);
+  end;
 end;
 
 procedure TIdeEnhancements.AddTabsToPopup(Sender: TObject);

@@ -104,6 +104,9 @@ type
     procedure ReadStrings(const List: TStrings; const ListName, Ident: string);
     procedure WriteStrings(const List: TStrings; const ListName, Ident: string);
     function ValueExists(const Ident: string): Boolean;
+    ///<summary>
+    /// Create a new TExpertSettings instance that reads/writes to Section below
+    /// the one used by this instance, that is FSection+'\'+Section. </summary>
     function CreateExpertSettings(const Section: string): TExpertSettings;
   end;
 
@@ -132,12 +135,6 @@ function ConfigInfo: IConfigInfo;
 //
 // Registry persistence utility functions
 //
-
-// Save settings of Font to the registry under Key.
-procedure RegSaveFont(const Settings: TGExpertsSettings; const Key: string; const Font: TFont);
-
-// From Key, load settings into Font from the registry.
-procedure RegLoadFont(const Settings: TGExpertsSettings; const Key: string; const Font: TFont);
 
 // Write List to registry at Key, using SubKey as the prefix for the string values
 procedure RegReadStrings(const Settings: TGExpertsSettings; const List: TStrings; const Key, SubKey: string);
