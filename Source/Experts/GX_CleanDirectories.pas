@@ -318,6 +318,7 @@ begin
       LastIdxAdded := clbDirs.Items.Add(AddSlash(ExtractFileDir(fn)));
     clbDirs.ItemIndex := LastIdxAdded;
   end;
+  AddHorizontalScrollbar;
 end;
 
 procedure TfmCleanDirectories.clbExtensionsOnFilesDropped(_Sender: TObject; _Files: TStrings);
