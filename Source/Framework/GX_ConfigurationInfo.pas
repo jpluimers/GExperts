@@ -6,7 +6,7 @@ interface
 
 uses
   Registry,
-  Graphics, Classes, TypInfo, Forms, ComCtrls;
+  Graphics, Classes, TypInfo, Forms, ComCtrls, Types;
 
 type
   IConfigInfo = interface(IUnknown) //FI:W523 - we don't need a GUID
@@ -89,6 +89,8 @@ type
     constructor Create(GExpertsSettings: TGExpertsSettings; const Section: string);
     function ReadBool(const Ident: string; Default: Boolean): Boolean;
     procedure WriteBool(const Ident: string; Value: Boolean);
+    function ReadBounds(const Default: TRect): TRect;
+    procedure WriteBounds(const Value: TRect);
     function ReadInteger(const Ident: string; Default: Longint): Longint;
     procedure WriteInteger(const Ident: string; Value: Longint);
     function ReadString(const Ident: string; const Default: string): string;
@@ -890,6 +892,22 @@ begin
   Result := FGExpertsSettings.ReadBool(FSection, Ident, Default);
 end;
 
+function TExpertSettings.ReadBounds(const Default: TRect): TRect;
+var
+  Width: integer;
+  Height: integer;
+  Left: Integer;
+  Top: Integer;
+begin
+  Left := ReadInteger('Left', Default.Left);
+  Top := ReadInteger('Top', Default.Top);
+  Width := Default.Right - Default.Left;
+  Height := Default.Bottom - Default.Top;
+  Width := ReadInteger('Width', Width);
+  Height := ReadInteger('Height', Height);
+  Result := Bounds(Left, Top, Width, Height);
+end;
+
 function TExpertSettings.ReadEnumerated(const Ident: string; TypeInfo: PTypeInfo;
   Default: Integer): Longint;
 begin
@@ -941,6 +959,19 @@ end;
 procedure TExpertSettings.WriteBool(const Ident: string; Value: Boolean);
 begin
   FGExpertsSettings.WriteBool(FSection, Ident, Value);
+end;
+
+procedure TExpertSettings.WriteBounds(const Value: TRect);
+var
+  Width: integer;
+  Height: integer;
+begin
+  Width := Value.Right - Value.Left;
+  Height := Value.Bottom - Value.Top;
+  WriteInteger('Left', Value.Left);
+  WriteInteger('Top', Value.Top);
+  WriteInteger('Width', Width);
+  WriteInteger('Height', Height);
 end;
 
 procedure TExpertSettings.WriteEnumerated(const Ident: string; TypeInfo: PTypeInfo;

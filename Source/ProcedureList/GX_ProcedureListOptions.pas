@@ -3,7 +3,7 @@ unit GX_ProcedureListOptions;
 interface
 
 uses
-  Classes, Graphics, Controls, Forms, ExtCtrls, StdCtrls, GX_BaseForm;
+  Types, Classes, Graphics, Controls, Forms, ExtCtrls, StdCtrls, GX_BaseForm;
 
 type
   TProcedureListOptions = class(TObject)
@@ -12,7 +12,7 @@ type
     FDialogFont: TFont;
     FCodeViewFont: TFont;
     FCodeViewAlignment: TAlign;
-    FLeft, FTop, FWidth, FHeight: Integer;
+    FBoundsRect: TRect;
     FSortOnColumn: Integer;
     FCodeViewVisible: Boolean;
     FSearchAll: Boolean;
@@ -20,6 +20,7 @@ type
     FOptions: TProcedureListOptions;
     FObjectNameVisible: Boolean;
     FSearchClassName: Boolean;
+    procedure SetBoundsRect(const AValue: TRect);
   public
     property AlignmentChanged: Boolean read FAlignmentChanged write FAlignmentChanged;
     property DialogFont: TFont read FDialogFont write FDialogFont;
@@ -28,10 +29,7 @@ type
     property CodeViewVisible: Boolean read FCodeViewVisible write FCodeViewVisible;
     property CodeViewHeight: Integer read FCodeViewHeight write FCodeViewHeight;
     property CodeViewWidth: Integer read FCodeViewWidth write FCodeViewWidth;
-    property Left: Integer read FLeft write FLeft;
-    property Top: Integer read FTop write FTop;
-    property Width: Integer read FWidth write FWidth;
-    property Height: Integer read FHeight write FHeight;
+    property BoundsRect: TRect read FBoundsRect write SetBoundsRect;
     property SortOnColumn: Integer read FSortOnColumn write FSortOnColumn;
     property SearchAll: Boolean read FSearchAll write FSearchAll;
     property SearchClassName: Boolean read FSearchClassName write FSearchClassName;
@@ -125,10 +123,7 @@ begin
   GxSettings := TGExpertsSettings.Create(ConfigInfo.GExpertsIdeRootRegistryKey);
   try
     Settings := GxSettings.CreateExpertSettings(ConfigurationKey);
-    FLeft := Settings.ReadInteger('Left', 317);
-    FTop := Settings.ReadInteger('Top', 279);
-    FWidth := Settings.ReadInteger('Width', 550);
-    FHeight := Settings.ReadInteger('Height', 500);
+    FBoundsRect := Settings.ReadBounds(Bounds(317, 279, 550, 500));
     FCodeViewVisible := Settings.ReadBool('ShowProcedureBody', False);
     FCodeViewWidth := Settings.ReadInteger('ProcedureWidth', 292);
     FCodeViewHeight := Settings.ReadInteger('ProcedureHeight', 100);
@@ -171,10 +166,7 @@ begin
     Settings := GxSettings.CreateExpertSettings(ConfigurationKey);
     Settings.WriteBool('SearchAll', FSearchAll);
     Settings.WriteBool('SearchClassName', FSearchClassName);
-    Settings.WriteInteger('Left', FLeft);
-    Settings.WriteInteger('Top', FTop);
-    Settings.WriteInteger('Width', FWidth);
-    Settings.WriteInteger('Height', FHeight);
+    Settings.WriteBounds(BoundsRect);
     Settings.WriteInteger('SortColumn', FSortOnColumn);
     Settings.WriteInteger('ProcedureWidth', FCodeViewWidth);
     Settings.WriteInteger('ProcedureHeight', FCodeViewHeight);
@@ -188,6 +180,11 @@ begin
     FreeAndNil(Settings);
     FreeAndNil(GxSettings);
   end;
+end;
+
+procedure TProcedureListOptions.SetBoundsRect(const AValue: TRect);
+begin
+  FBoundsRect := AValue;
 end;
 
 procedure TfmProcedureListOptions.btnChgDialogFontClick(Sender: TObject);

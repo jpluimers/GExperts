@@ -325,10 +325,7 @@ end;
 procedure TfmProcedureList.SaveSettings;
 begin
   // Things that might have changed on the procedure list dialog box
-  FOptions.Left := Left;
-  FOptions.Top := Top;
-  FOptions.Width := Width;
-  FOptions.Height := Height;
+  FOptions.BoundsRect := BoundsRect;
   FOptions.CodeViewWidth := pnlFunctionBody.Width;
   FOptions.CodeViewHeight := pnlFunctionBody.Height;
   FOptions.DialogFont.Assign(lvProcs.Font);
@@ -338,10 +335,7 @@ end;
 procedure TfmProcedureList.LoadSettings;
 begin
   FOptions.LoadSettings(ConfigurationKey);
-  Left := FOptions.Left;
-  Top := FOptions.Top;
-  Width := FOptions.Width;
-  Height := FOptions.Height;
+  BoundsRect := FOptions.BoundsRect;
   ApplyOptions(True);
   EnsureFormVisible(Self);
   ResizeCols;
