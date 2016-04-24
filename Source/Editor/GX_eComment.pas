@@ -29,7 +29,7 @@ type
     property CommentType: TCommentType read FCommentType write FCommentType;
     property InsertRemoveSpace: Boolean read FInsertRemoveSpace write FInsertRemoveSpace;
     property IsDefault: Boolean read FIsDefault write FIsDefault;
-  end ;
+  end;
 
   TCommentStyles = class(TStringList)
   private
