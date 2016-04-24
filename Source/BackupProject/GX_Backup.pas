@@ -84,8 +84,8 @@ type
     FIncludeDir: Boolean;
     FBackupScope: TBackupScope;
   protected
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
 
@@ -1145,28 +1145,28 @@ begin
   end;
 end;
 
-procedure TBackupExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TBackupExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize any of the following lines.
-  Settings.WriteBool(ConfigurationKey, 'Include', FBackupInc);
-  Settings.WriteEnumerated(ConfigurationKey, 'Type', TypeInfo(TBackupType), Ord(FBackupType));
-  Settings.WriteString(ConfigurationKey, 'Directory', FBackupDir);
-  Settings.WriteBool(ConfigurationKey, 'IncludeDir', FIncludeDir);
-  Settings.WriteEnumerated(ConfigurationKey, 'BackupScope', TypeInfo(TBackupScope), Ord(FBackupScope));
-  Settings.WriteBool(ConfigurationKey, 'FollowLibraryPath', FFollowLibraryPath);
+  Settings.WriteBool('Include', FBackupInc);
+  Settings.WriteEnumerated('Type', TypeInfo(TBackupType), Ord(FBackupType));
+  Settings.WriteString('Directory', FBackupDir);
+  Settings.WriteBool('IncludeDir', FIncludeDir);
+  Settings.WriteEnumerated('BackupScope', TypeInfo(TBackupScope), Ord(FBackupScope));
+  Settings.WriteBool('FollowLibraryPath', FFollowLibraryPath);
 end;
 
-procedure TBackupExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TBackupExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the following lines.
-  FBackupInc := Settings.ReadBool(ConfigurationKey, 'Include', FBackupInc);
-  FBackupType := TBackupType(Settings.ReadEnumerated(ConfigurationKey, 'Type', TypeInfo(TBackupType), Ord(FBackupType)));
-  FBackupDir := Settings.ReadString(ConfigurationKey, 'Directory', FBackupDir);
-  FIncludeDir := Settings.ReadBool(ConfigurationKey, 'IncludeDir', FIncludeDir);
-  FBackupScope := TBackupScope(Settings.ReadEnumerated(ConfigurationKey, 'BackupScope', TypeInfo(TBackupScope), Ord(FBackupScope)));
-  FFollowLibraryPath := Settings.ReadBool(ConfigurationKey, 'FollowLibraryPath', FFollowLibraryPath);
+  FBackupInc := Settings.ReadBool('Include', FBackupInc);
+  FBackupType := TBackupType(Settings.ReadEnumerated('Type', TypeInfo(TBackupType), Ord(FBackupType)));
+  FBackupDir := Settings.ReadString('Directory', FBackupDir);
+  FIncludeDir := Settings.ReadBool('IncludeDir', FIncludeDir);
+  FBackupScope := TBackupScope(Settings.ReadEnumerated('BackupScope', TypeInfo(TBackupScope), Ord(FBackupScope)));
+  FFollowLibraryPath := Settings.ReadBool('FollowLibraryPath', FFollowLibraryPath);
 end;
 
 initialization

@@ -242,100 +242,100 @@ end;
 
 procedure TIdeEnhancements.LoadSettings;
 var
-  GxSettings: TGExpertsSettings;
-  Settings: TExpertSettings;
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   Assert(ConfigInfo <> nil, 'No ConfigInfo found');
 
   // do not localize any of the below items
-  Settings := nil;
-  GxSettings := TGExpertsSettings.Create;
+  ExpSettings := nil;
+  Settings := TGExpertsSettings.Create;
   try
-    Settings := GxSettings.CreateExpertSettings(ConfigurationKey);
-    EnhanceIDEForms := Settings.ReadBool('EnhanceIDEForms', False);
-    IdeFormsAllowResize := Settings.ReadBool('IdeFormsAllowResize', False);
-    IdeFormsRememberPosition := Settings.ReadBool('IdeFormsRememberPosition', False);
-    EnhanceSearchPath := Settings.ReadBool('EnhanceSearchPath', False);
-    EnhanceSearchPathAggressive := Settings.ReadBool('EnhanceSearchPathAggressive', False);
-    EnhanceToolProperties := Settings.ReadBool('EnhanceToolProperties', False);
-    EnhanceInstallPackages := Settings.ReadBool('EnhanceInstallPackages', False);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    EnhanceIDEForms := ExpSettings.ReadBool('EnhanceIDEForms', False);
+    IdeFormsAllowResize := ExpSettings.ReadBool('IdeFormsAllowResize', False);
+    IdeFormsRememberPosition := ExpSettings.ReadBool('IdeFormsRememberPosition', False);
+    EnhanceSearchPath := ExpSettings.ReadBool('EnhanceSearchPath', False);
+    EnhanceSearchPathAggressive := ExpSettings.ReadBool('EnhanceSearchPathAggressive', False);
+    EnhanceToolProperties := ExpSettings.ReadBool('EnhanceToolProperties', False);
+    EnhanceInstallPackages := ExpSettings.ReadBool('EnhanceInstallPackages', False);
 
     // File saving
-    AutoSave := Settings.ReadBool('AutoSave', False);
-    AutoSaveInterval := Settings.ReadInteger('AutoSaveInterval', 5);
+    AutoSave := ExpSettings.ReadBool('AutoSave', False);
+    AutoSaveInterval := ExpSettings.ReadInteger('AutoSaveInterval', 5);
     // Fonts
-    Settings.LoadFont('OIFont', OIFont);
-    OIFontEnabled := Settings.ReadBool('EnableOIFont', False);
-    OICustomFontNames := Settings.ReadBool('OICustomFontNames', False);
+    ExpSettings.LoadFont('OIFont', OIFont);
+    OIFontEnabled := ExpSettings.ReadBool('EnableOIFont', False);
+    OICustomFontNames := ExpSettings.ReadBool('OICustomFontNames', False);
 
     // Component palette
-    CPFontEnabled := Settings.ReadBool('EnableCPFont', False);
-    Settings.LoadFont('CPFont', CPFont);
-    CPMultiLine := Settings.ReadBool('CPMultiLine', False);
-    CPScrollOpposite := Settings.ReadBool('CPScrollOpposite', False);
-    CPRaggedRight := Settings.ReadBool('CPRaggedRight', False);
-    CPFlatButtons := Settings.ReadBool('CPFlatButtons', False);
-    CPAsButtons := Settings.ReadBool('CPAsButtons', False);
-    CPTabsInPopup := Settings.ReadBool('CPTabsInPopup', False);
-    CPTabsInPopupAlphaSort := Settings.ReadBool('CPTabsInPopupAlphaSort', False);
-    CPHotTracking := Settings.ReadBool('CPHotTracking', False);
+    CPFontEnabled := ExpSettings.ReadBool('EnableCPFont', False);
+    ExpSettings.LoadFont('CPFont', CPFont);
+    CPMultiLine := ExpSettings.ReadBool('CPMultiLine', False);
+    CPScrollOpposite := ExpSettings.ReadBool('CPScrollOpposite', False);
+    CPRaggedRight := ExpSettings.ReadBool('CPRaggedRight', False);
+    CPFlatButtons := ExpSettings.ReadBool('CPFlatButtons', False);
+    CPAsButtons := ExpSettings.ReadBool('CPAsButtons', False);
+    CPTabsInPopup := ExpSettings.ReadBool('CPTabsInPopup', False);
+    CPTabsInPopupAlphaSort := ExpSettings.ReadBool('CPTabsInPopupAlphaSort', False);
+    CPHotTracking := ExpSettings.ReadBool('CPHotTracking', False);
 
     // MultiLine tab dock host
-    MultiLineTabDockHost := Settings.ReadBool('MultiLineTabDockHost', False);
-    DefaultMultiLineTabDockHost := Settings.ReadBool('DefaultMultiLineTabDockHost', True);
+    MultiLineTabDockHost := ExpSettings.ReadBool('MultiLineTabDockHost', False);
+    DefaultMultiLineTabDockHost := ExpSettings.ReadBool('DefaultMultiLineTabDockHost', True);
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
-    FreeAndNil(GxSettings);
   end;
 end;
 
 procedure TIdeEnhancements.SaveSettings;
 var
-  GxSettings: TGExpertsSettings;
-  Settings: TExpertSettings;
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   Assert(ConfigInfo <> nil, 'No ConfigInfo found');
 
   // do not localize any of the below items
-  Settings := nil;
-  GxSettings := TGExpertsSettings.Create;
+  ExpSettings := nil;
+  Settings := TGExpertsSettings.Create;
   try
-    Settings := GxSettings.CreateExpertSettings(ConfigurationKey);
-    Settings.WriteBool('EnhanceIDEForms', EnhanceIDEForms);
-    Settings.WriteBool('IdeFormsAllowResize', IdeFormsAllowResize);
-    Settings.WriteBool('IdeFormsRememberPosition', IdeFormsRememberPosition);
-    Settings.WriteBool('EnhanceSearchPath', EnhanceSearchPath);
-    Settings.WriteBool('EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
-    Settings.WriteBool('EnhanceToolProperties', EnhanceToolProperties);
-    Settings.WriteBool('EnhanceInstallPackages', EnhanceInstallPackages);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    ExpSettings.WriteBool('EnhanceIDEForms', EnhanceIDEForms);
+    ExpSettings.WriteBool('IdeFormsAllowResize', IdeFormsAllowResize);
+    ExpSettings.WriteBool('IdeFormsRememberPosition', IdeFormsRememberPosition);
+    ExpSettings.WriteBool('EnhanceSearchPath', EnhanceSearchPath);
+    ExpSettings.WriteBool('EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
+    ExpSettings.WriteBool('EnhanceToolProperties', EnhanceToolProperties);
+    ExpSettings.WriteBool('EnhanceInstallPackages', EnhanceInstallPackages);
 
     // File saving
-    Settings.WriteBool('AutoSave', AutoSave);
-    Settings.WriteInteger('AutoSaveInterval', AutoSaveInterval);
+    ExpSettings.WriteBool('AutoSave', AutoSave);
+    ExpSettings.WriteInteger('AutoSaveInterval', AutoSaveInterval);
     // Fonts
-    Settings.WriteBool('EnableOIFont', OIFontEnabled);
-    Settings.WriteBool('OICustomFontNames', OICustomFontNames);
+    ExpSettings.WriteBool('EnableOIFont', OIFontEnabled);
+    ExpSettings.WriteBool('OICustomFontNames', OICustomFontNames);
 
-    Settings.SaveFont('OIFont', OIFont);
+    ExpSettings.SaveFont('OIFont', OIFont);
 
     // Component palette
-    Settings.SaveFont('CPFont', CPFont);
-    Settings.WriteBool('EnableCPFont', CPFontEnabled);
-    Settings.WriteBool('CPTabsInPopupAlphaSort', CPTabsInPopupAlphaSort);
-    Settings.WriteBool('CPTabsInPopup', CPTabsInPopup);
-    Settings.WriteBool('CPMultiLine', CPMultiLine);
-    Settings.WriteBool('CPScrollOpposite', CPScrollOpposite);
-    Settings.WriteBool('CPRaggedRight', CPRaggedRight);
-    Settings.WriteBool('CPHotTracking', CPHotTracking);
-    Settings.WriteBool('CPAsButtons', CPAsButtons);
-    Settings.WriteBool('CPFlatButtons', CPFlatButtons);
+    ExpSettings.SaveFont('CPFont', CPFont);
+    ExpSettings.WriteBool('EnableCPFont', CPFontEnabled);
+    ExpSettings.WriteBool('CPTabsInPopupAlphaSort', CPTabsInPopupAlphaSort);
+    ExpSettings.WriteBool('CPTabsInPopup', CPTabsInPopup);
+    ExpSettings.WriteBool('CPMultiLine', CPMultiLine);
+    ExpSettings.WriteBool('CPScrollOpposite', CPScrollOpposite);
+    ExpSettings.WriteBool('CPRaggedRight', CPRaggedRight);
+    ExpSettings.WriteBool('CPHotTracking', CPHotTracking);
+    ExpSettings.WriteBool('CPAsButtons', CPAsButtons);
+    ExpSettings.WriteBool('CPFlatButtons', CPFlatButtons);
 
     // MultiLine tab dock host
-    Settings.WriteBool('MultiLineTabDockHost', MultiLineTabDockHost);
-    Settings.WriteBool('DefaultMultiLineTabDockHost', DefaultMultiLineTabDockHost);
+    ExpSettings.WriteBool('MultiLineTabDockHost', MultiLineTabDockHost);
+    ExpSettings.WriteBool('DefaultMultiLineTabDockHost', DefaultMultiLineTabDockHost);
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
-    FreeAndNil(GxSettings);
   end;
 end;
 

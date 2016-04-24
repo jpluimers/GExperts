@@ -14,6 +14,9 @@ type
     function GetShortCut: TShortCut; virtual; abstract;
     procedure SetActive(New: Boolean); virtual;
     procedure SetShortCut(Value: TShortCut); virtual; abstract;
+    // Subkey used to store configuration details in the registry
+    // defaults to GetName
+    class function ConfigurationKey: string; virtual;
     // Return the file name of an icon associated with
     // the expert. Do not specify a path.
     // This bitmap must be included in the
@@ -25,9 +28,11 @@ type
     // signals that no icon file is available.
     function GetBitmapFileName: string; virtual;
     // Overrride to load any configuration settings
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); virtual;
+    procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); virtual;
+    procedure InternalLoadSettings(Settings: TExpertSettings); virtual;
     // Overrride to save any configuration settings
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); virtual;
+    procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); virtual;
+    procedure InternalSaveSettings(Settings: TExpertSettings); virtual;
     // do nothing, overridden by TGX_Expert and TEditorExpert because
     // theses settings are "traditionally" stored differently.
     procedure LoadActiveAndShortCut(Settings: TGExpertsSettings); virtual;
@@ -89,6 +94,11 @@ destructor TGX_BaseExpert.Destroy;
 begin
   FreeAndNil(FBitmap);
   inherited;
+end;
+
+class function TGX_BaseExpert.ConfigurationKey: string;
+begin
+  Result := GetName;
 end;
 
 procedure TGX_BaseExpert.Configure;
@@ -160,12 +170,22 @@ begin
   Result := True;
 end;
 
-procedure TGX_BaseExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TGX_BaseExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   // do nothing
 end;
 
-procedure TGX_BaseExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TGX_BaseExpert.InternalLoadSettingsOld(Settings: TGExpertsSettings);
+begin
+  // do nothing
+end;
+
+procedure TGX_BaseExpert.InternalSaveSettings(Settings: TExpertSettings);
+begin
+  // do nothing
+end;
+
+procedure TGX_BaseExpert.InternalSaveSettingsOld(Settings: TGExpertsSettings);
 begin
   // do nothing
 end;
@@ -179,11 +199,18 @@ end;
 procedure TGX_BaseExpert.LoadSettings;
 var
   Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
   try
     LoadActiveAndShortCut(Settings);
-    InternalLoadSettings(Settings);
+    InternalLoadSettingsOld(Settings);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    try
+      InternalLoadSettings(ExpSettings);
+    finally
+      FreeAndNil(ExpSettings);
+    end;
   finally
     FreeAndNil(Settings);
   end;
@@ -198,11 +225,18 @@ end;
 procedure TGX_BaseExpert.SaveSettings;
 var
   Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
   try
     SaveActiveAndShortCut(Settings);
-    InternalSaveSettings(Settings);
+    InternalSaveSettingsOld(Settings);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    try
+      InternalSaveSettings(ExpSettings);
+    finally
+      FreeAndNil(ExpSettings);
+    end;
   finally
     FreeAndNil(Settings);
   end;

@@ -121,8 +121,8 @@ type
   TDependExpert = class(TGX_Expert)
   protected
     procedure UpdateAction(Action: TCustomAction); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
     procedure SetActive(New: Boolean); override;
   private
     FScanEntireUnit: Boolean;
@@ -1032,16 +1032,16 @@ begin
   FScanEntireUnit := (MessageDlg(SConfigureExplanation, mtConfirmation, [mbYes, mbNo], 0) = mrYes);
 end;
 
-procedure TDependExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TDependExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
-  Settings.WriteBool(ConfigurationKey, 'ScanEntireUnit', FScanEntireUnit);
+  Settings.WriteBool('ScanEntireUnit', FScanEntireUnit);
 end;
 
-procedure TDependExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TDependExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
-  FScanEntireUnit := Settings.ReadBool(ConfigurationKey, 'ScanEntireUnit', False);
+  FScanEntireUnit := Settings.ReadBool('ScanEntireUnit', False);
 end;
 
 procedure TDependExpert.Execute(Sender: TObject);

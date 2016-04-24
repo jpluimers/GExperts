@@ -225,8 +225,8 @@ type
     destructor Destroy; override;
     function HasConfigOptions: Boolean; override;
     function HasMenuItem: Boolean; override;
-    procedure InternalLoadSettings(ASettings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(ASettings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(ASettings: TExpertSettings); override;
+    procedure InternalSaveSettings(ASettings: TExpertSettings); override;
     procedure Execute(Sender: TObject); override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
@@ -297,16 +297,16 @@ begin
   Result := True;
 end;
 
-procedure TOpenFileExpert.InternalLoadSettings(ASettings: TGExpertsSettings);
+procedure TOpenFileExpert.InternalLoadSettings(ASettings: TExpertSettings);
 begin
   inherited;
-  Self.Settings.LoadFromRegistry(ASettings);
+  Settings.InternalLoadSettings(ASettings);
 end;
 
-procedure TOpenFileExpert.InternalSaveSettings(ASettings: TGExpertsSettings);
+procedure TOpenFileExpert.InternalSaveSettings(ASettings: TExpertSettings);
 begin
   inherited;
-  Self.Settings.SaveToRegistry(ASettings);
+  Settings.InternalSaveSettings(ASettings);
   HijackIDEActions;
 end;
 

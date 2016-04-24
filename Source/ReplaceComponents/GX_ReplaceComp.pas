@@ -136,8 +136,8 @@ type
     procedure UnprepareConfigData;
   protected
     procedure UpdateAction(Action: TCustomAction); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -583,28 +583,28 @@ begin
   Result := True;
 end;
 
-procedure TReplaceCompExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TReplaceCompExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize any of the following lines
-  FCROIgnoreErrors := Settings.ReadBool(ConfigurationKey, 'IgnoreErrors', False);
-  FCROLogChanges := Settings.ReadBool(ConfigurationKey, 'LogChanges', False);
-  FCROOverwriteLog := Settings.ReadBool(ConfigurationKey, 'OverwriteLog', False);
-  FCROShowLogWin := Settings.ReadBool(ConfigurationKey, 'ShowLogWin', False);
-  FCROLogValues := Settings.ReadBool(ConfigurationKey, 'LogValues', False);
-  FLastReplaceClass := Settings.ReadString(ConfigurationKey, 'LastReplaceClass', '');
+  FCROIgnoreErrors := Settings.ReadBool('IgnoreErrors', False);
+  FCROLogChanges := Settings.ReadBool('LogChanges', False);
+  FCROOverwriteLog := Settings.ReadBool('OverwriteLog', False);
+  FCROShowLogWin := Settings.ReadBool('ShowLogWin', False);
+  FCROLogValues := Settings.ReadBool('LogValues', False);
+  FLastReplaceClass := Settings.ReadString('LastReplaceClass', '');
 end;
 
-procedure TReplaceCompExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TReplaceCompExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize any of the following lines
-  Settings.WriteBool(ConfigurationKey, 'IgnoreErrors', FCROIgnoreErrors);
-  Settings.WriteBool(ConfigurationKey, 'LogChanges', FCROLogChanges);
-  Settings.WriteBool(ConfigurationKey, 'OverwriteLog', FCROOverwriteLog);
-  Settings.WriteBool(ConfigurationKey, 'ShowLogWin', FCROShowLogWin);
-  Settings.WriteBool(ConfigurationKey, 'LogValues', FCROLogValues);
-  Settings.WriteString(ConfigurationKey, 'LastReplaceClass', FLastReplaceClass);
+  Settings.WriteBool('IgnoreErrors', FCROIgnoreErrors);
+  Settings.WriteBool('LogChanges', FCROLogChanges);
+  Settings.WriteBool('OverwriteLog', FCROOverwriteLog);
+  Settings.WriteBool('ShowLogWin', FCROShowLogWin);
+  Settings.WriteBool('LogValues', FCROLogValues);
+  Settings.WriteString('LastReplaceClass', FLastReplaceClass);
 end;
 
 constructor TReplaceCompExpert.Create;

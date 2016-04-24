@@ -35,8 +35,11 @@ type
     function FindIdentAction(const Source: string; Pos: Integer;
       var FoundPos: Integer; var Ident: string): Boolean;
     procedure InternalExecute; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    // these cannot be changed to InternalLoad/SaveSettings because they are shared between
+    // TPrevIdentExpert and TNextIdentExpert
+    { TODO -oAnybody -cfixme : Resolve this }
+    procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -257,16 +260,16 @@ begin
   Result := 'PreviousIdent';
 end;
 
-procedure TPrevIdentExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TPrevIdentExpert.InternalLoadSettingsOld(Settings: TGExpertsSettings);
 begin
-  inherited InternalLoadSettings(Settings);
+  inherited InternalLoadSettingsOld(Settings);
   // Do not localize any of the below items.
   ViewChangeType := TViewChangeType(Settings.ReadEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(vctScrollCenter)));
 end;
 
-procedure TPrevIdentExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TPrevIdentExpert.InternalSaveSettingsOld(Settings: TGExpertsSettings);
 begin
-  inherited InternalSaveSettings(Settings);
+  inherited InternalSaveSettingsOld(Settings);
   // Do not localize any of the below items.
   Settings.WriteEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(ViewChangeType));
 end;

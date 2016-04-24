@@ -13,7 +13,7 @@ type
     FProofreaderData: TProofreaderData;
   protected
     procedure SetActive(New: Boolean); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     destructor Destroy; override;
     function GetActionCaption: string; override;
@@ -110,12 +110,12 @@ begin
   Result := 'CodeProofreader';
 end;
 
-procedure TCodeProofreaderExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TCodeProofreaderExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
 
   if Assigned(FProofreaderData) then
-    FProofreaderData.SaveSettings(ConfigurationKey);
+    FProofreaderData.SaveSettings(Settings);
 end;
 
 procedure TCodeProofreaderExpert.SetActive(New: Boolean);

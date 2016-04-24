@@ -64,7 +64,6 @@ type
   TOpenFileSettings = class(TObject)
   private
     procedure LoadDefaultSettings(FileTypes: TFileTypes);
-    function FileTypeKey: string;
   public
     MatchAnywhere: Boolean;
     DefaultFileType: string;
@@ -74,9 +73,9 @@ type
     LastTabIndex: Integer;
     constructor Create;
     destructor Destroy; override;
-    procedure LoadFromRegistry(Settings: TGExpertsSettings);
-    procedure SaveToRegistry; overload;
-    procedure SaveToRegistry(Settings: TGExpertsSettings); overload;
+    procedure InternalLoadSettings(Settings: TExpertSettings);
+    procedure SaveToRegistry;
+    procedure InternalSaveSettings(Settings: TExpertSettings);
   end;
 
   TfmOpenFileConfig = class(TfmBaseForm)
@@ -289,11 +288,6 @@ begin
   inherited;
 end;
 
-function TOpenFileSettings.FileTypeKey: string;
-begin
-  Result := ConfigurationKey + '\FileTypes';
-end;
-
 procedure TOpenFileSettings.LoadDefaultSettings(FileTypes: TFileTypes);
 var
   FileType: TFileType;
@@ -320,7 +314,7 @@ begin
   FileType.MaxRecentFiles := DefaultMaxMRU;
 end;
 
-procedure TOpenFileSettings.LoadFromRegistry(Settings: TGExpertsSettings);
+procedure TOpenFileSettings.InternalLoadSettings(Settings: TExpertSettings);
 const
   InvalidTypeName = '<invalid>';
 var
@@ -329,76 +323,92 @@ var
   KeyString: string;
   FileType: TFileType;
   TypeName: string;
+  FileTypeSettings: TExpertSettings;
 begin
   Assert(Assigned(Settings));
   FileTypes.Clear;
-  MatchAnywhere := Settings.ReadBool(ConfigurationKey, 'MatchAnywhere', True);
-  IDEOverride.Text := Settings.ReadString(ConfigurationKey, 'IDEOverride', '');
-  DefaultFileType := Settings.ReadString(ConfigurationKey, 'DefaultFileType', '');
-  NumFileTypes := Settings.ReadInteger(ConfigurationKey, 'NumberFileTypes', 0);
-  LastTabIndex := Settings.ReadInteger(ConfigurationKey, 'LastTabIndex', 0);
-  IDEOverride.CommaText := Settings.ReadString(ConfigurationKey, 'IDEOverride', '');
+  MatchAnywhere := Settings.ReadBool('MatchAnywhere', True);
+  IDEOverride.Text := Settings.ReadString('IDEOverride', '');
+  DefaultFileType := Settings.ReadString('DefaultFileType', '');
+  NumFileTypes := Settings.ReadInteger('NumberFileTypes', 0);
+  LastTabIndex := Settings.ReadInteger('LastTabIndex', 0);
+  IDEOverride.CommaText := Settings.ReadString('IDEOverride', '');
   if NumFileTypes > 0 then
   begin
-    for i := 0 to NumFileTypes - 1 do
-    begin
-      KeyString := IntToStr(i);
-      TypeName := Settings.ReadString(FileTypeKey, 'FileType' + KeyString, InvalidTypeName);
-      if TypeName = InvalidTypeName then
-        Continue;
-      FileType := TFileType.Create(FileTypes);
-      FileType.FileTypeName := TypeName;
-      FileType.Paths.Text := Settings.ReadString(FileTypeKey, 'Paths' + KeyString, '');
-      FileType.Extensions := Settings.ReadString(FileTypeKey, 'Extensions' + KeyString, AllFilesWildCard);
-      FileType.CustomDirectories := Settings.ReadBool(FileTypeKey, 'CustomDirectory' + KeyString, False);
-      FileType.Recursive := Settings.ReadBool(FileTypeKey, 'RecursiveDirectory' + KeyString, False);
-      FileType.RecentFiles.Text := Settings.ReadString(FileTypeKey, 'RecentFiles' + KeyString, '');
-      FileType.Favorites.Text := Settings.ReadString(FileTypeKey, 'Favorites' + KeyString, '');
-      FileType.MaxRecentFiles := Settings.ReadInteger(FileTypeKey, 'MaxRecentFiles' + KeyString, DefaultMaxMRU);
+    FileTypeSettings := Settings.CreateExpertSettings('FileTypes');
+    try
+      for i := 0 to NumFileTypes - 1 do
+      begin
+        KeyString := IntToStr(i);
+        TypeName := FileTypeSettings.ReadString('FileType' + KeyString, InvalidTypeName);
+        if TypeName = InvalidTypeName then
+          Continue;
+        FileType := TFileType.Create(FileTypes);
+        FileType.FileTypeName := TypeName;
+        FileTypeSettings.ReadStrings('Paths' + KeyString, FileType.Paths);
+        FileType.Extensions := FileTypeSettings.ReadString('Extensions' + KeyString, AllFilesWildCard);
+        FileType.CustomDirectories := FileTypeSettings.ReadBool('CustomDirectory' + KeyString, False);
+        FileType.Recursive := FileTypeSettings.ReadBool('RecursiveDirectory' + KeyString, False);
+        FileTypeSettings.ReadStrings('RecentFiles' + KeyString, FileType.RecentFiles);
+        FileTypeSettings.ReadStrings('Favorites' + KeyString, FileType.Favorites);
+        FileType.MaxRecentFiles := FileTypeSettings.ReadInteger('MaxRecentFiles' + KeyString, DefaultMaxMRU);
+      end;
+    finally
+      FreeAndNil(FileTypeSettings);
     end;
   end;
   if FileTypes.Count < 1 then
     LoadDefaultSettings(FileTypes);
 end;
 
-procedure TOpenFileSettings.SaveToRegistry(Settings: TGExpertsSettings);
+procedure TOpenFileSettings.InternalSaveSettings(Settings: TExpertSettings);
 var
   j: Integer;
   i: Integer;
   FileType: TFileType;
   KeyString: string;
+  FileTypeSettings: TExpertSettings;
 begin
   // Do not localize any of the following lines
-  Settings.WriteBool(ConfigurationKey, 'MatchAnywhere', MatchAnywhere);
-  Settings.WriteString(ConfigurationKey, 'DefaultFileType', DefaultFileType);
-  Settings.WriteInteger(ConfigurationKey, 'NumberFileTypes', FileTypes.Count);
-  Settings.WriteString(ConfigurationKey, 'IDEOverride', IDEOverride.CommaText);
-  Settings.WriteInteger(ConfigurationKey, 'LastTabIndex', LastTabIndex);
-  for i := 0 to FileTypes.Count - 1 do
-  begin
-    FileType := FileTypes[i];
-    KeyString := IntToStr(i);
-    Settings.WriteString(FileTypeKey, 'FileType' + KeyString, FileType.FileTypeName);
-    Settings.WriteString(FileTypeKey, 'Paths' + KeyString, FileType.Paths.Text);
-    Settings.WriteString(FileTypeKey, 'Extensions' + KeyString, FileType.Extensions);
-    Settings.WriteBool(FileTypeKey, 'CustomDirectory' + KeyString, FileType.CustomDirectories);
-    Settings.WriteBool(FileTypeKey, 'RecursiveDirectory' + KeyString, FileType.Recursive);
-    Settings.WriteInteger(FileTypeKey, 'MaxRecentFiles' + KeyString, FileType.MaxRecentFiles);
-    Settings.WriteString(FileTypeKey, 'Favorites' + KeyString, FileType.Favorites.Text);
-    for j := FileType.RecentFiles.Count - 1 downto FileType.MaxRecentFiles do
-      FileType.RecentFiles.Delete(j);
-    Settings.WriteString(FileTypeKey, 'RecentFiles' + KeyString, FileType.RecentFiles.Text);
+  Settings.WriteBool('MatchAnywhere', MatchAnywhere);
+  Settings.WriteString('DefaultFileType', DefaultFileType);
+  Settings.WriteInteger('NumberFileTypes', FileTypes.Count);
+  Settings.WriteString('IDEOverride', IDEOverride.CommaText);
+  Settings.WriteInteger('LastTabIndex', LastTabIndex);
+  FileTypeSettings := Settings.CreateExpertSettings('FileTypes');
+  try
+    for i := 0 to FileTypes.Count - 1 do
+    begin
+      FileType := FileTypes[i];
+      KeyString := IntToStr(i);
+      FileTypeSettings.WriteString('FileType' + KeyString, FileType.FileTypeName);
+      FileTypeSettings.WriteStrings('Paths' + KeyString, FileType.Paths);
+      FileTypeSettings.WriteString('Extensions' + KeyString, FileType.Extensions);
+      FileTypeSettings.WriteBool('CustomDirectory' + KeyString, FileType.CustomDirectories);
+      FileTypeSettings.WriteBool('RecursiveDirectory' + KeyString, FileType.Recursive);
+      FileTypeSettings.WriteInteger('MaxRecentFiles' + KeyString, FileType.MaxRecentFiles);
+      FileTypeSettings.WriteStrings('Favorites' + KeyString, FileType.Favorites);
+      for j := FileType.RecentFiles.Count - 1 downto FileType.MaxRecentFiles do
+        FileType.RecentFiles.Delete(j);
+      FileTypeSettings.WriteStrings('RecentFiles' + KeyString, FileType.RecentFiles);
+    end;
+  finally
+    FreeAndNil(FileTypeSettings);
   end;
 end;
 
 procedure TOpenFileSettings.SaveToRegistry;
 var
   Registry: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
+  ExpSettings := nil;
   Registry := TGExpertsSettings.Create('');
   try
-    SaveToRegistry(Registry);
+    ExpSettings := Registry.CreateExpertSettings(ConfigurationKey);
+    InternalSaveSettings(Expsettings);
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Registry);
   end;
 end;

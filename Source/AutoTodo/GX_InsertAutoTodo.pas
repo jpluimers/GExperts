@@ -57,8 +57,8 @@ type
   protected
     procedure UpdateAction(Action: TCustomAction); override;
     procedure SetActive(New: Boolean); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -285,20 +285,20 @@ begin
   Result := True;
 end;
 
-procedure TGxInsertAutoTodoExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TGxInsertAutoTodoExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FUsername := Settings.ReadString(ConfigurationKey, 'Username', FUsername);
-  FTextToInsert := Settings.ReadString(ConfigurationKey, 'TextToInsert', FTextToInsert);
-  FDoneDialogEnabled := Settings.ReadBool(ConfigurationKey, 'DoneDialogEnabled', FDoneDialogEnabled);
+  FUsername := Settings.ReadString('Username', FUsername);
+  FTextToInsert := Settings.ReadString('TextToInsert', FTextToInsert);
+  FDoneDialogEnabled := Settings.ReadBool('DoneDialogEnabled', FDoneDialogEnabled);
 end;
 
-procedure TGxInsertAutoTodoExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TGxInsertAutoTodoExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited;
-  Settings.WriteString(ConfigurationKey, 'Username', FUsername);
-  Settings.WriteString(ConfigurationKey, 'TextToInsert', FTextToInsert);
-  Settings.WriteBool(ConfigurationKey, 'DoneDialogEnabled', FDoneDialogEnabled);
+  Settings.WriteString('Username', FUsername);
+  Settings.WriteString('TextToInsert', FTextToInsert);
+  Settings.WriteBool('DoneDialogEnabled', FDoneDialogEnabled);
 end;
 
 procedure TGxInsertAutoTodoExpert.SetActive(New: Boolean);

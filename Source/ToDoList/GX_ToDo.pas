@@ -151,8 +151,8 @@ type
     FFont: TFont;
   protected
     procedure SetActive(New: Boolean); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -1329,57 +1329,40 @@ begin
   Result := 'ToDoList'; // Do not localize.
 end;
 
-procedure TToDoExpert.InternalLoadSettings(Settings: TGExpertsSettings);
-var
-  Key: string;
-  ExpSettings: TExpertSettings;
+procedure TToDoExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
-  // Do not localize
-  ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
-  try
-    Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
-    FTokenList.LoadFromSettings(ExpSettings);
-    FDirectoryHistoryList.LoadFromSettings(ExpSettings);
 
-    FShowTokens := ExpSettings.ReadBool('ShowTokens', False);
-    FAddMessage := ExpSettings.ReadBool('AddMessage', False);
-    FHideOnGoto := ExpSettings.ReadBool('HideOnGoto', False);
-    FScanType := TToDoScanType(ExpSettings.ReadEnumerated('ScanType', TypeInfo(TToDoScanType), Ord(tstProject)));
-    fDirsToScan := ExpSettings.ReadString('DirToScan', '');
-    fRecurseDirScan := ExpSettings.ReadBool('RecurseDirScan', False);
-    ExpSettings.LoadFont('Font', FFont); 
-  finally
-    FreeAndNil(ExpSettings);
-  end;
+  // Do not localize
+  FTokenList.LoadFromSettings(Settings);
+  FDirectoryHistoryList.LoadFromSettings(Settings);
+
+  FShowTokens := Settings.ReadBool('ShowTokens', False);
+  FAddMessage := Settings.ReadBool('AddMessage', False);
+  FHideOnGoto := Settings.ReadBool('HideOnGoto', False);
+  FScanType := TToDoScanType(Settings.ReadEnumerated('ScanType', TypeInfo(TToDoScanType), Ord(tstProject)));
+  fDirsToScan := Settings.ReadString('DirToScan', '');
+  fRecurseDirScan := Settings.ReadBool('RecurseDirScan', False);
+  Settings.LoadFont('Font', FFont);
 
   if Active then
     IdeDockManager.RegisterDockableForm(TfmToDo, fmToDo, 'fmToDo');
 end;
 
-procedure TToDoExpert.InternalSaveSettings(Settings: TGExpertsSettings);
-var
-  Key: string;
-  ExpSettings: TExpertSettings;
+procedure TToDoExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
 
-  ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
-  try
-    // Do not localize
-    Key := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + ConfigurationKey;
-    FTokenList.SaveToSettings(ExpSettings);
-    FDirectoryHistoryList.SaveToSettings(ExpSettings);
-    ExpSettings.WriteBool('ShowTokens', FShowTokens);
-    ExpSettings.WriteBool('AddMessage', FAddMessage);
-    ExpSettings.WriteBool('HideOnGoto', FHideOnGoto);
-    ExpSettings.WriteEnumerated('ScanType', TypeInfo(TToDoScanType), Ord(FScanType));
-    ExpSettings.WriteString('DirToScan', FDirsToScan);
-    ExpSettings.WriteBool('RecurseDirScan', FRecurseDirScan);
-    ExpSettings.SaveFont('Font', FFont);
-  finally
-    FreeAndNil(ExpSettings);
-  end;
+  // Do not localize
+  FTokenList.SaveToSettings(Settings);
+  FDirectoryHistoryList.SaveToSettings(Settings);
+  Settings.WriteBool('ShowTokens', FShowTokens);
+  Settings.WriteBool('AddMessage', FAddMessage);
+  Settings.WriteBool('HideOnGoto', FHideOnGoto);
+  Settings.WriteEnumerated('ScanType', TypeInfo(TToDoScanType), Ord(FScanType));
+  Settings.WriteString('DirToScan', FDirsToScan);
+  Settings.WriteBool('RecurseDirScan', FRecurseDirScan);
+  Settings.SaveFont('Font', FFont);
 end;
 
 procedure TToDoExpert.SetActive(New: Boolean);

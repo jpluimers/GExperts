@@ -145,8 +145,8 @@ type
     function GetStorageFile: string;
   protected
     procedure SetActive(New: Boolean); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -914,13 +914,13 @@ begin
   fmClipboardHistory.lvClip.SetFocus;
 end;
 
-procedure TClipExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TClipExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize.
-  FMaxClip := Min(Settings.ReadInteger(ConfigurationKey, 'Maximum', 20), 100);
-  FAutoStart := Settings.ReadBool(ConfigurationKey, 'AutoStart', False);
-  FAutoClose := Settings.ReadBool(ConfigurationKey, 'AutoClose', False);
+  FMaxClip := Min(Settings.ReadInteger('Maximum', 20), 100);
+  FAutoStart := Settings.ReadBool('AutoStart', False);
+  FAutoClose := Settings.ReadBool('AutoClose', False);
 
   // This procedure is only called once, so it is safe to
   // register the form for docking here.
@@ -931,13 +931,13 @@ begin
     fmClipboardHistory := TfmClipboardHistory.Create(nil);
 end;
 
-procedure TClipExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TClipExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize.
-  Settings.WriteInteger(ConfigurationKey, 'Maximum', FMaxClip);
-  Settings.WriteBool(ConfigurationKey, 'AutoStart', FAutoStart);
-  Settings.WriteBool(ConfigurationKey, 'AutoClose', FAutoClose);
+  Settings.WriteInteger('Maximum', FMaxClip);
+  Settings.WriteBool('AutoStart', FAutoStart);
+  Settings.WriteBool('AutoClose', FAutoClose);
 end;
 
 procedure TClipExpert.Configure;

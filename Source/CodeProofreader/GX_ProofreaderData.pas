@@ -8,7 +8,7 @@ unit GX_ProofreaderData;
 interface
 
 uses
-  SysUtils, Classes, OmniXML, GX_ProofreaderUtils;
+  SysUtils, Classes, OmniXML, GX_ProofreaderUtils, GX_ConfigurationInfo;
 
 type
   TProofreaderData = class
@@ -59,8 +59,8 @@ type
     function FindReplacementIndex(const Zone: TReplacementSource; const TypedString: string): Integer;
     function FindReplacement(const Zone: TReplacementSource; const TypedString: string): TReplacementItem;
 
-    procedure SaveSettings(const ConfigurationKey: string);
-    procedure LoadSettings(const ConfigurationKey: string);
+    procedure SaveSettings(Settings: TExpertSettings);
+    procedure LoadSettings(Settings: TExpertSettings);
     property ReplacerActive: Boolean read FReplacerActive write FReplacerActive;
     property DictionaryActive: Boolean read FDictionaryActive write FDictionaryActive;
     property CompilerActive: Boolean read FCompilerActive write FCompilerActive;
@@ -99,7 +99,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Dialogs,
   GX_ProofreaderCorrection, GX_ProofreaderKeyboard, GX_GenericUtils,
-  GX_ConfigurationInfo, GX_XmlUtils, Math;
+  GX_XmlUtils, Math;
 
 type
   EProofreader = class(Exception);
@@ -232,9 +232,20 @@ end;
 constructor TProofreaderData.Create(const ConfigurationKey: string);
 var
   i: TReplacementSource;
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   inherited Create;
-  LoadSettings(ConfigurationKey);
+
+  ExpSettings := nil;
+  Settings := TGExpertsSettings.Create;
+  try
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    LoadSettings(ExpSettings);
+  finally
+    FreeAndNil(ExpSettings);
+    FreeAndNil(Settings);
+  end;
 
   for i := Low(TReplacementSource) to High(TReplacementSource) do
   begin
@@ -519,57 +530,43 @@ begin
   Doc.Save(GetXmlFileName, ofIndent);
 end;
 
-procedure TProofreaderData.LoadSettings(const ConfigurationKey: string);
-var
-  Settings: TGExpertsSettings;
+procedure TProofreaderData.LoadSettings(Settings: TExpertSettings);
 begin
-  Settings := TGExpertsSettings.Create;
-  try
-    // Do not localize any of the items below:
-    FReplacerActive := Settings.ReadBool(ConfigurationKey, 'ReplacerActive', False);
-    FDictionaryActive := Settings.ReadBool(ConfigurationKey, 'DictionaryActive', False);
-    {$IFNDEF GX_BCB}
-    // C++Builder does not have support for compiler-assisted proofreading
-    FCompilerActive := Settings.ReadBool(ConfigurationKey, 'CompilerActive', False);
-    {$ENDIF GX_BCB}
-    FDictionaryCaseMayDiffer := Settings.ReadBool(ConfigurationKey, 'DictionaryCaseDiffer', True);
-    FOneCharIncorrect := Settings.ReadBool(ConfigurationKey, 'OtherLetter', True);
-    FMustBeNearbyLetter := Settings.ReadBool(ConfigurationKey, 'NearbyLetter', False);
-    FAllowOneCharacterMissing := Settings.ReadBool(ConfigurationKey, 'NoLetter', True);
-    FAllowExtraChar := Settings.ReadBool(ConfigurationKey, 'MoreLetter', True);
-    FAllowSwitchedChars := Settings.ReadBool(ConfigurationKey, 'MixedLetter', True);
-    FFirstCharMustBeCorrect := Settings.ReadBool(ConfigurationKey, 'NoFirstOther', True);
-    FBeepOnReplace := Settings.ReadBool(ConfigurationKey, 'BeepOnReplace', True);
-    FActiveTab := Settings.ReadInteger(ConfigurationKey, 'ActiveTab', 2);
-  finally
-    FreeAndNil(Settings);
-  end;
+  // Do not localize any of the items below:
+  FReplacerActive := Settings.ReadBool('ReplacerActive', False);
+  FDictionaryActive := Settings.ReadBool('DictionaryActive', False);
+  {$IFNDEF GX_BCB}
+  // C++Builder does not have support for compiler-assisted proofreading
+  FCompilerActive := Settings.ReadBool('CompilerActive', False);
+  {$ENDIF GX_BCB}
+  FDictionaryCaseMayDiffer := Settings.ReadBool('DictionaryCaseDiffer', True);
+  FOneCharIncorrect := Settings.ReadBool('OtherLetter', True);
+  FMustBeNearbyLetter := Settings.ReadBool('NearbyLetter', False);
+  FAllowOneCharacterMissing := Settings.ReadBool('NoLetter', True);
+  FAllowExtraChar := Settings.ReadBool('MoreLetter', True);
+  FAllowSwitchedChars := Settings.ReadBool('MixedLetter', True);
+  FFirstCharMustBeCorrect := Settings.ReadBool('NoFirstOther', True);
+  FBeepOnReplace := Settings.ReadBool('BeepOnReplace', True);
+  FActiveTab := Settings.ReadInteger('ActiveTab', 2);
 end;
 
-procedure TProofreaderData.SaveSettings(const ConfigurationKey: string);
-var
-  Settings: TGExpertsSettings;
+procedure TProofreaderData.SaveSettings(Settings: TExpertSettings);
 begin
-  Settings := TGExpertsSettings.Create;
-  try
-    // Do not localize any of the items below:
-    Settings.WriteBool(ConfigurationKey, 'ReplacerActive', FReplacerActive);
-    Settings.WriteBool(ConfigurationKey, 'DictionaryActive', FDictionaryActive);
-    {$IFNDEF GX_BCB}
-    Settings.WriteBool(ConfigurationKey, 'CompilerActive', FCompilerActive);
-    {$ENDIF GX_BCB}
-    Settings.WriteBool(ConfigurationKey, 'DictionaryCaseDiffer', FDictionaryCaseMayDiffer);
-    Settings.WriteBool(ConfigurationKey, 'OtherLetter', FOneCharIncorrect);
-    Settings.WriteBool(ConfigurationKey, 'NearbyLetter', FMustBeNearbyLetter);
-    Settings.WriteBool(ConfigurationKey, 'NoLetter', FAllowOneCharacterMissing);
-    Settings.WriteBool(ConfigurationKey, 'MoreLetter', FAllowExtraChar);
-    Settings.WriteBool(ConfigurationKey, 'MixedLetter', FAllowSwitchedChars);
-    Settings.WriteBool(ConfigurationKey, 'NoFirstOther', FFirstCharMustBeCorrect);
-    Settings.WriteBool(ConfigurationKey, 'BeepOnReplace', FBeepOnReplace);
-    Settings.WriteInteger(ConfigurationKey, 'ActiveTab', FActiveTab);
-  finally
-    FreeAndNil(Settings);
-  end;
+  // Do not localize any of the items below:
+  Settings.WriteBool('ReplacerActive', FReplacerActive);
+  Settings.WriteBool('DictionaryActive', FDictionaryActive);
+  {$IFNDEF GX_BCB}
+  Settings.WriteBool('CompilerActive', FCompilerActive);
+  {$ENDIF GX_BCB}
+  Settings.WriteBool('DictionaryCaseDiffer', FDictionaryCaseMayDiffer);
+  Settings.WriteBool('OtherLetter', FOneCharIncorrect);
+  Settings.WriteBool('NearbyLetter', FMustBeNearbyLetter);
+  Settings.WriteBool('NoLetter', FAllowOneCharacterMissing);
+  Settings.WriteBool('MoreLetter', FAllowExtraChar);
+  Settings.WriteBool('MixedLetter', FAllowSwitchedChars);
+  Settings.WriteBool('NoFirstOther', FFirstCharMustBeCorrect);
+  Settings.WriteBool('BeepOnReplace', FBeepOnReplace);
+  Settings.WriteInteger('ActiveTab', FActiveTab);
 end;
 
 function TProofreaderData.FindDictionary(const Zone: TReplacementSource; const AWord: string): string;

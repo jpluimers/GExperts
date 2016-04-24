@@ -86,8 +86,8 @@ type
     FSaveFilter: Integer;
     FBackgroundColor: TColor;
   protected
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -386,27 +386,28 @@ begin
   end;
 end;
 
-procedure TSourceExportExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TSourceExportExpert.InternalLoadSettings(Settings: TExpertSettings);
 var
   NewCopyFormat: TGXCopyFormat;
 begin
+  inherited InternalLoadSettings(Settings);
   // Do not localize.
-  NewCopyFormat := TGXCopyFormat(Settings.ReadEnumerated(ConfigurationKey, 'Copy Format', TypeInfo(TGXCopyFormat), 0));
+  NewCopyFormat := TGXCopyFormat(Settings.ReadEnumerated('Copy Format', TypeInfo(TGXCopyFormat), 0));
   Assert(NewCopyFormat in [Low(TGXCopyFormat)..High(TGXCopyFormat)]);
   FDefaultCopyFormat := NewCopyFormat;
-  FSaveDir := Settings.ReadString(ConfigurationKey, 'Save Directory', '');
-  FSaveFilter := Settings.ReadInteger(ConfigurationKey, 'Save Format', 1);
-  FBackgroundColor := Settings.ReadInteger(ConfigurationKey, 'Background', GetIdeEditorBackgroundColor);
+  FSaveDir := Settings.ReadString('Save Directory', '');
+  FSaveFilter := Settings.ReadInteger('Save Format', 1);
+  FBackgroundColor := Settings.ReadInteger('Background', GetIdeEditorBackgroundColor);
 end;
 
-procedure TSourceExportExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TSourceExportExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize.
-  Settings.WriteInteger(ConfigurationKey, 'Copy Format', Ord(FDefaultCopyFormat));
-  Settings.WriteString(ConfigurationKey, 'Save Directory', FSaveDir);
-  Settings.WriteInteger(ConfigurationKey, 'Save Format', FSaveFilter);
-  Settings.WriteInteger(ConfigurationKey, 'Background', FBackgroundColor);
+  Settings.WriteInteger('Copy Format', Ord(FDefaultCopyFormat));
+  Settings.WriteString('Save Directory', FSaveDir);
+  Settings.WriteInteger('Save Format', FSaveFilter);
+  Settings.WriteInteger('Background', FBackgroundColor);
 end;
 
 procedure TSourceExportExpert.Configure;

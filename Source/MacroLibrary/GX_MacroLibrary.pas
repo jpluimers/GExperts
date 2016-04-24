@@ -164,7 +164,7 @@ type
     FStoragePath: string;
     function GetStorageFile: string;
   protected
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -939,7 +939,7 @@ begin
     ShowGxMessageBox(TIDEMacroBugMessage);
 end;
 
-procedure TMacroLibExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TMacroLibExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
   // This procedure is only called once, so it is safe to

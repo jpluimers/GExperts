@@ -12,7 +12,8 @@ uses
   Controls,
   Forms,
   Dialogs,
-  GX_BaseForm, StdCtrls;
+  StdCtrls,
+  GX_BaseForm;
 
 type
   TeSortOrder = (esoAscending, esoDescending, esoReverse);

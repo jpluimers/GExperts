@@ -21,8 +21,8 @@ type
     procedure InternalExecute;
     function FindAction(out _Action: TBasicAction): Boolean;
   protected
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
     function GetBitmapFileName: string; override;
   public
     class function GetName: string; override;
@@ -349,22 +349,22 @@ begin
   end;
 end;
 
-procedure TUsesExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TUsesExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FFavoriteUnits.CommaText := Settings.ReadString(ConfigurationKey, 'Favorites', '');
-  FSingleActionMode := Settings.ReadBool(ConfigurationKey, 'SingleActionMode', False);
-  FReplaceFileUseUnit := Settings.ReadBool(ConfigurationKey, 'ReplaceFileUseUnit', False);
-  FAvailTabIndex := Settings.ReadInteger(ConfigurationKey, 'AvailTabIndex', 0);
+  FFavoriteUnits.CommaText := Settings.ReadString('Favorites', '');
+  FSingleActionMode := Settings.ReadBool('SingleActionMode', False);
+  FReplaceFileUseUnit := Settings.ReadBool('ReplaceFileUseUnit', False);
+  FAvailTabIndex := Settings.ReadInteger('AvailTabIndex', 0);
 end;
 
-procedure TUsesExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TUsesExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited;
-  Settings.WriteString(ConfigurationKey, 'Favorites', FFavoriteUnits.CommaText);
-  Settings.WriteBool(ConfigurationKey, 'SingleActionMode', FSingleActionMode);
-  Settings.WriteBool(ConfigurationKey, 'ReplaceFileUseUnit', FReplaceFileUseUnit);
-  Settings.WriteInteger(ConfigurationKey, 'AvailTabIndex', FAvailTabIndex);
+  Settings.WriteString('Favorites', FFavoriteUnits.CommaText);
+  Settings.WriteBool('SingleActionMode', FSingleActionMode);
+  Settings.WriteBool('ReplaceFileUseUnit', FReplaceFileUseUnit);
+  Settings.WriteInteger('AvailTabIndex', FAvailTabIndex);
 end;
 
 { TfmEditUsesExpert }

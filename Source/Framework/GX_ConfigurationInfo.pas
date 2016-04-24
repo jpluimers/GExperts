@@ -103,9 +103,18 @@ type
     procedure ReadSection(const Section: string; Strings: TStrings); 
     procedure LoadFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
     procedure SaveFont(const FontName: string; const Font: TFont; Flags: TGXFontFlags = []);
-    procedure ReadStrings(const List: TStrings; const ListName, Ident: string);
-    procedure WriteStrings(const List: TStrings; const ListName, Ident: string);
+    procedure LoadForm(const Section: string; Form: TCustomForm; FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
+    procedure SaveForm(const Section: string; Form: TCustomForm; FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
+    procedure ReadStrings(const ListName: string; List: TStrings; const Ident: string = 'Item');
+    procedure WriteStrings(const ListName: string; List: TStrings; const Ident: string = 'Item');
     function ValueExists(const Ident: string): Boolean;
+    ///<summary>
+    /// SubSection can be empty </summary>
+    function SectionExists(const SubSection: string): boolean;
+    ///<summary>
+    /// SubSection can be empty </summary>
+    procedure ReadSectionValues(const SubSection: string; Strings: TStrings);
+    procedure DeleteKey(const Ident: String);
     ///<summary>
     /// Create a new TExpertSettings instance that reads/writes to Section below
     /// the one used by this instance, that is FSection+'\'+Section. </summary>
@@ -876,6 +885,11 @@ begin
   Result := TExpertSettings.Create(FGExpertsSettings, FSection + '\' + Section);
 end;
 
+procedure TExpertSettings.DeleteKey(const Ident: String);
+begin
+  FGExpertsSettings.DeleteKey(FSection, Ident);
+end;
+
 procedure TExpertSettings.EraseSection(const Section: string);
 begin
   FGExpertsSettings.EraseSection(FSection + '\' + Section);
@@ -885,6 +899,12 @@ procedure TExpertSettings.LoadFont(const FontName: string; const Font: TFont;
   Flags: TGXFontFlags);
 begin
   FGExpertsSettings.LoadFont(AddSlash(FSection) + FontName, Font, Flags);
+end;
+
+procedure TExpertSettings.LoadForm(const Section: string; Form: TCustomForm;
+  FormSaveFlags: TFormSaveFlags);
+begin
+  FGExpertsSettings.LoadForm(Form, AddSlash(FSection) + Section, FormSaveFlags);
 end;
 
 function TExpertSettings.ReadBool(const Ident: string; Default: Boolean): Boolean;
@@ -934,21 +954,51 @@ begin
   FGExpertsSettings.ReadSection(FSection + '\' + Section, Strings);
 end;
 
+procedure TExpertSettings.ReadSectionValues(const SubSection: string; Strings: TStrings);
+var
+  s: string;
+begin
+  s := FSection;
+  if SubSection <> '' then
+    s := AddSlash(s) + SubSection;
+  FGExpertsSettings.ReadSectionValues(s, Strings);
+end;
+
 function TExpertSettings.ReadString(const Ident: string; const Default: string): string;
 begin
   Result := FGExpertsSettings.ReadString(FSection, Ident, Default);
 end;
 
-procedure TExpertSettings.ReadStrings(const List: TStrings;
-  const ListName, Ident: string);
+procedure TExpertSettings.ReadStrings(const ListName: string; List: TStrings; const Ident: string = 'Item');
+var
+  s: string;
 begin
-  FGExpertsSettings.ReadStrings(List, AddSlash(FSection) + ListName, Ident);
+  s := FSection;
+  if ListName <> '' then
+    s := AddSlash(s) + ListName;
+  FGExpertsSettings.ReadStrings(List, s, Ident);
 end;
 
 procedure TExpertSettings.SaveFont(const FontName: string; const Font: TFont;
   Flags: TGXFontFlags);
 begin
   FGExpertsSettings.SaveFont(AddSlash(FSection) + FontName, Font, Flags);
+end;
+
+procedure TExpertSettings.SaveForm(const Section: string; Form: TCustomForm;
+  FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
+begin
+  FGExpertsSettings.SaveForm(Form, AddSlash(FSection) + Section, FormSaveFlags);
+end;
+
+function TExpertSettings.SectionExists(const SubSection: string): boolean;
+var
+  s: string;
+begin
+  s := FSection;
+  if SubSection <> '' then
+    s := AddSlash(s) + SubSection;
+  Result := FGExpertsSettings.SectionExists(s);
 end;
 
 function TExpertSettings.ValueExists(const Ident: string): Boolean;
@@ -995,10 +1045,14 @@ begin
   FGExpertsSettings.WriteString(FSection, Ident, Value);
 end;
 
-procedure TExpertSettings.WriteStrings(const List: TStrings;
-  const ListName, Ident: string);
+procedure TExpertSettings.WriteStrings(const ListName: string; List: TStrings; const Ident: string = 'Item');
+var
+  s: string;
 begin
-  FGExpertsSettings.WriteStrings(List, AddSlash(FSection) + ListName, Ident);
+  s := FSection;
+  if ListName <> '' then
+    s := AddSlash(s) + ListName;
+  FGExpertsSettings.WriteStrings(List, s, Ident);
 end;
 
 initialization

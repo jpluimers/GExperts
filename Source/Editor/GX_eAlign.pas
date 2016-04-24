@@ -62,8 +62,8 @@ type
     function GetDefaultShortCut: TShortCut; override;
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   end;
 
 var
@@ -227,17 +227,17 @@ begin
   Result := True;
 end;
 
-procedure TAlignExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TAlignExpert.InternalLoadSettings(Settings: TExpertSettings);
 var
   i: Integer;
 begin
   inherited InternalLoadSettings(Settings);
 
   // Do not localize any of the below items
-  FWhitespace := Settings.ReadInteger(ConfigurationKey, 'Whitespace', DEFAULT_WHITESPACE);
-  Settings.ReadStrings(FTokens, ConfigurationKey + '\Tokens', 'Tokens');
-  FLastToken := Settings.ReadString(ConfigurationKey, 'Token', '');
-  FLastMode := TGXAlignMode(Settings.ReadEnumerated(ConfigurationKey, 'Mode', TypeInfo(TGXAlignMode), Ord(FLastMode)));
+  FWhitespace := Settings.ReadInteger('Whitespace', DEFAULT_WHITESPACE);
+  Settings.ReadStrings('Tokens', FTokens, 'Tokens');
+  FLastToken := Settings.ReadString('Token', '');
+  FLastMode := TGXAlignMode(Settings.ReadEnumerated('Mode', TypeInfo(TGXAlignMode), Ord(FLastMode)));
 
   // If no tokens were found, create a default list of tokens
   if FTokens.Count = 0 then
@@ -245,15 +245,15 @@ begin
       FTokens.Add(DEFAULT_TOKENS[i]);
 end;
 
-procedure TAlignExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TAlignExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
 
   // Do not localize any of the below items
-  Settings.WriteInteger(ConfigurationKey, 'Whitespace', FWhitespace);
-  Settings.WriteStrings(FTokens, ConfigurationKey + '\Tokens', 'Tokens');
-  Settings.WriteString(ConfigurationKey, 'Token', FLastToken);
-  Settings.WriteEnumerated(ConfigurationKey, 'Mode', TypeInfo(TGXAlignMode), Ord(FLastMode));
+  Settings.WriteInteger('Whitespace', FWhitespace);
+  Settings.WriteStrings('Tokens', FTokens, 'Tokens');
+  Settings.WriteString('Token', FLastToken);
+  Settings.WriteEnumerated('Mode', TypeInfo(TGXAlignMode), Ord(FLastMode));
 end;
 
 procedure TfmAlign.lstTokensDblClick(Sender: TObject);

@@ -19,8 +19,8 @@ type
   private
     FExpert: TCodeFormatterExpert;
   protected
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -94,13 +94,13 @@ begin
   Result := True;
 end;
 
-procedure TGxCodeFormatterExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TGxCodeFormatterExpert.InternalLoadSettingsOld(Settings: TGExpertsSettings);
 begin
   inherited;
   FExpert.InternalLoadSettings(ConfigurationKey, Settings);
 end;
 
-procedure TGxCodeFormatterExpert.InternalSaveSettings(Settings:
+procedure TGxCodeFormatterExpert.InternalSaveSettingsOld(Settings:
   TGExpertsSettings);
 begin
   inherited;

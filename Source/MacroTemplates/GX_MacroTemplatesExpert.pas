@@ -82,8 +82,8 @@ type
     class function GetName: string; override;
     function GetHelpString: string; override;
 
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
 
     procedure ReloadSettings;
     property Settings: TExpandTemplateSettings read FSettings;
@@ -739,7 +739,7 @@ begin
     'The supported macros are available via the context menu in the template editor.  See the help file for more complete documentation.';
 end;
 
-procedure TMacroTemplatesExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TMacroTemplatesExpert.InternalLoadSettings(Settings: TExpertSettings);
 var
   SettingStorage: TMacroTemplatesIni;
 begin
@@ -762,7 +762,7 @@ begin
   end;
 end;
 
-procedure TMacroTemplatesExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TMacroTemplatesExpert.InternalSaveSettings(Settings: TExpertSettings);
 var
   SettingStorage: TMacroTemplatesIni;
 begin

@@ -18,7 +18,7 @@ type
     function GetStorageFile: string;
   protected
     procedure UpdateAction(Action: TCustomAction); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
     procedure SetActive(New: Boolean); override;
   public
     constructor Create; override;
@@ -463,7 +463,7 @@ begin
     'ProjectOptionSets-' + IdeProductName + MajorVersionNumberChar + '.xml';
 end;
 
-procedure TProjOptionSetsExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TProjOptionSetsExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // This procedure is only called once so it is safe to register the form here.

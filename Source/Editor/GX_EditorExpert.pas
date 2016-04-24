@@ -14,7 +14,6 @@ type
   protected
     function GetShortCut: TShortCut; override;
     procedure SetShortCut(Value: TShortCut); override;
-    class function ConfigurationKey: string; virtual;
     // defaults to ClassName
     function GetBitmapFileName: string; override;
     // you usually don't need to override this
@@ -149,11 +148,6 @@ end;
 function TEditorExpert.CanHaveShortCut: boolean;
 begin
   Result := True;
-end;
-
-class function TEditorExpert.ConfigurationKey: string;
-begin
-  Result := GetName;
 end;
 
 var

@@ -90,8 +90,8 @@ type
     procedure AddNewClass(const AClassName: WideString);
     procedure DoOnTimer(Sender: TObject);
     function GetClassRenameRule(const AClassName: WideString): WideString;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
     procedure ComponentRenamed(const FormEditor: IOTAFormEditor;
       Component: IOTAComponent; const OldName, NewName: WideString);
     procedure FormEditorModified(const FormEditor: IOTAFormEditor);
@@ -710,16 +710,19 @@ begin
   Result := True;
 end;
 
-procedure TCompRenameExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TCompRenameExpert.InternalLoadSettings(Settings: TExpertSettings);
 var
   OtherProps: TStringList;
   i: Integer;
 begin
   inherited InternalLoadSettings(Settings);
   Assert(Assigned(FRenameRuleList));
-  FShowDialog := Settings.ReadBool(ConfigurationKey, 'ShowDialog', False);
-  FAutoAddClasses := Settings.ReadBool(ConfigurationKey, 'AutoAdd', True);
-  Settings.ReadStrings(FRenameRuleList, ConfigurationKey, 'Item');
+  FShowDialog := Settings.ReadBool('ShowDialog', False);
+  FAutoAddClasses := Settings.ReadBool('AutoAdd', True);
+  if Settings.SectionExists('Items') then
+    Settings.ReadStrings('Items', FRenameRuleList)
+  else
+    Settings.ReadStrings('', FRenameRuleList);
   FRenameRuleList.Sort;
 
   OtherProps := nil;
@@ -727,7 +730,7 @@ begin
   begin
     if not Assigned(OtherProps) then
       OtherProps := TStringList.Create;
-    Settings.ReadStrings(OtherProps, ConfigurationKey + '\' + FRenameRuleList.Names[i], 'Item');
+    Settings.ReadStrings(FRenameRuleList.Names[i], OtherProps);
     if OtherProps.Count > 0 then
     begin
       FRenameRuleList.Objects[i] := OtherProps;
@@ -737,22 +740,34 @@ begin
   FreeAndNil(OtherProps);
 end;
 
-procedure TCompRenameExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TCompRenameExpert.InternalSaveSettings(Settings: TExpertSettings);
 var
   i: Integer;
   OtherProps: TStringList;
+  cnt: integer;
 begin
   inherited InternalSaveSettings(Settings);
   Assert(Assigned(FRenameRuleList));
-  Settings.WriteStrings(FRenameRuleList, ConfigurationKey, 'Item');
-  Settings.WriteBool(ConfigurationKey, 'ShowDialog', FShowDialog);
-  Settings.WriteBool(ConfigurationKey, 'AutoAdd', FAutoAddClasses);
+
+  if Settings.ValueExists('Count') then begin
+    // clean up old entries that were directly in the section, we now write
+    // to a subsection
+    cnt := Settings.ReadInteger('Count', 0);
+    for i := 0 to cnt - 1  do begin
+      Settings.DeleteKey(Format('Item%d', [i]));
+    end;
+    Settings.DeleteKey('Count');
+  end;
+
+  Settings.WriteStrings('Items', FRenameRuleList);
+  Settings.WriteBool('ShowDialog', FShowDialog);
+  Settings.WriteBool('AutoAdd', FAutoAddClasses);
 
   for i := 0 to FRenameRuleList.Count - 1 do
   begin
     OtherProps := FRenameRuleList.Objects[i] as TStringList;
     if Assigned(OtherProps) then
-      Settings.WriteStrings(OtherProps, ConfigurationKey + '\' + FRenameRuleList.Names[i], 'Item');
+      Settings.WriteStrings(FRenameRuleList.Names[i], OtherProps);
   end;
 end;
 

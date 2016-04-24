@@ -115,29 +115,29 @@ procedure TProcedureListOptions.LoadSettings(const ConfigurationKey: string);
   end;
 
 var
-  GxSettings: TGExpertsSettings;
-  Settings: TExpertSettings;
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   // Do not localize any of the following lines
-  Settings := nil;
-  GxSettings := TGExpertsSettings.Create(ConfigInfo.GExpertsIdeRootRegistryKey);
+  ExpSettings := nil;
+  Settings := TGExpertsSettings.Create(ConfigInfo.GExpertsIdeRootRegistryKey);
   try
-    Settings := GxSettings.CreateExpertSettings(ConfigurationKey);
-    FBoundsRect := Settings.ReadBounds(Bounds(317, 279, 550, 500));
-    FCodeViewVisible := Settings.ReadBool('ShowProcedureBody', False);
-    FCodeViewWidth := Settings.ReadInteger('ProcedureWidth', 292);
-    FCodeViewHeight := Settings.ReadInteger('ProcedureHeight', 100);
-    FCodeViewAlignment := GetCodeViewAlignment(Settings.ReadString('ProcedureAlignment', 'Right'));
-    FAlignmentChanged := Settings.ReadBool('AlignmentChanged', False);
-    FSortOnColumn := Settings.ReadInteger('SortColumn', FSortOnColumn);
-    Settings.LoadFont(DialogFontKey, FDialogFont);
-    Settings.LoadFont(CodeViewFontKey, FCodeViewFont);
-    FSearchAll := Settings.ReadBool('SearchAll', True);
-    FSearchClassName := Settings.ReadBool('SearchClassName', True);
-    FObjectNameVisible := Settings.ReadBool('ShowObjectName', True);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    FBoundsRect := ExpSettings.ReadBounds(Bounds(317, 279, 550, 500));
+    FCodeViewVisible := ExpSettings.ReadBool('ShowProcedureBody', False);
+    FCodeViewWidth := ExpSettings.ReadInteger('ProcedureWidth', 292);
+    FCodeViewHeight := ExpSettings.ReadInteger('ProcedureHeight', 100);
+    FCodeViewAlignment := GetCodeViewAlignment(ExpSettings.ReadString('ProcedureAlignment', 'Right'));
+    FAlignmentChanged := ExpSettings.ReadBool('AlignmentChanged', False);
+    FSortOnColumn := ExpSettings.ReadInteger('SortColumn', FSortOnColumn);
+    ExpSettings.LoadFont(DialogFontKey, FDialogFont);
+    ExpSettings.LoadFont(CodeViewFontKey, FCodeViewFont);
+    FSearchAll := ExpSettings.ReadBool('SearchAll', True);
+    FSearchClassName := ExpSettings.ReadBool('SearchClassName', True);
+    FObjectNameVisible := ExpSettings.ReadBool('ShowObjectName', True);
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
-    FreeAndNil(GxSettings);
   end;
 end;
 

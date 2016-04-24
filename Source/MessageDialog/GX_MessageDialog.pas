@@ -249,8 +249,8 @@ type
     FSettings: TMessageDialogSettings;
   protected
     procedure UpdateAction(Action: TCustomAction); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -930,19 +930,19 @@ begin
   end;
 end;
 
-procedure TMsgExpExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TMsgExpExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
   FSettings.ConcatenationString :=
-    Settings.ReadString(ConfigurationKey, MsgDlgConcateIdent, FSettings.ConcatenationString);
+    Settings.ReadString(MsgDlgConcateIdent, FSettings.ConcatenationString);
   FSettings.CppConcatenationString :=
-    Settings.ReadString(ConfigurationKey, MsgDlgCppConcateIdent, FSettings.CppConcatenationString);
+    Settings.ReadString(MsgDlgCppConcateIdent, FSettings.CppConcatenationString);
 end;
 
-procedure TMsgExpExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TMsgExpExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
-  Settings.WriteString(ConfigurationKey, MsgDlgConcateIdent, FSettings.ConcatenationString);
-  Settings.WriteString(ConfigurationKey, MsgDlgCppConcateIdent, FSettings.CppConcatenationString);
+  Settings.WriteString(MsgDlgConcateIdent, FSettings.ConcatenationString);
+  Settings.WriteString(MsgDlgCppConcateIdent, FSettings.CppConcatenationString);
   inherited InternalSaveSettings(Settings);
 end;
 

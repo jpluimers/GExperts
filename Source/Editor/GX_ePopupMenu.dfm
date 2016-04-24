@@ -108,7 +108,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   end
   object b_Add: TButton
     Left = 216
-    Top = 40
+    Top = 88
     Width = 75
     Height = 25
     Caption = '>> Add >>'
@@ -117,7 +117,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   end
   object b_Remove: TButton
     Left = 216
-    Top = 80
+    Top = 128
     Width = 75
     Height = 25
     Caption = 'Remove <<'
@@ -126,9 +126,10 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
   end
   object b_Default: TButton
     Left = 216
-    Top = 208
+    Top = 224
     Width = 75
     Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = 'Default >>'
     TabOrder = 3
     OnClick = b_DefaultClick

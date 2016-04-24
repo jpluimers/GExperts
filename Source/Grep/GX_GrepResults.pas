@@ -312,7 +312,6 @@ type
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
     function ConfigurationKey: string;
-    function ConfigWindowKey: String;
   public
     GrepExpert: TGrepExpert;
     constructor Create(AOwner: TComponent); override;
@@ -320,7 +319,7 @@ type
     procedure InitGrepSettings(AGrepSettings: TGrepSettings);
     function  Execute(AState: TGrepSearchState): Boolean;
     procedure UpdateFromSettings;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings);
+    procedure InternalSaveSettings(Settings: TExpertSettings);
     property StayOnTop: Boolean read GetStayOnTop write SetStayOnTop;
     property ShowContext: Boolean read FShowContext write SetShowContext;
     property ShowFullFilename: Boolean read FShowFullFilename write SetShowFullFilename;
@@ -736,16 +735,16 @@ begin
   FGrepSettings := AGrepSettings;
 end;
 
-procedure TfmGrepResults.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TfmGrepResults.InternalSaveSettings(Settings: TExpertSettings);
 var
   WindowSettings: TExpertSettings;
   Percent: integer;
   IM: TGrepHistoryListMode;
   IT: TPageIndexType;
 begin
-  WindowSettings := Settings.CreateExpertSettings(ConfigWindowKey);
+  Settings.SaveForm('Window', Self);
+  WindowSettings := Settings.CreateExpertSettings('Window');
   try
-    Settings.SaveForm(Self, ConfigWindowKey);
     WindowSettings.WriteBool('OnTop', StayOnTop);
     WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
     WindowSettings.WriteBool('ShowContext', ShowContext);
@@ -777,12 +776,16 @@ end;
 procedure TfmGrepResults.SaveSettings;
 var
   Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
   // Do not localize any of the below strings.
+  ExpSettings := nil;
   Settings := TGExpertsSettings.Create;
   try
-    InternalSaveSettings(Settings);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    InternalSaveSettings(ExpSettings);
   finally
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
   end;
 end;
@@ -791,18 +794,21 @@ procedure TfmGrepResults.LoadSettings;
 var
   WindowSettings: TExpertSettings;
   Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
   AHistoryIniVersion: Integer;
   IM: TGrepHistoryListMode;
   IT: TPageIndexType;
 begin
   // Do not localize any of the below strings.
   WindowSettings := nil;
+  ExpSettings := nil;
   Settings := TGExpertsSettings.Create;
   try
-    AHistoryIniVersion := Settings.ReadInteger(ConfigurationKey, 'HistoryIniVersion', 0);
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    AHistoryIniVersion := ExpSettings.ReadInteger('HistoryIniVersion', 0);
 
-    WindowSettings := Settings.CreateExpertSettings(ConfigWindowKey);
-    Settings.LoadForm(Self, ConfigWindowKey);
+    ExpSettings.LoadForm('Window', Self);
+    WindowSettings := ExpSettings.CreateExpertSettings('Window');
     EnsureFormVisible(Self);
     StayOnTop := WindowSettings.ReadBool('OnTop', True);
     ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible);
@@ -840,6 +846,7 @@ begin
     FLoadHistoryListPage := WindowSettings.ReadInteger('HistoryListPage', tcHistoryListPage.TabIndex);
   finally
     FreeAndNil(WindowSettings);
+    FreeAndNil(ExpSettings);
     FreeAndNil(Settings);
   end;
 end;
@@ -1892,11 +1899,6 @@ end;
 function TfmGrepResults.ConfigurationKey: string;
 begin
   Result := TGrepExpert.ConfigurationKey;
-end;
-
-function TfmGrepResults.ConfigWindowKey: String;
-begin
-  Result := ConfigurationKey + '\Window';
 end;
 
 procedure TfmGrepResults.ResizeStatusBar;

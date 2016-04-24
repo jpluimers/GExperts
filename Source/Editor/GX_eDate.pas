@@ -13,8 +13,8 @@ type
   private
     FDateFormat: string;
   protected
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -104,16 +104,16 @@ begin
   Result := 'DateTime';
 end;
 
-procedure TDateExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TDateExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
-  DateFormat := Settings.ReadString(ConfigurationKey, 'Format', FDateFormat); // Do not localize
+  DateFormat := Settings.ReadString('Format', FDateFormat); // Do not localize
 end;
 
-procedure TDateExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TDateExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
-  Settings.WriteString(ConfigurationKey, 'Format', DateFormat); // Do not localize
+  Settings.WriteString('Format', DateFormat); // Do not localize
 end;
 
 initialization

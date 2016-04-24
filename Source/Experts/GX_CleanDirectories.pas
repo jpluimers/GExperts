@@ -99,8 +99,8 @@ type
     FCleanList: TStrings;
     FIncludeBinaryDirs: Boolean;
   protected
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -667,30 +667,24 @@ begin
   end;
 end;
 
-procedure TCleanExpert.InternalLoadSettings(Settings: TGExpertsSettings);
-var
-  Key: string;
+procedure TCleanExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize.
-  Key := AddSlash(ConfigurationKey);
-  RegReadStrings(Settings, CleanList, Key + 'Delete', 'CleanExt');
-  RegReadStrings(Settings, ExtensionList, Key + 'Extensions', 'AvailableExt');
-  FReportErrors := Settings.ReadBool(ConfigurationKey, 'ReportError', True);
-  FIncludeBinaryDirs := Settings.ReadBool(ConfigurationKey, 'IncludeBinaryDirs', False)
+  Settings.ReadStrings('Delete', CleanList, 'CleanExt');
+  Settings.ReadStrings('Extensions', ExtensionList, 'AvailableExt');
+  FReportErrors := Settings.ReadBool('ReportError', True);
+  FIncludeBinaryDirs := Settings.ReadBool('IncludeBinaryDirs', False)
 end;
 
-procedure TCleanExpert.InternalSaveSettings(Settings: TGExpertsSettings);
-var
-  Key: string;
+procedure TCleanExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
   // Do not localize.
-  Settings.WriteBool(ConfigurationKey, 'ReportError', FReportErrors);
-  Settings.WriteBool(ConfigurationKey, 'IncludeBinaryDirs', FIncludeBinaryDirs);
-  Key := AddSlash(ConfigurationKey);
-  RegWriteStrings(Settings, ExtensionList, Key + 'Extensions', 'AvailableExt');
-  RegWriteStrings(Settings, CleanList, Key + 'Delete', 'CleanExt');
+  Settings.WriteBool('ReportError', FReportErrors);
+  Settings.WriteBool('IncludeBinaryDirs', FIncludeBinaryDirs);
+  Settings.WriteStrings('Extensions', ExtensionList, 'AvailableExt');
+  Settings.WriteStrings('Delete', CleanList, 'CleanExt');
 end;
 
 function TCleanExpert.HasConfigOptions: Boolean;

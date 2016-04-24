@@ -90,8 +90,8 @@ type
     function GetDefaultShortCut: TShortCut; override;
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   end;
 
 { TGxEditorPopupMenuExpert }
@@ -201,41 +201,36 @@ begin
   Result := True;
 end;
 
-procedure TGxEditorPopupMenuExpert.InternalLoadSettings(Settings: TGExpertsSettings);
-var
-  MenuSection: string;
+procedure TGxEditorPopupMenuExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
   FShortcuts.Clear;
-  MenuSection := ConfigurationKey + PathDelim + 'menu';
-  if Settings.SectionExists(MenuSection) then begin
-    Settings.ReadSectionValues(MenuSection, FShortcuts);
+  if Settings.SectionExists('menu') then begin
+    Settings.ReadSectionValues('menu', FShortcuts);
   end else begin
     SetDefaults(FShortcuts);
   end;
-  FFormHeight := Settings.ReadInteger(ConfigurationKey, 'FormHeight', FFormHeight);
+  FFormHeight := Settings.ReadInteger('FormHeight', FFormHeight);
 end;
 
-procedure TGxEditorPopupMenuExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TGxEditorPopupMenuExpert.InternalSaveSettings(Settings: TExpertSettings);
 var
-  MenuSection: string;
-  ExpSettings: TExpertSettings;
   i: Integer;
   s: string;
+  MnuSettings: TExpertSettings;
 begin
   inherited;
-  MenuSection := ConfigurationKey + PathDelim + 'menu';
-  Settings.EraseSection(MenuSection);
-  ExpSettings := Settings.CreateExpertSettings(MenuSection);
+  Settings.EraseSection('menu');
+  MnuSettings := Settings.CreateExpertSettings('menu');
   try
     for i := 0 to FShortcuts.Count - 1 do begin
       s := FShortcuts.Names[i];
-      ExpSettings.WriteString(s, FShortcuts.Values[s]);
+      MnuSettings.WriteString(s, FShortcuts.Values[s]);
     end;
   finally
-    FreeAndNil(ExpSettings);
+    FreeAndNil(MnuSettings);
   end;
-  Settings.WriteInteger(ConfigurationKey, 'FormHeight', FFormHeight);
+  Settings.WriteInteger('FormHeight', FFormHeight);
 end;
 
 class procedure TGxEditorPopupMenuExpert.SetDefaults(_sl: TStringList);
@@ -248,6 +243,8 @@ begin
   _sl.Add('F=CodeFormatter');
   _sl.Add('G=GrepSearch');
   _sl.Add('H=ClipboardHistory');
+  _sl.Add('I=SelectIdent');
+  _sl.Add('J=SortLines');
   _sl.Add('L=CodeLibrarian');
   _sl.Add('M=MacroLibrary');
   _sl.Add('O=OpenFile');

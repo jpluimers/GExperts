@@ -39,8 +39,6 @@ type
     function GetActionCaption: string; virtual;
     // Determine if the expert action is enabled
     function GetActionEnabled: Boolean; virtual;
-    // Subkey used to store configuration details in the registry
-    class function ConfigurationKey: string; virtual;
     // Name of action to be created for expert; by default,
     // the action name is constructed from the expert's name.
     function GetActionName: string;
@@ -329,11 +327,6 @@ end;
 function TGX_Expert.CanHaveShortCut: boolean;
 begin
   Result := HasMenuItem;
-end;
-
-class function TGX_Expert.ConfigurationKey: string;
-begin
-  Result := GetName;
 end;
 
 {$IFDEF GX_BCB}
