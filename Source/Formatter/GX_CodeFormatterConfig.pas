@@ -167,6 +167,8 @@ type
     function GetSpaceItem(_Idx: Integer): TSpaceSet;
     procedure SetDefault(_Which: string);
     procedure HandleCaptitalizationFileDropped(_Sender: TObject; _Files: TStrings);
+    procedure m_PreviewFileDropped(_Sender: TObject; _Files: TStrings);
+    procedure UpdatePreview;
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -219,6 +221,9 @@ begin
   TWinControl_ActivateDropFiles(ed_CapitalizationFile, HandleCaptitalizationFileDropped);
   TEdit_ActivateAutoComplete(ed_CapitalizationFile, [acsFileSystem], [actSuggest]);
 
+  TWinControl_ActivateDropFiles(m_PreviewBefore, m_PreviewFileDropped);
+  TWinControl_ActivateDropFiles(m_PreviewAfter, m_PreviewFileDropped);
+
   grid_Spacing.DefaultRowHeight := grid_Spacing.Canvas.TextHeight('Mg') + 4;
 
   lb_Precedence.Items.AddObject(str_PrecedenceDirective, pointer(cpDirective));
@@ -235,6 +240,12 @@ end;
 procedure TfmCodeFormatterConfig.HandleCaptitalizationFileDropped(_Sender: TObject; _Files: TStrings);
 begin
   ed_CapitalizationFile.Text := _Files[0];
+end;
+
+procedure TfmCodeFormatterConfig.m_PreviewFileDropped(_Sender: TObject; _Files: TStrings);
+begin
+  m_PreviewBefore.Lines.LoadFromFile(_Files[0]);
+  UpdatePreview;
 end;
 
 function TfmCodeFormatterConfig.GetSpaceItem(_Idx: Integer): TSpaceSet;
@@ -587,26 +598,8 @@ begin
 end;
 
 procedure TfmCodeFormatterConfig.ts_PreviewShow(Sender: TObject);
-var
-  Formatter: TCodeFormatterEngine;
-  st: TGXUnicodeStringList;
 begin
-  st := nil;
-  Formatter := TCodeFormatterEngine.Create;
-  try
-    // this temporary string list is necessary to prevent an infinite loop (whose reason I don't really understand :-( )
-    st := TGXUnicodeStringList.Create;
-    st.Assign(m_PreviewBefore.Lines);
-    FormToSettings(Formatter.Settings);
-    Formatter.Execute(st);
-    m_PreviewAfter.Lines.BeginUpdate;
-    m_PreviewAfter.Lines.Assign(st);
-    m_PreviewAfter.Lines.EndUpdate;
-    m_PreviewBeforeClick(nil);
-  finally
-    Formatter.Free;
-    st.Free;
-  end;
+  UpdatePreview;
 end;
 
 procedure TfmCodeFormatterConfig.m_PreviewBeforeClick(Sender: TObject);
@@ -741,6 +734,29 @@ begin
       frm.FormToSettings(_Settings);
   finally
     frm.Free;
+  end;
+end;
+
+procedure TfmCodeFormatterConfig.UpdatePreview;
+var
+  st: TGXUnicodeStringList;
+  Formatter: TCodeFormatterEngine;
+begin
+  st := nil;
+  Formatter := TCodeFormatterEngine.Create;
+  try
+    // this temporary string list is necessary to prevent an infinite loop (whose reason I don't really understand :-( )
+    st := TGXUnicodeStringList.Create;
+    st.Assign(m_PreviewBefore.Lines);
+    FormToSettings(Formatter.Settings);
+    Formatter.Execute(st);
+    m_PreviewAfter.Lines.BeginUpdate;
+    m_PreviewAfter.Lines.Assign(st);
+    m_PreviewAfter.Lines.EndUpdate;
+    m_PreviewBeforeClick(nil);
+  finally
+    Formatter.Free;
+    st.Free;
   end;
 end;
 
