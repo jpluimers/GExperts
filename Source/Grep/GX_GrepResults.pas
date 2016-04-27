@@ -1913,9 +1913,9 @@ begin
     FShowHistoryList := Value;
     if Assigned(GrepExpert) then
       GrepExpert.HistoryList.Enabled := ShowHistoryList;
-    lbHistoryList.Visible := ShowHistoryList;
+    tcHistoryListPage.Visible := ShowHistoryList;
     if Value then
-      SplitterHistoryList.Left := lbHistoryList.Left + lbHistoryList.Width;
+      SplitterHistoryList.Left := tcHistoryListPage.Left + tcHistoryListPage.Width;
     SplitterHistoryList.Visible := ShowHistoryList;
     if lbHistoryList.Items.Count > 0 then
     begin
