@@ -63,6 +63,7 @@ implementation
 
 uses
   Menus,
+  Themes,
   GX_GenericUtils,
   GX_BaseExpert,
   GX_dzVclUtils;
@@ -248,8 +249,32 @@ var
   chk: TCheckBox;
   hk: THotKey;
   btn: TButton;
+
+  function IsThemesEnabled: Boolean;
+  begin
+{$IF CompilerVersion >= 23}
+    Result := StyleServices.Enabled;
+{$ELSE}
+{$IF CompilerVersion >= 18}
+    Result := ThemeServices.ThemesEnabled;
+{$ELSE}
+    Result := False;
+{$IFEND}
+{$IFEND}
+  end;
+
 begin
   FExperts.Assign(_Experts);
+
+  if IsThemesEnabled then begin
+    btnDefault.Top := edtExpert.Top - 1;
+    btnDefault.Height := edtExpert.Height + 2;
+  end else begin
+    btnDefault.Top := edtExpert.Top;
+    btnDefault.Height := edtExpert.Height;
+  end;
+  btnExpert.Top := btnDefault.Top;
+  btnExpert.Height := btnDefault.Height;
 
   RowWidth := sbxExperts.Width * 3;
   RowHeight := pnlExpertLayout.Height;
@@ -260,6 +285,7 @@ begin
     pnl := TPanel.Create(sbxExperts);
     pnl.Parent := sbxExperts;
     pnl.SetBounds(0, i * RowHeight, RowWidth, RowHeight);
+    pnl.Anchors := pnlExpertLayout.Anchors;
     pnl.Tag := i;
     pnl.FullRepaint := False;
 
@@ -284,6 +310,7 @@ begin
     hk := THotKey.Create(pnl);
     hk.Parent := pnl;
     hk.BoundsRect := edtExpert.BoundsRect;
+    hk.Anchors := edtExpert.Anchors;
     THotkey_SetHotkey(hk, AnExpert.ShortCut);
     hk.Visible := AnExpert.CanHaveShortCut;
     hk.Tag := i;
@@ -291,6 +318,7 @@ begin
     btn := TButton.Create(pnl);
     btn.Parent := pnl;
     btn.BoundsRect := btnDefault.BoundsRect;
+    btn.Anchors := btnDefault.Anchors;
     btn.Caption := 'Default';
     if AnExpert.GetDefaultShortCut <> 0 then begin
       btn.Hint := ShortCutToText(AnExpert.GetDefaultShortCut);
@@ -305,6 +333,7 @@ begin
       btn.Parent := pnl;
       btn.Caption := SConfigureButtonCaption;
       btn.BoundsRect := btnExpert.BoundsRect;
+      btn.Anchors    := btnExpert.Anchors;
       btn.OnClick := ConfigureExpertClick;
       btn.Tag := i;
     end;

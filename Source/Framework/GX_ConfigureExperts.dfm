@@ -99,6 +99,7 @@ object frConfigureExperts: TfrConfigureExperts
       Top = 0
       Width = 572
       Height = 40
+      Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
       object imgExpert: TImage
         Left = 4
@@ -122,6 +123,7 @@ object frConfigureExperts: TfrConfigureExperts
         Top = 10
         Width = 142
         Height = 22
+        Anchors = [akLeft, akTop, akRight]
         HotKey = 32833
         TabOrder = 1
       end
@@ -130,6 +132,7 @@ object frConfigureExperts: TfrConfigureExperts
         Top = 8
         Width = 98
         Height = 25
+        Anchors = [akTop, akRight]
         Caption = 'Configure...'
         TabOrder = 3
       end
@@ -138,6 +141,7 @@ object frConfigureExperts: TfrConfigureExperts
         Top = 8
         Width = 49
         Height = 25
+        Anchors = [akTop, akRight]
         Caption = 'Default'
         TabOrder = 2
       end
