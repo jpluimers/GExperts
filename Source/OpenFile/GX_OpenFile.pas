@@ -5,9 +5,8 @@ unit GX_OpenFile;
 interface
 
 uses
-  Classes, Controls, Forms, ActnList, Dialogs, StdCtrls,
+  Classes, Controls, Forms, Actions, ActnList, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, Messages,
-  
   GX_OpenFileConfig, GX_BaseForm;
 
 const
