@@ -200,6 +200,11 @@ begin
   TWinControl_ActivateDropFiles(edHelpFile, edHelpFileDropFiles);
   TEdit_ActivateAutoComplete(edHelpFile, [acsFileSystem], [actSuggest]);
 
+{$IFDEF GX_VER150_up}
+  pnlMain.ParentBackground := False; // reduce flickering
+{$ENDIF GX_VER150_up}
+  pnlMain.DoubleBuffered := True;
+
   pcConfig.ActivePage := tshExperts;
 
   FConfigEditorExpertsFrame := TfrConfigureExperts.Create(Self);

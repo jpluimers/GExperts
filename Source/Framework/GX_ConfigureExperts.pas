@@ -68,6 +68,19 @@ uses
   GX_BaseExpert,
   GX_dzVclUtils;
 
+function IsThemesEnabled: Boolean;
+begin
+{$IF CompilerVersion >= 23}
+  Result := StyleServices.Enabled;
+{$ELSE}
+{$IF CompilerVersion >= 18}
+  Result := ThemeServices.ThemesEnabled;
+{$ELSE}
+  Result := False;
+{$IFEND}
+{$IFEND}
+end;
+
 type
   THintImage = class(TImage)
     procedure CMHintShow(var _Msg: TCMHintShow); message CM_HINTSHOW;
@@ -91,6 +104,16 @@ constructor TfrConfigureExperts.Create(_Owner: TComponent);
 begin
   inherited;
   FExperts := TList.Create;
+
+  if IsThemesEnabled then begin
+    btnClear.Top := edtFilter.Top-1;
+    btnClear.Height := edtFilter.Height+2;
+  end else begin
+    btnClear.Top := edtFilter.Top;
+    btnClear.Height := edtFilter.Height;
+  end;
+
+  pnlExpertsFilter.FullRepaint := False;
 end;
 
 destructor TfrConfigureExperts.Destroy;
@@ -250,19 +273,6 @@ var
   hk: THotKey;
   btn: TButton;
 
-  function IsThemesEnabled: Boolean;
-  begin
-{$IF CompilerVersion >= 23}
-    Result := StyleServices.Enabled;
-{$ELSE}
-{$IF CompilerVersion >= 18}
-    Result := ThemeServices.ThemesEnabled;
-{$ELSE}
-    Result := False;
-{$IFEND}
-{$IFEND}
-  end;
-
 begin
   FExperts.Assign(_Experts);
 
@@ -327,6 +337,8 @@ begin
     end else
       btn.Enabled := False;
     btn.Tag := i;
+
+    hk.Width := btn.Left - hk.Left;
 
     if AnExpert.HasConfigOptions then begin
       btn := TButton.Create(pnl);
