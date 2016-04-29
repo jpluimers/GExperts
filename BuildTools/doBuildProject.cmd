@@ -3,7 +3,13 @@
 setlocal
 set buildtools=%~dp0%
 if exist _prebuild.cmd call _prebuild.cmd
+if "%1" == "" goto detectver
+echo %1
+set delphiver=%1
+goto continue
+:detectver
 call %buildtools%doGetDelphiVer.cmd
+:continue
 call %buildtools%\doGetDelphiPath.cmd %delphiver%
 
 if "%delphiver%" == "6" goto dcc32
@@ -36,7 +42,7 @@ goto :done
 
 :dcc32
 @rem determine the .dpr file
-for %%a in (GExperts*.dpr) do set dprname=%%a
+for %%a in (*.dpr) do set dprname=%%a
 @rem build is done with dcc32
 "%DelphiPath%\bin\dcc32.exe" %dprname%
 
