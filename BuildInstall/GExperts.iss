@@ -10,7 +10,7 @@
   #endif
 #else
 ; IDE compiler
-  #define RS100
+  #define RS101
   #define Version "1.38"
 #endif
 
@@ -169,7 +169,7 @@
   #define IDEShortName "RADStudio"
   #define IDELongName  "RAD Studio"
   #define IDEVer       "10.1"
-  #define DLLSuffix    "RS100"
+  #define DLLSuffix    "RS101"
   #define IDERegName   "BDS"
   #define IDERegVer    "18"
   #define RegCompany   "Embarcadero"
@@ -208,11 +208,11 @@ SolidCompression=yes
 ;OutputBaseFilename=Setup{#DLLSuffix}
 
 [Files]
-Source: ..\Binaries\{#BinaryDir}\ExpertManager.exe; DestDir: {app}; Flags: ignoreversion
-Source: ..\Binaries\{#BinaryDir}\GExpertsDebugWindow.exe; DestDir: {app}; Flags: ignoreversion
-Source: ..\Binaries\{#BinaryDir}\GExpertsGrep.exe; DestDir: {app}; Flags: ignoreversion
-Source: ..\Documentation\GExperts.chm; DestDir: {app}; Flags: ignoreversion
-Source: ..\Source\{#DLLName}; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\ExpertManager.exe; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\GExpertsDebugWindow.exe; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\GExpertsGrep.exe; DestDir: {app}; Flags: ignoreversion
+;Source: ..\Documentation\GExperts.chm; DestDir: {app}; Flags: ignoreversion
+Source: ..\DLLs\{#DLLName}; DestDir: {app}; Flags: ignoreversion
 Source: ..\ExternalSource\DbugIntf.pas; DestDir: {app}; Flags: ignoreversion
 Source: ..\Documentation\Readme.txt; DestDir: {app}; Flags: isreadme ignoreversion
 
