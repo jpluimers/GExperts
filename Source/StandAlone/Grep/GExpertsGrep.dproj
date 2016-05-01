@@ -52,6 +52,5 @@
     <DelphiCompile Include="GExpertsGrep.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\Framework\GX_VerDepConst.pas" />
   </ItemGroup>
 </Project>
