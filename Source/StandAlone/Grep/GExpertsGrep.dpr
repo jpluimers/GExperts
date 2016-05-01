@@ -6,7 +6,7 @@ uses
   Windows,
   SysUtils,
   Classes,
-  GX_VerDepConst in '..\..\Framework\GX_VerDepConst.pas';
+  Dialogs;
 
 procedure LoadDll(const _GExpertsDLLName: string);
 type
@@ -24,39 +24,39 @@ begin
   ShowGrep;
 end;
 
-procedure Main;
-var
-  sl: TStringList;
-  i: Integer;
+procedure TryLoad(const _GExpertsDLLName: string);
 begin
-  sl := TStringList.Create;
   try
-    sl.Add('GExpertsD6.dll');
-    sl.Add('GExpertsD7.dll');
-    sl.Add('GExpertsD8.dll');
-    sl.Add('GExpertsDelphi2005.dll');
-    sl.Add('GExpertsBDS2006.dll');
-    sl.Add('GExpertsDelphi2007.dll');
-    sl.Add('GExpertsRS2009.dll');
-    sl.Add('GExpertsRS2010.dll');
-    sl.Add('GExpertsRSXE1.dll');
-    sl.Add('GExpertsRSXE2.dll');
-    sl.Add('GExpertsRSXE3.dll');
-    sl.Add('GExpertsRSXE4.dll');
-    sl.Add('GExpertsRSXE5.dll');
-    sl.Add('GExpertsRSXE6.dll');
-    sl.Add('GExpertsRSXE7.dll');
-    sl.Add('GExpertsRSXE8.dll');
-    sl.Add('GExpertsRS10.dll');
-    sl.Add('GExpertsRS101.dll');
-    for i := sl.Count - 1 downto 0 do
-      if FileExists(sl[i]) then begin
-        LoadDll(sl[i]);
-        Exit;
-      end;
-  finally
-    FreeAndNil(sl);
+    LoadDll(_GExpertsDLLName);
+    // it worked halt the program
+    Halt(0);
+  except
+    // ignore (and try the next dll)
   end;
+end;
+
+procedure Main;
+begin
+  TryLoad('GExpertsRS101.dll');
+  TryLoad('GExpertsRS10.dll');
+  TryLoad('GExpertsRSXE8.dll');
+  TryLoad('GExpertsRSXE7.dll');
+  TryLoad('GExpertsRSXE6.dll');
+  TryLoad('GExpertsRSXE5.dll');
+  TryLoad('GExpertsRSXE4.dll');
+  TryLoad('GExpertsRSXE3.dll');
+  TryLoad('GExpertsRSXE2.dll');
+  TryLoad('GExpertsRSXE1.dll');
+  TryLoad('GExpertsRS2010.dll');
+  TryLoad('GExpertsRS2009.dll');
+  TryLoad('GExpertsDelphi2007.dll');
+  TryLoad('GExpertsBDS2006.dll');
+  TryLoad('GExpertsDelphi2005.dll');
+  TryLoad('GExpertsD8.dll');
+  TryLoad('GExpertsD7.dll');
+  TryLoad('GExpertsD6.dll');
+
+  MessageDlg('Failed to load any of the possible GExperts DLLs', mtError, [mbOK], 0);
 end;
 
 begin
