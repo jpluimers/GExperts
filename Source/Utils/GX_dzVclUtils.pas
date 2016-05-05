@@ -22,7 +22,8 @@ uses
   CommCtrl,
   ActnList,
   StdCtrls,
-  Menus;
+  Menus,
+  Forms;
 
 type
   ///<summary> Ancestor to all exceptions raised in this unit. </summary>
@@ -268,6 +269,26 @@ type
 /// the button. The button's OnClick event gets changed by this. </summary>
 procedure TButton_AddDropdownMenu(_btn: TCustomButton; _pm: TPopupMenu);
 
+type
+  TRectLTWH = record
+    Left: Integer;
+    Top: Integer;
+    Width: Integer;
+    Height: Integer;
+  end;
+procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _Left, _Top, _Width, _Height: Integer); overload;
+procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _a: TRect); overload;
+procedure TRectLTWH_AssignTLRB(var _LTWH: TRectLTWH; _Left, _Top, _Right, _Bottom: Integer);
+
+///<summary>
+/// Move the rectangle (usually representing a form) so it is fully visible on the given monitor.</summary>
+procedure TMonitor_MakeFullyVisible(_MonitorRect: TRect; var _Left, _Top, _Width, _Height: Integer); overload;
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Left, _Top, _Width, _Height: Integer); overload;
+procedure TMonitor_MakeFullyVisible(_MonitorRect: TRect; var _Rect: TRect; out _Width, _Height: Integer); overload;
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect; out _Width, _Height: Integer); overload;
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect); overload;
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH); overload;
+
 implementation
 
 uses
@@ -375,6 +396,7 @@ function CheckAdmin(out _IsAdmin: Boolean): Boolean; forward;
 
 // This allows dropping files to an elevated program from applications that don't run elevated
 // e.g. from normal Windows Explorer windows.
+
 procedure AllowDropFilesForAdmin(_Handle: HWND);
 const
   MSGFLT_ALLOW = 1;
@@ -1169,6 +1191,77 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TMonitor_MakeFullyVisible(_MonitorRect: TRect; var _Left, _Top, _Width, _Height: Integer); overload;
+begin
+  if _Left + _Width > _MonitorRect.Right then
+    _Left := _MonitorRect.Right - _Width;
+  if _Left < _MonitorRect.Left then
+    _Left := _MonitorRect.Left;
+  if _Top + _Height > _MonitorRect.Bottom then
+    _Top := _MonitorRect.Bottom - _Height;
+  if _Top < _MonitorRect.Top then
+    _Top := _MonitorRect.Top;
+end;
+
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Left, _Top, _Width, _Height: Integer); overload;
+begin
+  TMonitor_MakeFullyVisible(_Monitor.WorkareaRect, _Left, _Top, _Width, _Height);
+end;
+
+procedure TMonitor_MakeFullyVisible(_MonitorRect: TRect; var _Rect: TRect; out _Width, _Height: Integer); overload;
+var
+  Left: Integer;
+  Top: Integer;
+begin
+  Left := _Rect.Left;
+  Top := _Rect.Top;
+  _Width := _Rect.Right - Left;
+  _Height := _Rect.Bottom - Top;
+  TMonitor_MakeFullyVisible(_MonitorRect, Left, Top, _Width, _Height);
+  _Rect.Left := Left;
+  _Rect.Top := Top;
+  _Rect.Right := Left + _Width;
+  _Rect.Bottom := Top + _Height;
+end;
+
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect; out _Width, _Height: Integer); overload;
+begin
+  TMonitor_MakeFullyVisible(_Monitor.WorkareaRect, _Rect, _Width, _Height);
+end;
+
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect); overload;
+var
+  Width: Integer;
+  Height: Integer;
+begin
+  TMonitor_MakeFullyVisible(_Monitor, _Rect, Width, Height);
+end;
+
+procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH); overload;
+begin
+  TMonitor_MakeFullyVisible(_Monitor.WorkareaRect, _Rect.Left, _Rect.Top, _Rect.Width, _Rect.Height);
+end;
+
+{ TRectLTWH }
+
+procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _Left, _Top, _Width, _Height: Integer);
+begin
+  _LTWH.Left := _Left;
+  _LTWH.Top := _Top;
+  _LTWH.Width := _Width;
+  _LTWH.Height := _Height;
+end;
+
+procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _a: TRect);
+begin
+  TRectLTWH_AssignTLRB(_LTWH, _a.Left, _a.Top, _a.Right, _a.Bottom);
+end;
+
+procedure TRectLTWH_AssignTLRB(var _LTWH: TRectLTWH; _Left, _Top, _Right, _Bottom: Integer);
+begin
+  TRectLTWH_Assign(_LTWH, _Left, _Top, _Right - _Left, _Bottom - _Top);
 end;
 
 end.

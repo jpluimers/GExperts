@@ -19,13 +19,6 @@ const
   MaxSmallInt = 32767;
   MaxEditorCol = {$IFDEF GX_VER160_up} MaxSmallInt {$ELSE} 1023 {$ENDIF};
 
-  {$IFNDEF GX_VER160_up}
-  BIF_NONEWFOLDERBUTTON = $200;
-  {$ENDIF not GX_VER160_up}
-  {$IFNDEF GX_VER150_up}
-  BIF_NEWDIALOGSTYLE = $0040;
-  {$ENDIF not GX_VER150_up}
-
 resourcestring
   SAllAlphaNumericChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
@@ -735,7 +728,8 @@ uses
   {$IFDEF GX_DEBUGLOG} GX_Debug, {$ENDIF}
   {$IFDEF UNICODE} Character, {$ENDIF}
   {$IFDEF HAS_SHLWAPI} ShLwApi, {$ENDIF}
-  ShellAPI, ShlObj, ActiveX, StrUtils, Math;
+  ShellAPI, ShlObj, ActiveX, StrUtils, Math,
+  GX_dzSelectDirectoryFix;
 
 {$IFNDEF HAS_SHLWAPI}
 const
@@ -767,61 +761,6 @@ var
 const
   RichEdit10ModuleName = 'RICHED32.DLL';
   RichEdit20ModuleName = 'RICHED20.DLL';
-
-function SelectDirCB(Wnd: HWND; uMsg: UINT; lParam, lpData: LPARAM): Integer stdcall;
-begin
-  if (uMsg = BFFM_INITIALIZED) and (lpData <> 0) then
-    SendMessage(Wnd, BFFM_SETSELECTION, Integer(True), lpdata);
-  Result := 0;
-end;
-
-{$IFDEF MSWINDOWS}
-function GxSelectDirectory(const Caption: string; const Root: WideString;
-  var Directory: string; Owner: HWND): Boolean;
-var
-  BrowseInfo: TBrowseInfo;
-  Buffer: PChar;
-  RootItemIDList, ItemIDList: PItemIDList;
-  ShellMalloc: IMalloc;
-  IDesktopFolder: IShellFolder;
-  Eaten, Flags: LongWord;
-begin
-  Result := False;
-  FillChar(BrowseInfo, SizeOf(BrowseInfo), 0);
-  if (ShGetMalloc(ShellMalloc) = S_OK) and (ShellMalloc <> nil) then
-  begin
-    Buffer := ShellMalloc.Alloc(MAX_PATH);
-    try
-      SHGetDesktopFolder(IDesktopFolder);
-      if Root = '' then
-        RootItemIDList := nil
-      else
-        IDesktopFolder.ParseDisplayName(Application.Handle, nil,
-          POleStr(Root), Eaten, RootItemIDList, Flags);
-      with BrowseInfo do
-      begin
-        hwndOwner := Owner;
-        pidlRoot := RootItemIDList;
-        pszDisplayName := Buffer;
-        lpszTitle := PChar(Caption);
-        ulFlags := BIF_RETURNONLYFSDIRS or BIF_NEWDIALOGSTYLE or BIF_NONEWFOLDERBUTTON;
-        lpfn := SelectDirCB;
-        lparam := Integer(PChar(Directory));
-      end;
-      ItemIDList := ShBrowseForFolder(BrowseInfo);
-      Result :=  ItemIDList <> nil;
-      if Result then
-      begin
-        ShGetPathFromIDList(ItemIDList, Buffer);
-        ShellMalloc.Free(ItemIDList);
-        Directory := Buffer;
-      end;
-    finally
-      ShellMalloc.Free(Buffer);
-    end;
-  end;
-end;
-{$ENDIF MSWINDOWS}
 
 procedure MakeASCIICharTable;
 var
@@ -884,8 +823,7 @@ asm
   neg     edi              {-Length(SubStr)}
   mov     ecx, eax
   shl     eax, 16
-  or      ecx, eax         {All 4 Bytes = Uppercase Last Character of
-SubStr}
+  or      ecx, eax         {All 4 Bytes = Uppercase Last Character of SubStr}
 @@MainLoop:
   add     edx, 4
   cmp     edx, esi
@@ -916,8 +854,7 @@ SubStr}
   cmp     edi, -1
   je      @@SetResult      {Exit with Match if Lenght(SubStr) = 1}
   mov     eax, [esp._end]  {SubStr End Position}
-  movzx   eax, word ptr [edi+eax] {Last Char Matches - Compare First 2
-Chars}
+  movzx   eax, word ptr [edi+eax] {Last Char Matches - Compare First 2 Chars}
   cmp     ax, [edi+edx]
   je      @@SetResult      {Same - Skip Uppercase Conversion}
   mov     ebx, eax         {Convert Characters into Uppercase}
@@ -1023,8 +960,7 @@ Chars}
   mov     ecx, [esp._ecx]  {Restore ECX for Next Main Loop}
   jmp     @@MainLoop       {No Match}
 @@Remainder:               {Check Last 1 to 4 Characters}
-  mov     eax, [esi-3]     {Last 4 Characters of S - May include Length
-Bytes}
+  mov     eax, [esi-3]     {Last 4 Characters of S - May include Length Bytes}
   mov     ebx, eax         {Convert All 4 Characters into Uppercase}
   or      eax, $80808080
   mov     ebp, eax
@@ -3618,21 +3554,13 @@ resourcestring
 var
   OldErrorMode: UINT;
   BrowseRoot: WideString;
-  OwnerHandle: HWND;
 begin
   OldErrorMode := SetErrorMode(SEM_FAILCRITICALERRORS);
   try
     BrowseRoot := '';
     if Owner = nil then
-    begin
-      if Screen.ActiveCustomForm <> nil then
-        OwnerHandle := Screen.ActiveCustomForm.Handle
-      else
-        OwnerHandle := Application.Handle;
-    end
-    else
-      OwnerHandle := Owner.Handle;
-    Result := GxSelectDirectory(SSelDir, BrowseRoot, Dir, OwnerHandle);
+      Owner := Screen.ActiveCustomForm;
+    Result := dzSelectDirectory(SSelDir, BrowseRoot, Dir, Owner);
   finally
     SetErrorMode(OldErrorMode);
   end;
