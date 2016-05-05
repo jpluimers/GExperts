@@ -74,6 +74,7 @@ Expert Manager tool in the GExperts start menu group.  If you prefer, you
 can also manually register the DLL with the IDE using the Windows registry
 editor (RegEdit.exe).  Create a key similar to the following (the
 version number appearing before "\Experts\" is IDE dependent):
+HKEY_CURRENT_USER\Software\Embarcadero\BDS\18.0\Experts\ (RAD Studio 10.1)
 HKEY_CURRENT_USER\Software\Embarcadero\BDS\17.0\Experts\ (RAD Studio 10)
 HKEY_CURRENT_USER\Software\Embarcadero\BDS\16.0\Experts\ (RAD Studio XE8)
 HKEY_CURRENT_USER\Software\Embarcadero\BDS\12.0\Experts\ (RAD Studio XE5)
