@@ -260,7 +260,6 @@ inherited fmGrepResults: TfmGrepResults
         ParentFont = False
         PopupMenu = pmHistoryMenu
         TabOrder = 0
-        Visible = False
         OnContextPopup = lbHistoryListContextPopup
         OnData = lbHistoryListData
         OnDblClick = lbHistoryListDblClick
