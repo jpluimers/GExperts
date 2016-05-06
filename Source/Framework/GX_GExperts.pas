@@ -330,7 +330,6 @@ begin
     GxKeyboardShortCutBroker.EndUpdate;
   end;
 
-  GXMenuActionManager.ArrangeMenuItems;
   ShowGxMessageBox(TUnsupportedIDEMessage);
 end;
 
@@ -376,6 +375,7 @@ begin
     ExpertList[i].AfterIDEInitialized;
   if RunningDelphi8OrGreater then
     GxKeyboardShortCutBroker.DoUpdateKeyBindings;
+  GXMenuActionManager.ArrangeMenuItems;
   GXMenuActionManager.MoveMainMenuItems;
 end;
 
