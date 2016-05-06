@@ -100,10 +100,13 @@ begin
     AEditorExpert := AEditorExpertManager.EditorExpertList[i];
     Assert(Assigned(AEditorExpert));
 
-    ExpertMenuEntry := TMenuItem.Create(MenuItem);
-    ExpertMenuEntry.Action := GxActionBroker.FindAction(AEditorExpert.GetActionName);
+    if AEditorExpert.Active then
+    begin
+      ExpertMenuEntry := TMenuItem.Create(MenuItem);
+      ExpertMenuEntry.Action := GxActionBroker.FindAction(AEditorExpert.GetActionName);
 
-    MenuItem.Add(ExpertMenuEntry);
+      MenuItem.Add(ExpertMenuEntry);
+    end;
   end;
 end;
 
@@ -140,10 +143,13 @@ begin
     AEditorExpert := AEditorExpertManager.EditorExpertList[i];
     Assert(Assigned(AEditorExpert));
 
-    ExpertMenuEntry := TMenuItem.Create(PopupMenu);
-    ExpertMenuEntry.Action := GxActionBroker.FindAction(AEditorExpert.GetActionName);
+    if AEditorExpert.Active then
+    begin
+      ExpertMenuEntry := TMenuItem.Create(PopupMenu);
+      ExpertMenuEntry.Action := GxActionBroker.FindAction(AEditorExpert.GetActionName);
 
-    PopupMenu.Items.Add(ExpertMenuEntry);
+      PopupMenu.Items.Add(ExpertMenuEntry);
+    end;
   end;
 end;
 
