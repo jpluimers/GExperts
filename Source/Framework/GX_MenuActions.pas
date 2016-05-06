@@ -39,7 +39,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Windows, Classes, Graphics, ActnList, Menus,
   GX_GenericClasses, GX_ActionBroker, GX_ConfigurationInfo,
-  GX_GExperts, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils, Math, 
+  GX_GExperts, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils, Math,
   GX_KbdShortCutBroker;
 
 // We can enable a hack / kludge to get around
@@ -421,6 +421,14 @@ begin
   if RunningDelphi7OrGreater then
   begin
     MaxMenuItems := ScreenHeight div GetMainMenuItemHeight;
+    { TODO -oanybody -cbug : if the IDE window is not at the top of the screen,
+      there is less space for the menu than the screen height. Depending on how
+      far down it is, the menu will be drawn upwards, so at least half screen
+      height is always available. If the menu needs more space, it will overlap
+      the main menu item an releasing the mouse after clicking on the main menu
+      item will trigger a click on the item then under the mouse. We could try
+      to figure out how much space really is available and set MaxMenuItems to
+      that number. }
     MaxMenuItems := Max(8, MaxMenuItems);
   end
   else

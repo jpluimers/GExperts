@@ -37,7 +37,7 @@ type
     procedure InternalExecute; override;
     // these cannot be changed to InternalLoad/SaveSettings because they are shared between
     // TPrevIdentExpert and TNextIdentExpert
-    { TODO -oAnybody -cfixme : Resolve this }
+    { TODO -oAnyone -cfixme : Resolve this }
     procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); override;
     procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); override;
   public
