@@ -54,8 +54,6 @@ type
     function HasDesignerMenuItem: Boolean; virtual;
     procedure DoCreateSubMenuItems(MenuItem: TMenuItem);
     procedure CreateSubMenuItems(MenuItem: TMenuItem); virtual;
-    // Defaults to True
-    function IsDefaultActive: Boolean; virtual;
 //    procedure Execute(Sender: TObject); virtual; // declared in TGX_BaseExpert
     // Do any delayed setup after the IDE is done initializing
     procedure AfterIDEInitialized; virtual;
@@ -142,11 +140,6 @@ end;
 function TGX_Expert.HasSubmenuItems: Boolean;
 begin
   Result := False;
-end;
-
-function TGX_Expert.IsDefaultActive: Boolean;
-begin
-  Result := True;
 end;
 
 const

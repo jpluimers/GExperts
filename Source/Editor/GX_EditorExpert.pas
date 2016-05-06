@@ -128,15 +128,15 @@ end;
 procedure TEditorExpert.LoadActiveAndShortCut(Settings: TGExpertsSettings);
 begin
   inherited;
-  ShortCut := Settings.ReadInteger(GetName, 'ShortCut', ShortCut);
-  // todo: load Active
+  ShortCut := Settings.ReadInteger(ConfigurationKey, 'ShortCut', ShortCut);
+  Active := Settings.ReadBool(ConfigurationKey, 'Active', IsDefaultActive);
 end;
 
 procedure TEditorExpert.SaveActiveAndShortCut(Settings: TGExpertsSettings);
 begin
   inherited;
   Settings.WriteInteger(ConfigurationKey, 'ShortCut', ShortCut);
-  // todo: save Active
+  Settings.WriteBool(ConfigurationKey, 'Active', Active);
 end;
 
 procedure TEditorExpert.SetShortCut(Value: TShortCut);

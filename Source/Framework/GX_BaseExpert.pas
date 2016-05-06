@@ -78,6 +78,8 @@ type
     // Returns an empty string, overridden by TGX_Expert and TEditorExpert
     // to return the correct values.
     function GetOptionsBaseRegistryKey: string; virtual;
+    // Defaults to True
+    function IsDefaultActive: Boolean; virtual;
     property Active: Boolean read FActive write SetActive;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
   end;
@@ -188,6 +190,11 @@ end;
 procedure TGX_BaseExpert.InternalSaveSettingsOld(Settings: TGExpertsSettings);
 begin
   // do nothing
+end;
+
+function TGX_BaseExpert.IsDefaultActive: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TGX_BaseExpert.LoadActiveAndShortCut(Settings: TGExpertsSettings);
