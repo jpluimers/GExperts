@@ -1592,6 +1592,9 @@ var
   IT: TPageIndexType;
 begin
   inherited;
+
+  FShowHistoryList := True;
+
   for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
     for IT := Low(TPageIndexType) to High(TPageIndexType) do
       FPageIndexes[IM, IT] := -1;
