@@ -396,14 +396,16 @@ var
   CurrentIndex: Integer;
   MenuItems: TMenuItemArray;
 
-  function GetMenuItem(Caption: string): TMenuItem;
+  function GetMenuItem(const ActName: string): TMenuItem;
   var
     j: Integer;
+    FullActName: string;
   begin
+    FullActName := GxActionBroker.GenerateMenuActionName(ActName);
     Result := nil;
     for j := 0 to Length(MenuItems) - 1 do
     begin
-      if StripHotkey(MenuItems[j].Caption) = Caption then
+      if Assigned(MenuItems[j].Action) and (MenuItems[j].Action.Name = FullActName) then
       begin
         Result := MenuItems[j];
         Break;
@@ -425,7 +427,7 @@ begin
       there is less space for the menu than the screen height. Depending on how
       far down it is, the menu will be drawn upwards, so at least half screen
       height is always available. If the menu needs more space, it will overlap
-      the main menu item an releasing the mouse after clicking on the main menu
+      the main menu item and releasing the mouse after clicking on the main menu
       item will trigger a click on the item then under the mouse. We could try
       to figure out how much space really is available and set MaxMenuItems to
       that number. }
@@ -458,7 +460,7 @@ begin
 
   for i := 0 to GExpertsInst.ExpertCount - 1 do
   begin
-    ParentItem := GetMenuItem(GExpertsInst.ExpertList[i].GetActionCaption);
+    ParentItem := GetMenuItem(GExpertsInst.ExpertList[i].GetActionName);
     if Assigned(ParentItem) then
       GExpertsInst.ExpertList[i].DoCreateSubMenuItems(ParentItem);
   end;

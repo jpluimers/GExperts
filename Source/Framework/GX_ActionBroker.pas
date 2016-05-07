@@ -13,10 +13,7 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Classes, ActnList, Graphics,
-  {$IFDEF GX_VER240_up}
-  System.Actions,
-  {$ENDIF GX_VER240_up}
+  Classes, ActnList, Graphics, Actions,
   GX_Actions;
 
 type
@@ -53,6 +50,16 @@ type
     function RequestMenuAction(const ActionName: string; Bitmap: Graphics.TBitmap): IGxMenuAction;
     // Fill Categories with the all of the action categories
     procedure GetCategories(Categories: TStrings);
+
+    ///<summary>
+    /// Generates the name for a menu action as set by RequestMenuAction
+    /// (by prefixing GExpertsActionCategory) </summary>
+    function GenerateMenuActionName(const AActionName: string): string;
+
+    ///<summary>
+    /// Generates the name for a menu action as set by RequestAction
+    /// (by prefixing GExpertsActionCategory + GxGenericActionQualifier </summary>
+    function GenerateActionName(const AActionName: string): string;
 
     // Access to all actions available to the broker; this
     // includes GExperts's own actions as well as the IDE's
@@ -115,6 +122,8 @@ type
     function RequestAction(const ActionName: string; Bitmap: Graphics.TBitmap = nil): IGxAction;
     function RequestMenuAction(const ActionName: string; Bitmap: Graphics.TBitmap): IGxMenuAction;
     procedure GetCategories(Categories: TStrings);
+    function GenerateMenuActionName(const AActionName: string): string;
+    function GenerateActionName(const AActionName: string): string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -188,6 +197,16 @@ begin
       Break;
     end;
   end;
+end;
+
+function TGxActionBroker.GenerateActionName(const AActionName: string): string;
+begin
+  Result := GExpertsActionCategory + GxGenericActionQualifier + AActionName;
+end;
+
+function TGxActionBroker.GenerateMenuActionName(const AActionName: string): string;
+begin
+  Result := GExpertsActionCategory + AActionName;
 end;
 
 function TGxActionBroker.GetActionCount: Integer;
@@ -307,7 +326,7 @@ begin
 
   GxToolsAction := TGxToolsAction.Create(GetActionOwner);
   GxToolsAction.Category := GExpertsActionCategory;
-  GxToolsAction.Name := GExpertsActionCategory + GxGenericActionQualifier + ActionName;
+  GxToolsAction.Name := GenerateActionName(ActionName);
 
   RegisterActionWithIde(GxToolsAction, Bitmap);
 
@@ -324,7 +343,7 @@ begin
 
   GxMenuAction := TGxMenuAction.Create(GetActionOwner);
   GxMenuAction.Category := GExpertsActionCategory;
-  GxMenuAction.Name := GExpertsActionCategory + ActionName;
+  GxMenuAction.Name := GenerateMenuActionName(ActionName);
 
   GxMenuAction.FAssociatedMenuItem := TMenuItem.Create(GxMenuAction);
   GxMenuAction.FAssociatedMenuItem.Name := GxMenuAction.Name + MenuItemAppendix;
