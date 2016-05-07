@@ -190,6 +190,9 @@ constructor TfmConfiguration.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
+  Constraints.MinWidth := Self.Width;
+  Constraints.MinHeight := Self.Height;
+
   FOIFont := TFont.Create;
   FCPFont := TFont.Create;
 

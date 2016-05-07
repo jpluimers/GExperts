@@ -6,8 +6,6 @@ object fmConfiguration: TfmConfiguration
   ClientHeight = 531
   ClientWidth = 613
   Color = clBtnFace
-  Constraints.MinHeight = 530
-  Constraints.MinWidth = 613
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
