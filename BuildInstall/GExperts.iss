@@ -211,7 +211,7 @@ SolidCompression=yes
 Source: ..\Binaries\ExpertManager.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\Binaries\GExpertsDebugWindow.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\Binaries\GExpertsGrep.exe; DestDir: {app}; Flags: ignoreversion
-;Source: ..\Documentation\GExperts.chm; DestDir: {app}; Flags: ignoreversion
+Source: ..\Documentation\GExperts.chm; DestDir: {app}; Flags: ignoreversion
 Source: ..\DLLs\{#DLLName}; DestDir: {app}; Flags: ignoreversion
 Source: ..\ExternalSource\DbugIntf.pas; DestDir: {app}; Flags: ignoreversion
 Source: ..\Documentation\Readme.txt; DestDir: {app}; Flags: isreadme ignoreversion
