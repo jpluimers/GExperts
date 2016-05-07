@@ -403,7 +403,7 @@ var
     Result := nil;
     for j := 0 to Length(MenuItems) - 1 do
     begin
-      if MenuItems[j].Caption = Caption then
+      if StripHotkey(MenuItems[j].Caption) = Caption then
       begin
         Result := MenuItems[j];
         Break;

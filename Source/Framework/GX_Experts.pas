@@ -302,7 +302,7 @@ end;
 procedure TGX_Expert.DoCreateSubMenuItems(MenuItem: TMenuItem);
 begin
   if HasSubMenuItems then
-    if Assigned(MenuItem) and (MenuItem.Count = 0) then
+    if Assigned(MenuItem) then
       CreateSubMenuItems(MenuItem);
 end;
 
