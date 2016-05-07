@@ -59,10 +59,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Menus, ToolWin, ActnList, Graphics, ToolsAPI,
-  {$IFDEF GX_VER240_up}
-  System.Actions,
-  {$ENDIF GX_VER240_up}
+  SysUtils, Menus, ToolWin, ActnList, Graphics, ToolsAPI, Actions,
   GX_OtaUtils, GX_EditorEnhancements, GX_GxUtils, GX_IdeUtils, GX_GenericUtils;
 
 const

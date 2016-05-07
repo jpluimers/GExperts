@@ -6,10 +6,7 @@ interface
 
 uses
   Classes, Windows, Controls, Forms,
-  StdCtrls, ExtCtrls, ComCtrls, ActnList, Buttons,
-  {$IFDEF GX_VER240_up}
-  System.Actions,
-  {$ENDIF GX_VER240_up}
+  StdCtrls, ExtCtrls, ComCtrls, ActnList, Buttons, Actions,
   GX_BaseForm;
 
 type
