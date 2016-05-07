@@ -52,10 +52,10 @@ uses
   GX_eReverseStatement in '..\..\source\Editor\GX_eReverseStatement.pas',
   GX_eSelectIdentifier in '..\..\source\Editor\GX_eSelectIdentifier.pas',
   GX_eSelectionEditorExpert in '..\..\source\Editor\GX_eSelectionEditorExpert.pas',
-  GX_eSort in '..\..\source\Editor\GX_eSort.pas' {fmeSortConfig},
-  GX_UsesExpert in '..\..\source\UsesExpert\GX_UsesExpert.pas' {fmUsesManager},
+  GX_eSort in '..\..\Source\Editor\GX_eSort.pas' {fmeSortConfig},
+  GX_UsesExpert in '..\..\Source\UsesExpert\GX_UsesExpert.pas' {fmUsesManager},
   GX_UsesExpertOptions in '..\..\Source\UsesExpert\GX_UsesExpertOptions.pas' {fmUsesExpertOptions},
-  GX_ePopupMenu in '..\..\source\Editor\GX_ePopupMenu.pas' {fmEditorPopupMenuExpertConfig},
+  GX_ePopupMenu in '..\..\Source\Editor\GX_ePopupMenu.pas' {fmEditorPopupMenuExpertConfig},
   GX_EditorChangeServices in '..\..\source\Framework\GX_EditorChangeServices.pas',
   GX_EditorEnhancements in '..\..\source\Framework\GX_EditorEnhancements.pas',
   GX_EditorExpert in '..\..\source\Editor\GX_EditorExpert.pas',
@@ -203,7 +203,8 @@ uses
   GX_BaseExpert in '..\..\Source\Framework\GX_BaseExpert.pas',
   GX_uAutoTodoHandler in '..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas',
   GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone},
-  GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas';
+  GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas',
+  GX_dzSelectDirectoryFix in '..\..\Source\Utils\GX_dzSelectDirectoryFix.pas';
 
 begin
 end.

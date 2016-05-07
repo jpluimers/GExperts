@@ -456,6 +456,7 @@
 				<Form>fmAutoTodoDone</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas"/>
+			<DCCReference Include="..\..\Source\Utils\GX_dzSelectDirectoryFix.pas" />
 			<DCCReference Include="..\..\Source\Framework\GX_ConfigureExperts.pas">
 				<Form>frConfigureExperts</Form>
 				<DesignClass>TFrame</DesignClass>

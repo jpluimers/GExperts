@@ -203,7 +203,8 @@ uses
   GX_BaseExpert in '..\..\Source\Framework\GX_BaseExpert.pas',
   GX_uAutoTodoHandler in '..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas',
   GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone},
-  GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas';
+  GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas',
+  GX_dzSelectDirectoryFix in '..\..\Source\Utils\GX_dzSelectDirectoryFix.pas';
 
 end.
 
