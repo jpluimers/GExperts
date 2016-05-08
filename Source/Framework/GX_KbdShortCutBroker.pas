@@ -57,7 +57,7 @@ uses
   ToolsAPI,
   Forms, Controls, Types, Graphics, Messages, Windows, Contnrs,
   GX_GenericClasses, GX_GExperts, GX_IdeUtils, GX_ConfigurationInfo,
-  GX_EditorEnhancements, GX_GxUtils, GX_dzVclUtils;
+  GX_EditorEnhancements, GX_GxUtils, GX_dzVclUtils, GX_OtaUtils;
 
 // First of all we have shared code; in
 // particular, we share a large chunk
@@ -483,7 +483,7 @@ begin
 
   if FShortCutList.Count > 0 then
   begin
-    IKeyboardServices := BorlandIDEServices as IOTAKeyboardServices;
+    IKeyboardServices := GxOtaGetKeyboardServices;
     IKeyboardBinding := TGxKeyboardBinding.Create(Self);
     FKeyboardName := IKeyboardBinding.Name;
 
@@ -521,7 +521,7 @@ begin
   // ignore the request to remove it.
   if FKeyboardBindingIndex <> InvalidIndex then
   begin
-    IKeyboardServices := BorlandIDEServices as IOTAKeyboardServices;
+    IKeyboardServices := GxOtaGetKeyboardServices;
     try
       IKeyboardServices.RemoveKeyboardBinding(FKeyboardBindingIndex);
     except

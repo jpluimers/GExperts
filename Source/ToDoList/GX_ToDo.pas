@@ -6,7 +6,7 @@ interface
 
 uses Forms, Messages, Classes, ActnList, Menus, ImgList,
   Controls, ComCtrls, ToolWin, ToolsAPI,
-  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, Graphics;
+  GX_IdeDock, GX_Experts, GX_OtaUtils, GX_ConfigurationInfo, Graphics, Actions;
 
 const
   UM_RESIZECOLS = WM_USER + 523;
@@ -478,7 +478,9 @@ begin
           <-- Multiline test }
       // Identify owner of TODO item (-o)
       // Identify class of TODO item (-c)
+{$IFNDEF GX_VER310_up}
       OptionChar := #0; // Initialize to make compiler happy - redundant
+{$ENDIF}
       while StrContains('-', ParsingString) do
       begin
         if Length(ParsingString) > 1 then

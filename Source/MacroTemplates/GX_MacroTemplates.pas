@@ -11,7 +11,7 @@ uses
   Classes, Controls, Forms, ComCtrls, ExtCtrls,
   StdCtrls, Menus, Dialogs, ActnList, StdActns,
   GX_ConfigurationInfo, GX_MacroFile, GX_EnhancedEditor, GX_GenericUtils,
-  GX_BaseForm;
+  GX_BaseForm, Actions;
 
 const
   DefaultMacroFileName = 'MacroTemplates.xml';
@@ -1265,7 +1265,9 @@ var
 begin
   NewMacro := CreateMacroObject;
   try
+{$IFNDEF GX_VER310_up}
     MacroFound := False;
+{$ENDIF}
     repeat
       if not EditMacroObject(NewMacro) then
         Break;

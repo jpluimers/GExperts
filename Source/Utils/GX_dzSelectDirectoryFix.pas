@@ -206,7 +206,7 @@ var
   RootItemIDList, ItemIDList: PItemIDList;
 begin
   Result := False;
-  if not DirectoryExists(Directory) then
+  if not SysUtils.DirectoryExists(Directory) then
     Directory := '';
   FillChar(BrowseInfo, SizeOf(BrowseInfo), 0);
   if (ShGetMalloc(ShellMalloc) = S_OK) and (ShellMalloc <> nil) then begin

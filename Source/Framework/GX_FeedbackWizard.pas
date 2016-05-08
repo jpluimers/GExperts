@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, ComCtrls, ActnList,
-  GX_BaseForm;
+  GX_BaseForm, Actions;
 
 type
   TFeedbackType = (fbBug, fbFeature);
@@ -402,7 +402,9 @@ var
   i: Integer;
   CheckBox: TCheckBox;
 begin
+{$IFNDEF GX_VER310_up}
   CheckBox := nil;
+{$ENDIF}
   for i := 0 to gbxConfigurationData.ControlCount - 1 do
   begin
     if gbxConfigurationData.Controls[i] is TCheckBox then
