@@ -136,9 +136,9 @@ object frConfigureExperts: TfrConfigureExperts
         TabOrder = 1
       end
       object btnExpert: TButton
-        Left = 463
+        Left = 478
         Top = 8
-        Width = 98
+        Width = 84
         Height = 25
         Anchors = [akTop, akRight]
         Caption = 'Configure...'
@@ -147,7 +147,7 @@ object frConfigureExperts: TfrConfigureExperts
       object btnDefault: TButton
         Left = 408
         Top = 8
-        Width = 49
+        Width = 55
         Height = 25
         Anchors = [akTop, akRight]
         Caption = 'Default'
