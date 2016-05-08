@@ -1,5 +1,7 @@
 object dmSharedImages: TdmSharedImages
   OldCreateOrder = False
+  Left = 316
+  Top = 212
   Height = 291
   Width = 388
   object Images: TImageList
