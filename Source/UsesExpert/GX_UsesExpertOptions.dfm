@@ -1,6 +1,6 @@
 object fmUsesExpertOptions: TfmUsesExpertOptions
-  Left = 0
-  Top = 0
+  Left = 338
+  Top = 241
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Uses Clause Manager Options'
@@ -13,7 +13,7 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poOwnerFormCenter
+  Position = poScreenCenter
   DesignSize = (
     249
     97)
@@ -22,7 +22,7 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
   object chkSingleActionMode: TCheckBox
     Left = 8
     Top = 8
-    Width = 0
+    Width = 233
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Single action/quic&k add mode'
@@ -33,7 +33,8 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Top = 32
     Width = 233
     Height = 17
-    Caption = 'Replace File->Use Unit'
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Replace IDE File, Use Unit feature'
     TabOrder = 1
   end
   object btnOK: TButton
@@ -41,6 +42,7 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Top = 64
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'OK'
     Default = True
@@ -52,18 +54,10 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Top = 64
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 3
-  end
-  object CheckBox1: TCheckBox
-    Left = 8
-    Top = 8
-    Width = 233
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Single action/quic&k add mode'
-    TabOrder = 4
   end
 end

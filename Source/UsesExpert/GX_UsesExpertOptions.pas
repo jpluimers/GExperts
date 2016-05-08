@@ -20,7 +20,6 @@ type
     chkReplaceFileUnit: TCheckBox;
     btnOK: TButton;
     btnCancel: TButton;
-    CheckBox1: TCheckBox;
   private
     procedure SetData(const _CanReplaceFindUseUnit, _SingleActionMode, _ReplaceFileUseUnit: Boolean);
     procedure GetData(out _SingleActionMode, _ReplaceFileUseUnit: Boolean);
