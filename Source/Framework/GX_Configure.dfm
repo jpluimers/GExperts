@@ -1,10 +1,10 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
+  Width = 629
+  Height = 569
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
-  ClientHeight = 531
-  ClientWidth = 613
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -36,6 +36,7 @@ object fmConfiguration: TfmConfiguration
       Align = alClient
       HotTrack = True
       MultiLine = True
+      TabIndex = 0
       TabOrder = 0
       OnChange = pcConfigChange
       object tshExperts: TTabSheet
@@ -51,7 +52,7 @@ object fmConfiguration: TfmConfiguration
           Left = 0
           Top = 0
           Width = 591
-          Height = 435
+          Height = 454
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -229,7 +230,7 @@ object fmConfiguration: TfmConfiguration
           Left = 272
           Top = 8
           Width = 257
-          Height = 70
+          Height = 105
           Caption = 'Tab Dock &Hosts'
           TabOrder = 1
           object chkMultiLineTabDockHost: TCheckBox
@@ -254,12 +255,12 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 288
           Width = 521
-          Height = 157
+          Height = 159
           Caption = 'Component &Palette'
           TabOrder = 3
           object chkCPMultiLine: TCheckBox
             Left = 8
-            Top = 14
+            Top = 18
             Width = 505
             Height = 17
             Caption = 'Multiline tabs'
@@ -268,7 +269,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPAsButtons: TCheckBox
             Left = 8
-            Top = 71
+            Top = 75
             Width = 505
             Height = 17
             Caption = 'Show tabs as buttons'
@@ -277,7 +278,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPTabsInPopup: TCheckBox
             Left = 8
-            Top = 110
+            Top = 114
             Width = 505
             Height = 17
             Caption = 'Add popup menu/button with tab names'
@@ -286,7 +287,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPFlat: TCheckBox
             Left = 24
-            Top = 90
+            Top = 94
             Width = 489
             Height = 17
             Caption = 'Flat buttons'
@@ -294,7 +295,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPTabsInPopupAlphaSort: TCheckBox
             Left = 24
-            Top = 129
+            Top = 133
             Width = 489
             Height = 19
             Caption = 'Show tab names in alphabetical order'
@@ -302,7 +303,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPScrollOpposite: TCheckBox
             Left = 24
-            Top = 33
+            Top = 37
             Width = 489
             Height = 17
             Caption = 'Scroll &opposite'
@@ -310,7 +311,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkCPRaggedRight: TCheckBox
             Left = 24
-            Top = 52
+            Top = 56
             Width = 489
             Height = 17
             Caption = 'Ragged &right'
@@ -319,7 +320,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxIDEForms: TGroupBox
           Left = 8
-          Top = 112
+          Top = 115
           Width = 521
           Height = 169
           Caption = 'IDE'
@@ -402,7 +403,7 @@ object fmConfiguration: TfmConfiguration
         Caption = 'Code Editor'
         object gbxEditorTabs: TGroupBox
           Left = 8
-          Top = 256
+          Top = 192
           Width = 225
           Height = 121
           Caption = 'Editor T&abs'
@@ -499,11 +500,11 @@ object fmConfiguration: TfmConfiguration
           OnClick = chkDisableEDTEnhancementsClick
         end
         object chkHideNavbar: TCheckBox
-          Left = 16
-          Top = 392
-          Width = 210
+          Left = 8
+          Top = 320
+          Width = 305
           Height = 17
-          Caption = 'Hide Navigation Bar (Delphi 10 up)'
+          Caption = 'Hide Navigation Bar (Delphi 10 and up)'
           TabOrder = 2
         end
       end
@@ -535,7 +536,7 @@ object fmConfiguration: TfmConfiguration
           end
           object btnDeleteSuppressedMessage: TButton
             Left = 344
-            Top = 80
+            Top = 24
             Width = 75
             Height = 25
             Caption = 'Delete'
@@ -544,7 +545,7 @@ object fmConfiguration: TfmConfiguration
           end
           object btnClearSuppressedMessages: TButton
             Left = 344
-            Top = 112
+            Top = 56
             Width = 75
             Height = 25
             Caption = 'Clear'
@@ -696,6 +697,7 @@ object fmConfiguration: TfmConfiguration
             Max = 1000
             Position = 1
             TabOrder = 2
+            Wrap = False
           end
         end
         object btnEditView: TButton

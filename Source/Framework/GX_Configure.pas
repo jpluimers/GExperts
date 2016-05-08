@@ -214,6 +214,7 @@ begin
   FConfigEditorExpertsFrame.Name := '';
   FConfigEditorExpertsFrame.Parent := tshEditorExperts;
   FConfigEditorExpertsFrame.Align := alClient;
+  { TODO : Sort expert and editor expert lists by caption }
   FConfigEditorExpertsFrame.Init(GExpertsInst.EditorExpertManager.GetExpertList);
 
   FConfigExpertsFrame := TfrConfigureExperts.Create(Self);
