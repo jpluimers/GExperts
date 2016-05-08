@@ -1,10 +1,10 @@
 object fmCodeFormatterConfig: TfmCodeFormatterConfig
   Left = 339
   Top = 175
+  Width = 494
+  Height = 463
   HelpContext = 100
   Caption = 'Delphi Code Formatter Configuration'
-  ClientHeight = 425
-  ClientWidth = 478
   Color = clBtnFace
   Constraints.MinHeight = 375
   Constraints.MinWidth = 478
@@ -409,7 +409,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         Height = 25
         Anchors = [akTop, akRight]
         Caption = 'Edit ...'
-        TabOrder = 8
+        TabOrder = 7
         OnClick = b_EditCapitalizationClick
       end
       object rb_CapitalizationInRegistry: TRadioButton
@@ -429,7 +429,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         Width = 238
         Height = 17
         Caption = 'Stored in File'
-        TabOrder = 7
+        TabOrder = 8
         OnClick = rb_CapitalizationInFileClick
       end
       object ed_CapitalizationFile: TEdit
@@ -457,7 +457,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         Top = 129
         Width = 457
         Height = 134
-        Caption = 'User defined capitalization'
+        Caption = 'User Defined Capitalization'
         Items.Strings = (
           'Do not use list'
           'Add new words only'
@@ -521,7 +521,10 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         Width = 16
         Height = 21
         Associate = ed_AlignCommentPos
+        Min = 0
+        Position = 0
         TabOrder = 2
+        Wrap = False
       end
       object chk_AlignVar: TCheckBox
         Left = 16
@@ -545,7 +548,10 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         Width = 16
         Height = 21
         Associate = ed_AlignVarPos
+        Min = 0
+        Position = 0
         TabOrder = 5
+        Wrap = False
       end
     end
     object ts_Misc: TTabSheet
@@ -553,7 +559,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       object grp_ConfigPrecedence: TGroupBox
         Left = 8
         Top = 88
-        Width = 281
+        Width = 297
         Height = 97
         Caption = 'Configuration Precedence'
         TabOrder = 1
@@ -569,7 +575,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         object b_PrecedenceUp: TButton
           Left = 208
           Top = 24
-          Width = 65
+          Width = 78
           Height = 25
           Caption = 'Move Up'
           TabOrder = 1
@@ -578,7 +584,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         object b_PrecedenceDown: TButton
           Left = 208
           Top = 56
-          Width = 67
+          Width = 78
           Height = 25
           Caption = 'Move Down'
           TabOrder = 2
@@ -588,9 +594,9 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       object grp_DirectivesPreventFormatting: TGroupBox
         Left = 8
         Top = 8
-        Width = 281
+        Width = 297
         Height = 73
-        Caption = 'Directives in source to prevent formatting:'
+        Caption = 'Source Directives to Prevent Formatting'
         TabOrder = 0
         object l_MiscStart: TLabel
           Left = 8
@@ -600,7 +606,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
           Caption = 'Start'
         end
         object l_MiscEnd: TLabel
-          Left = 144
+          Left = 152
           Top = 24
           Width = 19
           Height = 13
@@ -609,15 +615,15 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         object ed_StartComment: TEdit
           Left = 8
           Top = 40
-          Width = 129
+          Width = 133
           Height = 21
           MaxLength = 20
           TabOrder = 0
         end
         object ed_EndCommentOut: TEdit
-          Left = 144
+          Left = 152
           Top = 40
-          Width = 129
+          Width = 133
           Height = 21
           MaxLength = 20
           TabOrder = 1
