@@ -43,7 +43,8 @@ uses
   GX_IdeFormEnhancer,
   GX_dzVclUtils,
   GX_dzFileUtils,
-  GX_OtaUtils;
+  GX_OtaUtils,
+  GX_dzSelectDirectoryFix;
 
 var
   gblAggressive: Boolean;
@@ -63,15 +64,19 @@ type
     FEdit: TEdit;
     FUpClick: TNotifyEvent;
     FDownClick: TNotifyEvent;
-    FUpBtn: TBitBtn;
-    FDownBtn: TBitBtn;
-    FDeleteBtn: TButton;
-    FDeleteInvalidBtn: TButton;
-    FReplaceBtn: TButton;
-    FAddBtn: TButton;
+    FUpBtn: TCustomButton;
+    FDownBtn: TCustomButton;
+    FDeleteBtn: TCustomButton;
+    FDeleteInvalidBtn: TCustomButton;
+    FReplaceBtn: TCustomButton;
+    FAddBtn: TCustomButton;
     FMakeRelativeBtn: TButton;
     FMakeAbsoluteBtn: TButton;
     FAddRecursiveBtn: TButton;
+{$IFNDEF GX_VER300_up}
+    FBrowseBtn: TCustomButton;
+    FBrowseClick: TNotifyEvent;
+{$ENDIF GX_VER300_up}
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
     ///<summary>
     /// frm can be nil </summary>
@@ -87,6 +92,9 @@ type
     procedure MakeAbsoluteBtnClick(_Sender: TObject);
     procedure AddRecursiveBtnClick(_Sender: TObject);
     function MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
+{$IFNDEF GX_VER300_up}
+    procedure BrowseBtnClick(_Sender: TObject);
+{$ENDIF GX_VER300_up}
   public
     constructor Create;
     destructor Destroy; override;
@@ -272,11 +280,15 @@ begin
   Result := False;
 end;
 
+type
+  TCustomButtonHack = class(TCustomButton)
+  end;
+
 procedure TSearchPathEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 var
   TheActionList: TActionList;
 
-  function TryFindBitBtn(const _BtnName: string; out _Btn: TBitBtn): Boolean;
+  function TryFindBitBtn(const _BtnName: string; out _Btn: TCustomButton): Boolean;
   var
     cmp: TComponent;
   begin
@@ -286,7 +298,7 @@ var
       _Btn := cmp as TBitBtn;
   end;
 
-  function TryFindButton(const _BtnName: string; out _Btn: TButton): Boolean;
+  function TryFindButton(const _BtnName: string; out _Btn: TCustomButton): Boolean;
   var
     cmp: TComponent;
   begin
@@ -299,7 +311,7 @@ var
   end;
 
   procedure AssignActionToButton(const _BtnName: string; const _Caption: string;
-    _OnExecute: TNotifyEvent; _Shortcut: TShortCut; out _Btn: TBitBtn; out _OnClick: TNotifyEvent);
+    _OnExecute: TNotifyEvent; _Shortcut: TShortCut; out _Btn: TCustomButton; out _OnClick: TNotifyEvent);
   var
     act: TAction;
   begin
@@ -309,8 +321,8 @@ var
     // by inspecting the Sender parameter. So, instead we save the OnClick
     // event, assign our own event to OnExecute and there call the original
     // OnClick event with the original Sender parameter.
-    if TryFindBitBtn(_BtnName, _Btn) then begin
-      _OnClick := _Btn.OnClick;
+    if TryFindBitBtn(_BtnName, _Btn) or TryFindButton(_BtnName, _Btn) then begin
+      _OnClick := TCustomButtonHack(_Btn).OnClick;
       act := TActionlist_Append(TheActionList, '', _OnExecute, _Shortcut);
       act.Hint := _Caption;
       _Btn.Action := act;
@@ -320,7 +332,7 @@ var
 
 var
   cmp: TComponent;
-  btn: TButton;
+  btn: TCustomButton;
 begin
   FListbox := nil;
   FMemo := nil;
@@ -346,6 +358,10 @@ begin
         // Assign shortcuts to the Up/Down buttons via actions
         AssignActionToButton('UpButton', 'Move Up', UpBtnClick, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
         AssignActionToButton('DownButton', 'Move Down', DownBtnClick, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
+{$IFNDEF GX_VER300_up}
+        // Delphi 10 and later no longer uses SelectDirectory, so we don't need to fix it.
+        AssignActionToButton('BrowseButton', 'Browse', BrowseBtnClick, ShortCut(VK_DOWN, [ssAlt]), FBrowseBtn, FBrowseClick);
+{$ENDIF GX_VER300_up}
 
         TWinControl_ActivateDropFiles(FListbox, HandleFilesDropped);
         FPageControl := TPageControl.Create(_Form);
@@ -383,7 +399,7 @@ begin
         TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
 
         if TryFindButton('AddButton', FAddBtn) then begin
-          FAddBtn.OnClick := AddBtnClick;
+          TCustomButtonHack(FAddBtn).OnClick := AddBtnClick;
         end;
         if TryFindButton('ReplaceButton', FReplaceBtn) then begin
           FMakeRelativeBtn := TButton.Create(_Form);
@@ -417,7 +433,7 @@ begin
         end;
 
         if TryFindButton('OkButton', btn) then
-          btn.Caption := '&OK';
+          TCustomButtonHack(btn).Caption := '&OK';
       end;
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
@@ -442,7 +458,7 @@ begin
   try
     for i := 0 to FMemo.Lines.Count - 1 do begin
       RelativeDir := FMemo.Lines[i];
-      AbsoluteDir := ExpandFileName(IncludeTrailingPathDelimiter(ProjectDir) + RelativeDir);
+      AbsoluteDir := TFileSystem.ExpandFileNameRelBaseDir(RelativeDir, ProjectDir);
       FMemo.Lines[i] := AbsoluteDir;
     end;
   finally
@@ -506,7 +522,7 @@ end;
 
 procedure TSearchPathEnhancer.PageControlChanging(_Sender: TObject; var AllowChange: Boolean);
 
-  procedure TrySetButtonVisibility(_Btn: TButton; _Visible: Boolean);
+  procedure TrySetButtonVisibility(_Btn: TCustomButton; _Visible: Boolean);
   begin
     if Assigned(_Btn) then
       _Btn.Visible := _Visible;
@@ -569,6 +585,25 @@ begin
   end;
 end;
 
+{$IFNDEF GX_VER300_up}
+
+procedure TSearchPathEnhancer.BrowseBtnClick(_Sender: TObject);
+var
+  ProjectFile: string;
+  ProjectDir: string;
+  Dir: string;
+begin
+  Dir := FEdit.Text;
+  ProjectFile := GxOtaGetCurrentProjectFileName(True);
+  if ProjectFile <> '' then begin
+    ProjectDir := ExtractFilePath(ProjectFile);
+    Dir := TFileSystem.ExpandFileNameRelBaseDir(Dir, ProjectDir);
+  end;
+  if dzSelectDirectory(FBrowseBtn.Hint, '', Dir, FBrowseBtn) then
+    FEdit.Text := Dir;
+end;
+{$ENDIF GX_VER300_up}
+
 procedure TSearchPathEnhancer.HandleMemoChange(_Sender: TObject);
 begin
   if Assigned(FListbox) and Assigned(FMemo) then
@@ -580,3 +615,4 @@ finalization
   gblAggressive := False;
   TGxIdeSearchPathEnhancer.SetEnabled(False);
 end.
+
