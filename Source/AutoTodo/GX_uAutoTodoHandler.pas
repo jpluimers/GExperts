@@ -27,7 +27,6 @@ type
   public
     class function GetDefaultTextToInsert: string;
     class procedure GetPlaceholders(_sl: TStrings);
-    class function GetWindowsUser: string;
     constructor Create;
     destructor Destroy; override;
     ///<summary>
@@ -75,7 +74,7 @@ type
 
 class function TAutoTodoHandler.GetDefaultTextToInsert: string;
 const
-  DefaultTextToInsert = '//TODO 5 -o{UserName} -cEmpty Structure : {ProcName} ({BeginKey}/{EndKey} in {ProcType})';
+  DefaultTextToInsert = '//TODO 5 -o{UserName} -cEmpty Code Block: {ProcName} ({BeginKey}/{EndKey} in {ProcType})';
 begin
   Result := DefaultTextToInsert;
 end;
@@ -93,7 +92,7 @@ end;
 constructor TAutoTodoHandler.Create;
 begin
   inherited;
-  FTodoUser := GetWindowsUser;
+  FTodoUser := GetCurrentUser;
   FTextToInsert := GetDefaultTextToInsert;
 end;
 
@@ -479,30 +478,5 @@ begin // TAutoTodoHandler.Execute
     List.EndUpdate;
   end;
 end; // TAutoTodoHandler.Execute
-
-class function TAutoTodoHandler.GetWindowsUser: string;
-const
-  InitialSize = 255;
-var
-  p: PChar;
-  Size: Cardinal;
-begin
-  Size := InitialSize;
-  Getmem(p, Size);
-  try
-    if not GetUserName(p, Size) then begin
-      if Size = InitialSize then
-        RaiseLastOSError
-      else begin
-        ReallocMem(p, Size);
-        if not GetUserName(p, Size) then
-          RaiseLastOSError;
-      end;
-    end;
-    SetString(Result, p, Size - 1);
-  finally
-    FreeMem(p);
-  end;
-end;
 
 end.
