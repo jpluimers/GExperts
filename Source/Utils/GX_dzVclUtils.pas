@@ -258,7 +258,7 @@ function TMainMenu_FindMenuItem(_mnu: TMainMenu; const _Name: string; out _miFou
 
 function TMenuItem_FindMenuItem(_mi: TMenuItem; const _Name: string; out _miFound: TMenuItem): Boolean;
 
-{$IFNDEF DELPHI2009_UP}
+{$IFNDEF GX_VER200_up}
 //Delphi 2009 introduced TCustomButton as the common Ancestor of TButton and TBitBtn.
 type
   TCustomButton = TButton;
