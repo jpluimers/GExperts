@@ -5,6 +5,7 @@ unit GX_dzSelectDirectoryFix;
 
 interface
 
+{$WARN UNIT_PLATFORM OFF}
 uses
   Windows,
   SysUtils,
