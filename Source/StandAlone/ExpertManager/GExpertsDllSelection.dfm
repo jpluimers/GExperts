@@ -1,10 +1,10 @@
 object frGEXpertsDllSelection: TfrGEXpertsDllSelection
-  Left = 0
-  Top = 0
+  Left = 328
+  Top = 228
+  Width = 293
+  Height = 303
   BorderIcons = [biSystemMenu]
   Caption = 'Select GExperts DLL'
-  ClientHeight = 265
-  ClientWidth = 273
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,16 +14,16 @@ object frGEXpertsDllSelection: TfrGEXpertsDllSelection
   OldCreateOrder = False
   Position = poOwnerFormCenter
   DesignSize = (
-    273
+    277
     265)
   PixelsPerInch = 96
   TextHeight = 13
   object l_SelectDll: TLabel
     Left = 8
     Top = 8
-    Width = 132
+    Width = 136
     Height = 13
-    Caption = 'Select GExperts DLL to load'
+    Caption = 'Select GExperts DLL to load:'
   end
   object lb_GExpertsDlls: TListBox
     Left = 8
@@ -42,6 +42,7 @@ object frGEXpertsDllSelection: TfrGEXpertsDllSelection
     Width = 75
     Height = 25
     Caption = 'Load'
+    Default = True
     Enabled = False
     TabOrder = 1
     OnClick = b_LoadClick
