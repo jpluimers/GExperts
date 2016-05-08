@@ -1,6 +1,6 @@
 {***************************************************************
  * Unit Name: GX_InsertAutoTodoExpert
- * Purpose  : Inserts TODOs for empty code blocks
+ * Purpose  : Inserts to do comments for empty code blocks
  * Authors  : Peter Laman, Thomas Mueller
  ****************************************************************}
 
@@ -12,25 +12,27 @@ interface
 
 uses
   SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, Menus,
-  GX_BaseForm, GX_Experts;
+  GX_BaseForm, GX_Experts, ExtCtrls;
 
 type
-  tfmInsertAutoTodoForm = class(TfmBaseForm)
-    b_OK: TButton;
-    b_Cancel: TButton;
-    l_Username: TLabel;
-    ed_Username: TEdit;
-    l_TextToInsert: TLabel;
-    b_ResetTextToInsert: TButton;
-    b_Placeholder: TButton;
-    m_TextToInsert: TMemo;
-    pm_Placeholders: TPopupMenu;
-    chk_ShowDoneDialog: TCheckBox;
-    procedure b_ResetTextToInsertClick(Sender: TObject);
+  TfmInsertAutoTodoForm = class(TfmBaseForm)
+    lblUsername: TLabel;
+    edtUsername: TEdit;
+    lblTextToInsert: TLabel;
+    btnLoadDetault: TButton;
+    btnInsertPlaceholder: TButton;
+    mmoTextToInsert: TMemo;
+    pmuPlaceholders: TPopupMenu;
+    lblStarWindows: TLabel;
+    pnlFooter: TPanel;
+    chkShowDoneDialog: TCheckBox;
+    btnOK: TButton;
+    btnCancel: TButton;
+    procedure btnLoadDetaultClick(Sender: TObject);
   private
-    procedure mi_PlaceholderClick(Sender: TObject);
-    procedure SetData(const AUsername, ATextToInsert: string; ADoneDialogEnabled: boolean);
-    procedure GetData(var AUsername, ATextToInsert: string; var ADoneDialogEnabled: boolean);
+    procedure InsertPlaceholderClick(Sender: TObject);
+    procedure SetData(const AUsername, ATextToInsert: string; ADoneDialogEnabled: Boolean);
+    procedure GetData(var AUsername, ATextToInsert: string; var ADoneDialogEnabled: Boolean);
   public
     constructor Create(Owner: TComponent); override;
   end;
@@ -78,7 +80,6 @@ type
     constructor Create(_sl: TGXUnicodeStringList);
     function CalcCursorPos(_Offset: integer): TPoint;
   end;
-
 
 { TOffsetToCursorPos }
 
@@ -170,7 +171,7 @@ begin
         Handler := TAutoTodoHandler.Create;
         try
           if FUsername = '*' then
-            Handler.TodoUser := Handler.GetWindowsUser
+            Handler.TodoUser := GetCurrentUser
           else
             Handler.TodoUser := FUsername;
           Handler.TextToInsert := FTextToInsert;
@@ -230,18 +231,18 @@ end;
 
 procedure TGxInsertAutoTodoExpert.Configure;
 var
-  frm: tfmInsertAutoTodoForm;
+  Dialog: tfmInsertAutoTodoForm;
 begin
-  frm := tfmInsertAutoTodoForm.Create(nil);
+  Dialog := tfmInsertAutoTodoForm.Create(nil);
   try
-    frm.SetData(FUsername, FTextToInsert, FDoneDialogEnabled);
-    if frm.ShowModal = mrOk then
+    Dialog.SetData(FUsername, FTextToInsert, FDoneDialogEnabled);
+    if Dialog.ShowModal = mrOk then
     begin
-     frm.GetData(FUsername, FTextToInsert, FDoneDialogEnabled);
+     Dialog.GetData(FUsername, FTextToInsert, FDoneDialogEnabled);
      SaveSettings;
     end;
   finally
-    frm.Free;
+    FreeAndNil(Dialog);
   end;
 end;
 
@@ -265,14 +266,14 @@ end;
 
 function TGxInsertAutoTodoExpert.GetActionCaption: string;
 resourcestring
-  SMenuCaption = 'Insert Auto TODOs...';
+  SMenuCaption = 'Comment Empty Code Blocks...';
 begin
   Result := SMenuCaption;
 end;
 
 class function TGxInsertAutoTodoExpert.GetName: string;
 begin
-  Result := 'InsertAutoTodo';
+  Result := 'InsertAutoToDo';
 end;
 
 function TGxInsertAutoTodoExpert.HasConfigOptions: Boolean;
@@ -314,58 +315,58 @@ begin
   Action.Enabled := FileMatchesExtensions(GxOtaGetCurrentSourceFile, SAllowableFileExtensions);
 end;
 
-{ tfmInsertAutoTodoForm }
+{ TfmInsertAutoTodoForm }
 
-constructor tfmInsertAutoTodoForm.Create(Owner: TComponent);
+constructor TfmInsertAutoTodoForm.Create(Owner: TComponent);
 var
-  sl: TStringList;
+  Placeholders: TStringList;
   i: Integer;
 begin
   inherited;
-  sl := TStringList.Create;
+  Placeholders := TStringList.Create;
   try
-    TAutoTodoHandler.GetPlaceholders(sl);
-    for i := 0 to sl.Count - 1 do
-      TPopupMenu_AppendMenuItem(pm_Placeholders, sl[i], mi_PlaceholderClick);
+    TAutoTodoHandler.GetPlaceholders(Placeholders);
+    for i := 0 to Placeholders.Count - 1 do
+      TPopupMenu_AppendMenuItem(pmuPlaceholders, Placeholders[i], InsertPlaceholderClick);
   finally
-    FreeAndNil(sl);
+    FreeAndNil(Placeholders);
   end;
-  TButton_AddDropdownMenu(b_Placeholder, pm_Placeholders);
-  m_TextToInsert.Lines.Text := TAutoTodoHandler.GetDefaultTextToInsert;
+  TButton_AddDropdownMenu(btnInsertPlaceholder, pmuPlaceholders);
+  mmoTextToInsert.Lines.Text := TAutoTodoHandler.GetDefaultTextToInsert;
 
   TControl_SetMinConstraints(Self);
   Constraints.MaxHeight := Height;
 end;
 
-procedure tfmInsertAutoTodoForm.GetData(var AUsername, ATextToInsert: string;
-  var ADoneDialogEnabled: boolean);
+procedure TfmInsertAutoTodoForm.GetData(var AUsername, ATextToInsert: string;
+  var ADoneDialogEnabled: Boolean);
 begin
-  AUsername := ed_Username.Text;
-  ATextToInsert := m_TextToInsert.Lines.Text;
-  ADoneDialogEnabled := chk_ShowDoneDialog.Checked;
+  AUsername := edtUsername.Text;
+  ATextToInsert := mmoTextToInsert.Lines.Text;
+  ADoneDialogEnabled := chkShowDoneDialog.Checked;
 end;
 
-procedure tfmInsertAutoTodoForm.SetData(const AUsername, ATextToInsert: string;
-  ADoneDialogEnabled: boolean);
+procedure TfmInsertAutoTodoForm.SetData(const AUsername, ATextToInsert: string;
+  ADoneDialogEnabled: Boolean);
 begin
-  ed_Username.Text := AUsername;
-  m_TextToInsert.Lines.Text := ATextToInsert;
-  chk_ShowDoneDialog.Checked := ADoneDialogEnabled;
+  edtUsername.Text := AUsername;
+  mmoTextToInsert.Lines.Text := ATextToInsert;
+  chkShowDoneDialog.Checked := ADoneDialogEnabled;
 end;
 
-procedure tfmInsertAutoTodoForm.b_ResetTextToInsertClick(Sender: TObject);
+procedure TfmInsertAutoTodoForm.btnLoadDetaultClick(Sender: TObject);
 begin
-  m_TextToInsert.Lines.Text := TAutoTodoHandler.GetDefaultTextToInsert;
+  mmoTextToInsert.Lines.Text := TAutoTodoHandler.GetDefaultTextToInsert;
 end;
 
-procedure tfmInsertAutoTodoForm.mi_PlaceholderClick(Sender: TObject);
+procedure TfmInsertAutoTodoForm.InsertPlaceholderClick(Sender: TObject);
 var
-  mi: TMenuItem;
-  s: string;
+  MenuItem: TMenuItem;
+  Str: string;
 begin
-  mi := Sender as TMenuItem;
-  s := StripHotKey(mi.Caption);
-  m_TextToInsert.SelText := '{' + s + '}';
+  MenuItem := Sender as TMenuItem;
+  Str := StripHotKey(MenuItem.Caption);
+  mmoTextToInsert.SelText := '{' + Str + '}';
 end;
 
 initialization

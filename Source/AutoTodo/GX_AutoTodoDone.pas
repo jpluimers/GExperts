@@ -3,23 +3,13 @@ unit GX_AutoTodoDone;
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Variants,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls;
+  SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls;
 
 type
   TfmAutoTodoDone = class(TForm)
-    l_Blurb: TLabel;
-    b_Ok: TButton;
-    chk_DontShowAgain: TCheckBox;
-  private
+    lblMesssage: TLabel;
+    btnOK: TButton;
+    chkDontShowAgain: TCheckBox;
   public
     class function Execute(ATodoCount: Integer): Boolean;
   end;
@@ -32,17 +22,17 @@ implementation
 
 class function TfmAutoTodoDone.Execute(ATodoCount: Integer): Boolean;
 resourcestring
-  str_Done = '%d todos have been inserted.';
+  DoneMessage = '%d comments have been inserted in empty code blocks.';
 var
-  frm: TfmAutoTodoDone;
+  Dialog: TfmAutoTodoDone;
 begin
-  frm := TfmAutoTodoDone.Create(nil);
+  Dialog := TfmAutoTodoDone.Create(nil);
   try
-    frm.l_Blurb.Caption := Format(str_Done, [ATodoCount]);
-    frm.ShowModal;
-    Result := frm.chk_DontShowAgain.Checked;
+    Dialog.lblMesssage.Caption := Format(DoneMessage, [ATodoCount]);
+    Dialog.ShowModal;
+    Result := Dialog.chkDontShowAgain.Checked;
   finally
-    FreeAndNil(frm);
+    FreeAndNil(Dialog);
   end;
 end;
 

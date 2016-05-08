@@ -1,10 +1,11 @@
 object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
   Left = 381
   Top = 212
+  AutoScroll = False
   BorderIcons = [biSystemMenu]
-  Caption = 'Insert Auto TODOs'
-  ClientHeight = 161
-  ClientWidth = 665
+  Caption = 'Comment Empty Code Blocks'
+  ClientHeight = 203
+  ClientWidth = 614
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -13,90 +14,109 @@ object fmInsertAutoTodoForm: TfmInsertAutoTodoForm
   Font.Style = []
   OldCreateOrder = True
   DesignSize = (
-    665
-    161)
+    614
+    203)
   PixelsPerInch = 96
   TextHeight = 14
-  object l_Username: TLabel
+  object lblUsername: TLabel
     Left = 8
     Top = 8
-    Width = 228
+    Width = 54
     Height = 14
-    Caption = 'Username ('#39'*'#39' = use Windows username)'
+    Caption = 'Username'
   end
-  object l_TextToInsert: TLabel
+  object lblTextToInsert: TLabel
     Left = 8
     Top = 56
-    Width = 293
+    Width = 239
     Height = 14
-    Caption = 'Text to insert (include comment markers if required!)'
+    Caption = 'Text to insert (include comment delimiters)'
   end
-  object b_OK: TButton
-    Left = 504
-    Top = 128
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 5
+  object lblStarWindows: TLabel
+    Left = 261
+    Top = 27
+    Width = 230
+    Height = 14
+    Caption = '(Enter '#39'*'#39' to use the Windows username)'
   end
-  object b_Cancel: TButton
-    Left = 584
-    Top = 128
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 6
-  end
-  object ed_Username: TEdit
+  object edtUsername: TEdit
     Left = 8
     Top = 24
     Width = 249
     Height = 22
     TabOrder = 0
   end
-  object b_ResetTextToInsert: TButton
-    Left = 496
-    Top = 48
-    Width = 75
-    Height = 25
-    Anchors = [akTop, akRight]
-    Caption = 'Reset'
-    TabOrder = 1
-    OnClick = b_ResetTextToInsertClick
-  end
-  object b_Placeholder: TButton
-    Left = 576
-    Top = 48
-    Width = 81
-    Height = 25
-    Anchors = [akTop, akRight]
-    Caption = 'Placeholders'
-    TabOrder = 2
-  end
-  object m_TextToInsert: TMemo
+  object btnLoadDetault: TButton
     Left = 8
-    Top = 72
-    Width = 649
-    Height = 41
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Top = 136
+    Width = 95
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'Load Default'
+    TabOrder = 2
+    OnClick = btnLoadDetaultClick
+  end
+  object btnInsertPlaceholder: TButton
+    Left = 114
+    Top = 135
+    Width = 115
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = 'Insert Placeholder'
     TabOrder = 3
   end
-  object chk_ShowDoneDialog: TCheckBox
+  object mmoTextToInsert: TMemo
     Left = 8
-    Top = 128
-    Width = 249
-    Height = 17
-    Caption = 'Show done dialog'
-    TabOrder = 4
+    Top = 72
+    Width = 596
+    Height = 61
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabOrder = 1
   end
-  object pm_Placeholders: TPopupMenu
-    Left = 448
-    Top = 8
+  object pnlFooter: TPanel
+    Left = 0
+    Top = 170
+    Width = 614
+    Height = 33
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 4
+    DesignSize = (
+      614
+      33)
+    object chkShowDoneDialog: TCheckBox
+      Left = 8
+      Top = 5
+      Width = 249
+      Height = 17
+      Caption = 'Show done dialog'
+      TabOrder = 0
+    end
+    object btnOK: TButton
+      Left = 425
+      Top = 0
+      Width = 83
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'OK'
+      Default = True
+      ModalResult = 1
+      TabOrder = 1
+    end
+    object btnCancel: TButton
+      Left = 521
+      Top = 0
+      Width = 83
+      Height = 25
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 2
+    end
+  end
+  object pmuPlaceholders: TPopupMenu
+    Left = 568
+    Top = 16
   end
 end
