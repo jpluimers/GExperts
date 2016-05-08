@@ -63,7 +63,9 @@ implementation
 
 uses
   Menus,
+  {$IFDEF GX_VER180_up}
   Themes,
+  {$ENDIF GX_VER180_up}
   GX_GenericUtils,
   GX_BaseExpert,
   GX_dzVclUtils;
@@ -204,14 +206,13 @@ end;
 
 procedure TfrConfigureExperts.btnClearAllClick(Sender: TObject);
 resourcestring
-  SWarning = 'This will clear the keyboard shortcuts of all experts.'#13#10
+  SWarning = 'This will clear the keyboard shortcuts for all experts.'#13#10
     + 'Are you sure you want to do that?';
 var
   i: Integer;
   AControl: TControl;
 begin
-  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) then
-    Exit; //==>
+  if MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) = mrYes then
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
     if AControl is TPanel then
@@ -228,8 +229,7 @@ var
   AControl: TControl;
   AnExpert: TGX_BaseExpert;
 begin
-  if not mrYes = MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) then
-    Exit; //==>
+  if (MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) = mrYes) then
   for i := 0 to sbxExperts.ComponentCount - 1 do begin
     AControl := sbxExperts.Components[i] as TControl;
     if AControl is TPanel then begin

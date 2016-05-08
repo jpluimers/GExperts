@@ -15,9 +15,9 @@ object frConfigureExperts: TfrConfigureExperts
     BevelOuter = bvNone
     TabOrder = 0
     object lblFilter: TLabel
-      Left = 11
-      Top = 12
-      Width = 24
+      Left = 13
+      Top = 14
+      Width = 22
       Height = 13
       Alignment = taRightJustify
       Caption = '&Filter'
@@ -25,33 +25,33 @@ object frConfigureExperts: TfrConfigureExperts
     end
     object edtFilter: TEdit
       Left = 42
-      Top = 8
-      Width = 199
+      Top = 10
+      Width = 143
       Height = 21
       TabOrder = 0
       OnChange = edtFilterChange
     end
     object btnEnableAll: TButton
-      Left = 432
-      Top = 6
-      Width = 75
+      Left = 406
+      Top = 7
+      Width = 86
       Height = 25
       Caption = 'Enable All'
       TabOrder = 4
       OnClick = btnEnableAllClick
     end
     object btnDisableAll: TButton
-      Left = 512
-      Top = 6
-      Width = 75
+      Left = 499
+      Top = 7
+      Width = 86
       Height = 25
       Caption = 'Disable All'
       TabOrder = 5
       OnClick = btnDisableAllClick
     end
     object btnClear: TButton
-      Left = 236
-      Top = 8
+      Left = 185
+      Top = 9
       Width = 21
       Height = 21
       Caption = 'X'
@@ -65,20 +65,20 @@ object frConfigureExperts: TfrConfigureExperts
       OnClick = btnClearClick
     end
     object btnClearAll: TButton
-      Left = 264
-      Top = 6
-      Width = 75
+      Left = 222
+      Top = 7
+      Width = 86
       Height = 25
       Caption = 'Clear All'
       TabOrder = 2
       OnClick = btnClearAllClick
     end
     object btnSetAllDefault: TButton
-      Left = 344
-      Top = 6
-      Width = 81
+      Left = 314
+      Top = 7
+      Width = 86
       Height = 25
-      Caption = 'Set to default'
+      Caption = 'Load Defaults'
       TabOrder = 3
       OnClick = btnSetAllDefaultClick
     end
@@ -94,6 +94,9 @@ object frConfigureExperts: TfrConfigureExperts
     Align = alClient
     AutoScroll = False
     TabOrder = 1
+    DesignSize = (
+      578
+      178)
     object pnlExpertLayout: TPanel
       Left = 0
       Top = 0
@@ -101,6 +104,9 @@ object frConfigureExperts: TfrConfigureExperts
       Height = 40
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
+      DesignSize = (
+        572
+        40)
       object imgExpert: TImage
         Left = 4
         Top = 4
@@ -125,6 +131,8 @@ object frConfigureExperts: TfrConfigureExperts
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         HotKey = 32833
+        InvalidKeys = [hcNone, hcShift]
+        Modifiers = [hkAlt]
         TabOrder = 1
       end
       object btnExpert: TButton
