@@ -178,7 +178,7 @@ end;
 
 function TGxBookmarksExpert.GetActionCaption: string;
 resourcestring
-  SMenuCaption = 'Bookmarks';
+  SMenuCaption = 'Editor Bookmarks';
 begin
   Result := SMenuCaption;
 end;
