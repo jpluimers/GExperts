@@ -417,7 +417,8 @@ begin
   {$IFOPT D+} SendDebug('Arranging menu items'); {$ENDIF}
   NormalizeMenuItems;
   GetMenuItems(MenuItems);
-  SortMenuItems(MenuItems);
+  if Assigned(MenuItems) then
+    SortMenuItems(MenuItems);
   ScreenRect := GetScreenWorkArea(GetIdeMainForm);
   ScreenHeight := ScreenRect.Bottom - ScreenRect.Top - 75;
   if RunningDelphi7OrGreater then
