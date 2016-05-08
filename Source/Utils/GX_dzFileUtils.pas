@@ -11,8 +11,14 @@ unit GX_dzFileUtils;
 interface
 
 uses
+  Windows,
   SysUtils,
   Classes;
+
+type
+  TFileSystem = class
+    class function ExpandFileNameRelBaseDir(const _FileName, _BaseDir: string): string;
+  end;
 
 type
   TFileAttributes = (
@@ -289,4 +295,41 @@ begin
   FActive := False;
 end;
 
+{ TFileSystem }
+
+const
+  shlwapi32 = 'shlwapi.dll';
+
+function PathIsRelative(pszPath: PChar): BOOL; stdcall; external shlwapi32
+{$IFDEF GX_VER200_up}
+name 'PathIsRelativeW';
+{$ELSE}
+name 'PathIsRelativeA';
+{$ENDIF}
+
+function PathCanonicalize(pszBuf: PChar; pszPath: PChar): BOOL; stdcall; external shlwapi32
+{$IFDEF GX_VER200_up}
+name 'PathCanonicalizeW';
+{$ELSE}
+name 'PathCanonicalizeA';
+{$ENDIF}
+
+// taken from
+// http://stackoverflow.com/a/5330691/49925
+
+class function TFileSystem.ExpandFileNameRelBaseDir(const _FileName, _BaseDir: string): string;
+var
+  Buffer: array[0..MAX_PATH - 1] of Char;
+begin
+  if PathIsRelative(PChar(_FileName)) then begin
+    Result := IncludeTrailingPathDelimiter(_BaseDir) + _FileName;
+  end else begin
+    Result := _FileName;
+  end;
+  if PathCanonicalize(@Buffer[0], PChar(Result)) then begin
+    Result := Buffer;
+  end;
+end;
+
 end.
+
