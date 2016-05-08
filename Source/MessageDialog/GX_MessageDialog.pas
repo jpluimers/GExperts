@@ -871,7 +871,9 @@ end;
 
 function TMsgExpExpert.GetDefaultShortCut: TShortCut;
 begin
-  Result := Menus.ShortCut(Ord('D'), [ssCtrl, ssShift]);
+  Result := 0;
+  // this shortcut conflicts with a Declare Field standard shortcut in the IDE
+  //  Result := Menus.ShortCut(Ord('D'), [ssCtrl, ssShift]);
 end;
 
 class function TMsgExpExpert.GetName: string;
