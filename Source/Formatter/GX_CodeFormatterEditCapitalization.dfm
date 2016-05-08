@@ -29,14 +29,14 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     Width = 452
     Height = 41
     Align = alBottom
-    TabOrder = 0
+    TabOrder = 1
     object b_Help: TButton
       Left = 8
       Top = 8
       Width = 75
       Height = 25
       Caption = '&Help'
-      TabOrder = 2
+      TabOrder = 0
       OnClick = b_HelpClick
     end
     object b_Ok: TButton
@@ -47,7 +47,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Caption = 'OK'
       Default = True
       ModalResult = 1
-      TabOrder = 0
+      TabOrder = 3
     end
     object b_Cancel: TButton
       Left = 369
@@ -57,7 +57,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
-      TabOrder = 1
+      TabOrder = 4
     end
     object b_Import: TButton
       Left = 104
@@ -65,7 +65,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Width = 75
       Height = 25
       Caption = 'Import ...'
-      TabOrder = 3
+      TabOrder = 1
       OnClick = b_ImportClick
     end
     object b_Export: TButton
@@ -74,7 +74,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Width = 75
       Height = 25
       Caption = 'Export ...'
-      TabOrder = 4
+      TabOrder = 2
       OnClick = b_ExportClick
     end
   end
@@ -85,7 +85,10 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     Height = 308
     Align = alClient
     BevelOuter = bvNone
-    TabOrder = 1
+    TabOrder = 0
+    DesignSize = (
+      452
+      308)
     object l_Select: TLabel
       Left = 8
       Top = 8
@@ -96,9 +99,9 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     object l_ChangeInto: TLabel
       Left = 240
       Top = 48
-      Width = 60
+      Width = 65
       Height = 13
-      Caption = 'Change into:'
+      Caption = 'Replace with:'
     end
     object lb_Items: TListBox
       Left = 8
@@ -108,7 +111,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Anchors = [akLeft, akTop, akBottom]
       ItemHeight = 13
       MultiSelect = True
-      TabOrder = 0
+      TabOrder = 1
       OnClick = lb_ItemsClick
     end
     object ed_Search: TEdit
@@ -116,7 +119,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Top = 24
       Width = 217
       Height = 21
-      TabOrder = 1
+      TabOrder = 0
       OnChange = ed_SearchChange
       OnKeyDown = ed_SearchKeyDown
     end
@@ -130,7 +133,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     end
     object b_UpperCase: TButton
       Left = 252
-      Top = 88
+      Top = 91
       Width = 89
       Height = 25
       Caption = 'UpperCase'
@@ -139,7 +142,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     end
     object b_LowerCase: TButton
       Left = 347
-      Top = 88
+      Top = 91
       Width = 89
       Height = 25
       Caption = 'LowerCase'
@@ -148,7 +151,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     end
     object b_FirstCharUp: TButton
       Left = 252
-      Top = 120
+      Top = 122
       Width = 89
       Height = 25
       Caption = 'First Char Up'
@@ -157,7 +160,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
     end
     object b_FirstCharLow: TButton
       Left = 347
-      Top = 119
+      Top = 122
       Width = 89
       Height = 25
       Caption = 'First Char Low'
@@ -187,7 +190,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Top = 232
       Width = 89
       Height = 25
-      Caption = 'Toggle comment'
+      Caption = 'Toggle Comment'
       TabOrder = 9
       OnClick = b_ToggleCommentClick
     end
