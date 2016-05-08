@@ -4,7 +4,7 @@ object fmEditorShortcut: TfmEditorShortcut
   BorderStyle = bsDialog
   Caption = 'Define Shortcut'
   ClientHeight = 129
-  ClientWidth = 266
+  ClientWidth = 306
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -14,15 +14,22 @@ object fmEditorShortcut: TfmEditorShortcut
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
+  DesignSize = (
+    306
+    129)
   PixelsPerInch = 96
   TextHeight = 14
   object gbxShortcut: TGroupBox
     Left = 8
     Top = 8
-    Width = 249
+    Width = 289
     Height = 81
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Editor Expert Name'
     TabOrder = 0
+    DesignSize = (
+      289
+      81)
     object lblShortCut: TLabel
       Left = 9
       Top = 24
@@ -34,38 +41,42 @@ object fmEditorShortcut: TfmEditorShortcut
     object hkyShortCut: THotKey
       Left = 9
       Top = 47
-      Width = 232
+      Width = 156
       Height = 22
+      Anchors = [akLeft, akTop, akRight]
       HotKey = 32833
       InvalidKeys = [hcNone, hcShift]
       Modifiers = [hkAlt]
       TabOrder = 0
     end
     object btnDefault: TButton
-      Left = 72
-      Top = 21
-      Width = 171
+      Left = 174
+      Top = 45
+      Width = 101
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'Default'
       TabOrder = 1
       OnClick = btnDefaultClick
     end
   end
   object btnCancel: TButton
-    Left = 184
+    Left = 224
     Top = 96
     Width = 73
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object btnOK: TButton
-    Left = 104
+    Left = 144
     Top = 96
     Width = 73
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1

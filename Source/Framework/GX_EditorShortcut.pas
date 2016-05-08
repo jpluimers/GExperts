@@ -25,26 +25,26 @@ implementation
 {$R *.dfm}
 
 uses
-  Menus, GX_dzVclUtils;
+  SysUtils, Menus, GX_dzVclUtils;
 
 { TfmEditorShortcut }
 
 class function TfmEditorShortcut.Execute(Owner: TWinControl; const Expert: string;
   var ShortCut: TShortCut; const Default: TShortCut): Boolean;
 var
-  fm: TfmEditorShortcut;
+  Dlg: TfmEditorShortcut;
 begin
-  fm := TfmEditorShortcut.Create(Owner);
+  Dlg := TfmEditorShortcut.Create(Owner);
   try
-    fm.FDefault := Default;
-    fm.gbxShortCut.Caption := Expert;
-    THotkey_SetHotkey(fm.hkyShortCut, ShortCut);
-    fm.btnDefault.Caption := ShortCutToText(Default);
-    Result := (fm.ShowModal = mrOk);
+    Dlg.FDefault := Default;
+    Dlg.gbxShortCut.Caption := Expert;
+    THotkey_SetHotkey(Dlg.hkyShortCut, ShortCut);
+    Dlg.btnDefault.Caption := ShortCutToText(Default);
+    Result := (Dlg.ShowModal = mrOk);
     if Result then
-      ShortCut := THotkey_GetHotkey(fm.hkyShortCut);
+      ShortCut := THotkey_GetHotkey(Dlg.hkyShortCut);
   finally
-    fm.Free;
+    FreeAndNil(Dlg);
   end;
 end;
 
