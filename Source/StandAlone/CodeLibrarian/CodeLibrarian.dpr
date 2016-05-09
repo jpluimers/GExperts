@@ -1,6 +1,6 @@
 program CodeLibrarian;
 
-{$R *.res}
+{$R *_icon.res}
 
 uses
   GX_VerDepConst in '..\..\Framework\GX_VerDepConst.pas';
