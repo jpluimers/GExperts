@@ -1,5 +1,7 @@
 unit GX_ConfigureExperts;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
