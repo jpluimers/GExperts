@@ -4,7 +4,6 @@
     <MainSource>GExpertsDebugWindow.dpr</MainSource>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <DCC_EnabledPackages>true</DCC_EnabledPackages>
     <DCC_UsePackage>vcl;vclx</DCC_UsePackage>
     <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
     <DCC_DependencyCheckOutputName>..\..\..\binaries\GExpertsDebugWindow.exe</DCC_DependencyCheckOutputName>
