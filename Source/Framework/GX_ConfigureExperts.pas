@@ -65,9 +65,7 @@ implementation
 
 uses
   Menus,
-  {$IFDEF GX_VER180_up}
   Themes,
-  {$ENDIF GX_VER180_up}
   GX_GenericUtils,
   GX_BaseExpert,
   GX_dzVclUtils;
