@@ -6,7 +6,7 @@ uses
   DebugOptions in 'DebugOptions.pas' {fmDebugOptions},
   DebugWindow in 'DebugWindow.pas' {fmDebug};
 
-{$R *.res}
+{$R *_icon.res}
 
 var
   PrvHWND: HWND;
