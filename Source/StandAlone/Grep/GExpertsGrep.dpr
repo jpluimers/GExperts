@@ -1,6 +1,6 @@
 program GExpertsGrep;
 
-{$R *.res}
+{$R *_icon.res}
 
 uses
   Windows,

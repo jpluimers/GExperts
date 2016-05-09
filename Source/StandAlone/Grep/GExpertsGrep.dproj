@@ -1,4 +1,5 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{0bbdde7e-378f-4816-b0dc-2ff18052d95a}</ProjectGuid>
     <MainSource>GExpertsGrep.dpr</MainSource>
