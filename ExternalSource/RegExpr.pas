@@ -52,6 +52,7 @@ interface
 {$IFDEF VER140} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D6
 {$IFDEF VER150} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D7
 {$IF CompilerVersion > 15} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$IFEND} // D7
+{$IFDEF VER310} {$DEFINE D101} {$ENDIF}
 
 // ======== Define base compiler options
 {$BOOLEVAL OFF}
@@ -1302,7 +1303,9 @@ var AModifiersInt : integer) : boolean;
  begin
   Result := true;
   IsOn := true;
-  Mask := 0; // prevent compiler warning
+{$IFNDEF D101}
+  Mask := 0; // prevent compiler warning (But Delphi 10.1 complains that this value is never used)
+{$ENDIF}
   for i := 1 to length (AModifiers) do
    if AModifiers [i] = '-'
     then IsOn := false

@@ -1296,7 +1296,9 @@ var AModifiersInt : integer) : boolean;
  begin
   Result := true;
   IsOn := true;
-  Mask := 0; // prevent compiler warning
+{$IFNDEF SYN_COMPILER_24_UP}
+  Mask := 0; // prevent compiler warning (But Delphi 10.1 complains that this value is never used)
+{$ENDIF}
   for i := 1 to length (AModifiers) do
    if AModifiers [i] = '-'
     then IsOn := false
