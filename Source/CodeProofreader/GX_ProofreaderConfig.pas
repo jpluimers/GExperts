@@ -15,8 +15,6 @@ const
 
 type
   TfmProofreaderConfig = class(TfmBaseForm)
-    dlgGetWordlist: TOpenDialog;
-    dlgPutWordlist: TSaveDialog;
     Actions: TActionList;
     actListDelete: TAction;
     actListInsert: TAction;
@@ -541,15 +539,16 @@ resourcestring
 var
   Words: TStringList;
   i: Integer;
+  fn: string;
 begin
-  if not GetOpenSaveDialogExecute(dlgGetWordlist) then
+  if not ShowOpenDialog('Select a word list file (one word per line)', 'txt', fn, 'Text Files (*.txt)|*.txt') then
     Exit;
 
-  if FileExists(dlgGetWordlist.FileName) then
+  if FileExists(fn) then
   begin
     Words := TStringList.Create;
     try
-      Words.LoadFromFile(dlgGetWordlist.FileName);
+      Words.LoadFromFile(fn);
       if Words.Count > 1000 then
         if not (MessageDlg(LargeListMsg, mtWarning, [mbYes, mbNo], 0) = mrYes) then
           Exit;
@@ -572,11 +571,12 @@ procedure TfmProofreaderConfig.actExportWordsExecute(Sender: TObject);
 var
   AFile: TextFile;
   i: Integer;
+  fn: string;
 begin
-  if not GetOpenSaveDialogExecute(dlgPutWordlist) then
+  if not ShowSaveDialog('Select a file to write the word list to', 'txt', fn, 'Text Files (*.txt)|*.txt') then
     Exit;
 
-  AssignFile(AFile, dlgPutWordlist.FileName);
+  AssignFile(AFile, fn);
   Rewrite(AFile);
   try
     for i := 0 to FProofreaderData.GetDictionaryCount(GetReplacementSource) - 1 do

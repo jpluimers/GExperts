@@ -16,7 +16,6 @@ type
     pcConfig: TPageControl;
     tshExperts: TTabSheet;
     tshGeneral: TTabSheet;
-    dlgHelpFile: TOpenDialog;
     tshIDE: TTabSheet;
     tshEditorExperts: TTabSheet;
     tshEditor: TTabSheet;
@@ -311,14 +310,12 @@ begin
 end;
 
 procedure TfmConfiguration.sbHelpFileClick(Sender: TObject);
+var
+  fn: string;
 begin
-  dlgHelpFile.DefaultExt := '.chm';
-  dlgHelpFile.Filter := 'Help Files (*.chm)|*.chm';
-  dlgHelpFile.Title := 'Select Help File';
-  dlgHelpFile.InitialDir := ExtractFilePath(edHelpFile.Text);
-
-  if GetOpenSaveDialogExecute(dlgHelpFile) then
-    edHelpFile.Text := dlgHelpFile.FileName;
+  fn := edHelpFile.Text;
+  if ShowOpenDialog('Select Help File', 'chm', fn, 'Help Files (*.chm)|*.chm') then
+    edHelpFile.Text := fn;
 end;
 
 procedure TfmConfiguration.SaveAllSettings;

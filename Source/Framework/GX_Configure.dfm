@@ -786,14 +786,6 @@ object fmConfiguration: TfmConfiguration
       OnClick = btnExportClick
     end
   end
-  object dlgHelpFile: TOpenDialog
-    DefaultExt = '.chm'
-    Filter = 'Help Files (*.chm)|*.chm'
-    Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
-    Title = 'Select Help File'
-    Left = 390
-    Top = 332
-  end
   object dlgUIFont: TFontDialog
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText

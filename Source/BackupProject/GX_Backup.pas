@@ -20,7 +20,6 @@ type
     pnlButtons: TPanel;
     pnlFiles: TPanel;
     gbxFiles: TGroupBox;
-    dlgSave: TSaveDialog;
     dlgOpen: TOpenDialog;
     pnlButtonsRight: TPanel;
     btnBackup: TButton;
@@ -44,6 +43,7 @@ type
   private
     FDoAbortCollectingFiles: Boolean;
     FHaveCollectedFiles: Boolean;
+    FLastZipFile: string;
     FZipEncrypted: Boolean;
     FZipPassword: string;
     FProgressForm: TfmProgress;
@@ -675,10 +675,9 @@ var
 begin
   if FBackupExpert.BackupType = btFile then
   begin
-    if not GetOpenSaveDialogExecute(dlgSave) then
+    CurrentZipFileName := FLastZipFile;
+    if not ShowSaveDialog('Backup As', 'zip', CurrentZipFileName) then
       Exit;
-
-    CurrentZipFileName := dlgSave.FileName;
 
     if ExtractFileExt(CurrentZipFileName) = '' then
       CurrentZipFileName := CurrentZipFileName + ZipExtension;
@@ -729,6 +728,7 @@ begin
   end;
 
   PerformBackup(ZipFilePath, CurrentZipFileName);
+  FLastZipFile := CurrentZipFileName;
 
   SaveSettings;
   ModalResult := mrOk;
@@ -998,7 +998,7 @@ begin
   Settings := TGExpertsSettings.Create;
   try
     Settings.SaveForm(Self, ConfigurationKey + '\Window');
-    Settings.WriteString(ConfigurationKey, 'LastZipDir', ExtractFilePath(dlgSave.FileName));
+    Settings.WriteString(ConfigurationKey, 'LastZipDir', ExtractFilePath(FLastZipFile));
   finally
     FreeAndNil(Settings);
   end;
@@ -1012,7 +1012,8 @@ begin
   Settings := TGExpertsSettings.Create;
   try
     Settings.LoadForm(Self, ConfigurationKey + '\Window');
-    dlgSave.InitialDir := Settings.ReadString(ConfigurationKey, 'LastZipDir', '');
+    FLastZipFile := Settings.ReadString(ConfigurationKey, 'LastZipDir', '');
+    FLastZipFile := IncludeTrailingPathDelimiter(FLastZipFile) + 'ProjectBackup.zip';
   finally
     FreeAndNil(Settings);
   end;

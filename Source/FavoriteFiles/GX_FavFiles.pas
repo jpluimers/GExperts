@@ -1134,20 +1134,11 @@ end;
 
 procedure TfmFavFiles.actOptionsCollectionOpenExecute(Sender: TObject);
 var
-  Dlg: TOpenDialog;
+  fn: string;
 begin
-  Dlg := TOpenDialog.Create(nil);
-  try
-    Dlg.FileName := FEntryFile;
-    Dlg.DefaultExt := 'xml';
-    Dlg.Filter := MakeDialogExtensionString('xml');
-    Dlg.Options := Dlg.Options + [ofPathMustExist, ofFileMustExist];
-    Dlg.Title := 'Load Collection';
-    if Dlg.Execute then
-      SwitchEntryFile(ExpandFileName(Dlg.FileName));
-  finally
-    FreeAndNil(Dlg);
-  end;
+  fn := FEntryFile;
+  if ShowOpenDialog('Load Collection', 'xml', fn) then
+    SwitchEntryFile(ExpandFileName(fn));
 end;
 
 procedure TfmFavFiles.mitOptionsCollectionOpenMRUExecute(Sender: TObject);
@@ -1158,24 +1149,16 @@ end;
 
 procedure TfmFavFiles.actOptionsCollectionSaveAsExecute(Sender: TObject);
 var
-  Dlg: TSaveDialog;
+  fn: string;
 begin
-  Dlg := TSaveDialog.Create(nil);
-  try
-    Dlg.FileName := FEntryFile;
-    Dlg.DefaultExt := 'xml';
-    Dlg.Filter := MakeDialogExtensionString('xml');
-    Dlg.Title := 'Save Collection';
-    if Dlg.Execute then
-    begin
-      EntryFile := ExpandFileName(Dlg.FileName);
-      SaveSettings;
-      FModified := True;
-      SaveEntries;
-      AddMRUString(EntryFile, MRUEntryFiles, False);
-    end;
-  finally
-    FreeAndNil(Dlg);
+  fn := FEntryFile;
+  if ShowSaveDialog('Save Collection', 'xml', fn) then
+  begin
+    EntryFile := ExpandFileName(fn);
+    SaveSettings;
+    FModified := True;
+    SaveEntries;
+    AddMRUString(EntryFile, MRUEntryFiles, False);
   end;
 end;
 

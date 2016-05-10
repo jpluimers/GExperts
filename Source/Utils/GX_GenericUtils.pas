@@ -593,6 +593,24 @@ function GetDirectory(var Dir: string; Owner: TCustomForm = nil): Boolean;
 // Also saves and restores the current directory.
 function GetOpenSaveDialogExecute(Dialog: TOpenDialog): Boolean;
 
+///<summary>
+/// Shows a TOpenDialog with the given title.
+/// @param Extension is the file extension without a leading dot.
+/// @param Filter is a file filter of the form '<description>|<mask>', if emtpy
+/// a file filter will be created for the given extension with the name "<extension> files".
+/// If the user clicks OK, the function returns true and the filename will contain the selected file. </summary>
+function ShowOpenDialog(const Title: string; const Extension: string; var Filename: string;
+  const Filter: string = ''): boolean;
+
+///<summary>
+/// Shows a TSaveDialog with the given title.
+/// @param Extension is the file extension without a leading dot.
+/// @param Filter is a file filter of the form '<description>|<mask>', if emtpy
+/// a file filter will be created for the given extension with the name "<extension> files".
+/// If the user clicks OK, the function returns true and the filename will contain the selected file. </summary>
+function ShowSaveDialog(const Title: string; const Extension: string; var Filename: string;
+  const Filter: string = ''): boolean;
+
 function MakeDialogExtensionString(const Ext: string): string;
 
 // Returns True if FileWildcard matches FileName, False otherwise.
@@ -3564,6 +3582,60 @@ begin
     Result := dzSelectDirectory(SSelDir, BrowseRoot, Dir, Owner);
   finally
     SetErrorMode(OldErrorMode);
+  end;
+end;
+
+function ShowOpenDialog(const Title: string; const Extension: string; var Filename: string;
+  const Filter: string = ''): boolean;
+var
+  Dlg: TOpenDialog;
+  dir: string;
+begin
+  Dlg := TOpenDialog.Create(nil);
+  try
+    Dlg.FileName := Filename;
+    Dlg.DefaultExt := Extension;
+    if Filter = '' then
+      Dlg.Filter := MakeDialogExtensionString(Extension)
+    else
+      Dlg.Filter := Format('%s|All Files (%s)|%s', [Filter, AllFilesWildCard, AllFilesWildCard]);
+    Dlg.Options := Dlg.Options + [ofPathMustExist, ofFileMustExist];
+    Dlg.Title := Title;
+    dir := ExtractFilePath(Filename);
+    if dir <> '' then
+      Dlg.InitialDir := dir;
+    Result := GetOpenSaveDialogExecute(Dlg);
+    if Result then
+      Filename := Dlg.FileName;
+  finally
+    FreeAndNil(Dlg);
+  end;
+end;
+
+function ShowSaveDialog(const Title: string; const Extension: string; var Filename: string;
+  const Filter: string = ''): boolean;
+var
+  Dlg: TSaveDialog;
+  dir: string;
+begin
+  Dlg := TSaveDialog.Create(nil);
+  try
+    Dlg.FileName := Filename;
+    Dlg.DefaultExt := Extension;
+    if Filter = '' then
+      Dlg.Filter := MakeDialogExtensionString(Extension)
+    else
+      Dlg.Filter := Format('%s|All Files (%s)|%s', [Filter, AllFilesWildCard, AllFilesWildCard]);
+    Dlg.Options := Dlg.Options + [ofPathMustExist];
+    Dlg.Title := Title;
+    dir := ExtractFilePath(Filename);
+    if dir <> '' then
+      Dlg.InitialDir := dir;
+    Result := GetOpenSaveDialogExecute(Dlg);
+    if Result then
+      Filename := Dlg.FileName;
+  finally
+    FreeAndNil(Dlg);
   end;
 end;
 

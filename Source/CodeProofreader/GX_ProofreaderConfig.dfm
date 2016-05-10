@@ -488,21 +488,6 @@ object fmProofreaderConfig: TfmProofreaderConfig
       TabOrder = 1
     end
   end
-  object dlgGetWordlist: TOpenDialog
-    DefaultExt = 'txt'
-    Filter = 'Text Files (*.txt)|*.txt|All Files (*.*)|*.*'
-    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Title = 'Select a word list file (one word per line)'
-    Left = 48
-    Top = 144
-  end
-  object dlgPutWordlist: TSaveDialog
-    DefaultExt = 'txt'
-    Filter = 'Text Files (*.txt)|*.txt|All Files (*.*)|*.*'
-    Title = 'Select a file write the word list to'
-    Left = 120
-    Top = 144
-  end
   object Actions: TActionList
     Images = dmSharedImages.Images
     OnUpdate = ActionsUpdate

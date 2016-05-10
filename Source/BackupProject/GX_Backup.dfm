@@ -165,13 +165,6 @@ object fmBackup: TfmBackup
       end
     end
   end
-  object dlgSave: TSaveDialog
-    DefaultExt = 'zip'
-    Filter = 'Zip Files (*.zip)|*.zip|All Files (*.*)|*.*'
-    Title = 'Backup As'
-    Left = 96
-    Top = 48
-  end
   object dlgOpen: TOpenDialog
     Filter = 
       'Delphi Files (*.pas;*.dfm;*.xfm;*.dpr;*.dpk;*.bpg;*.res)|*.pas;*' +

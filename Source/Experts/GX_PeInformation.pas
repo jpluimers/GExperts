@@ -11,7 +11,6 @@ uses
 
 type
   TfmPeInformation = class(TfmIdeDockForm)
-    dlgOpen: TOpenDialog;
     pcMain: TPageControl;
     tshMSDOS: TTabSheet;
     tshImport: TTabSheet;
@@ -90,7 +89,7 @@ type
     FFileName: string;
     FBlockEvents: Boolean;
     FileDrop: TDropFileTarget;
-    procedure LoadPEInfo(const FileName: string);
+    procedure LoadPEInfo(const AFileName: string);
     procedure SaveSettings;
     procedure LoadSettings;
     procedure DropFiles(Sender: TObject; ShiftState: TShiftState; Point: TPoint; var Effect: Longint);
@@ -163,23 +162,23 @@ begin
   end;
 end;
 
-procedure TfmPeInformation.LoadPEInfo(const FileName: string);
+procedure TfmPeInformation.LoadPEInfo(const AFileName: string);
 resourcestring
   SFormCaption = 'PE Information - ';
   SPENoDirectories = 'PE information is not available for directories';
 begin
-  if DirectoryExists(FileName) then
+  if DirectoryExists(AFileName) then
     raise Exception.Create(SPENoDirectories);
   Screen.Cursor := crHourglass;
   FBlockEvents := True;
   try
-    Self.FFileName := FileName;
-    Caption := SFormCaption + ExtractFileName(FileName);
+    Self.FFileName := AFileName;
+    Caption := SFormCaption + ExtractFileName(AFileName);
     pcMain.ActivePage := tshMSDOS;
 
     FreeAndNil(PEInfo);
 
-    PEInfo := TPEFileInfo.Create(FileName, NumberType);
+    PEInfo := TPEFileInfo.Create(AFileName, NumberType);
     lvImportFunctions.Items.Clear;
     SetListViewItems(lvMSDOS, PEInfo.MSDOSHeader);
     SetListViewItems(lvPEHeader, PEInfo.PEHeaderList);
@@ -257,7 +256,7 @@ begin
   try
     SaveForm(Self, ConfigurationKey + '\Window');
     WriteInteger(ConfigurationKey, 'Numbers', Integer(NumberType));
-    WriteString(ConfigurationKey, 'BinPath', ExtractFilePath(dlgOpen.FileName));
+    WriteString(ConfigurationKey, 'BinPath', ExtractFilePath(FFileName));
   finally
     Free;
   end;
@@ -270,7 +269,8 @@ begin
   try
     LoadForm(Self, ConfigurationKey + '\Window');
     NumberType := TNumberType(ReadInteger(ConfigurationKey, 'Numbers', Ord(ntHex)));
-    dlgOpen.InitialDir := ReadString(ConfigurationKey, 'BinPath', '');
+    FFileName := ReadString(ConfigurationKey, 'BinPath', '');
+    FFileName :=  IncludeTrailingPathDelimiter(FFileName) + 'SomeExecutable.exe';
   finally
     Free;
   end;
@@ -417,9 +417,17 @@ begin
 end;
 
 procedure TfmPeInformation.actFileOpenExecute(Sender: TObject);
+var
+  fn: string;
 begin
-  if GetOpenSaveDialogExecute(dlgOpen) then
-    LoadPEInfo(dlgOpen.FileName);
+  fn := FFileName;
+  if ShowOpenDialog('Open file to examine', 'exe', fn,
+    'PE Binary Files (*.exe, *.dll, *.bpl, *.dpl, *.ocx)|*.exe;*.dll;*.bpl;*.dpl;*.ocx|'
+    + 'EXE Files (*.exe)|*.EXE|'
+    + 'DLL Files (*.dll)|*.dll|'
+    + 'CodeGear Packages (*.bpl, *.dpl)|*.dpl;*.bpl|'
+    + 'OCX Controls (*.ocx)|*.ocx') then
+    LoadPEInfo(fn);
 end;
 
 procedure TfmPeInformation.actFilePrinterSetupExecute(Sender: TObject);
@@ -538,7 +546,7 @@ begin
         end;
       end;
 
-      RichEdit.Print(SPeInfoFor + ExtractFileName(dlgOpen.FileName));
+      RichEdit.Print(SPeInfoFor + ExtractFileName(FFileName));
     finally
       Screen.Cursor := crDefault;
       FreeAndNil(RichEdit);

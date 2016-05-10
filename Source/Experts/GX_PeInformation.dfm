@@ -237,16 +237,6 @@ inherited fmPeInformation: TfmPeInformation
       Action = actHelpHelp
     end
   end
-  object dlgOpen: TOpenDialog
-    DefaultExt = 'EXE'
-    Filter = 
-      'PE Binary Files (*.exe, *.dll, *.bpl, *.dpl, *.ocx)|*.exe;*.dll;' +
-      '*.bpl;*.dpl;*.ocx|EXE Files (*.exe)|*.EXE|DLL Files (*.dll)|*.dl' +
-      'l|CodeGear Packages (*.bpl, *.dpl)|*.dpl;*.bpl|OCX Controls (*.o' +
-      'cx)|*.ocx|All Files (*.*)|*.*'
-    Left = 128
-    Top = 76
-  end
   object MainMenu: TMainMenu
     Images = dmSharedImages.Images
     Left = 32
