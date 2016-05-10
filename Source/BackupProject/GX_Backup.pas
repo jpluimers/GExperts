@@ -672,18 +672,11 @@ var
   CurrentZipFileName: string;
   ZipFilePath: string;
   i: Integer;
-  CurrentIdeFolder: string;
 begin
   if FBackupExpert.BackupType = btFile then
   begin
-
-    CurrentIdeFolder := GetCurrentDir;
-    try
-      if not GetOpenSaveDialogExecute(dlgSave) then
-        Exit;
-    finally
-      SetCurrentDir(CurrentIdeFolder);
-    end;
+    if not GetOpenSaveDialogExecute(dlgSave) then
+      Exit;
 
     CurrentZipFileName := dlgSave.FileName;
 
@@ -744,19 +737,13 @@ end;
 procedure TfmBackup.btnAddClick(Sender: TObject);
 var
   i: Integer;
-  CurrentIdeFolder: string;
 begin
   dlgOpen.Options := dlgOpen.Options + [ofAllowMultiSelect, ofFileMustExist] - [ofNoValidate];
 
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if GetOpenSaveDialogExecute(dlgOpen) then
-      for i := 0 to dlgOpen.Files.Count - 1 do
-        AddBackupFile(dlgOpen.Files[i]);
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-    AfterFileListChange;
-  end;
+  if GetOpenSaveDialogExecute(dlgOpen) then
+    for i := 0 to dlgOpen.Files.Count - 1 do
+      AddBackupFile(dlgOpen.Files[i]);
+  AfterFileListChange;
 end;
 
 procedure TfmBackup.btnRemoveClick(Sender: TObject);

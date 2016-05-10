@@ -181,16 +181,9 @@ begin
 end;
 
 procedure TfmExpertManager.actExpertAddExecute(Sender: TObject);
-var
-  CurrentIdeFolder: string;
 begin
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if not GetOpenSaveDialogExecute(dlgAddExpert) then
-      Exit;
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-  end;
+  if not GetOpenSaveDialogExecute(dlgAddExpert) then
+    Exit;
 
   Self.AddExperts(dlgAddExpert.Files);
 end;

@@ -590,6 +590,7 @@ function GetDirectory(var Dir: string; Owner: TCustomForm = nil): Boolean;
 // Returns True if the user selected a file
 // Returns False if the user did not select a file.
 // Under Kylix, locking across threads is performed.
+// Also saves and restores the current directory.
 function GetOpenSaveDialogExecute(Dialog: TOpenDialog): Boolean;
 
 function MakeDialogExtensionString(const Ext: string): string;
@@ -3567,8 +3568,15 @@ begin
 end;
 
 function GetOpenSaveDialogExecute(Dialog: TOpenDialog): Boolean;
+var
+  CurrentIdeFolder: string;
 begin
-  Result := Dialog.Execute;
+  CurrentIdeFolder := GetCurrentDir;
+  try
+    Result := Dialog.Execute;
+  finally
+    SetCurrentDir(CurrentIdeFolder);
+  end;
 end;
 
 function MakeDialogExtensionString(const Ext: string): string;

@@ -541,15 +541,9 @@ resourcestring
 var
   Words: TStringList;
   i: Integer;
-  CurrentIdeFolder: string;
 begin
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if not GetOpenSaveDialogExecute(dlgGetWordlist) then
-      Exit;
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-  end;
+  if not GetOpenSaveDialogExecute(dlgGetWordlist) then
+    Exit;
 
   if FileExists(dlgGetWordlist.FileName) then
   begin
@@ -577,16 +571,10 @@ end;
 procedure TfmProofreaderConfig.actExportWordsExecute(Sender: TObject);
 var
   AFile: TextFile;
-  CurrentIdeFolder: string;
   i: Integer;
 begin
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if not GetOpenSaveDialogExecute(dlgPutWordlist) then
-      Exit;
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-  end;
+  if not GetOpenSaveDialogExecute(dlgPutWordlist) then
+    Exit;
 
   AssignFile(AFile, dlgPutWordlist.FileName);
   Rewrite(AFile);

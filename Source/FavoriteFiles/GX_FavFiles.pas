@@ -1257,20 +1257,13 @@ begin
 end;
 
 procedure TfmFavFiles.CreateNewFile;
-var
-  CurrentIdeFolder: string;
 begin
   if tvFolders.Selected = nil then
     Exit;
 
   SetFilter;
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if GetOpenSaveDialogExecute(dlgGetFiles) then
-      AddFilesToCurrentFolder(dlgGetFiles.Files);
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-  end;
+  if GetOpenSaveDialogExecute(dlgGetFiles) then
+    AddFilesToCurrentFolder(dlgGetFiles.Files);
 end;
 
 procedure TfmFavFiles.actFilePropertiesExecute(Sender: TObject);

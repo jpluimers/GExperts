@@ -180,7 +180,6 @@ procedure TfmSourceExport.actSaveExecute(Sender: TObject);
 resourcestring
   SDialogTitle = 'Save %s As';
 var
-  CurrentIdeDir: string;
   Exporter: TSynCustomExporter;
   Cursor: IInterface;
 begin
@@ -192,32 +191,27 @@ begin
   dlgSave.InitialDir := SourceExportExpert.FSaveDir;
   dlgSave.FilterIndex := SourceExportExpert.FSaveFilter;
 
-  CurrentIdeDir := GetCurrentDir;
-  try
-    if GetOpenSaveDialogExecute(dlgSave) then
-    begin
-      Cursor := TempHourGlassCursor;
-      SourceExportExpert.FSaveDir := ExtractFilePath(ExpandFileName(dlgSave.FileName));
-      SourceExportExpert.FSaveFilter := dlgSave.FilterIndex;
-      if dlgSave.FilterIndex = 1 then
-        Exporter := TSynExporterHTML.Create(nil)
-      else
-        Exporter := TSynExporterRTF.Create(nil);
-      try
-        Exporter.Title := ExtractFileName(dlgSave.FileName);
-        Exporter.UseBackground := True;
-        Exporter.Highlighter := FEditor.Highlighter;
-        Exporter.ExportAsText := True;
-        Exporter.Color := SourceExportExpert.FBackgroundColor;
-        Application.ProcessMessages;
-        Exporter.ExportAll(FEditor.Lines);
-        Exporter.SaveToFile(dlgSave.FileName);
-      finally
-        FreeAndNil(Exporter);
-      end;
+  if GetOpenSaveDialogExecute(dlgSave) then
+  begin
+    Cursor := TempHourGlassCursor;
+    SourceExportExpert.FSaveDir := ExtractFilePath(ExpandFileName(dlgSave.FileName));
+    SourceExportExpert.FSaveFilter := dlgSave.FilterIndex;
+    if dlgSave.FilterIndex = 1 then
+      Exporter := TSynExporterHTML.Create(nil)
+    else
+      Exporter := TSynExporterRTF.Create(nil);
+    try
+      Exporter.Title := ExtractFileName(dlgSave.FileName);
+      Exporter.UseBackground := True;
+      Exporter.Highlighter := FEditor.Highlighter;
+      Exporter.ExportAsText := True;
+      Exporter.Color := SourceExportExpert.FBackgroundColor;
+      Application.ProcessMessages;
+      Exporter.ExportAll(FEditor.Lines);
+      Exporter.SaveToFile(dlgSave.FileName);
+    finally
+      FreeAndNil(Exporter);
     end;
-  finally
-    SetCurrentDir(CurrentIdeDir);
   end;
 end;
 

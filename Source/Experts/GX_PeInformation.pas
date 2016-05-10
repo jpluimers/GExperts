@@ -417,16 +417,9 @@ begin
 end;
 
 procedure TfmPeInformation.actFileOpenExecute(Sender: TObject);
-var
-  CurrentIdeFolder: string;
 begin
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if GetOpenSaveDialogExecute(dlgOpen) then
-      LoadPEInfo(dlgOpen.FileName);
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-  end;
+  if GetOpenSaveDialogExecute(dlgOpen) then
+    LoadPEInfo(dlgOpen.FileName);
 end;
 
 procedure TfmPeInformation.actFilePrinterSetupExecute(Sender: TObject);

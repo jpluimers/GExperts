@@ -766,6 +766,25 @@ object fmConfiguration: TfmConfiguration
         OnClick = btnHelpClick
       end
     end
+    object btnImport: TButton
+      Left = 88
+      Top = 1
+      Width = 75
+      Height = 25
+      Caption = 'Import ...'
+      TabOrder = 2
+      Visible = False
+    end
+    object btnExport: TButton
+      Left = 8
+      Top = 1
+      Width = 75
+      Height = 25
+      Caption = 'Export ...'
+      TabOrder = 1
+      Visible = False
+      OnClick = btnExportClick
+    end
   end
   object dlgHelpFile: TOpenDialog
     DefaultExt = '.chm'

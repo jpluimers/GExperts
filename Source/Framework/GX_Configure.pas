@@ -101,6 +101,8 @@ type
     btnDeleteSuppressedMessage: TButton;
     btnClearSuppressedMessages: TButton;
     chkEnhanceInstallPackages: TCheckBox;
+    btnImport: TButton;
+    btnExport: TButton;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -129,6 +131,7 @@ type
     procedure chkEnhanceDialogsClick(Sender: TObject);
     procedure btnDeleteSuppressedMessageClick(Sender: TObject);
     procedure btnClearSuppressedMessagesClick(Sender: TObject);
+    procedure btnExportClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -152,6 +155,7 @@ type
     procedure edConfigPathDropFiles(_Sender: TObject; _Files: TStrings);
     procedure edHelpFileDropFiles(_Sender: TObject; _Files: TStrings);
     procedure UpdateIdeDialogCheckboxes;
+    procedure SaveAllSettings;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -307,21 +311,17 @@ begin
 end;
 
 procedure TfmConfiguration.sbHelpFileClick(Sender: TObject);
-var
-  CurrentIdeFolder: string;
 begin
+  dlgHelpFile.DefaultExt := '.chm';
+  dlgHelpFile.Filter := 'Help Files (*.chm)|*.chm';
+  dlgHelpFile.Title := 'Select Help File';
   dlgHelpFile.InitialDir := ExtractFilePath(edHelpFile.Text);
 
-  CurrentIdeFolder := GetCurrentDir;
-  try
-    if GetOpenSaveDialogExecute(dlgHelpFile) then
-      edHelpFile.Text := dlgHelpFile.FileName;
-  finally
-    SetCurrentDir(CurrentIdeFolder);
-  end;
+  if GetOpenSaveDialogExecute(dlgHelpFile) then
+    edHelpFile.Text := dlgHelpFile.FileName;
 end;
 
-procedure TfmConfiguration.btnOKClick(Sender: TObject);
+procedure TfmConfiguration.SaveAllSettings;
 begin
   GxKeyboardShortCutBroker.BeginUpdate;
   try
@@ -335,6 +335,11 @@ begin
   finally
     GxKeyboardShortCutBroker.EndUpdate;
   end;
+end;
+
+procedure TfmConfiguration.btnOKClick(Sender: TObject);
+begin
+  SaveAllSettings;
 
   ModalResult := mrOk;
 end;
@@ -699,6 +704,23 @@ end;
 procedure TfmConfiguration.btnEumerateActionsClick(Sender: TObject);
 begin
   GxOtaShowIDEActions;
+end;
+
+procedure TfmConfiguration.btnExportClick(Sender: TObject);
+//var
+//  fn: string;
+begin
+//  dlgHelpFile.DefaultExt := 'zip';
+//  dlgHelpFile.Filter := 'GExpertSettings (GXSettings*.chm)|GXSettings*.chm';
+//  dlgHelpFile.Title := 'Select GExperts Settings';
+//  dlgHelpFile.InitialDir :=
+
+//  if not GetOpenSaveDialogExecute(dlgHelpFile) then
+//    exit;
+
+//  fn := dlgHelpFile.FileName;
+//  SaveAllSettings;
+//  ConfigInfo.SaveToFile(fn);
 end;
 
 procedure TfmConfiguration.pcConfigChange(Sender: TObject);
