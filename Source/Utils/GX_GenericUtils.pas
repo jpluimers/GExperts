@@ -600,7 +600,12 @@ function GetOpenSaveDialogExecute(Dialog: TOpenDialog): Boolean;
 /// a file filter will be created for the given extension with the name "<extension> files".
 /// If the user clicks OK, the function returns true and the filename will contain the selected file. </summary>
 function ShowOpenDialog(const Title: string; const Extension: string; var Filename: string;
-  const Filter: string = ''): boolean;
+  const Filter: string = ''): boolean; overload;
+
+///<summary>
+/// Variant of ShowOpenDialog that allows to open multiple files </summary>
+function ShowOpenDialog(const Title: string; const Extension: string; Files: TStrings;
+  const Filter: string = ''): boolean; overload;
 
 ///<summary>
 /// Shows a TSaveDialog with the given title.
@@ -3582,6 +3587,37 @@ begin
     Result := dzSelectDirectory(SSelDir, BrowseRoot, Dir, Owner);
   finally
     SetErrorMode(OldErrorMode);
+  end;
+end;
+
+function ShowOpenDialog(const Title: string; const Extension: string; Files: TStrings;
+  const Filter: string = ''): boolean;
+var
+  Dlg: TOpenDialog;
+  fn: string;
+  dir: string;
+begin
+  Dlg := TOpenDialog.Create(nil);
+  try
+    fn := '';
+    if Files.Count > 0 then
+      fn := Files[0];
+    Dlg.FileName := fn;
+    Dlg.DefaultExt := Extension;
+    if Filter = '' then
+      Dlg.Filter := MakeDialogExtensionString(Extension)
+    else
+      Dlg.Filter := Format('%s|All Files (%s)|%s', [Filter, AllFilesWildCard, AllFilesWildCard]);
+    Dlg.Options := Dlg.Options + [ofPathMustExist, ofFileMustExist, ofAllowMultiSelect, ofDontAddToRecent];
+    Dlg.Title := Title;
+    dir := ExtractFilePath(fn);
+    if dir <> '' then
+      Dlg.InitialDir := dir;
+    Result := GetOpenSaveDialogExecute(Dlg);
+    if Result then
+      Files.Assign(Dlg.Files);
+  finally
+    FreeAndNil(Dlg);
   end;
 end;
 
