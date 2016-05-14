@@ -17,7 +17,6 @@ type
 
   TfmExpertManager = class(TfmBaseForm)
     lvExperts: TListView;
-    dlgAddExpert: TOpenDialog;
     pmItems: TPopupMenu;
     mitEnableExpert: TMenuItem;
     mitDisableExpert: TMenuItem;
@@ -181,11 +180,16 @@ begin
 end;
 
 procedure TfmExpertManager.actExpertAddExecute(Sender: TObject);
+var
+  Files: TStringList;
 begin
-  if not GetOpenSaveDialogExecute(dlgAddExpert) then
-    Exit;
-
-  Self.AddExperts(dlgAddExpert.Files);
+  Files := TStringList.Create;
+  try
+    if ShowOpenDialog('Select expert DLL', 'dll', Files, 'IDE Experts (*.dll)|*.dll') then
+      Self.AddExperts(Files);
+  finally
+    FreeAndNil(Files);
+  end;
 end;
 
 procedure TfmExpertManager.actExpertRemoveExecute(Sender: TObject);

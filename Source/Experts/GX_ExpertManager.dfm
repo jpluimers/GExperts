@@ -114,14 +114,6 @@ object fmExpertManager: TfmExpertManager
       Action = actHelpHelp
     end
   end
-  object dlgAddExpert: TOpenDialog
-    DefaultExt = '.dll'
-    Filter = 'IDE Experts (*.dll)|*.dll|All Files (*.*)|*.*'
-    Options = [ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
-    Title = 'Select expert DLL'
-    Left = 96
-    Top = 48
-  end
   object pmItems: TPopupMenu
     Images = dmSharedImages.Images
     Left = 32
