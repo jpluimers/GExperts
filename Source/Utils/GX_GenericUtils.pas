@@ -4492,7 +4492,7 @@ begin
       repeat
         if DirectoriesOnly then
         begin
-          if ((SearchRec.Attr and faDirectory) <> 0) and (not StringInArray(SearchRec.Name, ['..', '.'])) then
+          if ((SearchRec.Attr and faDirectory) <> 0) and not FDirsToIgnore.Find(SearchRec.Name, Idx) then
             AddResult(BuildFileName(Dir, SearchRec.Name));
         end
         else
