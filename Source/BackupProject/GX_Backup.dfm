@@ -165,13 +165,4 @@ object fmBackup: TfmBackup
       end
     end
   end
-  object dlgOpen: TOpenDialog
-    Filter = 
-      'Delphi Files (*.pas;*.dfm;*.xfm;*.dpr;*.dpk;*.bpg;*.res)|*.pas;*' +
-      '.dfm;*.xfm;*.dpr;*.dpk;*.bpg;*.res|All Files (*.*)|*.*'
-    Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist]
-    Title = 'Add to Backup'
-    Left = 48
-    Top = 48
-  end
 end

@@ -20,7 +20,6 @@ type
     pnlButtons: TPanel;
     pnlFiles: TPanel;
     gbxFiles: TGroupBox;
-    dlgOpen: TOpenDialog;
     pnlButtonsRight: TPanel;
     btnBackup: TButton;
     btnCancel: TButton;
@@ -83,6 +82,10 @@ type
     FBackupDir: string;
     FIncludeDir: Boolean;
     FBackupScope: TBackupScope;
+    FAddDirsRecursively: Boolean;
+    FIgnoreHistoryDir: Boolean;
+    FIgnoreScmDirs: Boolean;
+    FIgnoreBackupFiles: Boolean;
   protected
     procedure InternalLoadSettings(Settings: TExpertSettings); override;
     procedure InternalSaveSettings(Settings: TExpertSettings); override;
@@ -737,13 +740,18 @@ end;
 procedure TfmBackup.btnAddClick(Sender: TObject);
 var
   i: Integer;
+  Files: TStrings;
 begin
-  dlgOpen.Options := dlgOpen.Options + [ofAllowMultiSelect, ofFileMustExist] - [ofNoValidate];
-
-  if GetOpenSaveDialogExecute(dlgOpen) then
-    for i := 0 to dlgOpen.Files.Count - 1 do
-      AddBackupFile(dlgOpen.Files[i]);
-  AfterFileListChange;
+  Files := TStringList.Create;
+  try
+    if ShowOpenDialog('Add to Backup', '', Files,
+      'Delphi Files (*.pas;*.dfm;*.xfm;*.dpr;*.dpk;*.bpg;*.res)|*.pas;*.dfm;*.xfm;*.dpr;*.dpk;*.bpg;*.res') then
+      for i := 0 to Files.Count - 1 do
+        AddBackupFile(Files[i]);
+    AfterFileListChange;
+  finally
+    FreeAndNil(Files);
+  end;
 end;
 
 procedure TfmBackup.btnRemoveClick(Sender: TObject);
@@ -821,6 +829,36 @@ begin
 end;
 
 type
+  TGxContainsDirectoriesRecursiveMessage = class(TGxMsgBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+    function GetButtons: TMsgDlgButtons; override;
+    function GetDefaultButton: TMsgDlgBtn; override;
+  end;
+
+{ TGxContainsDirectoriesRecursiveMessage }
+
+function TGxContainsDirectoriesRecursiveMessage.GetButtons: TMsgDlgButtons;
+begin
+  Result := [mbYes, mbNo, mbCancel];
+end;
+
+function TGxContainsDirectoriesRecursiveMessage.GetDefaultButton: TMsgDlgBtn;
+begin
+  Result := mbCancel;
+end;
+
+function TGxContainsDirectoriesRecursiveMessage.GetMessage: string;
+resourcestring
+  SDroppedFilesContainedDirectories =
+    'The files you dropped contained at least one directory.  ' +
+    'Do you want to recursively add all files within these directories?';
+begin
+  Result := SDroppedFilesContainedDirectories + #13#10
+    + FData;
+end;
+
+type
   TGxContainsDirectoriesMessage = class(TGxMsgBoxAdaptor)
   protected
     function GetMessage: string; override;
@@ -844,7 +882,7 @@ function TGxContainsDirectoriesMessage.GetMessage: string;
 resourcestring
   SDroppedFilesContainedDirectories =
     'The files you dropped contained at least one directory.  ' +
-    'Do you want to recursively add all files within these directories?';
+    'Do you want to add all files within these directories?';
 begin
   Result := SDroppedFilesContainedDirectories + #13#10
     + FData;
@@ -854,36 +892,57 @@ type
   TExtFindFileThread = class(TFileFindThread)
   private
     FListBox: TListBox;
+    FIgnoreBackupFiles: Boolean;
   public
-    constructor Create(_ListBox: TListBox);
+    constructor Create(_ListBox: TListBox; _IgnoreBackupFiles: boolean);
     // This method is called in the main thread using synchronize, so access to the
-    // VCL is allowed. 
+    // VCL is allowed.
     procedure SyncFindComplete;
   end;
 
 { TExtFindFileThread }
 
-constructor TExtFindFileThread.Create(_ListBox: TListBox);
+constructor TExtFindFileThread.Create(_ListBox: TListBox; _IgnoreBackupFiles: boolean);
 begin
   inherited Create;
   FListBox := _ListBox;
+  FIgnoreBackupFiles := _IgnoreBackupFiles;
 end;
 
 procedure TExtFindFileThread.SyncFindComplete;
+
+  function IsBackupFile(const Filename: string): boolean;
+  var
+    Ext: string;
+  begin
+    Ext := ExtractFileExt(Filename);
+    Result := (Copy(Ext, 1, 2) = '.~') or (Copy(Ext, Length(Ext), 1) = '~');
+  end;
+
 var
   i: Integer;
   fn: string;
+  sl: TStringList;
+  Idx: Integer;
 begin
   LockResults;
   try
     FListBox.Items.BeginUpdate;
+    sl := TStringList.Create;
     try
+      sl.Sorted := True;
+      sl.Duplicates := dupIgnore;
+      sl.Assign(FListBox.Items);
       for i := 0 to Results.Count - 1 do begin
         fn := Results[i];
         if not DirectoryExists(fn) then
-          FListBox.Items.Add(fn);
+          if (not FIgnoreBackupFiles or not IsBackupFile(fn)) then
+            if not sl.Find(fn, Idx) then
+              sl.Add(fn);
       end;
+      FListBox.Items.Assign(sl);
     finally
+      FreeAndNil(sl);
       FListBox.Items.EndUpdate;
     end;
   finally
@@ -896,10 +955,17 @@ var
   DirThread: TExtFindFileThread;
   Idx: Integer;
 begin
-  DirThread := TExtFindFileThread.Create(lbFiles);
+  DirThread := TExtFindFileThread.Create(lbFiles, FBackupExpert.FIgnoreBackupFiles);
   try
     DirThread.FileMasks.Add(AllFilesWildCard);
-    DirThread.RecursiveSearchDirs.AddStrings(_Dirs);
+    if FBackupExpert.FAddDirsRecursively and FBackupExpert.FIgnoreHistoryDir then
+      DirThread.AddDelphiDirsToIgnore;
+    if FBackupExpert.FAddDirsRecursively and FBackupExpert.FIgnoreScmDirs then
+      DirThread.AddSCMDirsToIgnore;
+    if FBackupExpert.FAddDirsRecursively then
+      DirThread.RecursiveSearchDirs.AddStrings(_Dirs)
+    else
+      DirThread.SearchDirs.AddStrings(_Dirs);
     DirThread.OnFindComplete := DirThread.SyncFindComplete;
     DirThread.StartFind;
     Idx :=  Length(FFileSearchThreads);
@@ -921,28 +987,43 @@ begin
   try
   for i := _Files.Count - 1 downto 0 do begin
     fn := _Files[i];
-    if DirectoryExists(fn) then     begin
+    if DirectoryExists(fn) then begin
       Dirs.Add(fn);
       _Files.Delete(i);
     end;
   end;
-  if Dirs.Count > 0 then
-    case ShowGxMessageBox(TGxContainsDirectoriesMessage, Dirs.Text) of
-      mrYes: begin
-        AddFilesInDirs(Dirs);
+  if Dirs.Count > 0 then begin
+    if FBackupExpert.FAddDirsRecursively then begin
+      case ShowGxMessageBox(TGxContainsDirectoriesRecursiveMessage, Dirs.Text) of
+        mrYes: begin
+          AddFilesInDirs(Dirs);
+        end;
+        mrNo: begin
+          // nothing to do, we already removed the directories from _Files
+        end
+      else // mrCancel
+        Exit;
       end;
-      mrNo: begin
-        // nothing to do, we already removed the directories from _Files
-      end
-    else // mrCancel
-      Exit;
+    end else begin
+      case ShowGxMessageBox(TGxContainsDirectoriesMessage, Dirs.Text) of
+        mrYes: begin
+          AddFilesInDirs(Dirs);
+        end;
+        mrNo: begin
+          // nothing to do, we already removed the directories from _Files
+        end
+      else // mrCancel
+        Exit;
+      end;
     end;
+  end;
   finally
     FreeAndNil(Dirs);
   end;
   for i := 0 to _Files.Count - 1 do begin
     lbFiles.Items.Add(_Files[i]);
   end;
+  AfterFileListChange;
 end;
 
 procedure TfmBackup.lbFilesKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1074,6 +1155,10 @@ begin
   FBackupDir := AddSlash('%PROJECTDIR%') + '%PROJECTNAME%'; // Do not localize.
   FIncludeDir := True;
   FBackupScope := bsActiveProject;
+  FAddDirsRecursively := True;
+  FIgnoreHistoryDir := True;
+  FIgnoreScmDirs := True;
+  FIgnoreBackupFiles := True;
 end;
 
 function TBackupExpert.GetActionCaption: string;
@@ -1116,6 +1201,11 @@ begin
     Dlg.edBackupDir.Text := FBackupDir;
     Dlg.rgDefaultScope.ItemIndex := Ord(FBackupScope);
     Dlg.cbSearchOnLibraryPath.Checked := FFollowLibraryPath;
+    Dlg.cbAddRecursively.Checked := FAddDirsRecursively;
+    Dlg.cbIgnoreHistoryDir.Checked := FIgnoreHistoryDir;
+    Dlg.cbIgnoreScmDirs.Checked := FIgnoreScmDirs;
+    Dlg.cbIgnoreBackupFiles.Checked := FIgnoreBackupFiles;
+
     if Dlg.ShowModal = mrOk then
     begin
       if Dlg.rbBackupAskForFile.Checked then
@@ -1127,6 +1217,10 @@ begin
       FIncludeDir := Dlg.cbIncludeDir.Checked;
       FBackupScope := TBackupScope(Dlg.rgDefaultScope.ItemIndex);
       FFollowLibraryPath := Dlg.cbSearchOnLibraryPath.Checked;
+      FAddDirsRecursively := Dlg.cbAddRecursively.Checked;
+      FIgnoreHistoryDir := Dlg.cbIgnoreHistoryDir.Checked;
+      FIgnoreScmDirs := Dlg.cbIgnoreScmDirs.Checked;
+      FIgnoreBackupFiles := Dlg.cbIgnoreBackupFiles.Checked;
     end;
   finally
     FreeAndNil(Dlg);
@@ -1143,6 +1237,10 @@ begin
   Settings.WriteBool('IncludeDir', FIncludeDir);
   Settings.WriteEnumerated('BackupScope', TypeInfo(TBackupScope), Ord(FBackupScope));
   Settings.WriteBool('FollowLibraryPath', FFollowLibraryPath);
+  Settings.WriteBool('AddDirsRecursively', FAddDirsRecursively);
+  Settings.WriteBool('IgnoreHistoryDir', FIgnoreHistoryDir);
+  Settings.WriteBool('IgnoreScmDirs', FIgnoreScmDirs);
+  Settings.WriteBool('IgnoreBackupFiles', FIgnoreBackupFiles);
 end;
 
 procedure TBackupExpert.InternalLoadSettings(Settings: TExpertSettings);
@@ -1155,6 +1253,10 @@ begin
   FIncludeDir := Settings.ReadBool('IncludeDir', FIncludeDir);
   FBackupScope := TBackupScope(Settings.ReadEnumerated('BackupScope', TypeInfo(TBackupScope), Ord(FBackupScope)));
   FFollowLibraryPath := Settings.ReadBool('FollowLibraryPath', FFollowLibraryPath);
+  FAddDirsRecursively := Settings.ReadBool('AddDirsRecursively', FAddDirsRecursively);
+  FIgnoreHistoryDir := Settings.ReadBool('IgnoreHistoryDir', FIgnoreHistoryDir);
+  FIgnoreScmDirs := Settings.ReadBool('IgnoreScmDirs', FIgnoreScmDirs);
+  FIgnoreBackupFiles := Settings.ReadBool('IgnoreBackupFiles', FIgnoreBackupFiles);
 end;
 
 initialization

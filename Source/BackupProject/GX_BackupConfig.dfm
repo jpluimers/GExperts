@@ -3,7 +3,7 @@ object fmBackupConfig: TfmBackupConfig
   Top = 167
   BorderStyle = bsDialog
   Caption = 'Backup Project Configuration'
-  ClientHeight = 362
+  ClientHeight = 489
   ClientWidth = 377
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -21,7 +21,7 @@ object fmBackupConfig: TfmBackupConfig
     Left = 8
     Top = 8
     Width = 361
-    Height = 313
+    Height = 433
     Caption = 'Configuration'
     TabOrder = 0
     object lblDirectives: TLabel
@@ -50,22 +50,22 @@ object fmBackupConfig: TfmBackupConfig
     end
     object rgDefaultScope: TRadioGroup
       Left = 12
-      Top = 237
+      Top = 357
       Width = 338
       Height = 65
       Caption = 'Default Backup Sc&ope'
       Items.Strings = (
         'Acti&ve project'
         'Project &group')
-      TabOrder = 4
+      TabOrder = 5
     end
     object gbBackupTarget: TGroupBox
       Left = 12
-      Top = 116
+      Top = 236
       Width = 338
       Height = 113
       Caption = 'Backup &File Name'
-      TabOrder = 3
+      TabOrder = 4
       object lblBackupDir: TLabel
         Left = 25
         Top = 65
@@ -118,10 +118,53 @@ object fmBackupConfig: TfmBackupConfig
       Caption = 'Search &library path for included files'
       TabOrder = 1
     end
+    object gbDropDirs: TGroupBox
+      Left = 12
+      Top = 112
+      Width = 338
+      Height = 113
+      Caption = 'When dropping directories'
+      TabOrder = 3
+      object cbAddRecursively: TCheckBox
+        Left = 8
+        Top = 46
+        Width = 321
+        Height = 17
+        Caption = 'Recurse into subdirectories'
+        TabOrder = 1
+        OnClick = cbAddRecursivelyClick
+      end
+      object cbIgnoreHistoryDir: TCheckBox
+        Left = 24
+        Top = 66
+        Width = 305
+        Height = 17
+        Caption = 'Ignore __history and __recovery'
+        Enabled = False
+        TabOrder = 2
+      end
+      object cbIgnoreScmDirs: TCheckBox
+        Left = 24
+        Top = 88
+        Width = 305
+        Height = 17
+        Caption = 'Ignore .svn .hg .git'
+        Enabled = False
+        TabOrder = 3
+      end
+      object cbIgnoreBackupFiles: TCheckBox
+        Left = 8
+        Top = 24
+        Width = 313
+        Height = 17
+        Caption = 'Ingore backup files (*.~*)'
+        TabOrder = 0
+      end
+    end
   end
   object btnOK: TButton
-    Left = 126
-    Top = 330
+    Left = 216
+    Top = 456
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -130,8 +173,8 @@ object fmBackupConfig: TfmBackupConfig
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 210
-    Top = 330
+    Left = 296
+    Top = 456
     Width = 75
     Height = 25
     Cancel = True
@@ -140,8 +183,8 @@ object fmBackupConfig: TfmBackupConfig
     TabOrder = 2
   end
   object btHelp: TButton
-    Left = 294
-    Top = 330
+    Left = 8
+    Top = 456
     Width = 75
     Height = 25
     Cancel = True

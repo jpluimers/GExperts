@@ -24,11 +24,17 @@ type
     btnBackupDir: TButton;
     cbSearchOnLibraryPath: TCheckBox;
     btHelp: TButton;
+    gbDropDirs: TGroupBox;
+    cbAddRecursively: TCheckBox;
+    cbIgnoreHistoryDir: TCheckBox;
+    cbIgnoreScmDirs: TCheckBox;
+    cbIgnoreBackupFiles: TCheckBox;
     procedure btnBackupDirClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure rbGenericBackupTargetClick(Sender: TObject);
     procedure cbBackupIncClick(Sender: TObject);
     procedure btHelpClick(Sender: TObject);
+    procedure cbAddRecursivelyClick(Sender: TObject);
   private
     procedure edBackupDirOnDropFiles(_Sender: TObject; _Files: TStrings);
   public
@@ -80,6 +86,15 @@ end;
 procedure TfmBackupConfig.rbGenericBackupTargetClick(Sender: TObject);
 begin
   SetBackupTargetDirectoryEnabled(rbBackupToDirectory.Checked);
+end;
+
+procedure TfmBackupConfig.cbAddRecursivelyClick(Sender: TObject);
+var
+  b: Boolean;
+begin
+  b := cbAddRecursively.Checked;
+  cbIgnoreHistoryDir.Enabled := b;
+  cbIgnoreScmDirs.Enabled := b;
 end;
 
 procedure TfmBackupConfig.cbBackupIncClick(Sender: TObject);
