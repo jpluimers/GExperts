@@ -719,11 +719,14 @@ type
     FResultsLock: TCriticalSection;
     FDirectoriesOnly: Boolean;
     FComplete: Boolean;
+    FDirsToIgnore: TStringList;
+    procedure SetDirsToIgnore(const Value: TStringList);
   protected
     procedure Execute; override;
     procedure FindFilesInDir(const Dir: string; Recursive: Boolean);
     procedure AddResult(const FileName: string); virtual;
   public
+    property DirsToIgnore: TStringList read FDirsToIgnore write SetDirsToIgnore;
     property Complete: Boolean read FComplete;
     property FileMasks: TStringList read FFileMasks;
     property SearchDirs: TStringList read FSearchDirs;
@@ -733,6 +736,8 @@ type
     property Results: TStringList read FResults;
     constructor Create;
     destructor Destroy; override;
+    procedure AddDelphiDirsToIgnore;
+    procedure AddSCMDirsToIgnore;
     procedure StartFind;
     procedure LockResults;
     procedure ReleaseResults;
@@ -4364,6 +4369,12 @@ end;
 
 { TFileFindThread }
 
+procedure TFileFindThread.AddDelphiDirsToIgnore;
+begin
+  FDirsToIgnore.Add('__history');
+  FDirsToIgnore.Add('__recovery');
+end;
+
 procedure TFileFindThread.AddResult(const FileName: string);
 begin
   LockResults;
@@ -4372,6 +4383,13 @@ begin
   finally
     ReleaseResults;
   end;
+end;
+
+procedure TFileFindThread.AddSCMDirsToIgnore;
+begin
+  FDirsToIgnore.Add('.svn');
+  FDirsToIgnore.Add('.hg');
+  FDirsToIgnore.Add('.git');
 end;
 
 constructor TFileFindThread.Create;
@@ -4384,10 +4402,16 @@ begin
   FRecursiveSearchDirs := TStringList.Create;
   FResults.Duplicates := dupIgnore;
   FResults.Sorted := True;
+  FDirsToIgnore := TStringList.Create;
+  FDirsToIgnore.Duplicates := dupIgnore;
+  FDirsToIgnore.Sorted := True;
+  FDirsToIgnore.Add('.');
+  FDirsToIgnore.Add('..');
 end;
 
 destructor TFileFindThread.Destroy;
 begin
+  FreeAndNil(FDirsToIgnore);
   FreeAndNil(FFileMasks);
   FreeAndNil(FResults);
   FreeAndNil(FResultsLock);
@@ -4439,6 +4463,7 @@ procedure TFileFindThread.FindFilesInDir(const Dir: string; Recursive: Boolean);
 var
   SearchRec: TSearchRec;
   i: Integer;
+  Idx: Integer;
 begin
   if Recursive then
   begin
@@ -4447,7 +4472,7 @@ begin
       repeat
         if (SearchRec.Attr and faDirectory) <> 0 then
         begin
-          if (SearchRec.Name <> '.') and (SearchRec.Name <> '..') then
+          if not FDirsToIgnore.Find(SearchRec.Name, Idx) then
             FindFilesInDir(AddSlash(BuildFileName(Dir, SearchRec.Name)), Recursive);
         end;
       until (FindNext(SearchRec) <> 0) or Terminated;
@@ -4487,6 +4512,13 @@ end;
 procedure TFileFindThread.ReleaseResults;
 begin
   FResultsLock.Release;
+end;
+
+procedure TFileFindThread.SetDirsToIgnore(const Value: TStringList);
+begin
+  FDirsToIgnore.Assign(Value);
+  FDirsToIgnore.Add('.');
+  FDirsToIgnore.Add('..');
 end;
 
 procedure TFileFindThread.StartFind;
