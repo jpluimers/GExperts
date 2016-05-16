@@ -3999,10 +3999,20 @@ end;
 procedure GxOtaDeleteTextFromPos(StartPos, Count: Longint; SourceEditor: IOTASourceEditor = nil);
 var
   EditWriter: IOTAEditWriter;
+  Buffer: string;
+  IdeString: UTF8String;
+  UTF8Pos: Integer;
 begin
+  // "StartPos" is a character position in a (possibly unicode) string
+  // the EditWriter needs a byte position in a UTF-8 string (for Delphi >=8)
+  // or in an ansistring (for Delphi <8)
+  Buffer := GxOtaReadEditorTextToString(GxOtaGetEditReaderForSourceEditor(SourceEditor));
+  IdeString := ConvertToIDEEditorString(Buffer);
+  UTF8Pos := CharIndexToUTF8Pos(IdeString, StartPos);
+
   EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
-  EditWriter.CopyTo(StartPos);
-  EditWriter.DeleteTo(StartPos + Count);
+  EditWriter.CopyTo(UTF8Pos);
+  EditWriter.DeleteTo(UTF8Pos + Count);
 end;
 
 {$DEFINE GX_WorkAroundFirstCharInLineSelectionBug}

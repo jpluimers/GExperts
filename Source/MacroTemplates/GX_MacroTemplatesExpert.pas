@@ -624,7 +624,8 @@ var
   TemplateContainsPipe: Boolean;
 begin
   // Retrieve the template from the editor window
-  GxOtaGetCurrentIdentEx(TemplateName, CodeOffset, InsertPos, CurrentPos, AfterLen, True);
+  GxOtaGetCurrentIdentEx(TemplateName, CodeOffset, InsertPos, CurrentPos, AfterLen);
+
   // CodeOffset: Offset of the identifier in the character stream (Integer)
   // InsertPos:  Position where the identifier starts (line/col, 1-based)
   // CurrentPos: Current caret position (line/col)
