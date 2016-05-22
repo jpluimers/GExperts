@@ -156,6 +156,10 @@ function GxOtaGetCurrentEditPos(EditView: IOTAEditView = nil): TOTAEditPos;
 // Get the position in the character array for the edit view (defaults to the topmost view)
 function GxOtaGetCurrentEditBufferPos(EditView: IOTAEditView = nil): Integer;
 
+// Delete "Count" bytes starting from "StartIndex" in some source editor.
+// Uses the current source editor if none is specified.
+procedure GxOtaDeleteByteFromPos(StartIndex, Count: Longint; SourceEditor: IOTASourceEditor = nil);
+
 // Delete Count characters starting from StartPos in some source editor
 // Uses the current source editor if none is specified
 procedure GxOtaDeleteTextFromPos(StartPos, Count: Longint; SourceEditor: IOTASourceEditor = nil);
@@ -3994,6 +3998,15 @@ begin
   EditPos := GxOtaGetCurrentEditPos(EditView);
   EditView.ConvertPos(True, EditPos, CharPos);
   Result := EditView.CharPosToPos(CharPos);
+end;
+
+procedure GxOtaDeleteByteFromPos(StartIndex, Count: Longint; SourceEditor: IOTASourceEditor = nil);
+var
+  EditWriter: IOTAEditWriter;
+begin
+  EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
+  EditWriter.CopyTo(StartIndex);
+  EditWriter.DeleteTo(StartIndex + Count);
 end;
 
 procedure GxOtaDeleteTextFromPos(StartPos, Count: Longint; SourceEditor: IOTASourceEditor = nil);

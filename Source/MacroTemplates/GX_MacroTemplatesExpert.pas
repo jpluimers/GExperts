@@ -977,7 +977,7 @@ begin
   if TemplateOffset < 0 then
     Exit;
 
-  GxOtaDeleteTextFromPos(TemplateOffset, TextLen);
+  GxOtaDeleteByteFromPos(TemplateOffset, TextLen);
   ExpandTemplate(AName);
 
   Accepted := True;
