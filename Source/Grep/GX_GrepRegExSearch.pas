@@ -155,6 +155,8 @@ begin // Execute
   end;
 
   UnitSectionsToSkip := [];
+  CodeFragmentsToSkip := [];
+
   if IsPascalSourceFile then
   begin
     // Determine which sections must be skipped :
@@ -162,13 +164,13 @@ begin // Execute
     if not SectionImplementation then Include(UnitSectionsToSkip, usImplementation);
     if not SectionInitialization then Include(UnitSectionsToSkip, usInitialization);
     if not SectionFinalization then Include(UnitSectionsToSkip, usFinalization);
+
+    // Determine which code fragments must be skipped :
+    if NoCode then CodeFragmentsToSkip := CodeFragmentsToSkip + CodeFragments;
+    if NoStrings then CodeFragmentsToSkip := CodeFragmentsToSkip + StringFragments;
+    if NoComments then CodeFragmentsToSkip := CodeFragmentsToSkip + CommentFragments;
   end;
 
-  // Determine which code fragments must be skipped :
-  CodeFragmentsToSkip := [];
-  if NoCode then CodeFragmentsToSkip := CodeFragmentsToSkip + CodeFragments;
-  if NoStrings then CodeFragmentsToSkip := CodeFragmentsToSkip + StringFragments;
-  if NoComments then CodeFragmentsToSkip := CodeFragmentsToSkip + CommentFragments;
 
   ActiveSection := usStart;
   ActiveCodeFragment := cfCode;
