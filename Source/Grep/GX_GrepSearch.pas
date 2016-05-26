@@ -23,6 +23,7 @@ type
     lblMasks: TLabel;
     cbMasks: TComboBox;
     cbInclude: TCheckBox;
+    pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
     cbWholeWord: TCheckBox;
@@ -399,6 +400,8 @@ begin
 
   TWinControl_ActivateDropFiles(cbDirectory, cbDirectoryOnDropFiles);
 
+  pnlBottom.BevelOuter := bvNone;
+
   LoadFormSettings;
   FCheckedWhere := True;
 end;
@@ -566,6 +569,11 @@ begin
       cbMasks.Text := cbMasks.Items[0];
     if cbExcludedDirs.Items.Count > 0 then
       cbExcludedDirs.Text := cbExcludedDirs.Items[0];
+
+    if not FGrepExpert.GrepSaveHistoryListItems then begin
+      rgSaveOption.Visible := False;
+      Height := Height - rgSaveOption.Height;
+    end;
 
     if not IsStandAlone then
       SetDefaultSearchPattern;

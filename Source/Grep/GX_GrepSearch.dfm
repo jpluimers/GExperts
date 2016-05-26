@@ -347,7 +347,6 @@ object fmGrepSearch: TfmGrepSearch
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
-      TabStop = False
       OnClick = btnBrowseClick
     end
     object cbExcludedDirs: TComboBox
@@ -363,47 +362,67 @@ object fmGrepSearch: TfmGrepSearch
       OnKeyDown = ComboKeyDown
     end
   end
-  object btnOK: TButton
-    Left = 244
+  object pnlBottom: TPanel
+    Left = 0
     Top = 530
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    TabOrder = 6
-    OnClick = btnOKClick
-  end
-  object btnCancel: TButton
-    Left = 324
-    Top = 530
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
+    Width = 486
+    Height = 33
+    Align = alBottom
     TabOrder = 7
-  end
-  object btnHelp: TButton
-    Left = 404
-    Top = 530
-    Width = 75
-    Height = 25
-    Anchors = [akRight, akBottom]
-    Caption = 'Help'
-    TabOrder = 8
-    OnClick = btnHelpClick
-  end
-  object btnOptions: TButton
-    Left = 8
-    Top = 530
-    Width = 75
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = 'Options'
-    TabOrder = 9
-    OnClick = btnOptionsClick
+    DesignSize = (
+      486
+      33)
+    object btnOK: TButton
+      Left = 241
+      Top = 2
+      Width = 75
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'OK'
+      Default = True
+      TabOrder = 0
+      OnClick = btnOKClick
+    end
+    object btnCancel: TButton
+      Left = 321
+      Top = 2
+      Width = 75
+      Height = 25
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 1
+    end
+    object btnHelp: TButton
+      Left = 401
+      Top = 2
+      Width = 75
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'Help'
+      TabOrder = 2
+      OnClick = btnHelpClick
+    end
+    object btnSearch: TButton
+      Left = 89
+      Top = 2
+      Width = 75
+      Height = 25
+      Caption = 'Search'
+      TabOrder = 3
+      Visible = False
+      OnClick = btnOKClick
+    end
+    object btnOptions: TButton
+      Left = 8
+      Top = 2
+      Width = 75
+      Height = 25
+      Caption = 'Options'
+      TabOrder = 4
+      OnClick = btnOptionsClick
+    end
   end
   object rgSaveOption: TRadioGroup
     Left = 8
@@ -418,18 +437,7 @@ object fmGrepSearch: TfmGrepSearch
       'Save parameters and results'
       'Only save parameters'
       'No save (temp)')
-    TabOrder = 10
-  end
-  object btnSearch: TButton
-    Left = 89
-    Top = 530
-    Width = 75
-    Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = 'Search'
-    TabOrder = 11
-    Visible = False
-    OnClick = btnOKClick
+    TabOrder = 6
   end
   object timHintTimer: TTimer
     Interval = 2000
