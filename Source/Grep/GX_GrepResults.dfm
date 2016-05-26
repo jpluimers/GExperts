@@ -2,7 +2,7 @@ inherited fmGrepResults: TfmGrepResults
   Left = 324
   Top = 243
   ActiveControl = lbResults
-  Caption = 'Grep Results [%s page]'
+  Caption = 'Grep Results'
   ClientHeight = 689
   ClientWidth = 623
   DefaultMonitor = dmDesktop

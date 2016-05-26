@@ -570,7 +570,7 @@ begin
       SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
     GrepExpert.HistoryList.ListMode := ANewMode;
     tcHistoryListPage.TabIndex := Integer(ANewMode);
-    Caption := Format(FSavedFormCaption, [tcHistoryListPage.Tabs[Integer(ANewMode)]]);
+    Caption := FSavedFormCaption + Format(' [%s page]', [tcHistoryListPage.Tabs[Integer(ANewMode)]]);
     if DoRefresh then
       RefreshHistoryView(DoUpdateIndex);
   end;
