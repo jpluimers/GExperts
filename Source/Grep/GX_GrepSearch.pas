@@ -49,6 +49,7 @@ type
     btnOptions: TButton;
     rgSaveOption: TRadioGroup;
     btnSearch: TButton;
+    timHintTimer: TTimer;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -60,6 +61,14 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure btnOptionsClick(Sender: TObject);
+    procedure cbGrepCodeClick(Sender: TObject);
+    procedure cbGrepStringsClick(Sender: TObject);
+    procedure cbGrepCommentsClick(Sender: TObject);
+    procedure cbSectionInterfaceClick(Sender: TObject);
+    procedure cbSectionImplementationClick(Sender: TObject);
+    procedure cbSectionInitializationClick(Sender: TObject);
+    procedure cbSectionFinalizationClick(Sender: TObject);
+    procedure timHintTimerTimer(Sender: TObject);
   private
     FGrepExpert: TGrepExpert;
     FEmbedded: Boolean;
@@ -69,12 +78,17 @@ type
     FSaveOptionsGroupWidth: Integer;
     FSaveWhereGroupWidth: Integer;
     FSaveWhereGroupLeft: Integer;
+    FLoadingSettings: Boolean;
+    FTheHintWindow: THintWindow;
     procedure EnableDirectoryControls(New: Boolean);
     procedure LoadFormSettings;
     procedure SaveFormSettings;
     procedure UpdateMRUs;
     procedure cbDirectoryOnDropFiles(_Sender: TObject; _Files: TStrings);
     procedure CheckEnabledWhereControls;
+    procedure CheckContentTypeSelection(ClickedOption: TCheckBox);
+    procedure CheckSectionSelection(ClickedOption: TCheckBox);
+    procedure ShowControlHint(ctrl: TWinControl; const HintText: string);
   public
     constructor Create(AOwner: TComponent); override;
     procedure EmbeddedInit(AHolderControl: TWinControl; ASearchEvent: TNotifyEvent);
@@ -111,6 +125,8 @@ resourcestring
 const
   cEmbeddedLeft = 2;
   cEmbeddedTop = 55;
+
+{ TfmGrepSearch }
 
 procedure TfmGrepSearch.btnBrowseClick(Sender: TObject);
 var
@@ -169,6 +185,109 @@ end;
 procedure TfmGrepSearch.cbExcludedDirsDropDown(Sender: TObject);
 begin
   SizeComboDropdownToItems(cbExcludedDirs);
+end;
+
+procedure TfmGrepSearch.ShowControlHint(ctrl: TWinControl; const HintText: string);
+var
+  r: TRect;
+  Size: TSize;
+begin
+  timHintTimer.Enabled := False;
+  if Assigned(FTheHintWindow) then begin
+    FTheHintWindow.ReleaseHandle;
+    FTheHintWindow.Free;
+  end;
+  FTheHintWindow := THintWindow.Create(Self);
+  FTheHintWindow.Color := clInfoBk;
+  r.TopLeft := ctrl.ClientToScreen(Point(0, ctrl.Height));
+  Size := FTheHintWindow.Canvas.TextExtent(HintText);
+  r.Right := r.Left + Size.cx + 8;
+  r.Bottom := r.Top + Size.cy;
+  FTheHintWindow.ActivateHint(r, HintText);
+  timHintTimer.Enabled := True;
+end;
+
+procedure TfmGrepSearch.CheckContentTypeSelection(ClickedOption: TCheckBox);
+resourcestring
+  SCannotDisableAllContentTypes = 'You cannot disable all content types.';
+begin
+  if FLoadingSettings then
+    Exit;
+
+  if cbGrepCode.Checked or cbGrepStrings.Checked or cbGrepComments.Checked then begin
+    // at least one option is selected -> OK
+  end else begin
+    if Assigned(ClickedOption) then begin
+      // unchecked interactively -> check the last unchecked option again
+      ClickedOption.Checked := True;
+      ShowControlHint(ClickedOption, SCannotDisableAllContentTypes);
+    end else begin
+      // not interactively -> check them all
+      cbGrepCode.Checked := True;
+      cbGrepStrings.Checked := True;
+      cbGrepComments.Checked := True;
+    end;
+  end;
+end;
+
+procedure TfmGrepSearch.cbGrepCodeClick(Sender: TObject);
+begin
+  CheckContentTypeSelection(cbGrepCode);
+end;
+
+procedure TfmGrepSearch.cbGrepCommentsClick(Sender: TObject);
+begin
+  CheckContentTypeSelection(cbGrepComments);
+end;
+
+procedure TfmGrepSearch.cbGrepStringsClick(Sender: TObject);
+begin
+  CheckContentTypeSelection(cbGrepStrings);
+end;
+
+procedure TfmGrepSearch.CheckSectionSelection(ClickedOption: TCheckBox);
+resourcestring
+  SCannotDisableAllContentTypes = 'You cannot disable all unit sections.';
+begin
+  if FLoadingSettings then
+    Exit;
+
+  if cbSectionInterface.Checked or cbSectionImplementation.Checked
+    or cbSectionInitialization.Checked or cbSectionFinalization.Checked then begin
+    // at least one option is selected -> OK
+  end else begin
+    if Assigned(ClickedOption) then begin
+      // unchecked interactively -> check the last unchecked option again
+      ClickedOption.Checked := True;
+      ShowControlHint(ClickedOption, SCannotDisableAllContentTypes);
+    end else begin
+      // not interactively -> check them all
+      cbSectionInterface.Checked := True;
+      cbSectionImplementation.Checked := True;
+      cbSectionInitialization.Checked := True;
+      cbSectionFinalization.Checked := True;
+    end;
+  end;
+end;
+
+procedure TfmGrepSearch.cbSectionFinalizationClick(Sender: TObject);
+begin
+  CheckSectionSelection(cbSectionFinalization);
+end;
+
+procedure TfmGrepSearch.cbSectionImplementationClick(Sender: TObject);
+begin
+  CheckSectionSelection(cbSectionImplementation);
+end;
+
+procedure TfmGrepSearch.cbSectionInitializationClick(Sender: TObject);
+begin
+  CheckSectionSelection(cbSectionInitialization);
+end;
+
+procedure TfmGrepSearch.cbSectionInterfaceClick(Sender: TObject);
+begin
+  CheckSectionSelection(cbSectionInterface);
 end;
 
 { TGrepDlgExpert }
@@ -340,6 +459,15 @@ begin
     FGrepExpert.GrepSearch := 5;
 end;
 
+procedure TfmGrepSearch.timHintTimerTimer(Sender: TObject);
+begin
+  timHintTimer.Enabled := False;
+  if Assigned(FTheHintWindow) then begin
+    FTheHintWindow.ReleaseHandle;
+    FreeAndNil(FTheHintWindow);
+  end;
+end;
+
 procedure TfmGrepSearch.LoadFormSettings;
 
   function RetrieveEditorBlockSelection: string;
@@ -389,56 +517,64 @@ begin
     raise Exception.Create(SGrepResultsNotActive);
 
   FGrepExpert := fmGrepResults.GrepExpert;
-  cbText.Items.Assign(FGrepExpert.SearchList);
-  cbDirectory.Items.Assign(FGrepExpert.DirList);
-  cbMasks.Items.Assign(FGrepExpert.MaskList);
-  cbExcludedDirs.Items.Assign(FGrepExpert.ExcludedDirsList);
-  rbResults.Enabled := fmGrepResults.lbResults.Count > 0;
 
-  cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
-  cbGrepCode.Checked := FGrepExpert.GrepCode;
-  cbGrepComments.Checked := FGrepExpert.GrepComments;
-  cbGrepStrings.Checked := FGrepExpert.GrepStrings;
-  cbSectionFinalization.Checked := FGrepExpert.GrepFinalization;
-  cbSectionImplementation.Checked := FGrepExpert.GrepImplementation;
-  cbSectionInitialization.Checked := FGrepExpert.GrepInitialization;
-  cbSectionInterface.Checked := FGrepExpert.GrepInterface;
-  cbForms.Checked := FGrepExpert.GrepForms;
-  cbSQLFiles.Checked := FGrepExpert.GrepSQLFiles;
-  cbInclude.Checked := FGrepExpert.GrepSub;
-  cbWholeWord.Checked := FGrepExpert.GrepWholeWord;
-  cbRegEx.Checked := FGrepExpert.GrepRegEx;
+  FLoadingSettings := True;
+  try
+    cbText.Items.Assign(FGrepExpert.SearchList);
+    cbDirectory.Items.Assign(FGrepExpert.DirList);
+    cbMasks.Items.Assign(FGrepExpert.MaskList);
+    cbExcludedDirs.Items.Assign(FGrepExpert.ExcludedDirsList);
+    rbResults.Enabled := fmGrepResults.lbResults.Count > 0;
 
-  rgSaveOption.ItemIndex := Integer(FGrepExpert.SaveOption);
+    cbCaseSensitive.Checked := FGrepExpert.GrepCaseSensitive;
+    cbGrepCode.Checked := FGrepExpert.GrepCode;
+    cbGrepComments.Checked := FGrepExpert.GrepComments;
+    cbGrepStrings.Checked := FGrepExpert.GrepStrings;
+    cbSectionFinalization.Checked := FGrepExpert.GrepFinalization;
+    cbSectionImplementation.Checked := FGrepExpert.GrepImplementation;
+    cbSectionInitialization.Checked := FGrepExpert.GrepInitialization;
+    cbSectionInterface.Checked := FGrepExpert.GrepInterface;
+    cbForms.Checked := FGrepExpert.GrepForms;
+    cbSQLFiles.Checked := FGrepExpert.GrepSQLFiles;
+    cbInclude.Checked := FGrepExpert.GrepSub;
+    cbWholeWord.Checked := FGrepExpert.GrepWholeWord;
+    cbRegEx.Checked := FGrepExpert.GrepRegEx;
 
-  case FGrepExpert.GrepSearch of
-    0: rbCurrentOnly.Checked := True;
-    1: rbAllProjFiles.Checked := True;
-    2: rbOpenFiles.Checked := True;
-    3: rbDirectories.Checked := True;
-    4: rbAllProjGroupFiles.Checked := True;
-    5: begin
-        if rbResults.Enabled then
-          rbResults.Checked := True
-        else
-          rbAllProjFiles.Checked := True;
-      end;
-  else
-    rbAllProjFiles.Checked := True;
+    rgSaveOption.ItemIndex := Integer(FGrepExpert.SaveOption);
+
+    case FGrepExpert.GrepSearch of
+      0: rbCurrentOnly.Checked := True;
+      1: rbAllProjFiles.Checked := True;
+      2: rbOpenFiles.Checked := True;
+      3: rbDirectories.Checked := True;
+      4: rbAllProjGroupFiles.Checked := True;
+      5: begin
+          if rbResults.Enabled then
+            rbResults.Checked := True
+          else
+            rbAllProjFiles.Checked := True;
+        end;
+    else
+      rbAllProjFiles.Checked := True;
+    end;
+
+    if cbText.Items.Count > 0 then
+      cbText.Text := cbText.Items[0];
+    if cbDirectory.Items.Count > 0 then
+      cbDirectory.Text := cbDirectory.Items[0];
+    if cbMasks.Items.Count > 0 then
+      cbMasks.Text := cbMasks.Items[0];
+    if cbExcludedDirs.Items.Count > 0 then
+      cbExcludedDirs.Text := cbExcludedDirs.Items[0];
+
+    if not IsStandAlone then
+      SetDefaultSearchPattern;
+  finally
+    FLoadingSettings := False;
   end;
 
-  if cbText.Items.Count > 0 then
-    cbText.Text := cbText.Items[0];
-  if cbDirectory.Items.Count > 0 then
-    cbDirectory.Text := cbDirectory.Items[0];
-  if cbMasks.Items.Count > 0 then
-    cbMasks.Text := cbMasks.Items[0];
-  if cbExcludedDirs.Items.Count > 0 then
-    cbExcludedDirs.Text := cbExcludedDirs.Items[0];
-
-  if not IsStandAlone then
-    SetDefaultSearchPattern;
-
+  CheckContentTypeSelection(nil);
+  CheckSectionSelection(nil);
   CheckEnabledWhereControls;
 
   EnableDirectoryControls(rbDirectories.Checked);

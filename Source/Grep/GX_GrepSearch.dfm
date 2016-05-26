@@ -178,7 +178,7 @@ object fmGrepSearch: TfmGrepSearch
     Top = 192
     Width = 227
     Height = 102
-    Caption = 'Content types'
+    Caption = 'Content types (Pascal only)'
     TabOrder = 3
     DesignSize = (
       227
@@ -191,6 +191,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Grep code'
       TabOrder = 0
+      OnClick = cbGrepCodeClick
     end
     object cbGrepStrings: TCheckBox
       Left = 10
@@ -200,6 +201,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Grep strings'
       TabOrder = 1
+      OnClick = cbGrepStringsClick
     end
     object cbGrepComments: TCheckBox
       Left = 10
@@ -209,6 +211,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Grep comments'
       TabOrder = 2
+      OnClick = cbGrepCommentsClick
     end
   end
   object gbxUnitSections: TGroupBox
@@ -217,7 +220,7 @@ object fmGrepSearch: TfmGrepSearch
     Width = 227
     Height = 102
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Unit sections'
+    Caption = 'Unit sections (Pascal Only)'
     TabOrder = 4
     DesignSize = (
       227
@@ -230,6 +233,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Interface'
       TabOrder = 0
+      OnClick = cbSectionInterfaceClick
     end
     object cbSectionImplementation: TCheckBox
       Left = 10
@@ -239,6 +243,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Implementation'
       TabOrder = 1
+      OnClick = cbSectionImplementationClick
     end
     object cbSectionInitialization: TCheckBox
       Left = 10
@@ -248,6 +253,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Initialization'
       TabOrder = 2
+      OnClick = cbSectionInitializationClick
     end
     object cbSectionFinalization: TCheckBox
       Left = 10
@@ -257,6 +263,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Finalization'
       TabOrder = 3
+      OnClick = cbSectionFinalizationClick
     end
   end
   object gbxDirectories: TGroupBox
@@ -423,5 +430,11 @@ object fmGrepSearch: TfmGrepSearch
     TabOrder = 11
     Visible = False
     OnClick = btnOKClick
+  end
+  object timHintTimer: TTimer
+    Interval = 2000
+    OnTimer = timHintTimerTimer
+    Left = 160
+    Top = 232
   end
 end
