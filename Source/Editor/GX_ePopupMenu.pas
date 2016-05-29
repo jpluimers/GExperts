@@ -44,6 +44,7 @@ type
     procedure b_DefaultClick(Sender: TObject);
     procedure b_ClearShortcutClick(Sender: TObject);
   private
+    function GetExpertIndex(const _ListView: TListView; const _Expert: TGX_BaseExpert): Integer;
     procedure CheckForDuplicates;
     procedure GetData(_sl: TStringList);
     procedure SetData(_sl: TStringList);
@@ -390,11 +391,36 @@ begin
   end;
 end;
 
+function TfmEditorPopupMenuExpertConfig.GetExpertIndex(
+  const _ListView : TListView;
+  const _Expert: TGX_BaseExpert): Integer;
+var
+  i : Integer;
+begin
+  Result := -1;
+  if not Assigned(_ListView) then Exit;
+  if not Assigned(_Expert) then Exit;
+
+  for i := 0 to _ListView.Items.Count-1 do
+  begin
+    if _ListView.Items[i].Data = _Expert then
+    begin
+      Result := i;
+      Break;
+    end;
+  end;
+end;
+
 procedure TfmEditorPopupMenuExpertConfig.AddExpert(const _Key: string; const _ExpName: string;
   _Expert: TGX_BaseExpert);
 var
   li: TListItem;
 begin
+  if GetExpertIndex(lv_Selected, _Expert) >= 0
+  then begin
+    Exit; // expert is already in "lv_Selected"
+  end;
+
   li := lv_Selected.Items.Add;
   if _Key <> '' then
     li.Caption := _Key
