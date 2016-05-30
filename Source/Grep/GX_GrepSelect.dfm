@@ -1,6 +1,6 @@
 inherited fmGrepSelect: TfmGrepSelect
   ActiveControl = eSearch
-  Caption = 'Search History Maintenance'
+  Caption = 'Search History Select'
   ClientHeight = 534
   ClientWidth = 790
   ParentFont = False
