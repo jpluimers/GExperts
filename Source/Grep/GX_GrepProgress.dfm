@@ -1,8 +1,9 @@
 inherited fmGrepProgress: TfmGrepProgress
-  Caption = 'Grep progress'
+  Caption = 'Grep Search Progress'
   ClientHeight = 102
   ClientWidth = 340
   FormStyle = fsStayOnTop
+  OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   object lblProgressDetailText: TLabel
@@ -28,6 +29,8 @@ inherited fmGrepProgress: TfmGrepProgress
     Top = 8
     Width = 324
     Height = 25
+    Min = 0
+    Max = 100
     TabOrder = 0
   end
   object ProgressBarDetail: TProgressBar
@@ -35,6 +38,8 @@ inherited fmGrepProgress: TfmGrepProgress
     Top = 55
     Width = 324
     Height = 25
+    Min = 0
+    Max = 100
     TabOrder = 1
   end
 end
