@@ -37,9 +37,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object SplitterHistoryList: TSplitter
       Left = 147
-      Top = 26
+      Top = 24
       Width = 8
-      Height = 548
+      Height = 550
       Cursor = crHSplit
       AutoSnap = False
       Beveled = True
@@ -49,9 +49,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbResults: TListBox
       Left = 155
-      Top = 26
+      Top = 24
       Width = 468
-      Height = 548
+      Height = 550
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -69,9 +69,10 @@ inherited fmGrepResults: TfmGrepResults
       Left = 0
       Top = 0
       Width = 623
-      Height = 26
+      Height = 24
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
+      Flat = True
       Images = dmSharedImages.Images
       ParentShowHint = False
       ShowHint = True
@@ -232,9 +233,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object tcHistoryListPage: TTabControl
       Left = 0
-      Top = 26
+      Top = 24
       Width = 147
-      Height = 548
+      Height = 550
       Align = alLeft
       TabOrder = 1
       Tabs.Strings = (
@@ -248,7 +249,7 @@ inherited fmGrepResults: TfmGrepResults
         Left = 4
         Top = 25
         Width = 139
-        Height = 519
+        Height = 521
         Style = lbVirtualOwnerDraw
         Align = alClient
         Font.Charset = ANSI_CHARSET
@@ -283,6 +284,7 @@ inherited fmGrepResults: TfmGrepResults
         Width = 60
       end>
     ParentFont = True
+    SimplePanel = False
     UseSystemFont = False
   end
   object MainMenu: TMainMenu
@@ -589,7 +591,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actFilePrintToFile: TAction
       Category = 'File'
-      Caption = 'Print to file...'
+      Caption = 'Print to File...'
       Hint = 'Print results to file...'
       ImageIndex = 31
       OnExecute = actFileSaveExecute
@@ -671,19 +673,19 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actHistoryModifySearchSettings: TAction
       Category = 'History'
-      Caption = 'Modify search parameters...'
+      Caption = 'Modify Search Parameters...'
       OnExecute = actHistoryRefreshExecute
       OnUpdate = actHistoryUpdate
     end
     object actViewShowHistoryList: TAction
       Category = 'View'
-      Caption = 'Show history list'
+      Caption = 'Show History List'
       Hint = 'Show history list'
       OnExecute = actViewShowHistoryListExecute
     end
     object actViewShowFullFilename: TAction
       Category = 'View'
-      Caption = 'Show full filename'
+      Caption = 'Show Full Filename'
       Hint = 'Show full or relative filename'
       ImageIndex = 79
       OnExecute = actViewShowFullFilenameExecute
@@ -691,14 +693,14 @@ inherited fmGrepResults: TfmGrepResults
     object actHistoryDeleteSelected: TAction
       Tag = 1
       Category = 'History'
-      Caption = 'Delete items'
+      Caption = 'Delete Items'
       ImageIndex = 11
       OnExecute = actHistoryDeleteSelectedExecute
       OnUpdate = actHistoryUpdate
     end
     object actContextSelSearch: TAction
       Category = 'Context'
-      Caption = 'Search selected text...'
+      Caption = 'Search Selected Text...'
       ImageIndex = 34
       OnExecute = actContextSelSearchExecute
     end
@@ -712,7 +714,7 @@ inherited fmGrepResults: TfmGrepResults
     object actHistoryRefreshSelected: TAction
       Tag = 1
       Category = 'History'
-      Caption = 'Refresh items'
+      Caption = 'Refresh Items'
       ImageIndex = 34
       Visible = False
       OnExecute = actHistoryRefreshSelectedExecute
@@ -720,7 +722,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actHistoryModifySaveOptions: TAction
       Category = 'History'
-      Caption = 'Modify save options'
+      Caption = 'Modify Save Options'
       OnExecute = actHistoryModifySaveOptionsExecute
       OnUpdate = actHistoryUpdate
     end
@@ -733,14 +735,14 @@ inherited fmGrepResults: TfmGrepResults
     end
     object actViewShowIndent: TAction
       Category = 'View'
-      Caption = 'Show indent'
+      Caption = 'Show Indent'
       Hint = 'Show line indent in results list'
       ImageIndex = 80
       OnExecute = actViewShowIndentExecute
     end
     object actHistorySearchInHistory: TAction
       Category = 'History'
-      Caption = 'Search in history'
+      Caption = 'Search in History'
       Hint = 'Search in the all history list'
       ImageIndex = 81
       OnExecute = actHistorySearchInHistoryExecute

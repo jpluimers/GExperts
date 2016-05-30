@@ -256,11 +256,11 @@ type
     FLoadHistoryListPage: Integer;
     FContextSearchText: string;
     FPageIndexes: array[TGrepHistoryListMode] of TPageIndexes;
-    FSavedLastSearchTimeCaption: String;
-    FSavedSaveOptionCaption: String;
-    FSavedDirectoriesDataCaption: String;
-    FSavedExcludeDirsCaption: String;
-    FSavedFileMasksCaption: String;
+    FSavedLastSearchTimeCaption: string;
+    FSavedSaveOptionCaption: string;
+    FSavedDirectoriesDataCaption: string;
+    FSavedExcludeDirsCaption: string;
+    FSavedFileMasksCaption: string;
     FHistoryMousePos: TPoint;
     FSelectedCount: Integer;
     FSaveSplitCount: Integer;
@@ -268,9 +268,9 @@ type
     FNewSortMode: TGrepHistorySort;
     FNewSortDesc: Boolean;
     FSearchInClearSearchList: Boolean;
-    FSaveItemEmptyCaption: String;
-    FSaveSortCaption: String;
-    FSavedFormCaption: String;
+    FSaveItemEmptyCaption: string;
+    FSaveSortCaption: string;
+    FSavedFormCaption: string;
     procedure SetStayOnTop(Value: Boolean);
     procedure RefreshContextLines;
     procedure SetShowContext(Value: Boolean);
@@ -348,8 +348,8 @@ resourcestring
   SGrepReplaceStats = 'Replaced %d occurrence(s) in %.2f seconds';
 
 const  //do not localize
-  cKeyPageIndexType: array[TPageSavedIndexType] of String = ('Last', 'Top');
-  cKeyPageIndexMode: array[TGrepHistoryListMode] of String = (
+  cKeyPageIndexType: array[TPageSavedIndexType] of string = ('Last', 'Top');
+  cKeyPageIndexMode: array[TGrepHistoryListMode] of string = (
     'ViewedResultsItem',
     'ViewedSettingsItem',
     'ViewedItem',
@@ -406,9 +406,9 @@ end;
 function TGxResultRefreshSelectedQuestion.GetMessage: string;
 begin
   if FData = 'A' then
-    Result := 'Are you sure you want to refresh all search history item lists?'
+    Result := 'Are you sure you want to refresh all search history items?'
   else
-    Result := 'Are you sure you want to refresh selected search history item lists?';
+    Result := 'Are you sure you want to refresh selected search history items?';
 end;
 
 { TGxResultDeleteSelectedQuestion }
@@ -458,7 +458,7 @@ end;
 
 function TfmGrepResults.Execute(AState: TGrepSearchState): Boolean;
 resourcestring
-  SGrepActive = 'A Grep search is currently active; either abort it or wait until it is finished.';
+  SGrepActive = 'A Grep search is currently active.  Please abort it or wait until it is finished.';
   SGrepSearchStats = 'Searched %d files in %.2f seconds for "%s"';
 var
   TimeStart: TDateTime;
@@ -1371,7 +1371,7 @@ end;
 
 procedure TfmGrepResults.actFileOpenExecute(Sender: TObject);
 resourcestring
-  rsOpenCaption = 'Select the items for open';   //Open saved Search History
+  rsOpenCaption = 'Select the items to open';   //Open saved Search History
 var
   ASelResult: TGrepSelectResult;
   AIni: TGrepIniFile;
@@ -2160,14 +2160,14 @@ end;
 procedure TfmGrepResults.lbHistoryListContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 resourcestring
   rsItemCaptionFormat = 'Search text = %s';
-  rsItemCaptionHint = 'Click for copy search text';
+  rsItemCaptionHint = 'Click to copy search text';
   rsSortUnsorted = 'Unsorted';
   rsSortKeyIndex = 'by keyindex';
   rsSortSearchText = 'by search text';
   rsSortSearchTime = 'by last search time';
   rsSortDesc = 'descending';
 const
-  cSortTexts: array[TGrepHistorySort] of String = (rsSortUnsorted, rsSortKeyIndex, rsSortSearchText, rsSortSearchTime, '');
+  cSortTexts: array[TGrepHistorySort] of string = (rsSortUnsorted, rsSortKeyIndex, rsSortSearchText, rsSortSearchTime, '');
 var
   AIndex: Integer;
   AItem: TGrepHistoryListItem;
@@ -2310,12 +2310,12 @@ end;
 
 procedure TfmGrepResults.actFileSaveExecute(Sender: TObject);
 resourcestring
-  rsSaveAllCaption = 'Select the items for save';
-  rsSaveProgress = 'Grep save progress';
-  rsPrintAllCaption = 'Select the items for print to file';
-  rsPrintProgress = 'Grep print to file progress';
-  rsSavePrintAllCaption = 'Select the items for save & print';
-  rsSavePrintProgress = 'Grep save & print progress';
+  rsSaveAllCaption = 'Select the Items to Save';
+  rsSaveProgress = 'Grep Save Progress';
+  rsPrintAllCaption = 'Select the Items to Print to File';
+  rsPrintProgress = 'Grep Print to File Progress';
+  rsSavePrintAllCaption = 'Select the Items to Save & Print';
+  rsSavePrintProgress = 'Grep Save & Print Progress';
 const
   cSelectTypeByMode: array[TSaveToFileMode] of TGrepSelectType = (gstPrint, gstSave, gstSavePrint);
   cModeCaption: array[TSaveToFileMode] of string = (rsPrintAllCaption, rsSaveAllCaption, rsSavePrintAllCaption);
@@ -2407,7 +2407,7 @@ end;
 
 procedure TfmGrepResults.actHistoryDeleteSelectedExecute(Sender: TObject);
 resourcestring
-  rsDeleteSelectedCaption = 'Select the items for delete';
+  rsDeleteSelectedCaption = 'Select the items to delete';
 const
   cSelResult2DelMode: array[gsrSelectItems..gsrSelectAll] of TGrepDeleteMode = (delSelected, delAll);
 var
@@ -2445,7 +2445,7 @@ end;
 
 procedure TfmGrepResults.actHistoryModifySaveOptionsExecute(Sender: TObject);
 resourcestring
-  rsSaveOptionAllCaption = 'Select the items for modify save option';
+  rsSaveOptionAllCaption = 'Select the items to modify save option';
 var
   ASelResult: TGrepSelectResult;
 begin
