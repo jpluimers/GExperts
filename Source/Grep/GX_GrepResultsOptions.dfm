@@ -145,7 +145,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Top = 200
       Width = 305
       Height = 17
-      Caption = 'Mouse wheel select prev/next match'
+      Caption = 'Mouse wheel to select prev/next match'
       Enabled = False
       TabOrder = 8
     end
@@ -207,6 +207,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Min = 1
       Position = 1
       TabOrder = 4
+      Wrap = False
     end
     object pnlContextMacthLineFontColor: TPanel
       Left = 48
@@ -254,7 +255,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Top = 8
     Width = 317
     Height = 297
-    Caption = 'Search history'
+    Caption = 'Search History'
     TabOrder = 0
     DesignSize = (
       317
@@ -366,8 +367,9 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 202
       Height = 22
       Style = csDropDownList
+      ItemHeight = 14
       ItemIndex = 1
-      TabOrder = 8
+      TabOrder = 10
       Text = 'Only save parameters'
       Items.Strings = (
         'Save parameters and results'
@@ -381,8 +383,9 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 202
       Height = 22
       Style = csDropDownList
+      ItemHeight = 14
       ItemIndex = 1
-      TabOrder = 9
+      TabOrder = 12
       Text = 'Show embedded search'
       Items.Strings = (
         'Show search window'
@@ -422,7 +425,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 250
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'If results is empty, move to Params page'
+      Caption = 'If results are empty, go to Params page'
       TabOrder = 5
       Visible = False
     end
@@ -432,8 +435,9 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 202
       Height = 22
       Style = csDropDownList
+      ItemHeight = 14
       ItemIndex = 2
-      TabOrder = 10
+      TabOrder = 11
       Text = 'No save (temp)'
       Items.Strings = (
         'Save parameters and results'
@@ -447,7 +451,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Width = 89
       Height = 17
       Caption = 'Multiline'
-      TabOrder = 11
+      TabOrder = 8
       OnClick = chkHistoryPagesTabMultiLineClick
     end
     object eHistoryPagesTabWidth: TEdit
@@ -455,7 +459,7 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
       Top = 161
       Width = 33
       Height = 22
-      TabOrder = 12
+      TabOrder = 9
       Text = '0'
     end
   end
@@ -528,6 +532,8 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
+    MinFontSize = 0
+    MaxFontSize = 0
     Left = 271
     Top = 332
   end
@@ -537,25 +543,31 @@ object fmGrepResultsOptions: TfmGrepResultsOptions
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Style = []
+    MinFontSize = 0
+    MaxFontSize = 0
     Left = 602
     Top = 329
   end
   object dlgContextMatchFontColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 601
     Top = 409
   end
   object dlgListMatchTextColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 273
     Top = 401
   end
   object dlgListMatchBackgroundColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 273
     Top = 441
   end
   object dlgContextMatchLineFontColor: TColorDialog
+    Ctl3D = True
     Options = [cdSolidColor]
     Left = 601
     Top = 369
