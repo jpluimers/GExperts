@@ -39,7 +39,7 @@ object fmGrepSearch: TfmGrepSearch
     Height = 22
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 15
-    ItemHeight = 0
+    ItemHeight = 14
     TabOrder = 0
     OnKeyDown = ComboKeyDown
   end
@@ -105,7 +105,7 @@ object fmGrepSearch: TfmGrepSearch
     Width = 227
     Height = 145
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Where'
+    Caption = 'Files'
     TabOrder = 2
     DesignSize = (
       227
@@ -178,7 +178,7 @@ object fmGrepSearch: TfmGrepSearch
     Top = 192
     Width = 227
     Height = 102
-    Caption = 'Content types (Pascal only)'
+    Caption = 'Delphi Code Content Types'
     TabOrder = 3
     DesignSize = (
       227
@@ -189,7 +189,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 210
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Grep code'
+      Caption = 'Code'
       TabOrder = 0
       OnClick = cbGrepCodeClick
     end
@@ -199,7 +199,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 210
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Grep strings'
+      Caption = 'Strings'
       TabOrder = 1
       OnClick = cbGrepStringsClick
     end
@@ -209,7 +209,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 210
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Grep comments'
+      Caption = 'Comments'
       TabOrder = 2
       OnClick = cbGrepCommentsClick
     end
@@ -220,7 +220,7 @@ object fmGrepSearch: TfmGrepSearch
     Width = 227
     Height = 102
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Unit sections (Pascal Only)'
+    Caption = 'Delphi Code Sections'
     TabOrder = 4
     DesignSize = (
       227
@@ -311,7 +311,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 0
+      ItemHeight = 14
       TabOrder = 3
       OnKeyDown = ComboKeyDown
     end
@@ -331,7 +331,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 0
+      ItemHeight = 14
       TabOrder = 0
       OnDropDown = cbDirectoryDropDown
       OnKeyDown = ComboKeyDown
@@ -356,7 +356,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 22
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 15
-      ItemHeight = 0
+      ItemHeight = 14
       TabOrder = 2
       OnDropDown = cbExcludedDirsDropDown
       OnKeyDown = ComboKeyDown
@@ -380,7 +380,7 @@ object fmGrepSearch: TfmGrepSearch
       Anchors = [akTop, akRight]
       Caption = 'OK'
       Default = True
-      TabOrder = 0
+      TabOrder = 2
       OnClick = btnOKClick
     end
     object btnCancel: TButton
@@ -392,7 +392,7 @@ object fmGrepSearch: TfmGrepSearch
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
-      TabOrder = 1
+      TabOrder = 3
     end
     object btnHelp: TButton
       Left = 401
@@ -401,7 +401,7 @@ object fmGrepSearch: TfmGrepSearch
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Help'
-      TabOrder = 2
+      TabOrder = 4
       OnClick = btnHelpClick
     end
     object btnSearch: TButton
@@ -410,7 +410,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 75
       Height = 25
       Caption = 'Search'
-      TabOrder = 3
+      TabOrder = 1
       Visible = False
       OnClick = btnOKClick
     end
@@ -420,7 +420,7 @@ object fmGrepSearch: TfmGrepSearch
       Width = 75
       Height = 25
       Caption = 'Options'
-      TabOrder = 4
+      TabOrder = 0
       OnClick = btnOptionsClick
     end
   end
@@ -429,14 +429,15 @@ object fmGrepSearch: TfmGrepSearch
     Top = 439
     Width = 471
     Height = 86
-    Hint = 'History item will show on the RESULTS page.'
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Save option (when IDE closing)'
+    Caption = 'Save Search History'
     ItemIndex = 1
     Items.Strings = (
       'Save parameters and results'
       'Only save parameters'
-      'No save (temp)')
+      'Do not save')
+    ParentShowHint = False
+    ShowHint = False
     TabOrder = 6
   end
   object timHintTimer: TTimer
