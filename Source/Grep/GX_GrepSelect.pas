@@ -181,13 +181,13 @@ procedure TfmGrepSelect.Init(AHistoryList: TGrepHistoryList; ASelectType: TGrepS
 resourcestring
   rsDeleteText = 'Delete';
   rsTextSave = 'Save';
-  rsTextPrint = 'Print to file';
+  rsTextPrint = 'Print to File';
   rsTextSavePrint = 'Save && Print';
   rsTextRefresh = 'Refresh';
   rsTextSaveOptions = 'Modify';
   rsTextOpen = 'Open';
-  rsTextSort = 'Set order';
-  rsTextSearchIn = 'Search in';
+  rsTextSort = 'Set Order';
+  rsTextSearchIn = 'Search In';
 const
   cButtonText: array[TGrepSelectType] of String =
     (rsDeleteText, rsTextSave, rsTextPrint, rsTextSavePrint, rsTextRefresh, rsTextSaveOptions, rsTextOpen, rsTextSort, rsTextSearchIn);
