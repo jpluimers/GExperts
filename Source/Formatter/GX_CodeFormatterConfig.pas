@@ -23,7 +23,8 @@ uses
   Menus,
   GX_CodeFormatterTypes,
   GX_CodeFormatterEngine,
-  GX_CodeFormatterSettings;
+  GX_CodeFormatterSettings,
+  GX_EnhancedEditor;
 
 type
   TStringGrid = class(Grids.TStringGrid)
@@ -94,9 +95,7 @@ type
     chk_RemoveDoubleBlank: TCheckBox;
     b_EditCapitalization: TButton;
     ts_Preview: TTabSheet;
-    m_PreviewBefore: TMemo;
     l_Before: TLabel;
-    m_PreviewAfter: TMemo;
     l_After: TLabel;
     grid_Spacing: TStringGrid;
     chk_FeedEachUnit: TCheckBox;
@@ -139,7 +138,7 @@ type
     procedure m_PreviewBeforeClick(Sender: TObject);
     procedure m_PreviewBeforeKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure m_PreviewBeforeKeyPress(Sender: TObject; var Key: Char);
+    procedure m_PreviewBeforeKeyPress(Sender: TObject; var Key: WideChar);
     procedure m_PreviewBeforeMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
@@ -157,6 +156,8 @@ type
     procedure b_PrecedenceDownClick(Sender: TObject);
   private
     FCapitalization: TStringList;
+    m_PreviewBefore: TGxEnhancedEditor;
+    m_PreviewAfter: TGxEnhancedEditor;
     procedure EngineSettingsToForm(const _EngineSettings: TCodeFormatterEngineSettings);
     procedure SettingsToForm(const _Settings: TCodeFormatterSettings);
     procedure FormToEngineSettings(var _Settings: TCodeFormatterEngineSettings);
@@ -221,6 +222,34 @@ begin
   TWinControl_ActivateDropFiles(ed_CapitalizationFile, HandleCaptitalizationFileDropped);
   TEdit_ActivateAutoComplete(ed_CapitalizationFile, [acsFileSystem], [actSuggest]);
 
+  m_PreviewBefore := TGxEnhancedEditor.Create(Self);
+  m_PreviewBefore.Name := 'm_PreviewBefore';
+  m_PreviewBefore.Parent := ts_Preview;
+  m_PreviewBefore.Left := 0;
+  m_PreviewBefore.Top := 16;
+  m_PreviewBefore.Width := 241;
+  m_PreviewBefore.Height := 337;
+  m_PreviewBefore.TabOrder := 0;
+  m_PreviewBefore.OnChange := ts_PreviewShow;
+  m_PreviewBefore.OnClick := m_PreviewBeforeClick;
+  m_PreviewBefore.OnEnter := m_PreviewBeforeClick;
+  m_PreviewBefore.OnKeyDown := m_PreviewBeforeKeyDown;
+  m_PreviewBefore.OnKeyPress := m_PreviewBeforeKeyPress;
+  m_PreviewBefore.OnKeyUp := m_PreviewBeforeKeyDown;
+  m_PreviewBefore.OnMouseDown := m_PreviewBeforeMouseDown;
+  m_PreviewBefore.Highlighter := gxpPas;
+
+  m_PreviewAfter := TGxEnhancedEditor.Create(Self);
+  m_PreviewAfter.Name := 'm_PreviewAfter';
+  m_PreviewAfter.Parent := ts_Preview;
+  m_PreviewAfter.Left := 248;
+  m_PreviewAfter.Top := 16;
+  m_PreviewAfter.Width := 214;
+  m_PreviewAfter.Height := 337;
+  m_PreviewAfter.Anchors := [akLeft, akTop, akRight];
+  m_PreviewAfter.TabOrder := 1;
+  m_PreviewAfter.Highlighter := gxpPas;
+
   TWinControl_ActivateDropFiles(m_PreviewBefore, m_PreviewFileDropped);
   TWinControl_ActivateDropFiles(m_PreviewAfter, m_PreviewFileDropped);
 
@@ -244,7 +273,7 @@ end;
 
 procedure TfmCodeFormatterConfig.m_PreviewFileDropped(_Sender: TObject; _Files: TStrings);
 begin
-  m_PreviewBefore.Lines.LoadFromFile(_Files[0]);
+  m_PreviewBefore.LoadFromFile(_Files[0]);
   UpdatePreview;
 end;
 
@@ -332,7 +361,7 @@ begin
   s := IncludeTrailingPathDelimiter(GetModuleDir) + 'preview.pas';
   if FileExists(s) then begin
     m_PreviewBefore.Clear;
-    m_PreviewBefore.Lines.LoadFromFile(s);
+    m_PreviewBefore.LoadFromFile(s);
   end
 end;
 
@@ -609,7 +638,7 @@ begin
   CurLine := SendMessage(m_PreviewBefore.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
   CurLine2 := SendMessage(m_PreviewAfter.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
   SendMessage(m_PreviewAfter.Handle, EM_LINESCROLL, 0, CurLine - CurLine2);
-  m_PreviewAfter.SelStart := m_PreviewBefore.SelStart;
+  m_PreviewAfter.SetSelection(m_PreviewBefore.SelStart, 0);
 end;
 
 procedure TfmCodeFormatterConfig.m_PreviewBeforeKeyDown(Sender: TObject; var Key: Word;
@@ -618,7 +647,7 @@ begin
   m_PreviewBeforeClick(nil);
 end;
 
-procedure TfmCodeFormatterConfig.m_PreviewBeforeKeyPress(Sender: TObject; var Key: Char);
+procedure TfmCodeFormatterConfig.m_PreviewBeforeKeyPress(Sender: TObject; var Key: WideChar);
 begin
   m_PreviewBeforeClick(nil);
 end;
@@ -739,24 +768,22 @@ end;
 
 procedure TfmCodeFormatterConfig.UpdatePreview;
 var
-  st: TGXUnicodeStringList;
+  sl: TGXUnicodeStringList;
   Formatter: TCodeFormatterEngine;
 begin
-  st := nil;
+  sl := nil;
   Formatter := TCodeFormatterEngine.Create;
   try
     // this temporary string list is necessary to prevent an infinite loop (whose reason I don't really understand :-( )
-    st := TGXUnicodeStringList.Create;
-    st.Assign(m_PreviewBefore.Lines);
+    sl := TGXUnicodeStringList.Create;
+    m_PreviewBefore.GetLines(sl);
     FormToSettings(Formatter.Settings);
-    Formatter.Execute(st);
-    m_PreviewAfter.Lines.BeginUpdate;
-    m_PreviewAfter.Lines.Assign(st);
-    m_PreviewAfter.Lines.EndUpdate;
+    Formatter.Execute(sl);
+    m_PreviewAfter.SetLines(sl);
     m_PreviewBeforeClick(nil);
   finally
     Formatter.Free;
-    st.Free;
+    sl.Free;
   end;
 end;
 
@@ -809,4 +836,3 @@ begin
 end;
 
 end.
-

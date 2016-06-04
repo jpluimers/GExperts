@@ -660,43 +660,6 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
         ParentColor = False
         ParentFont = False
       end
-      object m_PreviewBefore: TMemo
-        Left = 0
-        Top = 16
-        Width = 241
-        Height = 337
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Courier New'
-        Font.Style = []
-        ParentFont = False
-        ScrollBars = ssBoth
-        TabOrder = 0
-        OnChange = ts_PreviewShow
-        OnClick = m_PreviewBeforeClick
-        OnEnter = m_PreviewBeforeClick
-        OnKeyDown = m_PreviewBeforeKeyDown
-        OnKeyPress = m_PreviewBeforeKeyPress
-        OnKeyUp = m_PreviewBeforeKeyDown
-        OnMouseDown = m_PreviewBeforeMouseDown
-      end
-      object m_PreviewAfter: TMemo
-        Left = 248
-        Top = 16
-        Width = 214
-        Height = 337
-        Anchors = [akLeft, akTop, akRight]
-        Color = clAqua
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Courier New'
-        Font.Style = []
-        ParentFont = False
-        ScrollBars = ssBoth
-        TabOrder = 1
-      end
     end
   end
   object p_Botton: TPanel
