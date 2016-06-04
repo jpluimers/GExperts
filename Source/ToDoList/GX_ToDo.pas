@@ -133,6 +133,7 @@ type
     procedure LoadSettings;
     function ConfigurationKey: string;
     function PriorityToImageIndex(Priority: TToDoPriority): Integer;
+    function NumericPriorityToGXPriority(const PriorityStr: string): TToDoPriority;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -244,11 +245,7 @@ begin
     AddToken('#ToDo1', tpHigh);
     AddToken('#ToDo2', tpNormal);
     AddToken('#ToDo3', tpLow);
-    AddToken('TODO 1', tpCritical);
-    AddToken('TODO 2', tpHigh);
-    AddToken('TODO 3', tpNormal);
-    AddToken('TODO 4', tpLow);
-    AddToken('TODO 5', tpLowest);
+    AddToken('INFO', tpInfo);
     AddToken('DONE', tpDone);
   end;
 end;
@@ -399,9 +396,6 @@ end;
 
 {#todo3 Another test}
 
-resourcestring
-  SDoneTodoDesignation = 'Done';
-
 // What are SComment and EComment passed in for?
 // If we want trimming, then a Boolean variable should
 // be passed in, clearly saying so.
@@ -411,7 +405,6 @@ procedure TfmToDo.ParseComment(const FileName: string; const SComment, EComment:
 var
   i, j, k, n, m, TokenPos, NextCharPos: Integer;
   Info: TToDoInfo;
-  IsDoneTodoItem: Boolean;
   ParsingString: string;
   OptionChar: Char;
   CListItem: TListItem;
@@ -443,10 +436,11 @@ begin
 
       // Token found in comment line
       Info := TToDoInfo.Create;
+      Info.Priority := TTokenInfo(ToDoExpert.FTokenList.Objects[i]).Priority;
 
       // Remove token from string
       Delete(ParsingString, 1, Length(ToDoExpert.FTokenList[i]));
-      ParsingString := TrimRight(ParsingString);
+      ParsingString := Trim(ParsingString);
 
       // Identify numeric priority (if there is one)
       j := 0;
@@ -456,10 +450,12 @@ begin
           Break;
         Inc(j);
       end;
-      Delete(ParsingString, 1, j);
-      ParsingString := TrimLeft(ParsingString);
-
-      IsDoneTodoItem := (AnsiCaseInsensitivePos(SDoneTodoDesignation, ParsingString) = 1);
+      if j > 0 then begin
+        if not (Info.Priority in [tpInfo, tpDone]) then
+          Info.Priority := NumericPriorityToGXPriority(Copy(ParsingString, 1, j));
+        Delete(ParsingString, 1, j);
+        ParsingString := TrimLeft(ParsingString);
+      end;
 
       { zTODO -oTestCase: -cIssue <-- test case for colon }
       { zTODO DONE -oTestCase: -cIssue <-- test case for DONE }
@@ -515,11 +511,6 @@ begin
 
       Info.Raw := TokenString;
 
-      if IsDoneTodoItem then
-        Info.Priority := tpDone
-      else
-        Info.Priority := TTokenInfo(ToDoExpert.FTokenList.Objects[i]).Priority;
-
       if not ToDoExpert.FShowTokens then
         n := n + Length(ToDoExpert.FTokenList[i]);
       if EComment <> '' then // Trim end-comment token.
@@ -543,6 +534,16 @@ begin
         Delete(Info.Display, Pos(' -O', UpperCase(Info.Display)), Length(Info.Owner) + 3);
       // Remove excess whitespace
       Info.Display := Trim(CompressWhiteSpace(Info.Display));
+      // Identify numeric priority (if there is one)
+      j := 0;
+      while j < Length(Info.Display) do
+      begin
+        if not IsCharNumeric(Info.Display[j + 1]) then
+          Break;
+        Inc(j);
+      end;
+      Delete(Info.Display, 1, j);
+      Info.Display := TrimLeft(Info.Display);
       if StrBeginsWith(':', Info.Display) then
       begin
         Delete(Info.Display, 1, 1);
@@ -1415,6 +1416,22 @@ begin
     Result := ImageIndexCheck
   else
     Result := ImageIndexToDoPriority + Ord(Priority);
+end;
+
+function TfmToDo.NumericPriorityToGXPriority(const PriorityStr: string): TToDoPriority;
+var
+  IntPriority: integer;
+begin
+  Result := tpNormal;
+  if TryStrToInt(PriorityStr, IntPriority) then begin
+    case IntPriority of
+      1: Result := tpCritical;
+      2: Result := tpHigh;
+      3: Result := tpNormal;
+      4: Result := tpLow;
+      5: Result := tpLowest;
+    end;
+  end;
 end;
 
 { TToDoInfo }
