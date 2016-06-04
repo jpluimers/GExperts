@@ -10,7 +10,7 @@ the specific language governing rights and limitations under the License.
 
 The Original Code is: SynHighlighterXML.pas, released 2000-11-20.
 The Initial Author of this file is Jeff Rafter.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -839,7 +839,7 @@ begin
   case fLine[Run] of
     '0'..'9', 'a'..'z', 'A'..'Z', '_', '.', ':', '-':
       Result := True;
-    else if fLine[Run] > 'À' then // TODO: this here is very vague, see above
+    else if fLine[Run] > #$00C0 then // TODO: this here is very vague, see above
       Result := True
     else
       Result := False;
