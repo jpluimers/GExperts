@@ -24,8 +24,14 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Top = 8
     Width = 233
     Height = 17
+    Hint = 
+      'If enabled, OK will add the currently selected unit on the right' +
+      ' hand side to the uses clause shown on the left hand side and cl' +
+      'ose the dialog.'
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Single action/quic&k add mode'
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 0
   end
   object chkReplaceFileUnit: TCheckBox
@@ -33,8 +39,13 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Top = 32
     Width = 233
     Height = 17
+    Hint = 
+      'If enabled, the menu entry File -> Use Unit will call the GExper' +
+      'ts Uses Clause Manager'
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Replace IDE File, Use Unit feature'
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 1
   end
   object btnOK: TButton
