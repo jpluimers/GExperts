@@ -28,6 +28,11 @@ type
     {$ENDIF GX_ENHANCED_EDITOR}
     FHighlighter: TGXSyntaxHighlighter;
     FOnChange: TNotifyEvent;
+    FOnClick: TNotifyEvent;
+    FOnKeyPress: TKeyPressWEvent;
+    FOnKeyDown: TKeyEvent;
+    FOnKeyUp: TKeyEvent;
+    FOnMouseDown: TMouseEvent;
     function  GetReadOnly: Boolean;
     procedure SetReadOnly(const Value: Boolean);
     function  GetModified: Boolean;
@@ -60,6 +65,11 @@ type
     function GetAsString: string;
     function GetAsUnicodeString: TGXUnicodeString;
     procedure SetAsUnicodeString(const Value: TGXUnicodeString);
+    procedure SetOnClick(const Value: TNotifyEvent);
+    procedure SetOnKeyDown(const Value: TKeyEvent);
+    procedure SetOnKeyPress(const Value: TKeyPressWEvent);
+    procedure SetOnKeyUp(const Value: TKeyEvent);
+    procedure SetOnMouseDown(const Value: TMouseEvent);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -72,8 +82,11 @@ type
     procedure Print(const ATitle: string);
     function Focused: Boolean; override;
     procedure LoadFromStream(Stream: TStream);
+    procedure LoadFromFile(const AFilename: string);
     procedure BeginUpdate;
     procedure EndUpdate;
+    procedure GetLines(ALines: TGXUnicodeStringList);
+    procedure SetLines(ALines: TGXUnicodeStringList);
     property Highlighter: TGXSyntaxHighlighter read GetHighlighter write SetHighlighter;
     property Text: string read GetText write SetText;
     property Color: TColor  read GetColor write SetColor;
@@ -100,8 +113,13 @@ type
     property TabOrder;
     property Visible;
     property OnChange: TNotifyEvent read FOnChange write SetOnChange;
+    property OnClick: TNotifyEvent read FOnClick write SetOnClick;
     property OnExit;
     property OnEnter;
+    property OnKeyDown: TKeyEvent read FOnKeyDown write SetOnKeyDown;
+    property OnKeyPress: TKeyPressWEvent read FOnKeyPress write SetOnKeyPress;
+    property OnKeyUp: TKeyEvent read FOnKeyUp write SetOnKeyUp;
+    property OnMouseDown: TMouseEvent read FOnMouseDown write SetOnMouseDown;
   end;
 
 procedure Register;
@@ -187,6 +205,36 @@ procedure TGxEnhancedEditor.SetOnChange(const Value: TNotifyEvent);
 begin
   FOnChange := Value;
   FEditor.OnChange := Value;
+end;
+
+procedure TGxEnhancedEditor.SetOnClick(const Value: TNotifyEvent);
+begin
+  FOnClick := Value;
+  FEditor.OnClick := Value;
+end;
+
+procedure TGxEnhancedEditor.SetOnKeyDown(const Value: TKeyEvent);
+begin
+  FOnKeyDown := Value;
+  FEditor.OnKeyDown := Value;
+end;
+
+procedure TGxEnhancedEditor.SetOnKeyPress(const Value: TKeyPressWEvent);
+begin
+  FOnKeypress := Value;
+  FEditor.OnKeyPress := Value;
+end;
+
+procedure TGxEnhancedEditor.SetOnKeyUp(const Value: TKeyEvent);
+begin
+  FOnKeyUp := Value;
+  FEditor.OnKeyUp := Value;
+end;
+
+procedure TGxEnhancedEditor.SetOnMouseDown(const Value: TMouseEvent);
+begin
+  FOnMouseDown := Value;
+  FEditor.OnMouseDown := Value;
 end;
 
 procedure TGxEnhancedEditor.SetFocus;
@@ -331,6 +379,11 @@ begin
   Result := FEditor.Lines.Count;
 end;
 
+procedure TGxEnhancedEditor.GetLines(ALines: TGXUnicodeStringList);
+begin
+  ALines.Assign(FEditor.Lines);
+end;
+
 function TGxEnhancedEditor.GetReadOnly: Boolean;
 begin
   Result := FEditor.ReadOnly
@@ -349,6 +402,18 @@ end;
 function TGxEnhancedEditor.GetWantTabs: Boolean;
 begin
   Result := FEditor.WantTabs;
+end;
+
+procedure TGxEnhancedEditor.LoadFromFile(const AFilename: string);
+var
+  fs: TFileStream;
+begin
+  fs := TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
+  try
+    LoadFromStream(fs);
+  finally
+    FreeAndNil(fs);
+  end;
 end;
 
 procedure TGxEnhancedEditor.LoadFromStream(Stream: TStream);
@@ -429,6 +494,11 @@ begin
   {$IFNDEF GX_ENHANCED_EDITOR}
   FHighlighter := gxpNone;
   {$ENDIF GX_ENHANCED_EDITOR}
+end;
+
+procedure TGxEnhancedEditor.SetLines(ALines: TGXUnicodeStringList);
+begin
+  FEditor.Lines.Assign(ALines);
 end;
 
 function TGxEnhancedEditor.GetNormalizedText: string;
