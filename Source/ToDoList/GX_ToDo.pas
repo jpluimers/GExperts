@@ -209,28 +209,33 @@ var
   i: Integer;
   TokenInfo: TTokenInfo;
   TempTokenText: string;
+  ListSettings: TExpertSettings;
 begin
   ExpSettings.ReadSection('Tokens', Self);
-
-  for i := 0 to Count - 1 do
-  begin
-    // Sanity checks of tokens
-    TempTokenText := Self[i];
-    if TempTokenText <> Trim(TempTokenText) then
+  ListSettings := ExpSettings.CreateExpertSettings('Tokens');
+  try
+    for i := 0 to Count - 1 do
     begin
-      MessageDlg(Format(SWhiteSpaceWarning, [TempTokenText]), mtWarning, [mbOK], 0);
-      TempTokenText := Trim(TempTokenText);
-    end;
+      // Sanity checks of tokens
+      TempTokenText := Self[i];
+      if TempTokenText <> Trim(TempTokenText) then
+      begin
+        MessageDlg(Format(SWhiteSpaceWarning, [TempTokenText]), mtWarning, [mbOK], 0);
+        TempTokenText := Trim(TempTokenText);
+      end;
 
-    if (Length(TempTokenText) > 0) and (TempTokenText[1] = '$') then
-    begin
-      MessageDlg(Format(SLeadingDollarWarning, [TempTokenText]), mtWarning, [mbOK], 0);
-    end;
+      if (Length(TempTokenText) > 0) and (TempTokenText[1] = '$') then
+      begin
+        MessageDlg(Format(SLeadingDollarWarning, [TempTokenText]), mtWarning, [mbOK], 0);
+      end;
 
-    TokenInfo := TTokenInfo.Create;
-    TokenInfo.Token := Self[i];
-    TokenInfo.Priority := TToDoPriority(ExpSettings.ReadInteger('Tokens\' + TokenInfo.Token, 1));
-    Objects[i] := TokenInfo;
+      TokenInfo := TTokenInfo.Create;
+      TokenInfo.Token := Self[i];
+      TokenInfo.Priority := TToDoPriority(ListSettings.ReadInteger(TokenInfo.Token, 1));
+      Objects[i] := TokenInfo;
+    end;
+  finally
+    FreeAndNil(ListSettings);
   end;
   if Count = 0 then
   begin
