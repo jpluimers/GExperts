@@ -1088,13 +1088,23 @@ end;
 procedure TfmBackup.LoadSettings;
 var
   Settings: TGExpertsSettings;
+  fn: string;
 begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
     Settings.LoadForm(Self, ConfigurationKey + '\Window');
+
+    if FCurrentBackupScope = bsActiveProject then
+      fn := ChangeFileExt(ExtractFileName(GxOtaGetCurrentProject.FileName), '')
+    else
+      fn := ChangeFileExt(ExtractFileName(GxOtaGetProjectGroupFileName), '');
+
     FLastZipFile := Settings.ReadString(ConfigurationKey, 'LastZipDir', '');
-    FLastZipFile := IncludeTrailingPathDelimiter(FLastZipFile) + 'ProjectBackup.zip';
+    if FLastZipFile <> '' then
+      FLastZipFile := IncludeTrailingPathDelimiter(FLastZipFile) + fn
+    else
+      FLastZipFile := fn;
   finally
     FreeAndNil(Settings);
   end;
