@@ -12,7 +12,7 @@ The Original Code is: SynHighlighterHTML.pas, released 2000-04-10.
 The Original Code is based on the hkHTMLSyn.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Hideo Koiso.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 HTML5 tags added by CodehunterWorks
 All Rights Reserved.
 

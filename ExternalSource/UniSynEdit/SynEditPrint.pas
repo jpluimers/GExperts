@@ -12,7 +12,7 @@ The Original Code is: SynEditPrint.pas, released 2000-06-01.
 
 The Initial Author of the Original Code is Morten J. Skovrup.
 Portions written by Morten J. Skovrup are copyright 2000 Morten J. Skovrup.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.

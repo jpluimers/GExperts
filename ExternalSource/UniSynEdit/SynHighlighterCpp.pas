@@ -12,7 +12,7 @@ The Original Code is: SynHighlighterCpp.pas, released 2000-04-10.
 The Original Code is based on the dcjCppSyn.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Michael Trier.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the

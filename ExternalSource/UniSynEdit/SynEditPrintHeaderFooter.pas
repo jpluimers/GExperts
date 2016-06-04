@@ -13,7 +13,7 @@ The Original Code is: SynEditPrintHeaderFooter.pas, released 2000-06-01.
 The Initial Author of the Original Code is Morten J. Skovrup.
 Portions written by Morten J. Skovrup are copyright 2000 Morten J. Skovrup.
 Portions written by Michael Hieke are copyright 2000 Michael Hieke.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.

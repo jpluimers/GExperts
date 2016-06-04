@@ -15,7 +15,7 @@ Initial Author of these files is Willo van der Merwe. Initial Author of
 SynHighlighterSQL.pas is Michael Hieke.
 Portions created by Willo van der Merwe are Copyright 1999 Willo van der Merwe.
 Portions created by Michael Hieke are Copyright 2000 Michael Hieke.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the

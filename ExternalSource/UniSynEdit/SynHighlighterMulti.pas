@@ -11,7 +11,7 @@ the specific language governing rights and limitations under the License.
 The Original Code is: SynHighlighterMulti.pas, released 2000-06-23.
 The Original Code is based on mwMultiSyn.pas by Willo van der Merwe, part of the
 mwEdit component suite.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 
 Contributors to the SynEdit and mwEdit projects are listed in the
 Contributors.txt file.

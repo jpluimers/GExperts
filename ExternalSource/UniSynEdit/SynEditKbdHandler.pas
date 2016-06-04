@@ -12,7 +12,7 @@ The Original Code is: SynEditKeyCmds.pas, released 2000-04-07.
 The Original Code is based on the mwKeyCmds.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Brad Stowers.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the

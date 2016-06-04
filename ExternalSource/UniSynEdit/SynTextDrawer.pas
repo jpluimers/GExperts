@@ -17,7 +17,7 @@
   All Rights Reserved.
  ==============================================================================
   Contributor(s):   HANAI Tohru
-  Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
  ==============================================================================
   History:  01/19/1999  HANAI Tohru
                         Initial Version

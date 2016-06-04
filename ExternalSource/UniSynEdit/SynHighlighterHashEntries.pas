@@ -12,7 +12,7 @@ The Original Code is: SynHighlighterHashEntries.pas, released 2000-04-21.
 
 The Initial Author of this file is Michael Hieke.
 Portions created by Michael Hieke are Copyright 2000 Michael Hieke.
-Unicode translation by Maël Hörz.
+Unicode translation by Mael Hoerz. (actually: Ma&euml;l H&ouml;rz)
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
