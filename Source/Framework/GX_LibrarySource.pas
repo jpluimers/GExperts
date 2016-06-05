@@ -23,7 +23,7 @@ implementation
 uses
   Windows, GX_GxUtils, GX_OtaUtils, GX_VerDepConst,
   GX_GExperts, GX_MessageBox, GX_CodeLib, GX_GrepExpert, GX_ExpertManager,
-  GX_GenericUtils;
+  GX_PeInformation, GX_GenericUtils;
 
 const
   InvalidIndex = -1;
@@ -85,6 +85,7 @@ exports
 {$ELSE}
   InitWizard name WizardEntryPoint,
   ShowExpertManager,
+  ShowPeInfo,
   InstallGExperts,
   ShowCodeLib,
   ShowGrep;

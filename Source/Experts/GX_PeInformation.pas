@@ -102,13 +102,16 @@ type
     property NumberType: TNumberType read FNumberType write SetNumberType;
   end;
 
+procedure ShowPeInfo(CmdLine: PAnsiChar); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+
 implementation
 
 {$R *.dfm}
 
 uses
   SysUtils, GX_GxUtils, GX_GenericUtils, GX_Experts,
-  GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math;
+  GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math,
+  GX_DbugIntf;
 
 type
   TPEExpert = class(TGX_Expert)
@@ -697,6 +700,37 @@ end;
 function TPEExpert.HasConfigOptions: Boolean;
 begin
   Result := False;
+end;
+
+procedure ShowPeInfo(CmdLine: PAnsiChar); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+var
+  PEExpertStandAlone: TPEExpert;
+  fn: string;
+begin
+  {$IFOPT D+}SendDebug('Showing PE Information'); {$ENDIF}
+  PEExpertStandAlone := nil;
+  InitSharedResources;
+  try
+    {$IFOPT D+} SendDebug('Created CodeLib window'); {$ENDIF}
+    PEExpertStandAlone := TPEExpert.Create;
+    PEExpertStandAlone.LoadSettings;
+    fmPeInformation := TfmPeInformation.Create(nil);
+    if Assigned(CmdLine)  then begin
+      fn := cmdline;
+      if fn <> '' then
+        fmPeInformation.LoadPEInfo(fn);
+    end;
+    fmPeInformation.ShowModal;
+    PEExpertStandAlone.SaveSettings;
+  finally
+    // Destroying the form will result in an access violation in
+    // TfmIdeDockForm.Destroy which I could not debug and prevent properly.
+    // Just setting it to nil creates a memory leak, but we are shutting down anyway.
+    // -- 2016-06-05 twm
+    fmPeInformation := nil;
+    FreeAndNil(PEExpertStandAlone);
+    FreeSharedResources;
+  end;
 end;
 
 initialization
