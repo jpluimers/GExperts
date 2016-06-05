@@ -208,6 +208,7 @@ SolidCompression=yes
 ;OutputBaseFilename=Setup{#DLLSuffix}
 
 [Files]
+Source: ..\Binaries\GExpertsPeInformation.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\Binaries\ExpertManager.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\Binaries\GExpertsDebugWindow.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\Binaries\GExpertsGrep.exe; DestDir: {app}; Flags: ignoreversion
@@ -227,6 +228,7 @@ Name: {group}\Expert Manager; Filename: {app}\ExpertManager.exe
 Name: {group}\GExperts Help; Filename: {app}\GExperts.chm
 Name: {group}\GExperts Readme; Filename: {app}\Readme.txt
 Name: {group}\Grep Search; Filename: {app}\GExpertsGrep.exe
+Name: {group}\PE Information; Filename: {app}\GExpertsPeInformation.exe
 
 [Registry]
 Root: HKCU; Subkey: Software\{#RegCompany}\{#IDERegName}\{#IDERegVer}.0\Experts; ValueType: STRING; ValueName: GExperts; ValueData: {app}\{#DLLName}; Flags: uninsdeletevalue; Check: IDEExecuted
