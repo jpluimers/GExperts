@@ -328,8 +328,8 @@ end;
 
 destructor TGxOneKeyShortCut.Destroy;
 begin
-  Assert(FOwner <> nil);
-  FOwner.NotifyOneShortCutDestruction(Self);
+  if FOwner <> nil then
+    FOwner.NotifyOneShortCutDestruction(Self);
 
   FOwner := nil;
 
