@@ -254,6 +254,9 @@ function TGxBaseKeyboardShortCutBroker.RequestOneKeyShortCut(
 var
   AShortCutContainer: TGxKeyboardShortCut;
 begin
+  Assert(Assigned(ATrigger), 'ATrigger not assigned');
+  Assert(AShortCut <> 0, 'AShortCut is 0');
+
   AShortCutContainer := TGxOneKeyShortCut.Create(Self, ATrigger, AShortCut);
   FShortCutList.Add(AShortCutContainer);
 
@@ -548,8 +551,9 @@ function TGxNativeKeyboardShortCutBroker.RequestMenuShortCut(
 var
   AShortCutContainer: TGxOneKeyShortCut;
 begin
-  Assert(Assigned(MenuItem));
-  Assert(Length(MenuItem.Name) > 0);
+  Assert(Assigned(Trigger), 'Trigger not assigned');
+  Assert(Assigned(MenuItem), 'MenuItem not assigned');
+  Assert(MenuItem.Name <> '', 'MenuItem.Name is empty');
 
   AShortCutContainer := TGxOneKeyShortCut.Create(Self, Trigger, 0);
   AShortCutContainer.FTrigger := Trigger;
