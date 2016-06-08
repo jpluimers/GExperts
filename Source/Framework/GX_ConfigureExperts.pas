@@ -108,8 +108,8 @@ begin
   FExperts := TList.Create;
 
   if IsThemesEnabled then begin
-    btnClear.Top := edtFilter.Top-1;
-    btnClear.Height := edtFilter.Height+2;
+    btnClear.Top := edtFilter.Top - 1;
+    btnClear.Height := edtFilter.Height + 2;
   end else begin
     btnClear.Top := edtFilter.Top;
     btnClear.Height := edtFilter.Height;
@@ -213,11 +213,11 @@ var
   AControl: TControl;
 begin
   if MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) = mrYes then
-  for i := 0 to sbxExperts.ComponentCount - 1 do begin
-    AControl := sbxExperts.Components[i] as TControl;
-    if AControl is TPanel then
-      GetHotkeyCtrl(AControl as TPanel).HotKey := 0;
-  end;
+    for i := 0 to sbxExperts.ComponentCount - 1 do begin
+      AControl := sbxExperts.Components[i] as TControl;
+      if AControl is TPanel then
+        GetHotkeyCtrl(AControl as TPanel).HotKey := 0;
+    end;
 end;
 
 procedure TfrConfigureExperts.btnSetAllDefaultClick(Sender: TObject);
@@ -230,13 +230,13 @@ var
   AnExpert: TGX_BaseExpert;
 begin
   if (MessageDlg(SWarning, mtWarning, [mbYes, mbCancel], 0) = mrYes) then
-  for i := 0 to sbxExperts.ComponentCount - 1 do begin
-    AControl := sbxExperts.Components[i] as TControl;
-    if AControl is TPanel then begin
-      AnExpert := FExperts[AControl.Tag];
-      GetHotkeyCtrl(AControl as TPanel).HotKey := AnExpert.GetDefaultShortCut;
+    for i := 0 to sbxExperts.ComponentCount - 1 do begin
+      AControl := sbxExperts.Components[i] as TControl;
+      if AControl is TPanel then begin
+        AnExpert := FExperts[AControl.Tag];
+        GetHotkeyCtrl(AControl as TPanel).HotKey := AnExpert.GetDefaultShortCut;
+      end;
     end;
-  end;
 end;
 
 procedure TfrConfigureExperts.ConfigureExpertClick(_Sender: TObject);
@@ -286,7 +286,7 @@ begin
   btnExpert.Top := btnDefault.Top;
   btnExpert.Height := btnDefault.Height;
 
-  RowWidth := sbxExperts.Width * 3;
+  RowWidth := sbxExperts.Width + 3;
   RowHeight := pnlExpertLayout.Height;
   FThumbSize := RowHeight;
   for i := 0 to FExperts.Count - 1 do begin
@@ -345,7 +345,7 @@ begin
       btn.Parent := pnl;
       btn.Caption := SConfigureButtonCaption;
       btn.BoundsRect := btnExpert.BoundsRect;
-      btn.Anchors    := btnExpert.Anchors;
+      btn.Anchors := btnExpert.Anchors;
       btn.OnClick := ConfigureExpertClick;
       btn.Tag := i;
     end;
