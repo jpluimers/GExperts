@@ -382,12 +382,14 @@ begin
   if Assigned(IdeShortCut) and (IdeShortCut.ShortCut <> Value) then
     IdeShortCut := nil;  // Unregisters the shortcut with the IDE
 
-  if Assigned(FAssociatedMenuItem) and not Assigned(IdeShortCut) then
-  begin
-    IdeShortCut := GxKeyboardShortCutBroker.RequestMenuShortCut(OnExecute, FAssociatedMenuItem);
+  if Value <> 0 then begin
+    if Assigned(FAssociatedMenuItem) and not Assigned(IdeShortCut) then
+    begin
+      IdeShortCut := GxKeyboardShortCutBroker.RequestMenuShortCut(OnExecute, FAssociatedMenuItem);
 
-    Assert(Assigned(IdeShortCut));
-    IdeShortCut.ShortCut := Value;
+      Assert(Assigned(IdeShortCut));
+      IdeShortCut.ShortCut := Value;
+    end;
   end;
 
   inherited;
@@ -403,10 +405,12 @@ begin
     if Assigned(IdeShortCut) and (IdeShortCut.ShortCut <> Value) then
       IdeShortCut := nil;  // Unregisters the shortcut with the IDE
 
-    if not Assigned(IdeShortCut) then
-    begin
-      IdeShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(OnExecute, Value);
-      Assert(Assigned(IdeShortCut));
+    if Value <> 0 then begin
+      if not Assigned(IdeShortCut) then
+      begin
+        IdeShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(OnExecute, Value);
+        Assert(Assigned(IdeShortCut));
+      end;
     end;
   end;
 
