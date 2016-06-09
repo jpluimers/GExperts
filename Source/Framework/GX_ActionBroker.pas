@@ -87,7 +87,7 @@ uses
   Windows, SysUtils, Forms, Menus, Rescaler,
   ToolsAPI,
   GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_KbdShortCutBroker,
-  GX_GenericClasses, GX_GenericUtils, Contnrs;
+  GX_GenericClasses, GX_GenericUtils, Contnrs, GX_DbugIntf;
 
 type
   // Special action that implements menu actions.
@@ -415,7 +415,8 @@ begin
     if Value <> 0 then begin
       if not Assigned(IdeShortCut) then
       begin
-        {$IFOPT D+} if not Assigned(OnExecute) then SendDebugError(Self.ClassName + '(' + Self.Caption + ') tried to register a shortcut but OnExecute was not assigned.'); {$ENDIF}
+        {$IFOPT D+} if not Assigned(OnExecute) then
+          SendDebugError(Self.ClassName + '(' + Self.Caption + ') tried to register a shortcut but OnExecute was not assigned.'); {$ENDIF}
         IdeShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(doOnExecute, Value);
 
         Assert(Assigned(IdeShortCut));
