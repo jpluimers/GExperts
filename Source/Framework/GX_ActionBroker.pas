@@ -103,6 +103,7 @@ type
   TGxToolsAction = class(TGxCustomAction, IUnknown, IGxAction)
   private
     procedure SetShortCut(Value: TShortCut); {$ifdef GX_VER240_up} override; {$endif}
+    procedure doOnExecute(Sender: TObject);
   end;
 
 type
@@ -397,6 +398,12 @@ end;
 
 { TGxToolsAction }
 
+procedure TGxToolsAction.doOnExecute(Sender: TObject);
+begin
+  if Assigned(OnExecute) then
+    OnExecute(Sender);
+end;
+
 procedure TGxToolsAction.SetShortCut(Value: TShortCut);
 begin
   // Not necessary under Delphi 5/6 since the callbacks never happen anyway
@@ -408,7 +415,9 @@ begin
     if Value <> 0 then begin
       if not Assigned(IdeShortCut) then
       begin
-        IdeShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(OnExecute, Value);
+        {$IFOPT D+} if not Assigned(OnExecute) then SendDebugError(Self.ClassName + '(' + Self.Caption + ') tried to register a shortcut but OnExecute was not assigned.'); {$ENDIF}
+        IdeShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(doOnExecute, Value);
+
         Assert(Assigned(IdeShortCut));
       end;
     end;
