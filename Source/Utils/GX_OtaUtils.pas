@@ -404,9 +404,23 @@ procedure GxOtaGetIdeEnvironmentStrings(Settings: TStrings);
 function GxOtaGetIdeLibraryPath: string;
 // Return the IDE's global browsing path
 function GxOtaGetIdeBrowsingPath: string;
-// Return the effective library path, with the project specific paths
-// first and then the IDE's global library path.  The paths are
-// optionally macro expanded and with non-existing paths removed.
+///<summary>
+/// Return project specific search path, with the directory containing the project
+// file first.
+/// @params if DoProcessing is true, the paths are macro expanded and non-existing
+///                         paths removed. </summary>
+procedure GxOtaGetProjectSourcePathStrings(Paths: TStrings;
+  Project: IOTAProject = nil; DoProcessing: Boolean = True);
+///<summary>
+/// Return the global IDE library path (without the project specific paths).
+/// @params if DoProcessing is true, the paths are macro expanded and non-existing
+///                         paths removed. </summary>
+procedure GxOtaGetIdeLibraryPathStrings(Paths: TStrings; DoProcessing: Boolean = true);
+///<summary>
+/// Return the effective library path, with the project specific paths
+/// first and then the IDE's global library path.
+/// @params if DoProcessing is true, the paths are macro expanded and non-existing
+///                         paths removed. </summary>
 procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
   Project: IOTAProject = nil; DoProcessing: Boolean = True);
 // Retrieve a guess at all possible paths where files in the current project
@@ -630,7 +644,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
   GX_EditReader, GX_VerDepConst, SynUnicode, Math,
-  GX_GetIdeVersion;
+  GX_GetIdeVersion, GX_dzFileUtils;
 
 const
   EditReaderBufferSize = 1024 * 24;
@@ -2449,30 +2463,51 @@ begin
     Result := '';
 end;
 
-procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
-  Project: IOTAProject; DoProcessing: Boolean);
+function ReplaceMacro(const Str, OldValue, NewValue: string): string;
+var
+  ReplaceVal: string;
+begin
+  ReplaceVal := '$(' + OldValue + ')';
+  Result := StringReplace(Str, ReplaceVal, NewValue, [rfReplaceAll, rfIgnoreCase]);
+end;
+
+procedure SplitIdePath(Strings: TStrings; IdePathString: string);
+var
+  PathItem: string;
+  SemicolonPos: Integer;
+begin
+  SemicolonPos := Pos(';', IdePathString);
+  while SemicolonPos > 0 do
+  begin
+    PathItem := Trim(Copy(IdePathString, 1, SemicolonPos - 1));
+    if PathItem <> '' then
+      EnsureStringInList(Strings, PathItem);
+    Delete(IdePathString, 1, SemicolonPos);
+    SemicolonPos := Pos(';', IdePathString);
+  end;
+  IdePathString := Trim(IdePathString);
+  if IdePathString <> '' then
+    EnsureStringInList(Strings, IdePathString);
+end;
+
+procedure ProcessPaths(Paths: TStrings; const Prefix: string);
 const
   IDEBaseMacros: array [0..2] of string = ('BDS', 'DELPHI', 'BCB');
 var
+  i: Integer;
+  DirIdx: Integer;
+  PathItem: string;
   BasePath: string;
   Environment: TStringList;
-
-  function ReplaceMacro(const Str, OldValue, NewValue: string): string;
-  var
-    ReplaceVal: string;
-  begin
-    ReplaceVal := '$(' + OldValue + ')';
-    Result := StringReplace(Str, ReplaceVal, NewValue, [rfReplaceAll, rfIgnoreCase]);
-  end;
-
-  procedure AddPathItemToList(PathItem: string; const Prefix: string);
-  var
-    i: Integer;
-    EnvName: string;
-    EnvValue: string;
-  begin
-    if DoProcessing then
-    begin
+  EnvName: string;
+  EnvValue: string;
+begin
+  BasePath := RemoveSlash(GetIdeRootDirectory);
+  Environment := TStringList.Create;
+  try
+    GetEnvironmentVariables(Environment);
+    for DirIdx := 0 to Paths.Count - 1 do begin
+      PathItem := Paths[DirIdx];
       // Expand the IDE base folder names $([DELPHI,BCB,BDS])
       for i := Low(IDEBaseMacros) to High(IDEBaseMacros) do
         PathItem := ReplaceMacro(PathItem, IDEBaseMacros[i], BasePath);
@@ -2487,69 +2522,84 @@ var
 
       if not IsPathAbsolute(PathItem) then
       begin
-        if Prefix <> '' then
-          if (Prefix[Length(Prefix)] <> PathDelim) and (PathItem[1] <> PathDelim) then
-            PathItem := AddSlash(PathItem);
-        PathItem := Prefix + PathItem;
+        if Prefix <> '' then begin
+          PathItem := TFileSystem.ExpandFileNameRelBaseDir(PathItem, Prefix);
+        end;
       end;
-      // Ensure the directory exists and has a trailing slash
-      if not DirectoryExists(PathItem) then
-        Exit;
-      PathItem := AddSlash(PathItem);
+      Paths[DirIdx] := PathItem;
     end;
-    PathItem := AddSlash(PathItem);
-    EnsureStringInList(Paths, PathItem);
+  finally
+    FreeAndNil(Environment);
   end;
+end;
 
-  procedure ProcessIdePathString(PathString: string; const Prefix: string);
-  var
-    PathItem: string;
-    SemicolonPos: Integer;
-  begin
-    SemicolonPos := Pos(';', PathString);  // Is this stored the same under Kylix?
-    while SemicolonPos > 0 do
-    begin
-      PathItem := Trim(Copy(PathString, 1, SemicolonPos - 1));
-      if PathItem <> '' then
-        AddPathItemToList(PathItem, Prefix);
-
-      Delete(PathString, 1, SemicolonPos);
-      SemicolonPos := Pos(';', PathString);
-    end;
-    PathString := Trim(PathString);
-    if PathString <> '' then
-      AddPathItemToList(PathString, Prefix);
-  end;
-
+procedure GxOtaGetProjectSourcePathStrings(Paths: TStrings;
+  Project: IOTAProject = nil; DoProcessing: Boolean = True);
 var
   IdePathString: string;
   ProjectOptions: IOTAProjectOptions;
+  ProjectDir: string;
+  i: Integer;
 begin
   Assert(Assigned(Paths));
   Paths.Clear;
-  BasePath := RemoveSlash(GetIdeRootDirectory);
-  Environment := TStringList.Create;
-  try
-    GetEnvironmentVariables(Environment);
-    if Project = nil then
-      Project := GxOtaGetCurrentProject;
-    if Assigned(Project) then
+  if Project = nil then
+    Project := GxOtaGetCurrentProject;
+  if Assigned(Project) then
+  begin
+    ProjectDir := ExtractFileDir(Project.FileName);
+    // Add the current project directory first
+    EnsureStringInList(Paths, ProjectDir);
+    // Then the project search path
+    ProjectOptions := Project.GetProjectOptions;
+    if Assigned(ProjectOptions) then
     begin
-      // Add the current project directory first
-      ProcessIdePathString(ExtractFileDir(Project.FileName), ExtractFileDir(Project.FileName));
-      // Then the project search path
-      ProjectOptions := Project.GetProjectOptions;
-      if Assigned(ProjectOptions) then
-      begin
-        IdePathString := ProjectOptions.Values['SrcDir'];
-        ProcessIdePathString(IdePathString, ExtractFilePath(Project.FileName));
-      end;
+      IdePathString := ProjectOptions.Values['SrcDir'];
+      SplitIdePath(Paths, IdePathString);
     end;
-    // And finally the IDE global search path
-    IdePathString := GxOtaGetIdeLibraryPath;
-    ProcessIdePathString(IdePathString, GetCurrentDir);
+  end;
+  if DoProcessing then begin
+    ProcessPaths(Paths, ProjectDir);
+  end;
+  for i := 0 to Paths.Count - 1 do begin
+    Paths[i] := AddSlash(Paths[i]);
+  end;
+end;
+
+procedure GxOtaGetIdeLibraryPathStrings(Paths: TStrings; DoProcessing: Boolean = true);
+var
+  IdePathString: string;
+  i: Integer;
+begin
+  Assert(Assigned(Paths));
+  Paths.Clear;
+  IdePathString := GxOtaGetIdeLibraryPath;
+  SplitIdePath(Paths, IdePathString);
+  if DoProcessing then begin
+    ProcessPaths(Paths, GetCurrentDir);
+  end;
+  for i := 0 to Paths.Count - 1 do begin
+    Paths[i] := AddSlash(Paths[i]);
+  end;
+end;
+
+procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
+  Project: IOTAProject; DoProcessing: Boolean);
+var
+  IdeLibraryPath: TStringList;
+  i: Integer;
+begin
+  Assert(Assigned(Paths));
+  Paths.Clear;
+  GxOtaGetProjectSourcePathStrings(Paths, Project, DoProcessing);
+  IdeLibraryPath := TStringList.Create;
+  try
+    GxOtaGetIdeLibraryPathStrings(IdeLibraryPath, DoProcessing);
+    for i := 0 to IdeLibraryPath.Count - 1 do begin
+      EnsureStringInList(Paths, IdeLibraryPath[i]);
+    end;
   finally
-    FreeAndNil(Environment);
+    FreeAndNil(IdeLibraryPath);
   end;
 end;
 
