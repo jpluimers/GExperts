@@ -301,7 +301,7 @@ procedure ScanForIncludesAndAdd(const FileName: string;
           Strings.LoadFromFile(FileName);
     except
       // This might be a lie since we might have found it, but since we can not
-      // 'Open' it and 'Read' it it is better to let the user know in now via a message
+      // 'Open' it and 'Read' it it is better to let the user know it now via a message
       // than find out later when the zip component crashes or reports an error.
       AddString := FileName + ItemSeparatorChar + FileName;
       EnsureStringInList(NotFoundFileList, AddString);
@@ -321,14 +321,17 @@ procedure ScanForIncludesAndAdd(const FileName: string;
     if (CompareExt = '*.dfm') or (CompareExt = '*.xfm') or (CompareExt = '*.nfm') then
       Exit; // Included elsewhere
     if SameText(StoreFileName, '*.res') then
-      StoreFileName := ChangeFileExt(FileName, '.res');
-    if SameText(StoreFileName, '*.dcr') then
+      StoreFileName := ChangeFileExt(FileName, '.res')
+    else if SameText(StoreFileName, '*.dcr') then
       StoreFileName := ChangeFileExt(FileName, '.dcr');
     BaseFileName := StoreFileName;
 
     StoreFileName := ExpandFileName(StoreFileName);
-    if FileNameHasWildcards(StoreFileName) then
-      AddFileToList(StoreFileName, FoundFileList)
+    if FileNameHasWildcards(StoreFileName) then begin
+      { TODO -oAnyone -cFeature : Search for matching files here and add them to the list
+        so the user can actually see what will be added. }
+      AddFileToList(StoreFileName, FoundFileList);
+    end
     else
     begin
       if FileExists(StoreFileName) then
@@ -406,7 +409,7 @@ begin
   AddBackupFile(ChangeFileExt(FileName, '.xfm')); // Do not localize.
   AddBackupFile(ChangeFileExt(FileName, '.nfm')); // Do not localize.
   AddBackupFile(ChangeFileExt(FileName, '.fmx')); // Do not localize.
-  AddBackupFile(ChangeFileExt(FileName, '.todo'));
+  AddBackupFile(ChangeFileExt(FileName, '.todo')); // Do not localize.
 
   if FBackupExpert.DoBackupIncludedFiles and (IsDprOrPas(FileName) or IsCpp(FileName)) then
   begin
@@ -448,6 +451,24 @@ begin
 end;
 
 procedure TfmBackup.LocateFileOnPathAndAdd(FilesNotFound: TStrings);
+var
+  LastFileChecked: string;
+  LastFileCheckResult: boolean;
+
+  // Often the same file is included from several places, like the GX_CondDefine.inc
+  // file in GExperts, which is included in >30 units. In that case it is listed in
+  // FilesNotFound multiple times, but we don't need to check it for every entry
+  // (accessing the hard disk is slow, even with caching). Here we simply cache the
+  //  result. On modern computers this doesn't make much of a difference (I benchmarked
+  // it with 200000 duplictes where it as 4 seconds faster), but in virtual machines it will.
+  function DoesFileExist(const Filename: string): boolean;
+  begin
+    if Filename <> LastFileChecked then begin
+      LastFileCheckResult := FileExists(Filename);
+      LastFileChecked := Filename;
+    end;
+    Result := LastFileCheckResult;
+  end;
 
   procedure SplitUpEntry(const Entry: string; var IncludedFile, RefererFile: string);
   var
@@ -492,6 +513,7 @@ begin
   // an easier job of reading the directory structure;
   // this should perform better than iterating over all files
   // and for each file trying to find the containing directory.
+  LastFileChecked := '';
   for i := 0 to FLibraryPath.Count - 1 do
   begin
     j := FilesNotFound.Count - 1;
@@ -499,7 +521,7 @@ begin
     begin
       SplitUpEntry(FilesNotFound[j], IncludedFile, RefererFile);
       FileLocation := FLibraryPath[i] + IncludedFile;
-      if FileExists(FileLocation) then
+      if DoesFileExist(FileLocation) then
       begin
         FilesNotFound.Delete(j);
         if lbFiles.Items.IndexOf(FileLocation) < 0 then
@@ -614,7 +636,7 @@ begin
       // "LocateFileOnPathAndAdd" will remove the files that it finds;
       // after returning, the list will contain those files that *really*
       // could not be found, not even on the library path.
-      if FBackupExpert.FollowLibraryPath then
+      if FBackupExpert.FollowLibraryPath and (FFilesFoundNowhere.Count > 0) then
         LocateFileOnPathAndAdd(FFilesFoundNowhere);
 
       FFilesFoundNowhere.Text := StringReplace(FFilesFoundNowhere.Text,
