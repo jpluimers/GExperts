@@ -10,7 +10,8 @@ type
   TfmMacroSelect = class(TfmBaseForm)
     pnlMain: TPanel;
     lvMacros: TListView;
-    pnlFooter: TPanel;
+    pnlHeader: TPanel;
+    lblFilter: TLabel;
     tbEnter: TMemo;
     pnlButtonsRight: TPanel;
     btnConfiguration: TButton;
@@ -31,7 +32,7 @@ type
     function WindowPosKey: string;
   public
     function GetSelectedMacroCode: Integer;
-    procedure LoadTemplates(AMacroFile: TMacroFile);
+    procedure LoadTemplates(AMacroFile: TMacroFile; Filter: string = '');
   end;
 
 // Returns the index of the selected macro
@@ -72,23 +73,8 @@ begin
 end;
 
 procedure TfmMacroSelect.tbEnterChange(Sender: TObject);
-var
-  MacroName: string;
-  ItemName: string;
-  t: Integer;
 begin
-  MacroName := tbEnter.Text;
-  for t := 0 to lvMacros.Items.Count - 1 do
-  begin
-    ItemName := lvMacros.Items[t].Caption;
-    if Copy(ItemName, 1, Length(MacroName)) = MacroName then
-    begin
-      SelectTemplate(t);
-      Exit;
-    end;
-  end;
-  MessageBeep(MB_OK);
-  lvMacros.Selected := nil;
+  LoadTemplates(GetExpandMacroExpert.MacroFile, tbEnter.Text);
 end;
 
 procedure TfmMacroSelect.lstMacrosDblClick(Sender: TObject);
@@ -117,15 +103,19 @@ begin
   end;
 end;
 
-procedure TfmMacroSelect.LoadTemplates(AMacroFile: TMacroFile);
+procedure TfmMacroSelect.LoadTemplates(AMacroFile: TMacroFile; Filter: string = '');
 
   procedure AddMacroToList(const AMacroName, AMacroDesc: string);
   var
     ListItem: TListItem;
   begin
-    ListItem := lvMacros.Items.Add;
-    ListItem.Caption := AMacroName;
-    ListItem.SubItems.Add(AMacroDesc);
+    if (Filter = '')
+      or StrContains(Filter, AMacroName, False) or StrContains(Filter, AMacroDesc, False)  then
+    begin
+      ListItem := lvMacros.Items.Add;
+      ListItem.Caption := AMacroName;
+      ListItem.SubItems.Add(AMacroDesc);
+    end;
   end;
 
   procedure FocusAndSelectFirstItem;

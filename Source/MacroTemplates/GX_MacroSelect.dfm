@@ -2,7 +2,8 @@ object fmMacroSelect: TfmMacroSelect
   Left = 366
   Top = 321
   Width = 439
-  Height = 281
+  Height = 367
+  ActiveControl = tbEnter
   BorderStyle = bsSizeToolWin
   Caption = 'Select Macro Template'
   Color = clBtnFace
@@ -23,18 +24,18 @@ object fmMacroSelect: TfmMacroSelect
   TextHeight = 14
   object pnlMain: TPanel
     Left = 0
-    Top = 0
+    Top = 25
     Width = 423
-    Height = 213
+    Height = 303
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
-    TabOrder = 0
+    TabOrder = 1
     object lvMacros: TListView
       Left = 6
       Top = 6
       Width = 411
-      Height = 201
+      Height = 291
       Align = alClient
       Columns = <
         item
@@ -57,24 +58,32 @@ object fmMacroSelect: TfmMacroSelect
       OnDblClick = lstMacrosDblClick
     end
   end
-  object pnlFooter: TPanel
+  object pnlHeader: TPanel
     Left = 0
-    Top = 213
+    Top = 0
     Width = 423
-    Height = 32
-    Align = alBottom
+    Height = 25
+    Align = alTop
     BevelOuter = bvNone
-    TabOrder = 1
+    TabOrder = 0
     DesignSize = (
       423
-      32)
+      25)
+    object lblFilter: TLabel
+      Left = 8
+      Top = 7
+      Width = 26
+      Height = 14
+      Caption = 'Filte&r'
+      FocusControl = tbEnter
+    end
     object tbEnter: TMemo
-      Left = 6
+      Left = 48
       Top = 4
-      Width = 282
+      Width = 249
       Height = 20
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 0
+      TabOrder = 1
       WantReturns = False
       WordWrap = False
       OnChange = tbEnterChange
@@ -84,16 +93,16 @@ object fmMacroSelect: TfmMacroSelect
       Left = 298
       Top = 0
       Width = 125
-      Height = 32
+      Height = 25
       Align = alRight
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
       object btnConfiguration: TButton
         Left = 15
         Top = 1
         Width = 103
         Height = 25
-        Caption = '&Configuration...'
+        Caption = '&Configure...'
         TabOrder = 0
         OnClick = btnConfigurationClick
       end
