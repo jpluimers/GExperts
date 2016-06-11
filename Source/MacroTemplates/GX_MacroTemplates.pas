@@ -917,6 +917,9 @@ begin
 end;
 
 procedure TfmMacroTemplates.pmUsesPopup(Sender: TObject);
+resourcestring
+  SAddToInterface = 'Add to Interface';
+  SAddToImplementation = 'Add to Implementation';
 var
   DeleteEnabled, TemplateReadOnly: Boolean;
   lb: TListBox;
@@ -929,9 +932,9 @@ begin
   miAddToUses.Enabled := not TemplateReadOnly;
 
   if lb = lbGlobalUses then
-    miAddToUses.Caption := 'Add to Interface'
+    miAddToUses.Caption := SAddToInterface
   else if lb = lbLocalUses then
-    miAddToUses.Caption := 'Add to Implementation';
+    miAddToUses.Caption := SAddToImplementation;
 end;
 
 procedure TfmMacroTemplates.miAddToUsesClick(Sender: TObject);
