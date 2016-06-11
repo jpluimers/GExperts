@@ -51,6 +51,7 @@ type
     tbnSep2: TToolButton;
     actHelpHelp: TAction;
     actHelpAbout: TAction;
+    btnClear: TButton;
     procedure FormPaint(Sender: TObject);
     procedure cbxFontNameChange(Sender: TObject);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
@@ -83,6 +84,7 @@ type
     procedure actCharHighUpdate(Sender: TObject);
     procedure actShowHintsUpdate(Sender: TObject);
     procedure ToolBarResize(Sender: TObject);
+    procedure btnClearClick(Sender: TObject);
   private
     FStartCharacter: Integer;
     FDisplayFontSize: Integer;
@@ -701,6 +703,12 @@ begin
   (Sender as TAction).Checked := FShowHints;
 end;
 
+procedure TfmAsciiChart.btnClearClick(Sender: TObject);
+begin
+  eChars.Text := '';
+  eChars.SetFocus;
+end;
+
 constructor TfmAsciiChart.Create(AOwner: TComponent);
 var
   Settings: TGExpertsSettings;
@@ -747,7 +755,7 @@ end;
 
 procedure TfmAsciiChart.ToolBarResize(Sender: TObject);
 begin
-  eChars.Width := (Sender as TControl).ClientWidth - eChars.Left;
+  eChars.Width := (Sender as TControl).ClientWidth - eChars.Left - btnClear.Width;
 end;
 
 function TfmAsciiChart.ConfigurationKey: string;

@@ -126,6 +126,15 @@ object fmAsciiChart: TfmAsciiChart
       Height = 22
       TabOrder = 3
     end
+    object btnClear: TButton
+      Left = 520
+      Top = 0
+      Width = 22
+      Height = 22
+      Caption = 'X'
+      TabOrder = 4
+      OnClick = btnClearClick
+    end
   end
   object pmContext: TPopupMenu
     AutoPopup = False
