@@ -219,27 +219,19 @@ object fmMacroTemplates: TfmMacroTemplates
               BevelOuter = bvNone
               FullRepaint = False
               TabOrder = 1
-              object lvLocalUses: TListView
+              object lbLocalUses: TListBox
                 Left = 0
                 Top = 18
                 Width = 141
                 Height = 70
                 Align = alClient
-                Columns = <
-                  item
-                    Caption = 'Uses'
-                  end>
                 DragMode = dmAutomatic
-                GridLines = True
-                IconOptions.Arrangement = iaLeft
-                IconOptions.WrapText = False
-                RowSelect = True
+                ItemHeight = 14
                 PopupMenu = pmUses
                 TabOrder = 1
-                ViewStyle = vsList
+                OnDragDrop = lbUsesDragDrop
+                OnDragOver = lbUsesDragOver
                 OnExit = TemplateCodeExit
-                OnDragDrop = lvGlobalUsesDragDrop
-                OnDragOver = lvGlobalUsesDragOver
               end
               object pnlImplementationHeader: TPanel
                 Left = 0
@@ -262,27 +254,19 @@ object fmMacroTemplates: TfmMacroTemplates
               BevelOuter = bvNone
               FullRepaint = False
               TabOrder = 0
-              object lvGlobalUses: TListView
+              object lbGlobalUses: TListBox
                 Left = 0
                 Top = 16
                 Width = 141
                 Height = 62
                 Align = alClient
-                Columns = <
-                  item
-                    Caption = 'Uses'
-                  end>
                 DragMode = dmAutomatic
-                GridLines = True
-                IconOptions.Arrangement = iaLeft
-                IconOptions.WrapText = False
-                RowSelect = True
+                ItemHeight = 14
                 PopupMenu = pmUses
                 TabOrder = 1
-                ViewStyle = vsList
+                OnDragDrop = lbUsesDragDrop
+                OnDragOver = lbUsesDragOver
                 OnExit = TemplateCodeExit
-                OnDragDrop = lvGlobalUsesDragDrop
-                OnDragOver = lvGlobalUsesDragOver
               end
               object pnlInterfaceHeader: TPanel
                 Left = 0

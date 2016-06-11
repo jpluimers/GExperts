@@ -136,10 +136,10 @@ type
     btnCancel: TButton;
     INTERFACEMacro1: TMenuItem;
     pnlUsesImplementation: TPanel;
-    lvLocalUses: TListView;
+    lbLocalUses: TListBox;
     pnlImplementationHeader: TPanel;
     pnlUsesInterface: TPanel;
-    lvGlobalUses: TListView;
+    lbGlobalUses: TListBox;
     pnlInterfaceHeader: TPanel;
     mitNone: TMenuItem;
     mitPas: TMenuItem;
@@ -221,10 +221,8 @@ type
     procedure pmUsesPopup(Sender: TObject);
     procedure miAddToUsesClick(Sender: TObject);
     procedure miDeleteUsesClick(Sender: TObject);
-    procedure lvGlobalUsesDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
-    procedure lvGlobalUsesDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure lvGlobalUsesChange(Sender: TObject; Item: TListItem; Change: TItemChange);
-    procedure lvGlobalUsesInsert(Sender: TObject; Item: TListItem);
+    procedure lbUsesDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure lbUsesDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure lvTemplatesClick(Sender: TObject);
     procedure edProgrammerNameChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -280,8 +278,8 @@ type
     procedure LoadSettings;
     procedure SaveMacroFile(const AFilename: string);
     procedure LoadMacroFile(const AFilename: string; AAppend: Boolean);
-    procedure AddUses(AUnits: TStringList; AListView: TListView);
-    procedure LoadUsesToMacroObject(AUnits: TStringList; AListView: TListView);
+    procedure AddUses(AUnits: TStringList; AListBox: TListBox);
+    procedure LoadUsesToMacroObject(AUnits: TStringList; AListBox: TListBox);
     procedure SaveTemplateChanges;
     procedure AddMacroToControls(AMacroObject: TMacroObject);
     procedure UpdateMacroListValues(AMacroIndex: Integer; AMacroObject: TMacroObject);
@@ -569,8 +567,8 @@ begin
   if MacroObject <> nil then
   begin
     FTemplateText.AsString := MacroObject.Text;
-    AddUses(MacroObject.PubUnits, lvGlobalUses);
-    AddUses(MacroObject.PrivUnits, lvLocalUses);
+    AddUses(MacroObject.PubUnits, lbGlobalUses);
+    AddUses(MacroObject.PrivUnits, lbLocalUses);
     SetEditing(True);
     SetInsertPos(MacroObject.InsertPos);
     FTemplateShortCut := MacroObject.ShortCut;
@@ -591,8 +589,8 @@ begin
   begin
     MacroText := FTemplateText.Text;
     MacroObject.Text := MacroText;
-    LoadUsesToMacroObject(MacroObject.PubUnits, lvGlobalUses);
-    LoadUsesToMacroObject(MacroObject.PrivUnits, lvLocalUses);
+    LoadUsesToMacroObject(MacroObject.PubUnits, lbGlobalUses);
+    LoadUsesToMacroObject(MacroObject.PrivUnits, lbLocalUses);
     MacroObject.InsertPos := GetInsertPos;
     MacroObject.ShortCut := FTemplateShortCut;
   end;
@@ -669,8 +667,8 @@ begin
   lvTemplates.Selected := nil;
   FTemplateText.Clear;
   FTemplateShortCut := EmptyShortCut;
-  lvGlobalUses.Items.Clear;
-  lvLocalUses.Items.Clear;
+  lbGlobalUses.Items.Clear;
+  lbLocalUses.Items.Clear;
   SetEditing(False);
 end;
 
@@ -921,113 +919,84 @@ end;
 procedure TfmMacroTemplates.pmUsesPopup(Sender: TObject);
 var
   DeleteEnabled, TemplateReadOnly: Boolean;
+  lb: TListBox;
 begin
-  DeleteEnabled := Assigned((pmUses.PopupComponent as TListView).Selected);
+  lb := (pmUses.PopupComponent as TListBox);
+  DeleteEnabled := (lb.ItemIndex <> -1);
   TemplateReadOnly := FTemplateText.ReadOnly;
 
   miDeleteUses.Enabled := DeleteEnabled and (not TemplateReadOnly);
   miAddToUses.Enabled := not TemplateReadOnly;
 
-  if (pmUses.PopupComponent as TListView) = lvGlobalUses then
+  if lb = lbGlobalUses then
     miAddToUses.Caption := 'Add to Interface'
-  else if (pmUses.PopupComponent as TListView) = lvLocalUses then
+  else if lb = lbLocalUses then
     miAddToUses.Caption := 'Add to Implementation';
 end;
 
 procedure TfmMacroTemplates.miAddToUsesClick(Sender: TObject);
 var
-  ListView: TListView;
+  lb: TListBox;
   UnitName: string;
-  ListItem: TListItem;
 begin
-  ListView := (pmUses.PopupComponent as TListView);
+  lb := (pmUses.PopupComponent as TListBox);
 
   UnitName := InputBox('Unit Name', 'Unit Name', '');
   if UnitName <> '' then
   begin
-    ListItem := ListView.Items.Add;
-    ListItem.Caption := UnitName;
+    lb.Items.Add(UnitName);
     MarkModified;
   end;
 end;
 
 procedure TfmMacroTemplates.miDeleteUsesClick(Sender: TObject);
 var
-  ListView: TListView;
+  lb: TListBox;
+  idx: Integer;
 begin
-  ListView := (pmUses.PopupComponent as TListView);
-  if ListView.Selected <> nil then
+  lb := (pmUses.PopupComponent as TListBox);
+  idx := lb.ItemIndex;
+  if idx <> -1 then
   begin
-    ListView.Selected.Delete;
+    lb.Items.Delete(Idx);
     MarkModified;
   end;
 end;
 
-procedure TfmMacroTemplates.lvGlobalUsesDragOver(Sender, Source: TObject;
-  X, Y: Integer; State: TDragState; var Accept: Boolean);
+procedure TfmMacroTemplates.lbUsesDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
 begin
-  Accept := Source is TListView;
+  Accept := Source is TListBox;
 end;
 
-procedure TfmMacroTemplates.lvGlobalUsesDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TfmMacroTemplates.lbUsesDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
-  SourceList, DestList: TListView;
-  ListItem: TListItem;
-  MovedItem: TListItem;
+  SourceList, DestList: TListBox;
+  Idx: Integer;
 begin
-  if (Sender is TListView) and (Source is TListView) then
+  if (Sender is TListBox) and (Source is TListBox) then
   begin
-    SourceList := Source as TListView;
-    DestList := Sender as TListView;
-    if SourceList.Selected = nil then
+    SourceList := Source as TListBox;
+    Idx := SourceList.ItemIndex;
+    if Idx = -1 then
       Exit;
-    MovedItem := SourceList.Selected;
-
-    ListItem := DestList.Items.Add;
-    ListItem.Caption := MovedItem.Caption;
-
-    MovedItem.Delete;
+    DestList := Sender as TListBox;
+    DestList.Items.Add(SourceList.Items[Idx]);
+    SourceList.Items.Delete(Idx);
+    MarkModified;
+    SaveTemplateChanges;
   end;
 end;
 
-// Copy uses list from AUnits to AListView
-procedure TfmMacroTemplates.AddUses(AUnits: TStringList; AListView: TListView);
-var
-  ListItem: TListItem;
-  UnitName: string;
-  t: Integer;
+procedure TfmMacroTemplates.AddUses(AUnits: TStringList; AListBox: TListBox);
 begin
-  AListView.Items.Clear;
-  for t := 0 to AUnits.Count - 1 do
-  begin
-    UnitName := AUnits.Strings[t];
-    ListItem := AListView.Items.Add;
-    ListItem.Caption := UnitName;
-  end;
+  AListBox.Items := AUnits;
 end;
 
 // Copy uses list from from AListsView to AUnits
-procedure TfmMacroTemplates.LoadUsesToMacroObject(AUnits: TStringList; AListView: TListView);
-var
-  ListItem: TListItem;
-  t: Integer;
+procedure TfmMacroTemplates.LoadUsesToMacroObject(AUnits: TStringList; AListBox: TListBox);
 begin
-  AUnits.Clear;
-  for t := 0 to AListView.Items.Count - 1 do
-  begin
-    ListItem := AListView.Items[t];
-    AUnits.Add(ListItem.Caption);
-  end;
-end;
-
-procedure TfmMacroTemplates.lvGlobalUsesChange(Sender: TObject; Item: TListItem; Change: TItemChange);
-begin
-  SaveTemplateChanges;
-end;
-
-procedure TfmMacroTemplates.lvGlobalUsesInsert(Sender: TObject; Item: TListItem);
-begin
-  SaveTemplateChanges;
+  AUnits.Assign(AListBox.Items);
 end;
 
 procedure TfmMacroTemplates.SaveMacroFile(const AFilename: string);
