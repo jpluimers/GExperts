@@ -109,6 +109,15 @@ object fmBackupConfig: TfmBackupConfig
         Height = 22
         TabOrder = 2
       end
+      object btnDefault: TButton
+        Left = 256
+        Top = 56
+        Width = 75
+        Height = 25
+        Caption = 'Default'
+        TabOrder = 4
+        OnClick = btnDefaultClick
+      end
     end
     object cbSearchOnLibraryPath: TCheckBox
       Left = 28

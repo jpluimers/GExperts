@@ -29,12 +29,14 @@ type
     cbIgnoreHistoryDir: TCheckBox;
     cbIgnoreScmDirs: TCheckBox;
     cbIgnoreBackupFiles: TCheckBox;
+    btnDefault: TButton;
     procedure btnBackupDirClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure rbGenericBackupTargetClick(Sender: TObject);
     procedure cbBackupIncClick(Sender: TObject);
     procedure btHelpClick(Sender: TObject);
     procedure cbAddRecursivelyClick(Sender: TObject);
+    procedure btnDefaultClick(Sender: TObject);
   private
     procedure edBackupDirOnDropFiles(_Sender: TObject; _Files: TStrings);
   public
@@ -47,7 +49,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_GenericUtils, GX_GxUtils, GX_dzVclUtils;
+  GX_GenericUtils, GX_GxUtils, GX_dzVclUtils, GX_MacroParser;
 
 constructor TfmBackupConfig.Create(_Owner: TComponent);
 begin
@@ -63,12 +65,20 @@ begin
 end;
 
 procedure TfmBackupConfig.btnBackupDirClick(Sender: TObject);
+resourcestring
+  SSaveDialogCaption = 'File to save to';
 var
   Temp: string;
 begin
   Temp := edBackupDir.Text;
-  if GetDirectory(Temp) then
+  Temp := ReplaceStrings(Temp, True);
+  if ShowSaveDialog(SSaveDialogCaption, 'zip', Temp) then
     edBackupDir.Text := Temp;
+end;
+
+procedure TfmBackupConfig.btnDefaultClick(Sender: TObject);
+begin
+  edBackupDir.Text := AddSlash('%PROJECTDIR%') + '%PROJECTNAME%';
 end;
 
 procedure TfmBackupConfig.FormShow(Sender: TObject);
