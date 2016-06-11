@@ -131,8 +131,16 @@ const
   CommentEnd = '}';
 {$ENDIF GX_DELPHI}
 
-  DefaultMacros: array[0..9] of TMacroDetails = (
+  DefaultMacros: array[0..10] of TMacroDetails = (
     ( // 0
+      Name: '_';
+      Desc: 'embed _() for gettext()';
+      ImplUnit: 'gnugettext';
+      InsertPos: tipCursorPos;
+      Text:
+         '_(%SELECTION%|)';
+    ),
+    ( // 1
       Name: 'ph';
       Desc: 'Procedure Header';
       ImplUnit: '';
@@ -146,7 +154,7 @@ const
         '  Result:    %RESULT%' +sLineBreak+
         '-----------------------------------------------------------------------------' + CommentEnd + sLineBreak + sLineBreak;
     ),
-    ( // 1
+    ( // 2
       Name: 'uh';
       Desc: 'Unit Header';
       ImplUnit: '';
@@ -160,14 +168,14 @@ const
         ' History:' +sLineBreak+
         '-----------------------------------------------------------------------------' + CommentEnd + sLineBreak + sLineBreak;
     ),
-    ( // 2
+    ( // 3
       Name: 'sd';
       Desc: 'Send Debug Message';
       ImplUnit: 'DbugIntf';
       InsertPos: tipCursorPos;
       Text: '{$IFOPT D+} SendDebug(''|''); {$ENDIF}';
     ),
-    ( // 3
+    ( // 4
       Name: 'sdme';
       Desc: 'Send Debug Method Enter/Exit';
       ImplUnit: 'DbugIntf';
@@ -180,7 +188,7 @@ const
         '    SendMethodExit(''%METHODCLASS%'');' + sLineBreak +
         '  end;' + sLineBreak;
     ),
-    ( // 4
+    ( // 5
       Name: 'xdoc';
       Desc: 'XML Method Documentation';
       InsertPos: tipCursorPos;
@@ -191,7 +199,7 @@ const
         '/// %BEGINPARAMLIST%<param name="%PARAMNAME%"></param>' + sLineBreak +
         '/// %ENDPARAMLIST%<returns>%RESULT%</returns>';
     ),
-    ( // 5
+    ( // 6
       Name: 'begin';
       Desc: 'Embed begin/end';
       InsertPos: tipCursorPos;
@@ -200,7 +208,7 @@ const
          '  %SELECTION%|' + sLineBreak +
          'end;';
     ),
-    ( // 6
+    ( // 7
       Name: 'tryf';
       Desc: 'Embed try/finally';
       InsertPos: tipCursorPos;
@@ -210,13 +218,13 @@ const
         'finally' + sLineBreak +
         'end;';
     ),
-    ( // 7
+    ( // 8
       Name: 'for';
       Desc: 'For loop (basic)';
       InsertPos: tipCursorPos;
       Text: 'for | := 0 to  do';
     ),
-    ( // 8
+    ( // 9
       Name: 'fori';
       Desc: 'For loop with counter/embedding';
       InsertPos: tipCursorPos;
@@ -226,7 +234,7 @@ const
         '  %SELECTION%' + sLineBreak +
         'end;';
     ),
-    ( // 9
+    ( // 10
       Name: 'while';
       Desc: 'Embed while/do/begin/end loop';
       InsertPos: tipCursorPos;
