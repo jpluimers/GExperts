@@ -20,7 +20,6 @@ object fmAsciiChart: TfmAsciiChart
   OnConstrainedResize = FormConstrainedResize
   OnDeactivate = FormDeactivate
   OnKeyDown = FormKeyDown
-  OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnPaint = FormPaint
@@ -212,6 +211,7 @@ object fmAsciiChart: TfmAsciiChart
       Category = 'HighLow'
       Caption = 'Show Characters &0-127'
       ImageIndex = 3
+      ShortCut = 16460
       OnExecute = actCharLowExecute
       OnUpdate = actCharLowUpdate
     end
@@ -219,6 +219,7 @@ object fmAsciiChart: TfmAsciiChart
       Category = 'HighLow'
       Caption = 'Show Characters &128-255'
       ImageIndex = 2
+      ShortCut = 16456
       OnExecute = actCharHighExecute
       OnUpdate = actCharHighUpdate
     end
@@ -226,6 +227,7 @@ object fmAsciiChart: TfmAsciiChart
       Category = 'HexDec'
       Caption = 'Character Values as &Decimal'
       ImageIndex = 0
+      ShortCut = 24644
       OnExecute = actCharDecExecute
       OnUpdate = actCharDecUpdate
     end
@@ -233,24 +235,28 @@ object fmAsciiChart: TfmAsciiChart
       Category = 'HexDec'
       Caption = 'Character Values as &Hexadecimal'
       ImageIndex = 1
+      ShortCut = 24648
       OnExecute = actCharHexExecute
       OnUpdate = actCharHexUpdate
     end
     object actFontSize8: TAction
       Category = 'FontSize'
       Caption = 'Font Size: 8'
+      ShortCut = 16440
       OnExecute = actFontSize8Execute
       OnUpdate = actGenericFontSizeUpdate
     end
     object actFontSize10: TAction
       Category = 'FontSize'
       Caption = 'Font Size: 10'
+      ShortCut = 16432
       OnExecute = actFontSize10Execute
       OnUpdate = actGenericFontSizeUpdate
     end
     object actFontSize12: TAction
       Category = 'FontSize'
       Caption = 'Font Size: 12'
+      ShortCut = 16434
       OnExecute = actFontSize12Execute
       OnUpdate = actGenericFontSizeUpdate
     end

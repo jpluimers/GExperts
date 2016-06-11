@@ -61,8 +61,6 @@ type
     procedure HintTimerTimer(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure updFontSizeClick(Sender: TObject; Button: TUDBtnType);
-    procedure FormMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
-      X, Y: Integer);
     procedure edFontSizeChange(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbxFontNameEnter(Sender: TObject);
@@ -87,7 +85,6 @@ type
     procedure ToolBarResize(Sender: TObject);
   private
     FStartCharacter: Integer;
-    CharPos: Integer;
     FDisplayFontSize: Integer;
     FFontName: string;
     FShowHex: Boolean;
@@ -97,7 +94,9 @@ type
     FHint: THintWindow;
     FOldCharPos: Integer;
     FZoomFontSize: Integer;
-    procedure SetCharPos(MouseX, MouseY: Integer);
+    function TryGetCharPos(MouseX, MouseY: Integer; out CharPos: Integer): Boolean; overload;
+    function TryGetCharPos(MouseX, MouseY: Integer; out CharPos: Integer;
+      out XPos, YPos, HorizMult, VertMult: Integer): Boolean; overload;
     procedure DrawCharacter(const CharValue: Integer; const CharText: string;
       const HorizMult, VertMult: Integer);
     procedure GetFonts;
@@ -312,10 +311,8 @@ begin
   KillHint;
 end;
 
-procedure TfmAsciiChart.SetCharPos(MouseX, MouseY: Integer);
-var
-  HorizMult, VertMult: Integer; { logical screen width/height segments }
-  XPos, YPos: Integer; { X and Y cells clicked on }
+function TfmAsciiChart.TryGetCharPos(MouseX, MouseY: Integer; out CharPos: Integer;
+  out XPos, YPos, HorizMult, VertMult: Integer): Boolean; 
 begin
   HorizMult := Self.ClientWidth div 8;
   VertMult := (Self.ClientHeight - ToolBar.Height) div 16;
@@ -323,23 +320,34 @@ begin
   YPos := (MouseY - 25) div VertMult;
   { only generate charpos if clicking inside the boundaries of the cells
     avoids the clicking beyond the right/bottom extents of the cells }
-  if (XPos < 8) and (YPos < 16) then
-    CharPos := FStartCharacter + XPos * 16 + YPos
-  else
-    CharPos := -1;
+  Result := (XPos < 8) and (YPos < 16);
+  if Result then begin
+    CharPos := FStartCharacter + XPos * 16 + YPos;
+    Result := (CharPos > -1) and (CharPos < 256);
+  end;
+end;
+
+function TfmAsciiChart.TryGetCharPos(MouseX, MouseY: Integer; out CharPos: Integer): Boolean;
+var
+  HorizMult, VertMult: Integer;
+  XPos, YPos: Integer;
+begin
+  Result := TryGetCharPos(MouseX, MouseY, CharPos, XPos, YPos, HorizMult, VertMult);
 end;
 
 procedure TfmAsciiChart.FormMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
   X, Y: Integer);
+var
+  Charpos: Integer;
 begin
-  SetCharPos(X, Y);
   if Button = mbRight then
     pmContext.Popup(X + Left + GetSystemMetrics(SM_CXFRAME),
       Y + Self.Top + GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION))
   else
   begin
-    if (CharPos > -1) and (CharPos < 256) then
-      eChars.Text := eChars.Text + Char(CharPos);
+    if TryGetCharPos(X, Y, Charpos) then begin
+      eChars.SelText := Char(CharPos);
+    end;
   end;
 end;
 
@@ -411,18 +419,9 @@ var
   HintDrawingRect: TRect;
   HintText: string;
   HintScreenOffset: TPoint;
-  CharPos: Integer; { Override the global Charpos variable }
+  CharPos: Integer;
 begin
-  HorizMult := Self.ClientWidth div 8;
-  VertMult := (Self.ClientHeight - ToolBar.Height) div 16;
-  XPos := X div HorizMult;
-  YPos := (Y - 25) div VertMult;
-
-  { Only generate charpos if clicking inside the boundaries of the cells
-    avoids the clicking beyond the right/bottom extents of the cells }
-  if (XPos < 8) and (YPos < 16) then
-    CharPos := FStartCharacter + XPos * 16 + YPos
-  else
+  if not TryGetCharPos(X, Y, CharPos, XPos, YPos, HorizMult, VertMult) then
     Exit;
 
   { Create my custom hint }
@@ -491,12 +490,6 @@ procedure TfmAsciiChart.updFontSizeClick(Sender: TObject;
 begin
   FDisplayFontSize := updFontSize.Position;
   Self.Refresh;
-end;
-
-procedure TfmAsciiChart.FormMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  SetCharPos(X, Y);
 end;
 
 procedure TfmAsciiChart.edFontSizeChange(Sender: TObject);
@@ -729,6 +722,7 @@ begin
     FShowHex := Settings.ReadBool(ConfigurationKey, 'Show Hex', False);
     FZoomFontSize := Settings.ReadInteger(ConfigurationKey, 'Zoom Font Size', 32);
     eChars.Text := Settings.ReadString(ConfigurationKey, 'Edit Display Text', '');
+    eChars.SelStart := Length(eChars.Text);
     FShowHints := Settings.ReadBool(ConfigurationKey, 'Show Hint', True);
     Settings.LoadForm(Self, ConfigurationKey + '\Window');
   finally
