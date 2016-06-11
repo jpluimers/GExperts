@@ -1118,7 +1118,7 @@ begin
     Settings.LoadForm(Self, ConfigurationKey + '\Window');
 
     if FCurrentBackupScope = bsActiveProject then
-      fn := ChangeFileExt(ExtractFileName(GxOtaGetCurrentProject.FileName), '')
+      fn := ChangeFileExt(ExtractFileName(GxOtaGetCurrentProjectFileName), '')
     else
       fn := ChangeFileExt(ExtractFileName(GxOtaGetProjectGroupFileName), '');
 
