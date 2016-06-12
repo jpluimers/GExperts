@@ -35,11 +35,9 @@ type
     function FindIdentAction(const Source: string; Pos: Integer;
       var FoundPos: Integer; var Ident: string): Boolean;
     procedure InternalExecute; override;
-    // these cannot be changed to InternalLoad/SaveSettings because they are shared between
-    // TPrevIdentExpert and TNextIdentExpert
-    { TODO -oAnyone -cfixme : Resolve this }
-    procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
+    class function ConfigurationKey: string; override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -260,18 +258,23 @@ begin
   Result := 'PreviousIdent';
 end;
 
-procedure TPrevIdentExpert.InternalLoadSettingsOld(Settings: TGExpertsSettings);
+class function TPrevIdentExpert.ConfigurationKey: string;
 begin
-  inherited InternalLoadSettingsOld(Settings);
-  // Do not localize any of the below items.
-  ViewChangeType := TViewChangeType(Settings.ReadEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(vctScrollCenter)));
+  Result := 'PrevNextIdentifier';
 end;
 
-procedure TPrevIdentExpert.InternalSaveSettingsOld(Settings: TGExpertsSettings);
+procedure TPrevIdentExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
-  inherited InternalSaveSettingsOld(Settings);
+  inherited InternalLoadSettings(Settings);
   // Do not localize any of the below items.
-  Settings.WriteEnumerated('PrevNextIdentifier', 'ViewChangeType', TypeInfo(TViewChangeType), Ord(ViewChangeType));
+  ViewChangeType := TViewChangeType(Settings.ReadEnumerated('ViewChangeType', TypeInfo(TViewChangeType), Ord(vctScrollCenter)));
+end;
+
+procedure TPrevIdentExpert.InternalSaveSettings(Settings: TExpertSettings);
+begin
+  inherited InternalSaveSettings(Settings);
+  // Do not localize any of the below items.
+  Settings.WriteEnumerated('ViewChangeType', TypeInfo(TViewChangeType), Ord(ViewChangeType));
 end;
 
 { TNextIdentExpert }
