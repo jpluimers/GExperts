@@ -17,7 +17,21 @@ uses
 
 type
   TFileSystem = class
+  public
+    const
+      /// <summary>
+      /// set of char constant containing all characters that are invalid in a filename </summary>
+      INVALID_FILENAME_CHARS: set of AnsiChar = ['\', '/', ':', '*', '?', '"', '<', '>', '|'];
     class function ExpandFileNameRelBaseDir(const _FileName, _BaseDir: string): string;
+    ///<summary>
+    /// Replaces all invalid characters in the file name with the given character </summary>
+    /// @param S is the input filename
+    /// @param ReplaceChar is the character to use for replacing in valid characters
+    ///                    defaults to '_'
+    /// @param AllowPathChars determines whether the name may contain '\' characters and a single
+    ///                       ':' as the second character, so a full path can be converted.
+    /// @returns a valid filename </summary>
+    class function MakeValidFilename(const _s: string; _ReplaceChar: Char = '_'; _AllowPathChars: Boolean = True): string;
   end;
 
 type
@@ -90,7 +104,7 @@ type
     /// @param IncludePath determines whether the List of filenames includes the full path or not
     ///                    defaults to false
     /// @Returns true, if a matching file was found, false otherwise </summary>
-    function FindNext(out _Filename: string; _IncludePath: Boolean = False): Boolean; overload;
+    function FindNext(out _FileName: string; _IncludePath: Boolean = False): Boolean; overload;
     /// <summary>
     /// Calls SysUtils.FindFirst on first call and SysUtls.FindNext in later
     /// calls. If it returns true, use the SR property to get information about
@@ -215,7 +229,7 @@ begin
   end;
 end;
 
-function TSimpleDirEnumerator.FindNext(out _Filename: string; _IncludePath: Boolean = False): Boolean;
+function TSimpleDirEnumerator.FindNext(out _FileName: string; _IncludePath: Boolean = False): Boolean;
 var
   Res: Integer;
   Attr: Integer;
@@ -274,9 +288,9 @@ begin
     end;
     Inc(FMatchCount);
     if _IncludePath then
-      _Filename := Path + Sr.Name
+      _FileName := Path + Sr.Name
     else
-      _Filename := Sr.Name;
+      _FileName := Sr.Name;
     Exit;
   until False;
 end;
@@ -331,5 +345,31 @@ begin
   end;
 end;
 
-end.
+{$IFNDEF SUPPORTS_UNICODE}
 
+function CharInSet(_c: Char; const _CharSet: TSysCharSet): Boolean;
+begin
+  Result := _c in _CharSet;
+end;
+
+{$ENDIF ~SUPPORTS_UNICODE}
+
+class function TFileSystem.MakeValidFilename(const _s: string; _ReplaceChar: Char = '_';
+  _AllowPathChars: Boolean = True): string;
+var
+  i: Integer;
+  InvalidChars: set of AnsiChar;
+begin
+  Result := _s;
+  InvalidChars := INVALID_FILENAME_CHARS;
+  if _AllowPathChars then
+    InvalidChars := InvalidChars - ['\'];
+  for i := 1 to Length(Result) do begin
+    if CharInSet(Result[i], InvalidChars) then begin
+      if not _AllowPathChars or (i <> 2) or (Result[2] <> ':') or not CharInSet(UpCase(Result[1]), ['A'..'Z']) then
+        Result[i] := _ReplaceChar;
+    end;
+  end;
+end;
+
+end.
