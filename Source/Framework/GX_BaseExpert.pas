@@ -28,10 +28,8 @@ type
     // signals that no icon file is available.
     function GetBitmapFileName: string; virtual;
     // Overrride to load any configuration settings
-    procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); virtual;
     procedure InternalLoadSettings(Settings: TExpertSettings); virtual;
     // Overrride to save any configuration settings
-    procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); virtual;
     procedure InternalSaveSettings(Settings: TExpertSettings); virtual;
     // do nothing, overridden by TGX_Expert and TEditorExpert because
     // theses settings are "traditionally" stored differently.
@@ -177,17 +175,7 @@ begin
   // do nothing
 end;
 
-procedure TGX_BaseExpert.InternalLoadSettingsOld(Settings: TGExpertsSettings);
-begin
-  // do nothing
-end;
-
 procedure TGX_BaseExpert.InternalSaveSettings(Settings: TExpertSettings);
-begin
-  // do nothing
-end;
-
-procedure TGX_BaseExpert.InternalSaveSettingsOld(Settings: TGExpertsSettings);
 begin
   // do nothing
 end;
@@ -211,7 +199,6 @@ begin
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
   try
     LoadActiveAndShortCut(Settings);
-    InternalLoadSettingsOld(Settings);
     ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
     try
       InternalLoadSettings(ExpSettings);
@@ -237,7 +224,6 @@ begin
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
   try
     SaveActiveAndShortCut(Settings);
-    InternalSaveSettingsOld(Settings);
     ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
     try
       InternalSaveSettings(ExpSettings);
