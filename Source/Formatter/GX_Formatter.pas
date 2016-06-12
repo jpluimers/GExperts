@@ -221,9 +221,9 @@ end;
 
 procedure AboutFormatter();
 {$IFNDEF GX_BCB} export;
+{$ENDIF GX_BCB}
 var
   frm: TfmAbout;
-{$ENDIF GX_BCB}
 begin
   InitSharedResources;
   try
