@@ -113,7 +113,8 @@ uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Windows, SysUtils, AbConst, StrUtils, Math,
   GX_OtaUtils, GX_MacroParser, GX_GxUtils,
-  GX_BackupOptions, GX_BackupConfig, GX_dzVclUtils, GX_MessageBox;
+  GX_BackupOptions, GX_BackupConfig, GX_dzVclUtils, GX_MessageBox,
+  GX_dzFileUtils;
 
 const // Do not localize these constants.
   ItemSeparatorChar = '|';
@@ -719,6 +720,7 @@ begin
   else
   begin
     CurrentZipFileName := ReplaceStrings(FBackupExpert.BackupDir, True);
+    CurrentZipFileName := TFileSystem.MakeValidFilename(CurrentZipFileName);
     ZipFilePath := ExtractFilePath(CurrentZipFileName);
     CurrentZipFileName := ExtractFileName(CurrentZipFileName);
     if not DirectoryExists(ZipFilePath) then
