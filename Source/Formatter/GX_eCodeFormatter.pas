@@ -95,7 +95,7 @@ resourcestring
     '    [FileSettings]' + sLineBreak +
     '    <mask>=<configname>' + sLineBreak +
     'The formatter will use the first match for the file name. ' +
-    'An empty <configname> means that it should use the ' +
+    'An empty <configname> means that it should work ' +
     'as configured in this dialog.' + sLineBreak +
     'You can also export your own configuration as' + sLineBreak +
     '    FormatterSettings-<YourName>.ini' + sLineBreak +
