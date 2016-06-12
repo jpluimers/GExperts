@@ -620,8 +620,7 @@ begin
   // Editor change notifiers may fire if the IDE auto-creates some
   // code behind the scenes. Since we only want to react on user
   // input, we exit if there is no edit view active.
-  EditView := GxOtaGetTopMostEditView(SourceEditor);
-  if not Assigned(EditView) then
+  if not GxOtaTryGetTopMostEditView(SourceEditor, EditView) then
     Exit;
 
   EditorPositionInformation := TEditorPositionInformation.Create(EditView);

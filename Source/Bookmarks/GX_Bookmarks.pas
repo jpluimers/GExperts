@@ -334,8 +334,7 @@ begin
     Exit;
   SourceEditor.Show;
 
-  EditView := GxOtaGetTopMostEditView(SourceEditor);
-  if not Assigned(EditView) then
+  if not GxOtaTryGetTopMostEditView(SourceEditor, EditView) then
     Exit;
 
   EditView.BookmarkGoto(bm.Number);

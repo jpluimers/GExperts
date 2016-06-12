@@ -90,8 +90,7 @@ begin
     exit;
 
   FIsNavbarVisible := _Value;
-  EditView := GxOtaGetTopMostEditView;
-  if Assigned(EditView) then begin
+  if GxOtaTryGetTopMostEditView(EditView) then begin
     TrySetNavbarVisible(EditView)
   end;
 {$ENDIF GX_VER300_up}

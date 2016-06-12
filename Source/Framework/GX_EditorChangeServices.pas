@@ -1001,8 +1001,7 @@ begin
   Result := nil;
   if Assigned(FAssociatedSourceEditor) then
   begin
-    EditView := GxOtaGetTopMostEditView(FAssociatedSourceEditor);
-    if Assigned(EditView) then
+    if GxOtaTryGetTopMostEditView(FAssociatedSourceEditor, EditView) then
     begin
       EditWindow := EditView.GetEditWindow;
       if Assigned(EditWindow) then

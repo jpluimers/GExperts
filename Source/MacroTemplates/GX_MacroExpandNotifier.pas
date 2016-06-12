@@ -205,8 +205,7 @@ var
   Index: Integer;
   TemplateName: string;
 begin
-  EditView := GxOtaGetTopMostEditView(SourceEditor);
-  if not Assigned(EditView) then
+  if not GxOtaTryGetTopMostEditView(SourceEditor, EditView) then
     Exit;
 
   LineText := GxOtaGetPreceedingCharactersInLine(EditView);

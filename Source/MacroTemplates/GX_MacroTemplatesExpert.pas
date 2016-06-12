@@ -456,8 +456,7 @@ var
   Idx: Integer;
 begin
   Result := '';
-  EditView := GxOtaGetTopMostEditView;
-  if EditView = nil then
+  if not GxOtaTryGetTopMostEditView(EditView) then
     Exit;
 
   Result := GxOtaGetPreceedingCharactersInLine(EditView);
@@ -589,8 +588,7 @@ begin
   Result.Col := 1;
   Result.Line := 1;
 
-  EditView := GxOtaGetTopMostEditView;
-  if not Assigned(EditView)then
+  if not GxOtaTryGetTopMostEditView(EditView) then
     Exit;
 
   EditView.ConvertPos(False, Result, ACharPos);
@@ -601,8 +599,7 @@ var
   EditView: IOTAEditView;
   CharPos: TOTACharPos;
 begin
-  EditView := GxOtaGetTopMostEditView;
-  if not Assigned(EditView)then
+  if not GxOtaTryGetTopMostEditView(EditView) then
     raise Exception.Create('No edit view present');
 
   CharPos := GxOtaGetCharPosFromPos(AOffset, EditView);
@@ -812,8 +809,7 @@ resourcestring
 var
   EditView: IOTAEditView;
 begin
-  EditView := GxOtaGetTopMostEditView;
-  if Assigned(EditView) then
+  if GxOtaTryGetTopMostEditView(EditView) then
     EditView.CursorPos := ANewEditPos
   else
     raise Exception.Create(SNoEditView);
