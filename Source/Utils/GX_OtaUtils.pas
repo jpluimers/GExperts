@@ -462,6 +462,10 @@ function GxOtaGetTopMostEditView(SourceEditor: IOTASourceEditor): IOTAEditView; 
 function GxOtaGetTopMostEditBuffer: IOTAEditBuffer;
 function GxOtaGetTopMostEditBufferFileName: string;
 
+// calls GxOtaGetTopMostEditView and returns false if no edit view is available
+function GxOtaTryGetTopMostEditView(out EditView: IOTAEditView): boolean; overload;
+function GxOtaTryGetTopMostEditView(SourceEditor: IOTASourceEditor; out EditView: IOTAEditView): boolean; overload;
+
 // Get the number of open modules
 function GxOtaGetOpenModuleCount: Integer;
 
@@ -1538,8 +1542,7 @@ var
 begin
   Result := '';
 
-  EditView := GxOtaGetTopMostEditView;
-  if not Assigned(EditView) then
+  if not GxOtaTryGetTopMostEditView(EditView) then
     Exit;
 
   EditBlock := EditView.Block;
@@ -2897,6 +2900,18 @@ begin
   if GxOtaGetOpenModuleCount = 0 then
     Exit;
   Result := GxOTAGetEditorServices.TopView;
+end;
+
+function GxOtaTryGetTopMostEditView(out EditView: IOTAEditView): boolean;
+begin
+  EditView := GxOtaGetTopMostEditView;
+  Result := Assigned(EditView);
+end;
+
+function GxOtaTryGetTopMostEditView(SourceEditor: IOTASourceEditor; out EditView: IOTAEditView): boolean; overload;
+begin
+  EditView := GxOtaGetTopMostEditView(SourceEditor);
+  Result := Assigned(EditView);
 end;
 
 function GxOtaGetTopMostEditBuffer: IOTAEditBuffer;
