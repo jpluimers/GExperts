@@ -316,7 +316,7 @@ begin
   IsMultiSelection := False;
   FirstTabOrder := -1;
 
-  FormEditor := GxOtaGetFormEditorFromModule(GxOtaGetCurrentModule);
+  FormEditor := GxOtaGetCurrentFormEditor;
   if not Assigned(FormEditor) then
     raise Exception.Create(SNoFormForCurrentModule);
 

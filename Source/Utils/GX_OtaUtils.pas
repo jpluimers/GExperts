@@ -512,6 +512,7 @@ function GxOtaGetCurrentFormEditorSelectionCount: Integer;
 // Determine if the curent form editor has a selected component (not the root designer)
 function GxOtaFormEditorHasSelectedComponent: Boolean;
 // Returns a form editor for Module if it exists; nil otherwise.
+// Module can be nil, if it is , this function will return nil
 function GxOtaGetFormEditorFromModule(const Module: IOTAModule): IOTAFormEditor;
 // Shows the form editor for a module.  Returns True if successful.
 function GxOtaShowFormForModule(const Module: IOTAModule): Boolean;
@@ -742,20 +743,13 @@ function GxOtaGetFormEditorForFileName(const FileName: string): IOTAFormEditor;
 var
   Module: IOTAModule;
 begin
-  Result := nil;
   Module := GxOtaGetModule(GxOtaGetBaseModuleFileName(FileName));
-  if Assigned(Module) then
-    Result := GxOtaGetFormEditorFromModule(Module);
+  Result := GxOtaGetFormEditorFromModule(Module);
 end;
 
 function GxOtaGetCurrentFormEditor: IOTAFormEditor;
-var
-  Module: IOTAModule;
 begin
-  Result := nil;
-  Module := GxOtaGetCurrentModule;
-  if Assigned(Module) then
-    Result := GxOtaGetFormEditorFromModule(Module);
+  Result := GxOtaGetFormEditorFromModule(GxOtaGetCurrentModule);
 end;
 
 function GxOtaGetCurrentFormEditorSelectionCount: Integer;

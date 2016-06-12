@@ -31,7 +31,6 @@ end;
 
 procedure TCopyComponentNamesExpert.Execute(Sender: TObject);
 var
-  CurrentModule: IOTAModule;
   FormEditor: IOTAFormEditor;
   SelCount: Integer;
   CurrentComponent: IOTAComponent;
@@ -39,10 +38,7 @@ var
   ComponentName: WideString;
   i: Integer;
 begin
-  CurrentModule := GxOtaGetCurrentModule;
-  FormEditor := nil;
-  if Assigned(CurrentModule) then
-    FormEditor := GxOtaGetFormEditorFromModule(CurrentModule);
+  FormEditor := GxOtaGetCurrentFormEditor;
   if not Assigned(FormEditor) then
     Exit;
   SelCount := FormEditor.GetSelCount;

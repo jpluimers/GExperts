@@ -407,13 +407,9 @@ end;
 
 procedure TfmReplaceComp.ReplaceComponentsOnCurrentForm(OnlySelected: Boolean);
 var
-  CurrentModule: IOTAModule;
   CurrentForm: IOTAFormEditor;
 begin
-  CurrentModule := GxOtaGetCurrentModule;
-  Assert(Assigned(CurrentModule));
-
-  CurrentForm := GxOtaGetFormEditorFromModule(CurrentModule);
+  CurrentForm := GxOtaGetCurrentFormEditor;
   Assert(Assigned(CurrentForm));
 
   ReplaceComponentsOnForm(CurrentForm, OnlySelected);
@@ -461,7 +457,6 @@ resourcestring
   SOpenSomethingFirst = 'Please open a project or unit first.';
 var
   FirstSelectedComponentTypeName: string;
-  CurrentModule: IOTAModule;
   FormEditor: IOTAFormEditor;
   SelCount: Integer;
   CurrentComponent: IOTAComponent;
@@ -469,11 +464,7 @@ var
 begin
   LoadComponentList;
 
-  CurrentModule := GxOtaGetCurrentModule;
-  if Assigned(CurrentModule) then
-    FormEditor := GxOtaGetFormEditorFromModule(CurrentModule)
-  else
-    FormEditor := nil;
+  FormEditor := GxOtaGetCurrentFormEditor;
 
   if not Assigned(FormEditor) then
   begin
@@ -539,14 +530,9 @@ end;
 
 procedure TReplaceCompExpert.UpdateAction(Action: TCustomAction);
 var
-  CurrentModule: IOTAModule;
   FormEditor: IOTAFormEditor;
 begin
-  CurrentModule := GxOtaGetCurrentModule;
-  if Assigned(CurrentModule) then
-    FormEditor := GxOtaGetFormEditorFromModule(CurrentModule)
-  else
-    FormEditor := nil;
+  FormEditor := GxOtaGetCurrentFormEditor;
 
   Action.Enabled := Assigned(FormEditor) or (GxOtaGetCurrentProject <> nil);
 end;

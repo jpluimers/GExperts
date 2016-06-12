@@ -321,7 +321,6 @@ end;
 
 procedure TCompRenameExpert.Execute(Sender: TObject);
 var
-  CurrentModule: IOTAModule;
   SelCount: Integer;
   CurrentComponent: IOTAComponent;
   i: Integer;
@@ -330,10 +329,7 @@ begin
     Configure
   else
   begin
-    CurrentModule := GxOtaGetCurrentModule;
-    FFormEditor := nil;
-    if Assigned(CurrentModule) then
-      FFormEditor := GxOtaGetFormEditorFromModule(CurrentModule);
+    FFormEditor := GxOtaGetCurrentFormEditor;
     if not Assigned(FFormEditor) then
       Exit;
     SelCount := FFormEditor.GetSelCount;

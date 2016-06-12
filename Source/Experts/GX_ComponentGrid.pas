@@ -238,7 +238,6 @@ procedure TfmComponentGrid.FillComponentList;
   end;
 
 var
-  Module: IOTAModule;
   FormEditor: IOTAFormEditor;
   RootComponent: IOTAComponent;
 begin
@@ -248,10 +247,7 @@ begin
     Exit;
   end;
 
-  Module := GxOtaGetCurrentModule;
-  Assert(Assigned(Module));
-
-  FormEditor := GxOtaGetFormEditorFromModule(Module);
+  FormEditor := GxOtaGetCurrentFormEditor;
   Assert(Assigned(FormEditor));
 
   RootComponent := FormEditor.GetRootComponent;

@@ -458,7 +458,6 @@ end;
 
 function TCompsToCodeExpert.GetDesignerComps: TComponentArray;
 var
-  Module: IOTAModule;
   FormEditor: IOTAFormEditor;
   AComponent: IOTAComponent;
   i, Count: Integer;
@@ -466,10 +465,7 @@ var
 begin
   Result := nil;
 
-  Module := GxOtaGetCurrentModule;
-  Assert(Assigned(Module));
-
-  FormEditor := GxOtaGetFormEditorFromModule(Module);
+  FormEditor := GxOtaGetCurrentFormEditor;
   if not Assigned(FormEditor) then
     Exit;
 
