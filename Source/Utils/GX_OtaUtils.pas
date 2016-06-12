@@ -1985,6 +1985,16 @@ begin
   EditView.Block.BeginBlock;
   EditView.CursorPos := After;
   EditView.Block.EndBlock;
+  if not EditView.Block.IsValid then begin
+    // this is a work  around for the case that the After position is beyond
+    // the end of file
+    EditView.CursorPos := Start;
+    EditView.Block.BeginBlock;
+    After.Line := After.Line - 1;
+    After.Col := MaxEditorCol;
+    EditView.CursorPos := After;
+    EditView.Block.EndBlock;
+  end;
   EditView.Block.SetVisible(True);
   EditView.Paint;
 end;
