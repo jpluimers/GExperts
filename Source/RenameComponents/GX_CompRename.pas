@@ -329,8 +329,7 @@ begin
     Configure
   else
   begin
-    FFormEditor := GxOtaGetCurrentFormEditor;
-    if not Assigned(FFormEditor) then
+    if not GxOtaTryGetCurrentFormEditor(FFormEditor) then
       Exit;
     SelCount := FFormEditor.GetSelCount;
     for i := 0 to SelCount - 1 do

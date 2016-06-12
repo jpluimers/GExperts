@@ -465,8 +465,7 @@ var
 begin
   Result := nil;
 
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if not Assigned(FormEditor) then
+  if not GxOtaTryGetCurrentFormEditor(FormEditor) then
     Exit;
 
   SetLength(Result, FormEditor.GetSelCount);

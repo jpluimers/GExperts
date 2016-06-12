@@ -464,9 +464,7 @@ var
 begin
   LoadComponentList;
 
-  FormEditor := GxOtaGetCurrentFormEditor;
-
-  if not Assigned(FormEditor) then
+  if not GxOtaTryGetCurrentFormEditor(FormEditor) then
   begin
     if GxOtaGetCurrentProject = nil then
       raise Exception.Create(SOpenSomethingFirst);
@@ -532,9 +530,7 @@ procedure TReplaceCompExpert.UpdateAction(Action: TCustomAction);
 var
   FormEditor: IOTAFormEditor;
 begin
-  FormEditor := GxOtaGetCurrentFormEditor;
-
-  Action.Enabled := Assigned(FormEditor) or (GxOtaGetCurrentProject <> nil);
+  Action.Enabled := GxOtaTryGetCurrentFormEditor(FormEditor) or (GxOtaHaveCurrentProject);
 end;
 
 procedure TReplaceCompExpert.Execute(Sender: TObject);

@@ -507,6 +507,7 @@ function GxOtaPropertyExists(const Component: IOTAComponent; const PropertyName:
 function GxOtaGetFormEditorForFileName(const FileName: string): IOTAFormEditor;
 // Gets the form editor for the active module, or nil if none is present
 function GxOtaGetCurrentFormEditor: IOTAFormEditor;
+function GxOtaTryGetCurrentFormEditor(out FormEditor: IOTAFormEditor): boolean;
 // Gets the number of selected components on the current form editor (if any)
 function GxOtaGetCurrentFormEditorSelectionCount: Integer;
 // Determine if the curent form editor has a selected component (not the root designer)
@@ -719,8 +720,7 @@ var
 begin
   Assert(Assigned(List));
 
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if Assigned(FormEditor) then
+  if GxOtaTryGetCurrentFormEditor(FormEditor) then
   begin
     RootComponent := FormEditor.GetRootComponent;
     Assert(Assigned(RootComponent), 'FormEditor has no root component');
@@ -752,13 +752,18 @@ begin
   Result := GxOtaGetFormEditorFromModule(GxOtaGetCurrentModule);
 end;
 
+function GxOtaTryGetCurrentFormEditor(out FormEditor: IOTAFormEditor): boolean;
+begin
+  FormEditor := GxOtaGetCurrentFormEditor;
+  Result := Assigned(FormEditor);
+end;
+
 function GxOtaGetCurrentFormEditorSelectionCount: Integer;
 var
   FormEditor: IOTAFormEditor;
 begin
   Result := 0;
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if Assigned(FormEditor) then
+  if GxOtaTryGetCurrentFormEditor(FormEditor) then
     Result := FormEditor.GetSelCount;
 end;
 
@@ -772,8 +777,7 @@ begin
   if not IsForm(FileName) then
     Exit;
 
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if Assigned(FormEditor) then
+  if GxOtaTryGetCurrentFormEditor(FormEditor) then
   begin
     Result := (FormEditor.GetSelCount > 0) and
       not GxOtaSelectedComponentIsRoot(FormEditor);
@@ -881,8 +885,7 @@ var
   PersistentForm: TPersistent;
   Designer: IDesigner;
 begin
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if Assigned(FormEditor) then
+  if GxOtaTryGetCurrentFormEditor(FormEditor) then
   begin
     if Assigned(FormEditor.GetRootComponent) then
     begin
@@ -964,8 +967,7 @@ var
 begin
   Result := nil;
 
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if not Assigned(FormEditor) then
+  if not GxOtaTryGetCurrentFormEditor(FormEditor) then
     Exit;
 
   FormDesigner := (FormEditor as INTAFormEditor).FormDesigner;
@@ -990,8 +992,7 @@ var
 begin
   Result := False;
 
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if not Assigned(FormEditor) then
+  if not GxOtaTryGetCurrentFormEditor(FormEditor) then
     Exit;
 
   FormDesigner := (FormEditor as INTAFormEditor).FormDesigner;

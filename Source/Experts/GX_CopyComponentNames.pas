@@ -38,8 +38,7 @@ var
   ComponentName: WideString;
   i: Integer;
 begin
-  FormEditor := GxOtaGetCurrentFormEditor;
-  if not Assigned(FormEditor) then
+  if not GxOtaTryGetCurrentFormEditor(FormEditor) then
     Exit;
   SelCount := FormEditor.GetSelCount;
   Names := TStringList.Create;  
