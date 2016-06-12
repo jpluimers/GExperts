@@ -218,8 +218,7 @@ function TfmGxBookmarksForm.GetEditView(var _SourceEditor: IOTASourceEditor;
   var _EditView: IOTAEditView): Boolean;
 begin
   Result := False;
-  _SourceEditor := GxOtaGetCurrentSourceEditor;
-  if not Assigned(_SourceEditor) then
+  if not GxOtaTryGetCurrentSourceEditor(_SourceEditor) then
     Exit; //==>
   if _SourceEditor.EditViewCount = 0 then
     Exit; //==>

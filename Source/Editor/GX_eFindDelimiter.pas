@@ -604,8 +604,7 @@ begin
     raise Exception.Create(SPasOrCFilesOnly);
 
   Module := GxOtaGetCurrentModule;
-  SourceEditor := GxOtaGetCurrentSourceEditor;
-  if (not Assigned(SourceEditor)) or (not Assigned(Module)) then
+  if (not Assigned(Module)) or not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     Exit;
 
   SPos := GetFileContent(FileContent, SourceEditor.FileName, EditorLine);

@@ -47,8 +47,7 @@ end;
 function TBookmarkHandler.GetEditView(var _SourceEditor: IOTASourceEditor; var _EditView: IOTAEditView): Boolean;
 begin
   Result := False;
-  _SourceEditor := GxOtaGetCurrentSourceEditor;
-  if not Assigned(_SourceEditor) then
+  if not GxOtaTryGetCurrentSourceEditor(_SourceEditor) then
     Exit;
   _EditView := _SourceEditor.GetEditView(0);
   Result := Assigned(_EditView);

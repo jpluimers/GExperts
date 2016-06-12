@@ -170,8 +170,7 @@ var
 begin
   FSource := '';
   FPosition := -1;
-  SourceEditor := GxOtaGetCurrentSourceEditor;
-  if SourceEditor = nil then
+  if not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     Exit;
 
   EditRead := TEditReader.Create(SourceEditor.FileName);

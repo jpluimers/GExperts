@@ -204,8 +204,7 @@ var
   OrigSettings: TCodeFormatterEngineSettings;
   SettingsName: string;
 begin
-  SourceEditor := GxOtaGetCurrentSourceEditor;
-  if not Assigned(SourceEditor) then
+  if not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     raise ECodeFormatter.Create(str_NoEditor);
   FileName := SourceEditor.FileName;
   if not (IsPascalSourceFile(FileName) or IsDelphiPackage(FileName) or FileMatchesExtension(FileName, '.tpl')) then

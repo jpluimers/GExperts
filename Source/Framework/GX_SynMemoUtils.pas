@@ -88,8 +88,7 @@ var
 begin
   Result := gxpNone;
 
-  SourceEditor := GxOtaGetCurrentSourceEditor;
-  if SourceEditor = nil then
+  if not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     Exit;
 
   Result := GxOtaGetCurrentSyntaxHighlighter(SourceEditor);
