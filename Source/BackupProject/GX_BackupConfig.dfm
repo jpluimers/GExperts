@@ -4,7 +4,7 @@ object fmBackupConfig: TfmBackupConfig
   BorderStyle = bsDialog
   Caption = 'Backup Project Configuration'
   ClientHeight = 489
-  ClientWidth = 377
+  ClientWidth = 409
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object fmBackupConfig: TfmBackupConfig
   object gbxOptions: TGroupBox
     Left = 8
     Top = 8
-    Width = 361
+    Width = 393
     Height = 433
     Caption = 'Configuration'
     TabOrder = 0
@@ -51,7 +51,7 @@ object fmBackupConfig: TfmBackupConfig
     object rgDefaultScope: TRadioGroup
       Left = 12
       Top = 357
-      Width = 338
+      Width = 373
       Height = 65
       Caption = 'Default Backup Sc&ope'
       Items.Strings = (
@@ -62,7 +62,7 @@ object fmBackupConfig: TfmBackupConfig
     object gbBackupTarget: TGroupBox
       Left = 12
       Top = 236
-      Width = 338
+      Width = 373
       Height = 113
       Caption = 'Backup &File Name'
       TabOrder = 4
@@ -75,8 +75,8 @@ object fmBackupConfig: TfmBackupConfig
         FocusControl = edBackupDir
       end
       object btnBackupDir: TButton
-        Left = 308
-        Top = 83
+        Left = 344
+        Top = 84
         Width = 21
         Height = 21
         Caption = '...'
@@ -105,18 +105,26 @@ object fmBackupConfig: TfmBackupConfig
       object edBackupDir: TEdit
         Left = 25
         Top = 83
-        Width = 280
+        Width = 312
         Height = 22
         TabOrder = 2
       end
       object btnDefault: TButton
-        Left = 256
+        Left = 290
         Top = 56
         Width = 75
         Height = 25
         Caption = 'Default'
-        TabOrder = 4
+        TabOrder = 5
         OnClick = btnDefaultClick
+      end
+      object btnVariables: TButton
+        Left = 208
+        Top = 56
+        Width = 75
+        Height = 25
+        Caption = '&Variables'
+        TabOrder = 4
       end
     end
     object cbSearchOnLibraryPath: TCheckBox
@@ -130,7 +138,7 @@ object fmBackupConfig: TfmBackupConfig
     object gbDropDirs: TGroupBox
       Left = 12
       Top = 112
-      Width = 338
+      Width = 373
       Height = 113
       Caption = 'When dropping directories'
       TabOrder = 3
@@ -172,7 +180,7 @@ object fmBackupConfig: TfmBackupConfig
     end
   end
   object btnOK: TButton
-    Left = 216
+    Left = 248
     Top = 456
     Width = 75
     Height = 25
@@ -182,7 +190,7 @@ object fmBackupConfig: TfmBackupConfig
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 296
+    Left = 328
     Top = 456
     Width = 75
     Height = 25
@@ -200,5 +208,9 @@ object fmBackupConfig: TfmBackupConfig
     Caption = '&Help'
     TabOrder = 3
     OnClick = btHelpClick
+  end
+  object pmuVariables: TPopupMenu
+    Left = 264
+    Top = 256
   end
 end

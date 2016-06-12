@@ -5,7 +5,7 @@ unit GX_BackupConfig;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
+  SysUtils, Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm, Menus;
 
 type
   TfmBackupConfig = class(TfmBaseForm)
@@ -30,6 +30,8 @@ type
     cbIgnoreScmDirs: TCheckBox;
     cbIgnoreBackupFiles: TCheckBox;
     btnDefault: TButton;
+    btnVariables: TButton;
+    pmuVariables: TPopupMenu;
     procedure btnBackupDirClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure rbGenericBackupTargetClick(Sender: TObject);
@@ -39,6 +41,7 @@ type
     procedure btnDefaultClick(Sender: TObject);
   private
     procedure edBackupDirOnDropFiles(_Sender: TObject; _Files: TStrings);
+    procedure InsertPlaceholderClick(Sender: TObject);
   public
     constructor Create(_Owner: TComponent); override;
     procedure SetBackupTargetDirectoryEnabled(const Enable: Boolean);
@@ -52,12 +55,59 @@ uses
   GX_GenericUtils, GX_GxUtils, GX_dzVclUtils, GX_MacroParser;
 
 constructor TfmBackupConfig.Create(_Owner: TComponent);
+var
+  Variables: TStringList;
+  i: Integer;
 begin
   inherited;
   TWinControl_ActivateDropFiles(edBackupDir, edBackupDirOnDropFiles);
   TEdit_ActivateAutoComplete(edBackupDir, [acsFileSystem], [actSuggest]);
+
+  Variables := TStringList.Create;
+  try
+    Variables.Add('PROJECTDIR');
+    Variables.Add('PROJECTNAME');
+    Variables.Add('PROJECTGROUPNAME');
+    Variables.Add('PROJECTGROUPDIR');
+    Variables.Add('DATETIME');
+    Variables.Add('HOUR');
+    Variables.Add('MINUTE');
+    Variables.Add('SECOND');
+    Variables.Add('DATE');
+    Variables.Add('YEAR');
+    Variables.Add('MONTH');
+    Variables.Add('%MONTHSHORTNAME');
+    Variables.Add('MONTHLONGNAME');
+    Variables.Add('DAY');
+    Variables.Add('DAYSHORTNAME');
+    Variables.Add('DAYLONGNAME');
+    Variables.Add('USER');
+    Variables.Add('VERPRODUCTVERSION');
+    Variables.Add('VERFILEVERSION');
+    Variables.Add('VERMAJOR');
+    Variables.Add('VERMINOR');
+    Variables.Add('VERRELEASE');
+    Variables.Add('VERBUILD');
+    Variables.Add('VERPRODUCTNAME');
+    Variables.Add('VERINTERNALNAME');
+    Variables.Add('VERFILEDESCRIPTION');
+    for i := 0 to Variables.Count - 1 do
+      TPopupMenu_AppendMenuItem(pmuVariables, Variables[i], InsertPlaceholderClick);
+  finally
+    FreeAndNil(Variables);
+  end;
+  TButton_AddDropdownMenu(btnVariables, pmuVariables);
 end;
 
+procedure TfmBackupConfig.InsertPlaceholderClick(Sender: TObject);
+var
+  MenuItem: TMenuItem;
+  Str: string;
+begin
+  MenuItem := Sender as TMenuItem;
+  Str := StripHotKey(MenuItem.Caption);
+  edBackupDir.SelText := '%' + Str + '%';
+end;
 
 procedure TfmBackupConfig.edBackupDirOnDropFiles(_Sender: TObject; _Files: TStrings);
 begin
