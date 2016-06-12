@@ -14,8 +14,7 @@ uses
 type
   TGxConfigWrapper = class(TInterfacedObject, IConfigReader, IConfigWriter)
   private
-    FGxSettings: TGExpertsSettings;
-    FSection: string;
+    FSettings: TExpertSettings;
   protected // implementation of IConfigReader
     function ReadBool(const AName: string; ADefault: Boolean): Boolean;
     function ReadInteger(const AName: string; ADefault: Integer): Integer;
@@ -27,58 +26,57 @@ type
     procedure WriteString(const AName: string; const AValue: string);
     procedure WriteStrings(const ASection: string; const AList: TStrings);
   public
-    constructor Create(AGxSettings: TGExpertsSettings; const ASection: string);
+    constructor Create(ASettings: TExpertSettings);
   end;
 
 implementation
 
 { TGxConfigWrapper }
 
-constructor TGxConfigWrapper.Create(AGxSettings: TGExpertsSettings; const ASection: string);
+constructor TGxConfigWrapper.Create(ASettings: TExpertSettings);
 begin
   inherited Create;
-  FGxSettings := AGxSettings;
-  FSection := ASection;
+  FSettings := ASettings;
 end;
 
 function TGxConfigWrapper.ReadBool(const AName: string; ADefault: Boolean): Boolean;
 begin
-  Result := FGxSettings.ReadBool(FSection, AName, ADefault);
+  Result := FSettings.ReadBool(AName, ADefault);
 end;
 
 function TGxConfigWrapper.ReadInteger(const AName: string; ADefault: Integer): Integer;
 begin
-  Result := FGxSettings.ReadInteger(FSection, AName, ADefault);
+  Result := FSettings.ReadInteger(AName, ADefault);
 end;
 
 function TGxConfigWrapper.ReadString(const AName, ADefault: string): string;
 begin
-  Result := FGxSettings.ReadString(FSection, AName, ADefault);
+  Result := FSettings.ReadString(AName, ADefault);
 end;
 
 procedure TGxConfigWrapper.ReadStrings(const ASection: string; const AList: TStrings);
 begin
-  FGxSettings.ReadStrings(AList, FSection + '\' + ASection, 'List');
+  FSettings.ReadStrings(ASection, AList, 'List');
 end;
 
 procedure TGxConfigWrapper.WriteBool(const AName: string; AValue: Boolean);
 begin
-  FGxSettings.WriteBool(FSection, AName, AValue);
+  FSettings.WriteBool(AName, AValue);
 end;
 
 procedure TGxConfigWrapper.WriteInteger(const AName: string; AValue: Integer);
 begin
-  FGxSettings.WriteInteger(FSection, AName, AValue);
+  FSettings.WriteInteger(AName, AValue);
 end;
 
 procedure TGxConfigWrapper.WriteString(const AName, AValue: string);
 begin
-  FGxSettings.WriteString(FSection, AName, AValue);
+  FSettings.WriteString(AName, AValue);
 end;
 
 procedure TGxConfigWrapper.WriteStrings(const ASection: string; const AList: TStrings);
 begin
-  FGxSettings.WriteStrings(AList, FSection + '\' + ASection, 'List');
+  FSettings.WriteStrings(ASection, AList, 'List');
 end;
 
 end.

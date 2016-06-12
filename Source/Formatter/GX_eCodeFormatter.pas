@@ -20,8 +20,8 @@ type
     FExpert: TCodeFormatterExpert;
   protected
     function GetBitmapFileName: string; override;
-    procedure InternalLoadSettingsOld(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettingsOld(Settings: TGExpertsSettings); override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -116,16 +116,16 @@ begin
   Result := True;
 end;
 
-procedure TeCodeFormatterExpert.InternalLoadSettingsOld(Settings: TGExpertsSettings);
+procedure TeCodeFormatterExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FExpert.InternalLoadSettings(ConfigurationKey, Settings);
+  FExpert.InternalLoadSettings(Settings);
 end;
 
-procedure TeCodeFormatterExpert.InternalSaveSettingsOld(Settings: TGExpertsSettings);
+procedure TeCodeFormatterExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FExpert.InternalSaveSettings(ConfigurationKey, Settings);
+  FExpert.InternalSaveSettings(Settings);
 end;
 
 initialization

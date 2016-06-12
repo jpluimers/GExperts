@@ -27,8 +27,8 @@ type
     destructor Destroy; override;
     procedure Configure;
     procedure Execute;
-    procedure InternalLoadSettings(const ConfigurationKey: string; Settings: TGExpertsSettings);
-    procedure InternalSaveSettings(const ConfigurationKey: string; Settings: TGExpertsSettings);
+    procedure InternalLoadSettings(Settings: TExpertSettings);
+    procedure InternalSaveSettings(Settings: TExpertSettings);
     function FormatFile(const _FileName: string): Boolean;
   end;
 
@@ -265,19 +265,19 @@ begin
   end;
 end;
 
-procedure TCodeFormatterExpert.InternalLoadSettings(const ConfigurationKey: string; Settings: TGExpertsSettings);
+procedure TCodeFormatterExpert.InternalLoadSettings(Settings: TExpertSettings);
 var
   Reader: IConfigReader;
 begin
-  Reader := TGxConfigWrapper.Create(Settings, ConfigurationKey);
+  Reader := TGxConfigWrapper.Create(Settings);
   TCodeFormatterConfigHandler.ReadSettings(Reader, FEngine.Settings);
 end;
 
-procedure TCodeFormatterExpert.InternalSaveSettings(const ConfigurationKey: string; Settings: TGExpertsSettings);
+procedure TCodeFormatterExpert.InternalSaveSettings(Settings: TExpertSettings);
 var
   Writer: IConfigWriter;
 begin
-  Writer := TGxConfigWrapper.Create(Settings, ConfigurationKey);
+  Writer := TGxConfigWrapper.Create(Settings);
   TCodeFormatterConfigHandler.WriteSettings(Writer, FEngine.Settings);
 end;
 
