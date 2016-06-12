@@ -476,6 +476,7 @@ function GxOtaGetCurrentModule: IOTAModule;
 // Returns the current IOTASourceEditor or nil if
 // there is no current source editor.
 function GxOtaGetCurrentSourceEditor: IOTASourceEditor;
+function GxOtaTryGetCurrentSourceEditor(out SourceEditor: IOTASourceEditor): boolean;
 procedure GxOtaShowCurrentSourceEditor;
 
 // Raise an exception if the source editor is readonly
@@ -1581,8 +1582,7 @@ begin
 
   Result := False;
 
-  ISourceEditor := GxOtaGetCurrentSourceEditor;
-  if ISourceEditor = nil then
+  if not GxOtaTryGetCurrentSourceEditor(ISourceEditor) then
     Exit;
 
   if ISourceEditor.EditViewCount > 0 then
@@ -2002,8 +2002,9 @@ var
   CharPos: TOTACharPos;
 begin
   Result := False;
-  UseView := EditView;
-  if not Assigned(UseView) then
+  if Assigned(EditView) then
+    UseView := EditView
+  else
     UseView := GxOtaGetTopmostEditView;
   if Assigned(UseView) then
   begin
@@ -2960,12 +2961,17 @@ begin
     Result := GxOtaGetSourceEditorFromModule(GxOtaGetCurrentModule);
 end;
 
+function GxOtaTryGetCurrentSourceEditor(out SourceEditor: IOTASourceEditor): boolean;
+begin
+  SourceEditor := GxOtaGetCurrentSourceEditor;
+  Result := Assigned(SourceEditor);
+end;
+
 procedure GxOtaShowCurrentSourceEditor;
 var
   Editor: IOTASourceEditor;
 begin
-  Editor := GxOtaGetCurrentSourceEditor;
-  if Assigned(Editor) then
+  if GxOtaTryGetCurrentSourceEditor(Editor) then
     Editor.Show;
 end;
 
@@ -3766,8 +3772,7 @@ begin
   Lines.Clear;
   Result := False;
 
-  ISourceEditor := GxOtaGetCurrentSourceEditor;
-  if ISourceEditor = nil then
+  if not GxOtaTryGetCurrentSourceEditor(ISourceEditor) then
     Exit;
 
   if ISourceEditor.EditViewCount > 0 then
