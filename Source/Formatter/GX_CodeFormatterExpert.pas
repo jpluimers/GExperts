@@ -192,6 +192,9 @@ resourcestring
   str_NoEditor = 'No source editor';
   str_UnsupportedFileTypeS = 'Unsupported file type: %s';
   str_UnableToGetContentsS = 'Unable to get contents of %s';
+const
+  FORMATTED_BLOCK_START = '****formatted block start****';
+  FORMATTED_BLOCK_END = '****formatted block end****';
 var
   SourceEditor: IOTASourceEditor;
   FileName: string;
@@ -203,6 +206,14 @@ var
   TempSettings: TCodeFormatterSettings;
   OrigSettings: TCodeFormatterEngineSettings;
   SettingsName: string;
+  BlockStart: TOTAEditPos;
+  BlockEnd: TOTAEditPos;
+  SelStart: Integer;
+  SelLength: Integer;
+  FormatSelection: Boolean;
+  Position: Integer;
+  FormattedBlockStart: string;
+  FormattedBlockEnd: string;
 begin
   if not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     raise ECodeFormatter.Create(str_NoEditor);
@@ -219,7 +230,6 @@ begin
     if FullTextStr = '' then
       exit;
     FullText.Text := FullTextStr;
-    FullTextStr := ''; // might save some memory
 
     Breakpoints := nil;
     Bookmarks := TBookmarkHandler.Create;
@@ -240,8 +250,42 @@ begin
         end else
           XSendDebug('Use default settings');
 
+        FormatSelection := False;
+        if GxOtaGetSelection(GxOtaGetTopMostEditView(SourceEditor), BlockStart, BlockEnd, SelStart, SelLength) then begin
+          FormatSelection := (BlockStart.Line < BlockEnd.Line);
+          if FormatSelection then begin
+            FormattedBlockStart := FORMATTED_BLOCK_START;
+            FormattedBlockEnd := FORMATTED_BLOCK_END;
+            while Pos(FormattedBlockStart, FullTextStr) <> 0 do
+              FormattedBlockStart := '*' + FormattedBlockStart + '*';
+            while Pos(FormattedBlockEnd, FullTextStr) <> 0 do
+              FormattedBlockEnd := '*' + FormattedBlockEnd + '*';
+            FormattedBlockStart := '{' + FormattedBlockStart + '}';
+            FormattedBlockEnd := '{' + FormattedBlockEnd + '}';
+
+            BlockStart.Col := 1;
+            if BlockEnd.Col > 1 then begin
+              BlockEnd.Col := 1;
+              BlockEnd.Line := BlockEnd.Line + 1;
+            end;
+            FullText.Insert(BlockEnd.Line - 1, FormattedBlockEnd);
+            FullText.Insert(BlockStart.Line - 1, FormattedBlockStart);
+          end;
+        end;
+        FullTextStr := ''; // might save some memory
         if FEngine.Execute(FullText) then begin
-          GxOtaReplaceEditorTextWithUnicodeString(SourceEditor, FullText.Text);
+          if FormatSelection then begin
+            FullTextStr := FullText.Text;
+            Position := Pos(FormattedBlockEnd, FullTextStr);
+            FullTextStr := Copy(FullTextStr, 1, Position - 1);
+            Position := Pos(FormattedBlockStart, FullTextStr);
+            FullTextStr := Copy(FullTextStr, Position + Length(FormattedBlockStart), MaxInt);
+            if Copy(FullTextStr, 1, 2) = CRLF then
+              FullTextStr := Copy(FullTextStr, 3, MaxInt);
+            GxOtaSelectBlock(SourceEditor, BlockStart, BlockEnd);
+            GxOtaReplaceSelection(SourceEditor, 0, FullTextStr);
+          end else
+            GxOtaReplaceEditorTextWithUnicodeString(SourceEditor, FullText.Text);
           Breakpoints.RestoreItems;
           Bookmarks.RestoreItems;
           for i := 0 to SourceEditor.EditViewCount - 1 do
