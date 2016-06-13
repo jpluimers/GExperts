@@ -80,7 +80,7 @@ object fmBackupConfig: TfmBackupConfig
         Width = 21
         Height = 21
         Caption = '...'
-        TabOrder = 3
+        TabOrder = 5
         OnClick = btnBackupDirClick
       end
       object rbBackupAskForFile: TRadioButton
@@ -107,7 +107,7 @@ object fmBackupConfig: TfmBackupConfig
         Top = 83
         Width = 312
         Height = 22
-        TabOrder = 2
+        TabOrder = 4
       end
       object btnDefault: TButton
         Left = 290
@@ -115,7 +115,7 @@ object fmBackupConfig: TfmBackupConfig
         Width = 75
         Height = 25
         Caption = 'Default'
-        TabOrder = 5
+        TabOrder = 3
         OnClick = btnDefaultClick
       end
       object btnVariables: TButton
@@ -124,7 +124,7 @@ object fmBackupConfig: TfmBackupConfig
         Width = 75
         Height = 25
         Caption = '&Variables'
-        TabOrder = 4
+        TabOrder = 2
       end
     end
     object cbSearchOnLibraryPath: TCheckBox
@@ -187,7 +187,7 @@ object fmBackupConfig: TfmBackupConfig
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 2
   end
   object btnCancel: TButton
     Left = 328
@@ -197,16 +197,16 @@ object fmBackupConfig: TfmBackupConfig
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 3
   end
   object btHelp: TButton
     Left = 8
-    Top = 456
+    Top = 455
     Width = 75
     Height = 25
     Cancel = True
     Caption = '&Help'
-    TabOrder = 3
+    TabOrder = 1
     OnClick = btHelpClick
   end
   object pmuVariables: TPopupMenu
