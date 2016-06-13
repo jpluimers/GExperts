@@ -24,7 +24,7 @@ object fmMacroSelect: TfmMacroSelect
   TextHeight = 14
   object pnlMain: TPanel
     Left = 0
-    Top = 25
+    Top = 26
     Width = 423
     Height = 303
     Align = alClient
@@ -62,13 +62,13 @@ object fmMacroSelect: TfmMacroSelect
     Left = 0
     Top = 0
     Width = 423
-    Height = 25
+    Height = 26
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
       423
-      25)
+      26)
     object lblFilter: TLabel
       Left = 8
       Top = 7
@@ -83,7 +83,7 @@ object fmMacroSelect: TfmMacroSelect
       Width = 249
       Height = 20
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 1
+      TabOrder = 0
       WantReturns = False
       WordWrap = False
       OnChange = tbEnterChange
@@ -93,10 +93,10 @@ object fmMacroSelect: TfmMacroSelect
       Left = 298
       Top = 0
       Width = 125
-      Height = 25
+      Height = 26
       Align = alRight
       BevelOuter = bvNone
-      TabOrder = 0
+      TabOrder = 1
       object btnConfiguration: TButton
         Left = 15
         Top = 1
