@@ -2709,7 +2709,6 @@ begin
   begin
     PathList := TStringList.Create;
     try
-      PathList.Sorted := True;
       if Assigned(Paths) then
         PathList.Assign(Paths)
       else
