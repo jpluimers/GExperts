@@ -15,13 +15,13 @@ uses
   SysUtils,
   Classes;
 
+const
+  /// <summary>
+  /// set of char constant containing all characters that are invalid in a filename </summary>
+  INVALID_FILENAME_CHARS: set of AnsiChar = ['\', '/', ':', '*', '?', '"', '<', '>', '|'];
 type
   TFileSystem = class
   public
-    const
-      /// <summary>
-      /// set of char constant containing all characters that are invalid in a filename </summary>
-      INVALID_FILENAME_CHARS: set of AnsiChar = ['\', '/', ':', '*', '?', '"', '<', '>', '|'];
     class function ExpandFileNameRelBaseDir(const _FileName, _BaseDir: string): string;
     ///<summary>
     /// Replaces all invalid characters in the file name with the given character </summary>
