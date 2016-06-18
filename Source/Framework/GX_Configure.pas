@@ -193,6 +193,9 @@ constructor TfmConfiguration.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
+  Width := 629;
+  Height := 569;
+
   Constraints.MinWidth := Self.Width;
   Constraints.MinHeight := Self.Height;
 
