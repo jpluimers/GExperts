@@ -716,7 +716,7 @@ begin
     PEExpertStandAlone.LoadSettings;
     fmPeInformation := TfmPeInformation.Create(nil);
     if Assigned(CmdLine)  then begin
-      fn := cmdline;
+      fn := string(cmdline);
       if fn <> '' then
         fmPeInformation.LoadPEInfo(fn);
     end;
