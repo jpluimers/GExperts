@@ -16,10 +16,18 @@ type
     lblWhitespace: TLabel;
     edtWhitespace: TEdit;
     mmoTokens: TMemo;
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   end;
 
 implementation
 
 {$R *.dfm}
+
+procedure TfmAlignOptions.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if Key = Chr(27) then
+    ModalResult := mrCancel;
+end;
 
 end.

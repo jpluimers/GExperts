@@ -11,9 +11,11 @@ object fmAlignOptions: TfmAlignOptions
   Font.Height = -12
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
+  OnKeyPress = FormKeyPress
   DesignSize = (
     245
     353)
@@ -47,7 +49,7 @@ object fmAlignOptions: TfmAlignOptions
     Width = 80
     Height = 26
     Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Caption = '&OK'
     Default = True
     ModalResult = 1
     TabOrder = 2
