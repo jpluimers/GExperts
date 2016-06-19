@@ -12,7 +12,8 @@ uses
   GX_EditorExpert,
   GX_CodeFormatterExpert,
   GX_ConfigurationInfo,
-  GX_KbdShortCutBroker;
+  GX_KbdShortCutBroker,
+  GX_GenericUtils;
 
 type
   TeCodeFormatterExpert = class(TEditorExpert)
@@ -32,7 +33,11 @@ type
     procedure Execute(Sender: TObject); override;
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
+    procedure AddToCapitalization(const _Identifier: TGXUnicodeString);
   end;
+
+var
+  gblCodeFormatter: TeCodeFormatterExpert;
 
 implementation
 
@@ -42,6 +47,24 @@ uses
   Menus;
 
 { TeCodeFormatterExpert }
+
+procedure TeCodeFormatterExpert.AddToCapitalization(const _Identifier: TGXUnicodeString);
+var
+  GExpertsSettings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
+begin
+  FExpert.AddToCapitalization(_Identifier);
+
+  ExpSettings := nil;
+  GExpertsSettings := TGExpertsSettings.Create;
+  try
+    ExpSettings := GExpertsSettings.CreateExpertSettings(ConfigurationKey);
+    InternalSaveSettings(ExpSettings);
+  finally
+    FreeAndNil(ExpSettings);
+    FreeAndNil(GExpertsSettings);
+  end;
+end;
 
 procedure TeCodeFormatterExpert.Configure;
 begin
@@ -53,10 +76,12 @@ begin
   inherited Create;
 
   FExpert := TCodeFormatterExpert.Create;
+  gblCodeFormatter := Self;
 end;
 
 destructor TeCodeFormatterExpert.Destroy;
 begin
+  gblCodeFormatter := nil;
   FreeAndNil(FExpert);
   inherited;
 end;

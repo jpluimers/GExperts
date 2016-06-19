@@ -30,6 +30,7 @@ type
     procedure InternalLoadSettings(Settings: TExpertSettings);
     procedure InternalSaveSettings(Settings: TExpertSettings);
     function FormatFile(const _FileName: string): Boolean;
+    procedure AddToCapitalization(const _Identifier: TGXUnicodeString);
   end;
 
 implementation
@@ -56,6 +57,11 @@ begin //FI:W519
 end;
 
 { TCodeFormatterExpert }
+
+procedure TCodeFormatterExpert.AddToCapitalization(const _Identifier: TGXUnicodeString);
+begin
+  FEngine.Settings.CapNames.Add(_Identifier);
+end;
 
 procedure TCodeFormatterExpert.Configure;
 begin
