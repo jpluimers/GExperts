@@ -385,7 +385,7 @@ begin
   // Do not localize any of the below items.
   FSettings.BinProps := TBinProps(Settings.ReadEnumerated('BinaryProperties', TypeInfo(TBinProps), Ord(bpComment)));
   FSettings.Prepend := Settings.ReadBool('PrependWithComponent', False);
-  FSettings.UseDelphiWith := Settings.ReadBool('UseDelphiWith', True);
+  FSettings.UseDelphiWith := Settings.ReadBool('UseDelphiWith', False);
   FSettings.CreateFreeCode := Settings.ReadBool('CreateFreeCode', False);
   FSettings.Language := TCToCLanguage(Settings.ReadEnumerated('Language', TypeInfo(TCToCLanguage), Ord(FSettings.Language)));
 end;
