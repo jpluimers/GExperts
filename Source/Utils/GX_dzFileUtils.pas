@@ -5,6 +5,10 @@ unit GX_dzFileUtils;
 
 {$I GX_CondDefine.inc}
 
+{$IFDEF GX_VER200_up}
+{$DEFINE SUPPORTS_UNICODE_STRING}
+{$ENDIF}
+
 {$WARN UNIT_PLATFORM OFF}
 {$WARN SYMBOL_PLATFORM OFF}
 
@@ -345,14 +349,14 @@ begin
   end;
 end;
 
-{$IFNDEF GX_VER200_up}
+{$IFNDEF SUPPORTS_UNICODE_STRING}
 
 function CharInSet(_c: Char; const _CharSet: TSysCharSet): Boolean;
 begin
   Result := _c in _CharSet;
 end;
 
-{$ENDIF ~GX_VER200_up}
+{$ENDIF ~SUPPORTS_UNICODE_STRING}
 
 class function TFileSystem.MakeValidFilename(const _s: string; _ReplaceChar: Char = '_';
   _AllowPathChars: Boolean = True): string;
