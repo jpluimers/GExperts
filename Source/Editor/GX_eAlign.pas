@@ -15,11 +15,12 @@ type
     btnCancel: TButton;
     lstTokens: TListBox;
     lblToken: TLabel;
-    pmuTokens: TPopupMenu;
-    mitConfiguration: TMenuItem;
+    btnConfig: TButton;
     cbxMode: TComboBox;
     procedure lstTokensDblClick(Sender: TObject);
-    procedure mitConfigurationClick(Sender: TObject);
+    procedure btnConfigClick(Sender: TObject);
+  public
+    constructor Create(_Owner: TComponent); override;
   end;
 
 implementation
@@ -29,7 +30,8 @@ implementation
 uses
   SysUtils,
   GX_OtaUtils, GX_GenericUtils, GX_ConfigurationInfo,
-  GX_EditorExpert, GX_eSelectionEditorExpert, GX_eAlignOptions, Math;
+  GX_EditorExpert, GX_eSelectionEditorExpert, GX_eAlignOptions, Math,
+  GX_dzVclUtils;
 
 const
   DEFAULT_WHITESPACE = 1;
@@ -256,6 +258,14 @@ begin
   Settings.WriteEnumerated('Mode', TypeInfo(TGXAlignMode), Ord(FLastMode));
 end;
 
+{ TfmAlign }
+
+constructor TfmAlign.Create(_Owner: TComponent);
+begin
+  inherited;
+  TControl_SetMinConstraints(Self);
+end;
+
 procedure TfmAlign.lstTokensDblClick(Sender: TObject);
 begin
   ModalResult := mrOk;
@@ -287,7 +297,7 @@ begin
   end;
 end;
 
-procedure TfmAlign.mitConfigurationClick(Sender: TObject);
+procedure TfmAlign.btnConfigClick(Sender: TObject);
 begin
   AlignExpertInst.Configure;
   AlignExpertInst.LoadConfiguration(Self);
