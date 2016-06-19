@@ -166,7 +166,7 @@ begin
     SetLine(Idx, LowerCase(Line));
 end;
 
-{$IFNDEF SUPPORTS_UNICODE}
+{$IFNDEF SUPPORTS_UNICODE_STRING}
 
 function UpCase(_c: WideChar): WideChar; overload;
 begin
