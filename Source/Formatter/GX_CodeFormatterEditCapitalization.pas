@@ -1,9 +1,10 @@
-// the code formatter dialog for editing the capitalization file
-// Original Author:     Egbert van Nes (http://www.dow.wau.nl/aew/People/Egbert_van_Nes.html)
-// Contributors:        Thomas Mueller (http://www.dummzeuch.de)
 unit GX_CodeFormatterEditCapitalization;
 
 {$I GX_CondDefine.inc}
+
+{$IFDEF GX_VER200_up}
+{$DEFINE SUPPORTS_UNICODE_STRING}
+{$ENDIF}
 
 interface
 
@@ -17,58 +18,56 @@ uses
   Forms,
   Dialogs,
   StdCtrls,
+  Actions,
+  ActnList,
   Buttons,
-  ExtCtrls;
+  ExtCtrls,
+  GX_EnhancedEditor,
+  GX_GenericUtils;
 
 type
-  TCapitalizationAction = (acUpperCase, acLowerCase, acFirstUp, acFirstLow, acCommentOut);
-
   TfmCodeFormatterEditCapitalization = class(TForm)
-    l_FileName: TLabel;
     p_Buttons: TPanel;
-    p_Upper: TPanel;
-    l_Select: TLabel;
-    l_ChangeInto: TLabel;
-    lb_Items: TListBox;
+    TheActionList: TActionList;
+    act_AllUpperCase: TAction;
+    act_AllLowerCase: TAction;
+    act_FirstCharUp: TAction;
+    act_ToggleComment: TAction;
+    act_Import: TAction;
+    act_Export: TAction;
+    act_ClearSearch: TAction;
+    p_Items: TPanel;
     ed_Search: TEdit;
-    ed_Change: TEdit;
-    b_UpperCase: TButton;
-    b_LowerCase: TButton;
-    b_FirstCharUp: TButton;
-    b_FirstCharLow: TButton;
-    b_AddIdentifier: TButton;
-    b_Delete: TButton;
-    b_ToggleComment: TButton;
-    b_Help: TButton;
-    b_Ok: TButton;
+    b_Clear: TSpeedButton;
+    b_UpperCase: TSpeedButton;
+    b_LowerCase: TSpeedButton;
+    b_FirstCharUp: TSpeedButton;
+    b_ToggleComment: TSpeedButton;
+    b_OK: TButton;
     b_Cancel: TButton;
     b_Import: TButton;
     b_Export: TButton;
-    od_Import: TOpenDialog;
-    sd_Export: TSaveDialog;
-    procedure FormShow(Sender: TObject);
-    procedure lb_ItemsClick(Sender: TObject);
-    procedure ed_ChangeChange(Sender: TObject);
-    procedure b_UpperCaseClick(Sender: TObject);
-    procedure b_LowerCaseClick(Sender: TObject);
-    procedure b_FirstCharUpClick(Sender: TObject);
+    procedure act_AllUpperCaseExecute(Sender: TObject);
+    procedure act_AllLowerCaseExecute(Sender: TObject);
+    procedure act_FirstCharUpExecute(Sender: TObject);
     procedure ed_SearchChange(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure b_FirstCharLowClick(Sender: TObject);
-    procedure ed_SearchKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure b_AddIdentifierClick(Sender: TObject);
-    procedure b_ToggleCommentClick(Sender: TObject);
-    procedure b_DeleteClick(Sender: TObject);
-    procedure b_HelpClick(Sender: TObject);
-    procedure b_ImportClick(Sender: TObject);
-    procedure b_ExportClick(Sender: TObject);
+    procedure act_ClearSearchExecute(Sender: TObject);
+    procedure act_ToggleCommentExecute(Sender: TObject);
+    procedure act_ImportExecute(Sender: TObject);
+    procedure act_ExportExecute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
-    FisChanged: Boolean;
-    procedure ChangeSelected(AnAction: TCapitalizationAction);
+    FOrigList: TGXUnicodeString;
+    FWords: TGxEnhancedEditor;
+    function TryGetLine(out _Idx: Integer; out _Line: TGXUnicodeString): Boolean;
+    procedure SetLine(_Idx: Integer; const _Line: TGXUnicodeString);
+    procedure HandleOnEnterList(Sender: TObject);
+    procedure HandleOnExitList(Sender: TObject);
   public
-    procedure ListToForm(AWordList: TStrings);
-    procedure FormToList(AWordList: TStrings);
-    property IsChanged: Boolean read FisChanged write FisChanged;
+    constructor Create(_Owner: TComponent); override;
+    procedure ListToForm(_Words: TGXUnicodeStringList);
+    procedure FormToList(_Words: TGXUnicodeStringList);
+    function IsChanged: Boolean;
   end;
 
 implementation
@@ -76,263 +75,193 @@ implementation
 {$R *.DFM}
 
 uses
-  GX_CodeFormatterConfig;
+  GX_dzVclUtils,
+  GX_dzClassUtils;
 
-procedure TfmCodeFormatterEditCapitalization.FormShow(Sender: TObject);
+{ TfmCodeFormatterCapitalization }
+
+constructor TfmCodeFormatterEditCapitalization.Create(_Owner: TComponent);
 begin
-  IsChanged := False;
+  inherited;
+
+  TControl_SetMinConstraints(Self);
+
+  p_Items.BevelOuter := bvNone;
+  p_Buttons.BevelOuter := bvNone;
+
+  FWords := TGxEnhancedEditor.Create(Self);
+  FWords.Parent := p_Items;
+  FWords.HighLighter := gxpNone;
+  FWords.Align := alClient;
+  FWords.Font.Name := 'Courier New';
+  FWords.Font.Size := 10;
+  FWords.OnEnter := HandleOnEnterList;
+  FWords.OnExit := HandleOnExitList;
+  FWords.ActiveLineColor := clYellow;
+  FWords.WantTabs := False;
 end;
 
-procedure TfmCodeFormatterEditCapitalization.ListToForm(AWordList: TStrings);
-var
-  s: string;
-  i: Integer;
+procedure TfmCodeFormatterEditCapitalization.ListToForm(_Words: TGXUnicodeStringList);
 begin
-//  l_FileName.Caption := AFileName;
-  ed_Search.Text := '';
-  ed_Change.Text := '';
-  lb_Items.Clear;
-  lb_Items.Sorted := False;
-  for i := 0 to AWordList.Count - 1 do begin
-    s := AWordList[i];
-    if s <> '' then
-      lb_Items.Items.Add(s);
+  FWords.SetLines(_Words);
+  FOrigList := _Words.Text;
+end;
+
+procedure TfmCodeFormatterEditCapitalization.FormToList(_Words: TGXUnicodeStringList);
+var
+  sl: TGXUnicodeStringList;
+begin
+  sl := TGXUnicodeStringList.Create;
+  try
+    FWords.GetLines(sl);
+    sl.Sort;
+    _Words.Assign(sl);
+  finally
+    FreeAndNil(sl);
   end;
-  lb_Items.Sorted := True;
 end;
 
-procedure TfmCodeFormatterEditCapitalization.FormToList(AWordList: TStrings);
-var
-  i: Integer;
+procedure TfmCodeFormatterEditCapitalization.HandleOnEnterList(Sender: TObject);
 begin
-  AWordList.Clear;
-  for i := 0 to lb_Items.Items.Count - 1 do begin
-    AWordList.Add(lb_Items.Items[i]);
-  end;
+  FWords.ActiveLineColor := RGB(250, 255, 230);
 end;
 
-procedure TfmCodeFormatterEditCapitalization.lb_ItemsClick(Sender: TObject);
+procedure TfmCodeFormatterEditCapitalization.HandleOnExitList(Sender: TObject);
 begin
-  if lb_Items.SelCount <= 1 then begin
-    ed_Search.Enabled := True;
-    ed_Change.Enabled := True;
-    ed_Search.OnChange := nil;
-    ed_Change.OnChange := nil;
-    ed_Change.Text := lb_Items.Items[lb_Items.ItemIndex];
-    ed_Search.Text := ed_Change.Text;
-    ed_Search.OnChange := ed_SearchChange;
-    ed_Change.OnChange := ed_ChangeChange;
-  end else begin
-    ed_Search.Enabled := False;
-    ed_Change.Enabled := False;
-  end
+  FWords.ActiveLineColor := clYellow;
 end;
 
-procedure TfmCodeFormatterEditCapitalization.ed_ChangeChange(Sender: TObject);
+function TfmCodeFormatterEditCapitalization.TryGetLine(out _Idx: Integer; out _Line: TGXUnicodeString): Boolean;
+begin
+  _Idx := FWords.CaretXY.Y;
+  Result := (_Idx >= 0) or (_Idx < FWords.LineCount);
+  if Result then
+    _Line := FWords.GetLine(_Idx);
+end;
+
+procedure TfmCodeFormatterEditCapitalization.SetLine(_Idx: Integer; const _Line: TGXUnicodeString);
 var
+  pnt: TPoint;
+begin
+  pnt := FWords.CaretXY;
+  FWords.SetLine(_Idx, _Line);
+  FWords.CaretXY := pnt;
+end;
+
+procedure TfmCodeFormatterEditCapitalization.act_AllUpperCaseExecute(Sender: TObject);
+var
+  Line: TGXUnicodeString;
   Idx: Integer;
 begin
-  Idx := lb_Items.ItemIndex;
-  if Idx < 0 then begin
-    lb_Items.Items.Add(ed_Change.Text);
-    IsChanged := True;
-  end else if not SameText(lb_Items.Items[Idx], ed_Change.Text) then begin
-    IsChanged := True;
-    lb_Items.Items.Delete(Idx);
-    lb_Items.Items.Add(ed_Change.Text);
-  end else if lb_Items.Items[Idx] <> ed_Change.Text then begin
-    lb_Items.Items[Idx] := ed_Change.Text;
-    IsChanged := True;
-  end;
-  lb_Items.ItemIndex := lb_Items.Items.IndexOf(ed_Change.Text);
+  if TryGetLine(Idx, Line) then
+    SetLine(Idx, UpperCase(Line));
 end;
 
-procedure TfmCodeFormatterEditCapitalization.ChangeSelected(AnAction: TCapitalizationAction);
+procedure TfmCodeFormatterEditCapitalization.act_AllLowerCaseExecute(Sender: TObject);
 var
-  i: Integer;
+  Line: TGXUnicodeString;
+  Idx: Integer;
+begin
+  if TryGetLine(Idx, Line) then
+    SetLine(Idx, LowerCase(Line));
+end;
 
-  function Change(s: string): string;
-  var
-    Ch: Char;
-  begin
-    Result := s;
-    if s <> '' then begin
-      case AnAction of
-        acUpperCase: Result := UpperCase(s);
-        acLowerCase: Result := LowerCase(s);
-        acFirstUp: begin
-            Result := s;
-            Result[1] := UpCase(Result[1]);
-          end;
-        acFirstLow: begin
-            Result := s;
-            Ch := Result[1];
-            if (Ch >= 'A') and (Ch <= 'Z') then
-              Inc(Result[1], 32);
-          end;
-        acCommentOut:
-          if s[1] = '*' then
-            Result := Copy(s, 2, Length(s))
-          else
-            Result := '*' + s;
-      end;
-    end;
-    IsChanged := IsChanged or (s <> Result);
+{$IFNDEF SUPPORTS_UNICODE}
+
+function UpCase(_c: WideChar): WideChar; overload;
+begin
+  Result := WideChar(System.UpCase(Char(_c)));
+end;
+{$ENDIF}
+
+procedure TfmCodeFormatterEditCapitalization.act_FirstCharUpExecute(Sender: TObject);
+var
+  Line: TGXUnicodeString;
+  Idx: Integer;
+begin
+  if TryGetLine(Idx, Line) and (Line <> '') then begin
+    Line[1] := UpCase(Line[1]);
+    SetLine(Idx, Line);
   end;
-
-begin
-  IsChanged := True;
-  if ed_Change.Enabled then begin
-    if ed_Change.SelLength = 0 then
-      ed_Change.Text := Change(ed_Change.Text)
-    else
-      ed_Change.SelText := Change(ed_Change.SelText);
-  end else begin
-    for i := 0 to lb_Items.Count - 1 do begin
-      if lb_Items.Selected[i] then begin
-        lb_Items.Items[i] := Change(lb_Items.Items[i]);
-        lb_Items.Selected[i] := True;
-      end;
-    end;
-    if (AnAction = acCommentOut) then begin
-      lb_Items.Sorted := False;
-      lb_Items.Sorted := True; //fi:W508 - Combination forces reorder
-    end;
-  end;
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_UpperCaseClick(Sender: TObject);
-begin
-  ChangeSelected(acUpperCase);
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_LowerCaseClick(Sender: TObject);
-begin
-  ChangeSelected(acLowerCase);
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_FirstCharUpClick(Sender: TObject);
-begin
-  ChangeSelected(acFirstUp);
 end;
 
 procedure TfmCodeFormatterEditCapitalization.ed_SearchChange(Sender: TObject);
 var
-  SearchEditText: string;
-  i, j, Lasti: Integer;
+  s: string;
+  sl: TGXUnicodeStringList;
+  Idx: Integer;
 begin
-  SearchEditText := ed_Search.Text;
-  j := 1;
-  Lasti := 0;
-  for i := 0 to lb_Items.Count - 1 do begin
-    if (StrLIComp(PChar(SearchEditText), PChar(lb_Items.Items[i]), j) = 0) then begin
-      Inc(j);
-      Lasti := i;
-    end;
-    lb_Items.Selected[i] := False;
-  end;
-  if Lasti < lb_Items.Count then begin
-    lb_Items.OnClick := nil;
-    try
-      lb_Items.Selected[Lasti] := True;
-      if Lasti > 0 then
-        lb_Items.TopIndex := Lasti - 1;
-    finally
-      lb_Items.OnClick := lb_ItemsClick;
-    end;
+  s := ed_Search.Text;
+  if s = '' then
+    Exit;
+  sl := TGXUnicodeStringList.Create;
+  try
+    FWords.GetLines(sl);
+    TGXUnicodeStringList_MakeIndex(sl);
+    sl.Find(s, Idx);
+    FWords.CaretXY := Point(0, Integer(sl.Objects[Idx]) - 1);
+  finally
+    FreeAndNil(sl);
   end;
 end;
 
-procedure TfmCodeFormatterEditCapitalization.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+function TfmCodeFormatterEditCapitalization.IsChanged: Boolean;
+var
+  sl: TGXUnicodeStringList;
+begin
+  sl := TGXUnicodeStringList.Create;
+  try
+    FWords.GetLines(sl);
+    sl.Sort;
+    Result := (sl.Text <> FOrigList);
+  finally
+    FreeAndNil(sl);
+  end;
+end;
+
+procedure TfmCodeFormatterEditCapitalization.FormCloseQuery(
+  Sender: TObject; var CanClose: Boolean);
 begin
   if mrCancel = ModalResult then begin
     if IsChanged and (MessageDlg('Leave without saving changes?', mtInformation,
       [mbYes, mbNo], 0) = ID_No) then
-      Action := caNone;
+      CanClose := False;
   end;
 end;
 
-procedure TfmCodeFormatterEditCapitalization.b_FirstCharLowClick(Sender: TObject);
+procedure TfmCodeFormatterEditCapitalization.act_ClearSearchExecute(Sender: TObject);
 begin
-  ChangeSelected(acFirstLow);
+  ed_Search.Text := '';
 end;
 
-procedure TfmCodeFormatterEditCapitalization.ed_SearchKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-
-  procedure HandleUpDown(ADirection: Integer);
-  begin
-    lb_Items.Selected[lb_Items.ItemIndex] := False;
-    lb_Items.ItemIndex := lb_Items.ItemIndex + ADirection;
-    lb_Items.Selected[lb_Items.ItemIndex] := True;
-    lb_Items.SetFocus;
-  end;
-
-begin
-  case Key of
-    VK_UP:
-      HandleUpDown(-1);
-    VK_DOWN:
-      HandleUpDown(1);
-  end;
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_AddIdentifierClick(Sender: TObject);
+procedure TfmCodeFormatterEditCapitalization.act_ToggleCommentExecute(Sender: TObject);
 var
-  i: Integer;
+  Idx: Integer;
+  Line: TGXUnicodeString;
 begin
-  IsChanged := True;
-  lb_Items.Items.Add('<New Identifier>');
-  lb_Items.ItemIndex := lb_Items.Items.IndexOf('<New Identifier>');
-  for i := 0 to lb_Items.Count - 1 do
-    lb_Items.Selected[i] := False;
-  lb_Items.Selected[lb_Items.ItemIndex] := True;
-  lb_ItemsClick(nil);
+  if TryGetLine(Idx, Line) and (Line <> '') then begin
+    if Line[1] = '*' then
+      Line := Copy(Line, 2, 255)
+    else
+      Line := '*' + Line;
+    SetLine(Idx, Line);
+  end;
 end;
 
-procedure TfmCodeFormatterEditCapitalization.b_ToggleCommentClick(Sender: TObject);
-begin
-  ChangeSelected(acCommentOut);
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_DeleteClick(Sender: TObject);
+procedure TfmCodeFormatterEditCapitalization.act_ExportExecute(Sender: TObject);
 var
-  i: Integer;
+  fn: string;
 begin
-  for i := lb_Items.Count - 1 downto 0 do
-    if lb_Items.Selected[i] then begin
-      lb_Items.Items.Delete(i);
-      IsChanged := True;
-    end;
+  if ShowSaveDialog('Select file to import', 'txt', fn) then
+    FWords.SaveToFile(fn);
 end;
 
-procedure TfmCodeFormatterEditCapitalization.b_ExportClick(Sender: TObject);
+procedure TfmCodeFormatterEditCapitalization.act_ImportExecute(Sender: TObject);
+var
+  fn: string;
 begin
-  if not sd_Export.Execute then
-    Exit;
-  lb_Items.Items.SaveToFile(sd_Export.FileName);
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_HelpClick(Sender: TObject);
-//var
-//  S: string;
-begin
-//  with TOptionsDlg(Owner) do
-//    if HelpFile <> nil then
-//    begin
-//      S := 'Edit file dialog';
-//      WinHelp(0, PChar(HelpFile), HELP_KEY,
-//        Integer(S));
-//    end;
-end;
-
-procedure TfmCodeFormatterEditCapitalization.b_ImportClick(Sender: TObject);
-begin
-  if not od_Import.Execute then
-    Exit;
-  lb_Items.Items.LoadFromFile(od_Import.FileName);
+  if ShowOpenDialog('Select file to import', 'txt', fn) then
+    FWords.LoadFromFile(fn);
 end;
 
 end.
-

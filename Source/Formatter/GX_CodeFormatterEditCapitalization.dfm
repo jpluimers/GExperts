@@ -1,213 +1,182 @@
 object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
-  Left = 451
-  Top = 195
-  BorderStyle = bsSingle
-  Caption = 'Code Formatter Capitalization'
-  ClientHeight = 349
-  ClientWidth = 452
+  Left = 0
+  Top = 0
+  Width = 377
+  Height = 368
+  ActiveControl = ed_Search
+  BorderIcons = [biSystemMenu, biMaximize]
+  Caption = 'Capitalization'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -10
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -11
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
-  OnClose = FormClose
-  OnShow = FormShow
+  OnCloseQuery = FormCloseQuery
+  DesignSize = (
+    361
+    329)
   PixelsPerInch = 96
   TextHeight = 13
-  object l_FileName: TLabel
-    Left = 9
-    Top = 324
-    Width = 3
-    Height = 13
+  object b_Clear: TSpeedButton
+    Left = 172
+    Top = 8
+    Width = 21
+    Height = 21
+    Action = act_ClearSearch
+    Anchors = [akTop, akRight]
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object b_UpperCase: TSpeedButton
+    Left = 200
+    Top = 8
+    Width = 153
+    Height = 25
+    Action = act_AllUpperCase
+    Anchors = [akTop, akRight]
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object b_LowerCase: TSpeedButton
+    Left = 200
+    Top = 72
+    Width = 153
+    Height = 25
+    Action = act_AllLowerCase
+    Anchors = [akTop, akRight]
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object b_FirstCharUp: TSpeedButton
+    Left = 200
+    Top = 40
+    Width = 153
+    Height = 25
+    Action = act_FirstCharUp
+    Anchors = [akTop, akRight]
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object b_ToggleComment: TSpeedButton
+    Left = 200
+    Top = 112
+    Width = 153
+    Height = 25
+    Action = act_ToggleComment
+    Anchors = [akTop, akRight]
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object ed_Search: TEdit
+    Left = 8
+    Top = 8
+    Width = 161
+    Height = 21
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 0
+    OnChange = ed_SearchChange
+  end
+  object p_Items: TPanel
+    Left = 8
+    Top = 32
+    Width = 185
+    Height = 257
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Caption = 'editor goes here, created at runtime'
+    TabOrder = 1
   end
   object p_Buttons: TPanel
     Left = 0
-    Top = 308
-    Width = 452
+    Top = 288
+    Width = 361
     Height = 41
     Align = alBottom
-    TabOrder = 1
-    object b_Help: TButton
-      Left = 8
+    TabOrder = 2
+    DesignSize = (
+      361
+      41)
+    object b_OK: TButton
+      Left = 200
       Top = 8
       Width = 75
       Height = 25
-      Caption = '&Help'
-      TabOrder = 0
-      OnClick = b_HelpClick
-    end
-    object b_Ok: TButton
-      Left = 288
-      Top = 8
-      Width = 75
-      Height = 25
+      Anchors = [akRight, akBottom]
       Caption = 'OK'
       Default = True
       ModalResult = 1
-      TabOrder = 3
+      TabOrder = 0
     end
     object b_Cancel: TButton
-      Left = 369
+      Left = 280
       Top = 8
       Width = 75
       Height = 25
+      Anchors = [akRight, akBottom]
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
-      TabOrder = 4
+      TabOrder = 1
     end
     object b_Import: TButton
-      Left = 104
+      Left = 8
       Top = 8
       Width = 75
       Height = 25
-      Caption = 'Import ...'
-      TabOrder = 1
-      OnClick = b_ImportClick
+      Action = act_Import
+      TabOrder = 2
     end
     object b_Export: TButton
-      Left = 185
+      Left = 89
       Top = 8
       Width = 75
       Height = 25
-      Caption = 'Export ...'
-      TabOrder = 2
-      OnClick = b_ExportClick
-    end
-  end
-  object p_Upper: TPanel
-    Left = 0
-    Top = 0
-    Width = 452
-    Height = 308
-    Align = alClient
-    BevelOuter = bvNone
-    TabOrder = 0
-    DesignSize = (
-      452
-      308)
-    object l_Select: TLabel
-      Left = 8
-      Top = 8
-      Width = 86
-      Height = 13
-      Caption = 'Select identifier(s):'
-    end
-    object l_ChangeInto: TLabel
-      Left = 240
-      Top = 48
-      Width = 65
-      Height = 13
-      Caption = 'Replace with:'
-    end
-    object lb_Items: TListBox
-      Left = 8
-      Top = 48
-      Width = 217
-      Height = 254
-      Anchors = [akLeft, akTop, akBottom]
-      ItemHeight = 13
-      MultiSelect = True
-      TabOrder = 1
-      OnClick = lb_ItemsClick
-    end
-    object ed_Search: TEdit
-      Left = 8
-      Top = 24
-      Width = 217
-      Height = 21
-      TabOrder = 0
-      OnChange = ed_SearchChange
-      OnKeyDown = ed_SearchKeyDown
-    end
-    object ed_Change: TEdit
-      Left = 240
-      Top = 64
-      Width = 204
-      Height = 21
-      TabOrder = 2
-      OnChange = ed_ChangeChange
-    end
-    object b_UpperCase: TButton
-      Left = 252
-      Top = 91
-      Width = 89
-      Height = 25
-      Caption = 'UpperCase'
+      Action = act_Export
       TabOrder = 3
-      OnClick = b_UpperCaseClick
-    end
-    object b_LowerCase: TButton
-      Left = 347
-      Top = 91
-      Width = 89
-      Height = 25
-      Caption = 'LowerCase'
-      TabOrder = 4
-      OnClick = b_LowerCaseClick
-    end
-    object b_FirstCharUp: TButton
-      Left = 252
-      Top = 122
-      Width = 89
-      Height = 25
-      Caption = 'First Char Up'
-      TabOrder = 5
-      OnClick = b_FirstCharUpClick
-    end
-    object b_FirstCharLow: TButton
-      Left = 347
-      Top = 122
-      Width = 89
-      Height = 25
-      Caption = 'First Char Low'
-      TabOrder = 6
-      OnClick = b_FirstCharLowClick
-    end
-    object b_AddIdentifier: TButton
-      Left = 252
-      Top = 168
-      Width = 89
-      Height = 26
-      Caption = 'Add Identifier'
-      TabOrder = 7
-      OnClick = b_AddIdentifierClick
-    end
-    object b_Delete: TButton
-      Left = 252
-      Top = 200
-      Width = 89
-      Height = 25
-      Caption = 'Delete'
-      TabOrder = 8
-      OnClick = b_DeleteClick
-    end
-    object b_ToggleComment: TButton
-      Left = 252
-      Top = 232
-      Width = 89
-      Height = 25
-      Caption = 'Toggle Comment'
-      TabOrder = 9
-      OnClick = b_ToggleCommentClick
     end
   end
-  object od_Import: TOpenDialog
-    DefaultExt = 'txt'
-    Filter = 'text files (*.txt)|*.txt|all files (*.*)|*.*'
-    FilterIndex = 0
-    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 248
-    Top = 256
-  end
-  object sd_Export: TSaveDialog
-    DefaultExt = 'txt'
-    Filter = 'text files (*.txt)|*.txt|all files (*.*)|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofNoReadOnlyReturn, ofEnableSizing]
-    Left = 328
-    Top = 256
+  object TheActionList: TActionList
+    Left = 232
+    Top = 152
+    object act_AllUpperCase: TAction
+      Caption = 'All Upper Case (Alt+PgUp)'
+      Hint = 'Alt+PgUp'
+      ShortCut = 32801
+      OnExecute = act_AllUpperCaseExecute
+    end
+    object act_AllLowerCase: TAction
+      Caption = 'All Lower Case (Alt+PgDn)'
+      Hint = 'Alt+PgDn'
+      ShortCut = 32802
+      OnExecute = act_AllLowerCaseExecute
+    end
+    object act_FirstCharUp: TAction
+      Caption = 'First Char Up (Alt+Up)'
+      Hint = 'Alt+Up'
+      ShortCut = 32806
+      OnExecute = act_FirstCharUpExecute
+    end
+    object act_ToggleComment: TAction
+      Caption = 'Toggle Comment (Alt+Del)'
+      Hint = 'Alt+Del'
+      ShortCut = 32814
+      OnExecute = act_ToggleCommentExecute
+    end
+    object act_ClearSearch: TAction
+      Caption = 'X'
+      Hint = 'Ctrl+Del'
+      ShortCut = 16430
+      OnExecute = act_ClearSearchExecute
+    end
+    object act_Import: TAction
+      Caption = 'Import ...'
+      OnExecute = act_ImportExecute
+    end
+    object act_Export: TAction
+      Caption = 'Export ...'
+      OnExecute = act_ExportExecute
+    end
   end
 end

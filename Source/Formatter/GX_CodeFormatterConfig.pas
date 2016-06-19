@@ -24,7 +24,8 @@ uses
   GX_CodeFormatterTypes,
   GX_CodeFormatterEngine,
   GX_CodeFormatterSettings,
-  GX_EnhancedEditor;
+  GX_EnhancedEditor,
+  GX_GenericUtils;
 
 type
   TStringGrid = class(Grids.TStringGrid)
@@ -155,7 +156,7 @@ type
     procedure b_PrecedenceUpClick(Sender: TObject);
     procedure b_PrecedenceDownClick(Sender: TObject);
   private
-    FCapitalization: TStringList;
+    FCapitalization: TGXUnicodeStringList;
     m_PreviewBefore: TGxEnhancedEditor;
     m_PreviewAfter: TGxEnhancedEditor;
     procedure EngineSettingsToForm(const _EngineSettings: TCodeFormatterEngineSettings);
@@ -183,7 +184,6 @@ implementation
 uses
   Messages,
   GX_dzVclUtils,
-  GX_GenericUtils,
   GX_CodeFormatterConfigHandler,
   GX_CodeFormatterEditCapitalization,
   GX_CodeFormatterDefaultSettings;
@@ -205,7 +205,7 @@ var
   mi: TMenuItem;
 begin
   inherited;
-  FCapitalization := TStringList.Create;
+  FCapitalization := TGXUnicodeStringList.Create;
   st := TStringList.Create;
   try
     TCodeFormatterConfigHandler.GetDefaultsList(st);
