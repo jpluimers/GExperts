@@ -345,14 +345,14 @@ begin
   end;
 end;
 
-{$IFNDEF SUPPORTS_UNICODE}
+{$IFNDEF GX_VER200_up}
 
 function CharInSet(_c: Char; const _CharSet: TSysCharSet): Boolean;
 begin
   Result := _c in _CharSet;
 end;
 
-{$ENDIF ~SUPPORTS_UNICODE}
+{$ENDIF ~GX_VER200_up}
 
 class function TFileSystem.MakeValidFilename(const _s: string; _ReplaceChar: Char = '_';
   _AllowPathChars: Boolean = True): string;
