@@ -70,6 +70,8 @@ type
     procedure SetOnKeyPress(const Value: TKeyPressWEvent);
     procedure SetOnKeyUp(const Value: TKeyEvent);
     procedure SetOnMouseDown(const Value: TMouseEvent);
+    function GetActiveLineColor: TColor;
+    procedure SetActiveLineColor(const Value: TColor);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -83,10 +85,13 @@ type
     function Focused: Boolean; override;
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
+    procedure SaveToFile(const AFilename: string);
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure GetLines(ALines: TGXUnicodeStringList);
     procedure SetLines(ALines: TGXUnicodeStringList);
+    function GetLine(AIdx: Integer): TGXUnicodeString;
+    procedure SetLine(AIdx: Integer; ALine: TGXUnicodeString);
     property Highlighter: TGXSyntaxHighlighter read GetHighlighter write SetHighlighter;
     property Text: string read GetText write SetText;
     property Color: TColor  read GetColor write SetColor;
@@ -101,6 +106,7 @@ type
     property NormalizedText: string read GetNormalizedText;
     property TabWidth: Integer read GetTabWidth write SetTabWidth;
     property LineCount: Integer read GetLineCount;
+    property ActiveLineColor: TColor read GetActiveLineColor write SetActiveLineColor;
     property AsString: string read GetAsString write SetAsString;
     property AsAnsiString: AnsiString read GetAsAnsiString write SetAsAnsiString;
     property AsUnicodeString: TGXUnicodeString read GetAsUnicodeString write SetAsUnicodeString;
@@ -287,6 +293,15 @@ begin
   {$ENDIF GX_ENHANCED_EDITOR}
 end;
 
+function TGxEnhancedEditor.GetActiveLineColor: TColor;
+begin
+  {$IFDEF SYNEDIT}
+  Result := FEditor.ActiveLineColor;
+  {$ELSE}
+  Result := FEditor.Color;
+  {$ENDIF SYNEDIT}
+end;
+
 function TGxEnhancedEditor.GetAsAnsiString: AnsiString;
 begin
   Result := AnsiString(FEditor.Lines.Text);
@@ -304,8 +319,25 @@ end;
 
 function TGxEnhancedEditor.GetCaretXY: TPoint;
 begin
-  Assert(False, 'Not implemented');
-  Result := Point(0, 0);
+  {$IFDEF SYNEDIT}
+  Result := Point(FEditor.CaretX, FEditor.CaretY - 1);
+  {$ELSE}
+  Result := FEditor.CaretXY;
+  {$ENDIF SYNEDIT}
+end;
+
+procedure TGxEnhancedEditor.SaveToFile(const AFilename: string);
+begin
+  FEditor.Lines.SaveToFile(AFilename);
+end;
+
+procedure TGxEnhancedEditor.SetActiveLineColor(const Value: TColor);
+begin
+  {$IFDEF SYNEDIT}
+  FEditor.ActiveLineColor := Value;
+  {$ELSE}
+  // cannot be done
+  {$ENDIF SYNEDIT}
 end;
 
 procedure TGxEnhancedEditor.SetAsAnsiString(const Value: AnsiString);
@@ -330,9 +362,6 @@ end;
 procedure TGxEnhancedEditor.SetCaretXY(const Value: TPoint);
 begin
   {$IFDEF SYNEDIT}
-  //FEditor.TopLine := Value.Y + 1;
-  // This code requires SynEdit 1.2 or later, otherwise use this line:
-  // FEditor.CaretXY := Point(1, Value.Y + 1);
   FEditor.CaretXY := BufferCoord(1, Value.Y + 1);
   {$ENDIF SYNEDIT}
 
@@ -372,6 +401,11 @@ end;
 procedure TGxEnhancedEditor.SetModified(const Value: Boolean);
 begin
   FEditor.Modified := Value;
+end;
+
+function TGxEnhancedEditor.GetLine(AIdx: Integer): TGXUnicodeString;
+begin
+  Result := FEditor.Lines[AIdx];
 end;
 
 function TGxEnhancedEditor.GetLineCount: Integer;
@@ -494,6 +528,11 @@ begin
   {$IFNDEF GX_ENHANCED_EDITOR}
   FHighlighter := gxpNone;
   {$ENDIF GX_ENHANCED_EDITOR}
+end;
+
+procedure TGxEnhancedEditor.SetLine(AIdx: Integer; ALine: TGXUnicodeString);
+begin
+  FEditor.Lines[AIdx] := ALine;
 end;
 
 procedure TGxEnhancedEditor.SetLines(ALines: TGXUnicodeStringList);
