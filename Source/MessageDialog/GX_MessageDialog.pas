@@ -649,51 +649,62 @@ const
   MsgExpMsgEmbedDefault = 0;
 
 procedure TfmMessageDialog.SaveSettings;
+var
+  GExpertsSettings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
 begin
-  with TGExpertsSettings.Create do
+  ExpSettings := nil;
+  GExpertsSettings := TGExpertsSettings.Create;
   try
-    WriteInteger(ConfigurationKey, MsgExpMsgActivePageIdent, pgeMessageDialog.ActivePageIndex);
-    WriteString(ConfigurationKey, MsgExpMsgTypeIdent, DialogType);
-    WriteString(ConfigurationKey, MsgExpMsgBoxTypeIdent, DialogBoxType);
-    WriteString(ConfigurationKey, MsgExpMsgButtonsIdent, DialogButtons);
-    WriteString(ConfigurationKey, MsgExpMsgModalityIdent, Modality);
-    WriteString(ConfigurationKey, MsgExpMsgFunctionResultsIdent, FunctionResults);
-    WriteInteger(ConfigurationKey, MsgExpMsgHelpContextIdent, DialogHelpContext);
-    WriteInteger(ConfigurationKey, MsgExpMsgEmbed, EmbedSelection);
-    WriteBool(ConfigurationKey, MsgExpMsgQuotesIdent, Quotes);
-    WriteBool(ConfigurationKey, MsgExpMsgCaptionQuotesIdent, CaptionQuotes);
-    WriteString(ConfigurationKey, MsgExpMsgDefaultButtonIdent, DefaultButton);
-    WriteBool(ConfigurationKey, MsgExpMsgEnableDefaultButtonIdent, DefaultButtonCheckbox);
+    ExpSettings := GExpertsSettings.CreateExpertSettings(ConfigurationKey);
+    ExpSettings.WriteInteger(MsgExpMsgActivePageIdent, pgeMessageDialog.ActivePageIndex);
+    ExpSettings.WriteString(MsgExpMsgTypeIdent, DialogType);
+    ExpSettings.WriteString(MsgExpMsgBoxTypeIdent, DialogBoxType);
+    ExpSettings.WriteString(MsgExpMsgButtonsIdent, DialogButtons);
+    ExpSettings.WriteString(MsgExpMsgModalityIdent, Modality);
+    ExpSettings.WriteString(MsgExpMsgFunctionResultsIdent, FunctionResults);
+    ExpSettings.WriteInteger(MsgExpMsgHelpContextIdent, DialogHelpContext);
+    ExpSettings.WriteInteger(MsgExpMsgEmbed, EmbedSelection);
+    ExpSettings.WriteBool(MsgExpMsgQuotesIdent, Quotes);
+    ExpSettings.WriteBool(MsgExpMsgCaptionQuotesIdent, CaptionQuotes);
+    ExpSettings.WriteString(MsgExpMsgDefaultButtonIdent, DefaultButton);
+    ExpSettings.WriteBool(MsgExpMsgEnableDefaultButtonIdent, DefaultButtonCheckbox);
   finally
-    Free;
+    FreeAndNil(ExpSettings);
+    FreeAndNil(GExpertsSettings);
   end;
 end;
 
 procedure TfmMessageDialog.LoadSettings;
 var
+  GExpertsSettings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
   LastPageIndex: Integer;
 begin
-  with TGExpertsSettings.Create do
+  ExpSettings := nil;
+  GExpertsSettings := TGExpertsSettings.Create;
   try
-    EmbedSelection := ReadInteger(ConfigurationKey, MsgExpMsgEmbed, MsgExpMsgEmbedDefault);
-    LastPageIndex := ReadInteger(ConfigurationKey, MsgExpMsgActivePageIdent, MsgExpMsgActivePageDefault);
+    ExpSettings := GExpertsSettings.CreateExpertSettings(ConfigurationKey);
+    EmbedSelection := ExpSettings.ReadInteger(MsgExpMsgEmbed, MsgExpMsgEmbedDefault);
+    LastPageIndex := ExpSettings.ReadInteger(MsgExpMsgActivePageIdent, MsgExpMsgActivePageDefault);
     if (LastPageIndex >= 0) and (LastPageIndex < pgeMessageDialog.PageCount) then
     begin
       pgeMessageDialog.ActivePageIndex := LastPageIndex;
       pgeMessageDialogChange(pgeMessageDialog);
     end;
-    DialogType := ReadString(ConfigurationKey, MsgExpMsgTypeIdent, MsgExpMsgTypeDefault);
-    DialogBoxType := ReadString(ConfigurationKey, MsgExpMsgBoxTypeIdent, MsgExpMsgBoxTypeDefault);
-    AllDialogButtons := ReadString(ConfigurationKey, MsgExpMsgButtonsIdent, MsgExpMsgButtonsDefault);
-    Modality := ReadString(ConfigurationKey, MsgExpMsgModalityIdent, MsgExpMsgModalityDefault);
-    AllFunctionResults := ReadString(ConfigurationKey, MsgExpMsgFunctionResultsIdent, MsgExpMsgFunctionResultsDefault);
-    DialogHelpContext := ReadInteger(ConfigurationKey, MsgExpMsgHelpContextIdent, MsgExpMsgHelpContextDefault);
-    Quotes := ReadBool(ConfigurationKey, MsgExpMsgQuotesIdent, MsgExpMsgQuotesDefault);
-    CaptionQuotes := ReadBool(ConfigurationKey, MsgExpMsgCaptionQuotesIdent, MsgExpMsgCaptionQuotesDefault);
-    DefaultButton := ReadString(ConfigurationKey, MsgExpMsgDefaultButtonIdent, MsgExpMsgDefaultButtonDefault);
-    DefaultButtonCheckbox := ReadBool(ConfigurationKey, MsgExpMsgEnableDefaultButtonIdent, MsgExpMsgEnableDefaultButtonDefault);
+    DialogType := ExpSettings.ReadString(MsgExpMsgTypeIdent, MsgExpMsgTypeDefault);
+    DialogBoxType := ExpSettings.ReadString(MsgExpMsgBoxTypeIdent, MsgExpMsgBoxTypeDefault);
+    AllDialogButtons := ExpSettings.ReadString(MsgExpMsgButtonsIdent, MsgExpMsgButtonsDefault);
+    Modality := ExpSettings.ReadString(MsgExpMsgModalityIdent, MsgExpMsgModalityDefault);
+    AllFunctionResults := ExpSettings.ReadString(MsgExpMsgFunctionResultsIdent, MsgExpMsgFunctionResultsDefault);
+    DialogHelpContext := ExpSettings.ReadInteger(MsgExpMsgHelpContextIdent, MsgExpMsgHelpContextDefault);
+    Quotes := ExpSettings.ReadBool(MsgExpMsgQuotesIdent, MsgExpMsgQuotesDefault);
+    CaptionQuotes := ExpSettings.ReadBool(MsgExpMsgCaptionQuotesIdent, MsgExpMsgCaptionQuotesDefault);
+    DefaultButton := ExpSettings.ReadString(MsgExpMsgDefaultButtonIdent, MsgExpMsgDefaultButtonDefault);
+    DefaultButtonCheckbox := ExpSettings.ReadBool(MsgExpMsgEnableDefaultButtonIdent, MsgExpMsgEnableDefaultButtonDefault);
   finally
-    Free;
+    FreeAndNil(ExpSettings);
+    FreeAndNil(GExpertsSettings);
   end;
 end;
 
