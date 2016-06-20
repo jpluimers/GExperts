@@ -72,20 +72,24 @@ procedure SetModalFormPopupMode(Form: TCustomForm);
 function GetIDEVersionID: string;
 
 function RunningWindows: Boolean;
+
 function RunningDelphi8: Boolean;
 function RunningDelphi8OrGreater: Boolean;
 function RunningDelphi7OrLess: Boolean;
 function RunningDelphi7OrGreater: Boolean;
 function RunningDelphi2005: Boolean;
-function RunningDelphi2007: Boolean;
+function RunningBDS2006OrLess: Boolean;
+function RunningBDS2006: Boolean;
+function RunningBDS2006OrGreater: Boolean;
 function RunningDelphi2007OrLess: Boolean;
+function RunningDelphi2007: Boolean;
 function RunningDelphi2007OrGreater: Boolean;
 function RunningRS2009: Boolean;
-function RunningRSXE: Boolean;
 function RunningRS2009OrGreater: Boolean;
-function RunningBDS2006OrLess: Boolean;
-function RunningBDS2006OrGreater: Boolean;
-function RunningBDS2006: Boolean;
+function RunningRS2010OrGreater: Boolean;
+function RunningRSXE: Boolean;
+function RunningRSXEOrGreater: Boolean;
+
 function RunningCPPBuilder: Boolean;
 function IDEHasWelcomePage: Boolean;
 function FileIsWelcomePage(const FileName: string): Boolean;
@@ -509,9 +513,27 @@ begin
   {$ENDIF}
 end;
 
+function RunningRSXEOrGreater: Boolean;
+begin
+  {$IFDEF GX_VER220_up}
+  Result := True;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
 function RunningRS2009OrGreater: Boolean;
 begin
   {$IFDEF GX_VER200_up}
+  Result := True;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+function RunningRS2010OrGreater: Boolean;
+begin
+  {$IFDEF GX_VER210_up}
   Result := True;
   {$ELSE}
   Result := False;
