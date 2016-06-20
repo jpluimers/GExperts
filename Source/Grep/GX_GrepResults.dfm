@@ -743,7 +743,7 @@ inherited fmGrepResults: TfmGrepResults
     object actHistorySearchInHistory: TAction
       Category = 'History'
       Caption = 'Search in History'
-      Hint = 'Search in the all history list'
+      Hint = 'Search in the history list'
       ImageIndex = 81
       OnExecute = actHistorySearchInHistoryExecute
     end
@@ -753,38 +753,38 @@ inherited fmGrepResults: TfmGrepResults
     Left = 16
     Top = 160
     object miHistoryItemName: TMenuItem
-      Caption = '[Search text=---]'
+      Caption = 'Search Text'
       OnClick = miHistoryItemNameClick
     end
     object miHistoryLastSearchTime: TMenuItem
-      Caption = 'Last search time'
+      Caption = 'Search Time'
     end
     object miHistorySettings: TMenuItem
-      Caption = 'Parameters info'
+      Caption = 'Search Parameters'
       ImageIndex = 76
       object miSettingsSaveOption: TMenuItem
-        Caption = 'Save option (when IDE closing)'
+        Caption = 'Save History'
       end
       object miSettingsSep1: TMenuItem
         Caption = '-'
       end
       object miSettingsCurrentFile: TMenuItem
-        Caption = 'Current file'
+        Caption = 'Current File'
       end
       object miSettingsAllFilesInProjectGroup: TMenuItem
-        Caption = 'All files in project group'
+        Caption = 'All Files in Project Group'
       end
       object miSettingsAllFilesInProject: TMenuItem
-        Caption = 'All files in project'
+        Caption = 'All Files in Project'
       end
       object miSettingsOpenProjectFiles: TMenuItem
-        Caption = 'Open project files'
+        Caption = 'Open Project Files'
       end
       object miSettingsDirectories: TMenuItem
         Caption = 'Directories'
       end
       object miSettingsPreviousSearchResultFiles: TMenuItem
-        Caption = 'Previous search result files'
+        Caption = 'Previous Search Result Files'
       end
       object miSettingsSepDir: TMenuItem
         Caption = '-'
@@ -796,55 +796,55 @@ inherited fmGrepResults: TfmGrepResults
         Caption = 'Exclude Dirs'
       end
       object miSettingsFileMasks: TMenuItem
-        Caption = 'File masks'
+        Caption = 'File Masks'
       end
       object miSettingsSearchSubDirectories: TMenuItem
-        Caption = 'Search subdirectories'
+        Caption = 'Search Subdirectories'
       end
       object miSettingsSep2: TMenuItem
         Caption = '-'
       end
       object miSettingsCaseSensitive: TMenuItem
-        Caption = 'Case sensitive'
+        Caption = 'Case Sensitive'
       end
       object miSettingsWholeWord: TMenuItem
-        Caption = 'Whole word'
+        Caption = 'Whole Word'
       end
       object miSettingsSearchFormFiles: TMenuItem
-        Caption = 'Search form files'
+        Caption = 'Search Form Files'
       end
       object miSettingsSearchSQLFiles: TMenuItem
-        Caption = 'Search SQL files'
+        Caption = 'Search SQL Files'
       end
       object miSettingsRegularExpression: TMenuItem
-        Caption = 'Regular expression'
+        Caption = 'Regular Expression'
       end
       object miSettingsSep3: TMenuItem
         Caption = '-'
       end
       object miSettingsGrepCode: TMenuItem
-        Caption = 'Grep code'
+        Caption = 'Delphi Code'
       end
       object miSettingsGrepStrings: TMenuItem
-        Caption = 'Grep strings'
+        Caption = 'Delphi Strings'
       end
       object miSettingsGrepComments: TMenuItem
-        Caption = 'Grep comments'
+        Caption = 'Delphi Comments'
       end
       object miSettingsSep4: TMenuItem
         Caption = '-'
       end
       object miSettingsSectionInterface: TMenuItem
-        Caption = 'Interface'
+        Caption = 'Delphi Interface'
       end
       object miSettingsSectionImplementation: TMenuItem
-        Caption = 'Implementation'
+        Caption = 'Delphi Implementation'
       end
       object miSettingsSectionInitialization: TMenuItem
-        Caption = 'Initialization'
+        Caption = 'Delphi Initialization'
       end
       object miSettingsSectionFinalization: TMenuItem
-        Caption = 'Finalization'
+        Caption = 'Delphi Finalization'
       end
     end
     object mitHistorySep1: TMenuItem
