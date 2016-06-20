@@ -23,6 +23,11 @@
   {.$DEFINE GX_DEBUGLOG}
 {$ENDIF GX_AutomatedBuild}
 
+// The use of Andy Hausladen's VCLFixPack is not yet tested well enough and
+// might have undesirable side effects when used in an IDE plugin. Therefore
+// it is disabled by default and must be enabled explicitly by setting the
+// following conditional define:
+{.$DEFINE GX_USE_VCL_FIX_PACK}
 
 // Miscellaneous GExperts Defines (do not change the items below!)
 // ---------------------------------------------------------------
