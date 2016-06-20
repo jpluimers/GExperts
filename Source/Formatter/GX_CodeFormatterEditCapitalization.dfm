@@ -1,6 +1,6 @@
 object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
-  Left = 0
-  Top = 0
+  Left = 317
+  Top = 211
   Width = 377
   Height = 368
   ActiveControl = ed_Search
@@ -17,7 +17,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
   OnCloseQuery = FormCloseQuery
   DesignSize = (
     361
-    329)
+    330)
   PixelsPerInch = 96
   TextHeight = 13
   object b_Clear: TSpeedButton
@@ -90,7 +90,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
   end
   object p_Buttons: TPanel
     Left = 0
-    Top = 288
+    Top = 289
     Width = 361
     Height = 41
     Align = alBottom
@@ -107,7 +107,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Caption = 'OK'
       Default = True
       ModalResult = 1
-      TabOrder = 0
+      TabOrder = 2
     end
     object b_Cancel: TButton
       Left = 280
@@ -118,7 +118,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
-      TabOrder = 1
+      TabOrder = 3
     end
     object b_Import: TButton
       Left = 8
@@ -126,7 +126,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Width = 75
       Height = 25
       Action = act_Import
-      TabOrder = 2
+      TabOrder = 0
     end
     object b_Export: TButton
       Left = 89
@@ -134,7 +134,7 @@ object fmCodeFormatterEditCapitalization: TfmCodeFormatterEditCapitalization
       Width = 75
       Height = 25
       Action = act_Export
-      TabOrder = 3
+      TabOrder = 1
     end
   end
   object TheActionList: TActionList
