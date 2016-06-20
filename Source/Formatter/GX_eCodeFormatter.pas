@@ -50,8 +50,7 @@ uses
 
 { TeCodeFormatterExpert }
 
-procedure TeCodeFormatterExpert.AddToCapitalization(const _Identifier
-  : TGXUnicodeString);
+procedure TeCodeFormatterExpert.AddToCapitalization(const _Identifier: TGXUnicodeString);
 var
   GExpertsSettings: TGExpertsSettings;
   ExpSettings: TExpertSettings;
@@ -125,15 +124,18 @@ end;
 
 function TeCodeFormatterExpert.GetHelpString: string;
 resourcestring
-  SFormatterHelp = 'This expert is the source code formatter formerly known as '
-    + 'DelForEx. To switch between different configuration sets, ' +
+  SFormatterHelp =
+    'This expert is the source code formatter formerly known as ' +
+    'DelForEx. To switch between different configuration sets, ' +
     'use the tools button.' + sLineBreak +
     'To force a configuration set for a particular unit, add' + sLineBreak +
     '    {GXFormatter.config=<configname>}' + sLineBreak +
     'as the first line to the unit.' + sLineBreak +
-    'You can also use a GXFormatter.ini per directory with content ' + 'like:' +
-    sLineBreak + '    [FileSettings]' + sLineBreak + '    <mask>=<configname>' +
-    sLineBreak + 'The formatter will use the first match for the file name. ' +
+    'You can also use a GXFormatter.ini per directory with content ' +
+    'like:' + sLineBreak +
+    '    [FileSettings]' + sLineBreak +
+    '    <mask>=<configname>' + sLineBreak +
+    'The formatter will use the first match for the file name. ' +
     'An empty <configname> means that it should work ' +
     'as configured in this dialog.' + sLineBreak +
     'You can also export your own configuration as' + sLineBreak +
@@ -168,8 +170,5 @@ begin
 end;
 
 initialization
-
   RegisterEditorExpert(TeCodeFormatterExpert);
-
 end.
-
