@@ -33,6 +33,7 @@ type
     procedure Execute(Sender: TObject); override;
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
+    function IsDefaultActive: Boolean; override;
     procedure AddToCapitalization(const _Identifier: TGXUnicodeString);
   end;
 
@@ -44,11 +45,13 @@ implementation
 uses
 {$IFOPT D+}GX_DbugIntf,
 {$ENDIF}
-  Menus;
+  Menus,
+  GX_IdeUtils;
 
 { TeCodeFormatterExpert }
 
-procedure TeCodeFormatterExpert.AddToCapitalization(const _Identifier: TGXUnicodeString);
+procedure TeCodeFormatterExpert.AddToCapitalization(const _Identifier
+  : TGXUnicodeString);
 var
   GExpertsSettings: TGExpertsSettings;
   ExpSettings: TExpertSettings;
@@ -86,6 +89,11 @@ begin
   inherited;
 end;
 
+function TeCodeFormatterExpert.IsDefaultActive: Boolean;
+begin
+  Result := not RunningRSXEOrGreater;
+end;
+
 procedure TeCodeFormatterExpert.Execute(Sender: TObject);
 begin
   FExpert.Execute;
@@ -98,7 +106,16 @@ end;
 
 function TeCodeFormatterExpert.GetDefaultShortCut: TShortCut;
 begin
-  Result := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt]);
+  if RunningRS2010OrGreater then begin
+    // Strarting with Delphi 2010 it has a built in code formatter
+    // it doesn't work very well in the early incarnations but
+    // if the user wants to replace it, he should configure it himself.
+    Result := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt])
+  end else begin
+    // for older versions, hijack the Ctrl+D shortcut that in later versions is
+    // used by the built in code formatter
+    Result := Menus.ShortCut(Word('D'), [ssCtrl]);
+  end;
 end;
 
 function TeCodeFormatterExpert.GetDisplayName: string;
@@ -108,18 +125,15 @@ end;
 
 function TeCodeFormatterExpert.GetHelpString: string;
 resourcestring
-  SFormatterHelp =
-    'This expert is the source code formatter formerly known as ' +
-    'DelForEx. To switch between different configuration sets, ' +
+  SFormatterHelp = 'This expert is the source code formatter formerly known as '
+    + 'DelForEx. To switch between different configuration sets, ' +
     'use the tools button.' + sLineBreak +
     'To force a configuration set for a particular unit, add' + sLineBreak +
     '    {GXFormatter.config=<configname>}' + sLineBreak +
     'as the first line to the unit.' + sLineBreak +
-    'You can also use a GXFormatter.ini per directory with content ' +
-    'like:' + sLineBreak +
-    '    [FileSettings]' + sLineBreak +
-    '    <mask>=<configname>' + sLineBreak +
-    'The formatter will use the first match for the file name. ' +
+    'You can also use a GXFormatter.ini per directory with content ' + 'like:' +
+    sLineBreak + '    [FileSettings]' + sLineBreak + '    <mask>=<configname>' +
+    sLineBreak + 'The formatter will use the first match for the file name. ' +
     'An empty <configname> means that it should work ' +
     'as configured in this dialog.' + sLineBreak +
     'You can also export your own configuration as' + sLineBreak +
@@ -154,5 +168,8 @@ begin
 end;
 
 initialization
+
   RegisterEditorExpert(TeCodeFormatterExpert);
+
 end.
+
