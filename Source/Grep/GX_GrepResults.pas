@@ -570,7 +570,7 @@ begin
       SetSavedHistoryIndexes(lbHistoryList.ItemIndex);
     GrepExpert.HistoryList.ListMode := ANewMode;
     tcHistoryListPage.TabIndex := Integer(ANewMode);
-    Caption := FSavedFormCaption + Format(' [%s page]', [tcHistoryListPage.Tabs[Integer(ANewMode)]]);
+    //Caption := FSavedFormCaption + Format(' [%s page]', [tcHistoryListPage.Tabs[Integer(ANewMode)]]);
     if DoRefresh then
       RefreshHistoryView(DoUpdateIndex);
   end;
@@ -2505,7 +2505,7 @@ end;
 
 procedure TfmGrepResults.actHistorySearchInHistoryExecute(Sender: TObject);
 resourcestring
-  rsSearchInCaption = 'Search in the history list';
+  rsSearchInCaption = 'Search in the History List';
 var
   ASelResult: TGrepSelectResult;
 begin
