@@ -121,6 +121,7 @@ type
     btnCancel: TButton;
     btnOK: TButton;
     btnOpen: TButton;
+    btnRemoveDots: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -148,6 +149,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure actUsesAddToFavoritesExecute(Sender: TObject);
     procedure pmuAvailPopup(Sender: TObject);
+    procedure btnRemoveDotsClick(Sender: TObject);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -194,7 +196,7 @@ implementation
 uses
   SysUtils, Messages, Windows, Graphics, ToolsAPI,
   GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils,
-  GX_UsesExpertOptions;
+  GX_UsesExpertOptions, GX_MessageBox;
 
 {$R *.dfm}
 
@@ -1017,6 +1019,57 @@ begin
       AddListToImplSection(ListBox, False);
   end;
   SaveChanges;
+end;
+
+type
+  TShowRemoveDotsMessage = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+{ TShowRemoveDotsMessage }
+
+function TShowRemoveDotsMessage.GetMessage: string;
+resourcestring
+  SConfirmRemoveDots =
+    'This will remove the namespace qualifiers from all unit names ' + sLineBreak
+    + 'in both uses clauses.' + sLineBreak
+    + sLineBreak
+    + 'Example:' + sLineBreak
+    + '"System.Win.Registry" will be shortended to "Registry".' + sLineBreak
+    + sLineBreak
+    + 'This is meant to keep backwards compatibility with older Delphi versions.' + sLineBreak
+    + sLineBreak
+    + 'Do you want to proceed?';
+begin
+  Result := SConfirmRemoveDots;
+end;
+
+procedure TfmUsesManager.btnRemoveDotsClick(Sender: TObject);
+
+  procedure RemoveDotsfrom(lb: TListBox);
+  var
+    i: Integer;
+    s: string;
+    p: Integer;
+  begin
+    for i := 0 to lb.Count - 1 do begin
+      s := lb.Items[i];
+      p := Pos('.', s);
+      while p > 0 do begin
+        s := Copy(s, p + 1, 255);
+        p := Pos('.', s);
+      end;
+      lb.Items[i] := s;
+    end;
+  end;
+
+begin
+  if ShowGxMessageBox(TShowRemoveDotsMessage) <> mrYes then
+    Exit;
+
+  RemoveDotsfrom(lbxInterface);
+  RemoveDotsfrom(lbxImplementation);
 end;
 
 procedure TfmUsesManager.SaveChanges;

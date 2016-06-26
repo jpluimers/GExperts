@@ -509,25 +509,25 @@ object fmUsesManager: TfmUsesManager
       TabOrder = 0
     end
     object pnlButtonsRight: TPanel
-      Left = 272
+      Left = 240
       Top = 0
-      Width = 323
+      Width = 355
       Height = 37
       Align = alRight
       BevelOuter = bvNone
       TabOrder = 1
       object btnCancel: TButton
-        Left = 241
+        Left = 273
         Top = 4
         Width = 75
         Height = 25
         Cancel = True
         Caption = 'Cancel'
         ModalResult = 2
-        TabOrder = 2
+        TabOrder = 3
       end
       object btnOK: TButton
-        Left = 157
+        Left = 189
         Top = 4
         Width = 75
         Height = 25
@@ -535,18 +535,27 @@ object fmUsesManager: TfmUsesManager
         Caption = 'OK'
         Default = True
         ModalResult = 1
-        TabOrder = 1
+        TabOrder = 2
         OnClick = btnOKClick
       end
       object btnOpen: TButton
-        Left = 8
+        Left = 104
         Top = 4
         Width = 75
         Height = 25
         Action = actOpenUnit
         ParentShowHint = False
         ShowHint = True
+        TabOrder = 1
+      end
+      object btnRemoveDots: TButton
+        Left = 8
+        Top = 4
+        Width = 89
+        Height = 25
+        Caption = 'Remove dots'
         TabOrder = 0
+        OnClick = btnRemoveDotsClick
       end
     end
   end
