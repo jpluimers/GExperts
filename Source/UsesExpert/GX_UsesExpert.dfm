@@ -553,7 +553,7 @@ object fmUsesManager: TfmUsesManager
         Top = 4
         Width = 89
         Height = 25
-        Caption = 'Remove dots'
+        Caption = 'Remove Dots'
         TabOrder = 0
         OnClick = btnRemoveDotsClick
       end
