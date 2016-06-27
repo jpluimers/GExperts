@@ -204,7 +204,9 @@ uses
   GX_uAutoTodoHandler in '..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas',
   GX_AutoTodoDone in '..\..\Source\AutoTodo\GX_AutoTodoDone.pas' {fmAutoTodoDone},
   GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas',
-  GX_dzSelectDirectoryFix in '..\..\Source\Utils\GX_dzSelectDirectoryFix.pas';
+  GX_dzSelectDirectoryFix in '..\..\Source\Utils\GX_dzSelectDirectoryFix.pas',
+  GX_eAddToCaptitalization in '..\..\Source\Formatter\GX_eAddToCaptitalization.pas',
+  GX_VCLFixPack in '..\..\Source\Utils\GX_VCLFixPack.pas';
 
 end.
 
