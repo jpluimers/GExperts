@@ -137,7 +137,12 @@ function GxOtaGetEditWriterForSourceEditor(SourceEditor: IOTASourceEditor = nil)
 
 // Insert a string into a file at a some character position
 // Uses the current source editor if none is specified
-procedure GxOtaInsertTextIntoEditorAtPos(const Text: string; Position: Longint;
+procedure GxOtaInsertTextIntoEditorAtCharPos(const Text: string; Position: Longint;
+  SourceEditor: IOTASourceEditor = nil);
+
+// Insert a string into a file at a some buffer position
+// Uses the current source editor if none is specified
+procedure GxOtaInsertTextIntoEditorAtBufferPos(const Text: string; Position: Longint;
   SourceEditor: IOTASourceEditor = nil);
 
 // Set the EditView's cursor position based on a character index or a
@@ -3947,7 +3952,7 @@ begin
   EditPos := EditView.CursorPos;
   EditView.ConvertPos(True, EditPos, CharPos);
   Position := EditView.CharPosToPos(CharPos);
-  GxOtaInsertTextIntoEditorAtPos(Text, Position);
+  GxOtaInsertTextIntoEditorAtBufferPos(Text, Position);
   EditView.MoveViewToCursor;
   EditView.Paint;
 end;
@@ -3979,7 +3984,23 @@ begin
   Assert(Assigned(Result), SEditReaderNotAvail);
 end;
 
-procedure GxOtaInsertTextIntoEditorAtPos(const Text: string; Position: Longint;
+procedure GxOtaInsertTextIntoEditorAtBufferPos(const Text: string; Position: Longint;
+  SourceEditor: IOTASourceEditor);
+var
+  EditWriter: IOTAEditWriter;
+  IdeString: UTF8String;
+begin
+  if Text = '' then
+    Exit;
+
+  EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
+  IdeString :=  ConvertToIDEEditorString(Text);
+  EditWriter.CopyTo(Position);
+  EditWriter.Insert(PAnsiChar(IdeString));
+end;
+
+
+procedure GxOtaInsertTextIntoEditorAtCharPos(const Text: string; Position: Longint;
   SourceEditor: IOTASourceEditor);
 var
   EditWriter: IOTAEditWriter;

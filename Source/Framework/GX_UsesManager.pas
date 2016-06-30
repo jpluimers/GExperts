@@ -260,12 +260,12 @@ begin
     if UsesLineWouldBeTooLong(InsertPosition, Length(InsertString)) then
       InsertString := ',' + sLineBreak + '  ' + AUnitName;
     // Insert the new unit name into the uses clause
-    GxOtaInsertTextIntoEditorAtPos(InsertString, InsertPosition);
+    GxOtaInsertTextIntoEditorAtCharPos(InsertString, InsertPosition);
   end
   else // The uses clause does not exist
   begin
     InsertString := sLineBreak + sLineBreak +'uses'+ sLineBreak +'  '+ AUnitName +';';
-    GxOtaInsertTextIntoEditorAtPos(InsertString, UsesPos);
+    GxOtaInsertTextIntoEditorAtCharPos(InsertString, UsesPos);
   end;
 
   // This needs to be done last since it changes the implementation offsets
