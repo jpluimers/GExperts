@@ -349,7 +349,7 @@ object fmUsesManager: TfmUsesManager
       Left = 6
       Top = 21
       Width = 254
-      Height = 414
+      Height = 379
       ActivePage = tabInterface
       Align = alClient
       TabIndex = 0
@@ -360,7 +360,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 246
-          Height = 351
+          Height = 316
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -370,7 +370,7 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 240
-            Height = 345
+            Height = 310
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 14
@@ -385,7 +385,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlIntfFooter: TPanel
           Left = 0
-          Top = 351
+          Top = 316
           Width = 246
           Height = 34
           Align = alBottom
@@ -416,7 +416,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 246
-          Height = 351
+          Height = 316
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -426,7 +426,7 @@ object fmUsesManager: TfmUsesManager
             Left = 3
             Top = 3
             Width = 240
-            Height = 345
+            Height = 310
             Align = alClient
             DragMode = dmAutomatic
             ItemHeight = 14
@@ -441,7 +441,7 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlImplFooter: TPanel
           Left = 0
-          Top = 351
+          Top = 316
           Width = 246
           Height = 34
           Align = alBottom
@@ -479,6 +479,32 @@ object fmUsesManager: TfmUsesManager
       Caption = 'Used Units '
       ParentColor = True
       TabOrder = 0
+    end
+    object pnlUsesBottom: TPanel
+      Left = 6
+      Top = 400
+      Width = 254
+      Height = 35
+      Align = alBottom
+      TabOrder = 2
+      object btnAddDots: TButton
+        Left = 8
+        Top = 4
+        Width = 105
+        Height = 25
+        Caption = 'Add Unit Prefixes'
+        TabOrder = 0
+        OnClick = btnAddDotsClick
+      end
+      object btnRemoveDots: TButton
+        Left = 120
+        Top = 4
+        Width = 129
+        Height = 25
+        Caption = 'Remove Unit Prefixes'
+        TabOrder = 1
+        OnClick = btnRemoveDotsClick
+      end
     end
   end
   object pnlFooter: TPanel
@@ -546,16 +572,7 @@ object fmUsesManager: TfmUsesManager
         Action = actOpenUnit
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 1
-      end
-      object btnRemoveDots: TButton
-        Left = 8
-        Top = 4
-        Width = 89
-        Height = 25
-        Caption = 'Remove Dots'
         TabOrder = 0
-        OnClick = btnRemoveDotsClick
       end
     end
   end

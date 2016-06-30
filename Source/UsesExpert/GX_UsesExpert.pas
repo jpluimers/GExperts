@@ -121,6 +121,8 @@ type
     btnCancel: TButton;
     btnOK: TButton;
     btnOpen: TButton;
+    pnlUsesBottom: TPanel;
+    btnAddDots: TButton;
     btnRemoveDots: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -150,6 +152,7 @@ type
     procedure actUsesAddToFavoritesExecute(Sender: TObject);
     procedure pmuAvailPopup(Sender: TObject);
     procedure btnRemoveDotsClick(Sender: TObject);
+    procedure btnAddDotsClick(Sender: TObject);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -998,12 +1001,92 @@ procedure TfmUsesManager.SelectFirstItemInLists;
     end;
   end;
 
-
 begin
   SelectBestItem(lbxCommon);
   SelectBestItem(lbxFavorite);
   SelectBestItem(lbxSearchPath);
   SelectBestItem(lbxProject);
+end;
+
+type
+  TShowAddDotsMessage = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+
+{ TShowAddDotsMessage }
+
+function TShowAddDotsMessage.GetMessage: string;
+resourcestring
+  SConfirmRemoveDots =
+    'This will try to add namespace qualifiers to all unit names ' + sLineBreak
+    + 'in both uses clauses.' + sLineBreak
+    + sLineBreak
+    + 'Example:' + sLineBreak
+    + '"Registry" will be changed to "System.Win.Registry".' + sLineBreak
+    + sLineBreak
+    + 'This is meant to update projects to newer Delphi versions.' + sLineBreak
+    + sLineBreak
+    + 'Do you want to proceed?';
+begin
+  Result := SConfirmRemoveDots;
+end;
+
+procedure TfmUsesManager.btnAddDotsClick(Sender: TObject);
+var
+  DefaultNamespace: string;
+  NameSpaces: TStringList;
+
+  procedure AddDotsTo(lb: TListBox);
+  var
+    UnitIdx: Integer;
+    UnitName: string;
+    p: Integer;
+    s: string;
+    NsIdx: Integer;
+  begin
+    for UnitIdx := 0 to lb.Count - 1 do begin
+      UnitName := lb.Items[UnitIdx];
+      p := Pos('.', UnitName);
+      if p = 0 then begin
+        for NsIdx := 0 to NameSpaces.Count - 1 do begin
+          s := NameSpaces[NsIdx] + '.' + UnitName;
+          if FSearchPathUnits.IndexOf(s) <> -1 then begin
+            UnitName := s;
+            break;
+          end;
+        end;
+      end;
+      lb.Items[UnitIdx] := UnitName;
+    end;
+  end;
+
+var
+  CurrentUnitName: string;
+  p: Integer;
+begin
+  if ShowGxMessageBox(TShowAddDotsMessage) <> mrYes then
+    Exit;
+
+  NameSpaces := TStringList.Create;
+  try
+    GxOtaGetProjectNamespaces(DefaultNamespace, NameSpaces);
+    CurrentUnitName := GxOtaGetCurrentSourceFile;
+    if CurrentUnitName <> '' then begin
+      // remove .pas
+      CurrentUnitName := ChangeFileExt(ExtractFilename(CurrentUnitName), '');
+      p := Pos('.', CurrentUnitName);
+      if p > 0 then begin
+        CurrentUnitName := Copy(CurrentUnitName, 1, p - 1);
+        NameSpaces.Insert(0, CurrentUnitName);
+      end;
+      AddDotsTo(lbxInterface);
+      AddDotsTo(lbxImplementation);
+    end;
+  finally
+    FreeAndNil(NameSpaces);
+  end;
 end;
 
 procedure TfmUsesManager.btnOKClick(Sender: TObject);

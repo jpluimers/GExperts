@@ -409,6 +409,17 @@ procedure GxOtaGetIdeEnvironmentStrings(Settings: TStrings);
 function GxOtaGetIdeLibraryPath: string;
 // Return the IDE's global browsing path
 function GxOtaGetIdeBrowsingPath: string;
+
+///<summary>
+/// Returns the project's platform, if any (and supported), or an empty string </summary>
+function GxOtaGetProjectPlatform(Project: IOTAProject = nil): string;
+
+///<summary>
+/// Returns the project's framework, if any (and supported), or an empty string </summary>
+function GxOtaGetProjectFrameworkType(Project: IOTAProject = nil): string;
+///<summary>
+/// reads the project's namespaces </summary>
+procedure GxOtaGetProjectNamespaces(var DefaultNamespace: string; SearchPath: TStrings; Project: IOTAProject = nil);
 ///<summary>
 /// Return project specific search path, with the directory containing the project
 // file first.
@@ -2504,7 +2515,29 @@ begin
     EnsureStringInList(Strings, IdePathString);
 end;
 
-procedure ProcessPaths(Paths: TStrings; const Prefix: string);
+function GxOtaGetProjectPlatform(Project: IOTAProject = nil): string;
+begin
+{$ifdef GX_VER230_up}
+  if Project = nil then
+    Project := GxOtaGetCurrentProject;
+  Result := Project.CurrentPlatform;
+{$else ~ GX_VER230_up}
+  Result := '';
+{$endif GX_VER230_up}
+end;
+
+function GxOtaGetProjectFrameworkType(Project: IOTAProject = nil): string;
+begin
+{$ifdef GX_VER230_up}
+  if Project = nil then
+    Project := GxOtaGetCurrentProject;
+  Result := Project.FrameworkType;
+{$else ~ GX_VER230_up}
+  Result := '';
+{$endif GX_VER230_up}
+end;
+
+procedure ProcessPaths(Paths: TStrings; const Prefix: string; const PlatformName: string);
 const
   IDEBaseMacros: array [0..2] of string = ('BDS', 'DELPHI', 'BCB');
 var
@@ -2534,6 +2567,9 @@ begin
           PathItem := ReplaceMacro(PathItem, EnvName, EnvValue);
       end;
 
+      if PlatformName <> '' then
+        PathItem := ReplaceMacro(PathItem, 'Platform', PlatformName);
+
       if not IsPathAbsolute(PathItem) then
       begin
         if Prefix <> '' then begin
@@ -2547,6 +2583,57 @@ begin
   end;
 end;
 
+procedure GxOtaGetProjectNamespaces(var DefaultNamespace: string; SearchPath: TStrings;
+  Project: IOTAProject = nil);
+var
+  ProjectName: string;
+  p: Integer;
+  ProjectNS: string;
+  ProjectOptions: IOTAProjectOptions;
+  ProjectNamespaces: string;
+  Framework: string;
+//  OptionNames: TOTAOptionNameArray;
+//  i: Integer;
+begin
+  Assert(Assigned(SearchPath));
+  SearchPath.Clear;
+  DefaultNamespace := '';
+  if Project = nil then
+    Project := GxOtaGetCurrentProject;
+  if Assigned(Project) then begin
+    ProjectName := ExtractFilename(Project.FileName);
+    // remove .dpr/dproj
+    ProjectName := ChangefileExt(ProjectName, '');
+    // Get the project's namespace (if any)
+    p := Pos('.', ProjectName);
+    if p > 0 then begin
+      ProjectNS := Copy(ProjectName, 1, p-1);
+      // Add the current project namespace
+      EnsureStringInList(SearchPath, ProjectName);
+    end;
+    // Then the project search path
+    ProjectOptions := Project.GetProjectOptions;
+    if Assigned(ProjectOptions) then begin
+
+//      OptionNames := ProjectOptions.GetOptionNames;
+//      for i := Low(OptionNames) to High(OptionNames) - 1 do
+//        SendDebug(OptionNames[i].Name);
+
+      DefaultNamespace := ProjectOptions.Values['DefaultNamespace'];
+      ProjectNamespaces := ProjectOptions.Values['NamespacePrefix'];
+      SplitIdePath(SearchPath, ProjectNamespaces);
+
+      // For FMX oddly the NamespacePrefix does not include 'FMX', so if the
+      // prefix is removed, the project no longer compiles.
+      // to prevent this, we add the framework type as the last entry to the
+      // name spaces.
+      Framework := GxOtaGetProjectFrameworkType;
+      if Framework <> '' then
+        EnsureStringInList(SearchPath, Framework);
+    end;
+  end;
+end;
+
 procedure GxOtaGetProjectSourcePathStrings(Paths: TStrings;
   Project: IOTAProject = nil; DoProcessing: Boolean = True);
 var
@@ -2554,6 +2641,7 @@ var
   ProjectOptions: IOTAProjectOptions;
   ProjectDir: string;
   i: Integer;
+  PlatformName: string;
 begin
   Assert(Assigned(Paths));
   Paths.Clear;
@@ -2572,8 +2660,11 @@ begin
       SplitIdePath(Paths, IdePathString);
     end;
   end;
+
+
   if DoProcessing then begin
-    ProcessPaths(Paths, ProjectDir);
+    PlatformName := GxOtaGetProjectPlatform(Project);
+    ProcessPaths(Paths, ProjectDir, PlatformName);
   end;
   for i := 0 to Paths.Count - 1 do begin
     Paths[i] := AddSlash(Paths[i]);
@@ -2590,7 +2681,7 @@ begin
   IdePathString := GxOtaGetIdeLibraryPath;
   SplitIdePath(Paths, IdePathString);
   if DoProcessing then begin
-    ProcessPaths(Paths, GetCurrentDir);
+    ProcessPaths(Paths, GetCurrentDir, '');
   end;
   for i := 0 to Paths.Count - 1 do begin
     Paths[i] := AddSlash(Paths[i]);
@@ -2602,13 +2693,19 @@ procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
 var
   IdeLibraryPath: TStringList;
   i: Integer;
+  PlatformName: string;
 begin
   Assert(Assigned(Paths));
   Paths.Clear;
   GxOtaGetProjectSourcePathStrings(Paths, Project, DoProcessing);
   IdeLibraryPath := TStringList.Create;
   try
+
     GxOtaGetIdeLibraryPathStrings(IdeLibraryPath, DoProcessing);
+    if DoProcessing then begin
+      PlatformName := GxOtaGetProjectPlatform(Project);
+      ProcessPaths(IdeLibraryPath, GetCurrentDir, PlatformName);
+    end;
     for i := 0 to IdeLibraryPath.Count - 1 do begin
       EnsureStringInList(Paths, IdeLibraryPath[i]);
     end;
