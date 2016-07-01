@@ -24,7 +24,9 @@ uses
   ExtCtrls,
   Forms,
   GX_IdeFormEnhancer,
-  GX_dzVclUtils;
+  GX_dzVclUtils,
+  ActnList,
+  Menus;
 
 type
   TComboboxDropHandler = class(TComponent)
@@ -88,6 +90,7 @@ type
   private
     FFormCallbackHandle: TFormChangeHandle;
     FControlCallbackHandle: TControlChangeHandle;
+    FOkBtn: TButton;
     ///<summary>
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
@@ -98,6 +101,7 @@ type
       const _Name: string; out _cmb: TWinControl): Boolean;
     function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl:
       TWinControl): Boolean;
+    procedure ShiftCtrlO(_Sender: TObject);
     //    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
   public
     constructor Create;
@@ -163,7 +167,7 @@ begin
       Ctrl := _Parent.Controls[i];
       if Ctrl.ClassName = _ClassName then begin
         _AsWinCtrl := TWinControl(Ctrl);
-        Result := true;
+        Result := True;
       end;
     end;
   end else begin
@@ -173,7 +177,7 @@ begin
     if Ctrl.ClassName <> _ClassName then
       Exit;
     _AsWinCtrl := TWinControl(Ctrl);
-    Result := true;
+    Result := True;
   end;
 end;
 
@@ -194,7 +198,7 @@ begin
   // in Delphi 10 there is an additional TPanel that contains the group boxes
   if CheckControl(wctrl, 2, 'TPanel', wctrl) then
     _SettingsControl := wctrl;
-  Result := true;
+  Result := True;
 {$ELSE}{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
   if not CheckControl(_Form, 2, 'TPanel', wctrl) then
     Exit;
@@ -206,14 +210,14 @@ begin
   // in Delphi 10 there is an additional TPanel that contains the group boxes
   if CheckControl(wctrl, 2, 'TPanel', wctrl) then
     _SettingsControl := wctrl;
-  Result := true;
+  Result := True;
 {$ELSE}{$IFDEF GX_VER140_up} // Delphi 6
   if not CheckControl(_Form, 1, 'TPageControl', wctrl) then
     Exit;
   if not CheckControl(wctrl, 0, 'TTabSheet', wctrl) then
     Exit;
   _SettingsControl := wctrl;
-  Result := true;
+  Result := True;
 {$ENDIF}{$ENDIF}{$ENDIF}
 end;
 
@@ -231,7 +235,7 @@ begin
     _Name) then
     Exit;
   _cmb := wctrl;
-  Result := true;
+  Result := True;
 end;
 
 type
@@ -303,7 +307,7 @@ procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form:
     if TryFindHistoryComboBox(_SettingsPanel, _Index, _Name, cmb) then begin
       if not TComboboxDropHandler.IsAlreadyHooked(cmb) then begin
         TComboboxDropHandler.Create(cmb);
-        Result := true;
+        Result := True;
       end;
     end;
   end;
@@ -311,6 +315,8 @@ procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form:
 var
   i: Integer;
   SettingsControl: TWinControl;
+  act: TAction;
+  al: TActionList;
 begin
   if not IsProjectOptionsForm(_Form) then begin
     if Assigned(FControlCallbackHandle) then begin
@@ -320,12 +326,25 @@ begin
     Exit;
   end;
 
+  FOkBtn := _Form.FindComponent('OKButton') as TButton;
+  if Assigned(FOkBtn) then begin
+    al := TActionList.Create(_Form);
+    al.Name := 'GXProjectOptionsActionList';
+    act := TActionlist_Append(al, 'OK', ShiftCtrlO, ShortCut(Ord('O'), [ssShift, ssCtrl]));
+    FOkBtn.Caption := 'OK (s+c+O)';
+  end;
+
   //  FControlCallbackHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
   if not TryGetSettingsControl(_Form, SettingsControl) then
     Exit;
 
   for i := 0 to 3 do
     TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[i], INPUT_COMBO_NAMES[i]);
+end;
+
+procedure TProjectOptionsEnhancer.ShiftCtrlO(_Sender: TObject);
+begin
+  FOkBtn.Click;
 end;
 
 function TProjectOptionsEnhancer.IsProjectOptionsForm(_Form: TCustomForm):
