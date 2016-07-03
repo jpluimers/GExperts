@@ -23,10 +23,10 @@ uses
   StdCtrls,
   ExtCtrls,
   Forms,
-  GX_IdeFormEnhancer,
-  GX_dzVclUtils,
   ActnList,
-  Menus;
+  Menus,
+  GX_IdeFormEnhancer,
+  GX_dzVclUtils;
 
 type
   TComboboxDropHandler = class(TComponent)
@@ -344,7 +344,12 @@ begin
       TActionlist_Append(al, 'Target', ShiftCtrlT, ShortCut(Ord('T'), [ssShift, ssCtrl]));
       lbl := _Form.FindComponent('Label1') as TLabel; // sic!
       if Assigned(lbl) then begin
-        lbl.Caption := 'Target (s+c+T):';
+        lbl.AutoSize := False;
+        lbl.Top := FConfigCombo.Top;
+        lbl.Height := lbl.Height * 2;
+        lbl.Width := FConfigCombo.Left - lbl.Left;
+        lbl.WordWrap := True;
+        lbl.Caption := '&Target: (s+c+T)';
       end;
     end;
   end;
