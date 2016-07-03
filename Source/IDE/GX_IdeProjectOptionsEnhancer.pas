@@ -103,7 +103,7 @@ type
     function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl:
       TWinControl): Boolean;
     procedure ShiftCtrlO(_Sender: TObject);
-    procedure ShiftCtrlB(_Sender: TObject);
+    procedure ShiftCtrlT(_Sender: TObject);
     //    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
   public
     constructor Create;
@@ -341,13 +341,10 @@ begin
     end;
     FConfigCombo := _Form.FindComponent('cbConfig') as TCustomCombo;
     if Assigned(FConfigCombo) then begin
-      TActionlist_Append(al, 'Build Configuration', ShiftCtrlB, ShortCut(Ord('B'), [ssShift, ssCtrl]));
+      TActionlist_Append(al, 'Target', ShiftCtrlT, ShortCut(Ord('T'), [ssShift, ssCtrl]));
       lbl := _Form.FindComponent('Label1') as TLabel; // sic!
       if Assigned(lbl) then begin
-        lbl.AutoSize := False;
-        lbl.Height := lbl.Height * 2;
-        lbl.WordWrap := True;
-        lbl.Caption := 'Build Configuration (s+c+B)';
+        lbl.Caption := 'Target (s+c+T):';
       end;
     end;
   end;
@@ -365,7 +362,7 @@ begin
   FOkBtn.Click;
 end;
 
-procedure TProjectOptionsEnhancer.ShiftCtrlB(_Sender: TObject);
+procedure TProjectOptionsEnhancer.ShiftCtrlT(_Sender: TObject);
 begin
   TWinControl_SetFocus(FConfigCombo);
 end;
