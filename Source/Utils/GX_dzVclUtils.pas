@@ -91,6 +91,8 @@ type
 ///                TEdit is destroyed. </summary>
 function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFilesDropped): TObject;
 
+///<summary> tries to focus the given control, returns false if that's not possible </summary>
+function TWinControl_SetFocus(_Ctrl: TWinControl): Boolean;
 ///<summary>
 /// @returns true, if the shift key is currently pressed </summary>
 function IsShiftDown: Boolean;
@@ -653,6 +655,28 @@ function TEdit_ActivateAutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSour
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
 begin
   Result := TAutoCompleteActivator.Create(_ed, _Source, _Type);
+end;
+
+function TWinControl_SetFocus(_Ctrl: TWinControl): Boolean;
+var
+  ParentForm: TCustomForm;
+begin
+  Result := False;
+  try
+    ParentForm := GetParentForm(_Ctrl);
+    if Assigned(ParentForm) then begin
+      ParentForm.ActiveControl := _Ctrl;
+      if ParentForm.Visible and ParentForm.Enabled and _Ctrl.CanFocus then
+        _Ctrl.SetFocus;
+      Result := True;
+    end;
+  except
+    on e: EInvalidOperation do begin
+      // ignore any EInvalidOperation here
+      // the VCL does not allow us to relly check if a control
+      // can be focused so we need to handle the exception
+    end;
+  end;
 end;
 
 // This code is based on an idea from
