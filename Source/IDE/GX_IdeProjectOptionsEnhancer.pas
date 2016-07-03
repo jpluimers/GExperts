@@ -91,6 +91,7 @@ type
     FFormCallbackHandle: TFormChangeHandle;
     FControlCallbackHandle: TControlChangeHandle;
     FOkBtn: TButton;
+    FConfigCombo: TCustomCombo;
     ///<summary>
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
@@ -102,6 +103,7 @@ type
     function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl:
       TWinControl): Boolean;
     procedure ShiftCtrlO(_Sender: TObject);
+    procedure ShiftCtrlB(_Sender: TObject);
     //    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
   public
     constructor Create;
@@ -312,11 +314,13 @@ procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form:
     end;
   end;
 
+const
+  GX_ACTION_LIST = 'GXProjectOptionsActionList'; // do no localize!
 var
   i: Integer;
   SettingsControl: TWinControl;
-  act: TAction;
   al: TActionList;
+  lbl: TLabel;
 begin
   if not IsProjectOptionsForm(_Form) then begin
     if Assigned(FControlCallbackHandle) then begin
@@ -326,12 +330,26 @@ begin
     Exit;
   end;
 
-  FOkBtn := _Form.FindComponent('OKButton') as TButton;
-  if Assigned(FOkBtn) then begin
+  if _Form.FindComponent(GX_ACTION_LIST) = nil then begin
     al := TActionList.Create(_Form);
-    al.Name := 'GXProjectOptionsActionList';
-    act := TActionlist_Append(al, 'OK', ShiftCtrlO, ShortCut(Ord('O'), [ssShift, ssCtrl]));
-    FOkBtn.Caption := 'OK (s+c+O)';
+    al.Name := GX_ACTION_LIST;
+
+    FOkBtn := _Form.FindComponent('OKButton') as TButton;
+    if Assigned(FOkBtn) then begin
+      TActionlist_Append(al, 'OK', ShiftCtrlO, ShortCut(Ord('O'), [ssShift, ssCtrl]));
+      FOkBtn.Caption := 'OK (s+c+O)';
+    end;
+    FConfigCombo := _Form.FindComponent('cbConfig') as TCustomCombo;
+    if Assigned(FConfigCombo) then begin
+      TActionlist_Append(al, 'Build Configuration', ShiftCtrlB, ShortCut(Ord('B'), [ssShift, ssCtrl]));
+      lbl := _Form.FindComponent('Label1') as TLabel; // sic!
+      if Assigned(lbl) then begin
+        lbl.AutoSize := False;
+        lbl.Height := lbl.Height * 2;
+        lbl.WordWrap := True;
+        lbl.Caption := 'Build Configuration (s+c+B)';
+      end;
+    end;
   end;
 
   //  FControlCallbackHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
@@ -345,6 +363,11 @@ end;
 procedure TProjectOptionsEnhancer.ShiftCtrlO(_Sender: TObject);
 begin
   FOkBtn.Click;
+end;
+
+procedure TProjectOptionsEnhancer.ShiftCtrlB(_Sender: TObject);
+begin
+  TWinControl_SetFocus(FConfigCombo);
 end;
 
 function TProjectOptionsEnhancer.IsProjectOptionsForm(_Form: TCustomForm):
