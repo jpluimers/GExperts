@@ -1369,7 +1369,7 @@ constructor TfmFavFiles.Create(AOwner: TComponent);
 resourcestring
   SOpenFilter = // Note: Localize only the descriptive text, not the extensions
     'Source Files (*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.pas;*.cpp;*.hpp;*.c;*.h)|*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.pas;*.cpp;*.hpp;*.c;*.h' +
-    '|Project Files (*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.bdsproj;*.bdsgroup;*.dproj)|*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.bdsproj;*.bdsgroup;*.dproj' +
+    '|Project Files (*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.bdsproj;*.bdsgroup;*.dproj;*.groupproj)|*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.bdsproj;*.bdsgroup;*.dproj;*.groupproj' +
     '|Pascal Files (*.pas;*.inc)|*.pas;*.inc' +
     '|Help Files (*.chm;*.hlp)|*.chm;*.hlp' +
     '|Graphics Files (*.bmp;*.wmf;*.jpg;*.png;*.gif;*.ico)|*.bmp;*.wmf;*.jpg;*.png;*.gif;*.ico' +

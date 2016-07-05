@@ -3181,7 +3181,7 @@ begin
     shSQL: Result := gxpSQL;
     else begin
       Ext := ExtractUpperFileExt(FileName);
-      if StringInArray(Ext, ['XML', 'BDSGROUP', 'BDSPROJ', 'DPROJ']) then
+      if StringInArray(Ext, ['XML', 'BDSGROUP', 'BDSPROJ', 'DPROJ', 'GROUPPROJ']) then
         Result := gxpXML
       else if StringInArray(Ext, ['HTM', 'HTML', 'ASP']) then
         Result := gxpHTML

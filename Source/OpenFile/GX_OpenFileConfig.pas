@@ -306,7 +306,7 @@ begin
 
   FileType := TFileType.Create(FileTypes);
   FileType.FileTypeName := 'Delphi Projects';
-  FileType.Extensions := '*.dpr;*.dpk;*.bpg;*.bdsproj;*.dproj';
+  FileType.Extensions := '*.dpr;*.dpk;*.bpg;*.bdsproj;*.dproj;*.groupproj';
   FileType.MaxRecentFiles := DefaultMaxMRU;
 
   FileType := TFileType.Create(FileTypes);
