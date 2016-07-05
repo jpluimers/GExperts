@@ -333,6 +333,7 @@ begin
   FGExpertsTopLevelMenu.Insert(MenuItemIndex, TempMenuItem);
 
   Result.Caption := ACaption;
+  Result.Hint := StripHotkey(ACaption);
   Result.OnExecute := OnExecute;
   Result.ShortCut := ShortCut;
 end;
