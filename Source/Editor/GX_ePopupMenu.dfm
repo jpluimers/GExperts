@@ -93,7 +93,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 6
+    TabOrder = 7
   end
   object b_Cancel: TButton
     Left = 496
@@ -104,7 +104,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 7
+    TabOrder = 8
   end
   object b_Add: TButton
     Left = 216
@@ -141,7 +141,15 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Clear Shortcut'
-    TabOrder = 5
+    TabOrder = 6
     OnClick = b_ClearShortcutClick
+  end
+  object chk_FocusEditor: TCheckBox
+    Left = 8
+    Top = 284
+    Width = 281
+    Height = 17
+    Caption = 'Focus editor window if not focused'
+    TabOrder = 5
   end
 end

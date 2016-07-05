@@ -32,6 +32,7 @@ type
     l_DuplicateShortcuts: TLabel;
     b_Default: TButton;
     b_ClearShortcut: TButton;
+    chk_FocusEditor: TCheckBox;
     procedure b_AddClick(Sender: TObject);
     procedure b_RemoveClick(Sender: TObject);
     procedure lb_EditorExpertsDblClick(Sender: TObject);
@@ -46,8 +47,8 @@ type
   private
     function GetExpertIndex(const _ListView: TListView; const _Expert: TGX_BaseExpert): Integer;
     procedure CheckForDuplicates;
-    procedure GetData(_sl: TStringList);
-    procedure SetData(_sl: TStringList);
+    procedure GetData(_sl: TStringList; out _ForceEdiorActive: Boolean);
+    procedure SetData(_sl: TStringList; _ForceEdiorActive: Boolean);
     procedure AddExpert(const _Key: string; const _ExpName: string; _Expert: TGX_BaseExpert);
     procedure RemoveExpert;
     procedure AddSelectedExpert;
@@ -70,7 +71,8 @@ uses
   GX_GExperts,
   GX_EditorExpertManager,
   GX_Experts,
-  GX_MessageBox;
+  GX_MessageBox,
+  GX_OtaUtils;
 
 type
   TGxEditorPopupMenuExpert = class(TEditorExpert)
@@ -78,8 +80,10 @@ type
     FFormHeight: Integer;
     FGExpertsShortcutMenu: TPopupMenu;
     FShortcuts: TStringList;
+    FForceEditorActive: Boolean;
     procedure ShowConfigForm(_Sender: TObject);
     class procedure SetDefaults(_sl: TStringList);
+    function IsEditorActive(out ctl: TWinControl): Boolean;
   protected
     function GetDisplayName: string; override;
     class function GetName: string; override;
@@ -103,11 +107,11 @@ var
 begin
   frm := TfmEditorPopupMenuExpertConfig.Create(nil);
   try
-    frm.SetData(FShortcuts);
+    frm.SetData(FShortcuts, FForceEditorActive);
     frm.Height := FFormHeight;
     if frm.ShowModal <> mrok then
       Exit;
-    frm.GetData(FShortcuts);
+    frm.GetData(FShortcuts, FForceEditorActive);
     FFormHeight := frm.Height;
   finally
     FreeAndNil(frm);
@@ -118,6 +122,7 @@ constructor TGxEditorPopupMenuExpert.Create;
 begin
   inherited;
   FShortcuts := TStringList.Create;
+  FForceEditorActive := True;
 end;
 
 destructor TGxEditorPopupMenuExpert.Destroy;
@@ -125,6 +130,12 @@ begin
   FreeAndNil(FGExpertsShortcutMenu);
   FreeAndNil(FShortcuts);
   inherited;
+end;
+
+function TGxEditorPopupMenuExpert.IsEditorActive(out ctl: TWinControl): Boolean;
+begin
+  ctl := Screen.ActiveControl;
+  Result := Assigned(ctl) and (ctl.Name = 'Editor') and ctl.ClassNameIs('TEditControl');
 end;
 
 procedure TGxEditorPopupMenuExpert.Execute(Sender: TObject);
@@ -136,32 +147,45 @@ var
   idx: Integer;
   ExpName: string;
   Expert: TGX_BaseExpert;
+  EditorForm: TCustomForm;
+  EditorControl: TComponent;
 begin
-  ctl := Screen.ActiveControl;
-  if Assigned(ctl) and (ctl.Name = 'Editor') and ctl.ClassNameIs('TEditControl') then begin
-    if Assigned(FGExpertsShortcutMenu) then
-      FreeAndNil(FGExpertsShortcutMenu);
-    FGExpertsShortcutMenu := TPopupMenu.Create(nil);
-    for i := 0 to FShortcuts.Count - 1 do begin
-      Key := FShortcuts.Names[i];
-      ExpName := FShortcuts.Values[Key];
-      if (Key <> '') and (Key <> 'X') then begin
-        if GExpertsInst.EditorExpertManager.FindExpert(ExpName, idx) then begin
-          Expert := GExpertsInst.EditorExpertManager.EditorExpertList[idx];
-          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
-            Expert.Execute);
-        end else if GExpertsInst.FindExpert(ExpName, idx) then begin
-          Expert := GExpertsInst.ExpertList[idx];
-          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
-            Expert.Execute);
-        end;
+  if not IsEditorActive(ctl) then begin
+    if not FForceEditorActive then
+      Exit;
+    EditorForm := GxOtaGetTopMostEditView.GetEditWindow.Form;
+    if Assigned(EditorForm) then begin
+      EditorControl := EditorForm.FindComponent('Editor');
+      if Assigned(EditorControl) and EditorControl.ClassNameIs('TEditControl') then
+        TWinControl_SetFocus(EditorControl as TWinControl);
+    end;
+  end;
+
+  if not IsEditorActive(ctl) then
+    Exit;
+
+  if Assigned(FGExpertsShortcutMenu) then
+    FreeAndNil(FGExpertsShortcutMenu);
+  FGExpertsShortcutMenu := TPopupMenu.Create(nil);
+  for i := 0 to FShortcuts.Count - 1 do begin
+    Key := FShortcuts.Names[i];
+    ExpName := FShortcuts.Values[Key];
+    if (Key <> '') and (Key <> 'X') then begin
+      if GExpertsInst.EditorExpertManager.FindExpert(ExpName, idx) then begin
+        Expert := GExpertsInst.EditorExpertManager.EditorExpertList[idx];
+        TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
+          Expert.Execute);
+      end else if GExpertsInst.FindExpert(ExpName, idx) then begin
+        Expert := GExpertsInst.ExpertList[idx];
+        TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
+          Expert.Execute);
       end;
     end;
-    TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + 'X' + ' ' + 'Configure',
-      ShowConfigForm);
-    pnt := ctl.ClientToScreen(Point(0, 0));
-    FGExpertsShortcutMenu.Popup(pnt.X, pnt.Y);
   end;
+  TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + 'X' + ' ' + 'Configure',
+    ShowConfigForm);
+  pnt := ctl.ClientToScreen(Point(0, 0));
+  FGExpertsShortcutMenu.Popup(pnt.X, pnt.Y);
 end;
 
 procedure TGxEditorPopupMenuExpert.ShowConfigForm(_Sender: TObject);
@@ -205,6 +229,7 @@ end;
 procedure TGxEditorPopupMenuExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
+  Settings.ReadBool('ForceEditorActive', FForceEditorActive);
   FShortcuts.Clear;
   if Settings.SectionExists('menu') then begin
     Settings.ReadSectionValues('menu', FShortcuts);
@@ -221,6 +246,7 @@ var
   MnuSettings: TExpertSettings;
 begin
   inherited;
+  Settings.WriteBool('ForceEditorActive', FForceEditorActive);
   Settings.EraseSection('menu');
   MnuSettings := Settings.CreateExpertSettings('menu');
   try
@@ -363,7 +389,7 @@ begin
   sl := TStringList.Create;
   try
     TGxEditorPopupMenuExpert.SetDefaults(sl);
-    SetData(sl);
+    SetData(sl, True);
   finally
     FreeAndNil(sl);
   end;
@@ -374,10 +400,11 @@ var
   i: Integer;
   sl: TStringList;
   DupeFound: Boolean;
+  Dummy: Boolean;
 begin
   sl := TStringList.Create;
   try
-    GetData(sl);
+    GetData(sl, Dummy);
     sl.Sort;
     DupeFound := False;
     for i := 1 to sl.Count - 1 do
@@ -392,21 +419,21 @@ begin
 end;
 
 function TfmEditorPopupMenuExpertConfig.GetExpertIndex(
-  const _ListView : TListView;
+  const _ListView: TListView;
   const _Expert: TGX_BaseExpert): Integer;
 var
-  i : Integer;
+  i: Integer;
 begin
   Result := -1;
-  if not Assigned(_ListView) then Exit;
-  if not Assigned(_Expert) then Exit;
+  if not Assigned(_ListView) then
+    Exit;
+  if not Assigned(_Expert) then
+    Exit;
 
-  for i := 0 to _ListView.Items.Count-1 do
-  begin
-    if _ListView.Items[i].Data = _Expert then
-    begin
+  for i := 0 to _ListView.Items.Count - 1 do begin
+    if _ListView.Items[i].Data = _Expert then begin
       Result := i;
-      Break;
+      break;
     end;
   end;
 end;
@@ -416,8 +443,7 @@ procedure TfmEditorPopupMenuExpertConfig.AddExpert(const _Key: string; const _Ex
 var
   li: TListItem;
 begin
-  if GetExpertIndex(lv_Selected, _Expert) >= 0
-  then begin
+  if GetExpertIndex(lv_Selected, _Expert) >= 0 then begin
     Exit; // expert is already in "lv_Selected"
   end;
 
@@ -431,11 +457,12 @@ begin
   CheckForDuplicates;
 end;
 
-procedure TfmEditorPopupMenuExpertConfig.GetData(_sl: TStringList);
+procedure TfmEditorPopupMenuExpertConfig.GetData(_sl: TStringList; out _ForceEdiorActive: Boolean);
 var
   i: Integer;
   li: TListItem;
 begin
+  _ForceEdiorActive := chk_FocusEditor.Checked;
   _sl.Clear;
   for i := 0 to lv_Selected.Items.Count - 1 do begin
     li := lv_Selected.Items[i];
@@ -506,13 +533,15 @@ begin
   CheckForDuplicates;
 end;
 
-procedure TfmEditorPopupMenuExpertConfig.SetData(_sl: TStringList);
+procedure TfmEditorPopupMenuExpertConfig.SetData(_sl: TStringList; _ForceEdiorActive: Boolean);
 var
   i: Integer;
   Key: string;
   ExpName: string;
   idx: Integer;
 begin
+  chk_FocusEditor.Checked := _ForceEdiorActive;
+
   lv_Selected.OnChange := nil;
   lv_Selected.Items.BeginUpdate;
   try
