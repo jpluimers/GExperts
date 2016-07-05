@@ -457,7 +457,7 @@ const // We will never localize these strings.
     '.tds' + sLineBreak + '.tmp' + sLineBreak + '.$*'  + sLineBreak + '.~*'  + sLineBreak +
     '.#??' + sLineBreak + '.ddp' + sLineBreak + '.rsm' + sLineBreak + '.map' + sLineBreak +
     '.pdb' + sLineBreak + '.gex' + sLineBreak +'.~xfm' + sLineBreak + '.~nfm'+ sLineBreak +
-    '.~bdsproj'+ sLineBreak + '.~dproj'+ sLineBreak + '.~bdsgroup' + sLineBreak + '.identcache' + sLineBreak +
+    '.~bdsproj'+ sLineBreak + '.~dproj'+ sLineBreak + '.~bdsgroup' + sLineBreak + '.~groupproj' + sLineBreak + '.identcache' + sLineBreak +
     '.dcuil' + sLineBreak + '.dcpil';
 var
   i, j: Integer;
