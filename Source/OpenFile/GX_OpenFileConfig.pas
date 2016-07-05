@@ -301,7 +301,7 @@ begin
 
   FileType := TFileType.Create(FileTypes);
   FileType.FileTypeName := 'Delphi Forms';
-  FileType.Extensions := '*.dfm;*.nfm;*.xfm';
+  FileType.Extensions := '*.dfm;*.fmx;*.nfm;*.xfm';
   FileType.MaxRecentFiles := DefaultMaxMRU;
 
   FileType := TFileType.Create(FileTypes);
