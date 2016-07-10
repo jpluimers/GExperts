@@ -7,7 +7,7 @@ interface
 uses
   Windows, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, GX_PeInfo, ComCtrls, Menus,
-  GX_IdeDock, DropTarget, DropSource, ActnList, ToolWin;
+  GX_IdeDock, DropTarget, DropSource, ActnList, ToolWin, StdCtrls, SysUtils;
 
 type
   TfmPeInformation = class(TfmIdeDockForm)
@@ -61,6 +61,12 @@ type
     mitEditCopy: TMenuItem;
     tbnSep1: TToolButton;
     tbnSep2: TToolButton;
+    tshVersionInfo: TTabSheet;
+    lvVersionInfo: TListView;
+    tsPackageInfo: TTabSheet;
+    splPackageInfo: TSplitter;
+    lbPackageInfoType: TListBox;
+    lbPackageInfo: TListBox;
     procedure lvImportsChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure FormResize(Sender: TObject);
     procedure pcMainChange(Sender: TObject);
@@ -83,6 +89,7 @@ type
     procedure actHelpContentsExecute(Sender: TObject);
     procedure ActionsUpdate(Action: TBasicAction; var Handled: Boolean);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure lbPackageInfoTypeClick(Sender: TObject);
   private
     PEInfo: TPEFileInfo;
     FNumberType: TNumberType;
@@ -95,6 +102,8 @@ type
     procedure DropFiles(Sender: TObject; ShiftState: TShiftState; Point: TPoint; var Effect: Longint);
     procedure SetNumberType(const Value: TNumberType);
     function ConfigurationKey: string;
+    procedure SetVersionInfo(const AFilename: string);
+    procedure SetPackageInfo(const AFilename: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -109,9 +118,10 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, GX_GxUtils, GX_GenericUtils, GX_Experts,
+  GX_GxUtils, GX_GenericUtils, GX_Experts,
   GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math,
-  GX_DbugIntf;
+  GX_DbugIntf, GX_dzVersionInfo, GX_dzPackageInfo, GX_dzClassUtils,
+  GX_dzVclUtils;
 
 type
   TPEExpert = class(TGX_Expert)
@@ -170,6 +180,10 @@ resourcestring
   SFormCaption = 'PE Information - ';
   SPENoDirectories = 'PE information is not available for directories';
 begin
+  lvVersionInfo.Items.Clear;
+  TListbox_ClearWithObjects(lbPackageInfoType);
+  lbPackageInfo.Items.Clear;
+
   if DirectoryExists(AFileName) then
     raise Exception.Create(SPENoDirectories);
   Screen.Cursor := crHourglass;
@@ -188,11 +202,113 @@ begin
     SetListViewItems(lvPEOptionalHeader, PEInfo.PEOptionalHeaderList);
     SetListViewItems(lvImports, PEInfo.ImportList);
     SetListViewItems(lvExportFunctions, PEInfo.ExportList);
-    FBlockEvents := False;
+
+    SetVersionInfo(AFilename);
+    SetPackageInfo(AFilename);
+
   finally
+    FBlockEvents := False;
     Screen.Cursor := crDefault;
   end;
   FormResize(Self);
+end;
+
+procedure TfmPeInformation.SetVersionInfo(const AFilename: string);
+resourcestring
+  SNoVersionInfo = 'no version info';
+var
+  VerInfo: IFileInfo;
+  VerItems: TListItems;
+  li: TListItem;
+begin
+  VerInfo := TFileInfo.Create(AFileName);
+  VerItems := lvVersionInfo.Items;
+  VerItems.BeginUpdate;
+  try
+    VerItems.Clear;
+    if not VerInfo.HasVersionInfo then begin
+      li := VerItems.Add;
+      li.Caption := SNoVersionInfo;
+    end else begin
+      li := VerItems.Add;
+      li.Caption := 'Filename';
+      li.SubItems.Add(VerInfo.Filename);
+
+      li := VerItems.Add;
+      li.Caption := 'FileDir';
+      li.SubItems.Add(VerInfo.FileDir);
+
+      li := VerItems.Add;
+      li.Caption := 'Description';
+      li.SubItems.Add(VerInfo.FileDescription);
+
+      li := VerItems.Add;
+      li.Caption := 'Version';
+      li.SubItems.Add(VerInfo.FileVersion);
+
+      li := VerItems.Add;
+      li.Caption := 'Product';
+      li.SubItems.Add(VerInfo.ProductName);
+
+      li := VerItems.Add;
+      li.Caption := 'Product Version';
+      li.SubItems.Add(VerInfo.ProductVersion);
+
+      li := VerItems.Add;
+      li.Caption := 'Company';
+      li.SubItems.Add(VerInfo.CompanyName);
+
+      li := VerItems.Add;
+      li.Caption := 'Copyright';
+      li.SubItems.Add(VerInfo.LegalCopyRight);
+
+      li := VerItems.Add;
+      li.Caption := 'Trademarks';
+      li.SubItems.Add(VerInfo.LegalTradeMarks);
+
+      li := VerItems.Add;
+      li.Caption := 'Internal Name';
+      li.SubItems.Add(VerInfo.InternalName);
+
+      li := VerItems.Add;
+      li.Caption := 'Original Filename';
+      li.SubItems.Add(VerInfo.OriginalFilename);
+    end;
+  finally
+    VerItems.EndUpdate;
+  end;
+end;
+
+procedure TfmPeInformation.SetPackageInfo(const AFilename: string);
+var
+  sl: TStringList;
+  pitItems: TStrings;
+  Info: TPackageInfo;
+begin
+  Info := TPackageInfo.Create(AFilename);
+  try
+    pitItems := lbPackageInfoType.Items;
+    pitItems.BeginUpdate;
+    try
+      TListbox_ClearWithObjects(lbPackageInfoType);
+
+      sl := TStringList.Create;
+      sl.Add(Info.Description);
+      pitItems.AddObject('Description', sl);
+
+      sl := TStringList.Create;
+      sl.Assign(Info.Units);
+      pitItems.AddObject('Units', sl);
+
+      sl := TStringList.Create;
+      sl.Assign(Info.Required);
+      pitItems.AddObject('Required Packages', sl);
+    finally
+      pitItems.EndUpdate;
+    end;
+  finally
+    FreeAndNil(Info);
+  end;
 end;
 
 procedure TfmPeInformation.lvImportsChange(Sender: TObject; Item: TListItem; Change: TItemChange);
@@ -236,11 +352,35 @@ begin
       Columns.Items[0].Width := Max(ClientWidth - Columns.Items[1].Width - 1, 0);
     with lvExportFunctions do
       Columns.Items[0].Width := Max(ClientWidth - Columns.Items[1].Width - Columns.Items[2].Width - 1, 0);
+    with lvVersionInfo do
+      Columns.Items[1].Width := Max(ClientWidth - Columns.Items[0].Width - 1, 0);
   except
     on E: Exception do
     begin
       // Swallow exceptions.
     end;
+  end;
+end;
+
+procedure TfmPeInformation.lbPackageInfoTypeClick(Sender: TObject);
+var
+  sl: TStringList;
+  Idx: Integer;
+  InfoItems: TStrings;
+begin
+  InfoItems := lbPackageInfo.Items;
+  InfoItems.BeginUpdate;
+  try
+    InfoItems.Clear;
+    Idx := lbPackageInfoType.ItemIndex;
+    if Idx = -1 then
+      Exit;
+    sl := lbPackageInfoType.Items.Objects[Idx] as TStringList;
+    if not Assigned(sl) then
+      Exit;
+    InfoItems.Assign(sl);
+  finally
+    InfoItems.EndUpdate;
   end;
 end;
 
@@ -395,15 +535,33 @@ begin
   List := nil;
   if ActiveControl is TListView then
     List := ActiveControl as TListView
-  else
+  else begin
+    if pcMain.ActivePage = tsPackageInfo then begin
+      PELines := TStringList.Create;
+      try
+        for i := 0 to lbPackageInfoType.Items.Count - 1 do begin
+          if i > 0 then
+            PELines.Add('');
+          PELines.Add(lbPackageInfoType.Items[i] + ':');
+          PELines.AddStrings(TStrings(lbPackageInfoType.Items.Objects[i]));
+        end;
+        Clipboard.AsText := PELines.Text;
+      finally
+        PELines.Free;
+      end;
+      Exit;
+    end;
+
     for i := pcMain.ActivePage.ControlCount - 1 downto 0 do
       if pcMain.ActivePage.Controls[i] is TListView then
       begin
         List := pcMain.ActivePage.Controls[i] as TListView;
         Break;
       end;
-  if List = nil then
+  end;
+  if (List = nil) then
     Exit;
+
   PELines := TStringList.Create;
   try
     for i := 0 to List.Items.Count - 1 do
@@ -448,16 +606,17 @@ resourcestring
   SFunction = 'Function';
   SOrdinal = 'Ordinal';
   SExports = 'Exports';
+  SVersionInfo = 'Version Info';
+  SPackageInfo = 'Package Info';
+  SNoPackageInformationAvailable = 'No package information available';
 
 var
   RichEdit: TRichEdit;
-  Line: string;
-  i, j: Integer;
-  ImpExp: TImportExport;
 
   procedure PrintHeader(LV: TListView; const Header: string);
   var
     i: Integer;
+    Line: string;
   begin
     with RichEdit do
     begin
@@ -467,30 +626,37 @@ var
       RichEdit.SelAttributes.Style := [];
       for i := 0 to LV.Items.Count - 1 do
       begin
-        Lines.Add('   ' + LV.Items[i].Caption + #9 + ':   ' + LV.Items[i].SubItems[0]);
+        Line := LV.Items[i].Caption;
+        if LV.Items[i].SubItems.Count > 0 then
+          Line := Line + #9 + ':   ' + LV.Items[i].SubItems[0];
+        Lines.Add('   ' + Line);
       end;
       Lines.Add('');
     end;
   end;
 
+var
+  Line: string;
+  i, j: Integer;
+  ImpExp: TImportExport;
+  sl: TStrings;
+  li: TListItem;
 begin
   if PEInfo = nil then
     Exit;
+
   try
     RichEdit := TRichEdit.Create(Self);
     Screen.Cursor := crHourglass;
     try
-      with RichEdit do
-      begin
-        Visible := False;
-        Parent := Self;
-        Clear;
-        DefAttributes.Name := 'Arial';
-        DefAttributes.Size := 10;
+      RichEdit.Visible := False;
+      RichEdit.Parent := Self;
+      RichEdit.Clear;
+      RichEdit.DefAttributes.Name := 'Arial';
+      RichEdit.DefAttributes.Size := 10;
 
-        Paragraph.TabCount := 1;
-        Paragraph.Tab[0]   := 200;
-      end;
+      RichEdit.Paragraph.TabCount := 1;
+      RichEdit.Paragraph.Tab[0]   := 200;
 
       // Document header
       RichEdit.Lines.Add('PE Header information for ' + FFileName);
@@ -504,48 +670,80 @@ begin
       PrintHeader(lvPEOptionalHeader, SPeOptionalHeader);
 
       // Imports
-      with RichEdit do
+      RichEdit.Paragraph.TabCount := 2;
+      RichEdit.Paragraph.Tab[0]   := 80;
+      RichEdit.Paragraph.Tab[1]   := 300;
+      RichEdit.SelAttributes.Style := [fsBold];
+      RichEdit.SelText := SImports;
+
+      for j := 0 to lvImports.Items.Count - 1 do
       begin
-        RichEdit.Paragraph.TabCount := 2;
-        RichEdit.Paragraph.Tab[0]   := 80;
-        RichEdit.Paragraph.Tab[1]   := 300;
-        RichEdit.SelAttributes.Style := [fsBold];
-        SelText := SImports;
+        RichEdit.SelAttributes.Style := [fsUnderline];
+        Line := PEInfo.ImportList[j] + #09 + SFunction + #09 + SOrdinal;
+        RichEdit.Lines.Add('   ' + Line + '   ');
+        RichEdit.SelAttributes.Style := [];
 
-        for j := 0 to lvImports.Items.Count - 1 do
+        ImpExp := TImportExport(PEInfo.ImportList.Objects[j]);
+
+        for i := 0 to ImpExp.Count - 1 do
         begin
-          SelAttributes.Style := [fsUnderline];
-          Lines.Add('   ' + lvImports.Items[j].Caption + #09 + SFunction + #09 + SOrdinal);
-          SelAttributes.Style := [];
-
-          ImpExp := TImportExport(PEInfo.ImportList.Objects[j]);
-
-          for i := 0 to ImpExp.Count - 1 do
-          begin
-            Line := ImpExp.Items[i].FunctionName;
-            if Length(Line) > 32 then
-              Line := Copy(ImpExp.Items[i].FunctionName, 1, 32) + '...';
-            Lines.Add(#09 + Line + #09 + IntToStr(ImpExp.Items[i].Ordinal));
-          end;
-          Lines.Add('');
+          Line := ImpExp.Items[i].FunctionName;
+          if Length(Line) > 32 then
+            Line := Copy(Line, 1, 32) + '...';
+          RichEdit.Lines.Add(#09 + Line + #09 + IntToStr(ImpExp.Items[i].Ordinal));
         end;
+        RichEdit.Lines.Add('');
       end;
 
       // Exports
-      with RichEdit do
-      begin
-        RichEdit.Paragraph.TabCount := 3;
-        RichEdit.Paragraph.Tab[0]   := 20;
-        RichEdit.Paragraph.Tab[1]   := 280;
-        RichEdit.Paragraph.Tab[2]   := 380;
+      RichEdit.Paragraph.TabCount := 3;
+      RichEdit.Paragraph.Tab[0]   := 20;
+      RichEdit.Paragraph.Tab[1]   := 280;
+      RichEdit.Paragraph.Tab[2]   := 380;
 
-        RichEdit.SelAttributes.Style := [fsBold];
-        SelText := SExports;
+      RichEdit.SelAttributes.Style := [fsBold];
+      RichEdit.SelText := SExports;
+      RichEdit.SelAttributes.Style := [];
+      for i := 0 to lvExportFunctions.Items.Count - 1 do
+      begin
+        li := lvExportFunctions.Items[i];
+        Line := li.Caption + #09 + li.SubItems[0] + #09 + li.SubItems[1];
+        RichEdit.Lines.Add(#09 + Line);
+      end;
+
+      RichEdit.Lines.Add('');
+      RichEdit.Lines.Add('');
+
+      // Version information
+      RichEdit.Paragraph.TabCount := 1;
+      RichEdit.Paragraph.Tab[0]   := 200;
+
+      PrintHeader(lvVersionInfo, SVersionInfo);
+
+      RichEdit.Lines.Add('');
+
+      // Package Info
+      RichEdit.Paragraph.TabCount := 1;
+      RichEdit.Paragraph.Tab[0]   := 100;
+      RichEdit.SelAttributes.Style := [fsBold];
+      RichEdit.SelText := SPackageInfo;
+
+      if lbPackageInfoType.Items.Count = 0 then begin
         RichEdit.SelAttributes.Style := [];
-        for i := 0 to lvExportFunctions.Items.Count - 1 do
-        begin
-          Lines.Add(#09 + lvExportFunctions.Items[i].Caption + #09 +
-            lvExportFunctions.Items[i].SubItems[0] + #09 + lvExportFunctions.Items[i].SubItems[1]);
+        RichEdit.Lines.Add(SNoPackageInformationAvailable);
+        RichEdit.Lines.Add('');
+      end else begin
+        for j := 0 to lbPackageInfoType.Items.Count - 1 do begin
+          RichEdit.SelAttributes.Style := [fsUnderline];
+          RichEdit.Lines.Add(lbPackageInfoType.Items[j]);
+
+          RichEdit.SelAttributes.Style := [];
+          sl := TStrings(lbPackageInfoType.Items.Objects[j]);
+          for i := 0 to sl.Count - 1 do begin
+            Line := sl[i];
+            RichEdit.Lines.Add(#09 + Line);
+          end;
+          RichEdit.Lines.Add('');
         end;
       end;
 
@@ -611,6 +809,8 @@ begin
   SaveSettings;
 
   FreeAndNil(PEInfo);
+
+  TListbox_ClearWithObjects(lbPackageInfoType);
 
   if Assigned(FileDrop) then
   begin

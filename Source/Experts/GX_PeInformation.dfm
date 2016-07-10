@@ -187,6 +187,59 @@ inherited fmPeInformation: TfmPeInformation
         OnData = lvExportFunctionsData
       end
     end
+    object tshVersionInfo: TTabSheet
+      Caption = 'Version Info'
+      ImageIndex = 5
+      object lvVersionInfo: TListView
+        Left = 0
+        Top = 0
+        Width = 481
+        Height = 408
+        Align = alClient
+        Columns = <
+          item
+            Caption = 'Name'
+            Width = 150
+          end
+          item
+            Caption = 'Value'
+            Width = 350
+          end>
+        ColumnClick = False
+        ReadOnly = True
+        RowSelect = True
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
+    end
+    object tsPackageInfo: TTabSheet
+      Caption = 'Package Info'
+      ImageIndex = 6
+      object splPackageInfo: TSplitter
+        Left = 142
+        Top = 0
+        Height = 408
+      end
+      object lbPackageInfoType: TListBox
+        Left = 0
+        Top = 0
+        Width = 142
+        Height = 408
+        Align = alLeft
+        ItemHeight = 14
+        TabOrder = 0
+        OnClick = lbPackageInfoTypeClick
+      end
+      object lbPackageInfo: TListBox
+        Left = 145
+        Top = 0
+        Width = 336
+        Height = 389
+        Align = alClient
+        ItemHeight = 14
+        TabOrder = 1
+      end
+    end
   end
   object ToolBar: TToolBar
     Left = 0
