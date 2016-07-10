@@ -114,6 +114,7 @@ const
 
 type
   TVersionNumber = packed record
+    IsValid: Boolean;
     case Boolean of
       True:  ( dwFileVersionMS: DWORD;    { e.g. $00030075 = "3.75" }
                dwFileVersionLS: DWORD;    { e.g. $00000031 = "0.31" }
@@ -547,8 +548,10 @@ function FileToWideString(const FileName: WideString): WideString;
 procedure AnsiStreamToWideString(Stream: TStream; var Data: WideString);
 
 // Get the Windows version information for a file
-function GetFileVersionNumber(const FileName: string; MustExist: Boolean = True): TVersionNumber;
-function GetFileVersionString(const FileName: string; MustExist: Boolean = True): string;
+function GetFileVersionNumber(const FileName: string;
+  MustExist: Boolean = True; MustHaveVersion: Boolean = True): TVersionNumber;
+function GetFileVersionString(const FileName: string;
+  MustExist: Boolean = True; MustHaveVersion: Boolean = True): string;
 
 // Executes FileName and passes Parameters to the application
 // If RaiseException is True, an exception is raised on failure
@@ -3312,7 +3315,8 @@ begin
 end;
 
 {$IFDEF MSWINDOWS}
-function GetFileVersionNumber(const FileName: string; MustExist: Boolean): TVersionNumber;
+function GetFileVersionNumber(const FileName: string;
+  MustExist: Boolean = True; MustHaveVersion: Boolean = True): TVersionNumber;
 var
   VersionInfoBufferSize: DWORD;
   dummyHandle: DWORD;
@@ -3320,37 +3324,58 @@ var
   FixedFileInfoPtr: PVSFixedFileInfo;
   VersionValueLength: UINT;
 begin
-  if MustExist then
-    if not FileExists(FileName) then
+  Result.IsValid := False;
+  if not FileExists(FileName) then begin
+    if MustExist then
       raise Exception.Create(ExpandFileName(FileName) + ' does not exist to obtain VersionInfo');
+    Exit;
+  end;
 
   VersionInfoBufferSize := GetFileVersionInfoSize(PChar(FileName), dummyHandle);
-  if VersionInfoBufferSize = 0 then
-    raise EVersionInfoNotFound.Create(SysErrorMessage(GetLastError));
+  if VersionInfoBufferSize = 0 then begin
+    if MustHaveVersion then
+      raise EVersionInfoNotFound.Create(SysErrorMessage(GetLastError));
+    Exit;
+  end;
 
   GetMem(VersionInfoBuffer, VersionInfoBufferSize);
   try
-    Win32Check(GetFileVersionInfo(PChar(FileName), dummyHandle,
-                                  VersionInfoBufferSize, VersionInfoBuffer));
+    if not GetFileVersionInfo(PChar(FileName), dummyHandle,
+                              VersionInfoBufferSize, VersionInfoBuffer) then begin
+      if MustHaveVersion then
+        RaiseLastOSError;
+      Exit;
+    end;
 
     // Retrieve root block / VS_FIXEDFILEINFO
-    Win32Check(VerQueryValue(VersionInfoBuffer, '\',
-                             Pointer(FixedFileInfoPtr), VersionValueLength));
+    if not VerQueryValue(VersionInfoBuffer, '\',
+                         Pointer(FixedFileInfoPtr), VersionValueLength) then begin
+      if MustHaveVersion then
+        RaiseLastOSError;
+      Exit;
+    end;
 
     Result.dwFileVersionMS := FixedFileInfoPtr^.dwFileVersionMS;
     Result.dwFileVersionLS := FixedFileInfoPtr^.dwFileVersionLS;
+    Result.IsValid := True;
   finally
     FreeMem(VersionInfoBuffer);
   end;
 end;
 {$ENDIF MSWINDOWS}
 
-function GetFileVersionString(const FileName: string; MustExist: Boolean): string;
+function GetFileVersionString(const FileName: string;
+  MustExist: Boolean = True; MustHaveVersion: Boolean = True): string;
+resourcestring
+  SUnknown = '<unknown>';
 var
   Version: TVersionNumber;
 begin
-  Version := GetFileVersionNumber(FileName, MustExist);
-  Result := Format('%d.%d.%d.%d', [Version.Major, Version.Minor, Version.Release, Version.Build]);
+  Version := GetFileVersionNumber(FileName, MustExist, MustHaveVersion);
+  if Version.IsValid then
+    Result := Format('%d.%d.%d.%d', [Version.Major, Version.Minor, Version.Release, Version.Build])
+  else
+    Result := SUnknown;
 end;
 
 function GXShellExecute(const FileName, Parameters: string; const RaiseException: Boolean): Boolean;

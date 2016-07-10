@@ -127,20 +127,8 @@ begin
 end;
 
 procedure TfmAbout.InitVersionInfoControls;
-resourcestring
-  SVersion = 'Version';
-  SUnknown = '<unknown>';
-var
-  Version: TVersionNumber;
 begin
-  try
-    Version := GetFileVersionNumber(ThisDllName);
-    lblVersion.Caption := Format('%s %d.%d%d', [SVersion, Version.Major, Version.Minor, Version.Release]);
-  except
-    lblVersion.Caption := Format('%s %s', [SVersion, SUnknown]);
-  end;
-  if Version.Build <> 0 then
-    lblVersion.Caption := lblVersion.Caption + '.' + IntToStr(Version.Build);
+  lblVersion.Caption := GetVersionStr;
 end;
 
 class procedure TfmAbout.SetCustomBuildDetails(const Details: string);
@@ -188,17 +176,12 @@ class function TfmAbout.GetVersionStr: string;
 resourcestring
   SVersion = 'Version';
   SUnknown = '<unknown>';
-var
-  Version: TVersionNumber;
 begin
   try
-    Version := GetFileVersionNumber(ThisDllName);
-    Result := Format('%s %d.%d%d', [SVersion, Version.Major, Version.Minor, Version.Release]);
+    Result := Format('%s %s', [SVersion, GetFileVersionString(ThisDllName, True, False)]);
   except
     Result := Format('%s %s', [SVersion, SUnknown]);
   end;
-  if Version.Build <> 0 then
-    Result := Result + '.' + IntToStr(Version.Build);
 end;
 
 {$IFOPT D+}

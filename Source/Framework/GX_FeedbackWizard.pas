@@ -666,7 +666,7 @@ end;
 function GetGExpertsVersionString: string;
 begin
   Result := ExtractFileName(ThisDllName);
-  Result := Result + ' ' + GetFileVersionString(ThisDllName);
+  Result := Result + ' ' + GetFileVersionString(ThisDllName, True, False);
   Result := Result + ' from ' + DateTimeToStr(GetFileDate(ThisDllName));
   Result := Result + CRLF;
 end;

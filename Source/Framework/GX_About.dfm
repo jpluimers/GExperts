@@ -26,9 +26,9 @@ object fmAbout: TfmAbout
     Caption = 'GExperts'
   end
   object lblVersion: TLabel
-    Left = 346
+    Left = 232
     Top = 35
-    Width = 140
+    Width = 369
     Height = 22
     Alignment = taCenter
     AutoSize = False
