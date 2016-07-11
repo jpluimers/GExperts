@@ -206,7 +206,10 @@ uses
   GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas',
   GX_dzSelectDirectoryFix in '..\..\Source\Utils\GX_dzSelectDirectoryFix.pas',
   GX_eAddToCaptitalization in '..\..\Source\Formatter\GX_eAddToCaptitalization.pas',
-  GX_VCLFixPack in '..\..\Source\Utils\GX_VCLFixPack.pas';
+  GX_VCLFixPack in '..\..\Source\Utils\GX_VCLFixPack.pas',
+  GX_dzVersionInfo in '..\..\Source\Utils\GX_dzVersionInfo.pas',
+  GX_dzOsUtils in '..\..\Source\Utils\GX_dzOsUtils.pas',
+  GX_dzPackageInfo in '..\..\Source\Utils\GX_dzPackageInfo.pas';
 
 end.
 
