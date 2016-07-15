@@ -118,7 +118,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_GxUtils, GX_GenericUtils, GX_Experts,
+  StrUtils, GX_GxUtils, GX_GenericUtils, GX_Experts,
   GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math,
   GX_DbugIntf, GX_dzVersionInfo, GX_dzPackageInfo, GX_dzClassUtils,
   GX_dzVclUtils;
@@ -284,6 +284,9 @@ var
   sl: TStringList;
   pitItems: TStrings;
   Info: TPackageInfo;
+  i: Integer;
+  s: string;
+  p: Integer;
 begin
   Info := TPackageInfo.Create(AFilename);
   try
@@ -303,6 +306,23 @@ begin
       sl := TStringList.Create;
       sl.Assign(Info.Required);
       pitItems.AddObject('Required Packages', sl);
+
+      sl := TStringList.Create;
+      for i := 0 to PEInfo.ExportList.Count - 1 do begin
+        s := PEInfo.ExportList[i];
+        if StartsText('@$xp$', s) then begin
+          s := Copy(s, 2, 255);
+          p := Pos('@', s);
+          if p > 0 then begin
+            s := Copy(s, p + 1, 255);
+            p := Pos('$', s);
+            if p > 0 then
+              s := Copy(s, 1, p - 1);
+            sl.Add(s);
+          end;
+        end;
+      end;
+      pitItems.AddObject('Exported Classes', sl);
     finally
       pitItems.EndUpdate;
     end;
@@ -789,6 +809,8 @@ begin
   inherited Create(AOwner);
 
   SetToolbarGradient(ToolBar);
+
+  TControl_SetMinConstraints(Self);
 
   if Assigned(PeExpert) then
     PeExpert.SetFormIcon(Self);
