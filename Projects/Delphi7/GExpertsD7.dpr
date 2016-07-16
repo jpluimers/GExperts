@@ -209,7 +209,10 @@ uses
   GX_VCLFixPack in '..\..\Source\Utils\GX_VCLFixPack.pas',
   GX_dzVersionInfo in '..\..\Source\Utils\GX_dzVersionInfo.pas',
   GX_dzOsUtils in '..\..\Source\Utils\GX_dzOsUtils.pas',
-  GX_dzPackageInfo in '..\..\Source\Utils\GX_dzPackageInfo.pas';
+  GX_dzPackageInfo in '..\..\Source\Utils\GX_dzPackageInfo.pas',
+  GX_PeInfoPrint in '..\..\Source\PeInfo\GX_PeInfoPrint.pas' {f_PeInfoPrint},
+  GX_IdeSearchPathFavorites in '..\..\Source\IDE\GX_IdeSearchPathFavorites.pas' {f_SarchPathFavorites},
+  GX_IdeSearchPathFavoriteEdit in '..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas' {f_IdeSearchPathFavoriteEdit};
 
 end.
 
