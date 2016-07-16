@@ -214,12 +214,22 @@ begin
 end;
 
 procedure TfmPeInformation.SetVersionInfo(const AFilename: string);
+var
+  VerItems: TListItems;
+
+  procedure AddItem(const ACaption, AValue: string);
+  var
+    li: TListItem;
+  begin
+      li := VerItems.Add;
+      li.Caption := ACaption;
+      li.SubItems.Add(AValue);
+  end;
+
 resourcestring
   SNoVersionInfo = 'no version info';
 var
   VerInfo: IFileInfo;
-  VerItems: TListItems;
-  li: TListItem;
 begin
   VerInfo := TFileInfo.Create(AFileName);
   VerItems := lvVersionInfo.Items;
@@ -227,52 +237,19 @@ begin
   try
     VerItems.Clear;
     if not VerInfo.HasVersionInfo then begin
-      li := VerItems.Add;
-      li.Caption := SNoVersionInfo;
+      AddItem(SNoVersionInfo, '');
     end else begin
-      li := VerItems.Add;
-      li.Caption := 'Filename';
-      li.SubItems.Add(VerInfo.Filename);
-
-      li := VerItems.Add;
-      li.Caption := 'FileDir';
-      li.SubItems.Add(VerInfo.FileDir);
-
-      li := VerItems.Add;
-      li.Caption := 'Description';
-      li.SubItems.Add(VerInfo.FileDescription);
-
-      li := VerItems.Add;
-      li.Caption := 'Version';
-      li.SubItems.Add(VerInfo.FileVersion);
-
-      li := VerItems.Add;
-      li.Caption := 'Product';
-      li.SubItems.Add(VerInfo.ProductName);
-
-      li := VerItems.Add;
-      li.Caption := 'Product Version';
-      li.SubItems.Add(VerInfo.ProductVersion);
-
-      li := VerItems.Add;
-      li.Caption := 'Company';
-      li.SubItems.Add(VerInfo.CompanyName);
-
-      li := VerItems.Add;
-      li.Caption := 'Copyright';
-      li.SubItems.Add(VerInfo.LegalCopyRight);
-
-      li := VerItems.Add;
-      li.Caption := 'Trademarks';
-      li.SubItems.Add(VerInfo.LegalTradeMarks);
-
-      li := VerItems.Add;
-      li.Caption := 'Internal Name';
-      li.SubItems.Add(VerInfo.InternalName);
-
-      li := VerItems.Add;
-      li.Caption := 'Original Filename';
-      li.SubItems.Add(VerInfo.OriginalFilename);
+      AddItem('Filename', VerInfo.Filename);
+      AddItem('FileDir', VerInfo.FileDir);
+      AddItem('Description', VerInfo.FileDescription);
+      AddItem('Version', VerInfo.FileVersion);
+      AddItem('Product', VerInfo.ProductName);
+      AddItem('Product Version', VerInfo.ProductVersion);
+      AddItem('Company', VerInfo.CompanyName);
+      AddItem('Copyright', VerInfo.LegalCopyRight);
+      AddItem('Trademarks', VerInfo.LegalTradeMarks);
+      AddItem('Internal Name', VerInfo.InternalName);
+      AddItem('Original Filename', VerInfo.OriginalFilename);
     end;
   finally
     VerItems.EndUpdate;
@@ -458,11 +435,8 @@ procedure TfmPeInformation.lvMSDOSData(Sender: TObject; Item: TListItem);
 begin
   if FBlockEvents then
     Exit;
-
-  Assert(Assigned(Item));
-  Assert(Assigned(PEInfo));
-  Assert(Assigned(PEInfo.MSDOSHeader));
-
+  if not Assigned(Item) or not Assigned(PEInfo) or not assigned(PEInfo.MSDOSHeader) then
+    Exit;
   SetListViewItem(Item, PEInfo.MSDOSHeader[Item.Index]);
 end;
 
@@ -470,11 +444,8 @@ procedure TfmPeInformation.lvPEHeaderData(Sender: TObject; Item: TListItem);
 begin
   if FBlockEvents then
     Exit;
-
-  Assert(Assigned(Item));
-  Assert(Assigned(PEInfo));
-  Assert(Assigned(PEInfo.PEHeaderList));
-
+  if not Assigned(Item) or not Assigned(PEInfo) or not assigned(PEInfo.PEHeaderList) then
+    Exit;
   SetListViewItem(Item, PEInfo.PEHeaderList[Item.Index]);
 end;
 
@@ -482,11 +453,8 @@ procedure TfmPeInformation.lvPEOptionalHeaderData(Sender: TObject; Item: TListIt
 begin
   if FBlockEvents then
     Exit;
-
-  Assert(Assigned(Item));
-  Assert(Assigned(PEInfo));
-  Assert(Assigned(PEInfo.PEOptionalHeaderList));
-
+  if not Assigned(Item) or not Assigned(PEInfo) or not assigned(PEInfo.PEOptionalHeaderList) then
+    Exit;
   SetListViewItem(Item, PEInfo.PEOptionalHeaderList[Item.Index]);
 end;
 
@@ -494,11 +462,8 @@ procedure TfmPeInformation.lvImportsData(Sender: TObject; Item: TListItem);
 begin
   if FBlockEvents then
     Exit;
-
-  Assert(Assigned(Item));
-  Assert(Assigned(PEInfo));
-  Assert(Assigned(PEInfo.ImportList));
-
+  if not Assigned(Item) or not Assigned(PEInfo) or not assigned(PEInfo.ImportList) then
+    Exit;
   SetListViewItem(Item, PEInfo.ImportList[Item.Index]);
 end;
 
@@ -506,11 +471,8 @@ procedure TfmPeInformation.lvExportFunctionsData(Sender: TObject; Item: TListIte
 begin
   if FBlockEvents then
     Exit;
-
-  Assert(Assigned(Item));
-  Assert(Assigned(PEInfo));
-  Assert(Assigned(PEInfo.ExportList));
-
+  if not Assigned(Item) or not Assigned(PEInfo) or not assigned(PEInfo.ExportList) then
+    Exit;
   SetListViewItem(Item, PEInfo.ExportList[Item.Index]);
 end;
 
@@ -526,9 +488,8 @@ begin
   if not Assigned(SelectedListItem) then
     Exit;
 
-  Assert(Assigned(Item));
-  Assert(Assigned(PEInfo));
-  Assert(Assigned(PEInfo.ImportList));
+  if not Assigned(Item) or not Assigned(PEInfo) or not assigned(PEInfo.ImportList) then
+    Exit;
 
   ImpExp := TImportExport(PEInfo.ImportList.Objects[SelectedListItem.Index]);
 
