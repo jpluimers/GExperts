@@ -34,13 +34,15 @@ type
     procedure EditCurrent;
   public
     class procedure Execute(_Owner: TComponent; var _Favorites: TStringList);
+    constructor Create(_Owner: TComponent); override;
   end;
 
 implementation
 
 uses
   GX_dzSelectDirectoryFix,
-  GX_IdeSearchPathFavoriteEdit;
+  GX_IdeSearchPathFavoriteEdit,
+  GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -58,6 +60,12 @@ begin
   finally
     FreeAndNil(frm);
   end;
+end;
+
+constructor Tf_SarchPathFavorites.Create(_Owner: TComponent);
+begin
+  inherited;
+  TControl_SetMinConstraints(Self);
 end;
 
 procedure Tf_SarchPathFavorites.b_AddClick(Sender: TObject);

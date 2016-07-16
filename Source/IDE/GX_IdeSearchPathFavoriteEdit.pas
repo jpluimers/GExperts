@@ -73,6 +73,9 @@ end;
 constructor Tf_IdeSearchPathFavoriteEdit.Create(_Owner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
   m_Path.Lines.Delimiter := ';';
   TWinControl_ActivateDropFiles(m_Path, HandleFilesDropped);
 end;

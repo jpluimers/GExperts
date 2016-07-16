@@ -22,9 +22,10 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    Cancel = True
     Caption = 'Close'
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 4
   end
   object lv_Favorites: TListView
     Left = 8
@@ -54,7 +55,7 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Height = 25
     Anchors = [akTop, akRight]
     Caption = 'Add ...'
-    TabOrder = 2
+    TabOrder = 1
     OnClick = b_AddClick
   end
   object b_Edit: TButton
@@ -64,7 +65,8 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Height = 25
     Anchors = [akTop, akRight]
     Caption = 'Edit ...'
-    TabOrder = 3
+    Default = True
+    TabOrder = 2
     OnClick = b_EditClick
   end
   object b_Delete: TButton
@@ -74,7 +76,7 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Height = 25
     Anchors = [akTop, akRight]
     Caption = 'Delete'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = b_DeleteClick
   end
 end
