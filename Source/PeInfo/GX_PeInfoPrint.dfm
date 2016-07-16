@@ -1,6 +1,6 @@
 inherited f_PeInfoPrint: Tf_PeInfoPrint
-  Left = 0
-  Top = 0
+  Left = 326
+  Top = 228
   BorderStyle = bsDialog
   Caption = 'Print PE Information'
   ClientHeight = 225
