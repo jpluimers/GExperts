@@ -77,8 +77,6 @@ type
     procedure SetEnhanceSearchPath(const Value: Boolean);
     function GetEnhanceToolProperties: Boolean;
     procedure SetEnhanceToolProperties(const Value: Boolean);
-    function GetEnhanceSearchPathAggressive: Boolean;
-    procedure SetEnhanceSearchPathAggressive(const Value: Boolean);
     function GetEnhanceInstallPackages: Boolean;
     procedure SetEnhanceInstallPackages(const Value: Boolean);
     function GetIdeFormsAllowResize: Boolean;
@@ -102,7 +100,6 @@ type
     property EnhanceInstallPackages: boolean read GetEnhanceInstallPackages write SetEnhanceInstallPackages;
     // Search path
     property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
-    property EnhanceSearchPathAggressive: Boolean read GetEnhanceSearchPathAggressive write SetEnhanceSearchPathAggressive;
     // Tool Options dialog
     property EnhanceToolProperties: Boolean read GetEnhanceToolProperties write SetEnhanceToolProperties;
     // Fonts
@@ -207,11 +204,6 @@ begin
   TGxIdeProjectOptionsEnhancer.SetEnabled(Value);
 end;
 
-procedure TIdeEnhancements.SetEnhanceSearchPathAggressive(const Value: Boolean);
-begin
-  TGxIdeSearchPathEnhancer.SetAggressive(Value);
-end;
-
 procedure TIdeEnhancements.SetEnhanceToolProperties(const Value: Boolean);
 begin
   TGxIdeToolPropertiesEnhancer.SetEnabled(Value);
@@ -256,7 +248,6 @@ begin
     IdeFormsAllowResize := ExpSettings.ReadBool('IdeFormsAllowResize', False);
     IdeFormsRememberPosition := ExpSettings.ReadBool('IdeFormsRememberPosition', False);
     EnhanceSearchPath := ExpSettings.ReadBool('EnhanceSearchPath', False);
-    EnhanceSearchPathAggressive := ExpSettings.ReadBool('EnhanceSearchPathAggressive', False);
     EnhanceToolProperties := ExpSettings.ReadBool('EnhanceToolProperties', False);
     EnhanceInstallPackages := ExpSettings.ReadBool('EnhanceInstallPackages', False);
 
@@ -305,7 +296,6 @@ begin
     ExpSettings.WriteBool('IdeFormsAllowResize', IdeFormsAllowResize);
     ExpSettings.WriteBool('IdeFormsRememberPosition', IdeFormsRememberPosition);
     ExpSettings.WriteBool('EnhanceSearchPath', EnhanceSearchPath);
-    ExpSettings.WriteBool('EnhanceSearchPathAggressive', EnhanceSearchPathAggressive);
     ExpSettings.WriteBool('EnhanceToolProperties', EnhanceToolProperties);
     ExpSettings.WriteBool('EnhanceInstallPackages', EnhanceInstallPackages);
 
@@ -756,11 +746,6 @@ end;
 function TIdeEnhancements.GetEnhanceSearchPath: Boolean;
 begin
   Result := TGxIdeSearchPathEnhancer.GetEnabled;
-end;
-
-function TIdeEnhancements.GetEnhanceSearchPathAggressive: Boolean;
-begin
-  Result := TGxIdeSearchPathEnhancer.GetAggressive;
 end;
 
 function TIdeEnhancements.GetEnhanceToolProperties: Boolean;

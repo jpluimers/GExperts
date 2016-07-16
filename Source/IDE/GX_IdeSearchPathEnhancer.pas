@@ -11,23 +11,10 @@ uses
   Forms;
 
 type
-  ///<summary>
-  /// defines the strings used to identify the search path edit dialog </summary>
-  TSearchPathDlgStrings = record
-    DialogClass: string;
-    DialogName: string;
-    DialogCaptionEn: string;
-    DialogCaptionFr: string;
-    DialogCaptionDe: string;
-  end;
-
-type
   TGxIdeSearchPathEnhancer = class
   public
-    class function GetEnabled: Boolean; // static;
-    class procedure SetEnabled(_Value: Boolean); // static;
-    class function GetAggressive: Boolean; // static;
-    class procedure SetAggressive(_Value: Boolean); // static;
+    class function GetEnabled: Boolean;
+    class procedure SetEnabled(_Value: Boolean);
   end;
 
 implementation
@@ -44,16 +31,26 @@ uses
   GX_dzVclUtils,
   GX_dzFileUtils,
   GX_OtaUtils,
-  GX_dzSelectDirectoryFix;
+  GX_dzSelectDirectoryFix,
+  GX_IdeSearchPathFavorites,
+  GX_ConfigurationInfo;
 
-var
-  gblAggressive: Boolean;
+type
+  ///<summary>
+  /// defines the strings used to identify the search path edit dialog </summary>
+  TSearchPathDlgStrings = record
+    DialogClass: string;
+    DialogName: string;
+    DialogCaptionEn: string;
+    DialogCaptionFr: string;
+    DialogCaptionDe: string;
+  end;
 
 type
   TSearchPathEnhancer = class
   private
     FCallbackHandle: TFormChangeHandle;
-    FIsAutocompleteEnabled: Boolean;
+    FForm: TCustomForm;
     FListbox: TListbox;
     FMemo: TMemo;
 
@@ -73,9 +70,14 @@ type
     FMakeRelativeBtn: TButton;
     FMakeAbsoluteBtn: TButton;
     FAddRecursiveBtn: TButton;
+    FFavoritesPm: TPopupMenu;
+    FFavoritesBtn: TButton;
+    FFavorites: TStringList;
+    FEnabled: Boolean;
 {$IFNDEF GX_VER300_up}
     FBrowseBtn: TCustomButton;
     FBrowseClick: TNotifyEvent;
+    procedure BrowseBtnClick(_Sender: TObject);
 {$ENDIF GX_VER300_up}
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
     ///<summary>
@@ -92,12 +94,18 @@ type
     procedure MakeAbsoluteBtnClick(_Sender: TObject);
     procedure AddRecursiveBtnClick(_Sender: TObject);
     function MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
-{$IFNDEF GX_VER300_up}
-    procedure BrowseBtnClick(_Sender: TObject);
-{$ENDIF GX_VER300_up}
+    procedure FavoritesBtnClick(_Sender: TObject);
+    procedure FavoritesPmConfigureClick(_Sender: TObject);
+    procedure InitFavoritesMenu;
+    procedure FavoritesPmHandleFavoriteClick(_Sender: TObject);
+    procedure SetEnabled(const Value: Boolean);
+    procedure LoadSettings;
+    procedure SaveSettings;
+    function ConfigurationKey: string;
   public
     constructor Create;
     destructor Destroy; override;
+    property Enabled: Boolean read FEnabled write SetEnabled;
   end;
 
 var
@@ -107,25 +115,19 @@ var
 
 class function TGxIdeSearchPathEnhancer.GetEnabled: Boolean;
 begin
-  Result := Assigned(TheSearchPathEnhancer);
+  Result := Assigned(TheSearchPathEnhancer) and TheSearchPathEnhancer.Enabled;
 end;
 
 class procedure TGxIdeSearchPathEnhancer.SetEnabled(_Value: Boolean);
 begin
-  if not _Value then
-    FreeAndNil(TheSearchPathEnhancer)
-  else if not Assigned(TheSearchPathEnhancer) then
-    TheSearchPathEnhancer := TSearchPathEnhancer.Create;
-end;
-
-class function TGxIdeSearchPathEnhancer.GetAggressive: Boolean;
-begin
-  Result := gblAggressive;
-end;
-
-class procedure TGxIdeSearchPathEnhancer.SetAggressive(_Value: Boolean);
-begin
-  gblAggressive := _Value;
+  if not _Value then begin
+    if Assigned(TheSearchPathEnhancer) then
+      TheSearchPathEnhancer.Enabled := False;
+  end else begin
+    if not Assigned(TheSearchPathEnhancer) then
+      TheSearchPathEnhancer := TSearchPathEnhancer.Create;
+    TheSearchPathEnhancer.Enabled := True;
+  end;
 end;
 
 { TSearchPathEnhancer }
@@ -133,13 +135,58 @@ end;
 constructor TSearchPathEnhancer.Create;
 begin
   inherited Create;
-  FCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
+  FFavorites := TStringList.Create;
+  LoadSettings;
+//  FFavorites.Values['jvcl'] := '..\libs\jvcl\common;..\libs\jvcl\run;..\libs\jvcl\resources';
+//  FFavorites.Values['jcl'] := '..\libs\jcl\source\include;..\libs\jcl\source\include\jedi;..\libs\jcl\source\common;..\libs\jcl\source\windows;..\libs\jcl\source\vcl';
 end;
 
 destructor TSearchPathEnhancer.Destroy;
 begin
   TIDEFormEnhancements.UnregisterFormChangeCallback(FCallbackHandle);
+
+  FreeAndNil(FFavorites);
   inherited;
+end;
+
+function TSearchPathEnhancer.ConfigurationKey: string;
+begin
+  Result := 'IDEEnhancements';
+end;
+
+procedure TSearchPathEnhancer.LoadSettings;
+var
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
+begin
+  ExpSettings := nil;
+  Settings := TGExpertsSettings.Create;
+  try
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    ExpSettings.ReadStrings('SearchPathFavorites', FFavorites);
+  finally
+    FreeAndNil(ExpSettings);
+    FreeAndNil(Settings);
+  end;
+end;
+
+procedure TSearchPathEnhancer.SaveSettings;
+var
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
+begin
+  Assert(ConfigInfo <> nil, 'No ConfigInfo found');
+
+  // do not localize any of the below items
+  ExpSettings := nil;
+  Settings := TGExpertsSettings.Create;
+  try
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    ExpSettings.WriteStrings('SearchPathFavorites', FFavorites);
+  finally
+    FreeAndNil(ExpSettings);
+    FreeAndNil(Settings);
+  end;
 end;
 
 procedure TSearchPathEnhancer.HandleFilesDropped(_Sender: TObject; _Files: TStrings);
@@ -334,111 +381,174 @@ var
   cmp: TComponent;
   btn: TCustomButton;
 begin
-  FListbox := nil;
-  FMemo := nil;
-
-  if not IsSearchPathForm(_Form) or not TryGetElementEdit(_Form, FEdit) then begin
-    FIsAutocompleteEnabled := False;
+  if not FEnabled then
     Exit;
-  end;
+  if not IsSearchPathForm(_Form) or not TryGetElementEdit(_Form, FEdit) then
+    Exit;
 
-  if not FIsAutocompleteEnabled and (_Form.FindComponent('TheActionList') = nil) then begin
+  if _Form.FindComponent('TheActionList') = nil then begin
+    FForm := _Form;
     TEdit_ActivateAutoComplete(FEdit, [acsFileSystem], [actSuggest]);
-    FIsAutocompleteEnabled := True;
     TWinControl_ActivateDropFiles(FEdit, HandleFilesDropped);
 
     cmp := _Form.FindComponent('CreationList');
     if Assigned(cmp) and (cmp is TListbox) then begin
       FListbox := TListbox(cmp);
 
-      if gblAggressive then begin
-        TheActionList := TActionList.Create(_Form);
-        TheActionList.Name := 'TheActionList';
+      TheActionList := TActionList.Create(_Form);
+      TheActionList.Name := 'TheActionList';
 
         // Assign shortcuts to the Up/Down buttons via actions
-        AssignActionToButton('UpButton', 'Move Up', UpBtnClick, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
-        AssignActionToButton('DownButton', 'Move Down', DownBtnClick, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
+      AssignActionToButton('UpButton', 'Move Up', UpBtnClick, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
+      AssignActionToButton('DownButton', 'Move Down', DownBtnClick, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
 {$IFNDEF GX_VER300_up}
         // Delphi 10 and later no longer uses SelectDirectory, so we don't need to fix it.
-        AssignActionToButton('BrowseButton', 'Browse', BrowseBtnClick, ShortCut(VK_DOWN, [ssAlt]), FBrowseBtn, FBrowseClick);
+      AssignActionToButton('BrowseButton', 'Browse', BrowseBtnClick, ShortCut(VK_DOWN, [ssAlt]), FBrowseBtn, FBrowseClick);
 {$ENDIF GX_VER300_up}
 
-        TWinControl_ActivateDropFiles(FListbox, HandleFilesDropped);
-        FPageControl := TPageControl.Create(_Form);
-        FTabSheetList := TTabSheet.Create(_Form);
-        FTabSheetMemo := TTabSheet.Create(_Form);
-        FPageControl.Name := 'pc_PathList';
-        FPageControl.Parent := _Form;
-        FPageControl.BoundsRect := FListbox.BoundsRect;
-        FPageControl.Anchors := [akLeft, akTop, akRight, akBottom];
-        FPageControl.TabPosition := tpBottom;
-        FPageControl.ActivePage := FTabSheetList;
-        FPageControl.OnChanging := PageControlChanging;
+      TWinControl_ActivateDropFiles(FListbox, HandleFilesDropped);
 
-        FTabSheetList.Name := 'ts_List';
-        FTabSheetList.Parent := FPageControl;
-        FTabSheetList.PageControl := FPageControl;
-        FTabSheetList.Caption := 'List';
+      FPageControl := TPageControl.Create(_Form);
+      FTabSheetList := TTabSheet.Create(_Form);
+      FTabSheetMemo := TTabSheet.Create(_Form);
+      FPageControl.Name := 'pc_PathList';
+      FPageControl.Parent := _Form;
+      FPageControl.BoundsRect := FListbox.BoundsRect;
+      FPageControl.Anchors := [akLeft, akTop, akRight, akBottom];
+      FPageControl.TabPosition := tpBottom;
+      FPageControl.ActivePage := FTabSheetList;
+      FPageControl.OnChanging := PageControlChanging;
 
-        FTabSheetMemo.Name := 'ts_Memo';
-        FTabSheetMemo.Parent := FPageControl;
-        FTabSheetMemo.PageControl := FPageControl;
-        FTabSheetMemo.Caption := 'Memo';
+      FTabSheetList.Name := 'ts_List';
+      FTabSheetList.Parent := FPageControl;
+      FTabSheetList.PageControl := FPageControl;
+      FTabSheetList.Caption := 'List';
 
-        FMemo := TMemo.Create(_Form);
-        FMemo.Parent := FTabSheetMemo;
-        FMemo.Align := alClient;
-        FMemo.Lines.Text := FListbox.Items.Text;
-        FMemo.OnChange := Self.HandleMemoChange;
-        FMemo.ScrollBars := ssBoth;
-        FMemo.WordWrap := False;
+      FTabSheetMemo.Name := 'ts_Memo';
+      FTabSheetMemo.Parent := FPageControl;
+      FTabSheetMemo.PageControl := FPageControl;
+      FTabSheetMemo.Caption := 'Memo';
 
-        FListbox.Parent := FTabSheetList;
-        FListbox.Align := alClient;
+      FMemo := TMemo.Create(_Form);
+      FMemo.Parent := FTabSheetMemo;
+      FMemo.Align := alClient;
+      FMemo.Lines.Text := FListbox.Items.Text;
+      FMemo.OnChange := Self.HandleMemoChange;
+      FMemo.ScrollBars := ssBoth;
+      FMemo.WordWrap := False;
 
-        TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
+      FListbox.Parent := FTabSheetList;
+      FListbox.Align := alClient;
 
-        if TryFindButton('AddButton', FAddBtn) then begin
-          TCustomButtonHack(FAddBtn).OnClick := AddBtnClick;
-        end;
-        if TryFindButton('ReplaceButton', FReplaceBtn) then begin
-          FMakeRelativeBtn := TButton.Create(_Form);
-          FMakeRelativeBtn.Name := 'MakeRelativeBtn';
-          FMakeRelativeBtn.Parent := FReplaceBtn.Parent;
-          FMakeRelativeBtn.BoundsRect := FReplaceBtn.BoundsRect;
-          FMakeRelativeBtn.Anchors := [akRight, akBottom];
-          FMakeRelativeBtn.Caption := 'Make Relative';
-          FMakeRelativeBtn.Visible := False;
-          FMakeRelativeBtn.OnClick := MakeRelativeBtnClick;
-        end;
-        if TryFindButton('DeleteButton', FDeleteBtn) then begin
-          FMakeAbsoluteBtn := TButton.Create(_Form);
-          FMakeAbsoluteBtn.Name := 'MakeAbsoluteBtn';
-          FMakeAbsoluteBtn.Parent := FDeleteBtn.Parent;
-          FMakeAbsoluteBtn.BoundsRect := FDeleteBtn.BoundsRect;
-          FMakeAbsoluteBtn.Anchors := [akRight, akBottom];
-          FMakeAbsoluteBtn.Caption := 'Make Absolute';
-          FMakeAbsoluteBtn.Visible := False;
-          FMakeAbsoluteBtn.OnClick := MakeAbsoluteBtnClick;
-        end;
-        if TryFindButton('DeleteInvalidBtn', FDeleteInvalidBtn) then begin
-          FAddRecursiveBtn := TButton.Create(_Form);
-          FAddRecursiveBtn.Name := 'AddRecursiveBtn';
-          FAddRecursiveBtn.Parent := FDeleteInvalidBtn.Parent;
-          FAddRecursiveBtn.BoundsRect := FDeleteInvalidBtn.BoundsRect;
-          FAddRecursiveBtn.Anchors := [akRight, akBottom];
-          FAddRecursiveBtn.Caption := 'Add Recursive';
-          FAddRecursiveBtn.Visible := False;
-          FAddRecursiveBtn.OnClick := AddRecursiveBtnClick;
-        end;
-
-        if TryFindButton('OkButton', btn) then
-          TCustomButtonHack(btn).Caption := '&OK';
+      if Assigned(FUpBtn) then begin
+        FFavoritesBtn := TButton.Create(_Form);
+        FFavoritesBtn.Parent := _Form;
+        FFavoritesBtn.Left := FUpBtn.Left;
+        FFavoritesBtn.Top := FPageControl.Top;
+        FFavoritesBtn.Width := FUpBtn.Width;
+        FFavoritesBtn.Height := FUpBtn.Height;
+        FFavoritesBtn.Anchors := [akRight, akTop];
+        FFavoritesBtn.Caption := 'Fav';
+        FFavoritesBtn.OnClick := FavoritesBtnClick;
+        FFavoritesBtn.TabOrder := FPageControl.TabOrder + 1;
+        FFavoritesPm := TPopupMenu.Create(_Form);
+        InitFavoritesMenu;
       end;
+
+      TWinControl_ActivateDropFiles(FMemo, HandleFilesDropped);
+
+      if TryFindButton('AddButton', FAddBtn) then begin
+        TCustomButtonHack(FAddBtn).OnClick := AddBtnClick;
+      end;
+      if TryFindButton('ReplaceButton', FReplaceBtn) then begin
+        FMakeRelativeBtn := TButton.Create(_Form);
+        FMakeRelativeBtn.Name := 'MakeRelativeBtn';
+        FMakeRelativeBtn.Parent := FReplaceBtn.Parent;
+        FMakeRelativeBtn.BoundsRect := FReplaceBtn.BoundsRect;
+        FMakeRelativeBtn.Anchors := [akRight, akBottom];
+        FMakeRelativeBtn.Caption := 'Make Relative';
+        FMakeRelativeBtn.Visible := False;
+        FMakeRelativeBtn.OnClick := MakeRelativeBtnClick;
+      end;
+      if TryFindButton('DeleteButton', FDeleteBtn) then begin
+        FMakeAbsoluteBtn := TButton.Create(_Form);
+        FMakeAbsoluteBtn.Name := 'MakeAbsoluteBtn';
+        FMakeAbsoluteBtn.Parent := FDeleteBtn.Parent;
+        FMakeAbsoluteBtn.BoundsRect := FDeleteBtn.BoundsRect;
+        FMakeAbsoluteBtn.Anchors := [akRight, akBottom];
+        FMakeAbsoluteBtn.Caption := 'Make Absolute';
+        FMakeAbsoluteBtn.Visible := False;
+        FMakeAbsoluteBtn.OnClick := MakeAbsoluteBtnClick;
+      end;
+      if TryFindButton('DeleteInvalidBtn', FDeleteInvalidBtn) then begin
+        FAddRecursiveBtn := TButton.Create(_Form);
+        FAddRecursiveBtn.Name := 'AddRecursiveBtn';
+        FAddRecursiveBtn.Parent := FDeleteInvalidBtn.Parent;
+        FAddRecursiveBtn.BoundsRect := FDeleteInvalidBtn.BoundsRect;
+        FAddRecursiveBtn.Anchors := [akRight, akBottom];
+        FAddRecursiveBtn.Caption := 'Add Recursive';
+        FAddRecursiveBtn.Visible := False;
+        FAddRecursiveBtn.OnClick := AddRecursiveBtnClick;
+      end;
+
+      if TryFindButton('OkButton', btn) then
+        TCustomButtonHack(btn).Caption := '&OK';
+
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
         TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
     end;
+  end;
+end;
+
+procedure TSearchPathEnhancer.InitFavoritesMenu;
+var
+  i: Integer;
+  mi: TMenuItem;
+  FavName: string;
+begin
+  FFavoritesPm.Items.Clear;
+  for i := 0 to FFavorites.Count - 1 do begin
+    FavName := FFavorites.Names[i];
+    mi := TPopupMenu_AppendMenuItem(FFavoritesPm, FavName, FavoritesPmHandleFavoriteClick);
+    mi.Tag := i + 1;
+  end;
+  TPopupMenu_AppendMenuItem(FFavoritesPm, 'Configure ...', FavoritesPmConfigureClick);
+end;
+
+procedure TSearchPathEnhancer.FavoritesBtnClick(_Sender: TObject);
+var
+  pnt: TPoint;
+begin
+  pnt := FFavoritesBtn.ClientToScreen(Point(0, FFavoritesBtn.Height));
+  FFavoritesPm.Popup(pnt.X, pnt.Y);
+end;
+
+procedure TSearchPathEnhancer.FavoritesPmConfigureClick(_Sender: TObject);
+begin
+  Tf_SarchPathFavorites.Execute(FForm, FFavorites);
+  SaveSettings;
+  InitFavoritesMenu;
+end;
+
+procedure TSearchPathEnhancer.FavoritesPmHandleFavoriteClick(_Sender: TObject);
+var
+  mi: TMenuItem;
+  sl: TStringList;
+  FavName: string;
+begin
+  mi := _Sender as TMenuItem;
+  sl := TStringList.Create;
+  try
+    FavName := FFavorites.Names[mi.Tag - 1];
+    sl.Delimiter := ';';
+    sl.DelimitedText := FFavorites.Values[FavName];
+    if FPageControl.ActivePage = FTabSheetList then
+      FListbox.Items.AddStrings(sl)
+    else
+      FMemo.Lines.AddStrings(sl);
+  finally
+    FreeAndNil(sl);
   end;
 end;
 
@@ -535,8 +645,10 @@ begin
   if SwitchingToMemo then begin
     FMemo.Lines.Text := FListbox.Items.Text;
     FMemo.CaretPos := Point(FMemo.CaretPos.X, FListbox.ItemIndex);
+    FFavoritesBtn.Enabled := True;
   end else begin
     FListbox.ItemIndex := FMemo.CaretPos.Y;
+    FFavoritesBtn.Enabled := False;
   end;
   TrySetButtonVisibility(FDeleteBtn, not SwitchingToMemo);
   TrySetButtonVisibility(FMakeAbsoluteBtn, SwitchingToMemo);
@@ -544,6 +656,15 @@ begin
   TrySetButtonVisibility(FAddRecursiveBtn, SwitchingToMemo);
   TrySetButtonVisibility(FReplaceBtn, not SwitchingToMemo);
   TrySetButtonVisibility(FMakeRelativeBtn, SwitchingToMemo);
+end;
+
+procedure TSearchPathEnhancer.SetEnabled(const Value: Boolean);
+begin
+  FEnabled := Value;
+  if FEnabled then begin
+    if not Assigned(FCallbackHandle) then
+      FCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
+  end;
 end;
 
 procedure TSearchPathEnhancer.UpBtnClick(_Sender: TObject);
@@ -611,8 +732,7 @@ begin
 end;
 
 initialization
+  TheSearchPathEnhancer := TSearchPathEnhancer.Create;
 finalization
-  gblAggressive := False;
-  TGxIdeSearchPathEnhancer.SetEnabled(False);
+  FreeAndNil(TheSearchPathEnhancer);
 end.
-

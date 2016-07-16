@@ -91,7 +91,6 @@ type
     chkHideNavbar: TCheckBox;
     chkEnhanceSearchPaths: TCheckBox;
     chkEnhanceToolProperties: TCheckBox;
-    chkReplaceListWithMemo: TCheckBox;
     chkAllowResize: TCheckBox;
     chkRememberPosition: TCheckBox;
     tshSuppressedMessages: TTabSheet;
@@ -398,7 +397,6 @@ begin
   chkAllowResize.Checked := IdeEnhancements.IdeFormsAllowResize;
   chkRememberPosition.Checked := IdeEnhancements.IdeFormsRememberPosition;
   chkEnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
-  chkReplaceListWithMemo.Checked := IdeEnhancements.EnhanceSearchPathAggressive;
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   UpdateIdeDialogCheckboxes;
@@ -499,7 +497,6 @@ begin
   IdeEnhancements.IdeFormsAllowResize := chkAllowResize.Checked;
   IdeEnhancements.IdeFormsRememberPosition := chkRememberPosition.Checked;
   IdeEnhancements.EnhanceSearchPath := chkEnhanceSearchPaths.Checked;
-  IdeEnhancements.EnhanceSearchPathAggressive := chkReplaceListWithMemo.Checked;
   IdeEnhancements.EnhanceInstallPackages := chkEnhanceInstallPackages.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
 
@@ -826,7 +823,6 @@ begin
   chkRememberPosition.Enabled := EnableState;
   chkEnhanceSearchPaths.Enabled := EnableState;
   chkEnhanceToolProperties.Enabled := EnableState;
-  chkReplaceListWithMemo.Enabled := EnableState;
   chkEnhanceInstallPackages.Enabled := EnableState;
 end;
 

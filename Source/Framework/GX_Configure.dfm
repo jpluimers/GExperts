@@ -20,8 +20,8 @@ object fmConfiguration: TfmConfiguration
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 613
-    Height = 497
+    Width = 621
+    Height = 504
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 7
@@ -30,8 +30,8 @@ object fmConfiguration: TfmConfiguration
     object pcConfig: TPageControl
       Left = 7
       Top = 7
-      Width = 599
-      Height = 483
+      Width = 607
+      Height = 490
       ActivePage = tshExperts
       Align = alClient
       HotTrack = True
@@ -343,11 +343,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 142
+            Top = 117
             Width = 505
             Height = 17
             Caption = 'Show object inspector font names using the font'
-            TabOrder = 7
+            TabOrder = 6
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
@@ -359,18 +359,10 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceToolProperties: TCheckBox
             Left = 24
-            Top = 100
+            Top = 79
             Width = 489
             Height = 17
             Caption = 'Enhance Tools menu Tool Properties dialog'
-            TabOrder = 5
-          end
-          object chkReplaceListWithMemo: TCheckBox
-            Left = 40
-            Top = 81
-            Width = 473
-            Height = 17
-            Caption = 'Add a memo for direct editing'
             TabOrder = 4
           end
           object chkAllowResize: TCheckBox
@@ -391,11 +383,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceInstallPackages: TCheckBox
             Left = 24
-            Top = 121
+            Top = 98
             Width = 489
             Height = 17
             Caption = 'Enhance Install Packages dialog with ... Explorer button'
-            TabOrder = 6
+            TabOrder = 5
           end
         end
       end
