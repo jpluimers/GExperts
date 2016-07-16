@@ -212,7 +212,7 @@ inherited fmPeInformation: TfmPeInformation
         ViewStyle = vsReport
       end
     end
-    object tsPackageInfo: TTabSheet
+    object tshPackageInfo: TTabSheet
       Caption = 'Package Info'
       ImageIndex = 6
       object splPackageInfo: TSplitter

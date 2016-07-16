@@ -63,7 +63,7 @@ type
     tbnSep2: TToolButton;
     tshVersionInfo: TTabSheet;
     lvVersionInfo: TListView;
-    tsPackageInfo: TTabSheet;
+    tshPackageInfo: TTabSheet;
     splPackageInfo: TSplitter;
     lbPackageInfoType: TListBox;
     lbPackageInfo: TListBox;
@@ -121,7 +121,7 @@ uses
   StrUtils, GX_GxUtils, GX_GenericUtils, GX_Experts,
   GX_ConfigurationInfo, GX_GExperts, Clipbrd, GX_SharedImages, Math,
   GX_DbugIntf, GX_dzVersionInfo, GX_dzPackageInfo, GX_dzClassUtils,
-  GX_dzVclUtils;
+  GX_dzVclUtils, GX_PeInfoPrint;
 
 type
   TPEExpert = class(TGX_Expert)
@@ -255,6 +255,14 @@ begin
     VerItems.EndUpdate;
   end;
 end;
+
+{$IFNDEF GX_VER170_up}
+
+function StartsText(const ASubText, AText: string): Boolean;
+begin
+  Result := AnsiStartsText(ASubText, AText);
+end;
+{$ENDIF}
 
 procedure TfmPeInformation.SetPackageInfo(const AFilename: string);
 var
@@ -517,7 +525,7 @@ begin
   if ActiveControl is TListView then
     List := ActiveControl as TListView
   else begin
-    if pcMain.ActivePage = tsPackageInfo then begin
+    if pcMain.ActivePage = tshPackageInfo then begin
       PELines := TStringList.Create;
       try
         for i := 0 to lbPackageInfoType.Items.Count - 1 do begin
@@ -617,6 +625,7 @@ var
   end;
 
 var
+  Tabs: TPeInfoTabSet;
   Line: string;
   i, j: Integer;
   ImpExp: TImportExport;
@@ -626,7 +635,28 @@ begin
   if PEInfo = nil then
     Exit;
 
+  if pcMain.ActivePage = tshMSDOS then
+    Tabs := [pitMsDos]
+  else if pcMain.ActivePage = tshPEHEader then
+    Tabs := [pitPeHeader]
+  else if pcMain.ActivePage = tshPEHEader then
+    Tabs := [pitPeHeader]
+  else if pcMain.ActivePage = tshPEOptional then
+    Tabs := [pitPeOptHeader]
+  else if pcMain.ActivePage = tshImport then
+    Tabs := [pitImports]
+  else if pcMain.ActivePage = tshExports then
+    Tabs := [pitExports]
+  else if pcMain.ActivePage = tshVersionInfo then
+    Tabs := [pitVersionInfo]
+  else
+    Tabs := [pitPackageInfo];
+
+  if not Tf_PeInfoPrint.Execute(Self, Tabs) or (Tabs = []) then
+    Exit;
+
   try
+
     RichEdit := TRichEdit.Create(Self);
     Screen.Cursor := crHourglass;
     try
@@ -643,88 +673,105 @@ begin
       RichEdit.Lines.Add('PE Header information for ' + FFileName);
       // AJB: I would like some file info here, date/time, version...
       RichEdit.Lines.Add('');
-      // MS-DOS Header
-      PrintHeader(lvMSDOS, SMsDosHeader);
-      // PE Header
-      PrintHeader(lvPEHeader, SPeHeader);
-      // PE Optional Header
-      PrintHeader(lvPEOptionalHeader, SPeOptionalHeader);
 
-      // Imports
-      RichEdit.Paragraph.TabCount := 2;
-      RichEdit.Paragraph.Tab[0]   := 80;
-      RichEdit.Paragraph.Tab[1]   := 300;
-      RichEdit.SelAttributes.Style := [fsBold];
-      RichEdit.SelText := SImports;
+      if pitMsDos in Tabs then begin
+        // MS-DOS Header
+        PrintHeader(lvMSDOS, SMsDosHeader);
+      end;
 
-      for j := 0 to lvImports.Items.Count - 1 do
-      begin
-        RichEdit.SelAttributes.Style := [fsUnderline];
-        Line := PEInfo.ImportList[j] + #09 + SFunction + #09 + SOrdinal;
-        RichEdit.Lines.Add('   ' + Line + '   ');
-        RichEdit.SelAttributes.Style := [];
+      if pitPeHeader in Tabs then begin
+        // PE Header
+        PrintHeader(lvPEHeader, SPeHeader);
+      end;
 
-        ImpExp := TImportExport(PEInfo.ImportList.Objects[j]);
+      if pitPeOptHeader in Tabs then begin
+        // PE Optional Header
+        PrintHeader(lvPEOptionalHeader, SPeOptionalHeader);
+      end;
 
-        for i := 0 to ImpExp.Count - 1 do
+      if pitImports in Tabs then begin
+        // Imports
+        RichEdit.Paragraph.TabCount := 2;
+        RichEdit.Paragraph.Tab[0]   := 80;
+        RichEdit.Paragraph.Tab[1]   := 300;
+        RichEdit.SelAttributes.Style := [fsBold];
+        RichEdit.SelText := SImports;
+
+        for j := 0 to lvImports.Items.Count - 1 do
         begin
-          Line := ImpExp.Items[i].FunctionName;
-          if Length(Line) > 32 then
-            Line := Copy(Line, 1, 32) + '...';
-          RichEdit.Lines.Add(#09 + Line + #09 + IntToStr(ImpExp.Items[i].Ordinal));
-        end;
-        RichEdit.Lines.Add('');
-      end;
-
-      // Exports
-      RichEdit.Paragraph.TabCount := 3;
-      RichEdit.Paragraph.Tab[0]   := 20;
-      RichEdit.Paragraph.Tab[1]   := 280;
-      RichEdit.Paragraph.Tab[2]   := 380;
-
-      RichEdit.SelAttributes.Style := [fsBold];
-      RichEdit.SelText := SExports;
-      RichEdit.SelAttributes.Style := [];
-      for i := 0 to lvExportFunctions.Items.Count - 1 do
-      begin
-        li := lvExportFunctions.Items[i];
-        Line := li.Caption + #09 + li.SubItems[0] + #09 + li.SubItems[1];
-        RichEdit.Lines.Add(#09 + Line);
-      end;
-
-      RichEdit.Lines.Add('');
-      RichEdit.Lines.Add('');
-
-      // Version information
-      RichEdit.Paragraph.TabCount := 1;
-      RichEdit.Paragraph.Tab[0]   := 200;
-
-      PrintHeader(lvVersionInfo, SVersionInfo);
-
-      RichEdit.Lines.Add('');
-
-      // Package Info
-      RichEdit.Paragraph.TabCount := 1;
-      RichEdit.Paragraph.Tab[0]   := 100;
-      RichEdit.SelAttributes.Style := [fsBold];
-      RichEdit.SelText := SPackageInfo;
-
-      if lbPackageInfoType.Items.Count = 0 then begin
-        RichEdit.SelAttributes.Style := [];
-        RichEdit.Lines.Add(SNoPackageInformationAvailable);
-        RichEdit.Lines.Add('');
-      end else begin
-        for j := 0 to lbPackageInfoType.Items.Count - 1 do begin
           RichEdit.SelAttributes.Style := [fsUnderline];
-          RichEdit.Lines.Add(lbPackageInfoType.Items[j]);
-
+          Line := PEInfo.ImportList[j] + #09 + SFunction + #09 + SOrdinal;
+          RichEdit.Lines.Add('   ' + Line + '   ');
           RichEdit.SelAttributes.Style := [];
-          sl := TStrings(lbPackageInfoType.Items.Objects[j]);
-          for i := 0 to sl.Count - 1 do begin
-            Line := sl[i];
-            RichEdit.Lines.Add(#09 + Line);
+
+          ImpExp := TImportExport(PEInfo.ImportList.Objects[j]);
+
+          for i := 0 to ImpExp.Count - 1 do
+          begin
+            Line := ImpExp.Items[i].FunctionName;
+            if Length(Line) > 32 then
+              Line := Copy(Line, 1, 32) + '...';
+            RichEdit.Lines.Add(#09 + Line + #09 + IntToStr(ImpExp.Items[i].Ordinal));
           end;
           RichEdit.Lines.Add('');
+        end;
+      end;
+
+      if pitExports in Tabs then begin
+        // Exports
+        RichEdit.Paragraph.TabCount := 3;
+        RichEdit.Paragraph.Tab[0]   := 20;
+        RichEdit.Paragraph.Tab[1]   := 280;
+        RichEdit.Paragraph.Tab[2]   := 380;
+
+        RichEdit.SelAttributes.Style := [fsBold];
+        RichEdit.SelText := SExports;
+        RichEdit.SelAttributes.Style := [];
+        for i := 0 to lvExportFunctions.Items.Count - 1 do
+        begin
+          li := lvExportFunctions.Items[i];
+          Line := li.Caption + #09 + li.SubItems[0] + #09 + li.SubItems[1];
+          RichEdit.Lines.Add(#09 + Line);
+        end;
+
+        RichEdit.Lines.Add('');
+        RichEdit.Lines.Add('');
+      end;
+
+      if pitVersionInfo in Tabs then begin
+        // Version information
+        RichEdit.Paragraph.TabCount := 1;
+        RichEdit.Paragraph.Tab[0]   := 200;
+
+        PrintHeader(lvVersionInfo, SVersionInfo);
+
+        RichEdit.Lines.Add('');
+      end;
+
+      if pitPackageInfo in Tabs then begin
+        // Package Info
+        RichEdit.Paragraph.TabCount := 1;
+        RichEdit.Paragraph.Tab[0]   := 100;
+        RichEdit.SelAttributes.Style := [fsBold];
+        RichEdit.SelText := SPackageInfo;
+
+        if lbPackageInfoType.Items.Count = 0 then begin
+          RichEdit.SelAttributes.Style := [];
+          RichEdit.Lines.Add(SNoPackageInformationAvailable);
+          RichEdit.Lines.Add('');
+        end else begin
+          for j := 0 to lbPackageInfoType.Items.Count - 1 do begin
+            RichEdit.SelAttributes.Style := [fsUnderline];
+            RichEdit.Lines.Add(lbPackageInfoType.Items[j]);
+
+            RichEdit.SelAttributes.Style := [];
+            sl := TStrings(lbPackageInfoType.Items.Objects[j]);
+            for i := 0 to sl.Count - 1 do begin
+              Line := sl[i];
+              RichEdit.Lines.Add(#09 + Line);
+            end;
+            RichEdit.Lines.Add('');
+          end;
         end;
       end;
 
