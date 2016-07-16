@@ -315,8 +315,8 @@
 				<Form>fmOpenFileConfig</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\source\Utils\GX_OtaUtils.pas"/>
-			<DCCReference Include="..\..\source\Experts\GX_PeInfo.pas"/>
-			<DCCReference Include="..\..\source\Experts\GX_PeInformation.pas">
+			<DCCReference Include="..\..\source\PeInfo\GX_PeInfo.pas"/>
+			<DCCReference Include="..\..\source\PeInfo\GX_PeInformation.pas">
 				<Form>fmPeInformation</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\source\Experts\GX_PerfectLayout.pas">

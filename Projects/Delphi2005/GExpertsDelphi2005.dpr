@@ -121,8 +121,8 @@ uses
   GX_OpenFile in '..\..\source\OpenFile\GX_OpenFile.pas' {fmOpenFile},
   GX_OpenFileConfig in '..\..\source\OpenFile\GX_OpenFileConfig.pas' {fmOpenFileConfig},
   GX_OtaUtils in '..\..\source\Utils\GX_OtaUtils.pas',
-  GX_PeInfo in '..\..\source\Experts\GX_PeInfo.pas',
-  GX_PeInformation in '..\..\source\Experts\GX_PeInformation.pas' {fmPeInformation},
+  GX_PeInfo in '..\..\source\PeInfo\GX_PeInfo.pas',
+  GX_PeInformation in '..\..\source\PeInfo\GX_PeInformation.pas' {fmPeInformation},
   GX_PerfectLayout in '..\..\source\Experts\GX_PerfectLayout.pas' {fmPerfectLayout},
   GX_ProcedureList in '..\..\source\ProcedureList\GX_ProcedureList.pas' {fmProcedureList},
   GX_ProcedureListOptions in '..\..\source\ProcedureList\GX_ProcedureListOptions.pas' {fmProcedureListOptions},
@@ -206,7 +206,10 @@ uses
   GX_dzFileUtils in '..\..\Source\Utils\GX_dzFileUtils.pas',
   GX_dzSelectDirectoryFix in '..\..\Source\Utils\GX_dzSelectDirectoryFix.pas',
   GX_eAddToCaptitalization in '..\..\Source\Formatter\GX_eAddToCaptitalization.pas',
-  GX_VCLFixPack in '..\..\Source\Utils\GX_VCLFixPack.pas';
+  GX_VCLFixPack in '..\..\Source\Utils\GX_VCLFixPack.pas',
+  GX_dzVersionInfo in '..\..\Source\Utils\GX_dzVersionInfo.pas',
+  GX_dzOsUtils in '..\..\Source\Utils\GX_dzOsUtils.pas',
+  GX_dzPackageInfo in '..\..\Source\Utils\GX_dzPackageInfo.pas';
 
 begin
 end.

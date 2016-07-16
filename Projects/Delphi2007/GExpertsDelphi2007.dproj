@@ -250,10 +250,6 @@
     <DCCReference Include="..\..\source\Experts\GX_IdeShortCuts.pas">
       <Form>fmIdeShortCuts</Form>
     </DCCReference>
-    <DCCReference Include="..\..\source\Experts\GX_PeInfo.pas" />
-    <DCCReference Include="..\..\source\Experts\GX_PeInformation.pas">
-      <Form>fmPeInformation</Form>
-    </DCCReference>
     <DCCReference Include="..\..\source\Experts\GX_PerfectLayout.pas">
       <Form>fmPerfectLayout</Form>
     </DCCReference>
@@ -299,6 +295,7 @@
     </DCCReference>
     <DCCReference Include="..\..\source\formatter\GX_CodeFormatterExpert.pas" />
     <DCCReference Include="..\..\source\formatter\GX_CodeFormatterGXConfigWrapper.pas" />
+    <DCCReference Include="..\..\Source\Formatter\GX_eAddToCaptitalization.pas" />
     <DCCReference Include="..\..\source\formatter\GX_eCodeFormatter.pas" />
     <DCCReference Include="..\..\source\formatter\GX_Formatter.pas" />
     <DCCReference Include="..\..\source\Framework\GX_About.pas">
@@ -432,6 +429,10 @@
     <DCCReference Include="..\..\source\OpenFile\GX_OpenFileConfig.pas">
       <Form>fmOpenFileConfig</Form>
     </DCCReference>
+    <DCCReference Include="..\..\source\PeInfo\GX_PeInfo.pas" />
+    <DCCReference Include="..\..\source\PeInfo\GX_PeInformation.pas">
+      <Form>fmPeInformation</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\ProcedureList\GX_ProcedureList.pas">
       <Form>fmProcedureList</Form>
     </DCCReference>
@@ -505,15 +506,19 @@
     <DCCReference Include="..\..\source\Utils\GX_BookmarkList.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzClassUtils.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzOsUtils.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzPackageInfo.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzQuicksort.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzSelectDirectoryFix.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzVclUtils.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzVersionInfo.pas" />
     <DCCReference Include="..\..\source\Utils\GX_GenericClasses.pas" />
     <DCCReference Include="..\..\source\Utils\GX_GenericUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_GxUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_IdeUtils.pas" />
     <DCCReference Include="..\..\source\Utils\GX_NTAEditServiceNotifier.pas" />
     <DCCReference Include="..\..\source\Utils\GX_OtaUtils.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_VCLFixPack.pas" />
     <DCCReference Include="..\..\source\Utils\GX_XmlUtils.pas" />
   </ItemGroup>
 </Project>
