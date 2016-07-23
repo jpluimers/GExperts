@@ -13,6 +13,7 @@ type
     function GetHelpString: string; override;
     procedure Execute(Sender: TObject); override;
     function GetDisplayName: string; override;
+    function HasConfigOptions: Boolean; override;
   end;
 
 implementation
@@ -34,9 +35,14 @@ end;
 function TAddToCapitalizationExpert.GetHelpString: string;
 resourcestring
   SAddToCapitalizationHelp = '  This expert adds the current word to the capitalization list '
-    + 'of the code formatter.';
+    + 'of the code formatter. It will overwrite existing entries.';
 begin
   Result := SAddToCapitalizationHelp;
+end;
+
+function TAddToCapitalizationExpert.HasConfigOptions: Boolean;
+begin
+  Result := False;
 end;
 
 procedure TAddToCapitalizationExpert.Execute(Sender: TObject);
@@ -45,9 +51,9 @@ var
   Position: TOTAEditPos;
 begin
   if not assigned(gblCodeFormatter) then
-    exit;
+    Exit;
   if not GxOtaGetCurrentIdentData(Identifier, Position) then
-    exit;
+    Exit;
   gblCodeFormatter.AddToCapitalization(Identifier);
 end;
 

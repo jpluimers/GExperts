@@ -37,7 +37,7 @@ implementation
 
 uses
   IniFiles,
-  ToolsApi,
+  ToolsAPI,
   GX_OtaUtils,
   GX_DbugIntf,
   GX_CodeFormatterGXConfigWrapper,
@@ -59,8 +59,14 @@ end;
 { TCodeFormatterExpert }
 
 procedure TCodeFormatterExpert.AddToCapitalization(const _Identifier: TGXUnicodeString);
+var
+  Idx: Integer;
+  sl: TStringList;
 begin
-  FEngine.Settings.CapNames.Add(_Identifier);
+  sl := FEngine.Settings.CapNames;
+  if sl.Find(_Identifier, Idx) then
+    sl.Delete(Idx);
+  sl.Add(_Identifier);
 end;
 
 procedure TCodeFormatterExpert.Configure;
@@ -174,7 +180,7 @@ var
 begin
   for i := Low(TOneToThree) to High(TOneToThree) do
     if GetSettingNameFor(FEngine.Settings.ConfigPrecedence[i], Result) then
-      exit;
+      Exit;
   Result := '';
 end;
 
@@ -234,7 +240,7 @@ begin
     if not GxOtaGetActiveEditorTextAsUnicodeString(FullTextStr, False) then
       raise ECodeFormatter.CreateFmt(str_UnableToGetContentsS, [FileName]);
     if FullTextStr = '' then
-      exit;
+      Exit;
     FullText.Text := FullTextStr;
 
     Breakpoints := nil;

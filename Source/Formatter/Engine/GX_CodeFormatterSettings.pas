@@ -187,6 +187,7 @@ begin
   FCapNames := TStringList.Create;
   FCapNames.Sorted := True;
   FCapNames.CaseSensitive := False;
+  FCapNames.Duplicates:= dupIgnore;
 
   FShowDoneDialog := True;
   FSettings := BorlandDefaults;
