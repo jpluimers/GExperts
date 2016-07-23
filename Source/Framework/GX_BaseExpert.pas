@@ -51,7 +51,7 @@ type
     // you will have to .Assign the bitmap to get a permanent copy.
     function GetBitmap: Graphics.TBitmap; virtual;
     // Name to be displayed for the expert in the GExperts
-    // *configuration* dialog; this mithgt be different from
+    // *configuration* dialog; this might be different from
     // the action caption (GetActionCaption) but is the default
     // for that as well.
     function GetDisplayName: string; virtual;
