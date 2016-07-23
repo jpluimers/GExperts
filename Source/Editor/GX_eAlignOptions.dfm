@@ -11,11 +11,9 @@ object fmAlignOptions: TfmAlignOptions
   Font.Height = -12
   Font.Name = 'Tahoma'
   Font.Style = []
-  KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
-  OnKeyPress = FormKeyPress
   DesignSize = (
     245
     353)
@@ -41,6 +39,7 @@ object fmAlignOptions: TfmAlignOptions
       ScrollBars = ssVertical
       TabOrder = 0
       WordWrap = False
+      OnKeyDown = mmoTokensKeyDown
     end
   end
   object btnOK: TButton
