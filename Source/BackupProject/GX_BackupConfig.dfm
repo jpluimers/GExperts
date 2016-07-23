@@ -174,7 +174,7 @@ object fmBackupConfig: TfmBackupConfig
         Top = 24
         Width = 313
         Height = 17
-        Caption = 'Ingore backup files (*.~*)'
+        Caption = 'Ignore backup files (*.~*)'
         TabOrder = 0
       end
     end
