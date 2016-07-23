@@ -107,6 +107,7 @@ type
     function GetActionCaption: string; override;
     function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
+    function GetHelpString: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
   end;
@@ -308,6 +309,16 @@ end;
 function TGrepDlgExpert.GetDefaultShortCut: TShortCut;
 begin
   Result := Menus.ShortCut(Word('S'), [ssAlt, ssShift]);
+end;
+
+function TGrepDlgExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  Grep regular expressions allow you to formulate complex searches'#13#10
+  + '  that are not possible using a basic text search.'#13#10
+  + '  GExperts implements a subset of the Perl regular expression syntax.';
+begin
+  Result := SHelpString;
 end;
 
 class function TGrepDlgExpert.GetName: string;

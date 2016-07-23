@@ -87,6 +87,8 @@ type
     function GetActionCaption: string; override;
     class function ConfigurationKey: string; override;
     class function GetName: string; override;
+    function GetHelpString: string; override;
+
     function  GrepConfigPath: String;
     function  GrepHistorySettingsFileName: String;
 
@@ -787,6 +789,15 @@ begin
     Result := FGrepSaveHistoryListItems in [1..2]
   else
     Result := FGrepSaveHistoryListItems = AIndex;
+end;
+
+function TGrepExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  The Grep Results window is where the results of a Grep Search are shown.'#13#10 +
+  '  It also provides an interface for multi-file search and replace on matches.';
+begin
+  Result := SHelpString;
 end;
 
 procedure TGrepExpert.SetSearchList(New: TStrings);
