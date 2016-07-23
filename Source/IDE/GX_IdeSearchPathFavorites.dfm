@@ -54,7 +54,7 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Width = 75
     Height = 25
     Anchors = [akTop, akRight]
-    Caption = 'Add ...'
+    Caption = '&Add ...'
     TabOrder = 1
     OnClick = b_AddClick
   end
@@ -64,7 +64,7 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Width = 75
     Height = 25
     Anchors = [akTop, akRight]
-    Caption = 'Edit ...'
+    Caption = '&Edit ...'
     Default = True
     TabOrder = 2
     OnClick = b_EditClick
@@ -75,7 +75,7 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
     Width = 75
     Height = 25
     Anchors = [akTop, akRight]
-    Caption = 'Delete'
+    Caption = '&Delete'
     TabOrder = 3
     OnClick = b_DeleteClick
   end
