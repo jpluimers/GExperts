@@ -345,9 +345,6 @@
         <DCCReference Include="..\..\source\PeInfo\GX_PeInformation.pas">
             <Form>fmPeInformation</Form>
         </DCCReference>
-        <DCCReference Include="..\..\source\Experts\GX_PerfectLayout.pas">
-            <Form>fmPerfectLayout</Form>
-        </DCCReference>
         <DCCReference Include="..\..\source\ProcedureList\GX_ProcedureList.pas">
             <Form>fmProcedureList</Form>
         </DCCReference>

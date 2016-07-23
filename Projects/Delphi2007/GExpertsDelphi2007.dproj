@@ -250,9 +250,6 @@
     <DCCReference Include="..\..\source\Experts\GX_IdeShortCuts.pas">
       <Form>fmIdeShortCuts</Form>
     </DCCReference>
-    <DCCReference Include="..\..\source\Experts\GX_PerfectLayout.pas">
-      <Form>fmPerfectLayout</Form>
-    </DCCReference>
     <DCCReference Include="..\..\source\Experts\GX_SetFocusControl.pas" />
     <DCCReference Include="..\..\source\Experts\GX_TabOrder.pas">
       <Form>fmTabOrder</Form>
@@ -393,6 +390,12 @@
     </DCCReference>
     <DCCReference Include="..\..\source\IDE\GX_IdeProjectOptionsEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdeSearchPathEnhancer.pas" />
+    <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas">
+      <Form>f_IdeSearchPathFavoriteEdit</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavorites.pas">
+      <Form>f_SarchPathFavorites</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\IDE\GX_IdeToolPropertiesEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_MultilineHost.pas" />
     <DCCReference Include="..\..\source\IDE\GX_MultiLinePalette.pas" />
@@ -430,6 +433,9 @@
       <Form>fmOpenFileConfig</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\PeInfo\GX_PeInfo.pas" />
+    <DCCReference Include="..\..\Source\PeInfo\GX_PeInfoPrint.pas">
+      <Form>f_PeInfoPrint</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\PeInfo\GX_PeInformation.pas">
       <Form>fmPeInformation</Form>
     </DCCReference>
