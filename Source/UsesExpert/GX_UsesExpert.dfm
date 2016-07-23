@@ -397,6 +397,8 @@ object fmUsesManager: TfmUsesManager
             Width = 75
             Height = 25
             Action = actUsesDelete
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
           end
           object btnIntfMoveToImpl: TButton
