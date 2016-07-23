@@ -102,6 +102,7 @@ type
     procedure LoadSettings;
     procedure SaveSettings;
     function ConfigurationKey: string;
+    procedure PageControlChange(_Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -417,17 +418,18 @@ begin
       FPageControl.Anchors := [akLeft, akTop, akRight, akBottom];
       FPageControl.TabPosition := tpBottom;
       FPageControl.ActivePage := FTabSheetList;
+      FPageControl.OnChange := PageControlChange;
       FPageControl.OnChanging := PageControlChanging;
 
       FTabSheetList.Name := 'ts_List';
       FTabSheetList.Parent := FPageControl;
       FTabSheetList.PageControl := FPageControl;
-      FTabSheetList.Caption := 'List';
+      FTabSheetList.Caption := '&List';
 
       FTabSheetMemo.Name := 'ts_Memo';
       FTabSheetMemo.Parent := FPageControl;
       FTabSheetMemo.PageControl := FPageControl;
-      FTabSheetMemo.Caption := 'Memo';
+      FTabSheetMemo.Caption := '&Memo';
 
       FMemo := TMemo.Create(_Form);
       FMemo.Parent := FTabSheetMemo;
@@ -448,9 +450,10 @@ begin
         FFavoritesBtn.Width := FUpBtn.Width;
         FFavoritesBtn.Height := FUpBtn.Height;
         FFavoritesBtn.Anchors := [akRight, akTop];
-        FFavoritesBtn.Caption := 'Fav';
+        FFavoritesBtn.Caption := '&Fav';
         FFavoritesBtn.OnClick := FavoritesBtnClick;
         FFavoritesBtn.TabOrder := FPageControl.TabOrder + 1;
+        FFavoritesBtn.Visible := False;
         FFavoritesPm := TPopupMenu.Create(_Form);
         InitFavoritesMenu;
       end;
@@ -631,6 +634,19 @@ begin
 end;
 
 procedure TSearchPathEnhancer.PageControlChanging(_Sender: TObject; var AllowChange: Boolean);
+var
+  SwitchingToMemo: Boolean;
+begin
+  SwitchingToMemo := (FPageControl.ActivePage = FTabSheetList);
+  if SwitchingToMemo then begin
+    FMemo.Lines.Text := FListbox.Items.Text;
+    FMemo.CaretPos := Point(FMemo.CaretPos.X, FListbox.ItemIndex);
+  end else begin
+    FListbox.ItemIndex := FMemo.CaretPos.Y;
+  end;
+end;
+
+procedure TSearchPathEnhancer.PageControlChange(_Sender: TObject);
 
   procedure TrySetButtonVisibility(_Btn: TCustomButton; _Visible: Boolean);
   begin
@@ -639,23 +655,17 @@ procedure TSearchPathEnhancer.PageControlChanging(_Sender: TObject; var AllowCha
   end;
 
 var
-  SwitchingToMemo: Boolean;
+  SwitchedToMemo: Boolean;
 begin
-  SwitchingToMemo := FPageControl.ActivePage = FTabSheetList;
-  if SwitchingToMemo then begin
-    FMemo.Lines.Text := FListbox.Items.Text;
-    FMemo.CaretPos := Point(FMemo.CaretPos.X, FListbox.ItemIndex);
-    FFavoritesBtn.Enabled := True;
-  end else begin
-    FListbox.ItemIndex := FMemo.CaretPos.Y;
-    FFavoritesBtn.Enabled := False;
-  end;
-  TrySetButtonVisibility(FDeleteBtn, not SwitchingToMemo);
-  TrySetButtonVisibility(FMakeAbsoluteBtn, SwitchingToMemo);
-  TrySetButtonVisibility(FDeleteInvalidBtn, not SwitchingToMemo);
-  TrySetButtonVisibility(FAddRecursiveBtn, SwitchingToMemo);
-  TrySetButtonVisibility(FReplaceBtn, not SwitchingToMemo);
-  TrySetButtonVisibility(FMakeRelativeBtn, SwitchingToMemo);
+  SwitchedToMemo := (FPageControl.ActivePage = FTabSheetMemo);
+
+  TrySetButtonVisibility(FFavoritesBtn, SwitchedToMemo);
+  TrySetButtonVisibility(FDeleteBtn, not SwitchedToMemo);
+  TrySetButtonVisibility(FMakeAbsoluteBtn, SwitchedToMemo);
+  TrySetButtonVisibility(FDeleteInvalidBtn, not SwitchedToMemo);
+  TrySetButtonVisibility(FAddRecursiveBtn, SwitchedToMemo);
+  TrySetButtonVisibility(FReplaceBtn, not SwitchedToMemo);
+  TrySetButtonVisibility(FMakeRelativeBtn, SwitchedToMemo);
 end;
 
 procedure TSearchPathEnhancer.SetEnabled(const Value: Boolean);
