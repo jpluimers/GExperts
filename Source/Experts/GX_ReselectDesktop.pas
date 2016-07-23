@@ -57,7 +57,7 @@ resourcestring
   SReselectDesktopHelpString =
     '  This expert does the same as selecting the currently active desktop again'#13#10
     + '  so it saves one mouse click or several key strokes.'#13#10
-    + '  It is meant to be put onto the Desktop toolbar.';
+    + '  It is meant to be put as an icon onto the Desktop toolbar.';
 begin
   Result := SReselectDesktopHelpString;
 end;
