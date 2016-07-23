@@ -76,7 +76,7 @@ begin
     Variables.Add('DATE');
     Variables.Add('YEAR');
     Variables.Add('MONTH');
-    Variables.Add('%MONTHSHORTNAME');
+    Variables.Add('MONTHSHORTNAME');
     Variables.Add('MONTHLONGNAME');
     Variables.Add('DAY');
     Variables.Add('DAYSHORTNAME');
