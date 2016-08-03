@@ -607,6 +607,7 @@ function TAutoTypeWriterNotifier.SetupProofing(const SourceEditor: IOTASourceEdi
 var
   SyntaxHighlighter: TGXSyntaxHighlighter;
   Element: Integer;
+  Element2: Integer;
   LineFlag: Integer;
   EditView: IOTAEditView;
   CursorPos: TOTAEditPos;
@@ -639,12 +640,22 @@ begin
 
   EditView.GetAttributeAtPos(CursorPos, False, Element, LineFlag);
 
+  // Get the element type of one char to the left:
+  Dec(CursorPos.Col);
+  EditView.GetAttributeAtPos(CursorPos, False, Element2, LineFlag);
+
   if Element = atWhiteSpace then
   begin
     if GxOtaIsWhiteSpaceInComment(EditView, EditorPositionInformation.CursorPos) then
       Element := atComment
     else if GxOtaIsWhiteSpaceInString(EditView, EditorPositionInformation.CursorPos) then
       Element := atString;
+  end;
+
+  // Don't mess with compiler directives or comments:
+  if (Element = atWhiteSpace) and (Element2 in [atComment, atPreproc]) then
+  begin
+    Exit;
   end;
 
   SyntaxHighlighter := GxOtaGetCurrentSyntaxHighlighter(SourceEditor);
