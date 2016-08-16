@@ -48,6 +48,7 @@ type
 
   TNextIdentExpert = class(TPrevIdentExpert)
   protected
+    class function ConfigurationKey: string; override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -259,7 +260,7 @@ end;
 
 class function TPrevIdentExpert.ConfigurationKey: string;
 begin
-  Result := 'PrevNextIdentifier';
+  Result := 'PrevIdentifier';
 end;
 
 procedure TPrevIdentExpert.InternalLoadSettings(Settings: TExpertSettings);
@@ -277,6 +278,11 @@ begin
 end;
 
 { TNextIdentExpert }
+
+class function TNextIdentExpert.ConfigurationKey: string;
+begin
+  Result := 'NextIdentifier';
+end;
 
 constructor TNextIdentExpert.Create;
 begin
