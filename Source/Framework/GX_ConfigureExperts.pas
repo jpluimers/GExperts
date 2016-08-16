@@ -234,7 +234,7 @@ begin
       AControl := sbxExperts.Components[i] as TControl;
       if AControl is TPanel then begin
         AnExpert := FExperts[AControl.Tag];
-        GetHotkeyCtrl(AControl as TPanel).HotKey := AnExpert.GetDefaultShortCut;
+        THotkey_SetHotkey(GetHotkeyCtrl(AControl as TPanel), AnExpert.GetDefaultShortCut);
       end;
     end;
 end;
@@ -256,7 +256,7 @@ var
 begin
   Idx := (_Sender as TButton).Tag;
   AnExpert := FExperts[Idx];
-  GetHotkeyCtrl(GetPanel(sbxExperts, Idx)).HotKey := AnExpert.GetDefaultShortCut;
+  THotkey_SetHotkey(GetHotkeyCtrl(GetPanel(sbxExperts, Idx)), AnExpert.GetDefaultShortCut);
 end;
 
 procedure TfrConfigureExperts.Init(_Experts: TList);
