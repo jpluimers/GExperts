@@ -149,6 +149,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Top = 284
     Width = 281
     Height = 17
+    Anchors = [akLeft, akBottom]
     Caption = 'Focus editor window if not focused'
     TabOrder = 5
   end
