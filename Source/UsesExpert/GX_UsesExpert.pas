@@ -1294,16 +1294,17 @@ type
 
 function TShowUnaliasMessage.GetMessage: string;
 resourcestring
-  SConfirmRemoveDots =
+  SConfirmUnalias =
     'This will replace aliases with the actual unit ' + sLineBreak
     + 'in both uses clauses.' + sLineBreak
     + sLineBreak
     + 'Example:' + sLineBreak
-    + '"dbiTypes" will be replaced by "BDE" (if default aliases are in effect).' + sLineBreak
+    + '"dbiTypes" will be replaced by "BDE" '  + sLineBreak
+    + '(if default aliases are in effect).' + sLineBreak
     + sLineBreak
     + 'Do you want to proceed?';
 begin
-  Result := SConfirmRemoveDots;
+  Result := SConfirmUnalias;
 end;
 
 procedure TfmUsesManager.actUsesUnAliasExecute(Sender: TObject);
