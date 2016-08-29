@@ -1318,8 +1318,8 @@ procedure TfmUsesManager.actUsesUnAliasExecute(Sender: TObject);
       s := AStrings[i];
       p := Pos(ALIAS_PREFIX, s);
       if p > 0 then begin
-        s := Copy(s, p + Length(ALIAS_PREFIX));
-        s := Copy(s, 1, Length(s) - 1);
+        p := p + Length(ALIAS_PREFIX);
+        s := Copy(s, p, Length(s) - p);
         AStrings[i] := s;
       end;
     end;
