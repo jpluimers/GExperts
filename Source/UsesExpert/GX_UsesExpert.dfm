@@ -591,6 +591,9 @@ object fmUsesManager: TfmUsesManager
     object mitUsesMoveToImplementation: TMenuItem
       Action = actIntfMoveToImpl
     end
+    object miUsesUnalias: TMenuItem
+      Action = actUsesUnAlias
+    end
     object mitIntfSep1: TMenuItem
       Caption = '-'
     end
@@ -639,6 +642,7 @@ object fmUsesManager: TfmUsesManager
     Left = 42
     Top = 56
     object actUsesDelete: TAction
+      Category = 'Uses'
       Caption = '&Delete'
       Hint = 'Delete unit from uses list (Double Click)'
       ImageIndex = 42
@@ -646,35 +650,41 @@ object fmUsesManager: TfmUsesManager
       OnExecute = acUsesDeleteExecute
     end
     object actIntfMoveToImpl: TAction
+      Category = 'Uses'
       Caption = 'Move to &Implementation'
       ImageIndex = 36
       ShortCut = 16464
       OnExecute = actIntfMoveToImplExecute
     end
     object actImplMoveToIntf: TAction
+      Category = 'Uses'
       Caption = 'Move to In&terface'
       ImageIndex = 36
       ShortCut = 16468
       OnExecute = actImplMoveToIntfExecute
     end
     object actFavDelete: TAction
+      Category = 'Fav'
       Caption = 'D&elete from Favorites'
       ImageIndex = 42
       ShortCut = 46
       OnExecute = actFavDeleteExecute
     end
     object actFavAdd: TAction
+      Category = 'Fav'
       Caption = '&Add to Favorites...'
       ImageIndex = 41
       ShortCut = 45
       OnExecute = actFavAddExecute
     end
     object actAvailAddToIntf: TAction
+      Category = 'Avail'
       Caption = 'Add to Interfa&ce'
       ShortCut = 16468
       OnExecute = actAvailAddToIntfExecute
     end
     object actAvailAddToImpl: TAction
+      Category = 'Avail'
       Caption = 'Add to Imp&lementation'
       ShortCut = 16464
       OnExecute = actAvailAddToImplExecute
@@ -687,8 +697,14 @@ object fmUsesManager: TfmUsesManager
       OnExecute = actOpenUnitExecute
     end
     object actUsesAddToFavorites: TAction
+      Category = 'Uses'
       Caption = 'Add to Favorites'
       OnExecute = actUsesAddToFavoritesExecute
+    end
+    object actUsesUnAlias: TAction
+      Category = 'Uses'
+      Caption = 'Unalias ...'
+      OnExecute = actUsesUnAliasExecute
     end
   end
 end

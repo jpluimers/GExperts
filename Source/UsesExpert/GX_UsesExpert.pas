@@ -124,6 +124,8 @@ type
     pnlUsesBottom: TPanel;
     btnAddDots: TButton;
     btnRemoveDots: TButton;
+    actUsesUnAlias: TAction;
+    miUsesUnalias: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -153,6 +155,7 @@ type
     procedure pmuAvailPopup(Sender: TObject);
     procedure btnRemoveDotsClick(Sender: TObject);
     procedure btnAddDotsClick(Sender: TObject);
+    procedure actUsesUnAliasExecute(Sender: TObject);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -165,6 +168,7 @@ type
     procedure OpenUnit(const UnitName: string);
     procedure ReadUsesList;
     function ApplyAlias(const UnitName: string): string;
+    procedure UnAlias(AStrings: TStrings);
     procedure AddListToIntfSection(ListBox: TObject);
     procedure AddListToImplSection(ListBox: TObject; RemoveFromInterface: Boolean);
     procedure AddListToFavorites(ListBox: TListBox);
@@ -346,6 +350,7 @@ begin
     Form.chkSingleActionMode.Checked := FSingleActionMode;
     if (FAvailTabIndex >= 0) and (FAvailTabIndex < Form.pcUnits.PageCount) then
       Form.pcUnits.ActivePageIndex := FAvailTabIndex;
+
     if Form.ShowModal = mrOk then
     begin
       FFavoriteUnits.Assign(Form.FFavoriteUnits);
@@ -553,6 +558,9 @@ begin
   DeleteStringFromList(lbxImplementation.Items, UnitName);
 end;
 
+const
+  ALIAS_PREFIX = ' (-> ';
+
 function TfmUsesManager.ApplyAlias(const UnitName: string): string;
 var
   i: Integer;
@@ -560,13 +568,36 @@ begin
   Result := UnitName;
   i := FAliases.IndexOfName(Result);
   if i <> -1 then
-    Result := FAliases.Values[Result];
+    Result := UnitName + ALIAS_PREFIX + FAliases.Values[Result] + ')';
+end;
+
+procedure TfmUsesManager.UnAlias(AStrings: TStrings);
+var
+  i: Integer;
+  s: string;
+  p: Integer;
+begin
+  for i := AStrings.Count - 1 downto 0 do begin
+    s := AStrings[i];
+    p := Pos(' ', s);
+    if p > 0 then begin
+      s := Copy(s, 1, p - 1);
+      AStrings[i] := s;
+    end;
+  end;
 end;
 
 procedure TfmUsesManager.ReadUsesList;
 var
   i: Integer;
   UsesManager: TUsesManager;
+  Ident: string;
+  IdentOffset: Integer;
+  StartPos: TOTAEditPos;
+  CurrentPos: TOTAEditPos;
+  AfterLen: Integer;
+  Idx: Integer;
+  lbx: TListBox;
 begin
   lbxInterface.Clear;
   lbxImplementation.Clear;
@@ -576,10 +607,38 @@ begin
       lbxInterface.Items.Add(ApplyAlias(UsesManager.InterfaceUses.Items[i].Name));
     for i := 0 to UsesManager.ImplementationUses.Count - 1 do
       lbxImplementation.Items.Add(ApplyAlias(UsesManager.ImplementationUses.Items[i].Name));
-    if not UsesManager.IsPositionBeforeImplementation(GxOtaGetCurrentEditBufferPos) then
-      pcUses.ActivePage := tabImplementation
-    else
-      pcUses.ActivePage := tabInterface;
+
+    GxOtaGetCurrentIdentEx(Ident, IdentOffset, StartPos, CurrentPos, AfterLen);
+    if Ident = '' then begin
+      if not UsesManager.IsPositionBeforeImplementation(GxOtaGetCurrentEditBufferPos) then
+        pcUses.ActivePage := tabImplementation
+      else
+        pcUses.ActivePage := tabInterface;
+    end else begin
+      lbx := nil;
+      case UsesManager.isPositionInUsesList(IdentOffset) of
+        puInterface: begin
+            if UsesManager.GetUsesStatus(Ident) = usInterface then begin
+              pcUses.ActivePage := tabInterface;
+              lbx := lbxInterface;
+            end;
+          end;
+        puImplementation: begin
+            if UsesManager.GetUsesStatus(Ident) = usImplementation then begin
+              pcUses.ActivePage := tabImplementation;
+              lbx := lbxImplementation;
+            end;
+          end;
+      end;
+      if Assigned(lbx) then begin
+        Idx := lbx.Items.IndexOf(Ident);
+        if Idx <> -1 then begin
+          TWinControl_SetFocus(lbx);
+          lbx.Selected[Idx] := True;
+          lbx.ItemIndex := Idx;
+        end;
+      end;
+    end;
   finally
     FreeAndNil(UsesManager);
   end;
@@ -1163,6 +1222,9 @@ var
 begin
   FFavoriteUnits.Assign(lbxFavorite.Items);
 
+  UnAlias(lbxInterface.Items);
+  UnAlias(lbxImplementation.Items);
+
   Units := TStringList.Create;
   try
     GetInterfaceUnits(Units);
@@ -1220,6 +1282,55 @@ end;
 procedure TfmUsesManager.actUsesAddToFavoritesExecute(Sender: TObject);
 begin
   AddListToFavorites(GetUsesSourceListBox);
+end;
+
+type
+  TShowUnaliasMessage = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+{ TShowUnaliasMessage }
+
+function TShowUnaliasMessage.GetMessage: string;
+resourcestring
+  SConfirmRemoveDots =
+    'This will replace aliases with the actual unit ' + sLineBreak
+    + 'in both uses clauses.' + sLineBreak
+    + sLineBreak
+    + 'Example:' + sLineBreak
+    + '"dbiTypes" will be replaced by "BDE" (if default aliases are in effect).' + sLineBreak
+    + sLineBreak
+    + 'Do you want to proceed?';
+begin
+  Result := SConfirmRemoveDots;
+end;
+
+procedure TfmUsesManager.actUsesUnAliasExecute(Sender: TObject);
+
+  procedure ReplaceByAlias(AStrings: TStrings);
+  var
+    i: Integer;
+    s: string;
+    p: Integer;
+  begin
+    for i := AStrings.Count - 1 downto 0 do begin
+      s := AStrings[i];
+      p := Pos(ALIAS_PREFIX, s);
+      if p > 0 then begin
+        s := Copy(s, p + Length(ALIAS_PREFIX));
+        s := Copy(s, 1, Length(s) - 1);
+        AStrings[i] := s;
+      end;
+    end;
+  end;
+
+begin
+  if ShowGxMessageBox(TShowUnaliasMessage) <> mrYes then
+    Exit;
+
+  ReplaceByAlias(lbxInterface.Items);
+  ReplaceByAlias(lbxImplementation.Items);
 end;
 
 procedure TfmUsesManager.AddListToFavorites(ListBox: TListBox);

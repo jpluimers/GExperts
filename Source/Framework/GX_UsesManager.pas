@@ -30,6 +30,7 @@ type
   end;
 
   TUsesStatus = (usNonExisting, usInterface, usImplementation, usInsideUnit);
+  TPosInUsesList = (puInterface, puImplementation, puNo);
 
   TUsesManager = class(TObject)
   private
@@ -57,6 +58,7 @@ type
     function AddToIntSection(const AUnitName: string): Boolean;
     function InternalAddToUsesSection(const AUnitName: string; ToInterface: Boolean): Boolean;
     function IsPositionBeforeImplementation(Pos: Integer): Boolean;
+    function IsPositionInUsesList(Pos: integer): TPosInUsesList;
     procedure AddUnits(AUnits: TStrings; AToImplementation: Boolean = True);
     procedure InternalRemoveFromUses(InInterface: Boolean; const AUnitName: string);
     procedure RemoveFromImplUses(const AUnitName: string);
@@ -567,6 +569,16 @@ end;
 function TUsesManager.IsPositionBeforeImplementation(Pos: Integer): Boolean;
 begin
   Result := FImplPosition > Pos;
+end;
+
+function TUsesManager.IsPositionInUsesList(Pos: Integer): TPosInUsesList;
+begin
+  if (FBegOfIntfUses + Length('uses') < Pos) and (Pos < FEndOfIntfUses) then
+    Result := puInterface
+  else if (FBegOfImplUses + Length('uses') < Pos) and (Pos < FEndOfImplUses) then
+    Result := puImplementation
+  else
+    Result := puNo;
 end;
 
 end.
