@@ -106,7 +106,7 @@ function GxOtaGetEditorLineAsString(View: IOTAEditView; LineNo: Integer): TGXUni
 // - CurrentPos is the current cursor position (line/col)
 // - AfterLen is the length of the part of the identifier that is after cursor
 procedure GxOtaGetCurrentIdentEx(var Ident: string; var IdentOffset: Integer;
-  var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer; ByteBased: Boolean = False); overload;
+  var StartPos: TOTAEditPos; var CurrentPos: TOTAEditPos; var AfterLen: Integer; ByteBased: Boolean = False);
 // Get the identifier and starting position only.  Return True on success.
 function GxOtaGetCurrentIdentData(var Ident: string; var StartEditPos: TOTAEditPos): Boolean;
 
