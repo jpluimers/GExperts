@@ -62,7 +62,7 @@ begin
       'GExperts is a free set of tools built to increase the productivity of Delphi and C++Builder'
       + ' programmers by adding several features to the IDE.'
       + ' GExperts is developed as Open Source software and we encourage user contributions to the project.'#13#10
-      + '(c) 2015 by Thomas Mueller'#13#10
+      + '(c) Erik Berry and the GExperts Team'#13#10
       + 'http://blog.dummzeuch.de',
       GetAboutIcon,
       False,
