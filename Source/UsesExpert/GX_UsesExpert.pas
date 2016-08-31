@@ -159,6 +159,7 @@ type
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
+    FCurrentIdentIdx: Integer;
     procedure GetCommonFiles;
     procedure GetProjectFiles;
     procedure AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean);
@@ -439,8 +440,8 @@ begin
   FFindThread.OnFindComplete := SearchPathReady;
   FFindThread.StartFind;
 
-  pcUnits.ActivePageIndex := 0;
-  pcUses.ActivePageIndex := 0;
+  pcUnits.ActivePage := tabSearchPath;
+  pcUses.ActivePage := tabInterface;
   GxOtaGetUnitAliases(FAliases);
   GetCommonFiles;
   GetProjectFiles;
@@ -453,8 +454,10 @@ end;
 
 procedure TfmUsesManager.FormDestroy(Sender: TObject);
 begin
-  FFindThread.OnFindComplete := nil;
-  FFindThread.Terminate;
+  if Assigned(FFindThread) then begin
+    FFindThread.OnFindComplete := nil;
+    FFindThread.Terminate;
+  end;
   FreeAndNil(FAliases);
   FreeAndNil(FFindThread);
   FreeAndNil(FProjectUnits);
@@ -484,7 +487,6 @@ begin
     AddToImplSection(ChangeFileExt(ExtractFileName(s), ''), True);
   end;
 end;
-
 
 procedure TfmUsesManager.lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
 var
@@ -596,11 +598,12 @@ var
   StartPos: TOTAEditPos;
   CurrentPos: TOTAEditPos;
   AfterLen: Integer;
-  Idx: Integer;
   lbx: TListBox;
+  tab: TTabSheet;
 begin
   lbxInterface.Clear;
   lbxImplementation.Clear;
+
   UsesManager := TUsesManager.Create(GxOtaGetCurrentSourceEditor);
   try
     for i := 0 to UsesManager.InterfaceUses.Count - 1 do
@@ -608,36 +611,31 @@ begin
     for i := 0 to UsesManager.ImplementationUses.Count - 1 do
       lbxImplementation.Items.Add(ApplyAlias(UsesManager.ImplementationUses.Items[i].Name));
 
+    if not UsesManager.IsPositionBeforeImplementation(GxOtaGetCurrentEditBufferPos) then
+      tab := tabImplementation
+    else
+      tab := tabInterface;
+
     GxOtaGetCurrentIdentEx(Ident, IdentOffset, StartPos, CurrentPos, AfterLen);
-    if Ident = '' then begin
-      if not UsesManager.IsPositionBeforeImplementation(GxOtaGetCurrentEditBufferPos) then
-        pcUses.ActivePage := tabImplementation
-      else
-        pcUses.ActivePage := tabInterface;
-    end else begin
+    if Ident <> '' then begin
       lbx := nil;
       case UsesManager.isPositionInUsesList(IdentOffset) of
         puInterface: begin
             if UsesManager.GetUsesStatus(Ident) = usInterface then begin
-              pcUses.ActivePage := tabInterface;
+              tab := tabInterface;
               lbx := lbxInterface;
             end;
           end;
         puImplementation: begin
             if UsesManager.GetUsesStatus(Ident) = usImplementation then begin
-              pcUses.ActivePage := tabImplementation;
+              tab := tabImplementation;
               lbx := lbxImplementation;
             end;
           end;
       end;
-      if Assigned(lbx) then begin
-        Idx := lbx.Items.IndexOf(Ident);
-        if Idx <> -1 then begin
-          TWinControl_SetFocus(lbx);
-          lbx.Selected[Idx] := True;
-          lbx.ItemIndex := Idx;
-        end;
-      end;
+      pcUses.ActivePage := tab;
+      if Assigned(lbx) then 
+        FCurrentIdentIdx := lbx.Items.IndexOf(Ident);
     end;
   finally
     FreeAndNil(UsesManager);
@@ -1275,8 +1273,17 @@ begin
 end;
 
 procedure TfmUsesManager.FormShow(Sender: TObject);
+var
+  lbx: TListBox;
 begin
   FilterVisibleUnits;
+  lbx := GetUsesSourceListBox;
+  if FCurrentIdentIdx <> -1 then
+    lbx.Selected[FCurrentIdentIdx] := True
+  else begin
+    lbx.ClearSelection;
+    lbx.ItemIndex := -1;
+  end;
 end;
 
 procedure TfmUsesManager.actUsesAddToFavoritesExecute(Sender: TObject);
