@@ -355,7 +355,7 @@ object fmUsesManager: TfmUsesManager
       TabIndex = 0
       TabOrder = 1
       object tabInterface: TTabSheet
-        Caption = 'I&nterface'
+        Caption = 'In&terface'
         object pnlInterface: TPanel
           Left = 0
           Top = 0
@@ -406,13 +406,13 @@ object fmUsesManager: TfmUsesManager
             Top = 4
             Width = 152
             Height = 25
-            Action = actIntfMoveToImpl
+            Action = actUsesMove
             TabOrder = 1
           end
         end
       end
       object tabImplementation: TTabSheet
-        Caption = 'I&mplementation'
+        Caption = 'Im&plementation'
         ImageIndex = 1
         object pnlImplementation: TPanel
           Left = 0
@@ -464,7 +464,7 @@ object fmUsesManager: TfmUsesManager
             Top = 4
             Width = 152
             Height = 25
-            Action = actImplMoveToIntf
+            Action = actUsesMove
             TabOrder = 1
           end
         end
@@ -552,7 +552,7 @@ object fmUsesManager: TfmUsesManager
         Cancel = True
         Caption = 'Cancel'
         ModalResult = 2
-        TabOrder = 3
+        TabOrder = 1
       end
       object btnOK: TButton
         Left = 189
@@ -581,20 +581,14 @@ object fmUsesManager: TfmUsesManager
   object pmuUses: TPopupMenu
     Left = 104
     Top = 56
-    object mitInterfaceDelete: TMenuItem
+    object mitUsesDelete: TMenuItem
       Action = actUsesDelete
       Default = True
     end
-    object mitUsesMoveToInterface: TMenuItem
-      Action = actImplMoveToIntf
+    object mitUsesMove: TMenuItem
+      Action = actUsesMove
     end
-    object mitUsesMoveToImplementation: TMenuItem
-      Action = actIntfMoveToImpl
-    end
-    object miUsesUnalias: TMenuItem
-      Action = actUsesUnAlias
-    end
-    object mitIntfSep1: TMenuItem
+    object mitUsesSep1: TMenuItem
       Caption = '-'
     end
     object mitUsesOpenUnit: TMenuItem
@@ -603,16 +597,19 @@ object fmUsesManager: TfmUsesManager
     object mitUsesAddToFavorites: TMenuItem
       Action = actUsesAddToFavorites
     end
+    object mitUsesSep2: TMenuItem
+      Caption = '-'
+    end
+    object mitUsesUnalias: TMenuItem
+      Action = actUsesUnAlias
+    end
   end
   object pmuAvail: TPopupMenu
-    OnPopup = pmuAvailPopup
     Left = 296
     Top = 80
-    object mitAvailAddToIntf: TMenuItem
-      Action = actAvailAddToIntf
-    end
-    object mitAvailAddToImpl: TMenuItem
+    object mitAvailAddToUses: TMenuItem
       Action = actAvailAddToImpl
+      Default = True
     end
     object mitAvailSep1: TMenuItem
       Caption = '-'
@@ -642,49 +639,35 @@ object fmUsesManager: TfmUsesManager
     Left = 42
     Top = 56
     object actUsesDelete: TAction
-      Category = 'Uses'
       Caption = '&Delete'
       Hint = 'Delete unit from uses list (Double Click)'
       ImageIndex = 42
       ShortCut = 46
       OnExecute = acUsesDeleteExecute
     end
-    object actIntfMoveToImpl: TAction
-      Category = 'Uses'
-      Caption = 'Move to &Implementation'
+    object actUsesMove: TAction
+      Caption = '&Move to Interface'
       ImageIndex = 36
-      ShortCut = 16464
-      OnExecute = actIntfMoveToImplExecute
-    end
-    object actImplMoveToIntf: TAction
-      Category = 'Uses'
-      Caption = 'Move to In&terface'
-      ImageIndex = 36
-      ShortCut = 16468
-      OnExecute = actImplMoveToIntfExecute
+      ShortCut = 32845
     end
     object actFavDelete: TAction
-      Category = 'Fav'
       Caption = 'D&elete from Favorites'
       ImageIndex = 42
       ShortCut = 46
       OnExecute = actFavDeleteExecute
     end
     object actFavAdd: TAction
-      Category = 'Fav'
       Caption = '&Add to Favorites...'
       ImageIndex = 41
       ShortCut = 45
       OnExecute = actFavAddExecute
     end
     object actAvailAddToIntf: TAction
-      Category = 'Avail'
       Caption = 'Add to Interfa&ce'
       ShortCut = 16468
       OnExecute = actAvailAddToIntfExecute
     end
     object actAvailAddToImpl: TAction
-      Category = 'Avail'
       Caption = 'Add to Imp&lementation'
       ShortCut = 16464
       OnExecute = actAvailAddToImplExecute
@@ -697,12 +680,10 @@ object fmUsesManager: TfmUsesManager
       OnExecute = actOpenUnitExecute
     end
     object actUsesAddToFavorites: TAction
-      Category = 'Uses'
       Caption = 'Add to Favorites'
       OnExecute = actUsesAddToFavoritesExecute
     end
     object actUsesUnAlias: TAction
-      Category = 'Uses'
       Caption = 'Unalias ...'
       OnExecute = actUsesUnAliasExecute
     end

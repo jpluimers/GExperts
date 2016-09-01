@@ -44,11 +44,10 @@ type
     pnlUnits: TPanel;
     Splitter: TSplitter;
     pmuUses: TPopupMenu;
-    mitInterfaceDelete: TMenuItem;
-    mitUsesMoveToImplementation: TMenuItem;
+    mitUsesDelete: TMenuItem;
+    mitUsesMove: TMenuItem;
     pmuAvail: TPopupMenu;
-    mitAvailAddToImpl: TMenuItem;
-    mitAvailAddToIntf: TMenuItem;
+    mitAvailAddToUses: TMenuItem;
     pnlUses: TPanel;
     pcUnits: TPageControl;
     tabProject: TTabSheet;
@@ -68,7 +67,8 @@ type
     pnlImplementation: TPanel;
     lbxImplementation: TListBox;
     mitUsesOpenUnit: TMenuItem;
-    mitIntfSep1: TMenuItem;
+    mitUsesSep1: TMenuItem;
+    mitUsesSep2: TMenuItem;
     pnlFooter: TPanel;
     pnlFavFooter: TPanel;
     btnFavoriteAddToInterface: TButton;
@@ -84,7 +84,7 @@ type
     dlgOpen: TOpenDialog;
     ActionList: TActionList;
     actUsesDelete: TAction;
-    actIntfMoveToImpl: TAction;
+    actUsesMove: TAction;
     actFavDelete: TAction;
     actFavAdd: TAction;
     actAvailAddToImpl: TAction;
@@ -95,7 +95,6 @@ type
     pnlIntfFooter: TPanel;
     btnIntfDelete: TButton;
     btnIntfMoveToImpl: TButton;
-    actImplMoveToIntf: TAction;
     actOpenUnit: TAction;
     tabSearchPath: TTabSheet;
     pnlSearchPathFooter: TPanel;
@@ -113,7 +112,6 @@ type
     mitAvailSep2: TMenuItem;
     mitAvailOpenUnit: TMenuItem;
     actUsesAddToFavorites: TAction;
-    mitUsesMoveToInterface: TMenuItem;
     mitUsesAddToFavorites: TMenuItem;
     lblUnits: TPanel;
     lblUses: TPanel;
@@ -125,7 +123,7 @@ type
     btnAddDots: TButton;
     btnRemoveDots: TButton;
     actUsesUnAlias: TAction;
-    miUsesUnalias: TMenuItem;
+    mitUsesUnalias: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -134,8 +132,6 @@ type
       State: TDragState; var Accept: Boolean);
     procedure ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
     procedure acUsesDeleteExecute(Sender: TObject);
-    procedure actIntfMoveToImplExecute(Sender: TObject);
-    procedure actImplMoveToIntfExecute(Sender: TObject);
     procedure actFavDeleteExecute(Sender: TObject);
     procedure actFavAddExecute(Sender: TObject);
     procedure actAvailAddToIntfExecute(Sender: TObject);
@@ -152,7 +148,6 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure actUsesAddToFavoritesExecute(Sender: TObject);
-    procedure pmuAvailPopup(Sender: TObject);
     procedure btnRemoveDotsClick(Sender: TObject);
     procedure btnAddDotsClick(Sender: TObject);
     procedure actUsesUnAliasExecute(Sender: TObject);
@@ -191,6 +186,8 @@ type
     procedure lbxInterfaceFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure lbxImplementationFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
+    procedure actUsesMoveToImplExecute(Sender: TObject);
+    procedure actUsesMoveToIntExecute(Sender: TObject);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -528,15 +525,6 @@ begin
   GxOtaOpenFileFromPath(FileName);
 end;
 
-procedure TfmUsesManager.pmuAvailPopup(Sender: TObject);
-begin
-  inherited;
-  if pcUses.ActivePage= tabInterface then
-    mitAvailAddToIntf.Default := True
-  else
-    mitAvailAddToImpl.Default := True;
-end;
-
 procedure TfmUsesManager.AddListToImplSection(ListBox: TObject; RemoveFromInterface: Boolean);
 var
   i: Integer;
@@ -662,6 +650,9 @@ begin
 end;
 
 procedure TfmUsesManager.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
+resourcestring
+  SUsesMoveToInterface = '&Move to Interface';
+  SUsesMoveToImplementation = '&Move to Implementation';
 var
   AvailableSourceListBox: TListBox;
   ActiveLBHasSelection: Boolean;
@@ -674,9 +665,19 @@ begin
   UsesIsInterface := (pcUses.ActivePage = tabInterface);
 
   actUsesDelete.Enabled := HaveSelectedItem(UsesSourceListBox);
+
   actUsesAddToFavorites.Enabled := actUsesDelete.Enabled;
-  actIntfMoveToImpl.Enabled := HaveSelectedItem(lbxInterface) and UsesIsInterface;
-  actImplMoveToIntf.Enabled := HaveSelectedItem(lbxImplementation) and not UsesIsInterface;
+  if UsesIsInterface then begin
+      actUsesMove.Caption := SUsesMoveToImplementation;
+      actUsesMove.OnExecute := actUsesMoveToImplExecute;
+      actUsesMove.Enabled := HaveSelectedItem(lbxInterface);
+      mitAvailAddToUses.Action := actAvailAddToIntf;
+  end else begin
+      actUsesMove.Caption := SUsesMoveToInterface;
+      actUsesMove.OnExecute := actUsesMoveToIntExecute;
+      actUsesMove.Enabled := HaveSelectedItem(lbxImplementation);
+      mitAvailAddToUses.Action := actAvailAddToImpl;
+  end;
 
   actAvailAddToImpl.Enabled := ActiveLBHasSelection;
   actAvailAddToIntf.Enabled := ActiveLBHasSelection;
@@ -748,13 +749,13 @@ begin
   CloseIfInSingleActionMode;
 end;
 
-procedure TfmUsesManager.actIntfMoveToImplExecute(Sender: TObject);
+procedure TfmUsesManager.actUsesMoveToImplExecute(Sender: TObject);
 begin
   MoveSelected(lbxInterface, lbxImplementation, False);
   CloseIfInSingleActionMode;
 end;
 
-procedure TfmUsesManager.actImplMoveToIntfExecute(Sender: TObject);
+procedure TfmUsesManager.actUsesMoveToIntExecute(Sender: TObject);
 begin
   MoveSelected(lbxImplementation, lbxInterface, True);
   CloseIfInSingleActionMode;
