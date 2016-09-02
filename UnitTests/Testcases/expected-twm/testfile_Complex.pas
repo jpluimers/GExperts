@@ -117,7 +117,7 @@ end;
 
 initialization
 
-  initComplexList := TMyComplexClassList<TMyComplexClass > .Create;
+  initComplexList := TMyComplexClassList<TMyComplexClass>.Create;
 
 finalization
 
