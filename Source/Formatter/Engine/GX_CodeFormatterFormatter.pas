@@ -145,6 +145,7 @@ var
   function DetectGeneric: Boolean;
   var
     Next: TPascalToken;
+    NextNext: TPascalToken;
     Idx, Offset: Integer;
     exp: TGXUnicodeString;
   begin
@@ -164,12 +165,22 @@ var
       if not GetNextNoComment(_TokenIdx, Next, Offset) then
         Exit;
 
-      if (exp = '>') and ((Next.ReservedType = rtSemiColon) or (Next.ReservedType = rtRightBr)) then begin
-        Result := True;
-        Exit;
+      if (exp = '>') then begin
+        if Next.ReservedType = rtDot then begin
+          // detect "x>.5" in contrast to "TSomeGeneric<SomeType>.Create"
+          if not GetNextNoComment(_TokenIdx + 1, NextNext, Offset) or (NextNext.WordType = wtNumber) then
+            Result := False
+          else
+            Result := True;
+          Exit;
+        end;
+        if (Next.ReservedType = rtSemiColon) or (Next.ReservedType = rtRightBr) then begin
+          Result := True;
+          Exit;
+        end;
       end;
 
-      if Next.ReservedType in [rtLogOper, rtDot, rtComma, rtSemiColon, rtLeftBr, rtRightBr] then begin
+      if Next.ReservedType in [rtLogOper, rtComma, rtSemiColon, rtLeftBr, rtRightBr] then begin
         Result := False;
         Exit; //=>
       end;
@@ -1463,4 +1474,3 @@ begin
 end;
 
 end.
-
