@@ -2,10 +2,7 @@ unit testfile_Complex;
 
 interface
 
-uses uDataObject,
-  Data.dbxJsonReflect,
-  System.SysUtils,
-  System.Classes;
+uses uDataObject, Data.dbxJsonReflect, System.SysUtils, System.Classes;
 
 type
   // COMPLEX OBJECT - Contains TStringList as property.
