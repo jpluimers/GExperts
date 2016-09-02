@@ -121,6 +121,13 @@ type
   end;
 
 type
+  TTestFilesDefaultFormatting = class(TTestTestfiles)
+  protected
+    function GetFormatSettings: TCodeFormatterEngineSettings; override;
+    function GetResultDir: string; override;
+  end;
+
+type
   TTestFilesTwmFormatting = class(TTestTestfiles)
   protected
     function GetFormatSettings: TCodeFormatterEngineSettings; override;
@@ -623,6 +630,25 @@ begin
   Result := 'delforex';
 end;
 
+{ TTestFilesDefaultFormatting }
+
+function TTestFilesDefaultFormatting.GetFormatSettings: TCodeFormatterEngineSettings;
+var
+  Settings: TCodeFormatterSettings;
+begin
+  Settings := TCodeFormatterSettings.Create;
+  try
+    Result := Settings.Settings;
+  finally
+    Settings.Free;
+  end;
+end;
+
+function TTestFilesDefaultFormatting.GetResultDir: string;
+begin
+  Result := 'default'
+end;
+
 { TTestFilesTwmFormatting }
 
 function TTestFilesTwmFormatting.GetFormatSettings: TCodeFormatterEngineSettings;
@@ -657,6 +683,7 @@ begin
 end;
 
 initialization
+  RegisterTest(TTestFilesDefaultFormatting.Suite);
   RegisterTest(TTestFilesHeadworkFormatting.Suite);
   RegisterTest(TTestFilesBorlandFormatting.Suite);
   RegisterTest(TTestFilesDelforFormatting.Suite);
