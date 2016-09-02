@@ -16,10 +16,10 @@
     <DCC_RangeChecking>True</DCC_RangeChecking>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_ExeOutput>..\</DCC_ExeOutput>
-    <DCC_UnitSearchPath>..\source\framework;..\source\utils;..\externalsource\UniSynEdit</DCC_UnitSearchPath>
-    <DCC_ResourcePath>..\source\framework;..\source\utils;..\externalsource\UniSynEdit</DCC_ResourcePath>
-    <DCC_ObjPath>..\source\framework;..\source\utils;..\externalsource\UniSynEdit</DCC_ObjPath>
-    <DCC_IncludePath>..\source\framework;..\source\utils;..\externalsource\UniSynEdit</DCC_IncludePath>
+    <DCC_UnitSearchPath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_ObjPath>
+    <DCC_IncludePath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_IncludePath>
     <DCC_Define>RELEASE</DCC_Define>
     <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
     <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
