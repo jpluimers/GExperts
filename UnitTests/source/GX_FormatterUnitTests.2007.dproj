@@ -35,9 +35,9 @@
     <DCC_ResourcePath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
     <DCC_ObjPath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_ObjPath>
     <DCC_IncludePath>..\..\source\framework;..\..\source\utils;..\..\externalsource\UniSynEdit</DCC_IncludePath>
-    <DCC_DcuOutput>.\dcu\delphi2007</DCC_DcuOutput>
-    <DCC_ObjOutput>.\dcu\delphi2007</DCC_ObjOutput>
-    <DCC_HppOutput>.\dcu\delphi2007</DCC_HppOutput>
+    <DCC_DcuOutput>..\dcu\delphi2007</DCC_DcuOutput>
+    <DCC_ObjOutput>..\dcu\delphi2007</DCC_ObjOutput>
+    <DCC_HppOutput>..\dcu\delphi2007</DCC_HppOutput>
     <DCC_Define>DEBUG</DCC_Define>
   </PropertyGroup>
   <ProjectExtensions>
