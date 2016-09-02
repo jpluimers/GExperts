@@ -85,7 +85,8 @@ type
     procedure testClassInImplementation;
     procedure testGenericClass;
     procedure testGenericClass2;
-    procedure testfile_GenericCreate;
+    procedure testfileGenericCreate;
+    procedure testfileFakeGenericCreate;
     procedure testUsesWithComment;
     procedure testTypeOf;
     procedure testNestedEventType;
@@ -488,9 +489,14 @@ begin
   TestFile('ConstVar');
 end;
 
-procedure TTestTestfiles.testfile_GenericCreate;
+procedure TTestTestfiles.testfileGenericCreate;
 begin
   TestFile('GenericCreate');
+end;
+
+procedure TTestTestfiles.testfileFakeGenericCreate;
+begin
+  TestFile('FakeGenericCreate');
 end;
 
 procedure TTestTestfiles.testFormula;
