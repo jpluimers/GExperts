@@ -40,18 +40,18 @@ uses
   GUITestRunner,
   DelForExTestOldNew in 'DelForExTestOldNew.pas',
   DelForExTestFiles in 'DelForExTestFiles.pas',
-  GX_CodeFormatterDefaultSettings in '..\Source\formatter\GX_CodeFormatterDefaultSettings.pas',
-  GX_CodeFormatterTokenList in '..\Source\formatter\engine\GX_CodeFormatterTokenList.pas',
-  GX_CodeFormatterTypes in '..\Source\formatter\engine\GX_CodeFormatterTypes.pas',
-  GX_CodeFormatterEngine in '..\Source\formatter\engine\GX_CodeFormatterEngine.pas',
-  GX_CodeFormatterTokens in '..\Source\formatter\engine\GX_CodeFormatterTokens.pas',
-  GX_CodeFormatterSettings in '..\Source\formatter\engine\GX_CodeFormatterSettings.pas',
-  GX_CodeFormatterFormatter in '..\Source\formatter\engine\GX_CodeFormatterFormatter.pas',
-  GX_CodeFormatterStack in '..\Source\formatter\engine\GX_CodeFormatterStack.pas',
-  GX_CodeFormatterParser in '..\Source\formatter\engine\GX_CodeFormatterParser.pas',
-  GX_CodeFormatterConfigHandler in '..\Source\formatter\GX_CodeFormatterConfigHandler.pas',
-  GX_CodeFormatterUnicode in '..\Source\formatter\engine\GX_CodeFormatterUnicode.pas',
-  GX_GenericUtils in '..\Source\Utils\GX_GenericUtils.pas';
+  GX_CodeFormatterDefaultSettings in '..\..\Source\Formatter\GX_CodeFormatterDefaultSettings.pas',
+  GX_CodeFormatterTokenList in '..\..\Source\Formatter\engine\GX_CodeFormatterTokenList.pas',
+  GX_CodeFormatterTypes in '..\..\Source\Formatter\engine\GX_CodeFormatterTypes.pas',
+  GX_CodeFormatterEngine in '..\..\Source\Formatter\engine\GX_CodeFormatterEngine.pas',
+  GX_CodeFormatterTokens in '..\..\Source\Formatter\engine\GX_CodeFormatterTokens.pas',
+  GX_CodeFormatterSettings in '..\..\Source\Formatter\engine\GX_CodeFormatterSettings.pas',
+  GX_CodeFormatterFormatter in '..\..\Source\Formatter\engine\GX_CodeFormatterFormatter.pas',
+  GX_CodeFormatterStack in '..\..\Source\Formatter\engine\GX_CodeFormatterStack.pas',
+  GX_CodeFormatterParser in '..\..\Source\Formatter\engine\GX_CodeFormatterParser.pas',
+  GX_CodeFormatterConfigHandler in '..\..\Source\Formatter\GX_CodeFormatterConfigHandler.pas',
+  GX_CodeFormatterUnicode in '..\..\Source\Formatter\engine\GX_CodeFormatterUnicode.pas',
+  GX_GenericUtils in '..\..\Source\Utils\GX_GenericUtils.pas';
 
 begin
   ReportMemoryLeaksOnShutdown := True;
