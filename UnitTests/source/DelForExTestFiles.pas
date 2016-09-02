@@ -611,7 +611,7 @@ var
 begin
   Settings := TCodeFormatterSettings.Create;
   try
-    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'FormatterSettings-Default.ini', Settings);
+    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'FormatterSettings-DelForEx.ini', Settings);
     Result := Settings.Settings;
   finally
     Settings.Free;
