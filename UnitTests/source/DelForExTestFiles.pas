@@ -85,6 +85,7 @@ type
     procedure testClassInImplementation;
     procedure testGenericClass;
     procedure testGenericClass2;
+    procedure testfile_GenericCreate;
     procedure testUsesWithComment;
     procedure testTypeOf;
     procedure testNestedEventType;
@@ -143,7 +144,7 @@ uses
 
 function TTestTestfiles.GetConfigDirBS: string;
 begin
-  Result := 'source\packagewiz\';
+  Result := '..\release\';
 end;
 
 procedure TTestTestfiles.SetUp;
@@ -189,8 +190,8 @@ var
   st: TGxUnicodeStringList;
 begin
   Filename := 'testfile_' + _Filename + '.pas';
-  InFile := 'source\unittests\testcases\input\' + Filename;
-  ExpectedFile := 'source\unittests\testcases\expected-' + GetResultDir + '\' + Filename;
+  InFile := 'testcases\input\' + Filename;
+  ExpectedFile := 'testcases\expected-' + GetResultDir + '\' + Filename;
   if not FileExists(InFile) then begin
     ExpectedException := EFileDoesNotExist;
     raise EFileDoesNotExist.Create('Input file does not exist');
@@ -212,7 +213,7 @@ begin
       TrimTrailingCrLf(st);
       CheckEquals(ExpectedText.Text, st.Text, 'error in output');
     except
-      st.SaveToFile('source\unittests\testcases\output-' + GetResultDir + '\' + Filename);
+      st.SaveToFile('testcases\output-' + GetResultDir + '\' + Filename);
       if not _AllowFailure then
         raise;
     end;
@@ -289,47 +290,47 @@ end;
 
 procedure TTestTestfiles.testIfThenTry;
 begin
-  Testfile('ifthentry');
+  TestFile('ifthentry');
 end;
 
 procedure TTestTestfiles.testDisableFormatComment;
 begin
-  Testfile('DisableFormatComment');
+  TestFile('DisableFormatComment');
 end;
 
 procedure TTestTestfiles.testLargeFile;
 begin
-  Testfile('xdom_3_1');
+  TestFile('xdom_3_1');
 end;
 
 procedure TTestTestfiles.testNestedClass;
 begin
-  Testfile('NestedClass');
+  TestFile('NestedClass');
 end;
 
 procedure TTestTestfiles.testNestedClass2;
 begin
-  Testfile('NestedClass2');
+  TestFile('NestedClass2');
 end;
 
 procedure TTestTestfiles.testNestedClass3;
 begin
-  Testfile('NestedClass3');
+  TestFile('NestedClass3');
 end;
 
 procedure TTestTestfiles.testNestedClass4;
 begin
-  Testfile('NestedClass4');
+  TestFile('NestedClass4');
 end;
 
 procedure TTestTestfiles.testNestedClass5;
 begin
-  Testfile('NestedClass5');
+  TestFile('NestedClass5');
 end;
 
 procedure TTestTestfiles.testNestedClass6;
 begin
-  Testfile('NestedClass6');
+  TestFile('NestedClass6');
 end;
 
 procedure TTestTestfiles.testNestedEventType;
@@ -349,12 +350,12 @@ end;
 
 procedure TTestTestfiles.testOperatorOverloading;
 begin
-  Testfile('OperatorOverloading');
+  TestFile('OperatorOverloading');
 end;
 
 procedure TTestTestfiles.testTripleQuotes;
 begin
-  Testfile('triplequotes');
+  TestFile('triplequotes');
 end;
 
 procedure TTestTestfiles.testTypeOf;
@@ -480,6 +481,11 @@ begin
   TestFile('ConstVar');
 end;
 
+procedure TTestTestfiles.testfile_GenericCreate;
+begin
+  TestFile('GenericCreate');
+end;
+
 procedure TTestTestfiles.testFormula;
 begin
   TestFile('Formula');
@@ -573,7 +579,7 @@ var
 begin
   Settings := TCodeFormatterSettings.Create;
   try
-    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'DelForExOptions-headwork.ini', Settings);
+    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'FormatterSettings-headwork.ini', Settings);
     Result := Settings.Settings;
   finally
     Settings.Free;
@@ -605,7 +611,7 @@ var
 begin
   Settings := TCodeFormatterSettings.Create;
   try
-    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'DelForExOptions-Default.ini', Settings);
+    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'FormatterSettings-Default.ini', Settings);
     Result := Settings.Settings;
   finally
     Settings.Free;
@@ -625,7 +631,7 @@ var
 begin
   Settings := TCodeFormatterSettings.Create;
   try
-    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'DelForExOptions-twm.ini', Settings);
+    TCodeFormatterConfigHandler.ImportFromFile(GetConfigDirBS + 'FormatterSettings-twm.ini', Settings);
     Result := Settings.Settings;
   finally
     Settings.Free;
