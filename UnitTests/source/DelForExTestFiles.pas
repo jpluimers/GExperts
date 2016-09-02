@@ -620,7 +620,7 @@ end;
 
 function TTestFilesDelforFormatting.GetResultDir: string;
 begin
-  Result := 'default';
+  Result := 'delforex';
 end;
 
 { TTestFilesTwmFormatting }
