@@ -53,7 +53,7 @@ begin
   Result.ReservedCase := rfLowerCase;
   Result.SpaceColon := [spAfter];
   Result.SpaceComma := [spAfter];
-  Result.SpaceEqualOper := [spAfter, spAfter];
+  Result.SpaceEqualOper := spBoth;
   Result.SpaceLeftBr := spNone;
   Result.SpaceLeftHook := spNone;
   Result.SpaceOperators := spBoth;
