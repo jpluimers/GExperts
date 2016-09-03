@@ -495,6 +495,16 @@
             <Form>f_PeInfoPrint</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavorites.pas">
+            <Form>f_SarchPathFavorites</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas">
+            <Form>f_IdeSearchPathFavoriteEdit</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Experts\GX_ReselectDesktop.pas"/>
+        <DCCReference Include="..\..\Source\Editor\GX_eWarn.pas">
+            <Form>fmConfigureWarning</Form>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

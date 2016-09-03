@@ -145,6 +145,11 @@
         <DCCReference Include="..\..\source\Framework\GX_Configure.pas">
             <Form>fmConfiguration</Form>
         </DCCReference>
+        <DCCReference Include="..\..\Source\Framework\GX_ConfigureExperts.pas">
+            <Form>frConfigureExperts</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <DCCReference Include="..\..\source\Framework\GX_Consts.pas"/>
         <DCCReference Include="..\..\source\Experts\GX_CopyComponentNames.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_DbugIntf.pas"/>
@@ -450,10 +455,23 @@
         </DCCReference>
         <DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas"/>
         <DCCReference Include="..\..\Source\Utils\GX_dzSelectDirectoryFix.pas"/>
-        <DCCReference Include="..\..\Source\Framework\GX_ConfigureExperts.pas">
-            <Form>frConfigureExperts</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
+        <DCCReference Include="..\..\Source\Formatter\GX_eAddToCaptitalization.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_VCLFixPack.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzVersionInfo.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzOsUtils.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzPackageInfo.pas"/>
+        <DCCReference Include="..\..\Source\PeInfo\GX_PeInfoPrint.pas">
+            <Form>f_PeInfoPrint</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavorites.pas">
+            <Form>f_SarchPathFavorites</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas">
+            <Form>f_IdeSearchPathFavoriteEdit</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Experts\GX_ReselectDesktop.pas"/>
+        <DCCReference Include="..\..\Source\Editor\GX_eWarn.pas">
+            <Form>fmConfigureWarning</Form>
         </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

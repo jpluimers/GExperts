@@ -211,7 +211,9 @@ uses
   GX_dzPackageInfo in '..\..\Source\Utils\GX_dzPackageInfo.pas',
   GX_PeInfoPrint in '..\..\Source\PeInfo\GX_PeInfoPrint.pas' {f_PeInfoPrint},
   GX_IdeSearchPathFavorites in '..\..\Source\IDE\GX_IdeSearchPathFavorites.pas' {f_SarchPathFavorites},
-  GX_IdeSearchPathFavoriteEdit in '..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas' {f_IdeSearchPathFavoriteEdit};
+  GX_IdeSearchPathFavoriteEdit in '..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas' {f_IdeSearchPathFavoriteEdit},
+  GX_ReselectDesktop in '..\..\Source\Experts\GX_ReselectDesktop.pas',
+  GX_eWarn in '..\..\Source\Editor\GX_eWarn.pas' {fmConfigureWarning};
 
 begin
 end.

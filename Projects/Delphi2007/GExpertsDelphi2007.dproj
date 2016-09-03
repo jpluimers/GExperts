@@ -227,6 +227,9 @@
     <DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
       <Form>fmeSortConfig</Form>
     </DCCReference>
+    <DCCReference Include="..\..\Source\Editor\GX_eWarn.pas">
+      <Form>fmConfigureWarning</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\Editor\GX_MenusForEditorExpert.pas" />
     <DCCReference Include="..\..\source\Experts\GX_AsciiChart.pas">
       <Form>fmAsciiChart</Form>
@@ -250,6 +253,7 @@
     <DCCReference Include="..\..\source\Experts\GX_IdeShortCuts.pas">
       <Form>fmIdeShortCuts</Form>
     </DCCReference>
+    <DCCReference Include="..\..\Source\Experts\GX_ReselectDesktop.pas" />
     <DCCReference Include="..\..\source\Experts\GX_SetFocusControl.pas" />
     <DCCReference Include="..\..\source\Experts\GX_TabOrder.pas">
       <Form>fmTabOrder</Form>
