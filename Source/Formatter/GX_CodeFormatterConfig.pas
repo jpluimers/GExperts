@@ -21,6 +21,7 @@ uses
   Dialogs,
   Grids,
   Menus,
+  SynEdit,
   GX_CodeFormatterTypes,
   GX_CodeFormatterEngine,
   GX_CodeFormatterSettings,
@@ -136,12 +137,7 @@ type
     procedure b_HelpClick(Sender: TObject);
     procedure b_EditCapitalizationClick(Sender: TObject);
     procedure ts_PreviewShow(Sender: TObject);
-    procedure m_PreviewBeforeClick(Sender: TObject);
-    procedure m_PreviewBeforeKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
-    procedure m_PreviewBeforeKeyPress(Sender: TObject; var Key: WideChar);
-    procedure m_PreviewBeforeMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure HandleOnStatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure FormShow(Sender: TObject);
     procedure chk_FeedAfterThenClick(Sender: TObject);
     procedure ts_PreviewResize(Sender: TObject);
@@ -231,12 +227,7 @@ begin
   m_PreviewBefore.Height := 337;
   m_PreviewBefore.TabOrder := 0;
   m_PreviewBefore.OnChange := ts_PreviewShow;
-  m_PreviewBefore.OnClick := m_PreviewBeforeClick;
-  m_PreviewBefore.OnEnter := m_PreviewBeforeClick;
-  m_PreviewBefore.OnKeyDown := m_PreviewBeforeKeyDown;
-  m_PreviewBefore.OnKeyPress := m_PreviewBeforeKeyPress;
-  m_PreviewBefore.OnKeyUp := m_PreviewBeforeKeyDown;
-  m_PreviewBefore.OnMouseDown := m_PreviewBeforeMouseDown;
+  m_PreviewBefore.OnStatusChange := HandleOnStatusChange;
   m_PreviewBefore.Highlighter := gxpPas;
 
   m_PreviewAfter := TGxEnhancedEditor.Create(Self);
@@ -255,9 +246,9 @@ begin
 
   grid_Spacing.DefaultRowHeight := grid_Spacing.Canvas.TextHeight('Mg') + 4;
 
-  lb_Precedence.Items.AddObject(str_PrecedenceDirective, pointer(cpDirective));
-  lb_Precedence.Items.AddObject(str_PrecedenceIniFile, pointer(cpIniFile));
-  lb_Precedence.Items.AddObject(str_PrecedenceMySettings, pointer(cpMyConfig));
+  lb_Precedence.Items.AddObject(str_PrecedenceDirective, Pointer(cpDirective));
+  lb_Precedence.Items.AddObject(str_PrecedenceIniFile, Pointer(cpIniFile));
+  lb_Precedence.Items.AddObject(str_PrecedenceMySettings, Pointer(cpMyConfig));
 end;
 
 destructor TfmCodeFormatterConfig.Destroy;
@@ -513,9 +504,9 @@ procedure TfmCodeFormatterConfig.SettingsToForm(const _Settings: TCodeFormatterS
   procedure AddPrecedenceSetting(_cp: TConfigPrecedenceEnum);
   begin
     case _cp of
-      cpDirective: lb_Precedence.Items.AddObject(str_PrecedenceDirective, pointer(cpDirective));
-      cpIniFile: lb_Precedence.Items.AddObject(str_PrecedenceIniFile, pointer(cpIniFile));
-      cpMyConfig: lb_Precedence.Items.AddObject(str_PrecedenceMySettings, pointer(cpMyConfig));
+      cpDirective: lb_Precedence.Items.AddObject(str_PrecedenceDirective, Pointer(cpDirective));
+      cpIniFile: lb_Precedence.Items.AddObject(str_PrecedenceIniFile, Pointer(cpIniFile));
+      cpMyConfig: lb_Precedence.Items.AddObject(str_PrecedenceMySettings, Pointer(cpMyConfig));
     end;
   end;
 
@@ -631,31 +622,10 @@ begin
   UpdatePreview;
 end;
 
-procedure TfmCodeFormatterConfig.m_PreviewBeforeClick(Sender: TObject);
-var
-  CurLine2, CurLine: Integer;
+procedure TfmCodeFormatterConfig.HandleOnStatusChange(Sender: TObject; Changes: TSynStatusChanges);
 begin
-  CurLine := SendMessage(m_PreviewBefore.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
-  CurLine2 := SendMessage(m_PreviewAfter.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
-  SendMessage(m_PreviewAfter.Handle, EM_LINESCROLL, 0, CurLine - CurLine2);
-  m_PreviewAfter.SetSelection(m_PreviewBefore.SelStart, 0);
-end;
-
-procedure TfmCodeFormatterConfig.m_PreviewBeforeKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  m_PreviewBeforeClick(nil);
-end;
-
-procedure TfmCodeFormatterConfig.m_PreviewBeforeKeyPress(Sender: TObject; var Key: WideChar);
-begin
-  m_PreviewBeforeClick(nil);
-end;
-
-procedure TfmCodeFormatterConfig.m_PreviewBeforeMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  m_PreviewBeforeClick(nil);
+  if m_PreviewAfter.TopLine <> m_PreviewBefore.TopLine then
+    m_PreviewAfter.TopLine := m_PreviewBefore.TopLine;
 end;
 
 procedure TfmCodeFormatterConfig.rb_CapitalizationInFileClick(Sender: TObject);
@@ -780,7 +750,6 @@ begin
     FormToSettings(Formatter.Settings);
     Formatter.Execute(sl);
     m_PreviewAfter.SetLines(sl);
-    m_PreviewBeforeClick(nil);
   finally
     Formatter.Free;
     sl.Free;

@@ -4,8 +4,6 @@ unit GX_SourceExport;
 
 {$I GX_CondDefine.inc}
 
-{$IFDEF SYNEDIT}
-
 interface
 
 uses
@@ -463,8 +461,5 @@ end;
 initialization
   RegisterGX_Expert(TSourceExportExpert);
 
-{$ELSE not SYNEDIT}
-interface implementation
-{$ENDIF SYNEDIT}
 end.
 

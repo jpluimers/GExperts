@@ -4,27 +4,22 @@ unit GX_SynMemoUtils;
 
 interface
 
-uses  // If you get errors here, edit GX_CondDefine.inc or add SynEdit to your library path
-  {$IFDEF SYNEDIT} SynEdit, SynUnicode, {$ENDIF SYNEDIT}
+uses  // If you get errors here, add SynEdit to your library path
+  SynEdit, SynUnicode,
   GX_GenericUtils, GX_IDEUtils;
 
 function GetGXHighlighterForCurrentSourceEditor: TGXSyntaxHighlighter;
 
-{$IFDEF SYNEDIT}
-  procedure SetSynEditHighlighter(SynEdit: TCustomSynEdit; Highlighter: TGXSyntaxHighlighter);
-{$ENDIF SYNEDIT}
+procedure SetSynEditHighlighter(SynEdit: TCustomSynEdit; Highlighter: TGXSyntaxHighlighter);
 
 implementation
 
 uses
-  {$IFDEF SYNEDIT}
   SynEditHighlighter, SynHighlighterPas, SynHighlighterCpp, SynHighlighterHtml,
   SynHighlighterSql, SynHighlighterCS, SynHighlighterXML, SynHighlighterGeneral,
   GX_VerDepConst, Classes,
-  {$ENDIF SYNEDIT}
   SysUtils, ToolsAPI, GX_OtaUtils, Graphics;
 
-{$IFDEF SYNEDIT}
 procedure GxGetIDEHighLigherSettings(Highlighter: TSynCustomHighlighter; const Prefer: string);
 var
   Elements: TStrings;
@@ -79,8 +74,6 @@ begin
   if Highlighter in [gxpPAS, gxpCPP, gxpSQL, gxpCS] then
     GxGetIDEHighLigherSettings(SynEdit.Highlighter, GetIDEVersionID);
 end;
-
-{$ENDIF SYNEDIT}
 
 function GetGXHighlighterForCurrentSourceEditor: TGXSyntaxHighlighter;
 var

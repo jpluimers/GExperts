@@ -19,6 +19,7 @@
 
 {$IFNDEF GX_AutomatedBuild}
   // Turn things on we want compiled into GExperts
+  // note: SynEdit is now always required
   {$DEFINE SYNEDIT}
   {.$DEFINE GX_DEBUGLOG}
 {$ENDIF GX_AutomatedBuild}
@@ -117,8 +118,9 @@ Kylix is no longer supported.  You can try compiling with the GExperts source fr
 
 // Define GX_ENHANCED_EDITOR if SynEdit is available
 {$IFDEF SYNEDIT}
-  {$DEFINE GX_ENHANCED_EDITOR}
   {$DEFINE UniSynEdit}
+{$ELSE}
+  GExperts now requires SynEdit.
 {$ENDIF SYNEDIT}
 
 {$IFOPT B+}

@@ -2,8 +2,6 @@ unit GX_SourceExportOptions;
 
 {$I GX_CondDefine.inc}
 
-{$IFDEF SYNEDIT}
-
 interface
 
 uses
@@ -114,7 +112,8 @@ var
 begin
   if NoChangeEvents then
     Exit;
-  Attr := TSynHighlighterAttributes.Create(cbxAttributes.Items[cbxAttributes.ItemIndex]{$IFDEF UniSynEdit}, cbxAttributes.Items[cbxAttributes.ItemIndex]{$ENDIF});
+  Attr := TSynHighlighterAttributes.Create(cbxAttributes.Items[cbxAttributes.ItemIndex],
+    cbxAttributes.Items[cbxAttributes.ItemIndex]);
   try
     AttrStyle := [];
     Attr.Foreground := ColorGrid.ForegroundColor;
@@ -139,7 +138,7 @@ procedure TfmSourceExportOptions.cbxAttributesChange(Sender: TObject);
 var
   Attr: TSynHighlighterAttributes;
 begin
-  Attr := TSynHighlighterAttributes.Create(''{$IFDEF UniSynEdit}, ''{$ENDIF});
+  Attr := TSynHighlighterAttributes.Create('', '');
   try
     Attr.Assign(FSampleEditor.Highlighter.Attribute[cbxAttributes.ItemIndex]);
     NoChangeEvents := True;
@@ -212,7 +211,7 @@ end;
 
 procedure TfmSourceExportOptions.SynEditSelectionChange(Sender: TObject; Changes: TSynStatusChanges);
 var
-  Token: {$IFDEF UniSynEdit}UnicodeString{$ELSE}string{$ENDIF};
+  Token: UnicodeString;
   Attributes: TSynHighlighterAttributes;
   i: Integer;
 begin
@@ -236,10 +235,6 @@ begin
   if dlgBackground.Execute then
     BackgroundColor := dlgBackground.Color;
 end;
-
-{$ELSE not SYNEDIT}
-interface implementation
-{$ENDIF SYNEDIT}
 
 end.
 
