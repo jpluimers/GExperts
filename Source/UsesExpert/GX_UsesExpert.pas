@@ -429,6 +429,7 @@ begin
   FFavoriteUnits := TStringList.Create;
   FSearchPathUnits := TStringList.Create;
   FAliases := TStringList.Create;
+  FCurrentIdentIdx := -1;
 
   FFindThread := TFileFindThread.Create;
   FFindThread.FileMasks.Add('*.pas');
