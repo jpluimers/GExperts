@@ -264,7 +264,7 @@ begin
 
         FormatSelection := False;
         if GxOtaGetSelection(GxOtaGetTopMostEditView(SourceEditor), BlockStart, BlockEnd, SelStart, SelLength) then begin
-          FormatSelection := (BlockStart.Line < BlockEnd.Line);
+          FormatSelection := (SelLength > 0) and (BlockStart.Line < BlockEnd.Line);
           if FormatSelection then begin
             FormattedBlockStart := FORMATTED_BLOCK_START;
             FormattedBlockEnd := FORMATTED_BLOCK_END;
@@ -280,6 +280,8 @@ begin
               BlockEnd.Col := 1;
               BlockEnd.Line := BlockEnd.Line + 1;
             end;
+            Assert(BlockEnd.Line > 0, 'Blockend.Line <= 0');
+            Assert(BlockStart.Line > 0, 'BlockStart.Line <= 0');
             FullText.Insert(BlockEnd.Line - 1, FormattedBlockEnd);
             FullText.Insert(BlockStart.Line - 1, FormattedBlockStart);
           end;
