@@ -23,7 +23,8 @@ uses
   ActnList,
   StdCtrls,
   Menus,
-  Forms;
+  Forms,
+  Grids;
 
 type
   ///<summary> Ancestor to all exceptions raised in this unit. </summary>
@@ -290,6 +291,30 @@ procedure TMonitor_MakeFullyVisible(_MonitorRect: TRect; var _Rect: TRect; out _
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect; out _Width, _Height: Integer); overload;
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect); overload;
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH); overload;
+
+type
+  ///<summary> used in ResizeStringGrid and ResizeDbGrid to specify additional options
+  ///  <ul>
+  ///    <li>roUseGridWidth -> make the columns take up the whole grid width</li>
+  ///    <li>roIgnoreHeader -> do not use the column header to calculate the column
+  ///                          width</li>
+  ///    <li>roUseLastRows -> use the last 10 rows to calculate the minimum width, not
+  ///                         first 10
+  ///    <li>roUseAllRows -> use all Grid rows to calculate the minimum width, not
+  ///                        just the first 10</li>
+  ///  </ul> </summary>
+  TResizeOptions = (roUseGridWidth, roIgnoreHeader, roUseLastRows, roUseAllRows, roReduceMinWidth);
+  TResizeOptionSet = set of TResizeOptions;
+
+///<summary> Resizes the columns of a TCustomGrid to fit their contents
+///          @param Grid is the TCustomGrid to work on
+///          @param Options is a TResizeOptionSet specifying additional options,
+///                         defaults to an empty set. </summary>
+procedure TGrid_Resize(_Grid: TCustomGrid); overload;
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet); overload;
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; _RowOffset: Integer); overload;
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer); overload;
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer; _RowOffset: Integer); overload;
 
 implementation
 
@@ -1286,6 +1311,127 @@ end;
 procedure TRectLTWH_AssignTLRB(var _LTWH: TRectLTWH; _Left, _Top, _Right, _Bottom: Integer);
 begin
   TRectLTWH_Assign(_LTWH, _Left, _Top, _Right - _Left, _Bottom - _Top);
+end;
+
+type
+  TGridHack = class(TCustomGrid);
+
+procedure TGrid_Resize(_Grid: TCustomGrid);
+begin
+  TGrid_Resize(_Grid, [], [], -1);
+end;
+
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet);
+begin
+  TGrid_Resize(_Grid, _Options, [], -1);
+end;
+
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; _RowOffset: Integer);
+begin
+  TGrid_Resize(_Grid, _Options, [], _RowOffset);
+end;
+
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer);
+begin
+  TGrid_Resize(_Grid, _Options, _ConstantCols, -1);
+end;
+
+function ArrayContains(_Element: Integer; const _Arr: array of Integer): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := Low(_Arr) to High(_Arr) do begin
+    Result := _Arr[i] = _Element;
+    if Result then
+      Exit;
+  end;
+end;
+
+procedure HandleRow(_Grid: TGridHack; _Col, _Row: Integer; var _MinWidth: Integer);
+var
+  ColWidth: Integer;
+  ColText: string;
+begin
+  ColText := _Grid.GetEditText(_Col, _Row);
+  ColWidth := _Grid.Canvas.TextWidth(ColText);
+  if ColWidth > _MinWidth then
+    _MinWidth := ColWidth;
+end;
+
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer; _RowOffset: Integer);
+var
+  Col, Row: Integer;
+  Grid: TGridHack;
+  MinWidth: Integer;
+  MinCol: Integer;
+  MaxCol: Integer;
+  MaxRow: Integer;
+  ColWidths: array of Integer;
+  FirstRow: Integer;
+  SumWidths: Integer;
+  Additional: Integer;
+begin
+  Grid := TGridHack(_Grid);
+  MaxCol := Grid.ColCount - 1;
+  MinCol := 0;
+  SetLength(ColWidths, MaxCol + 1);
+
+  if _RowOffset = -1 then
+    FirstRow := Grid.FixedRows
+  else
+    FirstRow := _RowOffset;
+
+  MaxRow := FirstRow + 10;
+  if (MaxRow >= Grid.RowCount) or (roUseAllRows in _Options) or (roUseLastRows in _Options) then
+    MaxRow := Grid.RowCount - 1;
+  if roUseLastRows in _Options then begin
+    if MaxRow > FirstRow + 10 then
+      FirstRow := MaxRow - 1
+  end;
+  SumWidths := MaxCol; // one spare pixel per column
+  if goVertLine in Grid.Options then
+    Inc(SumWidths, Grid.GridLineWidth);
+  for Col := MinCol to MaxCol do begin
+    if ArrayContains(Col, _ConstantCols) then
+      MinWidth := Grid.ColWidths[Col]
+    else begin
+      MinWidth := 0;
+
+      if not (roIgnoreHeader in _Options) then
+        for Row := 0 to Grid.FixedRows - 1 do
+          HandleRow(Grid, Col, Row, MinWidth);
+
+      for Row := FirstRow to MaxRow do
+        HandleRow(Grid, Col, Row, MinWidth);
+
+      if goVertLine in Grid.Options then
+        Inc(MinWidth, Grid.GridLineWidth);
+      Inc(MinWidth, 4); // 2 Punkte rechts und links, wie in TStringGrid.DrawCell
+      if MinWidth < Grid.DefaultColWidth then
+        MinWidth := Grid.DefaultColWidth;
+    end;
+    ColWidths[Col] := MinWidth;
+    Inc(SumWidths, MinWidth);
+  end;
+  if (SumWidths < Grid.ClientWidth) and (roUseGridWidth in _Options)
+    and (Length(_ConstantCols) < MaxCol + 1) then begin
+    Additional := (Grid.ClientWidth - SumWidths) div (MaxCol + 1 - Length(_ConstantCols));
+    for Col := MinCol to MaxCol do begin
+      if not ArrayContains(Col, _ConstantCols) then begin
+        Inc(ColWidths[Col], Additional);
+        Inc(SumWidths, Additional);
+      end;
+    end;
+    if SumWidths < Grid.ClientWidth then begin
+      Col := MaxCol;
+      while ArrayContains(Col, _ConstantCols) do
+        Dec(Col);
+      Inc(ColWidths[Col], Grid.ClientWidth - SumWidths);
+    end;
+  end;
+  for Col := MinCol to MaxCol do
+    Grid.ColWidths[Col] := ColWidths[Col];
 end;
 
 end.
