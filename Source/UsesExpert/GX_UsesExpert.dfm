@@ -355,7 +355,7 @@ object fmUsesManager: TfmUsesManager
       TabIndex = 0
       TabOrder = 1
       object tabInterface: TTabSheet
-        Caption = 'In&terface'
+        Caption = 'I&nterface'
         object pnlInterface: TPanel
           Left = 0
           Top = 0
@@ -412,7 +412,7 @@ object fmUsesManager: TfmUsesManager
         end
       end
       object tabImplementation: TTabSheet
-        Caption = 'Im&plementation'
+        Caption = 'I&mplementation'
         ImageIndex = 1
         object pnlImplementation: TPanel
           Left = 0
@@ -646,7 +646,7 @@ object fmUsesManager: TfmUsesManager
       OnExecute = acUsesDeleteExecute
     end
     object actUsesMove: TAction
-      Caption = '&Move to Interface'
+      Caption = 'M&ove to Interface'
       ImageIndex = 36
       ShortCut = 32845
     end
