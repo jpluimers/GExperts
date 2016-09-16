@@ -51,11 +51,11 @@ type
 implementation
 
 uses
+  Windows,
   SysUtils,
+  Messages,
   GX_OtaUtils,
   GX_dzVclUtils,
-  Windows,
-  Messages,
   GX_GenericUtils;
 
 {$R *.dfm}
@@ -279,6 +279,7 @@ begin
   if ts.Tag <> 0 then begin
     def := TIfdefTabDefinition(ts.Tag);
     TWinControl_SetFocus(def.FEdit);
+    FText := def.FEdit.Text;
   end;
 end;
 
