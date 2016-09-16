@@ -42,6 +42,7 @@ type
     procedure InitVerXxx;
     procedure InitOptions;
     procedure InitRtlVersion;
+    procedure InitIncludes;
   public
     class function Execute(out _Text: string): Boolean;
     constructor Create(_Owner: TComponent); override;
@@ -54,6 +55,8 @@ uses
   Windows,
   SysUtils,
   Messages,
+  ToolsAPI,
+  StrUtils,
   GX_OtaUtils,
   GX_dzVclUtils,
   GX_GenericUtils;
@@ -130,6 +133,8 @@ begin
   InitRtlVersion;
   InitVerXxx;
   InitOptions;
+  InitIncludes;
+
   pc_IfClassesChange(pc_IfClasses);
 end;
 
@@ -213,6 +218,7 @@ procedure TIfdefTabDefinition.InitEvents;
 var
   CellText: string;
 begin
+  TGrid_Resize(FStringGrid, [roUseGridWidth, roUseAllRows]);
   FStringGrid.OnSelectCell := HandleSelectCell;
   FEdit.OnChange := HandleEditChange;
   FEdit.OnEnter := HandleEditEnter;
@@ -404,6 +410,114 @@ begin
   def.AddGridRow('15', 'Delphi 7');
   def.AddGridRow('14', 'Delphi 6');
   def.InitEvents;
+end;
+
+procedure TfmConfigureIfDef.InitIncludes;
+
+  function IsCompilerDirective(const _Line: string; const _Directive: string;
+    out _Value: string; out _Comment: string): Boolean;
+  var
+    Incl: string;
+    s: string;
+    p: Integer;
+  begin
+    _Comment := '';
+    Incl := '{' + _Directive + ' ';
+    s := Trim(_Line);
+    Result := StrBeginsWith(Incl, s, false);
+    if Result then begin
+      p := Pos('}', s);
+      if p > Length(Incl) then begin
+        _Value := Copy(s, Length(Incl) + 1, p - 1 - Length(Incl));
+        _Value := Trim(_Value);
+        _Value := AnsiDequotedStr(_Value, '''');
+        s := Copy(s, p + 1, MaxInt);
+        p := Pos('//', s);
+        if p > 0 then
+          _Comment := Trim(Copy(s, p + 2, MaxInt));
+      end;
+    end;
+  end;
+
+  procedure AddIncludePage(var _Paths: TStrings; _No: Integer; const _IncFn: string);
+  const
+    DEFINE_STR = '$DEFINE';
+    UNDEF_STR = '$UNDEF';
+    NOT_DEFINE_STR = '.$DEFINE';
+    NOT_UNDEF_STR = '.$UNDEF';
+  var
+    def: TIfdefTabDefinition;
+    i: Integer;
+    FullFn: string;
+    Lines: TGXUnicodeStringList;
+    LineIdx: Integer;
+    Line: string;
+    Define: string;
+    Comment: string;
+  begin
+    if not Assigned(_Paths) then begin
+      _Paths := TStringList.Create;
+      GxOtaGetProjectSourcePathStrings(_Paths);
+    end;
+    def := nil;
+    for i := 0 to _Paths.Count - 1 do begin
+      FullFn := AddSlash(_Paths[i]) + _IncFn;
+      if FileExists(FullFn) then begin
+        Lines := TGXUnicodeStringList.Create;
+        try
+          Lines.LoadFromFile(FullFn);
+          for LineIdx := 0 to Lines.Count - 1 do begin
+            Line := Lines[LineIdx];
+            Line := Trim(Line);
+            if IsCompilerDirective(Line, DEFINE_STR, Define, Comment)
+              or IsCompilerDirective(Line, UNDEF_STR, Define, Comment)
+              or IsCompilerDirective(Line, NOT_DEFINE_STR, Define, Comment)
+              or IsCompilerDirective(Line, NOT_UNDEF_STR, Define, Comment) then begin
+              if not Assigned(def) then
+                def := TIfdefTabDefinition.Create(Self, pc_IfClasses, Format('&%d %s', [_No, _IncFn]), 4, 1, '{$IFNDEF %s}');
+              def.AddGridRow(Define, Comment);
+            end;
+          end;
+          Exit;
+        finally
+          if Assigned(def) then
+            def.InitEvents;
+          FreeAndNil(Lines);
+        end;
+      end;
+    end;
+  end;
+
+const
+  INCLUDE_STR = '$Include';
+  I_STR = '$I';
+var
+  Lines: TGXUnicodeStringList;
+  Paths: TStrings;
+  i: Integer;
+  s: string;
+  fn: string;
+  No: Integer;
+  Comment: string;
+begin
+  No := 1;
+  Paths := nil;
+  Lines := TGXUnicodeStringList.Create;
+  try
+    if not GxOtaGetActiveEditorText(Lines, False) then
+      Exit;
+    for i := 0 to Lines.Count - 1 do begin
+      s := Lines[i];
+      if IsCompilerDirective(s, INCLUDE_STR, fn, Comment)
+        or IsCompilerDirective(s, I_STR, fn, Comment) then begin
+        AddIncludePage(Paths, No, fn);
+        Inc(No);
+      end;
+    end;
+  finally
+    FreeAndNil(Paths);
+    FreeAndNil(Lines);
+  end;
 end;
 
 initialization

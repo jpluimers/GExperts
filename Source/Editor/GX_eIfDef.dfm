@@ -3,14 +3,14 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Insert IFDEF / IFNDEF'
   ClientHeight = 393
-  ClientWidth = 385
+  ClientWidth = 442
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   object pc_IfClasses: TPageControl
     Left = 0
     Top = 0
-    Width = 385
+    Width = 442
     Height = 352
     Align = alClient
     TabOrder = 0
@@ -19,15 +19,15 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
   object p_Bottom: TPanel
     Left = 0
     Top = 352
-    Width = 385
+    Width = 442
     Height = 41
     Align = alBottom
     TabOrder = 1
     DesignSize = (
-      385
+      442
       41)
     object b_OK: TButton
-      Left = 222
+      Left = 279
       Top = 8
       Width = 75
       Height = 25
@@ -38,7 +38,7 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
       TabOrder = 0
     end
     object b_Cancel: TButton
-      Left = 302
+      Left = 359
       Top = 8
       Width = 75
       Height = 25
