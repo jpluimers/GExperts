@@ -144,7 +144,6 @@ type
   TIfdefTabDefinition = class
   private
     FRow: Integer;
-    procedure AddGridRow(const _Value, _Desc: string);
   protected
     FForm: TfmConfigureIfDef;
     FTabSheet: TTabSheet;
@@ -154,12 +153,15 @@ type
     FSelStart: Integer;
     FSelLen: Integer;
     FTextFormatStr: string;
+    procedure AddGridRow(const _Value, _Desc: string);
+    procedure HandleEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure HandleSelectCell(_Sender: TObject; _Col, _Row: Integer; var _CanSelect: Boolean);
     procedure HandleEditEnter(_Sender: TObject);
     procedure HandleEditChange(_Sender: TObject);
   public
     constructor Create(_Form: TfmConfigureIfDef; _pc: TPageControl; const _Caption: string;
       _SelStart, _SelLen: Integer; const _TextFormatStr: string);
+    procedure InitEvents;
   end;
 
 constructor TIfdefTabDefinition.Create(_Form: TfmConfigureIfDef; _pc: TPageControl;
@@ -169,6 +171,7 @@ begin
   FSelStart := _SelStart;
   FSelLen := _SelLen;
   FTextFormatStr := _TextFormatStr;
+  FRow := 0;
 
   FTabSheet := TTabSheet.Create(_Form);
   FTabSheet.Name := '';
@@ -188,7 +191,6 @@ begin
   FStringGrid.FixedRows := 0;
   FStringGrid.Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect];
   FStringGrid.TabOrder := 0;
-  FStringGrid.OnSelectCell := HandleSelectCell;
   FStringGrid.ColWidths[0] := 50;
   FStringGrid.ColWidths[1] := 200;
 
@@ -205,10 +207,21 @@ begin
   FEdit.Parent := FPanel;
   FEdit.Align := alClient;
   FEdit.TabOrder := 0;
+end;
+
+procedure TIfdefTabDefinition.InitEvents;
+var
+  CellText: string;
+begin
+  FStringGrid.OnSelectCell := HandleSelectCell;
   FEdit.OnChange := HandleEditChange;
   FEdit.OnEnter := HandleEditEnter;
+  FEdit.OnKeyDown := HandleEditKeyDown;
 
-  FRow := 0;
+  CellText := FStringGrid.Cells[0, FStringGrid.Row];
+  FEdit.Text := Format(FTextFormatStr, [CellText]);
+  FEdit.SelStart := FSelStart;
+  FEdit.SelLength := FSelLen;
 end;
 
 procedure TIfdefTabDefinition.AddGridRow(const _Value, _Desc: string);
@@ -223,9 +236,19 @@ procedure TIfdefTabDefinition.HandleSelectCell(_Sender: TObject; _Col, _Row: Int
   var _CanSelect: Boolean);
 var
   CellText: string;
+  s: string;
 begin
   CellText := FStringGrid.Cells[0, _Row];
+
+  s := FEdit.SelText;
   FEdit.Text := Format(FTextFormatStr, [CellText]);
+  FEdit.SelStart := FSelStart;
+  FEdit.SelLength := FSelLen;
+  if s <> '' then begin
+    FEdit.SelText := s;
+    FEdit.SelStart := FSelStart;
+    FEdit.SelLength := FSelLen;
+  end;
 end;
 
 procedure TIfdefTabDefinition.HandleEditChange(_Sender: TObject);
@@ -239,6 +262,14 @@ begin
   FEdit.SelLength := FSelLen;
 end;
 
+procedure TIfdefTabDefinition.HandleEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then begin
+    FStringGrid.Perform(WM_KEYDOWN, Key, 0);
+    Key := 0;
+  end;
+end;
+
 procedure TfmConfigureIfDef.pc_IfClassesChange(Sender: TObject);
 var
   ts: TTabSheet;
@@ -247,7 +278,7 @@ begin
   ts := pc_IfClasses.ActivePage;
   if ts.Tag <> 0 then begin
     def := TIfdefTabDefinition(ts.Tag);
-    TWinControl_SetFocus(def.FStringGrid);
+    TWinControl_SetFocus(def.FEdit);
   end;
 end;
 
@@ -282,6 +313,7 @@ begin
   def.AddGridRow('X', 'ExtendedSyntax');
   def.AddGridRow('Y', 'ReferenceInfo / DefinitionInfo');
   def.AddGridRow('Z', '???');
+  def.InitEvents;
 end;
 
 procedure TfmConfigureIfDef.InitVerXxx;
@@ -314,6 +346,7 @@ begin
   def.AddGridRow('VER100', 'Delphi 3');
   def.AddGridRow('VER90', 'Delphi 2');
   def.AddGridRow('VER80', 'Delphi 1');
+  def.InitEvents;
 end;
 
 procedure TfmConfigureIfDef.InitRtlVersion;
@@ -341,6 +374,7 @@ begin
 //  def.AddGridRow('16', 'Delphi 8 .NET / BDS 1');
 //  def.AddGridRow('15', 'Delphi 7');
 //  def.AddGridRow('14', 'Delphi 6');
+  def.InitEvents;
 end;
 
 procedure TfmConfigureIfDef.InitCompilerVersion;
@@ -368,6 +402,7 @@ begin
   def.AddGridRow('16', 'Delphi 8 .NET / BDS 1');
   def.AddGridRow('15', 'Delphi 7');
   def.AddGridRow('14', 'Delphi 6');
+  def.InitEvents;
 end;
 
 initialization
