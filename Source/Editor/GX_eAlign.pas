@@ -57,6 +57,8 @@ type
     class function GetName: string; override;
     function ProcessSelected(Lines: TStrings): Boolean; override;
     procedure LoadConfiguration(Dialog: TfmAlign);
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -64,8 +66,6 @@ type
     function GetDefaultShortCut: TShortCut; override;
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
-    procedure InternalLoadSettings(Settings: TExpertSettings); override;
-    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   end;
 
 var
