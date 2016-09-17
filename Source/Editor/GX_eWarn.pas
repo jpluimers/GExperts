@@ -5,9 +5,12 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
+  Windows,
+  SysUtils,
   Classes,
   Controls,
   Forms,
+  Graphics,
   StdCtrls,
   GX_EditorExpert,
   GX_ConfigurationInfo,
@@ -54,8 +57,8 @@ type
     procedure SelectBestItem;
     procedure InitWarnings;
   public
-    class function Execute(out _Message: string; out _Status: TWarnStatusEnum):
-      Boolean;
+    class function Execute(_bmp: TBitmap;
+      out _Message: string; out _Status: TWarnStatusEnum): Boolean;
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
   end;
@@ -63,11 +66,9 @@ type
 implementation
 
 uses
-  SysUtils,
+  Messages,
   GX_OtaUtils,
   GX_dzVclUtils,
-  Windows,
-  Messages,
   GX_GenericUtils;
 
 {$R *.dfm}
@@ -97,7 +98,7 @@ var
   Msg: string;
   Status: TWarnStatusEnum;
 begin
-  if not TfmConfigureWarning.Execute(Msg, Status) then
+  if not TfmConfigureWarning.Execute(GetBitmap, Msg, Status) then
     Exit; //==>
   InsertString := Format('{$WARN %s %s}', [Msg, WarnStatusToStr(Status)]);
   GxOtaInsertLineIntoEditor(InsertString);
@@ -130,13 +131,14 @@ end;
 
 { TfmConfigureWarning }
 
-class function TfmConfigureWarning.Execute(out _Message: string;
-  out _Status: TWarnStatusEnum): Boolean;
+class function TfmConfigureWarning.Execute(_bmp: TBitmap;
+  out _Message: string; out _Status: TWarnStatusEnum): Boolean;
 var
   frm: TfmConfigureWarning;
 begin
   frm := TfmConfigureWarning.Create(Application);
   try
+    ConvertBitmapToIcon(_bmp, frm.Icon);
     Result := frm.ShowModal = mrOk;
     if Result then begin
       _Message := frm.GetMessage;

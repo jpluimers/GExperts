@@ -1,11 +1,11 @@
 object fmConfigureWarning: TfmConfigureWarning
   Left = 500
   Top = 265
-  Width = 426
-  Height = 352
   ActiveControl = ed_Filter
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Insert WARN directive'
+  ClientHeight = 321
+  ClientWidth = 418
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -30,15 +30,15 @@ object fmConfigureWarning: TfmConfigureWarning
   object lb_Warn: TListBox
     Left = 8
     Top = 48
-    Width = 401
-    Height = 233
+    Width = 393
+    Height = 202
     Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 14
     TabOrder = 1
   end
   object b_ON: TButton
     Left = 8
-    Top = 288
+    Top = 257
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -49,7 +49,7 @@ object fmConfigureWarning: TfmConfigureWarning
   end
   object b_OFF: TButton
     Left = 88
-    Top = 288
+    Top = 257
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -60,7 +60,7 @@ object fmConfigureWarning: TfmConfigureWarning
   end
   object b_Default: TButton
     Left = 168
-    Top = 288
+    Top = 257
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -70,8 +70,8 @@ object fmConfigureWarning: TfmConfigureWarning
     OnClick = b_DefaultClick
   end
   object b_Cancel: TButton
-    Left = 336
-    Top = 288
+    Left = 328
+    Top = 257
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -83,16 +83,16 @@ object fmConfigureWarning: TfmConfigureWarning
   object ed_Filter: TEdit
     Left = 8
     Top = 24
-    Width = 401
+    Width = 393
     Height = 22
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
     OnChange = ed_FilterChange
     OnKeyDown = ed_FilterKeyDown
   end
   object b_ERROR: TButton
     Left = 248
-    Top = 288
+    Top = 257
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
