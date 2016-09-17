@@ -43,8 +43,10 @@ type
     b_OK: TButton;
     b_Cancel: TButton;
     chk_AppendComment: TCheckBox;
+    b_Open: TButton;
     procedure pc_IfClassesChange(Sender: TObject);
     procedure chk_AppendCommentClick(Sender: TObject);
+    procedure b_OpenClick(Sender: TObject);
   private
     FText: string;
     procedure InitCompilerVersion;
@@ -184,25 +186,32 @@ type
     FSelStart: Integer;
     FSelLen: Integer;
     FTextFormatStr: string;
+    FFilename: string;
     procedure UpdateEditText(_Row: Integer);
-    procedure AddGridRow(const _Value, _Desc: string);
     procedure HandleEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure HandleSelectCell(_Sender: TObject; _Col, _Row: Integer; var _CanSelect: Boolean);
     procedure HandleEditEnter(_Sender: TObject);
     procedure HandleEditChange(_Sender: TObject);
   public
     constructor Create(_Form: TfmConfigureIfDef; _pc: TPageControl; const _Caption: string;
-      _SelStart, _SelLen: Integer; const _TextFormatStr: string);
+      _SelStart, _SelLen: Integer; const _TextFormatStr: string; const _Filename: string = '');
     procedure InitEvents;
+    procedure AddGridRow(const _Value, _Desc: string; _LineNo: Integer = 0);
+    function GetLineNoOfCurrentEntry: Integer;
+    property Filename: string read FFilename;
+    property StringGrid: TStringGrid read FStringGrid;
+    property Edit: TEdit read FEdit;
   end;
 
 constructor TIfdefTabDefinition.Create(_Form: TfmConfigureIfDef; _pc: TPageControl;
-  const _Caption: string; _SelStart, _SelLen: Integer; const _TextFormatStr: string);
+  const _Caption: string; _SelStart, _SelLen: Integer; const _TextFormatStr: string;
+  const _Filename: string = '');
 begin
   FForm := _Form;
   FSelStart := _SelStart;
   FSelLen := _SelLen;
   FTextFormatStr := _TextFormatStr;
+  FFilename := _Filename;
   FRow := 0;
 
   FTabSheet := TTabSheet.Create(_Form);
@@ -241,6 +250,17 @@ begin
   FEdit.TabOrder := 0;
 end;
 
+function TIfdefTabDefinition.GetLineNoOfCurrentEntry: Integer;
+var
+  r: Integer;
+begin
+  r := FStringGrid.Row;
+  if (r >= FStringGrid.FixedRows) and (r < FStringGrid.RowCount) then
+    Result := Integer(FStringGrid.Objects[0, r])
+  else
+    Result := 0;
+end;
+
 procedure TIfdefTabDefinition.InitEvents;
 begin
   TGrid_Resize(FStringGrid, [roUseGridWidth, roUseAllRows]);
@@ -252,11 +272,12 @@ begin
   UpdateEditText(FStringGrid.Row);
 end;
 
-procedure TIfdefTabDefinition.AddGridRow(const _Value, _Desc: string);
+procedure TIfdefTabDefinition.AddGridRow(const _Value, _Desc: string; _LineNo: Integer);
 begin
   FStringGrid.RowCount := FRow + 1;
   FStringGrid.Cells[0, FRow] := _Value;
   FStringGrid.Cells[1, FRow] := _Desc;
+  FStringGrid.Objects[0, FRow] := Pointer(_LineNo);
   Inc(FRow);
 end;
 
@@ -317,8 +338,28 @@ begin
   ts := pc_IfClasses.ActivePage;
   if ts.Tag <> 0 then begin
     def := TIfdefTabDefinition(ts.Tag);
-    TWinControl_SetFocus(def.FEdit);
-    FText := def.FEdit.Text;
+    b_Open.Enabled := (def.Filename <> '');
+    TGrid_Resize(def.StringGrid, [roUseGridWidth, roUseAllRows]);
+    TWinControl_SetFocus(def.Edit);
+    FText := def.Edit.Text;
+  end;
+end;
+
+procedure TfmConfigureIfDef.b_OpenClick(Sender: TObject);
+var
+  ts: TTabSheet;
+  def: TIfdefTabDefinition;
+  LineNo: Integer;
+begin
+  ts := pc_IfClasses.ActivePage;
+  if ts.Tag <> 0 then begin
+    def := TIfdefTabDefinition(ts.Tag);
+    if def.Filename = '' then
+      Exit;
+
+    LineNo := def.GetLineNoOfCurrentEntry;
+    GxOtaGoToFileLine(def.Filename, LineNo - 1);
+    ModalResult := mrCancel;
   end;
 end;
 
@@ -450,6 +491,17 @@ begin
   def.InitEvents;
 end;
 
+type
+  TIncDirective = class
+  private
+    FLineIdx: Integer;
+    FComment: string;
+  public
+    constructor Create(_LineIdx: Integer; const _Comment: string);
+    property LineIdx: Integer read FLineIdx;
+    property Comment: string read FComment;
+  end;
+
 procedure TfmConfigureIfDef.InitIncludes;
 
   function IsCompilerDirective(const _Line: string; const _Directive: string;
@@ -494,7 +546,7 @@ procedure TfmConfigureIfDef.InitIncludes;
     Comment: string;
     Directives: TStringList;
     Idx: Integer;
-    pc: PChar;
+    id: TIncDirective;
   begin
     if not Assigned(_Paths) then begin
       _Paths := TStringList.Create;
@@ -518,22 +570,18 @@ procedure TfmConfigureIfDef.InitIncludes;
               or IsCompilerDirective(Line, NOT_UNDEF_STR, Define, Comment) then begin
               if not Directives.Find(Define, Idx) then begin
                 Idx := Directives.Add(Define);
-                if Comment <> '' then
-                  Directives.Objects[Idx] := Pointer(StrNew(PChar(Comment)));
+                Directives.Objects[Idx] := TIncDirective.Create(LineIdx, Comment);
               end;
             end;
           end;
           if Directives.Count > 0 then begin
-            def := TIfdefTabDefinition.Create(Self, pc_IfClasses, Format('&%d %s', [_No, _IncFn]), 4, 1, '{$IFNDEF %s}');
+            def := TIfdefTabDefinition.Create(Self, pc_IfClasses, Format('&%d %s', [_No, _IncFn]),
+              4, 1, '{$IFNDEF %s}', FullFn);
             for Idx := 0 to Directives.Count - 1 do begin
               Define := Directives[Idx];
-              pc := PChar(Directives.Objects[Idx]);
-              if Assigned(pc) then begin
-                Comment := pc;
-                StrDispose(pc);
-              end else
-                Comment := '';
-              def.AddGridRow(Define, Comment);
+              id := TIncDirective(Directives.Objects[Idx]);
+              def.AddGridRow(Define, id.Comment, id.LineIdx + 1);
+              FreeAndNil(id);
             end;
             def.InitEvents;
           end;
@@ -576,6 +624,15 @@ begin
     FreeAndNil(Paths);
     FreeAndNil(Lines);
   end;
+end;
+
+{ TIncDirective }
+
+constructor TIncDirective.Create(_LineIdx: Integer; const _Comment: string);
+begin
+  inherited Create;
+  FLineIdx := _LineIdx;
+  FComment := _Comment;
 end;
 
 initialization

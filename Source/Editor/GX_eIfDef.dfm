@@ -51,11 +51,20 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
     object chk_AppendComment: TCheckBox
       Left = 8
       Top = 12
-      Width = 265
+      Width = 185
       Height = 17
       Caption = '&Append // Comment'
       TabOrder = 2
       OnClick = chk_AppendCommentClick
+    end
+    object b_Open: TButton
+      Left = 200
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'O&pen'
+      TabOrder = 3
+      OnClick = b_OpenClick
     end
   end
 end
