@@ -492,17 +492,22 @@ procedure TfmConfigureIfDef.InitIncludes;
     Line: string;
     Define: string;
     Comment: string;
+    Directives: TStringList;
+    Idx: Integer;
+    pc: PChar;
   begin
     if not Assigned(_Paths) then begin
       _Paths := TStringList.Create;
       GxOtaGetProjectSourcePathStrings(_Paths);
     end;
-    def := nil;
     for i := 0 to _Paths.Count - 1 do begin
       FullFn := AddSlash(_Paths[i]) + _IncFn;
       if FileExists(FullFn) then begin
+        Directives := nil;
         Lines := TGXUnicodeStringList.Create;
         try
+          Directives := TStringList.Create;
+          Directives.Sorted := True;
           Lines.LoadFromFile(FullFn);
           for LineIdx := 0 to Lines.Count - 1 do begin
             Line := Lines[LineIdx];
@@ -511,17 +516,32 @@ procedure TfmConfigureIfDef.InitIncludes;
               or IsCompilerDirective(Line, UNDEF_STR, Define, Comment)
               or IsCompilerDirective(Line, NOT_DEFINE_STR, Define, Comment)
               or IsCompilerDirective(Line, NOT_UNDEF_STR, Define, Comment) then begin
-              if not Assigned(def) then
-                def := TIfdefTabDefinition.Create(Self, pc_IfClasses, Format('&%d %s', [_No, _IncFn]), 4, 1, '{$IFNDEF %s}');
-              def.AddGridRow(Define, Comment);
+              if not Directives.Find(Define, Idx) then begin
+                Idx := Directives.Add(Define);
+                if Comment <> '' then
+                  Directives.Objects[Idx] := Pointer(StrNew(PChar(Comment)));
+              end;
             end;
           end;
-          Exit;
-        finally
-          if Assigned(def) then
+          if Directives.Count > 0 then begin
+            def := TIfdefTabDefinition.Create(Self, pc_IfClasses, Format('&%d %s', [_No, _IncFn]), 4, 1, '{$IFNDEF %s}');
+            for Idx := 0 to Directives.Count - 1 do begin
+              Define := Directives[Idx];
+              pc := PChar(Directives.Objects[Idx]);
+              if Assigned(pc) then begin
+                Comment := pc;
+                StrDispose(pc);
+              end else
+                Comment := '';
+              def.AddGridRow(Define, Comment);
+            end;
             def.InitEvents;
+          end;
+        finally
+          FreeAndNil(Directives);
           FreeAndNil(Lines);
         end;
+        Exit;
       end;
     end;
   end;
