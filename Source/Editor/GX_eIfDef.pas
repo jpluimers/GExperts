@@ -23,6 +23,10 @@ uses
 type
   TIfDefExpert = class(TEditorExpert)
   private
+    FAppendComment: Boolean;
+  protected
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     class function GetName: string; override;
     constructor Create; override;
@@ -49,7 +53,7 @@ type
     procedure InitRtlVersion;
     procedure InitIncludes;
   public
-    class function Execute(_bmp: TBitmap; out _Text: string): Boolean;
+    class function Execute(_bmp: TBitmap; var _AppendComment: Boolean; out _Text: string): Boolean;
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
   end;
@@ -77,7 +81,7 @@ procedure TIfDefExpert.Execute(Sender: TObject);
 var
   InsertString: string;
 begin
-  if not TfmConfigureIfDef.Execute(GetBitmap, InsertString) then
+  if not TfmConfigureIfDef.Execute(GetBitmap, FAppendComment, InsertString) then
     Exit; //==>
   GxOtaInsertLineIntoEditor(InsertString);
 end;
@@ -107,17 +111,35 @@ begin
   Result := False;
 end;
 
+procedure TIfDefExpert.InternalLoadSettings(Settings: TExpertSettings);
+begin
+  inherited InternalLoadSettings(Settings);
+
+  // Do not localize any of the below items
+  FAppendComment := Settings.ReadBool('AppendComment', False);
+end;
+
+procedure TIfDefExpert.InternalSaveSettings(Settings: TExpertSettings);
+begin
+  inherited InternalSaveSettings(Settings);
+
+  // Do not localize any of the below items
+  Settings.WriteBool('AppendComment', FAppendComment);
+end;
+
 { TfmConfigureIfDef }
 
-class function TfmConfigureIfDef.Execute(_bmp: TBitmap; out _Text: string): Boolean;
+class function TfmConfigureIfDef.Execute(_bmp: TBitmap; var _AppendComment: Boolean; out _Text: string): Boolean;
 var
   frm: TfmConfigureIfDef;
 begin
   frm := TfmConfigureIfDef.Create(Application);
   try
     ConvertBitmapToIcon(_bmp, frm.Icon);
+    frm.chk_AppendComment.Checked := _AppendComment;
     Result := frm.ShowModal = mrOk;
     if Result then begin
+      _AppendComment := frm.chk_AppendComment.Checked;
       _Text := frm.FText;
     end;
   finally
