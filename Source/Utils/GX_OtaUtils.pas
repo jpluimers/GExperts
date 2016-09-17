@@ -2700,7 +2700,6 @@ begin
   GxOtaGetProjectSourcePathStrings(Paths, Project, DoProcessing);
   IdeLibraryPath := TStringList.Create;
   try
-
     GxOtaGetIdeLibraryPathStrings(IdeLibraryPath, DoProcessing);
     if DoProcessing then begin
       PlatformName := GxOtaGetProjectPlatform(Project);
