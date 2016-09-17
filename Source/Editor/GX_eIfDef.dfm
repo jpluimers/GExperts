@@ -48,5 +48,14 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
       ModalResult = 2
       TabOrder = 1
     end
+    object chk_AppendComment: TCheckBox
+      Left = 8
+      Top = 12
+      Width = 265
+      Height = 17
+      Caption = '&Append // Comment'
+      TabOrder = 2
+      OnClick = chk_AppendCommentClick
+    end
   end
 end

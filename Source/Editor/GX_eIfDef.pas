@@ -5,6 +5,8 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
+  Windows,
+  SysUtils,
   Classes,
   Controls,
   Forms,
@@ -12,6 +14,7 @@ uses
   ComCtrls,
   Grids,
   ExtCtrls,
+  Graphics,
   GX_EditorExpert,
   GX_ConfigurationInfo,
   GX_BaseForm,
@@ -35,7 +38,9 @@ type
     p_Bottom: TPanel;
     b_OK: TButton;
     b_Cancel: TButton;
+    chk_AppendComment: TCheckBox;
     procedure pc_IfClassesChange(Sender: TObject);
+    procedure chk_AppendCommentClick(Sender: TObject);
   private
     FText: string;
     procedure InitCompilerVersion;
@@ -44,7 +49,7 @@ type
     procedure InitRtlVersion;
     procedure InitIncludes;
   public
-    class function Execute(out _Text: string): Boolean;
+    class function Execute(_bmp: TBitmap; out _Text: string): Boolean;
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
   end;
@@ -52,8 +57,6 @@ type
 implementation
 
 uses
-  Windows,
-  SysUtils,
   Messages,
   ToolsAPI,
   StrUtils,
@@ -74,7 +77,7 @@ procedure TIfDefExpert.Execute(Sender: TObject);
 var
   InsertString: string;
 begin
-  if not TfmConfigureIfDef.Execute(InsertString) then
+  if not TfmConfigureIfDef.Execute(GetBitmap, InsertString) then
     Exit; //==>
   GxOtaInsertLineIntoEditor(InsertString);
 end;
@@ -106,12 +109,13 @@ end;
 
 { TfmConfigureIfDef }
 
-class function TfmConfigureIfDef.Execute(out _Text: string): Boolean;
+class function TfmConfigureIfDef.Execute(_bmp: TBitmap; out _Text: string): Boolean;
 var
   frm: TfmConfigureIfDef;
 begin
   frm := TfmConfigureIfDef.Create(Application);
   try
+    ConvertBitmapToIcon(_bmp, frm.Icon);
     Result := frm.ShowModal = mrOk;
     if Result then begin
       _Text := frm.FText;
@@ -158,6 +162,7 @@ type
     FSelStart: Integer;
     FSelLen: Integer;
     FTextFormatStr: string;
+    procedure UpdateEditText(_Row: Integer);
     procedure AddGridRow(const _Value, _Desc: string);
     procedure HandleEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure HandleSelectCell(_Sender: TObject; _Col, _Row: Integer; var _CanSelect: Boolean);
@@ -215,8 +220,6 @@ begin
 end;
 
 procedure TIfdefTabDefinition.InitEvents;
-var
-  CellText: string;
 begin
   TGrid_Resize(FStringGrid, [roUseGridWidth, roUseAllRows]);
   FStringGrid.OnSelectCell := HandleSelectCell;
@@ -224,10 +227,7 @@ begin
   FEdit.OnEnter := HandleEditEnter;
   FEdit.OnKeyDown := HandleEditKeyDown;
 
-  CellText := FStringGrid.Cells[0, FStringGrid.Row];
-  FEdit.Text := Format(FTextFormatStr, [CellText]);
-  FEdit.SelStart := FSelStart;
-  FEdit.SelLength := FSelLen;
+  UpdateEditText(FStringGrid.Row);
 end;
 
 procedure TIfdefTabDefinition.AddGridRow(const _Value, _Desc: string);
@@ -238,23 +238,34 @@ begin
   Inc(FRow);
 end;
 
-procedure TIfdefTabDefinition.HandleSelectCell(_Sender: TObject; _Col, _Row: Integer;
-  var _CanSelect: Boolean);
+procedure TIfdefTabDefinition.UpdateEditText(_Row: Integer);
 var
   CellText: string;
-  s: string;
+  SelText: string;
+  NewText: string;
 begin
   CellText := FStringGrid.Cells[0, _Row];
 
-  s := FEdit.SelText;
-  FEdit.Text := Format(FTextFormatStr, [CellText]);
+  SelText := FEdit.SelText;
+  NewText := Format(FTextFormatStr, [CellText]);
+  if FForm.chk_AppendComment.Checked then begin
+    CellText := FStringGrid.Cells[1, _Row];
+    NewText := NewText + ' // ' + CellText;
+  end;
+  FEdit.Text := NewText;
   FEdit.SelStart := FSelStart;
   FEdit.SelLength := FSelLen;
-  if s <> '' then begin
-    FEdit.SelText := s;
+  if SelText <> '' then begin
+    FEdit.SelText := SelText;
     FEdit.SelStart := FSelStart;
     FEdit.SelLength := FSelLen;
   end;
+end;
+
+procedure TIfdefTabDefinition.HandleSelectCell(_Sender: TObject; _Col, _Row: Integer;
+  var _CanSelect: Boolean);
+begin
+  UpdateEditText(_Row);
 end;
 
 procedure TIfdefTabDefinition.HandleEditChange(_Sender: TObject);
@@ -287,6 +298,11 @@ begin
     TWinControl_SetFocus(def.FEdit);
     FText := def.FEdit.Text;
   end;
+end;
+
+procedure TfmConfigureIfDef.chk_AppendCommentClick(Sender: TObject);
+begin
+  pc_IfClassesChange(nil);
 end;
 
 procedure TfmConfigureIfDef.InitOptions;
@@ -424,7 +440,7 @@ procedure TfmConfigureIfDef.InitIncludes;
     _Comment := '';
     Incl := '{' + _Directive + ' ';
     s := Trim(_Line);
-    Result := StrBeginsWith(Incl, s, false);
+    Result := StrBeginsWith(Incl, s, False);
     if Result then begin
       p := Pos('}', s);
       if p > Length(Incl) then begin
