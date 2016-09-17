@@ -15,10 +15,14 @@ uses
   Grids,
   ExtCtrls,
   Graphics,
+  ActnList,
+  Menus,
+  Contnrs,
   GX_EditorExpert,
   GX_ConfigurationInfo,
   GX_BaseForm,
-  GX_BaseExpert;
+  GX_BaseExpert,
+  GX_GenericUtils;
 
 type
   TIfDefExpert = class(TEditorExpert)
@@ -44,16 +48,30 @@ type
     b_Cancel: TButton;
     chk_AppendComment: TCheckBox;
     b_Open: TButton;
+    b_Add: TButton;
+    TheActionList: TActionList;
+    act_Open: TAction;
+    act_Add: TAction;
+    pm_IncludeFiles: TPopupMenu;
     procedure pc_IfClassesChange(Sender: TObject);
     procedure chk_AppendCommentClick(Sender: TObject);
-    procedure b_OpenClick(Sender: TObject);
+    procedure act_OpenExecute(Sender: TObject);
+    procedure act_AddExecute(Sender: TObject);
+    procedure pc_IfClassesMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure pc_IfClassesMouseLeave(Sender: TObject);
   private
     FText: string;
+    FSearchPath: TStringList;
+    FFindThread: TFileFindThread;
+    FTabDefinitions: TObjectList;
     procedure InitCompilerVersion;
     procedure InitVerXxx;
     procedure InitOptions;
     procedure InitRtlVersion;
     procedure InitIncludes;
+    procedure IncludeFilesListReady;
+    procedure OnInludeFileSelected(_Sender: TObject);
+    procedure AddIncludePage(_No: Integer; const _FullFn: string);
   public
     class function Execute(_bmp: TBitmap; var _AppendComment: Boolean; out _Text: string): Boolean;
     constructor Create(_Owner: TComponent); override;
@@ -67,8 +85,7 @@ uses
   ToolsAPI,
   StrUtils,
   GX_OtaUtils,
-  GX_dzVclUtils,
-  GX_GenericUtils;
+  GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -150,6 +167,8 @@ begin
 end;
 
 constructor TfmConfigureIfDef.Create(_Owner: TComponent);
+var
+  r: TRect;
 begin
   inherited;
 
@@ -157,17 +176,41 @@ begin
 
   TControl_SetMinConstraints(Self);
 
+  FSearchPath := TStringList.Create;
+  GxOtaGetEffectiveLibraryPath(FSearchPath);
+
+  FTabDefinitions := TObjectList.Create;
+
+  FFindThread := TFileFindThread.Create;
+  FFindThread.FileMasks.Add('*.inc');
+  FFindThread.SearchDirs.Assign(FSearchPath);
+  FFindThread.OnFindComplete := IncludeFilesListReady;
+  FFindThread.StartFind;
+
   InitCompilerVersion;
   InitRtlVersion;
   InitVerXxx;
   InitOptions;
   InitIncludes;
 
+  // tabheight = pc_IfClasses.Height - pc_IfClasses.TabRect.height - tabsheet1.borderwidth;
+  r := pc_IfClasses.TabRect(0);
+  b_Add.Height := r.Bottom - r.Top;
+  b_Add.Top := r.Top;
+  b_Add.Left := pc_IfClasses.Width - b_Add.Width;
+
   pc_IfClassesChange(pc_IfClasses);
 end;
 
 destructor TfmConfigureIfDef.Destroy;
 begin
+  if Assigned(FFindThread) then begin
+    FFindThread.OnFindComplete := nil;
+    FFindThread.Terminate;
+  end;
+  FreeAndNil(FFindThread);
+  FreeAndNil(FSearchPath);
+  FreeAndNil(FTabDefinitions);
   inherited;
 end;
 
@@ -219,6 +262,8 @@ begin
   FTabSheet.Parent := _pc;
   FTabSheet.PageControl := _pc;
   FTabSheet.Caption := _Caption + ' ';
+  if FFilename <> '' then
+    FTabSheet.Hint := FFilename;
 
   // this is how the PageControl knows how to deal with this tab
   FTabSheet.Tag := Integer(Self);
@@ -345,7 +390,44 @@ begin
   end;
 end;
 
-procedure TfmConfigureIfDef.b_OpenClick(Sender: TObject);
+procedure TfmConfigureIfDef.pc_IfClassesMouseLeave(Sender: TObject);
+begin
+  pc_IfClasses.Hint := '';
+  pc_IfClasses.ShowHint := False;
+end;
+
+procedure TfmConfigureIfDef.pc_IfClassesMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
+var
+  hintPause: Integer;
+  tabindex: Integer;
+begin
+  tabindex := pc_IfClasses.IndexOfTabAt(X, Y);
+  if (tabindex >= 0) and (pc_IfClasses.Hint <> pc_IfClasses.Pages[tabindex].Hint) then begin
+    hintPause := Application.hintPause;
+    try
+      if pc_IfClasses.Hint <> '' then
+        Application.hintPause := 0;
+      Application.CancelHint;
+      pc_IfClasses.Hint := pc_IfClasses.Pages[tabindex].Hint;
+      pc_IfClasses.ShowHint := True;
+      Application.ProcessMessages; // force hint to appear
+    finally
+      Application.hintPause := hintPause;
+    end;
+  end;
+end;
+
+procedure TfmConfigureIfDef.act_AddExecute(Sender: TObject);
+var
+  pnt: TPoint;
+begin
+  pnt := point(0, b_Add.Height);
+  pnt := b_Add.ClientToScreen(pnt);
+  pm_IncludeFiles.Popup(pnt.X, pnt.Y);
+end;
+
+procedure TfmConfigureIfDef.act_OpenExecute(Sender: TObject);
 var
   ts: TTabSheet;
   def: TIfdefTabDefinition;
@@ -358,7 +440,7 @@ begin
       Exit;
 
     LineNo := def.GetLineNoOfCurrentEntry;
-    GxOtaGoToFileLine(def.Filename, LineNo - 1);
+    GxOtaGoToFileLine(def.Filename, LineNo);
     ModalResult := mrCancel;
   end;
 end;
@@ -373,6 +455,7 @@ var
   def: TIfdefTabDefinition;
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&Options', 9, 1, '{$IFOPT %s+}');
+  FTabDefinitions.Add(def);
   def.AddGridRow('A', 'Align');
   def.AddGridRow('B', 'BoolEval');
   def.AddGridRow('C', 'Assertions');
@@ -407,6 +490,7 @@ var
   def: TIfdefTabDefinition;
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&VERxxx', 4, 1, '{$IFNDEF %s}');
+  FTabDefinitions.Add(def);
   def.AddGridRow('VER310', 'Delphi 10.1 Berlin / BDS 17');
   def.AddGridRow('VER300', 'Delphi 10.0 Seattle / BDS 17');
   def.AddGridRow('VER290', 'Delphi XE8 / BDS 16');
@@ -440,6 +524,7 @@ var
   def: TIfdefTabDefinition;
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&RtlVersion', 16, 2, '{$IF RtlVersion >= %s}');
+  FTabDefinitions.Add(def);
   def.AddGridRow('31', 'Delphi 10.1 Berlin / BDS 17');
   def.AddGridRow('30', 'Delphi 10.0 Seattle / BDS 17');
   def.AddGridRow('29', 'Delphi XE8 / BDS 16');
@@ -468,6 +553,7 @@ var
   def: TIfdefTabDefinition;
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&CompilerVersion', 21, 2, '{$IF CompilerVersion >= %s}');
+  FTabDefinitions.Add(def);
   def.AddGridRow('31', 'Delphi 10.1 Berlin / BDS 17');
   def.AddGridRow('30', 'Delphi 10.0 Seattle / BDS 17');
   def.AddGridRow('29', 'Delphi XE8 / BDS 16');
@@ -502,94 +588,97 @@ type
     property Comment: string read FComment;
   end;
 
-procedure TfmConfigureIfDef.InitIncludes;
-
-  function IsCompilerDirective(const _Line: string; const _Directive: string;
-    out _Value: string; out _Comment: string): Boolean;
-  var
-    Incl: string;
-    s: string;
-    p: Integer;
-  begin
-    _Comment := '';
-    Incl := '{' + _Directive + ' ';
-    s := Trim(_Line);
-    Result := StrBeginsWith(Incl, s, False);
-    if Result then begin
-      p := Pos('}', s);
-      if p > Length(Incl) then begin
-        _Value := Copy(s, Length(Incl) + 1, p - 1 - Length(Incl));
-        _Value := Trim(_Value);
-        _Value := AnsiDequotedStr(_Value, '''');
-        s := Copy(s, p + 1, MaxInt);
-        p := Pos('//', s);
-        if p > 0 then
-          _Comment := Trim(Copy(s, p + 2, MaxInt));
-      end;
+function IsCompilerDirective(const _Line: string; const _Directive: string;
+  out _Value: string; out _Comment: string): Boolean;
+var
+  Incl: string;
+  s: string;
+  p: Integer;
+begin
+  _Comment := '';
+  Incl := '{' + _Directive + ' ';
+  s := Trim(_Line);
+  Result := StrBeginsWith(Incl, s, False);
+  if Result then begin
+    p := Pos('}', s);
+    if p > Length(Incl) then begin
+      _Value := Copy(s, Length(Incl) + 1, p - 1 - Length(Incl));
+      _Value := Trim(_Value);
+      _Value := AnsiDequotedStr(_Value, '''');
+      s := Copy(s, p + 1, MaxInt);
+      p := Pos('//', s);
+      if p > 0 then
+        _Comment := Trim(Copy(s, p + 2, MaxInt));
     end;
   end;
+end;
 
-  procedure AddIncludePage(var _Paths: TStrings; _No: Integer; const _IncFn: string);
-  const
-    DEFINE_STR = '$DEFINE';
-    UNDEF_STR = '$UNDEF';
-    NOT_DEFINE_STR = '.$DEFINE';
-    NOT_UNDEF_STR = '.$UNDEF';
+procedure TfmConfigureIfDef.AddIncludePage(_No: Integer; const _FullFn: string);
+const
+  DEFINE_STR = '$DEFINE';
+  UNDEF_STR = '$UNDEF';
+  NOT_DEFINE_STR = '.$DEFINE';
+  NOT_UNDEF_STR = '.$UNDEF';
+var
+  def: TIfdefTabDefinition;
+  Lines: TGXUnicodeStringList;
+  LineIdx: Integer;
+  Line: string;
+  Define: string;
+  Comment: string;
+  Directives: TStringList;
+  Idx: Integer;
+  id: TIncDirective;
+begin
+  Directives := nil;
+  Lines := TGXUnicodeStringList.Create;
+  try
+    Directives := TStringList.Create;
+    Directives.Sorted := True;
+    Lines.LoadFromFile(_FullFn);
+    for LineIdx := 0 to Lines.Count - 1 do begin
+      Line := Lines[LineIdx];
+      Line := Trim(Line);
+      if IsCompilerDirective(Line, DEFINE_STR, Define, Comment)
+        or IsCompilerDirective(Line, UNDEF_STR, Define, Comment)
+        or IsCompilerDirective(Line, NOT_DEFINE_STR, Define, Comment)
+        or IsCompilerDirective(Line, NOT_UNDEF_STR, Define, Comment) then begin
+        if not Directives.Find(Define, Idx) then begin
+          Idx := Directives.Add(Define);
+          Directives.Objects[Idx] := TIncDirective.Create(LineIdx, Comment);
+        end;
+      end;
+    end;
+    if Directives.Count > 0 then begin
+      def := TIfdefTabDefinition.Create(Self, pc_IfClasses,
+        Format('&%d %s', [_No, ExtractFilename(_FullFn)]), 4, 1, '{$IFNDEF %s}', _FullFn);
+      FTabDefinitions.Add(def);
+      for Idx := 0 to Directives.Count - 1 do begin
+        Define := Directives[Idx];
+        id := TIncDirective(Directives.Objects[Idx]);
+        def.AddGridRow(Define, id.Comment, id.LineIdx + 1);
+        FreeAndNil(id);
+      end;
+      def.InitEvents;
+    end;
+  finally
+    FreeAndNil(Directives);
+    FreeAndNil(Lines);
+  end;
+end;
+
+procedure TfmConfigureIfDef.InitIncludes;
+
+  procedure AddIfFound(var _Number: Integer; const _fn: string);
   var
-    def: TIfdefTabDefinition;
     i: Integer;
     FullFn: string;
-    Lines: TGXUnicodeStringList;
-    LineIdx: Integer;
-    Line: string;
-    Define: string;
-    Comment: string;
-    Directives: TStringList;
-    Idx: Integer;
-    id: TIncDirective;
   begin
-    if not Assigned(_Paths) then begin
-      _Paths := TStringList.Create;
-      GxOtaGetProjectSourcePathStrings(_Paths);
-    end;
-    for i := 0 to _Paths.Count - 1 do begin
-      FullFn := AddSlash(_Paths[i]) + _IncFn;
+    for i := 0 to FSearchPath.Count - 1 do begin
+      FullFn := AddSlash(FSearchPath[i]) + _fn;
       if FileExists(FullFn) then begin
-        Directives := nil;
-        Lines := TGXUnicodeStringList.Create;
-        try
-          Directives := TStringList.Create;
-          Directives.Sorted := True;
-          Lines.LoadFromFile(FullFn);
-          for LineIdx := 0 to Lines.Count - 1 do begin
-            Line := Lines[LineIdx];
-            Line := Trim(Line);
-            if IsCompilerDirective(Line, DEFINE_STR, Define, Comment)
-              or IsCompilerDirective(Line, UNDEF_STR, Define, Comment)
-              or IsCompilerDirective(Line, NOT_DEFINE_STR, Define, Comment)
-              or IsCompilerDirective(Line, NOT_UNDEF_STR, Define, Comment) then begin
-              if not Directives.Find(Define, Idx) then begin
-                Idx := Directives.Add(Define);
-                Directives.Objects[Idx] := TIncDirective.Create(LineIdx, Comment);
-              end;
-            end;
-          end;
-          if Directives.Count > 0 then begin
-            def := TIfdefTabDefinition.Create(Self, pc_IfClasses, Format('&%d %s', [_No, _IncFn]),
-              4, 1, '{$IFNDEF %s}', FullFn);
-            for Idx := 0 to Directives.Count - 1 do begin
-              Define := Directives[Idx];
-              id := TIncDirective(Directives.Objects[Idx]);
-              def.AddGridRow(Define, id.Comment, id.LineIdx + 1);
-              FreeAndNil(id);
-            end;
-            def.InitEvents;
-          end;
-        finally
-          FreeAndNil(Directives);
-          FreeAndNil(Lines);
-        end;
-        Exit;
+        AddIncludePage(_Number, FullFn);
+        Inc(_Number);
       end;
     end;
   end;
@@ -599,15 +688,13 @@ const
   I_STR = '$I';
 var
   Lines: TGXUnicodeStringList;
-  Paths: TStrings;
   i: Integer;
   s: string;
   fn: string;
-  No: Integer;
+  Number: Integer;
   Comment: string;
 begin
-  No := 1;
-  Paths := nil;
+  Number := 1;
   Lines := TGXUnicodeStringList.Create;
   try
     if not GxOtaGetActiveEditorText(Lines, False) then
@@ -616,14 +703,61 @@ begin
       s := Lines[i];
       if IsCompilerDirective(s, INCLUDE_STR, fn, Comment)
         or IsCompilerDirective(s, I_STR, fn, Comment) then begin
-        AddIncludePage(Paths, No, fn);
-        Inc(No);
+        AddIfFound(Number, fn);
       end;
     end;
   finally
-    FreeAndNil(Paths);
     FreeAndNil(Lines);
   end;
+end;
+
+procedure TfmConfigureIfDef.IncludeFilesListReady;
+
+  function IsKnownIncFile(const _fn: string): Boolean;
+  var
+    DefIdx: Integer;
+    def: TIfdefTabDefinition;
+  begin
+    for DefIdx := 0 to FTabDefinitions.Count - 1 do begin
+      def := FTabDefinitions[DefIdx] as TIfdefTabDefinition;
+      if SameText(_fn, def.Filename) then begin
+        Result := True;
+        Exit;
+      end;
+    end;
+    Result := False;
+  end;
+
+var
+  ResIdx: Integer;
+  fn: string;
+begin
+  // This is called via Synchronize.
+  // Can we be sure that the static tabs have already been created?
+  for ResIdx := 0 to FFindThread.Results.Count - 1 do begin
+    fn := FFindThread.Results[ResIdx];
+    if not IsKnownIncFile(fn) then begin
+      TPopupMenu_AppendMenuItem(pm_IncludeFiles, fn, OnInludeFileSelected);
+    end;
+  end;
+end;
+
+procedure TfmConfigureIfDef.OnInludeFileSelected(_Sender: TObject);
+var
+  DefIdx: Integer;
+  def: TIfdefTabDefinition;
+  Number: Integer;
+  mi: TMenuItem;
+begin
+  mi := _Sender as TMenuItem;
+  Number := 1;
+  for DefIdx := 0 to FTabDefinitions.Count - 1 do begin
+    def := FTabDefinitions[DefIdx] as TIfdefTabDefinition;
+    if def.Filename <> '' then
+      Inc(Number);
+  end;
+  AddIncludePage(Number, StripHotkey(mi.Caption));
+  mi.Free;
 end;
 
 { TIncDirective }
