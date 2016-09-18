@@ -88,11 +88,13 @@ type
     procedure InitIncludes;
     procedure IncludeFilesListReady;
     procedure OnInludeFileSelected(_Sender: TObject);
-    procedure AddIncludePage(_No: Integer; const _FullFn: string);
+    function AddIncludePage(_No: Integer; const _FullFn: string; _IsIncluded: boolean): TTabSheet;
   public
-    class function Execute(_bmp: TBitmap; var _AppendComment: Boolean; out _Text: string): Boolean;
+    class function Execute(_bmp: TBitmap; var _AppendComment: Boolean;
+      out _Text: string; out _IncludeFile: string): Boolean;
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
+    function GetIncludeFile: string;
   end;
 
 implementation
@@ -115,10 +117,41 @@ end;
 procedure TIfDefExpert.Execute(Sender: TObject);
 var
   InsertString: string;
+  IncFile: string;
+  Lines: TGXUnicodeStringList;
+  i: Integer;
+  s: string;
+  CurPos: TOTAEditPos;
+  EditPos: TOTAEditPos;
 begin
-  if not TfmConfigureIfDef.Execute(GetBitmap, FAppendComment, InsertString) then
+  if not TfmConfigureIfDef.Execute(GetBitmap, FAppendComment, InsertString, IncFile) then
     Exit; //==>
   GxOtaInsertLineIntoEditor(InsertString);
+
+  if IncFile <> '' then begin
+    CurPos := GxOtaGetCurrentEditPos();
+    Lines := TGXUnicodeStringList.Create;
+    try
+      if not GxOtaGetActiveEditorText(Lines, False) then
+        Exit; //==>
+      for i := 0 to Lines.Count - 1 do begin
+        s := Lines[i];
+        s := Trim(s);
+        if SameText(s, 'INTERFACE') then begin
+          EditPos.Col := 1;
+          EditPos.Line := i + 2; // +1 for index -> number, +1 for next line
+          GxOtaGotoEditPos(EditPos);
+          GxOtaInsertLineIntoEditor('{$I ' + IncFile + '}' + CRLF);
+          if CurPos.Line > EditPos.Line then
+            Inc(CurPos.Line);
+          GxOtaGotoEditPos(CurPos);
+          Exit; //==>
+        end;
+      end;
+    finally
+      FreeAndNil(Lines);
+    end;
+  end;
 end;
 
 function TIfDefExpert.GetDisplayName: string;
@@ -164,7 +197,8 @@ end;
 
 { TfmConfigureIfDef }
 
-class function TfmConfigureIfDef.Execute(_bmp: TBitmap; var _AppendComment: Boolean; out _Text: string): Boolean;
+class function TfmConfigureIfDef.Execute(_bmp: TBitmap; var _AppendComment: Boolean;
+  out _Text: string; out _IncludeFile: string): Boolean;
 var
   frm: TfmConfigureIfDef;
 begin
@@ -176,6 +210,7 @@ begin
     if Result then begin
       _AppendComment := frm.chk_AppendComment.Checked;
       _Text := frm.FText;
+      _IncludeFile := frm.GetIncludeFile;
     end;
   finally
     FreeAndNil(frm);
@@ -248,6 +283,7 @@ type
     FSelLen: Integer;
     FTextFormatStr: string;
     FFilename: string;
+    FIsIncluded: Boolean;
     procedure UpdateEditText(_Row: Integer);
     procedure HandleEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure HandleSelectCell(_Sender: TObject; _Col, _Row: Integer; var _CanSelect: Boolean);
@@ -255,24 +291,27 @@ type
     procedure HandleEditChange(_Sender: TObject);
   public
     constructor Create(_Form: TfmConfigureIfDef; _pc: TPageControl; const _Caption: string;
-      _SelStart, _SelLen: Integer; const _TextFormatStr: string; const _Filename: string = '');
+      _SelStart, _SelLen: Integer; const _TextFormatStr: string;
+      _IsIncluded: Boolean = True; const _Filename: string = '');
     procedure InitEvents;
     procedure AddGridRow(const _Value, _Desc: string; _LineNo: Integer = 0);
     function GetLineNoOfCurrentEntry: Integer;
     property Filename: string read FFilename;
     property StringGrid: TStringGrid read FStringGrid;
     property Edit: TEdit read FEdit;
+    property IsIncluded: Boolean read FIsIncluded;
   end;
 
 constructor TIfdefTabDefinition.Create(_Form: TfmConfigureIfDef; _pc: TPageControl;
   const _Caption: string; _SelStart, _SelLen: Integer; const _TextFormatStr: string;
-  const _Filename: string = '');
+  _IsIncluded: Boolean = True; const _Filename: string = '');
 begin
   FForm := _Form;
   FSelStart := _SelStart;
   FSelLen := _SelLen;
   FTextFormatStr := _TextFormatStr;
   FFilename := _Filename;
+  FIsIncluded := _IsIncluded;
   FRow := 0;
 
   FTabSheet := TTabSheet.Create(_Form);
@@ -405,6 +444,20 @@ begin
     TGrid_Resize(def.StringGrid, [roUseGridWidth, roUseAllRows]);
     TWinControl_SetFocus(def.Edit);
     FText := def.Edit.Text;
+  end;
+end;
+
+function TfmConfigureIfDef.GetIncludeFile: string;
+var
+  ts: TTabSheet;
+  def: TIfdefTabDefinition;
+begin
+  Result := '';
+  ts := pc_IfClasses.ActivePage;
+  if ts.Tag <> 0 then begin
+    def := TIfdefTabDefinition(ts.Tag);
+    if not def.IsIncluded then
+      Result := ExtractFileName(def.Filename);
   end;
 end;
 
@@ -631,7 +684,7 @@ begin
   end;
 end;
 
-procedure TfmConfigureIfDef.AddIncludePage(_No: Integer; const _FullFn: string);
+function TfmConfigureIfDef.AddIncludePage(_No: Integer; const _FullFn: string; _IsIncluded: boolean): TTabSheet;
 const
   DEFINE_STR = '$DEFINE';
   UNDEF_STR = '$UNDEF';
@@ -648,6 +701,7 @@ var
   Idx: Integer;
   id: TIncDirective;
 begin
+  Result := nil;
   Directives := nil;
   Lines := TGXUnicodeStringList.Create;
   try
@@ -669,7 +723,7 @@ begin
     end;
     if Directives.Count > 0 then begin
       def := TIfdefTabDefinition.Create(Self, pc_IfClasses,
-        Format('&%d %s', [_No, ExtractFilename(_FullFn)]), 4, 1, '{$IFNDEF %s}', _FullFn);
+        Format('&%d %s', [_No, ExtractFileName(_FullFn)]), 4, 1, '{$IFNDEF %s}', _IsIncluded, _FullFn);
       FTabDefinitions.Add(def);
       for Idx := 0 to Directives.Count - 1 do begin
         Define := Directives[Idx];
@@ -678,6 +732,7 @@ begin
         FreeAndNil(id);
       end;
       def.InitEvents;
+      Result := def.FTabSheet;
     end;
   finally
     FreeAndNil(Directives);
@@ -695,7 +750,7 @@ procedure TfmConfigureIfDef.InitIncludes;
     for i := 0 to FSearchPath.Count - 1 do begin
       FullFn := AddSlash(FSearchPath[i]) + _fn;
       if FileExists(FullFn) then begin
-        AddIncludePage(_Number, FullFn);
+        AddIncludePage(_Number, FullFn, True);
         Inc(_Number);
       end;
     end;
@@ -766,6 +821,7 @@ var
   def: TIfdefTabDefinition;
   Number: Integer;
   mi: TMenuItem;
+  ts: TTabSheet;
 begin
   mi := _Sender as TMenuItem;
   Number := 1;
@@ -774,7 +830,9 @@ begin
     if def.Filename <> '' then
       Inc(Number);
   end;
-  AddIncludePage(Number, StripHotkey(mi.Caption));
+  ts := AddIncludePage(Number, StripHotkey(mi.Caption), False);
+  if Assigned(ts) then
+    pc_IfClasses.ActivePage := ts;
   mi.Free;
 end;
 
