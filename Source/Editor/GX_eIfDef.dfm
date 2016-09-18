@@ -3,33 +3,32 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Insert IFDEF / IFNDEF'
   ClientHeight = 393
-  ClientWidth = 442
+  ClientWidth = 699
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   object pc_IfClasses: TPageControl
     Left = 0
     Top = 0
-    Width = 442
+    Width = 699
     Height = 352
     Align = alClient
     TabOrder = 0
     OnChange = pc_IfClassesChange
-    OnMouseLeave = pc_IfClassesMouseLeave
     OnMouseMove = pc_IfClassesMouseMove
   end
   object p_Bottom: TPanel
     Left = 0
     Top = 352
-    Width = 442
+    Width = 699
     Height = 41
     Align = alBottom
     TabOrder = 1
     DesignSize = (
-      442
+      699
       41)
     object b_OK: TButton
-      Left = 279
+      Left = 536
       Top = 8
       Width = 75
       Height = 25
@@ -40,7 +39,7 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
       TabOrder = 0
     end
     object b_Cancel: TButton
-      Left = 359
+      Left = 616
       Top = 8
       Width = 75
       Height = 25
@@ -60,7 +59,7 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
       OnClick = chk_AppendCommentClick
     end
     object b_Open: TButton
-      Left = 200
+      Left = 457
       Top = 8
       Width = 75
       Height = 25
@@ -72,7 +71,7 @@ inherited fmConfigureIfDef: TfmConfigureIfDef
     end
   end
   object b_Add: TButton
-    Left = 416
+    Left = 673
     Top = 0
     Width = 25
     Height = 25

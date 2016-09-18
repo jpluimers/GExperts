@@ -17,12 +17,29 @@ uses
   Graphics,
   ActnList,
   Menus,
+  Messages,
   Contnrs,
   GX_EditorExpert,
   GX_ConfigurationInfo,
   GX_BaseForm,
   GX_BaseExpert,
   GX_GenericUtils;
+
+{$IFNDEF GX_VER160}
+// Delphi 6/7 does not have the MouseLeave event so we implement it via
+// an interposer class using http://stackoverflow.com/a/3182185/49925
+type
+  TPageControl = class(ComCtrls.TPageControl)
+  private
+    FMouseTracking: Boolean;
+    FOnMouseLeave: TNotifyEvent;
+    procedure WMMouseLeave(var Msg: TMessage); message WM_MOUSELEAVE;
+  protected
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+  published
+    property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
+  end;
+{$ENDIF}
 
 type
   TIfDefExpert = class(TEditorExpert)
@@ -81,7 +98,6 @@ type
 implementation
 
 uses
-  Messages,
   ToolsAPI,
   StrUtils,
   GX_OtaUtils,
@@ -175,6 +191,8 @@ begin
   p_Bottom.BevelOuter := bvNone;
 
   TControl_SetMinConstraints(Self);
+
+  pc_IfClasses.OnMouseLeave := pc_IfClassesMouseLeave;
 
   FSearchPath := TStringList.Create;
   GxOtaGetEffectiveLibraryPath(FSearchPath);
@@ -383,7 +401,7 @@ begin
   ts := pc_IfClasses.ActivePage;
   if ts.Tag <> 0 then begin
     def := TIfdefTabDefinition(ts.Tag);
-    b_Open.Enabled := (def.Filename <> '');
+    act_Open.Enabled := (def.Filename <> '');
     TGrid_Resize(def.StringGrid, [roUseGridWidth, roUseAllRows]);
     TWinControl_SetFocus(def.Edit);
     FText := def.Edit.Text;
@@ -767,6 +785,30 @@ begin
   inherited Create;
   FLineIdx := _LineIdx;
   FComment := _Comment;
+end;
+
+{ TPageControl }
+
+procedure TPageControl.MouseMove(Shift: TShiftState; X, Y: Integer);
+var
+  mEvnt: TTrackMouseEvent;
+begin
+  inherited;
+  if not FMouseTracking then begin
+    mEvnt.cbSize := SizeOf(mEvnt);
+    mEvnt.dwFlags := TME_LEAVE;
+    mEvnt.hwndTrack := Handle;
+    TrackMouseEvent(mEvnt);
+    FMouseTracking := True;
+  end;
+end;
+
+procedure TPageControl.WMMouseLeave(var Msg: TMessage);
+begin
+  Msg.Result := 0;
+  FMouseTracking := False;
+  if Assigned(FOnMouseLeave) then
+    FOnMouseLeave(Self);
 end;
 
 initialization
