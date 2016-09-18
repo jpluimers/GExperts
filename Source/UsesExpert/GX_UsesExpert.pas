@@ -407,7 +407,7 @@ var
   Found: Integer;
   SearchRec: TSearchRec;
 begin
-  // Read all dcu files from the $(DELPHI)\lib directory
+  // Read all dcu files from the $(DELPHI)\lib directory (for XE+ use the Win32\Release subdir)
   Found := SysUtils.FindFirst(AddSlash(ExtractFilePath(GetIdeRootDirectory)) +
     AddSlash('lib') {$IFDEF GX_VER220_up} + AddSlash('Win32') + AddSlash('Release') {$ENDIF} + '*.dcu', $3F, SearchRec);
   try
