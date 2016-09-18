@@ -1213,7 +1213,9 @@ begin
     VK_PRIOR, VK_NEXT, VK_HOME, VK_END, VK_INSERT, VK_DELETE,
     VK_NUMLOCK, VK_PAUSE, VK_PRINT,
     VK_DIVIDE] then
-    _hk.Modifiers := _hk.Modifiers + [hkExt];
+    _hk.Modifiers := _hk.Modifiers + [hkExt]
+  else
+    _hk.Modifiers := _hk.Modifiers - [hkExt];
 end;
 
 function THotkey_GetHotkey(_hk: THotKey): TShortCut;
