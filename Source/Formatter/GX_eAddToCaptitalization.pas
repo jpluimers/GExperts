@@ -10,6 +10,8 @@ uses
 type
   TAddToCapitalizationExpert = class(TEditorExpert)
   public
+    // Internal name of expert for expert identification.
+    class function GetName: string; override;
     function GetHelpString: string; override;
     procedure Execute(Sender: TObject); override;
     function GetDisplayName: string; override;
@@ -38,6 +40,11 @@ resourcestring
     + 'of the code formatter. It will overwrite existing entries.';
 begin
   Result := SAddToCapitalizationHelp;
+end;
+
+class function TAddToCapitalizationExpert.GetName: string;
+begin
+  Result := 'AddToCapitalization';
 end;
 
 function TAddToCapitalizationExpert.HasConfigOptions: Boolean;
