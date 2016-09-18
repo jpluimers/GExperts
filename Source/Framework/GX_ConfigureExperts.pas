@@ -68,7 +68,8 @@ uses
   Themes,
   GX_GenericUtils,
   GX_BaseExpert,
-  GX_dzVclUtils;
+  GX_dzVclUtils,
+  GX_DbugIntf;
 
 function IsThemesEnabled: Boolean;
 begin
@@ -259,6 +260,101 @@ begin
   THotkey_SetHotkey(GetHotkeyCtrl(GetPanel(sbxExperts, Idx)), AnExpert.GetDefaultShortCut);
 end;
 
+type
+  THotKeyHack = class(thotkey)
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+  end;
+
+{ THotKeyHack }
+
+function AppendToCsvStr(const _AppendTo: string; const _s: string): string;
+begin
+  if _AppendTo = '' then
+    Result := _s
+  else
+    Result := _AppendTo + ', ' + _s;
+end;
+
+{$IFOPT D+}
+function ModifierStr(_Modifiers: THKModifiers): string;
+begin
+  Result := '';
+  if hkShift in _Modifiers then
+    Result := AppendToCsvStr(Result, 'hkShift');
+  if hkCtrl in _Modifiers then
+    Result := AppendToCsvStr(Result, 'hkCtrl');
+  if hkAlt in _Modifiers then
+    Result := AppendToCsvStr(Result, 'hkAlt');
+  if hkExt in _Modifiers then
+    Result := AppendToCsvStr(Result, 'hkExt');
+end;
+
+function ShiftStateToStr(_Shift: TShiftState): string;
+begin
+  Result := '';
+  if ssShift in _Shift then
+    Result := AppendToCsvStr(Result, 'ssShift');
+  if ssAlt in _Shift then
+    Result := AppendToCsvStr(Result, 'ssAlt');
+  if ssCtrl in _Shift then
+    Result := AppendToCsvStr(Result, 'ssCtrl');
+  if ssLeft in _Shift then
+    Result := AppendToCsvStr(Result, 'ssLeft');
+  if ssRight in _Shift then
+    Result := AppendToCsvStr(Result, 'ssRight');
+  if ssMiddle in _Shift then
+    Result := AppendToCsvStr(Result, 'ssMiddle');
+  if ssDouble in _Shift then
+    Result := AppendToCsvStr(Result, 'ssDouble');
+end;
+{$ENDIF}
+
+procedure THotKeyHack.KeyDown(var Key: Word; Shift: TShiftState);
+var
+  HkMods: THKModifiers;
+begin
+  inherited;
+  // This is a fix for THotkey behaving very oddly:
+  // When pressing a key without modifiers (e.g. A) it is displayed as "A" or sometimes as "Shift + A"
+  // even though InvalidKeys is [hcNone, hcShift] so neihter should be a valid hotkey.
+  // This explicitly sets the Modifiers property to get the documented behaviour.
+  // It has a side effect, though:
+  // Pressing Shift followed by F2 will first show Alt+ followed by Shift+F2.
+  // But that's better than the original behaviour.
+  HkMods := Modifiers;
+  if ssShift in Shift then
+    Include(HkMods, hkShift)
+  else
+    Exclude(HkMods, hkShift);
+  if ssCtrl in Shift then
+    Include(HkMods, hkCtrl)
+  else
+    Exclude(HkMods, hkCtrl);
+  if ssAlt in Shift then
+    Include(HkMods, hkAlt)
+  else
+    Exclude(HkMods, hkAlt);
+  if (hkmods = []) or (HkMods = [hkShift]) then begin
+    HkMods := [hkAlt];
+  end;
+  Modifiers := HkMods;
+{$IFOPT D+}
+  SendDebugFmt('KeyDown(Key: %4x, Shift: [%s], ShortCut: %s, Modifiers: [%s]',
+    [Key, ShiftStateToStr(Shift), ShortCutToText(HotKey), ModifierStr(Modifiers)]);
+{$ENDIF}
+end;
+
+procedure THotKeyHack.KeyUp(var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  inherited;
+{$IFOPT D+}
+  SendDebugFmt('KeyUp(Key: %4x, Shift: [%s], ShortCut: %s, Modifiers: [%s]',
+    [Key, ShiftStateToStr(Shift), ShortCutToText(HotKey), ModifierStr(Modifiers)]);
+{$ENDIF}
+end;
+
 procedure TfrConfigureExperts.Init(_Experts: TList);
 resourcestring
   SConfigureButtonCaption = 'Configure...';
@@ -317,10 +413,13 @@ begin
     chk.Checked := AnExpert.Active;
     chk.Tag := i;
 
-    hk := THotKey.Create(pnl);
+    hk := THotKeyHack.Create(pnl);
     hk.Parent := pnl;
     hk.BoundsRect := edtExpert.BoundsRect;
     hk.Anchors := edtExpert.Anchors;
+    hk.DoubleBuffered := False;
+    hk.InvalidKeys := [hcNone, hcShift];
+    hk.Modifiers := [hkAlt];
     THotkey_SetHotkey(hk, AnExpert.ShortCut);
     hk.Visible := AnExpert.CanHaveShortCut;
     hk.Tag := i;
@@ -420,3 +519,4 @@ begin
 end;
 
 end.
+
