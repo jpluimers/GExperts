@@ -5,6 +5,10 @@ unit GX_UsesManager;
 // Modified by Erik Berry to remove external dependencies and cleanup
 // These routines do not support C++ source
 
+// note: Even though TUsesManager.Create takes a parameter specifying the unit to work on
+//       this is only used in the parser. Any of the methodes manipulating the uses list
+//       always work on the current source editor.
+
 interface
 
 uses Classes, Contnrs, ToolsAPI, mPasLex;
@@ -49,6 +53,9 @@ type
     function GetCurrentUnitName: string;
     function UsesLineWouldBeTooLong(InsertPos, InsertLength: Integer): Boolean;
     procedure InternalInit;
+    procedure InternalReplaceInUses(UsesList: TUsesList; const AOldUnitName, ANewUnitName: string);
+    function InternalAddToUsesSection(const AUnitName: string; ToInterface: Boolean): Boolean;
+    procedure InternalRemoveFromUses(InInterface: Boolean; const AUnitName: string);
   public
     constructor Create(const SourceEditor: IOTASourceEditor); overload;
     constructor Create(const FileName: string); overload;
@@ -56,15 +63,15 @@ type
     function GetUsesStatus(const AUnitName: string): TUsesStatus;
     function AddToImpSection(const AUnitName: string): Boolean;
     function AddToIntSection(const AUnitName: string): Boolean;
-    function InternalAddToUsesSection(const AUnitName: string; ToInterface: Boolean): Boolean;
     function IsPositionBeforeImplementation(Pos: Integer): Boolean;
     function IsPositionInUsesList(Pos: integer): TPosInUsesList;
     procedure AddUnits(AUnits: TStrings; AToImplementation: Boolean = True);
-    procedure InternalRemoveFromUses(InInterface: Boolean; const AUnitName: string);
     procedure RemoveFromImplUses(const AUnitName: string);
     procedure RemoveImplementationUses;
     procedure RemoveFromIntfUses(const AUnitName: string);
     procedure RemoveInterfaceUses;
+    procedure ReplaceInImplUses(const AOldUnitName, ANewUnitName: string);
+    procedure ReplaceInIntUses(const AOldUnitName, ANewUnitName: string);
     property ImplementationUses: TUsesList read FImplemUses;
     property InterfaceUses: TUsesList read FInterfUses;
   end;
@@ -77,6 +84,8 @@ procedure GetImplementationUnits(Units: TStrings);
 procedure GetInterfaceUnits(Units: TStrings);
 procedure RemoveUnitFromImplementation(const AUnitName: string);
 procedure RemoveUnitFromInterface(const AUnitName: string);
+procedure ReplaceUnitInImplementation(const AOldUnitName, ANewUnitName: string);
+procedure ReplaceUnitInInterface(const AOldUnitName, ANewUnitName: string);
 
 
 implementation
@@ -158,6 +167,26 @@ begin
   with TUsesManager.Create(GxOtaGetCurrentSourceEditor) do
   try
     RemoveFromIntfUses(AUnitName);
+  finally
+    Free;
+  end;
+end;
+
+procedure ReplaceUnitInImplementation(const AOldUnitName, ANewUnitName: string);
+begin
+  with TUsesManager.Create(GxOtaGetCurrentSourceEditor) do
+  try
+    ReplaceInImplUses(AOldUnitName, ANewUnitName);
+  finally
+    Free;
+  end;
+end;
+
+procedure ReplaceUnitInInterface(const AOldUnitName, ANewUnitName: string);
+begin
+  with TUsesManager.Create(GxOtaGetCurrentSourceEditor) do
+  try
+    ReplaceInIntUses(AOldUnitName, ANewUnitName);
   finally
     Free;
   end;
@@ -416,7 +445,7 @@ end;
      -> Remove the unit name and trailing comma
   If the unit is the last one in the uses clause:
     uses Unit2, Unit1;
-    -> Remove unitthe  name and comma before it
+    -> Remove the unit name and comma before it
   If the unit the middle of the uses clause:
     uses Unit2, Unit1, Unit3; // Comma directly after the unit name
     -> The Unit name and trailing comma are deleted
@@ -523,6 +552,36 @@ begin
   BegIndex := FBegOfIntfUses;
   Count := FEndOfIntfUses - BegIndex;
   GxOtaDeleteTextFromPos(BegIndex, Count);
+end;
+
+procedure TUsesManager.InternalReplaceInUses(UsesList: TUsesList; const AOldUnitName, ANewUnitName: string);
+var
+  ReplaceUnit: TUsesItem;
+  UnitIndex: Integer;
+  BegPos, EndPos: Integer;
+  SourceEditor: IOTASourceEditor;
+begin
+  UnitIndex := UsesList.IndexOf(AOldUnitName);
+  if UnitIndex = -1 then
+    exit;
+
+  ReplaceUnit := UsesList.Items[UnitIndex];
+  SourceEditor := GxOtaGetCurrentSourceEditor;
+
+  EndPos := ReplaceUnit.EndPos;
+  BegPos := ReplaceUnit.BeginPos;
+  GxOtaDeleteTextFromPos(BegPos, EndPos - BegPos, SourceEditor);
+  GxOtaInsertTextIntoEditorAtCharPos(ANewUnitName, BegPos, SourceEditor);
+end;
+
+procedure TUsesManager.ReplaceInImplUses(const AOldUnitName, ANewUnitName: string);
+begin
+  InternalReplaceInUses(FImplemUses, AOldUnitName, ANewUnitName);
+end;
+
+procedure TUsesManager.ReplaceInIntUses(const AOldUnitName, ANewUnitName: string);
+begin
+  InternalReplaceInUses(FInterfUses, AOldUnitName, ANewUnitName);
 end;
 
 function TUsesList.Add: TUsesItem;
