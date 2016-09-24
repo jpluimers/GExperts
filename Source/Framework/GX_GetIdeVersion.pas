@@ -30,6 +30,7 @@ type
      ideRSXE8,
      ideRS10,
      ideRS101, // Rad Studio 10.1 Berlin
+     ideRS101U1, // Rad Studio 10.1 Berlin Update 1
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -811,16 +812,17 @@ end;
 }
 function GetRS101Version: TBorlandIdeVersion;
 const
-  CoreIde2400: TVersionNumber = (Minor: 0; Major: 0; Build: 0; Release: 0);
+  CoreIde2400: TVersionNumber = (Minor: 24; Major: 0; Build: 6822; Release: 22858);
+  CoreIde2400Upd1: TVersionNumber = (Minor: 24; Major: 0; Build: 8770; Release: 24468);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
 begin
   Result := ideRS101;
   CoreIdeFileVersion := GetFileVersionNumber(GetIdeRootDirectory + 'Bin\coreide240.bpl');
-  VersionNumber := CompareVersionNumber(CoreIdeFileVersion, CoreIde2400);
-  if VersionNumber > 0 then begin
-    //Result := ideRS10U1;
+  VersionNumber := CompareVersionNumber(CoreIde2400Upd1, CoreIde2400);
+  if VersionNumber >= 0 then begin
+    Result := ideRS101U1;
   end;
 end;
 
@@ -930,7 +932,7 @@ begin
 
   {$IFDEF VER310}
     Result := GetRS101Version;
-    Assert(Result in [ideRS101]);
+    Assert(Result in [ideRS101, ideRS101U1]);
   {$ENDIF VER310}
 
   if Result = ideUnknown then
