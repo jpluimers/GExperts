@@ -155,6 +155,10 @@ type
     FAliases: TStringList;
     FFindThread: TFileFindThread;
     FCurrentIdentIdx: Integer;
+    // maintains a list unit name mappings from "originally used" to "currently used"
+    // this is necessary to put units which have been switched between using prefixes and
+    // not in the correct place of the unit list.
+    FOldToNewUnitNameMap: TStringList;
     procedure GetCommonFiles;
     procedure GetProjectFiles;
     procedure AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean);
@@ -429,6 +433,7 @@ begin
   FFavoriteUnits := TStringList.Create;
   FSearchPathUnits := TStringList.Create;
   FAliases := TStringList.Create;
+  FOldToNewUnitNameMap := TStringList.Create;
   FCurrentIdentIdx := -1;
 
   FFindThread := TFileFindThread.Create;
@@ -456,6 +461,7 @@ begin
     FFindThread.OnFindComplete := nil;
     FFindThread.Terminate;
   end;
+  FreeAndNil(FOldToNewUnitNameMap);
   FreeAndNil(FAliases);
   FreeAndNil(FFindThread);
   FreeAndNil(FProjectUnits);
@@ -1100,22 +1106,26 @@ var
   procedure AddDotsTo(lb: TListBox);
   var
     UnitIdx: Integer;
-    UnitName: string;
+    OrigUnitName: string;
+    NewUnitName: string;
     s: string;
     NsIdx: Integer;
     SearchPathUnitsIndex: Integer;
   begin
     for UnitIdx := 0 to lb.Count - 1 do begin
-      UnitName := lb.Items[UnitIdx];
+      OrigUnitName := lb.Items[UnitIdx];
       for NsIdx := 0 to NameSpaces.Count - 1 do begin
-        s := NameSpaces[NsIdx] + '.' + UnitName;
+        s := NameSpaces[NsIdx] + '.' + OrigUnitName;
         SearchPathUnitsIndex := FSearchPathUnits.IndexOf(s);
         if SearchPathUnitsIndex <> -1 then begin
-          UnitName := FSearchPathUnits[SearchPathUnitsIndex];
+          NewUnitName := FSearchPathUnits[SearchPathUnitsIndex];
+          if OrigUnitName <> NewUnitName then begin
+            FOldToNewUnitNameMap.Values[OrigUnitName] := NewUnitName;
+            lb.Items[UnitIdx] := NewUnitName;
+          end;
           Break;
         end;
       end;
-      lb.Items[UnitIdx] := UnitName;
     end;
   end;
 
@@ -1190,17 +1200,22 @@ procedure TfmUsesManager.btnRemoveDotsClick(Sender: TObject);
   procedure RemoveDotsfrom(lb: TListBox);
   var
     i: Integer;
-    s: string;
+    OrigUnitName: string;
+    NewUnitName: string;
     p: Integer;
   begin
     for i := 0 to lb.Count - 1 do begin
-      s := lb.Items[i];
-      p := Pos('.', s);
+      OrigUnitName := lb.Items[i];
+      NewUnitName := OrigUnitName;
+      p := Pos('.', NewUnitName);
       while p > 0 do begin
-        s := Copy(s, p + 1, 255);
-        p := Pos('.', s);
+        NewUnitName := Copy(NewUnitName, p + 1, 255);
+        p := Pos('.', NewUnitName);
       end;
-      lb.Items[i] := s;
+      if NewUnitName <> OrigUnitName then begin
+        FOldToNewUnitNameMap.Values[OrigUnitName] := NewUnitName;
+        lb.Items[i] := NewUnitName;
+      end;
     end;
   end;
 
@@ -1215,51 +1230,154 @@ end;
 procedure TfmUsesManager.SaveChanges;
 var
   i: Integer;
-  UnitName: string;
+  OldUnitName: string;
+  NewUnitName: string;
   Units: TStringList;
+  NewToOldUnitNameMap: TStringList;
 begin
   FFavoriteUnits.Assign(lbxFavorite.Items);
 
   UnAlias(lbxInterface.Items);
   UnAlias(lbxImplementation.Items);
 
+  NewToOldUnitNameMap := nil;
   Units := TStringList.Create;
   try
     GetInterfaceUnits(Units);
-    for i := 0 to Units.Count - 1 do
-    begin
-      UnitName := Units[i];
-      if lbxInterface.Items.IndexOf(UnitName) = -1 then
-        RemoveUnitFromInterface(UnitName);
+    for i := 0 to Units.Count - 1 do begin
+      OldUnitName := Units[i];
+      if lbxInterface.Items.IndexOf(OldUnitName) = -1 then begin
+        NewUnitName := FOldToNewUnitNameMap.Values[OldUnitName];
+        if (NewUnitName = '') or (lbxInterface.Items.IndexOf(NewUnitName) = -1) then
+          RemoveUnitFromInterface(OldUnitName);
+      end;
     end;
 
     GetImplementationUnits(Units);
-    for i := 0 to Units.Count  - 1 do
-    begin
-      UnitName := Units[i];
-      if lbxImplementation.Items.IndexOf(UnitName) = -1 then
-        RemoveUnitFromImplementation(UnitName);
+    for i := 0 to Units.Count - 1 do begin
+      OldUnitName := Units[i];
+      if lbxImplementation.Items.IndexOf(OldUnitName) = -1 then begin
+        NewUnitName := FOldToNewUnitNameMap.Values[OldUnitName];
+        if (NewUnitName = '') or (lbxImplementation.Items.IndexOf(NewUnitName) = -1) then
+          RemoveUnitFromImplementation(OldUnitName);
+      end;
+    end;
+
+    NewToOldUnitNameMap := TStringList.Create;
+    for i := 0 to FOldToNewUnitNameMap.Count - 1 do begin
+      OldUnitName := FOldToNewUnitNameMap.Names[i];
+      NewUnitName := FOldToNewUnitNameMap.Values[OldUnitName];
+      NewToOldUnitNameMap.Values[NewUnitName] := OldUnitName;
+    end;
+
+    for i := 0 to lbxInterface.Items.Count - 1 do begin
+      NewUnitName := lbxInterface.Items[i];
+      OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
+      if OldUnitName = NewUnitName then
+        OldUnitName := '';
+      case GetUsesStatus(NewUnitName) of
+        usNonExisting: begin
+            if OldUnitName = '' then begin
+              UseUnitInInterface(NewUnitName);
+            end else begin
+              case GetUsesStatus(OldUnitName) of
+                usNonExisting: begin
+                    UseUnitInInterface(NewUnitName);
+                  end;
+                usImplementation: begin
+                    RemoveUnitFromImplementation(OldUnitName);
+                    UseUnitInInterface(NewUnitName);
+                  end;
+                usInterface: begin
+                    ReplaceUnitInInterface(OldUnitName, NewUnitName);
+                  end;
+              end;
+            end;
+          end;
+        usInterface: begin
+            // the new unit name is already in the interface uses
+            // there is a slim chance that the old one is also used
+            if OldUnitName <> '' then begin
+              case GetUsesStatus(OldUnitName) of
+                usImplementation:
+                  RemoveUnitFromImplementation(OldUnitName);
+                usInterface:
+                  RemoveUnitFromInterface(OldUnitName);
+              end;
+            end;
+          end;
+        usImplementation: begin
+            // also removes it from the implementation uses
+            UseUnitInInterface(NewUnitName);
+            // the new unit name is now in the interface uses
+            // there is a slim chance that the old one is also used
+            if OldUnitName <> '' then begin
+              case GetUsesStatus(OldUnitName) of
+                usImplementation:
+                  RemoveUnitFromImplementation(OldUnitName);
+                usInterface:
+                  RemoveUnitFromInterface(OldUnitName);
+              end;
+            end;
+          end;
+      end; // case New
+    end; // end for interface
+
+    for i := 0 to lbxImplementation.Items.Count - 1 do begin
+      NewUnitName := lbxImplementation.Items[i];
+      OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
+      if OldUnitName = NewUnitName then
+        OldUnitName := '';
+      case GetUsesStatus(NewUnitName) of
+        usNonExisting: begin
+            if OldUnitName = '' then begin
+              UseUnitInImplementation(NewUnitName);
+            end else begin
+              case GetUsesStatus(OldUnitName) of
+                usNonExisting: begin
+                    UseUnitInImplementation(NewUnitName);
+                  end;
+                usInterface: begin
+                    RemoveUnitFromInterface(OldUnitName);
+                    UseUnitInImplementation(NewUnitName);
+                  end;
+                usImplementation: begin
+                    ReplaceUnitInImplementation(OldUnitName, NewUnitName);
+                  end;
+              end;
+            end;
+          end;
+        usInterface: begin
+            // also removes it from the interface uses
+            UseUnitInImplementation(NewUnitName);
+            // the new unit name is now in the implementation uses
+            // there is a slim chance that the old one is also used
+            if OldUnitName <> '' then begin
+              case GetUsesStatus(OldUnitName) of
+                usImplementation:
+                  RemoveUnitFromImplementation(OldUnitName);
+                usInterface:
+                  RemoveUnitFromInterface(OldUnitName);
+              end;
+            end;
+          end;
+        usImplementation: begin
+            // the new unit name is already in the implementation uses
+            // there is a slim chance that the old one is also used
+            if OldUnitName <> '' then begin
+              case GetUsesStatus(OldUnitName) of
+                usImplementation:
+                  RemoveUnitFromImplementation(OldUnitName);
+                usInterface:
+                  RemoveUnitFromInterface(OldUnitName);
+              end;
+            end;
+          end;
+      end;
     end;
   finally
+    FreeAndNil(NewToOldUnitNameMap);
     FreeAndNil(Units);
-  end;
-
-  for i := 0 to lbxInterface.Items.Count - 1 do
-  begin
-    UnitName := lbxInterface.Items[i];
-    case GetUsesStatus(UnitName) of
-      usNonExisting, usImplementation:
-        UseUnitInInterface(UnitName);
-    end;
-  end;
-
-  for i := 0 to lbxImplementation.Items.Count - 1 do
-  begin
-    UnitName := lbxImplementation.Items[i];
-    case GetUsesStatus(UnitName) of
-      usNonExisting, usInterface:
-        UseUnitInImplementation(UnitName);
-    end;
   end;
 end;
 
