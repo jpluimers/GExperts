@@ -1101,20 +1101,18 @@ var
   var
     UnitIdx: Integer;
     UnitName: string;
-    p: Integer;
     s: string;
     NsIdx: Integer;
+    SearchPathUnitsIndex: Integer;
   begin
     for UnitIdx := 0 to lb.Count - 1 do begin
       UnitName := lb.Items[UnitIdx];
-      p := Pos('.', UnitName);
-      if p = 0 then begin
-        for NsIdx := 0 to NameSpaces.Count - 1 do begin
-          s := NameSpaces[NsIdx] + '.' + UnitName;
-          if FSearchPathUnits.IndexOf(s) <> -1 then begin
-            UnitName := s;
-            break;
-          end;
+      for NsIdx := 0 to NameSpaces.Count - 1 do begin
+        s := NameSpaces[NsIdx] + '.' + UnitName;
+        SearchPathUnitsIndex := FSearchPathUnits.IndexOf(s);
+        if SearchPathUnitsIndex <> -1 then begin
+          UnitName := FSearchPathUnits[SearchPathUnitsIndex];
+          Break;
         end;
       end;
       lb.Items[UnitIdx] := UnitName;
