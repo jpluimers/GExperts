@@ -106,7 +106,7 @@ end;
 
 function TWarnExpert.GetDisplayName: string;
 resourcestring
-  SWarnExpertName = 'WARN directive';
+  SWarnExpertName = 'WARN Directive';
 begin
   Result := SWarnExpertName;
 end;

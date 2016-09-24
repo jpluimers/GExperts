@@ -3,7 +3,7 @@ object fmConfigureWarning: TfmConfigureWarning
   Top = 265
   ActiveControl = ed_Filter
   BorderIcons = [biSystemMenu, biMaximize]
-  Caption = 'Insert WARN directive'
+  Caption = 'Insert WARN Directive'
   ClientHeight = 321
   ClientWidth = 418
   Color = clBtnFace
