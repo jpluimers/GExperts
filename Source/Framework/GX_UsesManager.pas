@@ -38,7 +38,6 @@ type
 
   TUsesManager = class(TObject)
   private
-    FParser: TmwPasLex;
     FFileContent: string;
     FInterfUses: TUsesList;
     FImplemUses: TUsesList;
@@ -224,14 +223,11 @@ begin
   FInterfUses := TUsesList.Create;
   FImplemUses := TUsesList.Create;
 
-  FParser := TmwPasLex.Create;
-  FParser.Origin := @FFileContent[1];
   BuildUsesList;
 end;
 
 destructor TUsesManager.Destroy;
 begin
-  FreeAndNil(FParser);
   FreeAndNil(FInterfUses);
   FreeAndNil(FImplemUses);
 
@@ -330,91 +326,98 @@ var
   InUses: Boolean;
   UsesItem: TUsesItem;
   LastCommaPos: Integer;
+  Parser: TmwPasLex;
 begin
-  Section := sInterface;
-  InUses := False;
-  FParser.RunPos := 0;
-  FBegOfImplUses := 0;
-  FImplPosition := 0;
-  FIntfPosition := 0;
-  FEndOfIntfUses := 0;
-  FBegOfIntfUses := 0;
+  Parser := TmwPasLex.Create;
+  try
+    Parser.Origin := @FFileContent[1];
+    Section := sInterface;
+    InUses := False;
+    Parser.RunPos := 0;
+    FBegOfImplUses := 0;
+    FImplPosition := 0;
+    FIntfPosition := 0;
+    FEndOfIntfUses := 0;
+    FBegOfIntfUses := 0;
 
-  UsesItem := nil;
-  LastCommaPos := 0;
+    UsesItem := nil;
+    LastCommaPos := 0;
 
-  FParser.NextNoJunk;
-  while FParser.TokenID <> tkNull do
-  begin
-    case FParser.TokenID of
-      tkInterface:
-        begin
-          Section := sInterface;
-          FIntfPosition := FParser.RunPos;
-          InUses := False;
-          LastCommaPos := 0;
-        end;
-      tkImplementation:
-        begin
-          Section := sImplementation;
-          FImplPosition := FParser.RunPos;
-          InUses := False;
-          LastCommaPos := 0;
-        end;
-      tkUses:
-        begin
-          InUses := True;
-          if Section = sImplementation then
-            FBegOfImplUses := FParser.RunPos - Length('uses');
-          if Section = sInterface then
-            FBegOfIntfUses := FParser.RunPos - Length('uses');
-          LastCommaPos := 0;
-        end;
-    else
-      // If it is after the unit identifier
-      if InUses and not (FParser.TokenID in [tkCompDirect, tkIn, tkString]) then
-      begin
-        if FParser.TokenID = tkIdentifier then
-        begin
-          if Section = sInterface then
-            UsesItem := FInterfUses.Add
-          else // Section = sImplementation
-            UsesItem := FImplemUses.Add;
-          {$IFOPT D+} Assert(UsesItem <> nil); {$ENDIF}
-
-          UsesItem.Name := FParser.GetDottedIdentifierAtPos(True);
-          UsesItem.EndPos := FParser.RunPos;
-          UsesItem.BeginPos := UsesItem.EndPos - Length(UsesItem.Name);
-
-          if LastCommaPos <> 0 then
-            UsesItem.CommaBeforePos := LastCommaPos - 1;
-
-          UsesItem.CommaAfterPos := 0;
-        end // tkIdentifier
-        else if FParser.TokenID = tkComma then
-        begin
-          LastCommaPos := FParser.RunPos;
-          if UsesItem <> nil then
+    Parser.NextNoJunk;
+    while Parser.TokenID <> tkNull do
+    begin
+      case Parser.TokenID of
+        tkInterface:
           begin
-            UsesItem.CommaAfterPos := LastCommaPos - 1;
-            if FParser.NextChar = ' ' then
-              UsesItem.SpaceAfter := True;
+            Section := sInterface;
+            FIntfPosition := Parser.RunPos;
+            InUses := False;
+            LastCommaPos := 0;
           end;
-        end
-        else // FParser.TokenID <> tkComma
-        begin
-          InUses := False;
-          if Section = sImplementation then
+        tkImplementation:
           begin
-            FEndOfImplUses := FParser.RunPos;
-            Break; // End of parsing
+            Section := sImplementation;
+            FImplPosition := Parser.RunPos;
+            InUses := False;
+            LastCommaPos := 0;
           end;
-          if Section = sInterface then
-            FEndOfIntfUses := FParser.RunPos;
-        end; // Not comma
-      end; // UsesFlag
+        tkUses:
+          begin
+            InUses := True;
+            if Section = sImplementation then
+              FBegOfImplUses := Parser.RunPos - Length('uses');
+            if Section = sInterface then
+              FBegOfIntfUses := Parser.RunPos - Length('uses');
+            LastCommaPos := 0;
+          end;
+      else
+        // If it is after the unit identifier
+        if InUses and not (Parser.TokenID in [tkCompDirect, tkIn, tkString]) then
+        begin
+          if Parser.TokenID = tkIdentifier then
+          begin
+            if Section = sInterface then
+              UsesItem := FInterfUses.Add
+            else // Section = sImplementation
+              UsesItem := FImplemUses.Add;
+            {$IFOPT D+} Assert(UsesItem <> nil); {$ENDIF}
+
+            UsesItem.Name := Parser.GetDottedIdentifierAtPos(True);
+            UsesItem.EndPos := Parser.RunPos;
+            UsesItem.BeginPos := UsesItem.EndPos - Length(UsesItem.Name);
+
+            if LastCommaPos <> 0 then
+              UsesItem.CommaBeforePos := LastCommaPos - 1;
+
+            UsesItem.CommaAfterPos := 0;
+          end // tkIdentifier
+          else if Parser.TokenID = tkComma then
+          begin
+            LastCommaPos := Parser.RunPos;
+            if UsesItem <> nil then
+            begin
+              UsesItem.CommaAfterPos := LastCommaPos - 1;
+              if Parser.NextChar = ' ' then
+                UsesItem.SpaceAfter := True;
+            end;
+          end
+          else // FParser.TokenID <> tkComma
+          begin
+            InUses := False;
+            if Section = sImplementation then
+            begin
+              FEndOfImplUses := Parser.RunPos;
+              Break; // End of parsing
+            end;
+            if Section = sInterface then
+              FEndOfIntfUses := Parser.RunPos;
+          end; // Not comma
+        end; // UsesFlag
+      end;
+      Parser.NextNoJunk;
     end;
-    FParser.NextNoJunk;
+  finally
+    FreeAndNil(Parser);
   end;
 end;
 
