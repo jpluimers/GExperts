@@ -95,6 +95,8 @@ procedure GxOtaReplaceEditorTextWithUnicodeString(SourceEditor: IOTASourceEditor
 // ColumnNo is the current column number (zero-based, can be > then number of chars in line)
 // LineNo is the current line number
 function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; ByteBased: Boolean = False): string;
+// Calls GxOtaGetCurrentLineData but only returns the line as a string
+function GxOtaGetCurrentLine: string;
 function GxOtaGetEditorLine(View: IOTAEditView; LineNo: Integer): UTF8String;
 function GxOtaGetEditorLineAsString(View: IOTAEditView; LineNo: Integer): TGXUnicodeString;
 
@@ -1730,6 +1732,15 @@ begin
   // The column number is the difference between the start-of-line offset
   // and the current-cursor-position offset, so it is zero-based
   ColumnNo := CursorPos - StartOffset;
+end;
+
+function GxOtaGetCurrentLine: string;
+var
+  StartOffset: Integer;
+  ColumnNo: Integer;
+  LineNo: Integer;
+begin
+  Result := GxOtaGetCurrentLineData(StartOffset, ColumnNo, LineNo)
 end;
 
 function GxOtaGetEditorLine(View: IOTAEditView; LineNo: Integer): UTF8String;
