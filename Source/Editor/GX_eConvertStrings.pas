@@ -188,8 +188,10 @@ begin
     m_Input.Lines.Assign(_sl);
 
     Prefix := Trim(GxOtaGetCurrentSelection(False));
-    if Prefix = '' then
+    if Prefix = '' then begin
       Prefix := Trim(GxOtaGetCurrentLine);
+      GxOtaSelectCurrentLine(GxOtaGetCurrentSourceEditor);
+    end;
     // multiple lines? Only take the first
     p := Pos(CR, Prefix);
     if p > 0 then
