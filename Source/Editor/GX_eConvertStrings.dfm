@@ -16,14 +16,16 @@ inherited fmERawStrings: TfmERawStrings
     Top = 8
     Width = 62
     Height = 13
-    Caption = 'Input Strings'
+    Caption = '&Input Strings'
+    FocusControl = m_InputStrings
   end
   object l_ConvertedStrings: TLabel
     Left = 440
     Top = 8
     Width = 87
     Height = 13
-    Caption = 'Converted Strings'
+    Caption = '&Converted Strings'
+    FocusControl = m_OutputStrings
   end
   object l_Prefix: TLabel
     Left = 264
@@ -51,7 +53,7 @@ inherited fmERawStrings: TfmERawStrings
     Height = 297
     Anchors = [akLeft, akTop, akBottom]
     ScrollBars = ssBoth
-    TabOrder = 5
+    TabOrder = 6
     WordWrap = False
   end
   object chk_QuoteStrings: TCheckBox
@@ -73,27 +75,27 @@ inherited fmERawStrings: TfmERawStrings
     OnClick = chk_AppendSpaceClick
   end
   object b_CopyConverted: TButton
-    Left = 415
+    Left = 400
     Top = 336
-    Width = 105
+    Width = 121
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'C&opy To Clipboard'
-    TabOrder = 7
+    TabOrder = 8
     OnClick = b_CopyConvertedClick
   end
   object b_InsertConverted: TButton
-    Left = 527
+    Left = 528
     Top = 336
     Width = 73
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'I&nsert'
-    TabOrder = 8
+    TabOrder = 9
     OnClick = b_InsertConvertedClick
   end
   object b_Cancel: TButton
-    Left = 607
+    Left = 608
     Top = 336
     Width = 75
     Height = 25
@@ -101,7 +103,7 @@ inherited fmERawStrings: TfmERawStrings
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 9
+    TabOrder = 10
   end
   object chk_ExtractRaw: TCheckBox
     Left = 264
@@ -137,7 +139,17 @@ inherited fmERawStrings: TfmERawStrings
     Top = 296
     Width = 161
     Height = 21
-    TabOrder = 6
+    TabOrder = 5
     OnChange = ed_PrefixChange
+  end
+  object b_Paste: TButton
+    Left = 8
+    Top = 336
+    Width = 121
+    Height = 25
+    Anchors = [akLeft, akBottom]
+    Caption = '&Paste From Clipboard'
+    TabOrder = 7
+    OnClick = b_PasteClick
   end
 end

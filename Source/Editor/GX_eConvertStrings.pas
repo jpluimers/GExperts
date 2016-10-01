@@ -35,6 +35,7 @@ type
     rg_ConvertType: TRadioGroup;
     l_Prefix: TLabel;
     ed_Prefix: TEdit;
+    b_Paste: TButton;
     procedure chk_ExtractRawClick(Sender: TObject);
     procedure rg_ConvertTypeClick(Sender: TObject);
     procedure b_CopyConvertedClick(Sender: TObject);
@@ -43,6 +44,7 @@ type
     procedure b_InsertConvertedClick(Sender: TObject);
     procedure chk_QuoteStringsClick(Sender: TObject);
     procedure chk_AppendSpaceClick(Sender: TObject);
+    procedure b_PasteClick(Sender: TObject);
   private
     FUpdating: Boolean;
     procedure SetData(_sl: TStrings);
@@ -109,40 +111,9 @@ begin
 end;
 
 constructor TfmERawStrings.Create(_Owner: TComponent);
-var
-  ALineStartBase: string;
-  p: Integer;
 begin
   inherited;
   TControl_SetMinConstraints(Self);
-
-  FUpdating := True;
-  try
-    ALineStartBase := Trim(GxOtaGetCurrentSelection(False));
-    // multiple lines? Only take the first
-    p := Pos(CR, ALineStartBase);
-    if p > 0 then
-      ALineStartBase := LeftStr(ALineStartBase, p - 1);
-    if ALineStartBase <> '' then begin
-      // Does it contain a '('? -> cut it there, we don't want parameters
-      p := Pos('(', ALineStartBase);
-      if p > 0 then
-        ALineStartBase := LeftStr(ALineStartBase, p - 1);
-      // now look up the last '.', that's where we append the .Add()
-      p := LastDelimiter('.', ALineStartBase);
-      if p > 0 then
-        ALineStartBase := LeftStr(ALineStartBase, p)
-      else begin
-        // no '.'? -> add one
-        ALineStartBase := ALineStartBase + '.';
-      end;
-      ed_Prefix.Text := ALineStartBase;
-    end;
-
-    LoadSettings;
-  finally
-    FUpdating := False;
-  end;
 end;
 
 destructor TfmERawStrings.Destroy;
@@ -182,8 +153,41 @@ begin
 end;
 
 procedure TfmERawStrings.SetData(_sl: TStrings);
+var
+  Prefix: string;
+  p: Integer;
 begin
+  FUpdating := True;
+  try
+    m_InputStrings.Lines.Assign(_sl);
 
+    Prefix := Trim(GxOtaGetCurrentSelection(False));
+    if Prefix = '' then
+      Prefix := Trim(GxOtaGetCurrentLine);
+    // multiple lines? Only take the first
+    p := Pos(CR, Prefix);
+    if p > 0 then
+      Prefix := LeftStr(Prefix, p - 1);
+    if Prefix <> '' then begin
+      // Does it contain a '('? -> cut it there, we don't want parameters
+      p := Pos('(', Prefix);
+      if p > 0 then
+        Prefix := LeftStr(Prefix, p - 1);
+      // now look up the last '.', that's where we append the .Add()
+      p := LastDelimiter('.', Prefix);
+      if p > 0 then
+        Prefix := LeftStr(Prefix, p)
+      else begin
+        // no '.'? -> add one
+        Prefix := Prefix + '.';
+      end;
+      ed_Prefix.Text := Prefix;
+    end;
+
+    LoadSettings;
+  finally
+    FUpdating := False;
+  end;
 end;
 
 procedure TfmERawStrings.LoadSettings;
@@ -227,6 +231,9 @@ var
   i, FirstCharPos, FirstQuotePos, LastQuotePos: Integer;
   Line, BaseIndent: string;
 begin
+  if _sl.Count = 0 then
+    Exit;
+
   FirstCharPos := DetermineIndent(_sl);
   // this works, because FirstCharPos is the smallest Indent for all lines
   BaseIndent := LeftStr(_sl[0], FirstCharPos - 1);
@@ -367,6 +374,11 @@ begin
   end;
 end;
 
+procedure TfmERawStrings.b_PasteClick(Sender: TObject);
+begin
+  m_InputStrings.Lines.Text := Clipboard.AsText;
+end;
+
 { TConvertStringsExpert }
 
 procedure TConvertStringsExpert.Configure;
@@ -392,7 +404,7 @@ end;
 
 function TConvertStringsExpert.GetDisplayName: string;
 resourcestring
-  SConvertStringsName = 'Convert Raw Strings';
+  SConvertStringsName = 'Convert Strings';
 begin
   Result := SConvertStringsName;
 end;
@@ -400,7 +412,7 @@ end;
 function TConvertStringsExpert.GetHelpString: string;
 resourcestring
   SConvertStringsHelp =
-    '  This expert takes the selected code lines (or the text on the clipboard, ' +
+    '  This expert takes the selected code lines (or the text on the clipboard), ' +
     'optionally removes the strings that are used to make them proper Delphi code, ' +
     'leaving you with just the raw strings.' + sLineBreak +
     '  It then uses the selected string prefix/suffix combination to create new strings, ' +
@@ -429,4 +441,6 @@ begin
 
 end;
 
+initialization
+  RegisterEditorExpert(TConvertStringsExpert);
 end.
