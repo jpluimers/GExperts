@@ -6,26 +6,27 @@ inherited fmERawStrings: TfmERawStrings
   ClientHeight = 369
   ClientWidth = 689
   ParentFont = False
+  OnResize = FormResize
   DesignSize = (
     689
     369)
   PixelsPerInch = 96
   TextHeight = 13
-  object l_InputStrings: TLabel
+  object l_Input: TLabel
     Left = 8
     Top = 8
-    Width = 62
+    Width = 26
     Height = 13
-    Caption = '&Input Strings'
-    FocusControl = m_InputStrings
+    Caption = '&Input'
+    FocusControl = m_Input
   end
-  object l_ConvertedStrings: TLabel
+  object l_Output: TLabel
     Left = 440
     Top = 8
-    Width = 87
+    Width = 34
     Height = 13
-    Caption = '&Converted Strings'
-    FocusControl = m_OutputStrings
+    Caption = '&Output'
+    FocusControl = m_Output
   end
   object l_Prefix: TLabel
     Left = 264
@@ -33,9 +34,10 @@ inherited fmERawStrings: TfmERawStrings
     Width = 28
     Height = 13
     Caption = '&Prefix'
-    OnClick = b_CopyConvertedClick
+    FocusControl = ed_Prefix
+    OnClick = b_CopyToClipboardClick
   end
-  object m_InputStrings: TMemo
+  object m_Input: TMemo
     Left = 8
     Top = 24
     Width = 241
@@ -44,9 +46,9 @@ inherited fmERawStrings: TfmERawStrings
     ScrollBars = ssBoth
     TabOrder = 0
     WordWrap = False
-    OnChange = m_InputStringsChange
+    OnChange = m_InputChange
   end
-  object m_OutputStrings: TMemo
+  object m_Output: TMemo
     Left = 440
     Top = 24
     Width = 241
@@ -70,21 +72,21 @@ inherited fmERawStrings: TfmERawStrings
     Top = 256
     Width = 161
     Height = 17
-    Caption = 'Append &space'
+    Caption = '&Append space'
     TabOrder = 4
     OnClick = chk_AppendSpaceClick
   end
-  object b_CopyConverted: TButton
+  object b_CopyToClipboard: TButton
     Left = 400
     Top = 336
     Width = 121
     Height = 25
     Anchors = [akRight, akBottom]
-    Caption = 'C&opy To Clipboard'
+    Caption = 'Copy &To Clipboard'
     TabOrder = 8
-    OnClick = b_CopyConvertedClick
+    OnClick = b_CopyToClipboardClick
   end
-  object b_InsertConverted: TButton
+  object b_Insert: TButton
     Left = 528
     Top = 336
     Width = 73
@@ -92,7 +94,7 @@ inherited fmERawStrings: TfmERawStrings
     Anchors = [akRight, akBottom]
     Caption = 'I&nsert'
     TabOrder = 9
-    OnClick = b_InsertConvertedClick
+    OnClick = b_InsertClick
   end
   object b_Cancel: TButton
     Left = 608
@@ -110,7 +112,7 @@ inherited fmERawStrings: TfmERawStrings
     Top = 24
     Width = 161
     Height = 17
-    Caption = 'Extract &Raw Strings'
+    Caption = '&Extract Raw Strings'
     TabOrder = 1
     OnClick = chk_ExtractRawClick
   end
@@ -119,7 +121,7 @@ inherited fmERawStrings: TfmERawStrings
     Top = 48
     Width = 161
     Height = 185
-    Caption = 'Convert &Type'
+    Caption = '&Convert Type'
     ItemIndex = 0
     Items.Strings = (
       '&1: %s'
@@ -142,14 +144,14 @@ inherited fmERawStrings: TfmERawStrings
     TabOrder = 5
     OnChange = ed_PrefixChange
   end
-  object b_Paste: TButton
+  object b_PasteFromClipboard: TButton
     Left = 8
     Top = 336
     Width = 121
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = '&Paste From Clipboard'
+    Caption = 'Paste &From Clipboard'
     TabOrder = 7
-    OnClick = b_PasteClick
+    OnClick = b_PasteFromClipboardClick
   end
 end

@@ -22,29 +22,30 @@ type
 
 type
   TfmERawStrings = class(TfmBaseForm)
-    m_InputStrings: TMemo;
-    l_InputStrings: TLabel;
-    m_OutputStrings: TMemo;
-    l_ConvertedStrings: TLabel;
+    m_Input: TMemo;
+    l_Input: TLabel;
+    m_Output: TMemo;
+    l_Output: TLabel;
     chk_QuoteStrings: TCheckBox;
     chk_AppendSpace: TCheckBox;
-    b_CopyConverted: TButton;
-    b_InsertConverted: TButton;
+    b_CopyToClipboard: TButton;
+    b_Insert: TButton;
     b_Cancel: TButton;
     chk_ExtractRaw: TCheckBox;
     rg_ConvertType: TRadioGroup;
     l_Prefix: TLabel;
     ed_Prefix: TEdit;
-    b_Paste: TButton;
+    b_PasteFromClipboard: TButton;
     procedure chk_ExtractRawClick(Sender: TObject);
     procedure rg_ConvertTypeClick(Sender: TObject);
-    procedure b_CopyConvertedClick(Sender: TObject);
+    procedure b_CopyToClipboardClick(Sender: TObject);
     procedure ed_PrefixChange(Sender: TObject);
-    procedure m_InputStringsChange(Sender: TObject);
-    procedure b_InsertConvertedClick(Sender: TObject);
+    procedure m_InputChange(Sender: TObject);
+    procedure b_InsertClick(Sender: TObject);
     procedure chk_QuoteStringsClick(Sender: TObject);
     procedure chk_AppendSpaceClick(Sender: TObject);
-    procedure b_PasteClick(Sender: TObject);
+    procedure b_PasteFromClipboardClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     FUpdating: Boolean;
     procedure SetData(_sl: TStrings);
@@ -55,7 +56,6 @@ type
       _AppendSpace: Boolean; const _Prefix: string);
     procedure LoadSettings;
     procedure SaveSettings;
-    function ConfigurationKey: string;
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -126,9 +126,28 @@ begin
   inherited;
 end;
 
-function TfmERawStrings.ConfigurationKey: string;
+procedure TfmERawStrings.FormResize(Sender: TObject);
+var
+  cw: Integer;
+  w: Integer;
+  x: Integer;
 begin
-  Result := TConvertStringsExpert.ConfigurationKey;
+  cw := ClientWidth;
+  x := (cw - rg_ConvertType.Width) div 2;
+  chk_ExtractRaw.Left := x;
+  rg_ConvertType.Left := x;
+  chk_QuoteStrings.Left := x;
+  chk_AppendSpace.Left := x;
+  l_Prefix.Left := x;
+  ed_Prefix.Left := x;
+
+  w := x - 2 * m_Input.Left;
+  m_Input.Width := w;
+  m_Output.Width := w;
+
+  x := cw - w - m_Input.Left;
+  l_Output.Left := x;
+  m_Output.Left := x;
 end;
 
 procedure TfmERawStrings.SaveSettings;
@@ -140,7 +159,7 @@ begin
   Settings := nil;
   GXSettings := TGExpertsSettings.Create;
   try
-    Settings := TExpertSettings.Create(GXSettings, ConfigurationKey);
+    Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
     Settings.SaveForm('Window', Self);
     Settings.WriteBool('ExtractRaw', chk_ExtractRaw.Checked);
     Settings.WriteInteger('ConvertType', rg_ConvertType.ItemIndex);
@@ -159,7 +178,7 @@ var
 begin
   FUpdating := True;
   try
-    m_InputStrings.Lines.Assign(_sl);
+    m_Input.Lines.Assign(_sl);
 
     Prefix := Trim(GxOtaGetCurrentSelection(False));
     if Prefix = '' then
@@ -188,6 +207,7 @@ begin
   finally
     FUpdating := False;
   end;
+  ConvertStrings;
 end;
 
 procedure TfmERawStrings.LoadSettings;
@@ -199,7 +219,7 @@ begin
   Settings := nil;
   GXSettings := TGExpertsSettings.Create;
   try
-    Settings := TExpertSettings.Create(GXSettings, ConfigurationKey);
+    Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
     Settings.LoadForm('Window', Self);
     chk_ExtractRaw.Checked := Settings.ReadBool('ExtractRaw', True);
     rg_ConvertType.ItemIndex := Settings.ReadInteger('ConvertType', Ord(paAdd));
@@ -315,19 +335,19 @@ begin
     QuoteStrings := chk_QuoteStrings.Checked;
     AppendSpace := chk_AppendSpace.Checked;
 
-    sl.Assign(m_InputStrings.Lines);
+    sl.Assign(m_Input.Lines);
     if chk_ExtractRaw.Checked then
       ExtractRawStrings(sl, True);
     if sl.Count > 0 then begin
       ConvertToCode(sl, PasteAsType, QuoteStrings, AppendSpace, ed_Prefix.Text);
     end;
-    m_OutputStrings.Lines.Assign(sl);
+    m_Output.Lines.Assign(sl);
   finally
     FreeAndNil(sl);
   end;
 end;
 
-procedure TfmERawStrings.m_InputStringsChange(Sender: TObject);
+procedure TfmERawStrings.m_InputChange(Sender: TObject);
 begin
   ConvertStrings;
 end;
@@ -357,26 +377,27 @@ begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.b_CopyConvertedClick(Sender: TObject);
+procedure TfmERawStrings.b_CopyToClipboardClick(Sender: TObject);
 begin
-  Clipboard.AsText := m_OutputStrings.Lines.Text;
+  Clipboard.AsText := m_Output.Lines.Text;
   ModalResult := mrOk;
 end;
 
-procedure TfmERawStrings.b_InsertConvertedClick(Sender: TObject);
+procedure TfmERawStrings.b_InsertClick(Sender: TObject);
 var
   i: Integer;
   Lines: TStrings;
 begin
-  Lines := m_OutputStrings.Lines;
+  Lines := m_Output.Lines;
   for i := 0 to Lines.Count - 1 do begin
     GxOtaInsertLineIntoEditor(Lines[i] + sLineBreak);
   end;
+  ModalResult := mrOk;
 end;
 
-procedure TfmERawStrings.b_PasteClick(Sender: TObject);
+procedure TfmERawStrings.b_PasteFromClipboardClick(Sender: TObject);
 begin
-  m_InputStrings.Lines.Text := Clipboard.AsText;
+  m_Input.Lines.Text := Clipboard.AsText;
 end;
 
 { TConvertStringsExpert }
