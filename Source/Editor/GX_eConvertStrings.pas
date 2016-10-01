@@ -63,7 +63,7 @@ type
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
-    class procedure Execute(_Owner: TComponent; _sl: TStrings);
+    class procedure Execute(_bmp: TBitmap; _sl: TStrings);
   end;
 
 implementation
@@ -82,15 +82,13 @@ uses
 
 type
   TConvertStringsExpert = class(TEditorExpert)
-  protected
-    procedure InternalLoadSettings(Settings: TExpertSettings); override;
-    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     class function GetName: string; override;
     function GetDisplayName: string; override;
-    procedure Configure; override;
     procedure Execute(Sender: TObject); override;
     function GetHelpString: string; override;
+    // Returns false
+    function HasConfigOptions: Boolean; override;
   end;
 
 const
@@ -101,12 +99,13 @@ const
     '%s', '%s,', 'Add(%s);', '%s + sLineBreak +',
     '%s + #10 +', '%s + #13 +', '%s + #13#10 +', '%s + CRLF +', '%s + CR_LF +');
 
-class procedure TfmERawStrings.Execute(_Owner: TComponent; _sl: TStrings);
+class procedure TfmERawStrings.Execute(_bmp: TBitmap; _sl: TStrings);
 var
   frm: TfmERawStrings;
 begin
-  frm := TfmERawStrings.Create(_Owner);
+  frm := TfmERawStrings.Create(Application);
   try
+    ConvertBitmapToIcon(_bmp, frm.Icon);
     frm.SetData(_sl);
     frm.ShowModal;
   finally
@@ -437,12 +436,6 @@ end;
 
 { TConvertStringsExpert }
 
-procedure TConvertStringsExpert.Configure;
-begin
-  inherited;
-
-end;
-
 procedure TConvertStringsExpert.Execute(Sender: TObject);
 var
   sl: TStringList;
@@ -452,7 +445,7 @@ begin
     sl.Text := GxOtaGetCurrentSelection(False);
     if sl.Count = 0 then
       sl.Text := Clipboard.AsText;
-    TfmERawStrings.Execute(nil, sl);
+    TfmERawStrings.Execute(GetBitmap, sl);
   finally
     FreeAndNil(sl);
   end;
@@ -474,8 +467,7 @@ resourcestring
     '  It then uses the selected string prefix/suffix combination to create new strings, ' +
     'that can be pasted back the editor or copied to the clipboard.' + sLineBreak +
     '  To use it, select the string constants in the Delphi editor and ' +
-    'activate this expert.' + sLineBreak +
-    '  You can configure this expert to use different string prefix/suffix combinations.';
+    'activate this expert.';
 begin
   Result := SConvertStringsHelp;
 end;
@@ -485,16 +477,9 @@ begin
   Result := 'ConvertStrings';
 end;
 
-procedure TConvertStringsExpert.InternalLoadSettings(Settings: TExpertSettings);
+function TConvertStringsExpert.HasConfigOptions: Boolean;
 begin
-  inherited;
-
-end;
-
-procedure TConvertStringsExpert.InternalSaveSettings(Settings: TExpertSettings);
-begin
-  inherited;
-
+  Result := False;
 end;
 
 initialization
