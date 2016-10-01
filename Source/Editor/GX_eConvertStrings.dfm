@@ -1,4 +1,4 @@
-inherited fmERawStrings: TfmERawStrings
+inherited fmEConvertStrings: TfmEConvertStrings
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]

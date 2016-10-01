@@ -21,7 +21,7 @@ type
     paChar10, paChar13, paChars1310, paCRLF, paCR_LF);
 
 type
-  TfmERawStrings = class(TfmBaseForm)
+  TfmEConvertStrings = class(TfmBaseForm)
     m_Input: TMemo;
     l_Input: TLabel;
     m_Output: TMemo;
@@ -99,11 +99,11 @@ const
     '%s', '%s,', 'Add(%s);', '%s + sLineBreak +',
     '%s + #10 +', '%s + #13 +', '%s + #13#10 +', '%s + CRLF +', '%s + CR_LF +');
 
-class procedure TfmERawStrings.Execute(_bmp: TBitmap; _sl: TStrings);
+class procedure TfmEConvertStrings.Execute(_bmp: TBitmap; _sl: TStrings);
 var
-  frm: TfmERawStrings;
+  frm: TfmEConvertStrings;
 begin
-  frm := TfmERawStrings.Create(Application);
+  frm := TfmEConvertStrings.Create(Application);
   try
     ConvertBitmapToIcon(_bmp, frm.Icon);
     frm.SetData(_sl);
@@ -113,13 +113,13 @@ begin
   end;
 end;
 
-constructor TfmERawStrings.Create(_Owner: TComponent);
+constructor TfmEConvertStrings.Create(_Owner: TComponent);
 begin
   inherited;
   TControl_SetMinConstraints(Self);
 end;
 
-destructor TfmERawStrings.Destroy;
+destructor TfmEConvertStrings.Destroy;
 begin
   try
     SaveSettings;
@@ -129,7 +129,7 @@ begin
   inherited;
 end;
 
-procedure TfmERawStrings.FormResize(Sender: TObject);
+procedure TfmEConvertStrings.FormResize(Sender: TObject);
 var
   cw: Integer;
   w: Integer;
@@ -157,7 +157,7 @@ begin
   m_Output.Left := x;
 end;
 
-procedure TfmERawStrings.SaveSettings;
+procedure TfmEConvertStrings.SaveSettings;
 var
   GXSettings: TGExpertsSettings;
   Settings: TExpertSettings;
@@ -178,7 +178,7 @@ begin
   end;
 end;
 
-procedure TfmERawStrings.SetData(_sl: TStrings);
+procedure TfmEConvertStrings.SetData(_sl: TStrings);
 var
   Prefix: string;
   p: Integer;
@@ -217,7 +217,7 @@ begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.LoadSettings;
+procedure TfmEConvertStrings.LoadSettings;
 var
   GXSettings: TGExpertsSettings;
   Settings: TExpertSettings;
@@ -238,7 +238,7 @@ begin
   end;
 end;
 
-function TfmERawStrings.DetermineIndent(_sl: TStrings): Integer;
+function TfmEConvertStrings.DetermineIndent(_sl: TStrings): Integer;
 var
   i: Integer;
   Line: string;
@@ -253,7 +253,7 @@ begin
   end;
 end;
 
-procedure TfmERawStrings.ExtractRawStrings(_sl: TStrings; _AddBaseIndent: Boolean);
+procedure TfmEConvertStrings.ExtractRawStrings(_sl: TStrings; _AddBaseIndent: Boolean);
 var
   i, FirstCharPos, FirstQuotePos, LastQuotePos: Integer;
   Line, BaseIndent: string;
@@ -281,7 +281,7 @@ begin
   end;
 end;
 
-procedure TfmERawStrings.ConvertToCode(_sl: TStrings; _PasteAsType: TPasteAsType; _QuoteStrings: Boolean;
+procedure TfmEConvertStrings.ConvertToCode(_sl: TStrings; _PasteAsType: TPasteAsType; _QuoteStrings: Boolean;
   _AppendSpace: Boolean; const _Prefix: string);
 var
   i, FirstCharPos: Integer;
@@ -326,7 +326,7 @@ begin
   end;
 end;
 
-procedure TfmERawStrings.ConvertStrings;
+procedure TfmEConvertStrings.ConvertStrings;
 var
   sl: TStrings;
   PasteAsType: TPasteAsType;
@@ -354,42 +354,42 @@ begin
   end;
 end;
 
-procedure TfmERawStrings.m_InputChange(Sender: TObject);
+procedure TfmEConvertStrings.m_InputChange(Sender: TObject);
 begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.ed_PrefixChange(Sender: TObject);
+procedure TfmEConvertStrings.ed_PrefixChange(Sender: TObject);
 begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.rg_ConvertTypeClick(Sender: TObject);
+procedure TfmEConvertStrings.rg_ConvertTypeClick(Sender: TObject);
 begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.chk_AppendSpaceClick(Sender: TObject);
+procedure TfmEConvertStrings.chk_AppendSpaceClick(Sender: TObject);
 begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.chk_ExtractRawClick(Sender: TObject);
+procedure TfmEConvertStrings.chk_ExtractRawClick(Sender: TObject);
 begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.chk_QuoteStringsClick(Sender: TObject);
+procedure TfmEConvertStrings.chk_QuoteStringsClick(Sender: TObject);
 begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.b_CopyToClipboardClick(Sender: TObject);
+procedure TfmEConvertStrings.b_CopyToClipboardClick(Sender: TObject);
 begin
   Clipboard.AsText := m_Output.Lines.Text;
 end;
 
-procedure TfmERawStrings.b_InsertClick(Sender: TObject);
+procedure TfmEConvertStrings.b_InsertClick(Sender: TObject);
 var
   i: Integer;
   Lines: TStrings;
@@ -401,12 +401,12 @@ begin
   ModalResult := mrOk;
 end;
 
-procedure TfmERawStrings.b_PasteFromClipboardClick(Sender: TObject);
+procedure TfmEConvertStrings.b_PasteFromClipboardClick(Sender: TObject);
 begin
   m_Input.Lines.Text := Clipboard.AsText;
 end;
 
-procedure TfmERawStrings.b_ToTStringsClick(Sender: TObject);
+procedure TfmEConvertStrings.b_ToTStringsClick(Sender: TObject);
 begin
   FUpdating := True;
   try
@@ -420,7 +420,7 @@ begin
   ConvertStrings;
 end;
 
-procedure TfmERawStrings.b_ToSQLClick(Sender: TObject);
+procedure TfmEConvertStrings.b_ToSQLClick(Sender: TObject);
 begin
   FUpdating := True;
   try
@@ -445,7 +445,7 @@ begin
     sl.Text := GxOtaGetCurrentSelection(False);
     if sl.Count = 0 then
       sl.Text := Clipboard.AsText;
-    TfmERawStrings.Execute(GetBitmap, sl);
+    TfmEConvertStrings.Execute(GetBitmap, sl);
   finally
     FreeAndNil(sl);
   end;
