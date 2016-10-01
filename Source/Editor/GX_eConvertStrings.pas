@@ -30,12 +30,14 @@ type
     chk_AppendSpace: TCheckBox;
     b_CopyToClipboard: TButton;
     b_Insert: TButton;
-    b_Cancel: TButton;
+    b_Close: TButton;
     chk_ExtractRaw: TCheckBox;
     rg_ConvertType: TRadioGroup;
     l_Prefix: TLabel;
     ed_Prefix: TEdit;
     b_PasteFromClipboard: TButton;
+    b_ToSQL: TButton;
+    b_ToTStrings: TButton;
     procedure chk_ExtractRawClick(Sender: TObject);
     procedure rg_ConvertTypeClick(Sender: TObject);
     procedure b_CopyToClipboardClick(Sender: TObject);
@@ -46,6 +48,8 @@ type
     procedure chk_AppendSpaceClick(Sender: TObject);
     procedure b_PasteFromClipboardClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure b_ToSQLClick(Sender: TObject);
+    procedure b_ToTStringsClick(Sender: TObject);
   private
     FUpdating: Boolean;
     procedure SetData(_sl: TStrings);
@@ -131,7 +135,9 @@ var
   cw: Integer;
   w: Integer;
   x: Integer;
+  m: Integer;
 begin
+  m := m_Input.Left;
   cw := ClientWidth;
   x := (cw - rg_ConvertType.Width) div 2;
   chk_ExtractRaw.Left := x;
@@ -140,12 +146,14 @@ begin
   chk_AppendSpace.Left := x;
   l_Prefix.Left := x;
   ed_Prefix.Left := x;
+  b_ToSQL.Left := x;
+  b_ToTStrings.Left := x + b_ToSQL.Width + m;
 
-  w := x - 2 * m_Input.Left;
+  w := x - 2 * m;
   m_Input.Width := w;
   m_Output.Width := w;
 
-  x := cw - w - m_Input.Left;
+  x := cw - w - m;
   l_Output.Left := x;
   m_Output.Left := x;
 end;
@@ -380,7 +388,6 @@ end;
 procedure TfmERawStrings.b_CopyToClipboardClick(Sender: TObject);
 begin
   Clipboard.AsText := m_Output.Lines.Text;
-  ModalResult := mrOk;
 end;
 
 procedure TfmERawStrings.b_InsertClick(Sender: TObject);
@@ -398,6 +405,34 @@ end;
 procedure TfmERawStrings.b_PasteFromClipboardClick(Sender: TObject);
 begin
   m_Input.Lines.Text := Clipboard.AsText;
+end;
+
+procedure TfmERawStrings.b_ToTStringsClick(Sender: TObject);
+begin
+  FUpdating := True;
+  try
+    chk_ExtractRaw.Checked := True;
+    rg_ConvertType.ItemIndex := Integer(paAdd);
+    chk_QuoteStrings.Checked := True;
+    chk_AppendSpace.Checked := True;
+  finally
+    FUpdating := False;
+  end;
+  ConvertStrings;
+end;
+
+procedure TfmERawStrings.b_ToSQLClick(Sender: TObject);
+begin
+  FUpdating := True;
+  try
+    chk_ExtractRaw.Checked := True;
+    rg_ConvertType.ItemIndex := Integer(paRaw);
+    chk_QuoteStrings.Checked := False;
+    chk_AppendSpace.Checked := False;
+  finally
+    FUpdating := False;
+  end;
+  ConvertStrings;
 end;
 
 { TConvertStringsExpert }

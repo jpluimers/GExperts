@@ -3,13 +3,13 @@ inherited fmERawStrings: TfmERawStrings
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Convert Strings'
-  ClientHeight = 369
+  ClientHeight = 401
   ClientWidth = 689
   ParentFont = False
   OnResize = FormResize
   DesignSize = (
     689
-    369)
+    401)
   PixelsPerInch = 96
   TextHeight = 13
   object l_Input: TLabel
@@ -41,7 +41,7 @@ inherited fmERawStrings: TfmERawStrings
     Left = 8
     Top = 24
     Width = 241
-    Height = 297
+    Height = 329
     Anchors = [akLeft, akTop, akBottom]
     ScrollBars = ssBoth
     TabOrder = 0
@@ -52,10 +52,10 @@ inherited fmERawStrings: TfmERawStrings
     Left = 440
     Top = 24
     Width = 241
-    Height = 297
+    Height = 329
     Anchors = [akLeft, akTop, akBottom]
     ScrollBars = ssBoth
-    TabOrder = 6
+    TabOrder = 8
     WordWrap = False
   end
   object chk_QuoteStrings: TCheckBox
@@ -77,35 +77,35 @@ inherited fmERawStrings: TfmERawStrings
     OnClick = chk_AppendSpaceClick
   end
   object b_CopyToClipboard: TButton
-    Left = 400
-    Top = 336
+    Left = 352
+    Top = 368
     Width = 121
     Height = 25
     Anchors = [akRight, akBottom]
-    Caption = 'Copy &To Clipboard'
-    TabOrder = 8
+    Caption = 'Copy To Clip&board'
+    TabOrder = 10
     OnClick = b_CopyToClipboardClick
   end
   object b_Insert: TButton
-    Left = 528
-    Top = 336
-    Width = 73
+    Left = 480
+    Top = 368
+    Width = 121
     Height = 25
     Anchors = [akRight, akBottom]
-    Caption = 'I&nsert'
-    TabOrder = 9
+    Caption = 'I&nsert and Close'
+    TabOrder = 11
     OnClick = b_InsertClick
   end
-  object b_Cancel: TButton
+  object b_Close: TButton
     Left = 608
-    Top = 336
+    Top = 368
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'Close'
     ModalResult = 2
-    TabOrder = 10
+    TabOrder = 12
   end
   object chk_ExtractRaw: TCheckBox
     Left = 264
@@ -146,12 +146,30 @@ inherited fmERawStrings: TfmERawStrings
   end
   object b_PasteFromClipboard: TButton
     Left = 8
-    Top = 336
+    Top = 368
     Width = 121
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Paste &From Clipboard'
-    TabOrder = 7
+    TabOrder = 9
     OnClick = b_PasteFromClipboardClick
+  end
+  object b_ToSQL: TButton
+    Left = 264
+    Top = 328
+    Width = 75
+    Height = 25
+    Caption = '-> &SQL'
+    TabOrder = 6
+    OnClick = b_ToSQLClick
+  end
+  object b_ToTStrings: TButton
+    Left = 352
+    Top = 328
+    Width = 75
+    Height = 25
+    Caption = '-> &TStrings'
+    TabOrder = 7
+    OnClick = b_ToTStringsClick
   end
 end
