@@ -189,9 +189,7 @@
         <DCCReference Include="..\..\source\Editor\GX_eAlignOptions.pas">
             <Form>fmAlignOptions</Form>
         </DCCReference>
-        <DCCReference Include="..\..\source\Editor\GX_eChangeCase.pas">
-            <Form>fmChangeCase</Form>
-        </DCCReference>
+        <DCCReference Include="..\..\source\Editor\GX_eChangeCase.pas" />
         <DCCReference Include="..\..\source\formatter\GX_eCodeFormatter.pas"/>
         <DCCReference Include="..\..\source\Editor\GX_eComment.pas">
             <Form>fmCommentConfig</Form>

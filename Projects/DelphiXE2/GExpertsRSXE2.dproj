@@ -204,9 +204,7 @@
 			<DCCReference Include="..\..\source\Editor\GX_eAlignOptions.pas">
 				<Form>fmAlignOptions</Form>
 			</DCCReference>
-			<DCCReference Include="..\..\source\Editor\GX_eChangeCase.pas">
-				<Form>fmChangeCase</Form>
-			</DCCReference>
+			<DCCReference Include="..\..\source\Editor\GX_eChangeCase.pas" />
 			<DCCReference Include="..\..\source\formatter\GX_eCodeFormatter.pas"/>
 			<DCCReference Include="..\..\source\Editor\GX_eComment.pas">
 				<Form>fmCommentConfig</Form>
@@ -516,6 +514,9 @@
 			<DCCReference Include="..\..\Source\Experts\GX_ReselectDesktop.pas"/>
 			<DCCReference Include="..\..\Source\Editor\GX_eWarn.pas">
 				<Form>fmConfigureWarning</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\Editor\GX_eIfDef.pas">
+				<Form>fmConfigureIfDef</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
