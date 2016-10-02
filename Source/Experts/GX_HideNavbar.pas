@@ -31,6 +31,7 @@ uses
   SysUtils,
   Controls,
   GX_OtaUtils,
+  GX_DbugIntf,
   GX_NTAEditServiceNotifier;
 
 {$IFDEF GX_VER300_up}
@@ -87,7 +88,7 @@ var
 begin
 {$IFDEF GX_VER300_up}
   if not Assigned(BorlandIDEServices) then
-    exit;
+    Exit;
 
   FIsNavbarVisible := _Value;
   if GxOtaTryGetTopMostEditView(EditView) then begin
@@ -109,8 +110,18 @@ end;
 
 destructor THideNavigationToolbarExpert.Destroy;
 begin
-  if FNotifierIdx <> 0 then
-    (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
+{$IFOPT D+}SendDebug('THideNavigationToolbarExpert.Destroy');{$ENDIF}
+  if FNotifierIdx <> 0 then begin
+    {$IFOPT D+}SendDebugFmt('FNotifierIdx: %d', [FNotifierIdx]);{$ENDIF}
+    if Assigned(BorlandIDEServices) then begin
+      {$IFOPT D+}SendDebug('BorlandIDEServices is assigned');{$ENDIF}
+      {$IFOPT D+}SendDebug('Calling RemoveNotifyer');{$ENDIF}
+      (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FNotifierIdx);
+      {$IFOPT D+}SendDebug('Returned from RemoveNotifyer');{$ENDIF}
+    end else begin
+      {$IFOPT D+}SendDebug('BorlandIDEServices is NOT assigned');{$ENDIF}
+    end;
+  end;
 
   inherited Destroy;
 end;
@@ -125,7 +136,7 @@ function THideNavigationToolbarExpert.TryFindComponentByName(const ParentCompone
   const _Name: string; out _Comp: TComponent): Boolean;
 var
   i: Integer;
-  Cmp: TComponent;
+  cmp: TComponent;
 begin
   Result := False;
   if not Assigned(ParentComponent) then
@@ -145,7 +156,7 @@ end;
 
 function THideNavigationToolbarExpert.TrySetNavbarVisible(_EditView: IOTAEditView): Boolean;
 var
-  C: TComponent;
+  c: TComponent;
   EditWindow: INTAEditWindow;
   Ctrl: TWinControl;
 begin
