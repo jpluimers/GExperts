@@ -555,6 +555,24 @@ begin
   end;
 end;
 
+{$IFNDEF GX_VER170_up}
+
+function StartsText(const ASubText, AText: string): Boolean;
+var
+  P: PChar;
+  L, L2: Integer;
+begin
+  P := PChar(AText);
+  L := Length(ASubText);
+  L2 := Length(AText);
+  if L > L2 then
+    Result := False
+  else
+    Result := CompareString(LOCALE_USER_DEFAULT, NORM_IGNORECASE,
+      P, L, PChar(ASubText), L) = 2;
+end;
+{$ENDIF}
+
 procedure TSearchPathEnhancer.MakeAbsoluteBtnClick(_Sender: TObject);
 var
   i: Integer;
