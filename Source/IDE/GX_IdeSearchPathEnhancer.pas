@@ -571,8 +571,15 @@ begin
   try
     for i := 0 to FMemo.Lines.Count - 1 do begin
       RelativeDir := FMemo.Lines[i];
+      if not StartsText('$(BDS)\', RelativeDir) then begin
+        AbsoluteDir := TFileSystem.ExpandFileNameRelBaseDir(RelativeDir, ProjectDir);
+        FMemo.Lines[i] := AbsoluteDir;
+      end;
+    end;
+    RelativeDir := FEdit.Text;
+    if not StartsText('$(BDS)\', RelativeDir) then begin
       AbsoluteDir := TFileSystem.ExpandFileNameRelBaseDir(RelativeDir, ProjectDir);
-      FMemo.Lines[i] := AbsoluteDir;
+      FEdit.Text := AbsoluteDir;
     end;
   finally
     FMemo.Lines.EndUpdate;
@@ -595,8 +602,15 @@ begin
   try
     for i := 0 to FMemo.Lines.Count - 1 do begin
       AbsoluteDir := FMemo.Lines[i];
+      if not StartsText('$(BDS)\', AbsoluteDir) then begin
+        RelativeDir := ExtractRelativePath(IncludeTrailingPathDelimiter(ProjectDir), AbsoluteDir);
+        FMemo.Lines[i] := RelativeDir;
+      end;
+    end;
+    AbsoluteDir := FEdit.Text;
+    if not StartsText('$(BDS)\', AbsoluteDir) then begin
       RelativeDir := ExtractRelativePath(IncludeTrailingPathDelimiter(ProjectDir), AbsoluteDir);
-      FMemo.Lines[i] := RelativeDir;
+      FEdit.Text := RelativeDir;
     end;
   finally
     FMemo.Lines.EndUpdate;
