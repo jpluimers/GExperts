@@ -84,7 +84,7 @@ begin
   mi.Tag := Ord(ccToggleCase);
   FCodeList := TStringList.Create;
 
-  FKBHook := SetWindowsHookEx(WH_KEYBOARD, @KeyboardHookProc, HInstance, GetCurrentThreadId());
+  FKBHook := SetWindowsHookEx(WH_KEYBOARD, TFNHookProc(@KeyboardHookProc), HInstance, GetCurrentThreadId());
 end;
 
 destructor TChangeCaseExpert.Destroy;
