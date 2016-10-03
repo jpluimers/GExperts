@@ -82,6 +82,7 @@ begin
   mi.Tag := Ord(ccSentenceCase);
   mi := TPopupMenu_AppendMenuItem(FPopup, SToggleCase, miToggleCaseClicked);
   mi.Tag := Ord(ccToggleCase);
+
   FCodeList := TStringList.Create;
 
   FKBHook := SetWindowsHookEx(WH_KEYBOARD, TFNHookProc(@KeyboardHookProc), HInstance, GetCurrentThreadId());
@@ -162,9 +163,10 @@ begin
   EnterWasPressed := False;
   if not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     Exit;
-  if FCodeList.Count = 1 then
-    GxOtaReplaceSelection(SourceEditor, 0, TrimRight(FCodeList.Text))
-  else begin
+  if FCodeList.Count = 1 then begin
+    {$IFOPT D+}SendDebugFmt('Replacing selected editor text with "%s"', [FCodeList.Text]);{$ENDIF}
+    GxOtaReplaceSelection(SourceEditor, 0, TrimRight(FCodeList.Text));
+  end else begin
     LineEndType := BlockSelectionToLineEndType(SourceEditor, FCodeList.Text);
     if LineEndType = 2 then
       GxOtaReplaceSelection(SourceEditor, 0, Copy(FCodeList.Text, 1, Length(FCodeList.Text) - 2))
@@ -245,7 +247,7 @@ begin
   pnt := ctl.ClientToScreen(pnt);
   EnterWasPressed := False;
   FPopup.Popup(pnt.X, pnt.Y);
-  // This is a rather ugly hack to execute the default menu item when the user presses OK:
+  // This is a rather ugly hack to execute the default menu item when the user presses Enter:
   // We installed a keyboard hook that sets the global variable EnterWasPressed to true,
   // when (you guessed it:) the Enter key was pressed. Pressing Enter closes the popup
   // menu even if no item was selected. EnterWasPressed is set to false just before
@@ -255,8 +257,14 @@ begin
   // 2. No menu item was executed
   // so we execute the default item.
   // I said it was ugly, didn't I?
+  // But it gets worse: In order to execute the Item's .OnClick method we have to call
+  // Application.ProcessMessages before we can check for EnterWasPressed. If we don't do
+  // that, selecting an entry with the arrow keys and Enter will result in duplicating
+  // the selected text. I'm beginning to regret changing the selection from a dialog to
+  // a popup menu.
   // If you have got any better idea, please feel free to change this code.
   // -- 2016-10-01 twm
+  Application.ProcessMessages;
   if EnterWasPressed then
     FPopup.Items[FLastSelection].Click;
 end;
