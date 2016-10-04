@@ -2528,12 +2528,12 @@ end;
 
 function GxOtaGetProjectPlatform(Project: IOTAProject = nil): string;
 begin
+  Result := '';
 {$ifdef GX_VER230_up}
   if Project = nil then
     Project := GxOtaGetCurrentProject;
-  Result := Project.CurrentPlatform;
-{$else ~ GX_VER230_up}
-  Result := '';
+  if Project <> nil then
+    Result := Project.CurrentPlatform;
 {$endif GX_VER230_up}
 end;
 
