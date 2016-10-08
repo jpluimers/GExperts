@@ -740,11 +740,17 @@ begin
 end;
 
 procedure TSearchPathEnhancer.AddBtnClick(_Sender: TObject);
+var
+  Idx: Integer;
 begin
   if FPageControl.ActivePage = FTabSheetMemo then begin
     FMemo.Lines.Add(FEdit.Text);
   end else begin
-    FListbox.Items.Add(FEdit.Text);
+    Idx := FListbox.Items.Add(FEdit.Text);
+    // In order to prevent adding the path twice, we need to select the new entry and
+    // call the OnClick event.
+    FListbox.ItemIndex := Idx;
+    FListbox.OnClick(FListbox);
   end;
 end;
 
