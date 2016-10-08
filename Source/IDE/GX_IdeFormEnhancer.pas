@@ -849,10 +849,11 @@ begin
     end;
   end;
   // fix for RSP-13229: File -> New -> Other opens on different monitor
-  // which occurs in Delphi 2009 to 10.0 Berlin
+  //     and RSP-13230: on dual monitor Project -> Resources and images gets shown on primary monitor
+  // which occur in Delphi 2009 to 10.0 Berlin
 {$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
 {$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
-  if (Form.ClassName = 'TGalleryBrowseDlg') then begin
+  if (Form.ClassName = 'TGalleryBrowseDlg') or (Form.ClassName = 'TProjectResourcesDlg') then begin
     // File -> New -> Other
     try
       // this results in an EInvalidOperation exception the first time it is called ...
