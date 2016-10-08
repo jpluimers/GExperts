@@ -2,6 +2,8 @@ unit GX_IdeFormEnhancer;
 
 interface
 
+{$I GX_CondDefine.inc}
+
 uses
   SysUtils,
   Classes,
@@ -846,6 +848,23 @@ begin
       end;
     end;
   end;
+  // fix for RSP-13229: File -> New -> Other opens on different monitor
+  // which occurs in Delphi 2009 to 10.0 Berlin
+{$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
+{$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
+  if (Form.ClassName = 'TGalleryBrowseDlg') then begin
+    // File -> New -> Other
+    try
+      // this results in an EInvalidOperation exception the first time it is called ...
+      TForm(Form).Position := poDesigned;
+    except
+      on EInvalidOperation do
+        ; // ... which we ignore
+    end;
+    Exit;
+  end;
+{$ENDIF}
+{$ENDIF}
   for i := Low(FormsToChange) to High(FormsToChange) do
   begin
     if StrContains(Form.ClassName + ';', FormsToChange[i].FormClassNames + ';') then
