@@ -34,7 +34,7 @@ uses
 
 type
   ///<summary>
-  /// Use this sample editor expert as a starting point for your own expert.
+  /// Use this sample expert as a starting point for your own expert.
   /// Do not forget to rename the unit and the class(es).
   /// Many of the methods are optional and you can omit them if the default
   /// behaviour is suitable for your expert. </summary>
@@ -61,8 +61,10 @@ type
     function HasMenuItem: Boolean; override;
     // optional if HasConfigOptions returns false
     procedure Configure; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    // Overrride to load any configuration settings
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    // Overrride to save any configuration settings
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
     procedure Execute(Sender: TObject); override;
   end;
 
@@ -222,10 +224,10 @@ end;
 //    Name: TGxSampleExpert.LoadSettings
 // Purpose: Gets the expert settings from the registry
 //*********************************************************
-procedure TGxSampleExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TGxSampleExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FSomeData := Settings.ReadString(ConfigurationKey, 'TestSetting', FSomeData);
+  FSomeData := Settings.ReadString('TestSetting', FSomeData);
 end;
 
 //*********************************************************
@@ -233,10 +235,10 @@ end;
 // Purpose: Saves the expert settings to the registry
 // You must call this manually in the destructor
 //*********************************************************
-procedure TGxSampleExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TGxSampleExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited;
-  Settings.WriteString(ConfigurationKey, 'TestSetting', FSomeData);
+  Settings.WriteString('TestSetting', FSomeData);
 end;
 
 //********************************************************************

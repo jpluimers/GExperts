@@ -43,8 +43,10 @@ type
     function GetHelpString: string; override;
     // optional, default to true
     function HasConfigOptions: Boolean; override;
-    procedure InternalLoadSettings(Settings: TGExpertsSettings); override;
-    procedure InternalSaveSettings(Settings: TGExpertsSettings); override;
+    // Overrride to load any configuration settings
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    // Overrride to save any configuration settings
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   end;
 
 type
@@ -235,18 +237,18 @@ begin
   Result := True;
 end;
 
-procedure TGxSampleEditorExpert.InternalLoadSettings(Settings: TGExpertsSettings);
+procedure TGxSampleEditorExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
 
-  FData := Settings.ReadString(ConfigurationKey, 'TestData', FData);
+  FData := Settings.ReadString('TestData', FData);
 end;
 
-procedure TGxSampleEditorExpert.InternalSaveSettings(Settings: TGExpertsSettings);
+procedure TGxSampleEditorExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
 
-  Settings.WriteString(ConfigurationKey, 'TestData', FData);
+  Settings.WriteString('TestData', FData);
 end;
 
 //*******************************************************************
