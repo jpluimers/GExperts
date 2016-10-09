@@ -88,7 +88,7 @@ type
     procedure InitIncludes;
     procedure IncludeFilesListReady;
     procedure OnInludeFileSelected(_Sender: TObject);
-    function AddIncludePage(_No: Integer; const _FullFn: string; _IsIncluded: boolean): TTabSheet;
+    function AddIncludePage(_No: Integer; const _FullFn: string; _IsIncluded: Boolean): TTabSheet;
   public
     class function Execute(_bmp: TBitmap; var _AppendComment: Boolean;
       out _Text: string; out _IncludeFile: string): Boolean;
@@ -493,7 +493,7 @@ procedure TfmConfigureIfDef.act_AddExecute(Sender: TObject);
 var
   pnt: TPoint;
 begin
-  pnt := point(0, b_Add.Height);
+  pnt := Point(0, b_Add.Height);
   pnt := b_Add.ClientToScreen(pnt);
   pm_IncludeFiles.Popup(pnt.X, pnt.Y);
 end;
@@ -517,8 +517,17 @@ begin
 end;
 
 procedure TfmConfigureIfDef.chk_AppendCommentClick(Sender: TObject);
+var
+  ts: TTabSheet;
+  def: TIfdefTabDefinition;
+  LineNo: Integer;
 begin
   pc_IfClassesChange(nil);
+  ts := pc_IfClasses.ActivePage;
+  if ts.Tag <> 0 then begin
+    def := TIfdefTabDefinition(ts.Tag);
+    def.UpdateEditText(def.StringGrid.Row);
+  end;
 end;
 
 procedure TfmConfigureIfDef.InitOptions;
@@ -684,7 +693,7 @@ begin
   end;
 end;
 
-function TfmConfigureIfDef.AddIncludePage(_No: Integer; const _FullFn: string; _IsIncluded: boolean): TTabSheet;
+function TfmConfigureIfDef.AddIncludePage(_No: Integer; const _FullFn: string; _IsIncluded: Boolean): TTabSheet;
 const
   DEFINE_STR = '$DEFINE';
   UNDEF_STR = '$UNDEF';
