@@ -59,7 +59,7 @@ type
     procedure AfterIDEInitialized; virtual;
     // Update the action state
     procedure DoUpdateAction;
-    // returns true
+    // Calls HasMenuItem
     function CanHaveShortCut: boolean; override;
     // Index of expert; used to determine a "historic"
     // menu item order in the GExperts menu item.
