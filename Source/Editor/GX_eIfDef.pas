@@ -520,7 +520,6 @@ procedure TfmConfigureIfDef.chk_AppendCommentClick(Sender: TObject);
 var
   ts: TTabSheet;
   def: TIfdefTabDefinition;
-  LineNo: Integer;
 begin
   pc_IfClassesChange(nil);
   ts := pc_IfClasses.ActivePage;
