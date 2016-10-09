@@ -79,6 +79,8 @@ type
     procedure SetEnhanceToolProperties(const Value: Boolean);
     function GetEnhanceInstallPackages: Boolean;
     procedure SetEnhanceInstallPackages(const Value: Boolean);
+    function GetEnhanceGotoDialog: boolean;
+    procedure SetEnhanceGotoDialog(const Value: Boolean);
     function GetIdeFormsAllowResize: Boolean;
     function GetIdeFormsRememberPosition: Boolean;
     procedure SetIdeFormsAllowResize(const Value: Boolean);
@@ -102,6 +104,8 @@ type
     property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
     // Tool Options dialog
     property EnhanceToolProperties: Boolean read GetEnhanceToolProperties write SetEnhanceToolProperties;
+    // Goto dialog
+    property EnhanceGotoDialog: Boolean read GetEnhanceGotoDialog write SetEnhanceGotoDialog;
     // Fonts
     property OIFontEnabled: Boolean read FOIFontEnabled write SetOIFontEnabled;
     property OIFont: TFont read FOIFont;
@@ -137,7 +141,8 @@ uses
   SysUtils, Forms,
   GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo, 
   GX_IdeSearchPathEnhancer, GX_IdeProjectOptionsEnhancer,
-  GX_IdeToolPropertiesEnhancer, GX_IdeInstallPackagesEnhancer;
+  GX_IdeToolPropertiesEnhancer, GX_IdeInstallPackagesEnhancer, 
+  GX_IdeGotoEnhancer;
 
 { TIdeEnhancements }
 
@@ -187,10 +192,7 @@ end;
 
 procedure TIdeEnhancements.SetEnhanceIDEForms(const Value: Boolean);
 begin
-  if Value then
-    TIDEFormEnhancements.SetEnabled(True)
-  else
-    TIDEFormEnhancements.SetEnabled(False);
+  TIDEFormEnhancements.SetEnabled(Value);
 end;
 
 procedure TIdeEnhancements.SetEnhanceInstallPackages(const Value: Boolean);
@@ -207,6 +209,11 @@ end;
 procedure TIdeEnhancements.SetEnhanceToolProperties(const Value: Boolean);
 begin
   TGxIdeToolPropertiesEnhancer.SetEnabled(Value);
+end;
+
+procedure TIdeEnhancements.SetEnhanceGotoDialog(const Value: Boolean);
+begin
+  TGxIdeGotoEnhancer.SetEnabled(Value);
 end;
 
 procedure TIdeEnhancements.SetIdeFormsAllowResize(const Value: Boolean);
@@ -250,6 +257,7 @@ begin
     EnhanceSearchPath := ExpSettings.ReadBool('EnhanceSearchPath', False);
     EnhanceToolProperties := ExpSettings.ReadBool('EnhanceToolProperties', False);
     EnhanceInstallPackages := ExpSettings.ReadBool('EnhanceInstallPackages', False);
+    EnhanceGotoDialog := ExpSettings.ReadBool('EnhanceGotoDialog', False);
 
     // File saving
     AutoSave := ExpSettings.ReadBool('AutoSave', False);
@@ -298,6 +306,7 @@ begin
     ExpSettings.WriteBool('EnhanceSearchPath', EnhanceSearchPath);
     ExpSettings.WriteBool('EnhanceToolProperties', EnhanceToolProperties);
     ExpSettings.WriteBool('EnhanceInstallPackages', EnhanceInstallPackages);
+    ExpSettings.WriteBool('EnhanceGotoDialog', EnhanceGotoDialog);
 
     // File saving
     ExpSettings.WriteBool('AutoSave', AutoSave);
@@ -731,6 +740,11 @@ end;
 function TIdeEnhancements.GetDefaultMultiLineTabDockHost: Boolean;
 begin
   Result := GX_MultilineHost.DefaultToMultiLine;
+end;
+
+function TIdeEnhancements.GetEnhanceGotoDialog: boolean;
+begin
+  Result := TGxIdeGotoEnhancer.GetEnabled;
 end;
 
 function TIdeEnhancements.GetEnhanceIDEForms: Boolean;
