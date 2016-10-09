@@ -234,7 +234,7 @@ begin
   if Idx = -1 then
     Exit;
   View := GxOtaGetTopMostEditView;
-  CharPos := View.PosToCharPos(FUnitPositions.Positions[Idx].Position);
+  CharPos := GxOtaGetCharPosFromPos(FUnitPositions.Positions[Idx].Position, View);
   View.ConvertPos(False, CursorPos, CharPos);
   TCombobox_SetText(FLineInput, IntToStr(CursorPos.Line));
   TCombobox_SelectAll(FLineInput);
