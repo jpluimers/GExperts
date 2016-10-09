@@ -66,7 +66,7 @@ object fmConfiguration: TfmConfiguration
             Caption = 'File Locations'
             TabOrder = 0
             DesignSize = (
-              575
+              583
               169)
             object lblVCL: TLabel
               Left = 12
@@ -93,7 +93,7 @@ object fmConfiguration: TfmConfiguration
               FocusControl = edHelpFile
             end
             object sbVCLDir: TButton
-              Left = 542
+              Left = 566
               Top = 40
               Width = 21
               Height = 21
@@ -103,7 +103,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbVCLDirClick
             end
             object sbConfigDir: TButton
-              Left = 542
+              Left = 566
               Top = 88
               Width = 21
               Height = 21
@@ -113,7 +113,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbConfigDirClick
             end
             object sbHelpFile: TButton
-              Left = 542
+              Left = 566
               Top = 136
               Width = 21
               Height = 21
@@ -125,7 +125,7 @@ object fmConfiguration: TfmConfiguration
             object edVCLPath: TEdit
               Left = 12
               Top = 40
-              Width = 530
+              Width = 554
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 0
@@ -133,7 +133,7 @@ object fmConfiguration: TfmConfiguration
             object edConfigPath: TEdit
               Left = 12
               Top = 88
-              Width = 530
+              Width = 554
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 2
@@ -141,7 +141,7 @@ object fmConfiguration: TfmConfiguration
             object edHelpFile: TEdit
               Left = 12
               Top = 136
-              Width = 530
+              Width = 554
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 4
@@ -150,7 +150,7 @@ object fmConfiguration: TfmConfiguration
           object gbxCustomFont: TGroupBox
             Left = 8
             Top = 183
-            Width = 575
+            Width = 583
             Height = 65
             Align = alTop
             Caption = 'User Interface'
@@ -176,7 +176,7 @@ object fmConfiguration: TfmConfiguration
           object pnlGeneralSpacer: TPanel
             Left = 8
             Top = 177
-            Width = 575
+            Width = 583
             Height = 6
             Align = alTop
             BevelOuter = bvNone
@@ -335,7 +335,7 @@ object fmConfiguration: TfmConfiguration
               's, increase'#13'combobox DropDownCounts, resizable picture open dial' +
               'ogs, collapse Together'#13'options tree node, etc.  (Some enhancemen' +
               'ts require BDS 2006 or later)'
-            Caption = 'Enhance IDE dialogs'
+            Caption = 'Enhance IDE dialogs (and fix form positioning bugs)'
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
@@ -343,11 +343,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkOIFontNames: TCheckBox
             Left = 8
-            Top = 117
+            Top = 136
             Width = 505
             Height = 17
             Caption = 'Show object inspector font names using the font'
-            TabOrder = 6
+            TabOrder = 7
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
@@ -388,6 +388,14 @@ object fmConfiguration: TfmConfiguration
             Height = 17
             Caption = 'Enhance Install Packages dialog with ... Explorer button'
             TabOrder = 5
+          end
+          object chkEnhanceGotoDialog: TCheckBox
+            Left = 24
+            Top = 117
+            Width = 489
+            Height = 17
+            Caption = 'Enhance Goto dialog'
+            TabOrder = 6
           end
         end
       end
@@ -504,8 +512,8 @@ object fmConfiguration: TfmConfiguration
         Caption = 'Suppressed Messages'
         ImageIndex = 6
         DesignSize = (
-          591
-          454)
+          599
+          461)
         object gbSuppressedMessages: TGroupBox
           Left = 8
           Top = 8
@@ -706,15 +714,15 @@ object fmConfiguration: TfmConfiguration
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 497
-    Width = 613
+    Top = 504
+    Width = 621
     Height = 34
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 326
+      Left = 334
       Top = 0
       Width = 287
       Height = 34

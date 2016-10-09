@@ -101,6 +101,7 @@ type
     chkEnhanceInstallPackages: TCheckBox;
     btnImport: TButton;
     btnExport: TButton;
+    chkEnhanceGotoDialog: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -399,6 +400,7 @@ begin
   chkEnhanceSearchPaths.Checked := IdeEnhancements.EnhanceSearchPath;
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
+  chkEnhanceGotoDialog.Checked := IdeEnhancements.EnhanceGotoDialog;
   UpdateIdeDialogCheckboxes;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
@@ -499,6 +501,7 @@ begin
   IdeEnhancements.EnhanceSearchPath := chkEnhanceSearchPaths.Checked;
   IdeEnhancements.EnhanceInstallPackages := chkEnhanceInstallPackages.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
+  IdeEnhancements.EnhanceGotoDialog := chkEnhanceGotoDialog.Checked;
 
   // Menus
   ConfigInfo.PlaceGxMainMenuInToolsMenu := chkPlaceGxMainMenuInToolsMenu.Checked;
