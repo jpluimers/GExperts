@@ -473,7 +473,7 @@ object fmCodeLib: TfmCodeLib
       Caption = 'Find Next'
       Hint = 'Find Next'
       ImageIndex = 15
-      ShortCut = 16498
+      ShortCut = 114
       OnExecute = FindNextExecute
     end
     object actExpandAll: TAction
