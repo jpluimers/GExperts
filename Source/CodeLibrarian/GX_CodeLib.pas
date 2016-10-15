@@ -535,6 +535,8 @@ begin
       FCodeText.Clear;
 
     Modified := False;
+    if Node <> nil then
+      StatusBar.Panels[0].Text := GetNodePath(Node);
   except
     on E: Exception do
       GxLogAndShowException(E);
