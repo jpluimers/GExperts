@@ -278,7 +278,8 @@ uses
   SysUtils, Windows, Clipbrd,
   GX_CodeSrch, GX_CodeOpt, GX_GxUtils,
   GX_OtaUtils, GX_IdeUtils,
-  GX_GExperts, GX_ConfigurationInfo, GX_MessageBox, GX_SharedImages;
+  GX_GExperts, GX_ConfigurationInfo, GX_MessageBox, GX_SharedImages,
+  GX_dzVclUtils;
 
 const
   DefaultFileName = 'CodeLibrarian.fs';
@@ -755,7 +756,7 @@ begin
           tvTopics.SetFocus
         else
         begin
-          FCodeText.SetFocus;
+          TWinControl_SetFocus(FCodeText);
           Dec(Match);
           FCodeText.SetSelection(Match, Length(FSearch.Text));
           //{$IFOPT D+}SendDebug('Focused Text: '+Copy(FCodeText.Lines.Text, Match - 1, 10));{$ENDIF}
