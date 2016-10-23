@@ -494,24 +494,94 @@ begin
 end;
 
 procedure TClassItem.SaveToFile;
+//const
+//  BoolValues: array[Boolean] of string = ('0', '1');
 var
   FileName: string;
   i: Integer;
+  sl: TStringList;
+//  Cnt1: Int64;
+//  Cnt2: Int64;
+//  PFreq: Int64;
 begin
   if not DirectoryExists(Directory) then
     Exit;
   FileName := AddSlash(Directory) + Name + '.gex'; // Do not localize.
-  with TMemIniFile.Create(FileName) do
+
+//  QueryPerformanceFrequency(PFreq);
+
+//  QueryPerformanceCounter(Cnt1);
+  // Using TStringlist.SaveToFile is much(!) faster than TIniFile and still 50 times faster
+  // than TMemIniFile.
+  // I left the timing code commented out, so you can see for yourself, if you want.
+  sl := TStringList.Create;
   try
-    WriteString('General', 'Name', Name); // do not localize
-    WriteBool('General', 'Project', IsProject); // do not localize
-    WriteInteger('Classes', 'Count', ClassCount); // do not localize
-    for i := 0 to ClassCount-1 do // do not localize
-      WriteString('Classes', 'Class' + IntToStr(i), ClassItem[i].AsText); // do not localize
-    UpdateFile;
+    sl.Add('[General]');
+    sl.Add('Name=' + Name);
+    sl.Add('Project=' + BoolValues[IsProject]);
+    sl.Add('[Classes]');
+    sl.Add('Count=' + IntToStr(ClassCount));
+    for i := 0 to ClassCount - 1 do // do not localize
+      sl.Add('Class' + IntToStr(i) + '=' + ClassItem[i].AsText);
+    sl.SaveToFile(FileName);
   finally
-    Free;
+    FreeAndNil(sl);
   end;
+//  QueryPerformanceCounter(Cnt2);
+//{$IFOPT D+}SendDebugFmt('Writing with TStringList.SaveToFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
+
+//  QueryPerformanceCounter(Cnt1);
+//  sl := TStringList.Create;
+//  try
+//    sl.Add('[General]');
+//    sl.Add('Name=' + Name);
+//    sl.Add('Project=' + BoolValues[IsProject]);
+//    sl.Add('[Classes]');
+//    sl.Add('Count=' + IntToStr(ClassCount));
+//    for i := 0 to ClassCount-1 do // do not localize
+//      sl.Add('Class' + IntToStr(i) + '=' + ClassItem[i].AsText);
+//    with TMemIniFile.Create(FileName) do
+//    try
+//      SetStrings(sl);
+//      UpdateFile;
+//    finally
+//      Free;
+//    end;
+//  finally
+//    FreeAndNil(sl);
+//  end;
+//  QueryPerformanceCounter(Cnt2);
+//{$IFOPT D+}SendDebugFmt('Writing with TMemIniFile.SetStrings took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
+
+//  QueryPerformanceCounter(Cnt1);
+//  with TMemIniFile.Create(FileName) do
+//  try
+//    WriteString('General', 'Name', Name); // do not localize
+//    WriteBool('General', 'Project', IsProject); // do not localize
+//    WriteInteger('Classes', 'Count', ClassCount); // do not localize
+//    for i := 0 to ClassCount-1 do // do not localize
+//      WriteString('Classes', 'Class' + IntToStr(i), ClassItem[i].AsText); // do not localize
+//    UpdateFile;
+//  finally
+//    Free;
+//  end;
+//  QueryPerformanceCounter(Cnt2);
+//{$IFOPT D+}SendDebugFmt('Writing with TMemIniFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
+
+//  QueryPerformanceCounter(Cnt1);
+  with TIniFile.Create(FileName) do
+//  try
+//    WriteString('General', 'Name', Name); // do not localize
+//    WriteBool('General', 'Project', IsProject); // do not localize
+//    WriteInteger('Classes', 'Count', ClassCount); // do not localize
+//    for i := 0 to ClassCount-1 do // do not localize
+//      WriteString('Classes', 'Class' + IntToStr(i), ClassItem[i].AsText); // do not localize
+//    UpdateFile;
+//  finally
+//    Free;
+//  end;
+//  QueryPerformanceCounter(Cnt2);
+//{$IFOPT D+}SendDebugFmt('Writing with TIniFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
 end;
 
 procedure TClassItem.LoadFromFile;
