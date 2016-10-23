@@ -181,14 +181,14 @@ end;
 
 procedure TClassList.LoadFromFile;
 var
-  IniFile: TIniFile;
+  IniFile: TMemIniFile;
   IniDatabaseItemCount: Integer;
   i: Integer;
   Item: TClassItem;
 begin
   if not CheckStorageDirectory(True) then
     Exit;
-  IniFile := TIniFile.Create(AddSlash(FStoragePath) + 'Classes.ini'); // Do not localize.
+  IniFile := TMemIniFile.Create(AddSlash(FStoragePath) + 'Classes.ini'); // Do not localize.
   try
     IniDatabaseItemCount := IniFile.ReadInteger('Databases', 'Count', 0); // Do not localize.
     if IniDatabaseItemCount > 0 then
@@ -230,12 +230,12 @@ end;
 
 procedure TClassList.SaveToFile(CreateIfNecessary: Boolean);
 var
-  IniFile: TIniFile;
+  IniFile: TMemIniFile;
   i: Integer;
 begin
   if not CheckStorageDirectory(CreateIfNecessary) then
     Exit;
-  IniFile := TIniFile.Create(AddSlash(FStoragePath) + 'Classes.ini'); // Do not localize.
+  IniFile := TMemIniFile.Create(AddSlash(FStoragePath) + 'Classes.ini'); // Do not localize.
   try
     IniFile.WriteInteger('Databases', 'Count', Count); // do not localize
     for i := 0 to Self.Count-1 do
@@ -247,6 +247,7 @@ begin
         Items[i].SaveToFile;
       end;
     end;
+    IniFile.UpdateFile;
   finally
     FreeAndNil(IniFile);
   end;
@@ -500,13 +501,14 @@ begin
   if not DirectoryExists(Directory) then
     Exit;
   FileName := AddSlash(Directory) + Name + '.gex'; // Do not localize.
-  with TIniFile.Create(FileName) do
+  with TMemIniFile.Create(FileName) do
   try
     WriteString('General', 'Name', Name); // do not localize
     WriteBool('General', 'Project', IsProject); // do not localize
     WriteInteger('Classes', 'Count', ClassCount); // do not localize
     for i := 0 to ClassCount-1 do // do not localize
       WriteString('Classes', 'Class' + IntToStr(i), ClassItem[i].AsText); // do not localize
+    UpdateFile;
   finally
     Free;
   end;
@@ -514,7 +516,7 @@ end;
 
 procedure TClassItem.LoadFromFile;
 var
-  IniFile: TIniFile;
+  IniFile: TMemIniFile;
   IniClassCount: Integer;
   FileName: string;
   TempClassName: string;
@@ -524,7 +526,7 @@ begin
   FileName := AddSlash(ExtractFilePath(Directory)) + Name + '.gex'; // Do not localize.
   if not FileExists(FileName) then
     Exit;
-  IniFile := TIniFile.Create(FileName);
+  IniFile := TMemIniFile.Create(FileName);
   try
     FName := IniFile.ReadString('General', 'Name', Name); // do not localize
     FIsProject := IniFile.ReadBool('General', 'Project', IsProject); // do not localize
