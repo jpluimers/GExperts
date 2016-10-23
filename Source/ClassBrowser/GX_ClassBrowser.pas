@@ -338,6 +338,7 @@ var
   Node: TTreeNode;
   Item: TClassItem;
 begin
+  FLastProject := '';
   if tvBrowse.Items.Count = 0 then
     Exit;
   Node := tvBrowse.Items[0];
@@ -402,6 +403,8 @@ begin
     else
       Assert(False, 'Unknown view mode!');
     end;
+    if tvBrowse.Items.Count > 0 then
+      tvBrowse.Items[0].Expand(False);
   finally
     StatusBar.SimpleText := SSorting;
     StatusBar.Repaint;
