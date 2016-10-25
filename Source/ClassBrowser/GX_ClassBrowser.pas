@@ -312,8 +312,8 @@ begin
     Item.IsProject := True;
     Item.Directory := ExtractFilePath(ProjectName);
     Item.Name := ExtractPureFileName(ProjectName);
-    if FileExists(Item.Directory + Item.Name + '.GEX') then
-      Item.LoadFromFile
+    if FileExists(Item.GenerateFilename(Item.Directory)) then
+      Item.LoadFromFile(Item.Directory)
     else
       Item.Load;
   end;
@@ -349,7 +349,7 @@ begin
     Item := TClassItem(Node.Data);
     if Item.IsProject then
     begin
-      Item.SaveToFile;
+      Item.SaveToFile(Item.Directory);
       FreeAndNil(Item);
       ONode := Node.GetNextSibling;
       FreeAndNil(Node);
@@ -403,8 +403,7 @@ begin
     else
       Assert(False, 'Unknown view mode!');
     end;
-    if tvBrowse.Items.Count > 0 then
-      tvBrowse.Items[0].Expand(False);
+    ONode.Expand(False);
   finally
     StatusBar.SimpleText := SSorting;
     StatusBar.Repaint;

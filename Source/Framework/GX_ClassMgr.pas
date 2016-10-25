@@ -114,8 +114,9 @@ type
     destructor Destroy; override;
     procedure Clear;
     procedure Load;
-    procedure SaveToFile;
-    procedure LoadFromFile;
+    function GenerateFilename(const ADirectory: string): string;
+    procedure SaveToFile(const ADirectory: string);
+    procedure LoadFromFile(const ADirectory: string);
     function ObjectByName(const ObjectName: string): TBrowseClassInfoCollection;
     property Directory: string read FDirectory write FDirectory;
     property Recurse: Boolean read FRecurse write FRecurse;
@@ -198,7 +199,7 @@ begin
         Item := Self.Add;
         Item.FName := IniFile.ReadString('Databases', 'Name' + IntToStr(i), 'Unknown'); // do not localize
         Item.FDirectory := AddSlash(IniFile.ReadString('Databases', 'Database' + IntToStr(i), 'Unknown')); // Do not localize.
-        Item.LoadFromFile;
+        Item.LoadFromFile(FStoragePath);
       end;
     end;
   finally
@@ -244,7 +245,7 @@ begin
       begin
         IniFile.WriteString('Databases', 'Name' + IntToStr(i), Items[i].Name); // do not localize
         IniFile.WriteString('Databases', 'Database' + IntToStr(i), AddSlash(Items[i].Directory)); // Do not localize.
-        Items[i].SaveToFile;
+        Items[i].SaveToFile(FStoragePath);
       end;
     end;
     IniFile.UpdateFile;
@@ -279,6 +280,11 @@ begin
 
     FOList.Clear;
   end;
+end;
+
+function TClassItem.GenerateFilename(const ADirectory: string): string;
+begin
+  Result := AddSlash(ADirectory) + Name + '.gex';
 end;
 
 function TClassItem.GetClassCount: Integer;
@@ -493,7 +499,7 @@ begin
   end;
 end;
 
-procedure TClassItem.SaveToFile;
+procedure TClassItem.SaveToFile(const ADirectory: string);
 const
   BoolValues: array[Boolean] of string = ('0', '1');
 var
@@ -504,9 +510,7 @@ var
 //  Cnt2: Int64;
 //  PFreq: Int64;
 begin
-  if not DirectoryExists(Directory) then
-    Exit;
-  FileName := AddSlash(Directory) + Name + '.gex'; // Do not localize.
+  FileName := GenerateFilename(ADirectory);
 
 //  QueryPerformanceFrequency(PFreq);
 
@@ -518,6 +522,7 @@ begin
   try
     sl.Add('[General]');
     sl.Add('Name=' + Name);
+    sl.Add('BaseDir=' + Directory);
     sl.Add('Project=' + BoolValues[IsProject]);
     sl.Add('[Classes]');
     sl.Add('Count=' + IntToStr(ClassCount));
@@ -584,7 +589,7 @@ begin
 //{$IFOPT D+}SendDebugFmt('Writing with TIniFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
 end;
 
-procedure TClassItem.LoadFromFile;
+procedure TClassItem.LoadFromFile(const ADirectory: string);
 var
   IniFile: TMemIniFile;
   IniClassCount: Integer;
@@ -593,7 +598,7 @@ var
   i: Integer;
   OInfo: TBrowseClassInfoCollection;
 begin
-  FileName := AddSlash(ExtractFilePath(Directory)) + Name + '.gex'; // Do not localize.
+  FileName := GenerateFilename(ADirectory);
   if not FileExists(FileName) then
     Exit;
   IniFile := TMemIniFile.Create(FileName);
