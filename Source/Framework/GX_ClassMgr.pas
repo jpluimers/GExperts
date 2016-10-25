@@ -494,8 +494,8 @@ begin
 end;
 
 procedure TClassItem.SaveToFile;
-//const
-//  BoolValues: array[Boolean] of string = ('0', '1');
+const
+  BoolValues: array[Boolean] of string = ('0', '1');
 var
   FileName: string;
   i: Integer;
