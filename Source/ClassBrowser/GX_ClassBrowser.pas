@@ -1572,33 +1572,20 @@ begin
 end;
 
 procedure TfmClassBrowser.actFileAddExecute(Sender: TObject);
-
-  function GetID: string;
-  begin
-    with TfmClassIdentify.Create(nil) do
-    try
-      if ShowModal = mrOk then
-        Result := edtID.Text
-      else
-        Result := '';
-    finally
-      Free;
-    end;
-  end;
-
 var
   New, SDir: string;
   Node: TTreeNode;
   Ticks: DWORD;
   Item: TClassItem;
 begin
-  New := GetID;
-  if New = '' then
-    Exit;
   SDir := FStartingDir;
-  if GetDirectory(SDir) then
+  if not GetDirectory(SDir) then
+    Exit;
+  FStartingDir := SDir;
+  New := ExtractFileName(SDir);
+  if not TfmClassIdentify.Execute(Self, New, FParseRecursing) then
+    Exit;
   begin
-    FStartingDir := SDir;
     Node := tvBrowse.Items.Add(nil, New);
     Node.ImageIndex := ImageIndexClosedFolder;
     Node.SelectedIndex := ImageIndexOpenFolder;
