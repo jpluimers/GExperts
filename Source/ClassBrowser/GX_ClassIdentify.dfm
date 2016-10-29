@@ -3,8 +3,8 @@ object fmClassIdentify: TfmClassIdentify
   Top = 176
   BorderStyle = bsDialog
   Caption = 'Enter Class Identifier'
-  ClientHeight = 193
-  ClientWidth = 326
+  ClientHeight = 225
+  ClientWidth = 321
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -19,8 +19,8 @@ object fmClassIdentify: TfmClassIdentify
   object gbxIdentifier: TGroupBox
     Left = 8
     Top = 8
-    Width = 309
-    Height = 149
+    Width = 305
+    Height = 177
     Caption = 'Class Set Identifier'
     TabOrder = 0
     object lblNotes: TLabel
@@ -51,22 +51,32 @@ object fmClassIdentify: TfmClassIdentify
       Width = 229
       Height = 22
       TabOrder = 0
+      OnChange = edtIDChange
+    end
+    object chk_ScanRecursively: TCheckBox
+      Left = 8
+      Top = 144
+      Width = 289
+      Height = 17
+      Caption = 'Scan Subdirectories'
+      TabOrder = 1
     end
   end
   object btnOK: TButton
     Left = 160
-    Top = 163
-    Width = 75
+    Top = 192
+    Width = 73
     Height = 25
     Caption = 'OK'
     Default = True
+    Enabled = False
     ModalResult = 1
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 242
-    Top = 163
-    Width = 75
+    Left = 240
+    Top = 192
+    Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
