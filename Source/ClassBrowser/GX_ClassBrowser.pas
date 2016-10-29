@@ -168,7 +168,7 @@ type
     FLastFind: string;
 
     procedure EndParse(Sender: TObject);
-    procedure ParseFile(const FileName: string; FileIndex, FileCount: Integer);
+    procedure ParseFile(Sender: TObject; const FileName: string; FileIndex, FileCount: Integer);
     procedure LoadObjects(Item: TClassItem; ONode: TTreeNode);
     procedure LoadList(OInfo: TBrowseClassInfoCollection);
     procedure LoadClassList(Item: TClassItem; ONode: TTreeNode);
@@ -527,7 +527,8 @@ begin
   end;
 end;
 
-procedure TfmClassBrowser.ParseFile(const FileName: string; FileIndex, FileCount: Integer);
+procedure TfmClassBrowser.ParseFile(Sender: TObject; const FileName: string;
+  FileIndex, FileCount: Integer);
 resourcestring
   SParsingProgress = 'Parsing classes in %s ...';
 begin
@@ -1459,7 +1460,6 @@ end;
 destructor TfmClassBrowser.Destroy;
 begin
   SaveSettings;
-  ClassList.SaveToFile(False);
 
   if not IsStandAlone then
   begin
@@ -1609,6 +1609,7 @@ begin
     Item.Name := New;
     Item.Recurse := FParseRecursing;
     Item.Load;
+    ClassList.SaveToFile(False);
     Node.Data := Pointer(Item);
     LoadObjects(Item, Node);
     StatusBar.SimpleText := GetClassesParsedText(Item.ClassCount, GetTickCount - Ticks);
@@ -1628,6 +1629,7 @@ begin
   Item := TClassItem(tvBrowse.Selected.Data);
   tvBrowse.Selected.Free;
   FreeAndNil(Item);
+  ClassList.SaveToFile(False);
   if tvBrowse.Selected = nil then
     actFileRemove.Enabled := False;
 end;
@@ -1643,6 +1645,7 @@ begin
     TBrowseClassInfoCollection(tvBrowse.Selected.Data).LoadMethods;
     tvBrowseChange(tvBrowse, tvBrowse.Selected);
   end;
+  ClassList.SaveToFile(False);
 end;
 
 procedure TfmClassBrowser.actEditFindExecute(Sender: TObject);

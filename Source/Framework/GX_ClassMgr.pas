@@ -17,7 +17,8 @@ uses
   mwPasParser;
 
 type
-  TOnParseFile = procedure(const FileName: string; FileIndex, FileCount: Integer) of object;
+  TOnParseFile = procedure(Sender: TObject; const FileName: string;
+    FileIndex, FileCount: Integer) of object;
 
   TMethodDeclare = (cdPrivate, cdProtected, cdPublic, cdPublished);
 
@@ -132,6 +133,8 @@ type
     FOnEndParse: TNotifyEvent;
     FStoragePath: string;
     function GetItem(Index: Integer): TClassItem;
+    procedure doOnParseFile(const FileName: string; FileIndex, FileCount: Integer);
+    procedure doOnEndParse;
   protected
     EditRead: TEditReader;
   public
@@ -168,6 +171,18 @@ begin
   FreeAndNil(EditRead);
   
   inherited Destroy;
+end;
+
+procedure TClassList.doOnEndParse;
+begin
+  if Assigned(FOnEndParse) then
+    FOnEndParse(Self);
+end;
+
+procedure TClassList.doOnParseFile(const FileName: string; FileIndex, FileCount: Integer);
+begin
+  if Assigned(FOnParseFile) then
+    FOnParseFile(Self, FileName, FileIndex, FileCount);
 end;
 
 function TClassList.Add: TClassItem;
@@ -233,21 +248,24 @@ procedure TClassList.SaveToFile(CreateIfNecessary: Boolean);
 var
   IniFile: TMemIniFile;
   i: Integer;
+  cnt: Integer;
 begin
   if not CheckStorageDirectory(CreateIfNecessary) then
     Exit;
   IniFile := TMemIniFile.Create(AddSlash(FStoragePath) + 'Classes.ini'); // Do not localize.
   try
-    IniFile.WriteInteger('Databases', 'Count', Count); // do not localize
+    cnt := 0;
     for i := 0 to Self.Count-1 do
     begin
       if not Items[i].IsProject then
       begin
-        IniFile.WriteString('Databases', 'Name' + IntToStr(i), Items[i].Name); // do not localize
-        IniFile.WriteString('Databases', 'Database' + IntToStr(i), AddSlash(Items[i].Directory)); // Do not localize.
+        IniFile.WriteString('Databases', 'Name' + IntToStr(cnt), Items[i].Name); // do not localize
+        IniFile.WriteString('Databases', 'Database' + IntToStr(cnt), AddSlash(Items[i].Directory)); // Do not localize.
         Items[i].SaveToFile(FStoragePath);
+        Inc(cnt);
       end;
     end;
+    IniFile.WriteInteger('Databases', 'Count', cnt); // do not localize
     IniFile.UpdateFile;
   finally
     FreeAndNil(IniFile);
@@ -362,13 +380,11 @@ begin
 
       Inc(FProjectCount);
 
-      if Assigned(ClassList.OnParseFile) then
-        ClassList.OnParseFile(ModuleFileName, FProjectCount, ModuleFileCount);
+      ClassList.doOnParseFile(ModuleFileName, FProjectCount, ModuleFileCount);
     end;
   end;
 
-  if Assigned(ClassList.OnEndParse) then
-    ClassList.OnEndParse(ClassList);
+  ClassList.doOnEndParse;
 
   ClassList.EditRead.FileName := '';
 end;
@@ -410,7 +426,9 @@ var
 
 var
   i: Integer;
+  ClsList: TClassList;
 begin
+  ClsList := TClassList(Collection);
   Mask := '*.pas;*.dpr;*.inc';
 
   FileList := TStringList.Create;
@@ -429,14 +447,12 @@ begin
           // Swallow exception
         end;
       end;
-      if Assigned(TClassList(Collection).OnParseFile) then
-        TClassList(Collection).OnParseFile(FileList[i], i + 1, FileList.Count);
+      ClsList.doOnParseFile(FileList[i], i + 1, FileList.Count);
     end;
   finally
     FreeAndNil(FileList);
 
-    if Assigned(TClassList(Collection).OnEndParse) then
-      TClassList(Collection).OnEndParse(Self);
+    ClsList.doOnEndParse;
   end;
 end;
 
