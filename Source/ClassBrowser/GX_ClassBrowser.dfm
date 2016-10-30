@@ -59,7 +59,7 @@ object fmClassBrowser: TfmClassBrowser
       TabOrder = 0
       OnChange = pcMainChange
       object tshMembers: TTabSheet
-        Caption = 'Members'
+        Caption = '&Members'
         object Splitter2: TSplitter
           Left = 0
           Top = 321
@@ -96,7 +96,7 @@ object fmClassBrowser: TfmClassBrowser
               Width = 28
             end
             item
-              Caption = 'Vr'
+              Caption = 'Di'
               Width = 28
             end
             item
@@ -104,7 +104,7 @@ object fmClassBrowser: TfmClassBrowser
               Width = 28
             end
             item
-              Caption = 'Ov'
+              Caption = 'Ol'
               Width = 28
             end
             item
@@ -115,16 +115,19 @@ object fmClassBrowser: TfmClassBrowser
           HideSelection = False
           ReadOnly = True
           RowSelect = True
+          ParentShowHint = False
           PopupMenu = pmInfo
+          ShowHint = True
           SmallImages = dmSharedImages.Images
           TabOrder = 1
           ViewStyle = vsReport
           OnChange = lvInfoChange
           OnDblClick = actEditGotoMemberExecute
+          OnMouseMove = lvInfoMouseMove
         end
       end
       object tshInherit: TTabSheet
-        Caption = 'Inheritance'
+        Caption = '&Inheritance'
         object scInherit: TScrollBox
           Left = 0
           Top = 0
@@ -137,7 +140,7 @@ object fmClassBrowser: TfmClassBrowser
         end
       end
       object tshCode: TTabSheet
-        Caption = 'Interface Code'
+        Caption = 'Interface &Code'
       end
     end
   end
@@ -363,6 +366,39 @@ object fmClassBrowser: TfmClassBrowser
       end
       object mitViewDetails: TMenuItem
         Action = actViewClassProperties
+      end
+      object mitViewSep3: TMenuItem
+        Caption = '-'
+      end
+      object mitViewConstants: TMenuItem
+        Action = actViewConstants
+      end
+      object mitViewMethods: TMenuItem
+        Action = actViewMethods
+      end
+      object mitViewTypes: TMenuItem
+        Action = actViewTypes
+      end
+      object mitViewVariables: TMenuItem
+        Action = actViewVariables
+      end
+      object mitViewProperties: TMenuItem
+        Action = actViewProperties
+      end
+      object mitViewSep4: TMenuItem
+        Caption = '-'
+      end
+      object mitViewPrivate: TMenuItem
+        Action = actViewPrivate
+      end
+      object mitViewProtected: TMenuItem
+        Action = actViewProtected
+      end
+      object mitViewPublic: TMenuItem
+        Action = actViewPublic
+      end
+      object mitViewPublished: TMenuItem
+        Action = actViewPublished
       end
     end
     object mitOptions: TMenuItem

@@ -115,6 +115,17 @@ type
     actViewProtected: TAction;
     actViewPublic: TAction;
     actViewPublished: TAction;
+    mitViewSep3: TMenuItem;
+    mitViewConstants: TMenuItem;
+    mitViewMethods: TMenuItem;
+    mitViewTypes: TMenuItem;
+    mitViewVariables: TMenuItem;
+    mitViewProperties: TMenuItem;
+    mitViewSep4: TMenuItem;
+    mitViewPrivate: TMenuItem;
+    mitViewProtected: TMenuItem;
+    mitViewPublic: TMenuItem;
+    mitViewPublished: TMenuItem;
     procedure tvBrowseChange(Sender: TObject; Node: TTreeNode);
     procedure pnlDataResize(Sender: TObject);
     procedure lvInfoChange(Sender: TObject; Item: TListItem; Change: TItemChange);
@@ -146,6 +157,7 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure actEditFindNextExecute(Sender: TObject);
     procedure tvBrowseDblClick(Sender: TObject);
+    procedure lvInfoMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
   private
     FProjectNotifier: TBaseIdeNotifier;
     FIsFirstInvocation: Boolean;
@@ -166,6 +178,8 @@ type
     FClassHierarchyFont: string;
     FFilters: array[0..8] of Boolean;
     FLastFind: string;
+    FLastHitTestItemIdx: Integer;
+    FLastHitTestSubItemIdx: Integer;
 
     procedure EndParse(Sender: TObject);
     procedure ParseFile(Sender: TObject; const FileName: string; FileIndex, FileCount: Integer);
@@ -237,7 +251,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Messages, StdCtrls, Printers,
+  SysUtils, Windows, Messages, StdCtrls, Printers, CommCtrl,
   GX_VerDepConst, GX_ClassIdentify, GX_ConfigurationInfo, GX_EditReader,
   GX_ClassProp, GX_ClassOptions, GX_ClassReport, GX_GExperts,
   GX_GxUtils, GX_GenericUtils, GX_SharedImages, GX_IdeUtils, Math;
@@ -588,12 +602,18 @@ begin
         SetSubItemImage(ListItem, 0, Ord(AMethod.MethodType) + ImageIndexMemberType);
         ListItem.SubItems.Add('');
         if AMethod.cVirtual then
-          SetSubItemImage(ListItem, 1, ImageIndexCheck);
+          SetSubItemImage(ListItem, 1, ImageIndexVirtual);
+        if AMethod.cDynamic then
+          SetSubItemImage(ListItem, 1, ImageIndexDynamic);
+        if AMethod.cMessage then
+          SetSubItemImage(ListItem, 1, ImageIndexMessage);
+        if AMethod.cOverride then
+          SetSubItemImage(ListItem, 1, ImageIndexOverride);
         ListItem.SubItems.Add('');
         if AMethod.cAbstract then
           SetSubItemImage(ListItem, 2, ImageIndexCheck);
         ListItem.SubItems.Add('');
-        if AMethod.cOverride then
+        if AMethod.cOverload then
           SetSubItemImage(ListItem, 3, ImageIndexCheck);
         ListItem.SubItems.Add(CompressWhiteSpace(AMethod.DName));
         ListItem.Data := AMethod;
@@ -601,6 +621,78 @@ begin
     end;
   finally
     lvInfo.Items.EndUpdate;
+  end;
+end;
+
+procedure TfmClassBrowser.lvInfoMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+resourcestring
+  SHintVisibility = 'Visibility';
+  SHintType = 'Type';
+  SHintDirective = 'Directive';
+  SHintVisPrivate = 'Private';
+  SHintVisProtected = 'Protected';
+  SHintVisPublic = 'Public';
+  SHintVisPublished = 'Published';
+  SHintTypeConstant = 'Constant';
+  SHintTypeMethod = 'Method';
+  SHintTypeType = 'Type';
+  SHintTypeVariable = 'Variable';
+  SHintTypeProperty = 'Property';
+  SHintDirVirtual = 'Virtual';
+  SHintDirDynamic = 'Dynamic';
+  SHintDirMessage = 'Message';
+  SHintDirOverride = 'Override';
+  SHintDirAbstract = 'Abstract';
+  SHintDirOverload = 'Overload';
+  SHintDirReintroduce = 'Reintroduce';
+var
+  lvHitInfo: TLVHitTestInfo;
+  Hint: string;
+begin
+  ZeroMemory(@lvHitInfo, SizeOf(lvHitInfo));
+  lvHitInfo.pt.X := X;
+  lvHitInfo.pt.Y := Y;
+  if - 1 <> lvInfo.Perform(LVM_SUBITEMHITTEST, 0, LParam(@lvHitInfo)) then begin
+    Hint := '';
+    case lvHitInfo.iSubItem of
+      0: begin
+        Hint := SHintVisibility;
+        case lvInfo.Items[lvHitInfo.iItem].ImageIndex - ImageIndexVisibility of
+          Ord(cdPrivate): Hint := Hint + ': ' + SHintVisPrivate;
+          Ord(cdProtected): Hint := Hint + ': ' + SHintVisProtected;
+          Ord(cdPublic): Hint := Hint + ': ' + SHintVisPublic;
+          Ord(cdPublished): Hint := Hint + ': ' + SHintVisPublished;
+        end;
+      end;
+      1: begin
+        Hint := SHintType;
+        case lvInfo.Items[lvHitInfo.iItem].SubItemImages[lvHitInfo.iSubItem - 1] - ImageIndexMemberType of
+          Ord(ctConstant): Hint := Hint + ': ' + SHintTypeConstant;
+          Ord(ctMethod): Hint := Hint + ': ' + SHintTypeMethod;
+          Ord(ctType): Hint := Hint + ': ' + SHintTypeType;
+          Ord(ctVariable): Hint := Hint + ': ' + SHintTypeVariable;
+          Ord(ctProperty): Hint := Hint + ': ' + SHintTypeProperty;
+        end;
+      end;
+      2: begin
+        Hint := SHintDirective;
+        case lvInfo.Items[lvHitInfo.iItem].SubItemImages[lvHitInfo.iSubItem - 1] of
+          ImageIndexVirtual: Hint := Hint + ': ' + SHintDirVirtual;
+          ImageIndexDynamic: Hint := Hint + ': ' + SHintDirDynamic;
+          ImageIndexMessage: Hint := Hint + ': ' + SHintDirMessage;
+          ImageIndexOverride: Hint := Hint + ': ' + SHintDirOverride;
+        end;
+      end;
+      3: Hint := SHintDirAbstract;
+      4: Hint := SHintDirOverload;
+    end;
+    if (Hint <> '')
+      and ((FLastHitTestItemIdx <> lvHitInfo.iItem) or (FLastHitTestSubItemIdx <> lvHitInfo.iSubItem)) then begin
+      FLastHitTestItemIdx := lvHitInfo.iItem;
+      FLastHitTestSubItemIdx := lvHitInfo.iSubItem;
+      lvInfo.Hint := Hint;
+      Application.ActivateHint(Mouse.CursorPos);
+    end;
   end;
 end;
 
@@ -1435,6 +1527,8 @@ begin
   FStartingDir := ExtractFilePath(Application.ExeName);
   FIsFirstInvocation := True;
   FLoadProject := True;
+  FLastHitTestItemIdx := -1;
+  FLastHitTestItemIdx := -1;
 
   SetupEditorControls;
 

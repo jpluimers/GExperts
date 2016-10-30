@@ -42,6 +42,7 @@ type
     FcOverride: Boolean;
     FcAbstract: Boolean;
     FcVirtual: Boolean;
+    FcDynamic: Boolean;
     FcMessage: Boolean;
     FcReintroduce: Boolean;
     FcOverload: Boolean;
@@ -58,6 +59,7 @@ type
     property cOverride: Boolean read FcOverride;
     property cAbstract: Boolean read FcAbstract;
     property cVirtual: Boolean read FcVirtual;
+    property cDynamic: Boolean read FcDynamic;
     property cMessage: Boolean read FcMessage;
     property cReintroduce: Boolean read FcReintroduce;
     property cOverload: Boolean read FcOverload;
@@ -933,6 +935,12 @@ var
             begin
               MInfo.FDName := MInfo.FDName + '; ' + Parser.Token.Data;
               MInfo.FcVirtual := True;
+              Parser.NextNonJunk;
+            end;
+          tkDynamic:
+            begin
+              MInfo.FDName := MInfo.FDName + '; ' + Parser.Token.Data;
+              MInfo.FcDynamic:= True;
               Parser.NextNonJunk;
             end;
           tkReintroduce:

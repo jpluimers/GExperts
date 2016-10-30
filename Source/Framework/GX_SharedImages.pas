@@ -34,6 +34,11 @@ const
   ImageIndexUnit = 59;
   ImageIndexToDoPriority = 71;
 
+  ImageIndexVirtual = 82;
+  ImageIndexDynamic = 83;
+  ImageIndexOverride = 84;
+  ImageIndexMessage = 85;
+
 function GetSharedImageList: TImageList;
 
 implementation
