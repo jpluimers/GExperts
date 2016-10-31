@@ -602,12 +602,12 @@ begin
         SetSubItemImage(ListItem, 0, Ord(AMethod.MethodType) + ImageIndexMemberType);
         ListItem.SubItems.Add('');
         if AMethod.cVirtual then
-          SetSubItemImage(ListItem, 1, ImageIndexVirtual);
-        if AMethod.cDynamic then
-          SetSubItemImage(ListItem, 1, ImageIndexDynamic);
-        if AMethod.cMessage then
-          SetSubItemImage(ListItem, 1, ImageIndexMessage);
-        if AMethod.cOverride then
+          SetSubItemImage(ListItem, 1, ImageIndexVirtual)
+        else if AMethod.cDynamic then
+          SetSubItemImage(ListItem, 1, ImageIndexDynamic)
+        else if AMethod.cMessage then
+          SetSubItemImage(ListItem, 1, ImageIndexMessage)
+        else if AMethod.cOverride then
           SetSubItemImage(ListItem, 1, ImageIndexOverride);
         ListItem.SubItems.Add('');
         if AMethod.cAbstract then
