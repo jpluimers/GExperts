@@ -157,7 +157,7 @@ implementation
 uses
   SysUtils, Dialogs, Controls, IniFiles, mwEPTokenList,
   ToolsAPI,
-  GX_GenericUtils, GX_OtaUtils;
+  GX_GenericUtils, GX_OtaUtils, GX_dzFileUtils;
 
 { TClassList }
 
@@ -304,7 +304,7 @@ end;
 
 function TClassItem.GenerateFilename(const ADirectory: string): string;
 begin
-  Result := AddSlash(ADirectory) + Name + '.gex';
+  Result := AddSlash(ADirectory) + TFileSystem.MakeValidFilename(Name, '_', False) + '.gex';
 end;
 
 function TClassItem.GetClassCount: Integer;
