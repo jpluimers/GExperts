@@ -140,7 +140,7 @@ object fmClassBrowser: TfmClassBrowser
         end
       end
       object tshCode: TTabSheet
-        Caption = 'Interface &Code'
+        Caption = '&Code'
       end
     end
   end
@@ -429,6 +429,7 @@ object fmClassBrowser: TfmClassBrowser
     Top = 240
     object pmiBrowserGotoClass: TMenuItem
       Action = actEditGotoClass
+      Default = True
     end
     object pmiBrowserRefresh: TMenuItem
       Action = actFileRefresh
@@ -580,9 +581,10 @@ object fmClassBrowser: TfmClassBrowser
     end
     object actFileRefresh: TAction
       Category = 'File'
-      Caption = '&Refresh'
+      Caption = 'Refres&h'
       Hint = 'Refresh classes'
       ImageIndex = 39
+      ShortCut = 116
       OnExecute = actFileRefreshExecute
     end
     object actEditGotoMember: TAction

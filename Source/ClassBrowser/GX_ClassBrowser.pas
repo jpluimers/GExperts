@@ -1234,9 +1234,9 @@ var
       Font.Style := [fsBold];
       TextOut(PR_OffsetX, Row, 'Vi');
       TextOut(PR_OffsetX + ColumnWidth, Row, 'Ty');
-      TextOut(PR_OffsetX + ColumnWidth * 2, Row, 'Vr');
+      TextOut(PR_OffsetX + ColumnWidth * 2, Row, 'Di');
       TextOut(PR_OffsetX + ColumnWidth * 3, Row, 'Ab');
-      TextOut(PR_OffsetX + ColumnWidth * 4, Row, 'Ov');
+      TextOut(PR_OffsetX + ColumnWidth * 4, Row, 'Ol');
       TextOut(PR_OffsetX + ColumnWidth * 6, Row, SName);
       MoveTo(PR_OffsetX, Row + FontHeight + 1);
       LineTo(PR_OffsetX + Printer.PageWidth - (2 * PR_OffsetX), Row + FontHeight + 1);
@@ -1252,6 +1252,8 @@ var
     HeaderSize: DWord;
     ImageSize: DWord;
   begin
+    if Bitmap.Width = 0 then
+      Exit;
     GetDIBSizes(Bitmap.Handle, HeaderSize, ImageSize);
     GetMem(BitmapHeader, HeaderSize);
     GetMem(BitmapImage, ImageSize);
@@ -1313,18 +1315,24 @@ begin
           PrintBitmap(ACanvas, Rect(PR_OffsetX + ColumnWidth, Row, PR_OffsetX + ColumnWidth + BitmapSize, Row + BitmapSize), Bitmap);
 
           if MInfo.cVirtual then
-          begin
+            Images.GetBitmap(ImageIndexVirtual, Bitmap)
+          else if MInfo.cDynamic then
+            Images.GetBitmap(ImageIndexDynamic, Bitmap)
+          else if MInfo.cMessage then
+            Images.GetBitmap(ImageIndexMessage, Bitmap)
+          else if MInfo.cOverride then
+            Images.GetBitmap(ImageIndexOverride, Bitmap)
+          else
             ClearBitmap(Bitmap);
-            Images.GetBitmap(ImageIndexCheck, Bitmap);
-            PrintBitmap(ACanvas, Rect(PR_OffsetX + ColumnWidth*2, Row, PR_OffsetX + ColumnWidth*2 + BitmapSize, Row + BitmapSize), Bitmap);
-          end;
+          PrintBitmap(ACanvas, Rect(PR_OffsetX + ColumnWidth*2, Row, PR_OffsetX + ColumnWidth*2 + BitmapSize, Row + BitmapSize), Bitmap);
+
           if MInfo.cAbstract then
           begin
             ClearBitmap(Bitmap);
             Images.GetBitmap(ImageIndexCheck, Bitmap);
             PrintBitmap(ACanvas, Rect(PR_OffsetX + ColumnWidth*3, Row, PR_OffsetX + ColumnWidth*3 + BitmapSize, row + BitmapSize), Bitmap);
           end;
-          if MInfo.cOverride then
+          if MInfo.cOverload then
           begin
             ClearBitmap(Bitmap);
             Images.GetBitmap(ImageIndexCheck, Bitmap);
