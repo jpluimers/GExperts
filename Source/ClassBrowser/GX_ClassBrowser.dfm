@@ -22,10 +22,10 @@ object fmClassBrowser: TfmClassBrowser
   PixelsPerInch = 96
   TextHeight = 14
   object Splitter1: TSplitter
-    Left = 175
-    Top = 30
+    Left = 233
+    Top = 0
     Width = 3
-    Height = 414
+    Height = 444
     Cursor = crHSplit
   end
   object StatusBar: TStatusBar
@@ -39,10 +39,10 @@ object fmClassBrowser: TfmClassBrowser
     UseSystemFont = False
   end
   object pnlData: TPanel
-    Left = 178
-    Top = 30
-    Width = 442
-    Height = 414
+    Left = 236
+    Top = 0
+    Width = 384
+    Height = 444
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
@@ -51,8 +51,8 @@ object fmClassBrowser: TfmClassBrowser
     object pcMain: TPageControl
       Left = 0
       Top = 0
-      Width = 442
-      Height = 414
+      Width = 384
+      Height = 444
       ActivePage = tshMembers
       Align = alClient
       TabIndex = 0
@@ -62,29 +62,29 @@ object fmClassBrowser: TfmClassBrowser
         Caption = '&Members'
         object Splitter2: TSplitter
           Left = 0
-          Top = 321
-          Width = 434
+          Top = 351
+          Width = 376
           Height = 4
           Cursor = crVSplit
           Align = alBottom
         end
         object pnlMethod: TPanel
           Left = 0
-          Top = 325
-          Width = 434
+          Top = 355
+          Width = 376
           Height = 60
           Align = alBottom
           BevelOuter = bvNone
           Caption = 'This editor is created at runtime'
           FullRepaint = False
-          TabOrder = 0
+          TabOrder = 2
           TabStop = True
         end
         object lvInfo: TListView
           Left = 0
-          Top = 0
-          Width = 434
-          Height = 321
+          Top = 25
+          Width = 376
+          Height = 326
           Align = alClient
           Columns = <
             item
@@ -125,6 +125,86 @@ object fmClassBrowser: TfmClassBrowser
           OnDblClick = actEditGotoMemberExecute
           OnMouseMove = lvInfoMouseMove
         end
+        object tbInfo: TToolBar
+          Left = 0
+          Top = 0
+          Width = 376
+          Height = 25
+          Caption = 'tbInfo'
+          DisabledImages = dmSharedImages.DisabledImages
+          Images = dmSharedImages.Images
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+          object tbnPrivate: TToolButton
+            Left = 0
+            Top = 2
+            Action = actViewPrivate
+          end
+          object tbnProtected: TToolButton
+            Left = 23
+            Top = 2
+            Action = actViewProtected
+          end
+          object tbnPublic: TToolButton
+            Left = 46
+            Top = 2
+            Action = actViewPublic
+          end
+          object tbnPublished: TToolButton
+            Left = 69
+            Top = 2
+            Action = actViewPublished
+          end
+          object tbnSeparator2: TToolButton
+            Left = 92
+            Top = 2
+            Width = 8
+            ImageIndex = 57
+            Style = tbsSeparator
+          end
+          object tbnConstants: TToolButton
+            Left = 100
+            Top = 2
+            Action = actViewConstants
+          end
+          object tbnMethods: TToolButton
+            Left = 123
+            Top = 2
+            Action = actViewMethods
+          end
+          object tbnTypes: TToolButton
+            Left = 146
+            Top = 2
+            Action = actViewTypes
+          end
+          object tbnVariables: TToolButton
+            Left = 169
+            Top = 2
+            Action = actViewVariables
+          end
+          object tbnProperties: TToolButton
+            Left = 192
+            Top = 2
+            Action = actViewProperties
+          end
+          object tbnSeparator3: TToolButton
+            Left = 215
+            Top = 2
+            Width = 8
+            ImageIndex = 53
+            Style = tbsSeparator
+          end
+          object edtMemberFilter: TEdit
+            Left = 223
+            Top = 2
+            Width = 146
+            Height = 22
+            TabOrder = 0
+            OnChange = edtMemberFilterChange
+            OnKeyDown = edtMemberFilterKeyDown
+          end
+        end
       end
       object tshInherit: TTabSheet
         Caption = '&Inheritance'
@@ -144,154 +224,77 @@ object fmClassBrowser: TfmClassBrowser
       end
     end
   end
-  object tvBrowse: TTreeView
-    Left = 0
-    Top = 30
-    Width = 175
-    Height = 414
-    Align = alLeft
-    HideSelection = False
-    Images = dmSharedImages.Images
-    Indent = 19
-    PopupMenu = pmBrowser
-    ReadOnly = True
-    RightClickSelect = True
-    TabOrder = 1
-    ToolTips = False
-    OnChange = tvBrowseChange
-    OnDblClick = tvBrowseDblClick
-    OnMouseDown = tvBrowseMouseDown
-  end
-  object ControlBar: TControlBar
+  object pnlBrowse: TPanel
     Left = 0
     Top = 0
-    Width = 620
-    Height = 30
-    Align = alTop
-    AutoSize = True
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 3
-    object tbMain: TToolBar
-      Left = 11
-      Top = 2
-      Width = 110
-      Height = 22
-      AutoSize = True
-      DisabledImages = dmSharedImages.DisabledImages
-      EdgeBorders = []
-      Flat = True
+    Width = 233
+    Height = 444
+    Align = alLeft
+    BevelOuter = bvNone
+    TabOrder = 0
+    object tvBrowse: TTreeView
+      Left = 0
+      Top = 25
+      Width = 233
+      Height = 419
+      Align = alClient
+      HideSelection = False
       Images = dmSharedImages.Images
+      Indent = 19
+      PopupMenu = pmBrowser
+      ReadOnly = True
+      RightClickSelect = True
+      TabOrder = 1
+      ToolTips = False
+      OnChange = tvBrowseChange
+      OnDblClick = tvBrowseDblClick
+      OnMouseDown = tvBrowseMouseDown
+    end
+    object tbBrowse: TToolBar
+      Left = 0
+      Top = 0
+      Width = 233
+      Height = 25
+      Caption = 'tbBrowse'
+      DisabledImages = dmSharedImages.DisabledImages
+      Images = dmSharedImages.Images
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
-      Wrapable = False
-      object tbnAdd: TToolButton
+      object edtClassFilter: TEdit
         Left = 0
-        Top = 0
+        Top = 2
+        Width = 121
+        Height = 22
+        TabOrder = 0
+        OnKeyDown = edtClassFilterKeyDown
+      end
+      object tbnSeparator1: TToolButton
+        Left = 121
+        Top = 2
+        Width = 8
+        ImageIndex = 4
+        Style = tbsSeparator
+      end
+      object tbnAdd: TToolButton
+        Left = 129
+        Top = 2
         Action = actFileAdd
       end
       object tbnRemove: TToolButton
-        Left = 23
-        Top = 0
+        Left = 152
+        Top = 2
         Action = actFileRemove
       end
-      object tbnSep1: TToolButton
-        Left = 46
-        Top = 0
-        Width = 8
-        ImageIndex = 2
-        Style = tbsSeparator
-      end
       object tbnRefresh: TToolButton
-        Left = 54
-        Top = 0
+        Left = 175
+        Top = 2
         Action = actFileRefresh
       end
-      object tbnSep2: TToolButton
-        Left = 77
-        Top = 0
-        Width = 8
-        ImageIndex = 3
-        Style = tbsSeparator
-      end
       object tbnFind: TToolButton
-        Left = 85
-        Top = 0
+        Left = 198
+        Top = 2
         Action = actEditFind
-      end
-    end
-    object tbKinds: TToolBar
-      Left = 134
-      Top = 2
-      Width = 121
-      Height = 22
-      AutoSize = True
-      DisabledImages = dmSharedImages.DisabledImages
-      EdgeBorders = []
-      Flat = True
-      Images = dmSharedImages.Images
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 1
-      Wrapable = False
-      object tbnConstants: TToolButton
-        Left = 0
-        Top = 0
-        Action = actViewConstants
-      end
-      object tbnMethods: TToolButton
-        Left = 23
-        Top = 0
-        Action = actViewMethods
-      end
-      object tbnTypes: TToolButton
-        Left = 46
-        Top = 0
-        Action = actViewTypes
-      end
-      object tbnVariables: TToolButton
-        Left = 69
-        Top = 0
-        Action = actViewVariables
-      end
-      object tbnProperties: TToolButton
-        Left = 92
-        Top = 0
-        Action = actViewProperties
-      end
-    end
-    object tbVisibility: TToolBar
-      Left = 268
-      Top = 2
-      Width = 97
-      Height = 22
-      AutoSize = True
-      DisabledImages = dmSharedImages.DisabledImages
-      EdgeBorders = []
-      Flat = True
-      Images = dmSharedImages.Images
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 2
-      Wrapable = False
-      object tbnPrivate: TToolButton
-        Left = 0
-        Top = 0
-        Action = actViewPrivate
-      end
-      object tbnProtected: TToolButton
-        Left = 23
-        Top = 0
-        Action = actViewProtected
-      end
-      object tbnPublic: TToolButton
-        Left = 46
-        Top = 0
-        Action = actViewPublic
-      end
-      object tbnPublished: TToolButton
-        Left = 69
-        Top = 0
-        Action = actViewPublished
       end
     end
   end

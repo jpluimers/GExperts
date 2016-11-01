@@ -8,8 +8,8 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  GX_ClassMgr, GX_ClassParsing, GX_Experts, GX_OtaUtils, GX_EnhancedEditor,
-  Classes, Controls, Forms, Dialogs, ActnList, ToolWin, ToolsAPI,
+  Windows, GX_ClassMgr, GX_ClassParsing, GX_Experts, GX_OtaUtils, GX_EnhancedEditor,
+  Classes, Controls, Buttons, StdCtrls, Forms, Dialogs, ActnList, ToolWin, ToolsAPI,
   Graphics, Menus, ExtCtrls, ComCtrls, ImgList, GX_BaseForm;
 
 type
@@ -61,6 +61,7 @@ type
     mitViewSep2: TMenuItem;
     mitViewDetails: TMenuItem;
     pnlMethod: TPanel;
+    pnlBrowse: TPanel;
     tvBrowse: TTreeView;
     Actions: TActionList;
     actFileAdd: TAction;
@@ -79,29 +80,30 @@ type
     actHelpHelp: TAction;
     actHelpContents: TAction;
     actHelpAbout: TAction;
-    ControlBar: TControlBar;
-    tbMain: TToolBar;
+    tbBrowse: TToolBar;
     tbnAdd: TToolButton;
     tbnRemove: TToolButton;
-    tbnSep1: TToolButton;
+    tbnSeparator1: TToolButton;
     tbnRefresh: TToolButton;
-    tbnSep2: TToolButton;
     tbnFind: TToolButton;
+    edtClassFilter: TEdit;
     mitFileRefresh: TMenuItem;
     mitEditFind: TMenuItem;
     actEditFind: TAction;
     actFileRefresh: TAction;
-    tbKinds: TToolBar;
-    tbVisibility: TToolBar;
+    tbInfo: TToolBar;
     tbnConstants: TToolButton;
     tbnMethods: TToolButton;
     tbnTypes: TToolButton;
     tbnVariables: TToolButton;
     tbnProperties: TToolButton;
+    tbnSeparator2: TToolButton;
     tbnPrivate: TToolButton;
     tbnProtected: TToolButton;
     tbnPublic: TToolButton;
     tbnPublished: TToolButton;
+    tbnSeparator3: TToolButton;
+    edtMemberFilter: TEdit;
     actEditGotoMember: TAction;
     actEditGotoClass: TAction;
     actEditFindNext: TAction;
@@ -158,6 +160,9 @@ type
     procedure actEditFindNextExecute(Sender: TObject);
     procedure tvBrowseDblClick(Sender: TObject);
     procedure lvInfoMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure edtMemberFilterChange(Sender: TObject);
+    procedure edtMemberFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtClassFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FProjectNotifier: TBaseIdeNotifier;
     FIsFirstInvocation: Boolean;
@@ -251,7 +256,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Messages, StdCtrls, Printers, CommCtrl,
+  SysUtils, Messages, Printers, CommCtrl,
   GX_VerDepConst, GX_ClassIdentify, GX_ConfigurationInfo, GX_EditReader,
   GX_ClassProp, GX_ClassOptions, GX_ClassReport, GX_GExperts,
   GX_GxUtils, GX_GenericUtils, GX_SharedImages, GX_IdeUtils, Math;
@@ -724,10 +729,13 @@ begin
         Screen.Cursor := crHourglass;
         try
           OInfo := TBrowseClassInfoCollection(tvBrowse.Selected.Data);
-          if not OInfo.IsLoaded then OInfo.LoadMethods;
+          if not OInfo.IsLoaded then
+            OInfo.LoadMethods;
           TimeSpent := GetTickCount;
-          if pcMain.ActivePage = tshCode then LoadCode;
-          if pcMain.ActivePage = tshInherit then DrawInheritance;
+          if pcMain.ActivePage = tshCode then
+            LoadCode;
+          if pcMain.ActivePage = tshInherit then
+            DrawInheritance;
           TimeSpent := GetTickCount - TimeSpent;
           LoadList(OInfo);
           StatusBar.SimpleText := Format(SSourceModule, [OInfo.SourceName, TimeSpent]);
@@ -752,6 +760,8 @@ begin
 end;
 
 function TfmClassBrowser.CheckFilter(MInfo: TBrowseMethodInfoItem): Boolean;
+var
+  Filter: string;
 begin
   Result := True;
   case MInfo.MethodType of
@@ -761,13 +771,19 @@ begin
     ctVariable:   Result := actViewVariables.Checked;
     ctProperty:   Result := actViewProperties.Checked;
   end;
-  if Result then
+  if Result then begin
     case MInfo.MethodDeclare of
       cdPrivate:   Result := actViewPrivate.Checked;
       cdProtected: Result := actViewProtected.Checked;
       cdPublic:    Result := actViewPublic.Checked;
       cdPublished: Result := actViewPublished.Checked;
     end;
+  end;
+  if Result then begin
+    Filter := edtMemberFilter.Text;
+    if (Filter <> '') and not StrContains(Filter, MInfo.RName, False) then
+      Result := False;
+  end;
 end;
 
 procedure TfmClassBrowser.pnlDataResize(Sender: TObject);
@@ -816,6 +832,33 @@ begin
     for i := 0 to scInherit.ControlCount - 1 do
        scInherit.Controls[i].Invalidate;
     scInherit.Invalidate;
+  end;
+end;
+
+procedure TfmClassBrowser.edtClassFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then begin
+    if tvBrowse.Items.Count > 1 then
+      tvBrowse.Perform(WM_KEYDOWN, Key, 0)
+    else if tvBrowse.Items.Count = 1 then
+      tvBrowse.Items[0].Selected := True;
+    Key := 0;
+  end;
+end;
+
+procedure TfmClassBrowser.edtMemberFilterChange(Sender: TObject);
+begin
+  tvBrowseChange(tvBrowse, tvBrowse.Selected);
+end;
+
+procedure TfmClassBrowser.edtMemberFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then begin
+    if lvInfo.Items.Count > 1 then
+      lvInfo.Perform(WM_KEYDOWN, Key, 0)
+    else if lvInfo.Items.Count = 1 then
+      lvInfo.Items[0].Selected := True;
+    Key := 0;
   end;
 end;
 
@@ -1526,9 +1569,6 @@ end;
 constructor TfmClassBrowser.Create(AOwner: TComponent);
 begin
   inherited;
-  SetToolbarGradient(tbMain);
-  SetToolbarGradient(tbKinds);
-  SetToolbarGradient(tbVisibility);
 
   SetNonModalFormPopupMode(Self);
   FStartingDir := ExtractFilePath(Application.ExeName);
@@ -1780,12 +1820,14 @@ end;
 procedure TfmClassBrowser.SetupEditorControls;
 begin
   FMethodText := TGxEnhancedEditor.Create(Self);
-  FCodeText := TGxEnhancedEditor.Create(Self);
-
+  FMethodText.Name := 'edtMethodText';
   FMethodText.Parent := pnlMethod;
   FMethodText.Align := alClient;
   FMethodText.ReadOnly := True;
   FMethodText.Highlighter := gxpPas;
+
+  FCodeText := TGxEnhancedEditor.Create(Self);
+  FCodeText.Name := 'edtCodeText';
   FCodeText.Parent := tshCode;
   FCodeText.Align := alClient;
   FCodeText.ReadOnly := True;
