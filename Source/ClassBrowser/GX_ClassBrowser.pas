@@ -710,34 +710,34 @@ var
   OInfo: TBrowseClassInfoCollection;
   TimeSpent: DWORD;
 begin
-  Screen.Cursor := crHourglass;
+  lvInfo.Items.BeginUpdate;
   try
+    lvInfo.Items.Clear;
     if Node = nil then
       actFileRemove.Enabled := False
     else
       actFileRemove.Enabled := (Node.Level = 0);
-    lvInfo.Items.BeginUpdate;
-    lvInfo.Items.Clear;
-    lvInfo.Items.EndUpdate;
     if Assigned(tvBrowse.Selected) and Assigned(tvBrowse.Selected.Data) then
     begin
       if tvBrowse.Selected.Level > 0 then
       begin
-        OInfo := TBrowseClassInfoCollection(tvBrowse.Selected.Data);
-        if not OInfo.IsLoaded then OInfo.LoadMethods;
-        TimeSpent := GetTickCount;
-        if pcMain.ActivePage = tshCode then LoadCode;
-        if pcMain.ActivePage = tshInherit then DrawInheritance;
-        TimeSpent := GetTickCount - TimeSpent;
-        LoadList(OInfo);
-        StatusBar.SimpleText := Format(SSourceModule, [OInfo.SourceName, TimeSpent]);
+        Screen.Cursor := crHourglass;
+        try
+          OInfo := TBrowseClassInfoCollection(tvBrowse.Selected.Data);
+          if not OInfo.IsLoaded then OInfo.LoadMethods;
+          TimeSpent := GetTickCount;
+          if pcMain.ActivePage = tshCode then LoadCode;
+          if pcMain.ActivePage = tshInherit then DrawInheritance;
+          TimeSpent := GetTickCount - TimeSpent;
+          LoadList(OInfo);
+          StatusBar.SimpleText := Format(SSourceModule, [OInfo.SourceName, TimeSpent]);
+        finally
+          Screen.Cursor := crDefault;
+        end;
       end
       else
       begin
         StatusBar.SimpleText := '';
-        lvInfo.Items.BeginUpdate;
-        lvInfo.Items.Clear;
-        lvInfo.Items.EndUpdate;
         FMethodText.Clear;
         FCodeText.Clear;
         FCurrentCodePaneFile := '';
@@ -746,7 +746,7 @@ begin
       end;
     end;
   finally
-    Screen.Cursor := crDefault;
+    lvInfo.Items.EndUpdate;
   end;
   pnlDataResize(Self);
 end;
@@ -827,8 +827,7 @@ begin
   FMethodText.Text := '';
   if Assigned(lvInfo.Selected) then
   begin
-    with lvInfo do
-      InfoItem := TBrowseMethodInfoItem(lvInfo.Selected.Data);
+    InfoItem := TBrowseMethodInfoItem(lvInfo.Selected.Data);
     if Assigned(InfoItem) then
     begin
       FMethodText.Text := CompressWhiteSpace(FilterTab(InfoItem.DName));
