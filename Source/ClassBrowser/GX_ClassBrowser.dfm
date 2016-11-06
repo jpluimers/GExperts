@@ -132,72 +132,74 @@ object fmClassBrowser: TfmClassBrowser
           Height = 25
           Caption = 'tbInfo'
           DisabledImages = dmSharedImages.DisabledImages
+          EdgeBorders = []
+          Flat = True
           Images = dmSharedImages.Images
           ParentShowHint = False
           ShowHint = True
           TabOrder = 0
           object tbnPrivate: TToolButton
             Left = 0
-            Top = 2
+            Top = 0
             Action = actViewPrivate
           end
           object tbnProtected: TToolButton
             Left = 23
-            Top = 2
+            Top = 0
             Action = actViewProtected
           end
           object tbnPublic: TToolButton
             Left = 46
-            Top = 2
+            Top = 0
             Action = actViewPublic
           end
           object tbnPublished: TToolButton
             Left = 69
-            Top = 2
+            Top = 0
             Action = actViewPublished
           end
           object tbnSeparator2: TToolButton
             Left = 92
-            Top = 2
+            Top = 0
             Width = 8
             ImageIndex = 57
             Style = tbsSeparator
           end
           object tbnConstants: TToolButton
             Left = 100
-            Top = 2
+            Top = 0
             Action = actViewConstants
           end
           object tbnMethods: TToolButton
             Left = 123
-            Top = 2
+            Top = 0
             Action = actViewMethods
           end
           object tbnTypes: TToolButton
             Left = 146
-            Top = 2
+            Top = 0
             Action = actViewTypes
           end
           object tbnVariables: TToolButton
             Left = 169
-            Top = 2
+            Top = 0
             Action = actViewVariables
           end
           object tbnProperties: TToolButton
             Left = 192
-            Top = 2
+            Top = 0
             Action = actViewProperties
           end
           object tbnSeparator3: TToolButton
             Left = 215
-            Top = 2
+            Top = 0
             Width = 8
             ImageIndex = 53
             Style = tbsSeparator
           end
           object edtMemberFilter: TEdit
             Left = 223
-            Top = 2
+            Top = 0
             Width = 146
             Height = 22
             TabOrder = 0
@@ -257,13 +259,15 @@ object fmClassBrowser: TfmClassBrowser
       Height = 25
       Caption = 'tbBrowse'
       DisabledImages = dmSharedImages.DisabledImages
+      EdgeBorders = []
+      Flat = True
       Images = dmSharedImages.Images
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
       object edtClassFilter: TEdit
         Left = 0
-        Top = 2
+        Top = 0
         Width = 121
         Height = 22
         TabOrder = 0
@@ -271,29 +275,29 @@ object fmClassBrowser: TfmClassBrowser
       end
       object tbnSeparator1: TToolButton
         Left = 121
-        Top = 2
+        Top = 0
         Width = 8
         ImageIndex = 4
         Style = tbsSeparator
       end
       object tbnAdd: TToolButton
         Left = 129
-        Top = 2
+        Top = 0
         Action = actFileAdd
       end
       object tbnRemove: TToolButton
         Left = 152
-        Top = 2
+        Top = 0
         Action = actFileRemove
       end
       object tbnRefresh: TToolButton
         Left = 175
-        Top = 2
+        Top = 0
         Action = actFileRefresh
       end
       object tbnFind: TToolButton
         Left = 198
-        Top = 2
+        Top = 0
         Action = actEditFind
       end
     end
