@@ -91,8 +91,6 @@ type
     procedure testUsesWithComment;
     procedure testTypeOf;
     procedure testNestedEventType;
-    procedure TestNoFeedAfterThen;
-    procedure TestNoFeedAfterDo;
     procedure TestUnicode;
     procedure testAnonymousCurrentlyFails;
     procedure testCurlyHalfCommentEndCurrentlyFails;
@@ -340,7 +338,7 @@ end;
 
 procedure TTestTestfiles.testLargeFile;
 begin
-  TestFile('xdom_3_1');
+  TestFile('LargeFile');
 end;
 
 procedure TTestTestfiles.testNestedClass;
@@ -376,16 +374,6 @@ end;
 procedure TTestTestfiles.testNestedEventType;
 begin
   TestFile('NestedEventType');
-end;
-
-procedure TTestTestfiles.TestNoFeedAfterDo;
-begin
-  TestFile('NoFeedAfterDo');
-end;
-
-procedure TTestTestfiles.TestNoFeedAfterThen;
-begin
-  TestFile('NoFeedAfterThen');
 end;
 
 procedure TTestTestfiles.testOperatorOverloading;

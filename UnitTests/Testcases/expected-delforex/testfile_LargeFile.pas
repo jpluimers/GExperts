@@ -60,23 +60,17 @@ unit XDOM_3_1;
 interface
 
 uses dialogs,
-  cUnicodeCodecs,
-  ParserUtils,
-  TreeUtils,
-  WideStrUtils,
-  MiscUtils,
+  cUnicodeCodecs, ParserUtils, TreeUtils, WideStrUtils, MiscUtils,
     // The above units are contained in the Open XML Utilities package 1.x
     // available at "http://www.philo.de/xml/".
 {$IFDEF MSWINDOWS}
 {$IFDEF VER140+}Types,
-{$ELSE}Windows,
-{$ENDIF}
+{$ELSE}Windows, {$ENDIF}
 {$ENDIF}
 {$IFDEF LINUX}
   Types,
 {$ENDIF}
-  SysUtils,
-  Classes;
+  SysUtils, Classes;
 
 type
   EDomException = class(Exception);
@@ -110,6 +104,7 @@ type
   EXPath_Invalid_Expression_Err = class(EXPath_Exception);
   EXPath_Invalid_Function_Call_Err = class(EXPath_Exception);
   EXPath_Type_Err = class(EXPath_Exception);
+
 
   TXmlErrorType = (
 
@@ -2383,6 +2378,7 @@ type
   end;
 {$ENDIF}
 
+
 // Views
 
   TdomAbstractView = class
@@ -2474,6 +2470,7 @@ type
     property offset: integer read FOffset;
     property ownerSourceCode: TXmlSourceCode read FOwner;
   end;
+
 
 // Parser
 
@@ -2921,7 +2918,7 @@ type
 
     property Reader: TXmlCustomReader read FReader;
 
-    { IDomLocator interface properties: }// xxx Revisit
+    { IDomLocator interface properties: } // xxx Revisit
     property EndByteNumber: Int64 read GetEndByteNumber;
     property EndCharNumber: Int64 read GetEndCharNumber;
     property EndColumnNumber: Int64 read GetEndColumnNumber;
@@ -3884,9 +3881,7 @@ type
     procedure setIgnoreUnspecified(const value: boolean); virtual;
     procedure setIncludeXmlDecl(const value: boolean); virtual;
 {$IFNDEF LINUX}
-    procedure setUseActiveCodePage(const value: boolean); virtual;
-{$IFDEF VER140+} platform;
-{$ENDIF}
+    procedure setUseActiveCodePage(const value: boolean); virtual; {$IFDEF VER140+} platform; {$ENDIF}
 {$ENDIF}
     procedure setWriteLFOption(const value: TCodecWriteLFOption); virtual;
 
@@ -3917,6 +3912,7 @@ type
     property OnAfterWrite: TdomSerializationEvent read getOnAfterWrite write setOnAfterWrite;
     property OnBeforeWrite: TdomSerializationEvent read getOnBeforeWrite write setOnBeforeWrite;
   end;
+
 
 {XPath implementation}
 
@@ -4814,6 +4810,7 @@ function XPathFunctionRound(const contextNode: TdomNode;
   const contextSize: Integer;
   const arguments: TList): TdomXPathCustomResult;
 
+
 // Whitespace Processing
 function normalizeSpace(const S: wideString): wideString;
 function normalizeWhiteSpace(const S: wideString): wideString;
@@ -4875,10 +4872,7 @@ var
 implementation
 
 uses
-  LangUtils,
-  UnicodeUtils,
-  UriUtils,
-  XmlRulesUtils,
+  LangUtils, UnicodeUtils, UriUtils, XmlRulesUtils,
     // The above units are contained in the Open XML Utilities package 1.x
     // available at "http://www.philo.de/xml/".
   Math;
@@ -4935,8 +4929,7 @@ begin
   // Evaluate tagName:
   i := 1;
   while i <= sourceLength do begin
-    if IsXmlWhiteSpace(Source[i]) then
-      break;
+    if IsXmlWhiteSpace(Source[i]) then break;
     inc(i);
   end;
 
@@ -4945,13 +4938,11 @@ begin
   // Evaluate Attributes:
   while i < sourceLength do begin
     inc(i);
-    if not IsXmlWhiteSpace(Source[i]) then
-      break;
+    if not IsXmlWhiteSpace(Source[i]) then break;
   end;
   j := length(Source);
   while j >= i do begin
-    if not IsXmlWhiteSpace(Source[j]) then
-      break;
+    if not IsXmlWhiteSpace(Source[j]) then break;
     dec(j);
   end;
 
@@ -4986,77 +4977,49 @@ begin
   PubidLiteral := '';
   NDataName := '';
   Error := false;
-  if Length(Source) < 2 then begin
-    Error := true;
-    exit;
-  end;
+  if Length(Source) < 2 then begin Error := true; exit; end;
 
   Src := trimWhitespaceLeft(Source); // Remove leading white space.
   if (Src[1] = SQ) or (Src[1] = DQ) then begin
     XMLIsolateQuote(Src, entityValue, rest, QuoteType, Error);
-    if Error then
-      exit;
-    if rest <> '' then begin
-      Error := true;
-      exit;
-    end;
-    if not isXmlEntityValueChars(entityValue) then begin
-      Error := true;
-      exit;
-    end;
+    if Error then exit;
+    if rest <> '' then begin Error := true; exit; end;
+    if not isXmlEntityValueChars(entityValue)
+      then begin Error := true; exit; end;
   end else begin
     intro := copy(Src, 1, 6);
     if (intro = 'SYSTEM') or (intro = 'PUBLIC') then begin
       S := copy(Src, 7, maxint);
-      if S = '' then begin
-        Error := true;
-        exit;
-      end;
-      if not IsXmlWhiteSpace(S[1]) then begin
-        Error := true;
-        exit;
-      end;
+      if S = '' then begin Error := true; exit; end;
+      if not IsXmlWhiteSpace(S[1]) then begin Error := true; exit; end;
 
       if (intro = 'SYSTEM') then begin
         XMLIsolateQuote(S, SystemLit, S, QuoteType, Error);
-        if Error then
-          exit;
+        if Error then exit;
       end else begin
         XMLIsolateQuote(S, PubidLit, S, QuoteType, Error);
-        if Error then
-          exit;
-        if not isXmlPubidChars(PubidLit) then begin
-          Error := true;
-          exit;
-        end;
+        if Error then exit;
+        if not isXmlPubidChars(PubidLit)
+          then begin Error := true; exit; end;
         XMLIsolateQuote(S, SystemLit, S, QuoteType, Error);
-        if Error then
-          exit;
+        if Error then exit;
       end;
 
       if S <> '' then begin
         if (length(S) > 6) and (copy(S, 1, 5) = 'NDATA') and isXmlWhitespace(S[6]) then begin
           notaName := trimWhitespace(copy(S, 7, maxint));
-          if IsXmlName(notaName) then
-            NDataName := notaName
-          else begin
-            Error := true;
-            exit;
-          end;
-        end else begin
-          Error := true;
-          exit;
-        end;
+          if IsXmlName(notaName)
+            then NDataName := notaName
+          else begin Error := true; exit; end;
+        end else begin Error := true; exit; end;
       end;
 
-    end else begin
-      Error := true;
-      exit;
-    end;
+    end else begin Error := true; exit; end;
     SystemLiteral := SystemLit;
     PubidLiteral := PubidLit;
   end; {if (S[1] ... }
 end;
+
 
 procedure XMLAnalyseNotationDecl(Decl: wideString;
   var SystemLiteral,
@@ -5077,52 +5040,30 @@ begin
   SystemLiteral := '';
   PubidLiteral := '';
   Error := false;
-  if Length(Decl) < 2 then begin
-    Error := true;
-    exit;
-  end;
+  if Length(Decl) < 2 then begin Error := true; exit; end;
 
   Source := trimWhitespace(Decl);
   intro := copy(Source, 1, 6);
 
-  if (intro <> 'SYSTEM') and (intro <> 'PUBLIC') then begin
-    Error := true;
-    exit;
-  end;
+  if (intro <> 'SYSTEM') and (intro <> 'PUBLIC') then begin Error := true; exit; end;
 
   Dummy := copy(Source, 7, Length(Source) - 6);
   Source := dummy; // Necessary, because of Delphi's problem when copying WideStrings.
-  if Source = '' then begin
-    Error := true;
-    exit;
-  end;
-  if not IsXmlWhiteSpace(Source[1]) then begin
-    Error := true;
-    exit;
-  end;
+  if Source = '' then begin Error := true; exit; end;
+  if not IsXmlWhiteSpace(Source[1]) then begin Error := true; exit; end;
 
   if (intro = 'SYSTEM') then begin
     XMLIsolateQuote(Source, SystemLit, dummy, QuoteType, Error);
-    if Error then
-      exit;
-    if dummy <> '' then begin
-      Error := true;
-      exit;
-    end;
+    if Error then exit;
+    if dummy <> '' then begin Error := true; exit; end;
   end else begin
     XMLIsolateQuote(Source, PubidLit, dummy, QuoteType, Error);
     Source := dummy;
-    if Error then
-      exit;
-    if not isXmlPubidChars(PubidLit) then begin
-      Error := true;
-      exit;
-    end;
+    if Error then exit;
+    if not isXmlPubidChars(PubidLit)
+      then begin Error := true; exit; end;
     if Source <> '' then begin
-      if not IsXmlSystemLiteral(Source) then begin
-        Error := true;
-        exit;
-      end;
+      if not IsXmlSystemLiteral(Source) then begin Error := true; exit; end;
       SystemLit := copy(Source, 2, length(Source) - 2);
     end;
   end;
@@ -5170,12 +5111,9 @@ var
 begin
   content := '';
   BracketStr := trimWhitespace(Source);
-  if length(BracketStr) < 2 then begin
-    Error := true;
-    exit;
-  end;
-  if (BracketStr[1] <> '(') or (BracketStr[length(BracketStr)] <> ')') then
-    Error := true
+  if length(BracketStr) < 2 then begin Error := true; exit; end;
+  if (BracketStr[1] <> '(') or (BracketStr[length(BracketStr)] <> ')')
+  then Error := true
   else begin
     content := trimWhitespace(copy(BracketStr, 2, Length(BracketStr) - 2));
     Error := false;
@@ -5212,50 +5150,30 @@ var
 begin
   content := '';
   rest := '';
-  if Length(Source) < 2 then begin
-    Error := true;
-    exit;
-  end;
+  if Length(Source) < 2 then begin Error := true; exit; end;
   Error := false;
 
   dummy := trimWhitespaceLeft(Source); // Remove leading white space.
   Source := dummy; // Necessary, because of Delphi's problem when copying WideStrings.
   QuoteType := Source[1];
-  if (QuoteType <> SQ) and (QuoteType <> DQ) then begin
-    QuoteType := #0;
-    Error := true;
-    exit;
-  end;
+  if (QuoteType <> SQ) and (QuoteType <> DQ)
+    then begin QuoteType := #0; Error := true; exit; end;
   Dummy := Copy(Source, 2, Length(Source) - 1);
   Source := dummy; // Necessary, because of Delphi's problem when copying WideStrings.
   QuotePos := Pos(wideString(QuoteType), Source);
-  if QuotePos = 0 then begin
-    QuoteType := #0;
-    Error := true;
-    exit;
-  end;
+  if QuotePos = 0 then begin QuoteType := #0; Error := true; exit; end;
   if Length(Source) > QuotePos then
-    if not IsXmlWhiteSpace(Source[QuotePos + 1]) then begin
-      QuoteType := #0;
-      Error := true;
-      exit;
-    end; // No White-Space after quotation mark
+    if not IsXmlWhiteSpace(Source[QuotePos + 1])
+      then begin QuoteType := #0; Error := true; exit; end; // No White-Space after quotation mark
   content := Copy(Source, 1, QuotePos - 1);
-  if not isXmlChars(content) then begin
-    content := '';
-    QuoteType := #0;
-    Error := true;
-    exit;
-  end;
+  if not isXmlChars(content) then begin content := ''; QuoteType := #0; Error := true; exit; end;
   // Strip White-Space:
   i := QuotePos + 1;
   while (i <= length(Source)) do begin
-    if not IsXmlWhiteSpace(Source[i]) then
-      break;
+    if not IsXmlWhiteSpace(Source[i]) then break;
     inc(i);
   end;
-  if i <= Length(Source) then
-    rest := copy(Source, i, Length(Source) - i + 1);
+  if i <= Length(Source) then rest := copy(Source, i, Length(Source) - i + 1);
 end;
 
 { Whitespace Processing }
@@ -5342,13 +5260,11 @@ var
 begin
   l := Length(S);
   i := 1;
-  while (i <= l) and (S[i] = SPACE) do
-    inc(i);
+  while (i <= l) and (S[i] = SPACE) do inc(i);
   if i > l then
     result := ''
   else begin
-    while (S[l] = SPACE) do
-      dec(l);
+    while (S[l] = SPACE) do dec(l);
     result := copy(S, i, l - i + 1);
   end;
 end;
@@ -5359,13 +5275,11 @@ var
 begin
   l := Length(S);
   i := 1;
-  while (i <= l) and IsXmlWhiteSpace(S[i]) do
-    inc(i);
+  while (i <= l) and IsXmlWhiteSpace(S[i]) do inc(i);
   if i > l then
     result := ''
   else begin
-    while IsXmlWhiteSpace(S[l]) do
-      dec(l);
+    while IsXmlWhiteSpace(S[l]) do dec(l);
     result := copy(S, i, l - i + 1);
   end;
 end;
@@ -5376,8 +5290,7 @@ var
 begin
   l := Length(S);
   i := 1;
-  while (i <= l) and IsXmlWhiteSpace(S[i]) do
-    inc(i);
+  while (i <= l) and IsXmlWhiteSpace(S[i]) do inc(i);
   result := copy(s, i, Maxint);
 end;
 
@@ -5386,8 +5299,7 @@ var
   i: integer;
 begin
   i := Length(S);
-  while (i > 0) and IsXmlWhiteSpace(S[i]) do
-    dec(I);
+  while (i > 0) and IsXmlWhiteSpace(S[i]) do dec(I);
   result := copy(s, 1, i);
 end;
 
@@ -5398,16 +5310,16 @@ var
   prefix: wideString; // = 0
 begin
   colonpos := pos(':', qualifiedName);
-  if colonpos = 0 then
-    localpart := qualifiedName
+  if colonpos = 0
+    then localpart := qualifiedName
   else begin
     prefix := copy(qualifiedName, 1, colonpos - 1);
     localpart := copy(qualifiedName, colonpos + 1, length(qualifiedName) - colonpos);
-    if not IsXmlPrefix(prefix) then
-      raise EInvalid_Character_Err.create('Invalid character error.');
+    if not IsXmlPrefix(prefix)
+      then raise EInvalid_Character_Err.create('Invalid character error.');
   end;
-  if not IsXmlLocalPart(localpart) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlLocalPart(localpart)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   result := prefix;
 end;
 
@@ -5417,16 +5329,16 @@ var
   prefix, localpart: wideString;
 begin
   colonpos := pos(':', qualifiedName);
-  if colonpos = 0 then
-    localpart := qualifiedName
+  if colonpos = 0
+    then localpart := qualifiedName
   else begin
     prefix := copy(qualifiedName, 1, colonpos - 1);
     localpart := copy(qualifiedName, colonpos + 1, length(qualifiedName) - colonpos);
-    if not IsXmlPrefix(prefix) then
-      raise EInvalid_Character_Err.create('Invalid character error.');
+    if not IsXmlPrefix(prefix)
+      then raise EInvalid_Character_Err.create('Invalid character error.');
   end;
-  if not IsXmlLocalPart(localpart) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlLocalPart(localpart)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   result := localpart;
 end;
 
@@ -5506,40 +5418,35 @@ begin
 
     while i <= length(S) do begin
       SChar := WideChar((PWideChar(S) + i - 1)^);
-      if IsUtf16LowSurrogate(sChar) then
-        raise EConvertError.Create('WideString must not start with a UTF-16 low surrogate.');
+      if IsUtf16LowSurrogate(sChar)
+        then raise EConvertError.Create('WideString must not start with a UTF-16 low surrogate.');
       if IsUtf16HighSurrogate(SChar) then begin
-        if i = length(s) then
-          raise EConvertError.Create('WideString must not end with a UTF-16 high surrogate.');
+        if i = length(s)
+          then raise EConvertError.Create('WideString must not end with a UTF-16 high surrogate.');
         inc(i);
         content.addWideChar(SChar);
         SChar := WideChar((PWideChar(S) + i - 1)^);
-        if not IsUtf16LowSurrogate(SChar) then
-          raise EConvertError.Create('WideString contains an UTF-16 high surrogate without its corresponding low surrogate.');
+        if not IsUtf16LowSurrogate(SChar)
+          then raise EConvertError.Create('WideString contains an UTF-16 high surrogate without its corresponding low surrogate.');
       end;
-      if not IsXmlChar(SChar) then
-        raise EConvertError.Create('WideString contains an invalid character.');
+      if not IsXmlChar(SChar)
+        then raise EConvertError.Create('WideString contains an invalid character.');
       if SChar = '&' then begin {Reference?}
         indexpos := -1;
         for j := i + 1 to length(S) do begin
           SChar2 := WideChar((PWideChar(S) + j - 1)^);
-          if SChar2 = ';' then begin
-            indexpos := j;
-            break;
-          end;
+          if SChar2 = ';' then begin indexpos := j; break; end;
         end;
-        if indexpos = -1 then
-          raise EConvertError.Create('WideString contains an ''&'' without a '';''.');
+        if indexpos = -1
+          then raise EConvertError.Create('WideString contains an ''&'' without a '';''.');
         ref := copy(S, i, indexpos - i + 1);
         if IsXmlEntityRef(ref) then begin
           content.addWideString(ref);
         end else if IsXmlCharRef(ref) then begin
           content.addWideString(XmlCharRefToStr(ref));
-        end else
-          raise EConvertError.CreateFmt('WideString contains an invalid reference %S.', [ref]);
+        end else raise EConvertError.CreateFmt('WideString contains an invalid reference %S.', [ref]);
         i := indexpos;
-      end else
-        content.addWideChar(SChar);
+      end else content.addWideChar(SChar);
       inc(i);
     end; {while ...}
     result := content.value;
@@ -5552,18 +5459,17 @@ function xmlCharRefToInt(const S: wideString): integer;
 var
   value: word;
 begin
-  if not IsXmlCharRef(S) then
-    raise EConvertError.CreateFmt('%S is not a valid XmlCharRef value.', [S]);
-  if S[3] = 'x' then
-    Result := StrToInt(concat('$', copy(S, 4, length(S) - 4))) // Hex
-  else
-    Result := StrToInt(copy(S, 3, length(S) - 3)); // Dec
-  if Result > $10FFFF then
-    raise EConvertError.CreateFmt('%S is not a valid XmlCharRef value.', [S]);
+  if not IsXmlCharRef(S)
+    then raise EConvertError.CreateFmt('%S is not a valid XmlCharRef value.', [S]);
+  if S[3] = 'x'
+    then Result := StrToInt(concat('$', copy(S, 4, length(S) - 4))) // Hex
+  else Result := StrToInt(copy(S, 3, length(S) - 3)); // Dec
+  if Result > $10FFFF
+    then raise EConvertError.CreateFmt('%S is not a valid XmlCharRef value.', [S]);
   if Result < $10000 then begin
     value := Result;
-    if not IsXmlChar(WideChar(value)) then
-      raise EConvertError.CreateFmt('%S is not a valid XmlCharRef value.', [S]);
+    if not IsXmlChar(WideChar(value))
+      then raise EConvertError.CreateFmt('%S is not a valid XmlCharRef value.', [S]);
     case result of
       $D800..$DBFF, // Reserved for high surrogate of Unicode character [$10000..$10FFFF]
         $DC00..$DFFF: // Reserved for low surrogate of Unicode character [$10000..$10FFFF]
@@ -5598,10 +5504,9 @@ end;
 
 function XPathRound(const d: double): double;
 begin
-  if IsNaN(D) or IsInfinite(D) then
-    Result := D
-  else
-    Result := Floor(D + 0.5);
+  if IsNaN(D) or IsInfinite(D)
+    then Result := D
+  else Result := Floor(D + 0.5);
   if Result = 0 then
     if D < 0 then
       Result := 0 / -1; // Set to negative null.    // xxx Does this work?
@@ -5628,8 +5533,7 @@ begin
     if ord(P^) = $2E then begin // '.' at the end of the number --> invalid
       Result := NaN;
       Exit;
-    end else
-      Result := 0;
+    end else Result := 0;
   end;
 
   while P >= B do begin
@@ -5650,10 +5554,8 @@ begin
         Result := -Result;
         Dec(P);
         Break;
-      end else
-        Break;
-    end else
-      Break;
+      end else Break;
+    end else Break;
     Dec(P);
   end;
 
@@ -5661,14 +5563,13 @@ begin
   while (P >= B) and IsXmlWhiteSpace(P^) do
     Dec(P);
 
-  if P >= B then
-    Result := NaN;
+  if P >= B then Result := NaN;
 end;
 
 function XPathBooleanFunc(const oldResult: TdomXPathCustomResult): TdomXPathBooleanResult;
 begin
-  if not assigned(oldResult) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(oldResult)
+    then raise ENot_Supported_Err.create('Not supported error.');
   if oldResult.resultType = XPATH_BOOLEAN_TYPE then begin
     result := (oldResult as TdomXPathBooleanResult);
   end else begin
@@ -5679,8 +5580,8 @@ end;
 
 function XPathNumberFunc(const oldResult: TdomXPathCustomResult): TdomXPathNumberResult;
 begin
-  if not assigned(oldResult) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(oldResult)
+    then raise ENot_Supported_Err.create('Not supported error.');
   if oldResult.resultType = XPATH_NUMBER_TYPE then begin
     result := (oldResult as TdomXPathNumberResult);
   end else begin
@@ -5691,8 +5592,8 @@ end;
 
 function XPathStringFunc(const oldResult: TdomXPathCustomResult): TdomXPathStringResult;
 begin
-  if not assigned(oldResult) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(oldResult)
+    then raise ENot_Supported_Err.create('Not supported error.');
   if oldResult.resultType = XPATH_STRING_TYPE then begin
     result := (oldResult as TdomXPathStringResult);
   end else begin
@@ -5701,12 +5602,16 @@ begin
   end;
 end;
 
+
+
 //+++++++++++++++++++++++++ TDomBaseComponent +++++++++++++++++++++++++
 
 function TDomBaseComponent.getXdomVersion: wideString;
 begin
   result := '3.1.14';
 end;
+
+
 
 //++++++++++++++++++++++++ TDomImplementation +++++++++++++++++++++++++
 
@@ -5761,8 +5666,8 @@ begin
   FCreatedDocumentTypesListing.Capacity := FCreatedDocumentTypesListing.Count;
 
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
-  for i := 0 to pred(FCreatedASModelsNS.count) do
-    TdomASModelNS(FCreatedASModelsNS[i]).free;
+  for i := 0 to pred(FCreatedASModelsNS.count)
+    do TdomASModelNS(FCreatedASModelsNS[i]).free;
   FCreatedASModelsNS.clear;
 {$ENDIF}
 end;
@@ -5785,8 +5690,8 @@ end;
 function TDomImplementation.createDocument(const name: wideString;
   doctype: TdomDocumentType): TdomDocument;
 begin
-  if not IsXmlName(name) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(name)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   result := getDocumentInstance(name, doctype);
   FCreatedDocumentsListing.add(result);
   result.InitDoc(name);
@@ -5799,21 +5704,20 @@ var
   prfx, localName: wideString;
 begin
   if assigned(doctype) then
-    if assigned(doctype.referenceDocument) or (documentTypes.IndexOf(doctype) = -1) then
-      raise EWrong_Document_Err.create('Wrong document error.');
+    if assigned(doctype.referenceDocument) or (documentTypes.IndexOf(doctype) = -1)
+      then raise EWrong_Document_Err.create('Wrong document error.');
   if not xmlExtractPrefixAndLocalName(qualifiedName, prfx, localName) then begin
-    if not IsXmlName(qualifiedName) then
-      raise EInvalid_Character_Err.create('Invalid character error.')
-    else
-      raise ENamespace_Err.create('Namespace error.');
+    if not IsXmlName(qualifiedName)
+      then raise EInvalid_Character_Err.create('Invalid character error.')
+    else raise ENamespace_Err.create('Namespace error.');
   end;
   if (((prfx = 'xmlns') or (qualifiedName = 'xmlns'))
-    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/')) then
-    raise ENamespace_Err.create('Namespace error.');
-  if (namespaceURI = '') and (prfx <> '') then
-    raise ENamespace_Err.create('Namespace error.');
-  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/'))
+    then raise ENamespace_Err.create('Namespace error.');
+  if (namespaceURI = '') and (prfx <> '')
+    then raise ENamespace_Err.create('Namespace error.');
+  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   result := getDocumentInstanceNS(namespaceURI, qualifiedName, doctype);
   FCreatedDocuments.FNodeList.add(Result);
   Result.InitDocNS(namespaceURI, qualifiedName);
@@ -5823,10 +5727,10 @@ function TDomImplementation.createDocumentType(const qualifiedName,
   publicId,
   systemId: wideString): TdomDocumentType;
 begin
-  if not IsXmlName(qualifiedName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not IsXmlQName(qualifiedName) then
-    raise ENamespace_Err.create('Namespace error.');
+  if not IsXmlName(qualifiedName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlQName(qualifiedName)
+    then raise ENamespace_Err.create('Namespace error.');
   Result := TdomDocumentType.create(self, qualifiedName, publicId, systemId);
   FCreatedDocumentTypes.FNodeList.add(Result);
 end;
@@ -5848,12 +5752,11 @@ var
   index: integer;
   temp: TdomASModelNS;
 begin
-  if not assigned(arg) then
-    exit;
+  if not assigned(arg) then exit;
   temp := arg;
   index := FCreatedASModelsNS.IndexOf(arg);
-  if index = -1 then
-    raise ENot_Found_Err.create('ASModel not found error.');
+  if index = -1
+    then raise ENot_Found_Err.create('ASModel not found error.');
 
   // Free the TdomASModelNS object:
   FCreatedASModelsNS.Delete(index);
@@ -5867,11 +5770,10 @@ var
   index: integer;
   dummyDocTyp: TdomDocumentType;
 begin
-  if not assigned(doc) then
-    exit;
+  if not assigned(doc) then exit;
   index := FCreatedDocumentsListing.IndexOf(doc);
-  if index = -1 then
-    raise ENot_Found_Err.create('Document not found error.');
+  if index = -1
+    then raise ENot_Found_Err.create('Document not found error.');
 
   dummyDocTyp := doc.doctype;
   // Free the document:
@@ -5880,21 +5782,19 @@ begin
   doc := nil;
   // Free doctype (we do this after freeing the document, because doc.free
   // automatically removes an associated document type node):
-  if assigned(dummyDocTyp) then
-    freeDocumentType(dummyDocTyp);
+  if assigned(dummyDocTyp) then freeDocumentType(dummyDocTyp);
 end;
 
 procedure TDomImplementation.freeDocumentType(var docType: TdomDocumentType);
 var
   index: integer;
 begin
-  if not assigned(docType) then
-    exit;
+  if not assigned(docType) then exit;
   index := FCreatedDocumentTypesListing.IndexOf(docType);
-  if index = -1 then
-    raise ENot_Found_Err.create('DocumentType not found error.');
-  if assigned(docType.ownerDocument) then
-    raise EInuse_Err.create('Inuse DocumentType error.');
+  if index = -1
+    then raise ENot_Found_Err.create('DocumentType not found error.');
+  if assigned(docType.ownerDocument)
+    then raise EInuse_Err.create('Inuse DocumentType error.');
   FCreatedDocumentTypesListing.Delete(index);
   docType.free;
   docType := nil;
@@ -5947,20 +5847,18 @@ end;
 function TDomImplementation.getDocumentInstance(const name: wideString;
   const doctype: TdomDocumentType): TdomDocument;
 begin
-  if SupportsDocumentFormat('', name) then
-    Result := getDocumentClass('', name).create(self, doctype)
-  else
-    Result := defaultDocumentClass.create(self, doctype);
+  if SupportsDocumentFormat('', name)
+    then Result := getDocumentClass('', name).create(self, doctype)
+  else Result := defaultDocumentClass.create(self, doctype);
 end;
 
 function TDomImplementation.getDocumentInstanceNS(const aNamespaceUri,
   aQualifiedName: wideString;
   const doctype: TdomDocumentType): TdomDocument;
 begin
-  if SupportsDocumentFormat(aNamespaceUri, aQualifiedName) then
-    Result := getDocumentClass(aNamespaceUri, aQualifiedName).create(self, doctype)
-  else
-    Result := defaultDocumentClass.create(self, doctype);
+  if SupportsDocumentFormat(aNamespaceUri, aQualifiedName)
+    then Result := getDocumentClass(aNamespaceUri, aQualifiedName).create(self, doctype)
+  else Result := defaultDocumentClass.create(self, doctype);
 end;
 {$ENDIF}
 
@@ -5983,14 +5881,14 @@ procedure TDomImplementation.doAttrModified(const modifiedNode: TdomNode;
   const attrChange: TdomAttrChange;
   const relatedAttr: TdomAttr);
 begin
-  if assigned(FOnAttrModified) then
-    FOnAttrModified(self, modifiedNode, attrChange, relatedAttr);
+  if assigned(FOnAttrModified)
+    then FOnAttrModified(self, modifiedNode, attrChange, relatedAttr);
 end;
 
 procedure TDomImplementation.doCharacterDataModified(modifiedNode: TdomNode);
 begin
-  if assigned(FOnCharacterDataModified) then
-    FOnCharacterDataModified(self, modifiedNode);
+  if assigned(FOnCharacterDataModified)
+    then FOnCharacterDataModified(self, modifiedNode);
 end;
 
 procedure TDomImplementation.doError(sender: TObject;
@@ -6001,26 +5899,26 @@ begin
     DOM_SEVERITY_WARNING, DOM_SEVERITY_ERROR: go := true;
     DOM_SEVERITY_FATAL_ERROR: go := false;
   end;
-  if assigned(FOnError) and (FErrorReportLevel = 0) then
-    FOnError(sender, error, go);
+  if assigned(FOnError) and (FErrorReportLevel = 0)
+    then FOnError(sender, error, go);
 end;
 
 procedure TDomImplementation.doNodeClearing(node: TdomNode);
 begin
-  if assigned(FOnNodeClearing) then
-    FOnNodeClearing(self, node);
+  if assigned(FOnNodeClearing)
+    then FOnNodeClearing(self, node);
 end;
 
 procedure TDomImplementation.doNodeInserted(node: TdomNode);
 begin
-  if assigned(FOnNodeInserted) then
-    FOnNodeInserted(self, node);
+  if assigned(FOnNodeInserted)
+    then FOnNodeInserted(self, node);
 end;
 
 procedure TDomImplementation.doNodeRemoving(node: TdomNode);
 begin
-  if assigned(FOnNodeRemoving) then
-    FOnNodeRemoving(self, node);
+  if assigned(FOnNodeRemoving)
+    then FOnNodeRemoving(self, node);
 end;
 
 procedure TDomImplementation.doRequestXPathFunctionResult(const namespaceUri,
@@ -6031,8 +5929,8 @@ procedure TDomImplementation.doRequestXPathFunctionResult(const namespaceUri,
   const arguments: TList;
   var value: TdomXPathCustomResult);
 begin
-  if assigned(FOnRequestXPathFunctionResult) then
-    FOnRequestXPathFunctionResult(namespaceUri, localName, contextNode, contextPosition, contextSize, arguments, value);
+  if assigned(FOnRequestXPathFunctionResult)
+    then FOnRequestXPathFunctionResult(namespaceUri, localName, contextNode, contextPosition, contextSize, arguments, value);
 end;
 
 procedure TDomImplementation.doRequestXPathVariable(const XPathExpression: TXPathExpression;
@@ -6040,8 +5938,8 @@ procedure TDomImplementation.doRequestXPathVariable(const XPathExpression: TXPat
   localName: wideString;
   var value: TdomXPathCustomResult);
 begin
-  if assigned(FOnRequestXPathVariable) then
-    FOnRequestXPathVariable(XPathExpression, namespaceURI, localName, value);
+  if assigned(FOnRequestXPathVariable)
+    then FOnRequestXPathVariable(XPathExpression, namespaceURI, localName, value);
 end;
 
 function TDomImplementation.hasFeature(const feature,
@@ -6052,25 +5950,28 @@ begin
   Result := false;
   VersionStr := WideCharToString(PWideChar(feature));
   if (WideCharToString(PWideChar(version)) = '1.0')
-    or (WideCharToString(PWideChar(version)) = '') then begin
-    if (CompareText(VersionStr, 'XML') = 0) then
-      Result := true;
+    or (WideCharToString(PWideChar(version)) = '')
+    then begin
+    if (CompareText(VersionStr, 'XML') = 0)
+      then Result := true;
   end else begin
-    if (WideCharToString(PWideChar(version)) = '2.0') then begin
-      if (CompareText(VersionStr, 'XML') = 0) then
-        Result := true;
-      if (CompareText(VersionStr, 'VIEWS') = 0) then
-        Result := true;
-      if (CompareText(VersionStr, 'TRAVERSAL') = 0) then
-        Result := true;
+    if (WideCharToString(PWideChar(version)) = '2.0')
+      then begin
+      if (CompareText(VersionStr, 'XML') = 0)
+        then Result := true;
+      if (CompareText(VersionStr, 'VIEWS') = 0)
+        then Result := true;
+      if (CompareText(VersionStr, 'TRAVERSAL') = 0)
+        then Result := true;
     end else begin
-      if version = '' then begin
-        if (CompareText(VersionStr, 'XML') = 0) then
-          Result := true;
-        if (CompareText(VersionStr, 'VIEWS') = 0) then
-          Result := true;
-        if (CompareText(VersionStr, 'TRAVERSAL') = 0) then
-          Result := true;
+      if version = ''
+        then begin
+        if (CompareText(VersionStr, 'XML') = 0)
+          then Result := true;
+        if (CompareText(VersionStr, 'VIEWS') = 0)
+          then Result := true;
+        if (CompareText(VersionStr, 'TRAVERSAL') = 0)
+          then Result := true;
       end; {if ... }
     end; {if ... else ...}
   end; {if ... else ...}
@@ -6089,8 +5990,7 @@ begin
       if (aNamespaceUri = NamespaceUri) and (aQualifiedName = qualifiedName) then begin
         Result := DocumentClass;
         exit;
-      end else
-        aDocFormat := next;
+      end else aDocFormat := next;
     end;
   raise EUnknown_Document_Format_Err.create('Unknown document format yet');
 end;
@@ -6099,16 +5999,16 @@ end;
 function TDomImplementation.handleError(const sender: TObject;
   const error: TdomError): boolean;
 begin
-  if not assigned(error) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(error)
+    then raise ENot_Supported_Err.create('Not supported error.');
   doError(sender, error, result);
 end;
 
 procedure TDomImplementation.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FResourceResolver) then
-    FResourceResolver := nil;
+  if (Operation = opRemove) and (AComponent = FResourceResolver)
+    then FResourceResolver := nil;
 end;
 
 {$IFNDEF IGNORE_DOCUMENT_FORMAT}
@@ -6154,19 +6054,18 @@ end;
 
 procedure TDomImplementation.setResourceResolver(const AResourceResolver: TCustomResourceResolver);
 begin
-  if FResourceResolver = AResourceResolver then
-    exit;
+  if FResourceResolver = AResourceResolver then exit;
 {$IFDEF VER140+}
-  if assigned(FResourceResolver) then
-    FResourceResolver.RemoveFreeNotification(Self);
+  if assigned(FResourceResolver)
+    then FResourceResolver.RemoveFreeNotification(Self);
 {$ENDIF}
 {$IFDEF LINUX}
-  if assigned(FResourceResolver) then
-    FResourceResolver.RemoveFreeNotification(Self);
+  if assigned(FResourceResolver)
+    then FResourceResolver.RemoveFreeNotification(Self);
 {$ENDIF}
   FResourceResolver := AResourceResolver;
-  if assigned(AResourceResolver) then
-    AResourceResolver.FreeNotification(Self);
+  if assigned(AResourceResolver)
+    then AResourceResolver.FreeNotification(Self);
 end;
 
 {$IFNDEF IGNORE_DOCUMENT_FORMAT}
@@ -6183,8 +6082,7 @@ begin
       if (aNamespaceUri = NamespaceUri) and (aQualifiedName = qualifiedName) then begin
         Result := true;
         exit;
-      end else
-        aDocFormat := next;
+      end else aDocFormat := next;
     end;
 end;
 
@@ -6198,10 +6096,9 @@ begin
     with aDocFormat^ do begin
       if aDocumentClass = DocumentClass then begin
         oldRec := aDocFormat;
-        if assigned(previous) then
-          previous.next := next
-        else
-          domDocumentFormatList := next;
+        if assigned(previous)
+          then previous.next := next
+        else domDocumentFormatList := next;
         previous := aDocFormat;
         aDocFormat := next;
         Dispose(oldRec);
@@ -6213,6 +6110,7 @@ begin
 end;
 {$ENDIF}
 
+
 //++++++++++++++++++++++++++++ TdomTreeWalker +++++++++++++++++++++++++++++++
 
 constructor TdomTreeWalker.create(const Root: TdomNode;
@@ -6220,8 +6118,8 @@ constructor TdomTreeWalker.create(const Root: TdomNode;
   const NodeFilter: TdomNodeFilter;
   const EntityReferenceExpansion: boolean);
 begin
-  if not assigned(Root) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(Root)
+    then raise ENot_Supported_Err.create('Not supported error.');
   inherited create;
   FWhatToShow := WhatToShow;
   FFilter := NodeFilter;
@@ -6232,8 +6130,8 @@ end;
 
 procedure TdomTreeWalker.SetCurrentNode(const node: TdomNode);
 begin
-  if not assigned(node) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(node)
+    then raise ENot_Supported_Err.create('Not supported error.');
   FCurrentNode := node;
 end;
 
@@ -6249,8 +6147,8 @@ end;
 
 procedure TdomTreeWalker.setRoot(const node: TdomNode);
 begin
-  if not assigned(node) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(node)
+    then raise ENot_Supported_Err.create('Not supported error.');
   FRoot := node;
 end;
 
@@ -6265,40 +6163,34 @@ var
   newNode: TdomNode;
 begin
   Result := nil;
-  if oldNode = root then
-    exit;
+  if oldNode = root then exit;
   newNode := oldNode.NextSibling;
   if assigned(newNode) then begin
     if newNode.NodeType in FWhatToShow then begin
-      if assigned(FFilter) then
-        accept := FFilter.acceptNode(newNode)
-      else
-        accept := filter_accept;
-    end else
-      accept := filter_skip;
+      if assigned(FFilter)
+        then accept := FFilter.acceptNode(newNode)
+      else accept := filter_accept;
+    end else accept := filter_skip;
     case accept of
       filter_reject:
         Result := FindNextSibling(newNode);
-      filter_skip: begin
+      filter_skip:
+        begin
           Result := FindFirstChild(newNode);
-          if not assigned(result) then
-            Result := FindNextSibling(newNode);
+          if not assigned(result)
+            then Result := FindNextSibling(newNode);
         end;
       filter_accept:
         Result := newNode;
     end; {case ...}
   end else begin
-    if not assigned(oldNode.parentNode) then begin
-      result := nil;
-      exit;
-    end; // TreeWalker.root not found!
+    if not assigned(oldNode.parentNode)
+      then begin result := nil; exit; end; // TreeWalker.root not found!
     if oldNode.parentNode.NodeType in FWhatToShow then begin
-      if assigned(FFilter) then
-        accept := FFilter.acceptNode(oldNode.parentNode)
-      else
-        accept := filter_accept;
-    end else
-      accept := filter_skip;
+      if assigned(FFilter)
+        then accept := FFilter.acceptNode(oldNode.parentNode)
+      else accept := filter_accept;
+    end else accept := filter_skip;
     case accept of
       filter_reject, filter_skip:
         Result := FindNextSibling(oldNode.parentNode);
@@ -6314,40 +6206,34 @@ var
   newNode: TdomNode;
 begin
   Result := nil;
-  if OldNode = root then
-    exit;
+  if OldNode = root then exit;
   newNode := oldNode.PreviousSibling;
   if assigned(newNode) then begin
     if newNode.NodeType in FWhatToShow then begin
-      if assigned(FFilter) then
-        accept := FFilter.acceptNode(newNode)
-      else
-        accept := filter_accept;
-    end else
-      accept := filter_skip;
+      if assigned(FFilter)
+        then accept := FFilter.acceptNode(newNode)
+      else accept := filter_accept;
+    end else accept := filter_skip;
     case accept of
       filter_reject:
         Result := FindPreviousSibling(newNode);
-      filter_skip: begin
+      filter_skip:
+        begin
           Result := FindLastChild(newNode);
-          if not assigned(result) then
-            Result := FindPreviousSibling(newNode);
+          if not assigned(result)
+            then Result := FindPreviousSibling(newNode);
         end;
       filter_accept:
         Result := newNode;
     end; {case ...}
   end else begin
-    if not assigned(oldNode.parentNode) then begin
-      result := nil;
-      exit;
-    end; // TreeWalker.root not found!
+    if not assigned(oldNode.parentNode)
+      then begin result := nil; exit; end; // TreeWalker.root not found!
     if oldNode.parentNode.NodeType in FWhatToShow then begin
-      if assigned(FFilter) then
-        accept := FFilter.acceptNode(oldNode.parentNode)
-      else
-        accept := filter_accept;
-    end else
-      accept := filter_skip;
+      if assigned(FFilter)
+        then accept := FFilter.acceptNode(oldNode.parentNode)
+      else accept := filter_accept;
+    end else accept := filter_skip;
     case accept of
       filter_reject, filter_skip:
         Result := FindPreviousSibling(oldNode.parentNode);
@@ -6362,20 +6248,15 @@ var
   accept: TdomFilterResult;
 begin
   Result := nil;
-  if OldNode = root then
-    exit;
+  if OldNode = root then exit;
   Result := OldNode.ParentNode;
-  if not assigned(Result) then begin
-    result := nil;
-    exit;
-  end; // TreeWalker.root not found!
+  if not assigned(Result)
+    then begin result := nil; exit; end; // TreeWalker.root not found!
   if Result.NodeType in FWhatToShow then begin
-    if assigned(FFilter) then
-      accept := FFilter.acceptNode(Result)
-    else
-      accept := filter_accept;
-  end else
-    accept := filter_skip;
+    if assigned(FFilter)
+      then accept := FFilter.acceptNode(Result)
+    else accept := filter_accept;
+  end else accept := filter_skip;
   case accept of
     filter_reject, filter_skip:
       Result := FindParentNode(Result);
@@ -6389,25 +6270,22 @@ var
   accept: TdomFilterResult;
 begin
   Result := nil;
-  if (oldNode.nodeType = ntEntity_Reference_Node) and not FExpandEntityReferences then
-    exit;
+  if (oldNode.nodeType = ntEntity_Reference_Node) and not FExpandEntityReferences
+    then exit;
   for i := 0 to pred(oldnode.childNodes.length) do begin
     newNode := oldnode.childNodes.item(i);
     if newNode.NodeType in FWhatToShow then begin
-      if assigned(FFilter) then
-        accept := FFilter.acceptNode(newNode)
-      else
-        accept := filter_accept;
-    end else
-      accept := filter_skip;
+      if assigned(FFilter)
+        then accept := FFilter.acceptNode(newNode)
+      else accept := filter_accept;
+    end else accept := filter_skip;
     case accept of
       filter_skip:
         Result := FindFirstChild(newNode);
       filter_accept:
         Result := newNode;
     end; {case ...}
-    if assigned(result) then
-      break;
+    if assigned(result) then break;
   end; {for ...}
 end;
 
@@ -6418,25 +6296,22 @@ var
   accept: TdomFilterResult;
 begin
   Result := nil;
-  if (oldNode.nodeType = ntEntity_Reference_Node) and not FExpandEntityReferences then
-    exit;
+  if (oldNode.nodeType = ntEntity_Reference_Node) and not FExpandEntityReferences
+    then exit;
   for i := pred(oldnode.childNodes.length) downto 0 do begin
     newNode := oldnode.childNodes.item(i);
     if newNode.NodeType in FWhatToShow then begin
-      if assigned(FFilter) then
-        accept := FFilter.acceptNode(newNode)
-      else
-        accept := filter_accept;
-    end else
-      accept := filter_skip;
+      if assigned(FFilter)
+        then accept := FFilter.acceptNode(newNode)
+      else accept := filter_accept;
+    end else accept := filter_skip;
     case accept of
       filter_skip:
         Result := FindLastChild(newNode);
       filter_accept:
         Result := newNode;
     end; {case ...}
-    if assigned(result) then
-      break;
+    if assigned(result) then break;
   end; {for ...}
 end;
 
@@ -6445,14 +6320,12 @@ var
   newNode: TdomNode;
 begin
   Result := FindFirstChild(oldNode);
-  if OldNode = root then
-    exit;
-  if not assigned(Result) then
-    Result := FindNextSibling(oldNode);
+  if OldNode = root then exit;
+  if not assigned(Result)
+    then Result := FindNextSibling(oldNode);
   while not assigned(Result) do begin
     newNode := FindParentNode(oldNode);
-    if not assigned(newNode) then
-      exit; // No next node.
+    if not assigned(newNode) then exit; // No next node.
     Result := FindNextSibling(newNode);
     oldNode := newNode;
   end;
@@ -6463,13 +6336,11 @@ var
   newNode: TdomNode;
 begin
   Result := nil;
-  if OldNode = root then
-    exit;
+  if OldNode = root then exit;
   Result := FindPreviousSibling(oldNode);
   if assigned(Result) then begin
     newNode := FindLastChild(Result);
-    if assigned(newNode) then
-      result := newNode;
+    if assigned(newNode) then result := newNode;
   end else
     result := FindParentNode(oldNode);
 end;
@@ -6477,51 +6348,46 @@ end;
 function TdomTreeWalker.parentNode: TdomNode;
 begin
   Result := FindParentNode(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
 
 function TdomTreeWalker.firstChild: TdomNode;
 begin
   Result := FindFirstChild(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
 
 function TdomTreeWalker.lastChild: TdomNode;
 begin
   Result := FindLastChild(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
 
 function TdomTreeWalker.previousSibling: TdomNode;
 begin
   Result := FindPreviousSibling(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
 
 function TdomTreeWalker.nextSibling: TdomNode;
 begin
   Result := FindNextSibling(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
 
 function TdomTreeWalker.previousNode: TdomNode;
 begin
   Result := FindPreviousNode(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
 
 function TdomTreeWalker.nextNode: TdomNode;
 begin
   Result := FindNextNode(FCurrentNode);
-  if assigned(Result) then
-    FCurrentNode := Result;
+  if assigned(Result) then FCurrentNode := Result;
 end;
+
+
 
 //++++++++++++++++++++++++++++ TdomNodeIterator +++++++++++++++++++++++++++++++
 
@@ -6530,8 +6396,8 @@ constructor TdomNodeIterator.create(const Root: TdomNode;
   const nodeFilter: TdomNodeFilter;
   const EntityReferenceExpansion: boolean);
 begin
-  if not assigned(Root) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(Root)
+    then raise ENot_Supported_Err.create('Not supported error.');
   inherited create;
   FRoot := root;
   FWhatToShow := WhatToShow;
@@ -6549,8 +6415,7 @@ var
   newPosition: TdomPosition;
   TP_Ref, TP_Root: TdomTreePosition;
 begin
-  if FInvalid then
-    exit;
+  if FInvalid then exit;
   case eventType of
     neClearing: begin
         TP_Ref := FReferenceNode.compareTreePosition(node);
@@ -6623,14 +6488,12 @@ var
 begin
   with OldNode do
     if HasChildNodes
-      and (FExpandEntityReferences or (nodeType <> ntEntity_Reference_Node)) then
-      result := FirstChild
-    else
-      result := NextSibling;
+      and (FExpandEntityReferences or (nodeType <> ntEntity_Reference_Node))
+      then result := FirstChild
+    else result := NextSibling;
   while not assigned(Result) do begin
     newNode := oldNode.ParentNode;
-    if not assigned(newNode) then
-      exit; // No next node.
+    if not assigned(newNode) then exit; // No next node.
     Result := newNode.NextSibling;
     oldNode := newNode;
   end;
@@ -6648,8 +6511,7 @@ begin
         result := newNode;
         newNode := newNode.LastChild;
       end;
-    end else
-      result := ParentNode;
+    end else result := ParentNode;
   end;
 end;
 
@@ -6659,8 +6521,8 @@ var
   newNode: TdomNode;
 begin
   newNode := nil;
-  if FInvalid then
-    raise EInvalid_State_Err.create('Invalid state error.');
+  if FInvalid
+    then raise EInvalid_State_Err.create('Invalid state error.');
   case FPosition of
     posBefore: begin
         FPosition := posAfter;
@@ -6674,20 +6536,17 @@ begin
     accept := filter_accept;
     if assigned(newNode) then begin
       if newNode.NodeType in FWhatToShow then begin
-        if assigned(FFilter) then
-          accept := FFilter.acceptNode(newNode);
-      end else
-        accept := filter_skip;
-      if not (accept = filter_accept) then
-        newNode := FindNextNode(newNode);
+        if assigned(FFilter)
+          then accept := FFilter.acceptNode(newNode);
+      end else accept := filter_skip;
+      if not (accept = filter_accept)
+        then newNode := FindNextNode(newNode);
     end;
   until accept = filter_accept;
   if assigned(newNode) then
     if not (newNode.hasAsAncestor(root) or (newNode = root)) then
-      if (FReferenceNode.hasAsAncestor(root) or (FReferenceNode = root)) then
-        newNode := nil;
-  if assigned(newNode) then
-    FReferenceNode := newNode;
+      if (FReferenceNode.hasAsAncestor(root) or (FReferenceNode = root)) then newNode := nil;
+  if assigned(newNode) then FReferenceNode := newNode;
   Result := newNode;
 end;
 
@@ -6697,8 +6556,8 @@ var
   newNode: TdomNode;
 begin
   newNode := nil;
-  if FInvalid then
-    raise EInvalid_State_Err.create('Invalid state error.');
+  if FInvalid
+    then raise EInvalid_State_Err.create('Invalid state error.');
   case FPosition of
     posBefore: begin
         newNode := FindPreviousNode(FReferenceNode);
@@ -6712,22 +6571,21 @@ begin
     accept := filter_accept;
     if assigned(newNode) then begin
       if newNode.NodeType in FWhatToShow then begin
-        if assigned(FFilter) then
-          accept := FFilter.acceptNode(newNode);
-      end else
-        accept := filter_skip;
-      if not (accept = filter_accept) then
-        newNode := FindPreviousNode(newNode);
+        if assigned(FFilter)
+          then accept := FFilter.acceptNode(newNode);
+      end else accept := filter_skip;
+      if not (accept = filter_accept)
+        then newNode := FindPreviousNode(newNode);
     end;
   until accept = filter_accept;
   if assigned(newNode) then
     if not (newNode.hasAsAncestor(root) or (newNode = root)) then
-      if (FReferenceNode.hasAsAncestor(root) or (FReferenceNode = root)) then
-        newNode := nil;
-  if assigned(newNode) then
-    FReferenceNode := newNode;
+      if (FReferenceNode.hasAsAncestor(root) or (FReferenceNode = root)) then newNode := nil;
+  if assigned(newNode) then FReferenceNode := newNode;
   Result := newNode;
 end;
+
+
 
 //++++++++++++++++++++++++++++ TdomNodeList +++++++++++++++++++++++++++++++
 
@@ -6749,11 +6607,12 @@ end;
 
 function TdomNodeList.item(const index: integer): TdomNode;
 begin
-  if (index < 0) or (index >= FNodeList.Count) then
-    result := nil
-  else
-    result := TdomNode(FNodeList.List^[Index]);
+  if (index < 0) or (index >= FNodeList.Count)
+    then result := nil
+  else result := TdomNode(FNodeList.List^[Index]);
 end;
+
+
 
 //++++++++++++++++++++++++ TdomElementsNodeList ++++++++++++++++++++++++++
 
@@ -6771,28 +6630,23 @@ var
   Level: integer;
 begin
   Result := 0;
-  if not assigned(FStartElement) then
-    exit;
+  if not assigned(FStartElement) then exit;
   Level := 0;
   AktNode := FStartElement;
   if AktNode.NodeType = ntElement_Node then
     if (AktNode.NodeName = FQueryName) or (FQueryName = '*') then
       inc(Result);
   repeat
-    if AktNode.HasChildNodes then begin
-      NewNode := AktNode.FirstChild;
-      inc(Level);
-    end else
-      NewNode := AktNode.NextSibling;
+    if AktNode.HasChildNodes
+      then begin NewNode := AktNode.FirstChild; inc(Level); end
+    else NewNode := AktNode.NextSibling;
     while not assigned(NewNode) do begin
       dec(Level);
-      if Level < 1 then
-        break;
+      if Level < 1 then break;
       AktNode := AktNode.ParentNode;
       NewNode := AktNode.NextSibling;
     end;
-    if Level < 1 then
-      break;
+    if Level < 1 then break;
     AktNode := NewNode;
     if AktNode.NodeType = ntElement_Node then
       if (AktNode.NodeName = FQueryName) or (FQueryName = '*') then
@@ -6806,38 +6660,28 @@ var
   Level, i: integer;
 begin
   Result := -1;
-  if not assigned(FStartElement) then
-    exit;
-  if not (node is TdomNode) then
-    exit;
-  if node.NodeType <> ntElement_Node then
-    exit;
+  if not assigned(FStartElement) then exit;
+  if not (node is TdomNode) then exit;
+  if node.NodeType <> ntElement_Node then exit;
   i := -1;
   Level := 0;
   AktNode := FStartElement;
   repeat
-    if AktNode.HasChildNodes then begin
-      NewNode := AktNode.FirstChild;
-      inc(Level);
-    end else
-      NewNode := AktNode.NextSibling;
+    if AktNode.HasChildNodes
+      then begin NewNode := AktNode.FirstChild; inc(Level); end
+    else NewNode := AktNode.NextSibling;
     while not assigned(NewNode) do begin
       dec(Level);
-      if Level < 1 then
-        break;
+      if Level < 1 then break;
       AktNode := AktNode.ParentNode;
       NewNode := AktNode.NextSibling;
     end;
-    if Level < 1 then
-      break;
+    if Level < 1 then break;
     AktNode := NewNode;
     if AktNode.NodeType = ntElement_Node then
       if (AktNode.NodeName = FQueryName) or (FQueryName = '*') then begin
         inc(i);
-        if AktNode = node then begin
-          Result := i;
-          break;
-        end;
+        if AktNode = node then begin Result := i; break; end;
       end;
   until Level < 1;
 end;
@@ -6848,39 +6692,32 @@ var
   Level, i: integer;
 begin
   Result := nil;
-  if not assigned(FStartElement) then
-    exit;
-  if (index < 0) then
-    exit;
+  if not assigned(FStartElement) then exit;
+  if (index < 0) then exit;
   i := -1;
   Level := 0;
   AktNode := FStartElement;
   repeat
-    if AktNode.HasChildNodes then begin
-      NewNode := AktNode.FirstChild;
-      inc(Level);
-    end else
-      NewNode := AktNode.NextSibling;
+    if AktNode.HasChildNodes
+      then begin NewNode := AktNode.FirstChild; inc(Level); end
+    else NewNode := AktNode.NextSibling;
     while not assigned(NewNode) do begin
       dec(Level);
-      if Level < 1 then
-        break;
+      if Level < 1 then break;
       AktNode := AktNode.ParentNode;
       NewNode := AktNode.NextSibling;
     end;
-    if Level < 1 then
-      break;
+    if Level < 1 then break;
     AktNode := NewNode;
     if AktNode.NodeType = ntElement_Node then
       if (AktNode.NodeName = FQueryName) or (FQueryName = '*') then begin
         inc(i);
-        if i = index then begin
-          Result := AktNode;
-          break;
-        end;
+        if i = index then begin Result := AktNode; break; end;
       end;
   until Level < 1;
 end;
+
+
 
 //+++++++++++++++++++++TdomElementsNodeListNS ++++++++++++++++++++++++++
 
@@ -6900,30 +6737,25 @@ var
   Level: integer;
 begin
   Result := 0;
-  if not assigned(FStartElement) then
-    exit;
+  if not assigned(FStartElement) then exit;
   Level := 0;
   AktNode := FStartElement;
   repeat
-    if AktNode.HasChildNodes then begin
-      NewNode := AktNode.FirstChild;
-      inc(Level);
-    end else
-      NewNode := AktNode.NextSibling;
+    if AktNode.HasChildNodes
+      then begin NewNode := AktNode.FirstChild; inc(Level); end
+    else NewNode := AktNode.NextSibling;
     while not assigned(NewNode) do begin
       dec(Level);
-      if Level < 1 then
-        break;
+      if Level < 1 then break;
       AktNode := AktNode.ParentNode;
       NewNode := AktNode.NextSibling;
     end;
-    if Level < 1 then
-      break;
+    if Level < 1 then break;
     AktNode := NewNode;
     if AktNode.NodeType = ntElement_Node then
       if ((AktNode.namespaceURI = FQueryNamespaceURI) or (FQueryNamespaceURI = '*'))
-        and ((AktNode.localName = FQueryLocalName) or (FQueryLocalName = '*')) then
-        inc(Result);
+        and ((AktNode.localName = FQueryLocalName) or (FQueryLocalName = '*'))
+        then inc(Result);
   until Level < 1;
 end;
 
@@ -6933,39 +6765,30 @@ var
   Level, i: integer;
 begin
   Result := -1;
-  if not assigned(FStartElement) then
-    exit;
-  if not (node is TdomNode) then
-    exit;
-  if node.NodeType <> ntElement_Node then
-    exit;
+  if not assigned(FStartElement) then exit;
+  if not (node is TdomNode) then exit;
+  if node.NodeType <> ntElement_Node then exit;
   i := -1;
   Level := 0;
   AktNode := FStartElement;
   repeat
-    if AktNode.HasChildNodes then begin
-      NewNode := AktNode.FirstChild;
-      inc(Level);
-    end else
-      NewNode := AktNode.NextSibling;
+    if AktNode.HasChildNodes
+      then begin NewNode := AktNode.FirstChild; inc(Level); end
+    else NewNode := AktNode.NextSibling;
     while not assigned(NewNode) do begin
       dec(Level);
-      if Level < 1 then
-        break;
+      if Level < 1 then break;
       AktNode := AktNode.ParentNode;
       NewNode := AktNode.NextSibling;
     end;
-    if Level < 1 then
-      break;
+    if Level < 1 then break;
     AktNode := NewNode;
     if AktNode.NodeType = ntElement_Node then
       if ((AktNode.namespaceURI = FQueryNamespaceURI) or (FQueryNamespaceURI = '*'))
-        and ((AktNode.localName = FQueryLocalName) or (FQueryLocalName = '*')) then begin
+        and ((AktNode.localName = FQueryLocalName) or (FQueryLocalName = '*'))
+        then begin
         inc(i);
-        if AktNode = node then begin
-          Result := i;
-          break;
-        end;
+        if AktNode = node then begin Result := i; break; end;
       end;
   until Level < 1;
 end;
@@ -6976,40 +6799,34 @@ var
   Level, i: integer;
 begin
   Result := nil;
-  if not assigned(FStartElement) then
-    exit;
-  if (index < 0) then
-    exit;
+  if not assigned(FStartElement) then exit;
+  if (index < 0) then exit;
   i := -1;
   Level := 0;
   AktNode := FStartElement;
   repeat
-    if AktNode.HasChildNodes then begin
-      NewNode := AktNode.FirstChild;
-      inc(Level);
-    end else
-      NewNode := AktNode.NextSibling;
+    if AktNode.HasChildNodes
+      then begin NewNode := AktNode.FirstChild; inc(Level); end
+    else NewNode := AktNode.NextSibling;
     while not assigned(NewNode) do begin
       dec(Level);
-      if Level < 1 then
-        break;
+      if Level < 1 then break;
       AktNode := AktNode.ParentNode;
       NewNode := AktNode.NextSibling;
     end;
-    if Level < 1 then
-      break;
+    if Level < 1 then break;
     AktNode := NewNode;
     if AktNode.NodeType = ntElement_Node then
       if ((AktNode.namespaceURI = FQueryNamespaceURI) or (FQueryNamespaceURI = '*'))
-        and ((AktNode.localName = FQueryLocalName) or (FQueryLocalName = '*')) then begin
+        and ((AktNode.localName = FQueryLocalName) or (FQueryLocalName = '*'))
+        then begin
         inc(i);
-        if i = index then begin
-          Result := AktNode;
-          break;
-        end;
+        if i = index then begin Result := AktNode; break; end;
       end;
   until Level < 1;
 end;
+
+
 
 //+++++++++++++++++++++++ TdomOwnerNamedNodeMap +++++++++++++++++++++++++++
 
@@ -7030,8 +6847,8 @@ end;
 
 function TdomOwnerNamedNodeMap.add(const node: TdomCustomNode): integer;
 begin
-  if not (node is itemClass) then
-    raise EHierarchy_Request_Err.create('Hierarchy request error.');
+  if not (node is itemClass)
+    then raise EHierarchy_Request_Err.create('Hierarchy request error.');
   result := FNodeList.addObject(node.nodeName, node);
 end;
 
@@ -7046,8 +6863,8 @@ end;
 
 procedure TdomOwnerNamedNodeMap.Delete(const index: integer);
 begin
-  if (index < 0) or (index >= count) then
-    raise EStringListError.CreateFmt('List index out of bounds (%d)', [Index]);
+  if (index < 0) or (index >= count)
+    then raise EStringListError.CreateFmt('List index out of bounds (%d)', [Index]);
   TdomCustomNode(FNodeList.objects[index]).Free;
   FNodeList.Delete(index);
 end;
@@ -7057,8 +6874,8 @@ var
   index: integer;
 begin
   index := indexOfItem(node);
-  if index = -1 then
-    raise EStringListError.Create('Item not found');
+  if index = -1
+    then raise EStringListError.Create('Item not found');
   result := items[index];
   FNodeList.Delete(index);
 end;
@@ -7078,10 +6895,9 @@ var
   index: integer;
 begin
   index := indexOfNamedItem(name);
-  if index = -1 then
-    result := nil
-  else
-    result := items[index];
+  if index = -1
+    then result := nil
+  else result := items[index];
 end;
 
 function TdomOwnerNamedNodeMap.hasNamedItem(const name: wideString): boolean;
@@ -7124,6 +6940,9 @@ begin
   end;
 end;
 
+
+
+
 //+++++++++++++++++++++++++ TdomNamedNodeMap +++++++++++++++++++++++++++++
 
 constructor TdomNamedNodeMap.create(const aOwner: TdomNode;
@@ -7139,48 +6958,48 @@ end;
 
 procedure TdomNamedNodeMap.checkAllowedNodeType(const node: TdomNode);
 begin
-  if not (node.NodeType in FAllowedNodeTypes) then
-    raise EHierarchy_Request_Err.create('Hierarchy request error.');
+  if not (node.NodeType in FAllowedNodeTypes)
+    then raise EHierarchy_Request_Err.create('Hierarchy request error.');
 end;
 
 procedure TdomNamedNodeMap.checkHasNode(const node: TdomNode);
 begin
-  if FNodeList.indexOf(node) = -1 then
-    raise ENot_Found_Err.create('Node not found error.');
+  if FNodeList.indexOf(node) = -1
+    then raise ENot_Found_Err.create('Node not found error.');
 end;
 
 procedure TdomNamedNodeMap.checkNamespaceAware;
 begin
-  if not namespaceAware then
-    raise ENamespace_Err.create('Namespace error.');
+  if not namespaceAware
+    then raise ENamespace_Err.create('Namespace error.');
 end;
 
 procedure TdomNamedNodeMap.checkNotInUse(const node: TdomNode);
 begin
-  if assigned(node.parentNode) then
-    raise EInuse_Err.create('Inuse node error.');
-  if node.NodeType = ntAttribute_Node then
-    if assigned((node as TdomAttr).FOwnerMap) then
-      if (node as TdomAttr).FOwnerMap <> self then
-        raise EInuse_Err.create('Inuse attribute error.');
+  if assigned(node.parentNode)
+    then raise EInuse_Err.create('Inuse node error.');
+  if node.NodeType = ntAttribute_Node
+    then if assigned((node as TdomAttr).FOwnerMap)
+    then if (node as TdomAttr).FOwnerMap <> self
+      then raise EInuse_Err.create('Inuse attribute error.');
 end;
 
 procedure TdomNamedNodeMap.checkNotNamespaceAware;
 begin
-  if namespaceAware then
-    raise ENamespace_Err.create('Namespace error.');
+  if namespaceAware
+    then raise ENamespace_Err.create('Namespace error.');
 end;
 
 procedure TdomNamedNodeMap.checkNotReadOnly;
 begin
-  if ReadOnly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if ReadOnly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
 end;
 
 procedure TdomNamedNodeMap.checkSameReferenceDocument(const node: TdomNode);
 begin
-  if ownerNode.referenceDocument <> node.referenceDocument then
-    raise EWrong_Document_Err.create('Wrong document error.');
+  if ownerNode.referenceDocument <> node.referenceDocument
+    then raise EWrong_Document_Err.create('Wrong document error.');
 end;
 
 function TdomNamedNodeMap.getNamedItem(const name: wideString): TdomNode;
@@ -7213,32 +7032,30 @@ end;
 
 function TdomNamedNodeMap.getNamespaceAware: boolean;
 begin
-  if assigned(ownerNode) then
-    result := ownerNode.isNamespaceNode
-  else
-    result := FDefaultNamespaceAware;
+  if assigned(ownerNode)
+    then result := ownerNode.isNamespaceNode
+  else result := FDefaultNamespaceAware;
 end;
 
 function TdomNamedNodeMap.getReadOnly: boolean;
 begin
-  if assigned(ownerNode) then
-    result := ownerNode.isReadonly
-  else
-    result := false;
+  if assigned(ownerNode)
+    then result := ownerNode.isReadonly
+  else result := false;
 end;
 
 procedure TdomNamedNodeMap.internalAdd(const node: TdomNode);
 begin
   FNodeList.Add(node);
-  if (node.NodeType = ntAttribute_Node) then
-    (node as TdomAttr).FOwnerMap := self;
+  if (node.NodeType = ntAttribute_Node)
+    then (node as TdomAttr).FOwnerMap := self;
 end;
 
 procedure TdomNamedNodeMap.internalRemove(const node: TdomNode);
 begin
   FNodeList.remove(node);
-  if (node.NodeType = ntAttribute_Node) then
-    (node as TdomAttr).FOwnerMap := nil;
+  if (node.NodeType = ntAttribute_Node)
+    then (node as TdomAttr).FOwnerMap := nil;
 end;
 
 function TdomNamedNodeMap.removeItem(const arg: TdomNode): TdomNode;
@@ -7254,8 +7071,8 @@ begin
   checkNotNamespaceAware;
   checkNotReadOnly;
   Result := getNamedItem(name);
-  if not assigned(Result) then
-    raise ENot_Found_Err.create('Node not found error.');
+  if not assigned(Result)
+    then raise ENot_Found_Err.create('Node not found error.');
   internalRemove(result);
 end;
 
@@ -7265,8 +7082,8 @@ begin
   checkNamespaceAware;
   checkNotReadOnly;
   Result := getNamedItemNS(namespaceURI, localName);
-  if not assigned(Result) then
-    raise ENot_Found_Err.create('Node not found error.');
+  if not assigned(Result)
+    then raise ENot_Found_Err.create('Node not found error.');
   internalRemove(result);
 end;
 
@@ -7282,8 +7099,8 @@ begin
   if result = arg then begin // Is arg already in the map?
     result := nil;
   end else begin
-    if assigned(result) then
-      internalRemove(result);
+    if assigned(result)
+      then internalRemove(result);
     internalAdd(arg);
   end;
 end;
@@ -7300,29 +7117,32 @@ begin
   if result = arg then begin // Is arg already in the map?
     result := nil;
   end else begin
-    if assigned(result) then
-      internalRemove(result);
+    if assigned(result)
+      then internalRemove(result);
     internalAdd(arg);
   end;
 end;
+
+
 
 //+++++++++++++++++++++++++++ TdomCustomNode ++++++++++++++++++++++++++++++
 
 procedure TdomCustomNode.raiseException(const E: ExceptClass);
 begin
-  if E = EHierarchyRequestError then
-    raise EHierarchy_Request_Err.Create('EHierarchy request error.')
-  else if E = ENoModificationAllowedError then
-    raise ENo_Modification_Allowed_Err.Create('No modification allowed.')
-  else if E = ENotAssignedError then
-    raise ENot_Supported_Err.Create('Node not specified.')
-  else if E = ENotFoundError then
-    raise ENot_Found_Err.Create('Node not found.')
-  else if E = EWrongOwnerError then
-    raise EWrong_Document_Err.Create('Wrong document.')
-  else
-    raise E.Create(E.ClassName);
+  if E = EHierarchyRequestError
+    then raise EHierarchy_Request_Err.Create('EHierarchy request error.')
+  else if E = ENoModificationAllowedError
+    then raise ENo_Modification_Allowed_Err.Create('No modification allowed.')
+  else if E = ENotAssignedError
+    then raise ENot_Supported_Err.Create('Node not specified.')
+  else if E = ENotFoundError
+    then raise ENot_Found_Err.Create('Node not found.')
+  else if E = EWrongOwnerError
+    then raise EWrong_Document_Err.Create('Wrong document.')
+  else raise E.Create(E.ClassName);
 end;
+
+
 
 //++++++++++++++++++++++++++++++ TdomNode +++++++++++++++++++++++++++++++++
 
@@ -7340,10 +7160,9 @@ begin
     ntDocument_Fragment_Node,
     ntNotation_Node];
   FIsNamespaceNode := false;
-  if AOwner is TdomDocument then
-    FOwnerDocument := aOwner as TdomDocument
-  else
-    FOwnerDocument := nil;
+  if AOwner is TdomDocument
+    then FOwnerDocument := aOwner as TdomDocument
+  else FOwnerDocument := nil;
 end;
 
 destructor TdomNode.destroy;
@@ -7378,8 +7197,7 @@ begin
       append(newChild);
     result := newChild;
 
-  end else
-    result := (append(newChild) as TdomNode);
+  end else result := (append(newChild) as TdomNode);
 end;
 
 procedure TdomNode.checkTypeAllowed(const node: TdomNode);
@@ -7426,12 +7244,10 @@ function TdomNode.compareTreePosition(const other: TdomNode): TdomTreePosition;
         node := node.parentNode;
       end else begin
         if node.nodeType = ntAttribute_Node then begin
-          if assigned(TdomAttr(node).ownerElement) then
-            node := TdomAttr(node).ownerElement
-          else
-            break;
-        end else
-          break;
+          if assigned(TdomAttr(node).ownerElement)
+            then node := TdomAttr(node).ownerElement
+          else break;
+        end else break;
       end; {if ... else ...}
     end; {while ...}
   end;
@@ -7440,8 +7256,8 @@ var
   selfAncestors, otherAncestors: TList;
   i: integer;
 begin
-  if not assigned(other) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(other)
+    then raise ENot_Supported_Err.create('Not supported error.');
   if other = self then begin
     result := [Tree_Position_Equivalent, Tree_Position_Same_Node];
     exit;
@@ -7482,10 +7298,9 @@ begin
 
     // Attributes involved?
     if (TdomNode(selfAncestors[1]).nodeType = ntAttribute_Node) then begin
-      if (TdomNode(otherAncestors[1]).nodeType = ntAttribute_Node) then
-        result := [Tree_Position_Equivalent]
-      else
-        result := [Tree_Position_Following];
+      if (TdomNode(otherAncestors[1]).nodeType = ntAttribute_Node)
+        then result := [Tree_Position_Equivalent]
+      else result := [Tree_Position_Following];
       exit;
     end;
     if (TdomNode(otherAncestors[1]).nodeType = ntAttribute_Node) then begin
@@ -7515,20 +7330,20 @@ end;
 
 procedure TdomNode.doAfterAddition(const node: TCustomOwnedNode);
 begin
-  if assigned(referenceDocument) then
-    referenceDocument.doNodeInserted(node as TdomNode);
+  if assigned(referenceDocument)
+    then referenceDocument.doNodeInserted(node as TdomNode);
 end;
 
 procedure TdomNode.doBeforeClear;
 begin
-  if assigned(referenceDocument) then
-    referenceDocument.doNodeClearing(self);
+  if assigned(referenceDocument)
+    then referenceDocument.doNodeClearing(self);
 end;
 
 procedure TdomNode.doBeforeRemoval(const node: TCustomOwnedNode);
 begin
-  if assigned(referenceDocument) then
-    referenceDocument.doNodeRemoving(node as TdomNode);
+  if assigned(referenceDocument)
+    then referenceDocument.doNodeRemoving(node as TdomNode);
 end;
 
 function TdomNode.evaluateToBoolean(const expression: wideString): boolean;
@@ -7673,10 +7488,8 @@ begin
   N := PreviousNode;
   if Assigned(N) then begin
     Result := N.AbsoluteIndex;
-    if Result > -1 then
-      Inc(Result);
-  end else
-    Result := -1;
+    if Result > -1 then Inc(Result);
+  end else Result := -1;
 end;
 
 function TdomNode.getAttributes: TdomNamedNodeMap;
@@ -7692,10 +7505,9 @@ var
 begin
   case nodeType of
     ntElement_Node: begin
-        if isNamespaceNode then
-          attr := TdomElement(self).getAttributeNodeNS('http://www.w3.org/XML/1998/namespace', 'base')
-        else
-          attr := TdomElement(self).getAttributeNode('xml:base');
+        if isNamespaceNode
+          then attr := TdomElement(self).getAttributeNodeNS('http://www.w3.org/XML/1998/namespace', 'base')
+        else attr := TdomElement(self).getAttributeNode('xml:base');
         if assigned(attr) then begin
 
           uri1 := attr.value;
@@ -7714,28 +7526,25 @@ begin
           end;
 
         end else begin
-          if assigned(parentNode) then
-            result := parentNode.baseUri
-          else
-            result := '';
+          if assigned(parentNode)
+            then result := parentNode.baseUri
+          else result := '';
         end; {if ... else ...}
       end;
     ntText_Node, ntCDATA_Section_Node, ntEntity_Reference_Node,
       ntProcessing_Instruction_Node, ntComment_Node, ntDocument_Type_Node,
       ntDocument_Type_Decl_Node:
-      if assigned(parentNode) then
-        result := parentNode.baseUri
-      else
-        result := '';
+      if assigned(parentNode)
+        then result := parentNode.baseUri
+      else result := '';
     ntAttribute_Node: begin
         result := '';
         if assigned(TdomAttr(self).ownerElement) then begin
           if ((namespaceURI = 'http://www.w3.org/XML/1998/namespace') and (localName = 'base'))
             or ((namespaceURI = '') and (nodeName = 'xml:base')) then begin
-            if assigned(TdomAttr(self).ownerElement.parentNode) then
-              result := TdomAttr(self).ownerElement.parentNode.baseUri;
-          end else
-            result := TdomAttr(self).ownerElement.baseUri;
+            if assigned(TdomAttr(self).ownerElement.parentNode)
+              then result := TdomAttr(self).ownerElement.parentNode.baseUri;
+          end else result := TdomAttr(self).ownerElement.baseUri;
         end;
       end;
     ntEntity_Node, ntNotation_Node:
@@ -7790,7 +7599,8 @@ begin
   while assigned(nodeToTest) do begin
     if (nodeToTest.nodeType = ntElement_Node)
       and (nodeToTest.namespaceURI = namespaceURI)
-      and (nodeToTest.localName = localName) then begin
+      and (nodeToTest.localName = localName)
+      then begin
       result := (nodeToTest as TdomElement);
       exit;
     end;
@@ -7804,35 +7614,30 @@ var
 begin
   case nodeType of
     ntElement_Node: begin
-        if isNamespaceNode then
-          attr := TdomElement(self).getAttributeNodeNS('http://www.w3.org/XML/1998/namespace', 'lang')
-        else
-          attr := TdomElement(self).getAttributeNode('xml:lang');
+        if isNamespaceNode
+          then attr := TdomElement(self).getAttributeNodeNS('http://www.w3.org/XML/1998/namespace', 'lang')
+        else attr := TdomElement(self).getAttributeNode('xml:lang');
         if assigned(attr) then begin
           result := attr.value;
         end else begin
-          if assigned(parentNode) then
-            result := parentNode.language
-          else
-            result := '';
+          if assigned(parentNode)
+            then result := parentNode.language
+          else result := '';
         end; {if ... else ...}
       end;
     ntText_Node, ntCDATA_Section_Node, ntEntity_Reference_Node,
       ntProcessing_Instruction_Node, ntComment_Node:
-      if assigned(parentNode) then
-        result := parentNode.language
-      else
-        result := '';
+      if assigned(parentNode)
+        then result := parentNode.language
+      else result := '';
     ntAttribute_Node:
-      if assigned(TdomAttr(self).ownerElement) then
-        result := TdomAttr(self).ownerElement.language
-      else
-        result := '';
+      if assigned(TdomAttr(self).ownerElement)
+        then result := TdomAttr(self).ownerElement.language
+      else result := '';
     ntXPath_Namespace_Node:
-      if assigned(TdomXPathNamespace(self).ownerElement) then
-        result := TdomXPathNamespace(self).ownerElement.language
-      else
-        result := '';
+      if assigned(TdomXPathNamespace(self).ownerElement)
+        then result := TdomXPathNamespace(self).ownerElement.language
+      else result := '';
   else
     result := '';
   end;
@@ -7868,7 +7673,8 @@ begin
   while assigned(nodeToTest) do begin
     if (nodeToTest.nodeType = ntElement_Node)
       and (nodeToTest.namespaceURI = namespaceURI)
-      and (nodeToTest.localName = localName) then begin
+      and (nodeToTest.localName = localName)
+      then begin
       result := (nodeToTest as TdomElement);
       exit;
     end;
@@ -7880,10 +7686,8 @@ function TdomNode.getLevel: integer;
 begin
   if Assigned(parentNode) then begin
     Result := parentNode.level;
-    if Result > -1 then
-      Inc(Result);
-  end else
-    Result := -1;
+    if Result > -1 then Inc(Result);
+  end else Result := -1;
 end;
 
 function TdomNode.getLocalName: wideString;
@@ -7926,7 +7730,8 @@ begin
   while assigned(nodeToTest) do begin
     if (nodeToTest.nodeType = ntElement_Node)
       and (nodeToTest.namespaceURI = namespaceURI)
-      and (nodeToTest.localName = localName) then begin
+      and (nodeToTest.localName = localName)
+      then begin
       result := (nodeToTest as TdomElement);
       exit;
     end;
@@ -7974,7 +7779,8 @@ begin
   while assigned(nodeToTest) do begin
     if (nodeToTest.nodeType = ntElement_Node)
       and (nodeToTest.namespaceURI = namespaceURI)
-      and (nodeToTest.localName = localName) then begin
+      and (nodeToTest.localName = localName)
+      then begin
       result := (nodeToTest as TdomElement);
       exit;
     end;
@@ -8022,7 +7828,8 @@ begin
   while assigned(nodeToTest) do begin
     if (nodeToTest.nodeType = ntElement_Node)
       and (nodeToTest.namespaceURI = namespaceURI)
-      and (nodeToTest.localName = localName) then begin
+      and (nodeToTest.localName = localName)
+      then begin
       result := (nodeToTest as TdomElement);
       exit;
     end;
@@ -8036,12 +7843,10 @@ var
 begin
   if Assigned(FUserData) then begin
     with FUserData do
-      if Find(Key, Index) then
-        Result := Objects[Index]
-      else
-        Result := nil;
-  end else
-    Result := nil;
+      if Find(Key, Index)
+        then Result := Objects[Index]
+      else Result := nil;
+  end else Result := nil;
 end;
 
 function TdomNode.getReferenceDocument: TdomDocument;
@@ -8055,12 +7860,10 @@ var
 begin
   if assigned(ReferenceDocument) then begin
     DomImpl := ReferenceDocument.DomImplementation;
-    if assigned(DomImpl) then
-      Result := DomImpl.TabWidth
-    else
-      Result := 1;
-  end else
-    Result := 1;
+    if assigned(DomImpl)
+      then Result := DomImpl.TabWidth
+    else Result := 1;
+  end else Result := 1;
 end;
 
 function TdomNode.getTextContent: wideString;
@@ -8101,10 +7904,9 @@ begin
     ntAttribute_Node, ntComment_Node, ntProcessing_Instruction_Node, ntText_Node:
       result := nodeValue;
     ntDocument_Node:
-      if assigned(TdomDocument(self).documentElement) then
-        result := TdomDocument(self).documentElement.textContent
-      else
-        result := '';
+      if assigned(TdomDocument(self).documentElement)
+        then result := TdomDocument(self).documentElement.textContent
+      else result := '';
     ntXPath_Namespace_Node:
       result := namespaceUri;
   else
@@ -8135,12 +7937,9 @@ begin
   for i := 0 to pred(childnodes.length) do
     with childnodes.item(i) do
       if (nodeType = ntEntity_Reference_Node)
-        and (nodeName = EntName) then
-        result := true
-      else if HasEntRef(EntName) then begin
-        result := true;
-        exit;
-      end;
+        and (nodeName = EntName)
+        then result := true
+      else if HasEntRef(EntName) then begin result := true; exit; end;
 end;
 
 function TdomNode.insertBefore(const newChild,
@@ -8157,18 +7956,16 @@ begin
       insertBefore(newChild.childNodes.item(0), refChild);
     result := newChild;
 
-  end else
-    result := (inherited insertBefore(newChild, refChild) as TdomNode);
+  end else result := (inherited insertBefore(newChild, refChild) as TdomNode);
 end;
 
 function TdomNode.lookupNamespaceURI(const aPrefix: wideString): wideString;
 begin
-  if APrefix = 'xml' then
-    Result := 'http://www.w3.org/XML/1998/namespace'
-  else if APrefix = 'xmlns' then
-    Result := 'http://www.w3.org/2000/xmlns/'
-  else
-    Result := '';
+  if APrefix = 'xml'
+    then Result := 'http://www.w3.org/XML/1998/namespace'
+  else if APrefix = 'xmlns'
+    then Result := 'http://www.w3.org/2000/xmlns/'
+  else Result := '';
 end;
 
 procedure TdomNode.makeChildrenReadonly;
@@ -8204,8 +8001,7 @@ begin
       result := newNode;
       newNode := newNode.lastChild;
     end;
-  end else
-    result := parentNode;
+  end else result := parentNode;
 end;
 
 function TdomNode.removeChild(const oldChild: TdomNode): TdomNode;
@@ -8230,11 +8026,9 @@ begin
       result := replaceChild(lastFragmentChild, oldChild);
       while newChild.hasChildNodes do
         insertBefore(newChild.childNodes.item(0), lastFragmentChild);
-    end else
-      result := removeChild(oldChild);
+    end else result := removeChild(oldChild);
 
-  end else
-    result := (inherited replace(newChild, oldChild) as TdomNode);
+  end else result := (inherited replace(newChild, oldChild) as TdomNode);
 end;
 
 function TdomNode.resolveEntityReferences(const opt: TdomEntityResolveOption): integer;
@@ -8255,17 +8049,15 @@ begin
   if assigned(referenceDocument) then begin
     domImpl := referenceDocument.domImplementation;
     uri := referenceDocument.documentUri;
-  end else
-    domImpl := nil;
+  end else domImpl := nil;
 
   error := TdomError.Create(XmlErrorType, -1, -1, -1, -1, -1, -1, -1, -1, uri, nil, relNode, '');
   try
     if assigned(domImpl) then begin
       result := domImpl.handleError(domImpl, error);
-    end else if error.severity = DOM_SEVERITY_FATAL_ERROR then
-      result := false
-    else
-      result := true;
+    end else if error.severity = DOM_SEVERITY_FATAL_ERROR
+      then result := false
+    else result := true;
   finally
     error.free;
   end;
@@ -8342,13 +8134,15 @@ begin
   Result := false;
   VersionStr := WideCharToString(PWideChar(feature));
   if (WideCharToString(PWideChar(version)) = '1.0')
-    or (WideCharToString(PWideChar(version)) = '') then begin
-    if (CompareText(VersionStr, 'XML') = 0) then
-      Result := true;
+    or (WideCharToString(PWideChar(version)) = '')
+    then begin
+    if (CompareText(VersionStr, 'XML') = 0)
+      then Result := true;
   end else begin
-    if (WideCharToString(PWideChar(version)) = '2.0') then begin
-      if (CompareText(VersionStr, 'XML') = 0) then
-        Result := true;
+    if (WideCharToString(PWideChar(version)) = '2.0')
+      then begin
+      if (CompareText(VersionStr, 'XML') = 0)
+        then Result := true;
     end; {if ...}
   end; {if ... else ...}
 end;
@@ -8374,6 +8168,8 @@ begin
   end;
 end;
 
+
+
 //+++++++++++++++++++++++++ TdomCharacterData ++++++++++++++++++++++++++++
 
 constructor TdomCharacterData.create(const aOwner: TdomDocument);
@@ -8384,8 +8180,8 @@ end;
 
 procedure TdomCharacterData.appendData(const arg: wideString);
 begin
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   Data := concat(Data, arg);
 end;
 
@@ -8397,8 +8193,8 @@ end;
 
 procedure TdomCharacterData.doCharacterDataModified;
 begin
-  if assigned(referenceDocument) then
-    referenceDocument.doCharacterDataModified(self);
+  if assigned(referenceDocument)
+    then referenceDocument.doCharacterDataModified(self);
 end;
 
 function TdomCharacterData.getData: wideString;
@@ -8424,15 +8220,14 @@ var
   len: integer;
   Data1, Data2: wideString;
 begin
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
-  if (offset < 0) or (offset > Length) or (count < 0) then
-    raise EIndex_Size_Err.create('Index size error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if (offset < 0) or (offset > Length) or (count < 0)
+    then raise EIndex_Size_Err.create('Index size error.');
   // Make sure, that the length of the wideString is not
   // exeeded, when using count and offset:
   len := Length - Offset;
-  if count < len then
-    len := count;
+  if count < len then len := count;
   Data1 := SubstringData(0, offset);
   Data2 := SubstringData(offset + len, Length - offset - len);
   Data := concat(Data1, arg, Data2);
@@ -8452,15 +8247,16 @@ function TdomCharacterData.substringData(const offset,
 var
   len: integer;
 begin
-  if (offset < 0) or (offset > Length) or (count < 0) then
-    raise EIndex_Size_Err.create('Index size error.');
+  if (offset < 0) or (offset > Length) or (count < 0)
+    then raise EIndex_Size_Err.create('Index size error.');
   // Make sure, that the length of the wideString is not
   // exeeded, when using count and offset:
   len := Length - Offset;
-  if count < len then
-    len := count;
+  if count < len then len := count;
   setString(Result, PWideChar(Data) + Offset, len);
 end;
+
+
 
 // +++++++++++++++++++++++++++++ TdomAttr +++++++++++++++++++++++++++++
 
@@ -8468,15 +8264,14 @@ constructor TdomAttr.create(const aOwner: TdomDocument;
   const name: wideString;
   const spcfd: boolean);
 begin
-  if not IsXmlName(name) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(name)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner);
   if isXmlDefaultAttName(name) then begin
     FIsXmlnsDecl := NSDT_DEFAULT;
   end else if isXmlPrefixedAttName(name) then begin
     FIsXmlnsDecl := NSDT_PREFIXED;
-  end else
-    FIsXmlnsDecl := NSDT_NONE;
+  end else FIsXmlnsDecl := NSDT_NONE;
   FNodeName := name;
   FNodeValue := '';
   FPrefix := '';
@@ -8492,25 +8287,23 @@ var
   locName, prfx: wideString;
 begin
   if not xmlExtractPrefixAndLocalName(qualifiedName, prfx, locName) then begin
-    if not IsXmlName(qualifiedName) then
-      raise EInvalid_Character_Err.create('Invalid character error.')
-    else
-      raise ENamespace_Err.create('Namespace error.');
+    if not IsXmlName(qualifiedName)
+      then raise EInvalid_Character_Err.create('Invalid character error.')
+    else raise ENamespace_Err.create('Namespace error.');
   end;
   if prfx = 'xmlns' then begin
-    if not (namespaceURI = 'http://www.w3.org/2000/xmlns/') then
-      raise ENamespace_Err.create('Namespace error.');
+    if not (namespaceURI = 'http://www.w3.org/2000/xmlns/')
+      then raise ENamespace_Err.create('Namespace error.');
     FIsXmlnsDecl := NSDT_PREFIXED;
   end else if qualifiedName = 'xmlns' then begin
-    if not (namespaceURI = 'http://www.w3.org/2000/xmlns/') then
-      raise ENamespace_Err.create('Namespace error.');
+    if not (namespaceURI = 'http://www.w3.org/2000/xmlns/')
+      then raise ENamespace_Err.create('Namespace error.');
     FIsXmlnsDecl := NSDT_DEFAULT;
-  end else
-    FIsXmlnsDecl := NSDT_NONE;
-  if (namespaceURI = '') and (prfx <> '') then
-    raise ENamespace_Err.create('Namespace error.');
-  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+  end else FIsXmlnsDecl := NSDT_NONE;
+  if (namespaceURI = '') and (prfx <> '')
+    then raise ENamespace_Err.create('Namespace error.');
+  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   inherited create(aOwner);
   FNodeName := qualifiedName;
   FNamespaceURI := namespaceURI;
@@ -8594,12 +8387,10 @@ var
 begin
   if Assigned(FOwnerMap) then begin
     Node := FOwnerMap.OwnerNode;
-    if Node.NodeType = ntElement_Node then
-      Result := (Node as TdomElement)
-    else
-      Result := nil;
-  end else
-    Result := nil;
+    if Node.NodeType = ntElement_Node
+      then Result := (Node as TdomElement)
+    else Result := nil;
+  end else Result := nil;
 end;
 
 function TdomAttr.getPrefix: wideString;
@@ -8624,16 +8415,15 @@ end;
 
 function TdomAttr.lookupNamespaceURI(const aPrefix: wideString): wideString;
 begin
-  if Assigned(OwnerElement) then
-    Result := OwnerElement.LookupNamespaceURI(APrefix)
-  else
-    Result := inherited LookupNamespaceURI(APrefix);
+  if Assigned(OwnerElement)
+    then Result := OwnerElement.LookupNamespaceURI(APrefix)
+  else Result := inherited LookupNamespaceURI(APrefix);
 end;
 
 procedure TdomAttr.doAttrModified(const attrChange: TdomAttrChange);
 begin
-  if assigned(ownerElement) then
-    ownerElement.doAttrModified(ownerElement, attrChange, self);
+  if assigned(ownerElement)
+    then ownerElement.doAttrModified(ownerElement, attrChange, self);
 end;
 
 procedure TdomAttr.setNodeValue(const value: wideString);
@@ -8644,36 +8434,34 @@ end;
 
 procedure TdomAttr.setPrefix(const value: wideString);
 begin
-  if not isXmlName(value) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
-  if not isXmlPrefix(value) then
-    raise ENamespace_Err.create('Namespace error.');
-  if namespaceURI = '' then
-    raise ENamespace_Err.create('Namespace error.');
-  if (value = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+  if not isXmlName(value)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if not isXmlPrefix(value)
+    then raise ENamespace_Err.create('Namespace error.');
+  if namespaceURI = ''
+    then raise ENamespace_Err.create('Namespace error.');
+  if (value = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   if (value = 'xmlns')
-    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/') then
-    raise ENamespace_Err.create('Namespace error.');
-  if NodeName = 'xmlns' then
-    raise ENamespace_Err.create('Namespace error.');
+    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/')
+    then raise ENamespace_Err.create('Namespace error.');
+  if NodeName = 'xmlns'
+    then raise ENamespace_Err.create('Namespace error.');
   FPrefix := value;
   FNodeName := concat(value, ':', localName);
 end;
 
 function TdomAttr.validateIDREFS: boolean;
-
-function isValidIDREF(const idrefValue: wideString): boolean;
+  function isValidIDREF(const idrefValue: wideString): boolean;
   var
     dummyIndex: integer;
   begin
     if not referenceDocument.IDs.find(idrefValue, dummyIndex) then begin
       result := false;
       sendErrorNotification(ET_TARGET_ID_VALUE_NOT_FOUND, self);
-    end else
-      result := true;
+    end else result := true;
   end;
 
 const
@@ -8699,31 +8487,29 @@ begin
   if assigned(OwnerElement) then begin
     case referenceDocument.GetAttrType(OwnerElement.nodeName, nodename) of
 
-      AS_IDREF_DATATYPE: begin
+      AS_IDREF_DATATYPE:
+        begin
           if isXMLName(attriValue) then begin
-            if not isValidIDREF(attriValue) then
-              result := false;
-          end else
-            TypeMismatch := true;
+            if not isValidIDREF(attriValue)
+              then result := false;
+          end else TypeMismatch := true;
         end;
 
-      AS_IDREFS_DATATYPE: begin
+      AS_IDREFS_DATATYPE:
+        begin
           if isXMLNames(attriValue) then begin
-            startIndex := 1;
-            indexCount := 0;
+            startIndex := 1; indexCount := 0;
             for i := 1 to length(attriValue) do begin
               if attriValue[i] = SPACE then begin
-                if not isValidIDREF(copy(attriValue, startIndex, IndexCount)) then
-                  result := false;
+                if not isValidIDREF(copy(attriValue, startIndex, IndexCount))
+                  then result := false;
                 startIndex := succ(i);
                 indexCount := 0;
-              end else
-                inc(indexCount);
+              end else inc(indexCount);
             end;
-            if not isValidIDREF(copy(attriValue, startIndex, IndexCount)) then
-              result := false;
-          end else
-            TypeMismatch := true;
+            if not isValidIDREF(copy(attriValue, startIndex, IndexCount))
+              then result := false;
+          end else TypeMismatch := true;
         end;
 
     end; {case ...}
@@ -8736,13 +8522,15 @@ begin
 
 end;
 
+
+
 //++++++++++++++++++++++++++++ TdomElement ++++++++++++++++++++++++++++++++
 
 constructor TdomElement.create(const aOwner: TdomDocument;
   const tagName: wideString);
 begin
-  if not IsXmlName(tagName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(tagName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner);
   FNodeName := tagName;
   FNodeValue := '';
@@ -8767,15 +8555,14 @@ var
   locName, prfx: wideString;
 begin
   if not xmlExtractPrefixAndLocalName(qualifiedName, prfx, locName) then begin
-    if not IsXmlName(qualifiedName) then
-      raise EInvalid_Character_Err.create('Invalid character error.')
-    else
-      raise ENamespace_Err.create('Namespace error.');
+    if not IsXmlName(qualifiedName)
+      then raise EInvalid_Character_Err.create('Invalid character error.')
+    else raise ENamespace_Err.create('Namespace error.');
   end;
-  if (namespaceURI = '') and (prfx <> '') then
-    raise ENamespace_Err.create('Namespace error.');
-  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+  if (namespaceURI = '') and (prfx <> '')
+    then raise ENamespace_Err.create('Namespace error.');
+  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   inherited create(aOwner);
   FNodeName := qualifiedName;
   FNamespaceURI := namespaceURI;
@@ -8805,11 +8592,11 @@ begin
   FAttributeList.free;
   FAttributeList := nil;
   FAttributeListing.free;
-  if assigned(FCreatedElementsNodeLists) then
-    for i := 0 to pred(FCreatedElementsNodeLists.Count) do
+  if assigned(FCreatedElementsNodeLists)
+    then for i := 0 to pred(FCreatedElementsNodeLists.Count) do
       TdomElementsNodeList(FCreatedElementsNodeLists[i]).free;
-  if assigned(FCreatedElementsNodeListNSs) then
-    for i := 0 to pred(FCreatedElementsNodeListNSs.Count) do
+  if assigned(FCreatedElementsNodeListNSs)
+    then for i := 0 to pred(FCreatedElementsNodeListNSs.Count) do
       TdomElementsNodeListNS(FCreatedElementsNodeListNSs[i]).free;
   FCreatedElementsNodeLists.free;
   FCreatedElementsNodeListNSs.free;
@@ -8820,8 +8607,8 @@ procedure TdomElement.doAttrModified(const originalTarget: TdomNode;
   const attrChange: TdomAttrChange;
   const relatedAttr: TdomAttr);
 begin
-  if assigned(referenceDocument) then
-    referenceDocument.doAttrModified(originalTarget, attrChange, relatedAttr);
+  if assigned(referenceDocument)
+    then referenceDocument.doAttrModified(originalTarget, attrChange, relatedAttr);
 end;
 
 procedure TdomElement.doBeforeClear;
@@ -8850,10 +8637,9 @@ var
 begin
   attr := getAttributeNode(name);
     // Raises ENamespace_Err, if attributes.namespaceAware is 'true'.
-  if assigned(attr) then
-    result := attr.nodeValue
-  else
-    result := '';
+  if assigned(attr)
+    then result := attr.nodeValue
+  else result := '';
 end;
 
 function TdomElement.getAttributeNode(const name: wideString): TdomAttr;
@@ -8880,8 +8666,7 @@ begin
     except
       raise EConvertError.Create('Literal attribute value cannot be resolved.');
     end;
-  end else
-    result := '';
+  end else result := '';
 end;
 
 function TdomElement.getAttributeNSLiteralValue(const namespaceURI,
@@ -8890,10 +8675,9 @@ var
   attr: TdomAttr;
 begin
   attr := getAttributeNodeNS(namespaceURI, localName); // Raises ENamespace_Err, if attributes.namespaceAware is 'false'.
-  if assigned(attr) then
-    result := attr.nodeValue
-  else
-    result := '';
+  if assigned(attr)
+    then result := attr.nodeValue
+  else result := '';
 end;
 
 function TdomElement.getAttributeNSNormalizedValue(const namespaceURI,
@@ -8908,8 +8692,7 @@ begin
     except
       raise EConvertError.Create('Literal attribute value cannot be resolved.');
     end;
-  end else
-    result := '';
+  end else result := '';
 end;
 
 function TdomElement.getElementsByTagName(const name: wideString): TdomNodeList;
@@ -8917,10 +8700,8 @@ var
   i: integer;
 begin
   for i := 0 to FCreatedElementsNodeLists.Count - 1 do
-    if TdomElementsNodeList(FCreatedElementsNodeLists[i]).FQueryName = name then begin
-      Result := TdomElementsNodeList(FCreatedElementsNodeLists[i]);
-      exit;
-    end;
+    if TdomElementsNodeList(FCreatedElementsNodeLists[i]).FQueryName = name
+      then begin Result := TdomElementsNodeList(FCreatedElementsNodeLists[i]); exit; end;
   Result := TdomElementsNodeList.create(name, self);
   FCreatedElementsNodeLists.add(Result);
 end;
@@ -8933,10 +8714,8 @@ var
 begin
   for i := 0 to FCreatedElementsNodeListNSs.Count - 1 do begin
     nl := TdomElementsNodeListNS(FCreatedElementsNodeListNSs[i]);
-    if (nl.FQueryNamespaceURI = namespaceURI) and (nl.FQueryLocalName = localName) then begin
-      Result := nl;
-      exit;
-    end;
+    if (nl.FQueryNamespaceURI = namespaceURI) and (nl.FQueryLocalName = localName)
+      then begin Result := nl; exit; end;
   end;
   Result := TdomElementsNodeListNS.create(namespaceURI, localName, self);
   FCreatedElementsNodeListNSs.add(Result);
@@ -9004,10 +8783,9 @@ begin
             Exit;
           end;
   end;
-  if Assigned(ParentNode) then
-    Result := ParentNode.LookupNamespaceURI(APrefix)
-  else
-    Result := inherited LookupNamespaceURI(APrefix);
+  if Assigned(ParentNode)
+    then Result := ParentNode.LookupNamespaceURI(APrefix)
+  else Result := inherited LookupNamespaceURI(APrefix);
 end;
 
 procedure TdomElement.normalize;
@@ -9018,15 +8796,18 @@ begin
   {normalize text:}
   PrevNode := nil;
   i := ChildNodes.Length;
-  while i > 0 do begin
+  while i > 0 do
+  begin
     Dec(i);
     CurrentNode := ChildNodes.Item(i);
-    if (CurrentNode.NodeType = ntText_Node) then begin
+    if (CurrentNode.NodeType = ntText_Node) then
+    begin
       if (Assigned(PrevNode)) and (PrevNode.NodeType = ntText_Node) then begin
         (CurrentNode as TdomText).AppendData((PrevNode as TdomText).Data);
         PrevNode.free; // Removes and frees the node.
       end;
-    end else // no text node, then normalize
+    end
+    else // no text node, then normalize
       CurrentNode.normalize;
     PrevNode := CurrentNode;
   end;
@@ -9110,8 +8891,7 @@ begin
         finally
           parser.free;
         end;
-        if hasEntRefs then
-          normalize;
+        if hasEntRefs then normalize;
       end;
     erExpand: begin
         for i := 0 to pred(ChildNodes.Length) do begin
@@ -9131,8 +8911,8 @@ function TdomElement.setAttribute(const name,
 var
   attr: TdomAttr;
 begin
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   attr := getAttributeNode(name);
     // Raises ENamespace_Err, if attributes.namespaceAware is 'true'.
   if assigned(attr) then begin
@@ -9153,21 +8933,20 @@ var
   attr: TdomAttr;
   prfx, localname: wideString;
 begin
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   if not xmlExtractPrefixAndLocalName(qualifiedName, prfx, localName) then begin
-    if not IsXmlName(qualifiedName) then
-      raise EInvalid_Character_Err.create('Invalid character error.')
-    else
-      raise ENamespace_Err.create('Namespace error.');
+    if not IsXmlName(qualifiedName)
+      then raise EInvalid_Character_Err.create('Invalid character error.')
+    else raise ENamespace_Err.create('Namespace error.');
   end;
   if (((prfx = 'xmlns') or (qualifiedName = 'xmlns'))
-    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/')) then
-    raise ENamespace_Err.create('Namespace error.');
-  if (namespaceURI = '') and (prfx <> '') then
-    raise ENamespace_Err.create('Namespace error.');
-  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/'))
+    then raise ENamespace_Err.create('Namespace error.');
+  if (namespaceURI = '') and (prfx <> '')
+    then raise ENamespace_Err.create('Namespace error.');
+  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   attr := getAttributeNodeNS(namespaceURI, localName);
     // Raises ENamespace_Err, if attributes.namespaceAware is 'false'.
   if assigned(attr) then begin
@@ -9188,8 +8967,8 @@ var
 begin
   attrModified := newAttr.ownerElement = nil;
   result := (attributes.setNamedItem(newAttr) as TdomAttr); // Raises all required exceptions.
-  if attrModified then
-    doAttrModified(self, AC_ADDITION, newAttr);
+  if attrModified
+    then doAttrModified(self, AC_ADDITION, newAttr);
 end;
 
 function TdomElement.setAttributeNodeNS(const newAttr: TdomAttr): TdomAttr;
@@ -9198,8 +8977,8 @@ var
 begin
   attrModified := newAttr.ownerElement = nil;
   result := (attributes.setNamedItemNS(newAttr) as TdomAttr); // Raises all required exceptions.
-  if attrModified then
-    doAttrModified(self, AC_ADDITION, newAttr);
+  if attrModified
+    then doAttrModified(self, AC_ADDITION, newAttr);
 end;
 
 procedure TdomElement.setNodeValue(const value: wideString);
@@ -9209,16 +8988,16 @@ end;
 
 procedure TdomElement.setPrefix(const value: wideString);
 begin
-  if not isXmlName(value) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
-  if not isXmlPrefix(value) then
-    raise ENamespace_Err.create('Namespace error.');
-  if namespaceURI = '' then
-    raise ENamespace_Err.create('Namespace error.');
-  if (value = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+  if not isXmlName(value)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if not isXmlPrefix(value)
+    then raise ENamespace_Err.create('Namespace error.');
+  if namespaceURI = ''
+    then raise ENamespace_Err.create('Namespace error.');
+  if (value = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   FPrefix := value;
   FNodeName := concat(value, ':', localName);
 end;
@@ -9248,14 +9027,16 @@ begin
 
   // Validate attributes:
   for I := 0 to Pred(Attributes.Length) do
-    if not Attributes.Item(I).ValidateIDREFS then
-      Result := False;
+    if not Attributes.Item(I).ValidateIDREFS
+      then Result := False;
 
   // Validate child elements:
   for I := 0 to Pred(Childnodes.Length) do
     if not Childnodes.Item(I).ValidateIDREFS then
       Result := False;
 end;
+
+
 
 //+++++++++++++++++++++++++++++ TdomText +++++++++++++++++++++++++++++++++
 
@@ -9271,8 +9052,7 @@ var
   pNode: TdomNode;
 begin
   result := false;
-  if not (isXMLS(nodeValue) or (nodeValue = '')) then
-    exit;
+  if not (isXMLS(nodeValue) or (nodeValue = '')) then exit;
   pNode := parentNode;
   while assigned(pNode) do begin
     case pNode.nodeType of
@@ -9300,15 +9080,16 @@ end;
 
 function TdomText.SplitText(const offset: integer): TdomText;
 begin
-  if isReadonly then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
-  if (offset < 0) or (offset > Length) then
-    raise EIndex_Size_Err.create('Index size error.');
+  if isReadonly
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if (offset < 0) or (offset > Length)
+    then raise EIndex_Size_Err.create('Index size error.');
   Result := referenceDocument.CreateTextNode(SubstringData(offset, length - offset));
   DeleteData(offset, length - offset);
-  if assigned(ParentNode) then
-    ParentNode.insertBefore(Result, self.NextSibling);
+  if assigned(ParentNode) then ParentNode.insertBefore(Result, self.NextSibling);
 end;
+
+
 
 //++++++++++++++++++++++++++++ TdomComment +++++++++++++++++++++++++++++++
 
@@ -9329,13 +9110,15 @@ begin
   Result := ntComment_Node;
 end;
 
+
+
 //+++++++++++++++++++++ TdomProcessingInstruction +++++++++++++++++++++++++
 
 constructor TdomProcessingInstruction.create(const aOwner: TdomDocument;
   const targ: wideString);
 begin
-  if not IsXmlPITarget(targ) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlPITarget(targ)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner);
   FTarget := targ;
   FNodeValue := '';
@@ -9344,8 +9127,8 @@ end;
 
 procedure TdomProcessingInstruction.doCharacterDataModified;
 begin
-  if assigned(referenceDocument) then
-    referenceDocument.doCharacterDataModified(self);
+  if assigned(referenceDocument)
+    then referenceDocument.doCharacterDataModified(self);
 end;
 
 function TdomProcessingInstruction.getData: wideString;
@@ -9377,6 +9160,8 @@ begin
   doCharacterDataModified;
 end;
 
+
+
 //++++++++++++++++++++++++++ TdomCDATASection +++++++++++++++++++++++++++++
 
 constructor TdomCDATASection.create(const aOwner: TdomDocument);
@@ -9394,6 +9179,8 @@ function TdomCDATASection.getNodeType: TdomNodeType;
 begin
   Result := ntCDATA_Section_Node;
 end;
+
+
 
 //++++++++++++++++++++++++ TdomDocumentTypeDecl +++++++++++++++++++++++++++
 
@@ -9479,12 +9266,10 @@ begin
       intSubsetStartColumn, intSubsetStartLine, publicId, systemId,
       FDtdModel);
     if result then begin
-      if stopAtExtDecl then
-        FPreparationStatus := PS_INCOMPLETE
-      else
-        FPreparationStatus := PS_SUCCESSFUL;
-    end else
-      FPreparationStatus := PS_UNSUCCESSFUL;
+      if stopAtExtDecl
+        then FPreparationStatus := PS_INCOMPLETE
+      else FPreparationStatus := PS_SUCCESSFUL;
+    end else FPreparationStatus := PS_UNSUCCESSFUL;
   finally
     DtdToASParser.free;
   end;
@@ -9494,6 +9279,8 @@ procedure TdomDocumentTypeDecl.setNodeValue(const value: wideString);
 begin
   // Do nothing.
 end;
+
+
 
 //++++++++++++++++++++++++++ TdomDocumentType +++++++++++++++++++++++++++++
 
@@ -9528,8 +9315,8 @@ end;
 
 procedure TdomDocumentType.attachOwnerDocument(const doc: TdomDocument);
 begin
-  if assigned(FOwnerDocument) then
-    raise EWrong_Document_Err.create('Wrong document error.');
+  if assigned(FOwnerDocument)
+    then raise EWrong_Document_Err.create('Wrong document error.');
   FOwnerDocument := doc;
   doc.FDoctype := self;
 end;
@@ -9592,6 +9379,9 @@ begin
   // Do nothing.
 end;
 
+
+
+
 //++++++++++++++++++++++++++ TdomNotation ++++++++++++++++++++++++++++++
 
 constructor TdomNotation.create(const aOwner: TdomDocument;
@@ -9599,12 +9389,12 @@ constructor TdomNotation.create(const aOwner: TdomDocument;
   pubId,
   sysId: wideString);
 begin
-  if not IsXmlName(name) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlSystemChars(sysId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlPubidChars(publicId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(name)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlSystemChars(sysId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlPubidChars(publicId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner);
   FNodeName := name;
   FNodeValue := '';
@@ -9628,6 +9418,8 @@ begin
   // Do nothing.
 end;
 
+
+
 //+++++++++++++++++++++++++++ TdomEntity +++++++++++++++++++++++++++++++++
 
 constructor TdomEntity.create(const aOwner: TdomDocument;
@@ -9636,12 +9428,12 @@ constructor TdomEntity.create(const aOwner: TdomDocument;
   sysId,
   notaName: wideString);
 begin
-  if not IsXmlName(name) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlSystemChars(sysId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlPubidChars(pubId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(name)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlSystemChars(sysId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlPubidChars(pubId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner);
   FInputEncoding := '';
   FNodeName := name;
@@ -9661,8 +9453,8 @@ end;
 
 function TdomEntity.appendChild(const newChild: TdomNode): TdomNode;
 begin
-  if (publicId <> '') or (systemId <> '') then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if (publicId <> '') or (systemId <> '')
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   Result := inherited appendChild(newChild);
 end;
 
@@ -9684,16 +9476,16 @@ end;
 function TdomEntity.insertBefore(const newChild,
   refChild: TdomNode): TdomNode;
 begin
-  if (publicId <> '') or (systemId <> '') then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if (publicId <> '') or (systemId <> '')
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   Result := inherited insertBefore(newChild, refChild);
 end;
 
 function TdomEntity.replaceChild(const newChild,
   oldChild: TdomNode): TdomNode;
 begin
-  if (publicId <> '') or (systemId <> '') then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if (publicId <> '') or (systemId <> '')
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   Result := inherited replaceChild(newChild, oldChild);
 end;
 
@@ -9702,13 +9494,15 @@ begin
   // Do nothing
 end;
 
+
+
 //++++++++++++++++++++++++ TdomEntityReference +++++++++++++++++++++++++
 
 constructor TdomEntityReference.create(const aOwner: TdomDocument;
   const name: wideString);
 begin
-  if not IsXmlName(name) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(name)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner);
   setReadOnly(true);
   FNodeName := name;
@@ -9786,6 +9580,8 @@ begin
   result := inherited cloneNode(deep);
 end;
 
+
+
 //++++++++++++++++++++++++ TdomDocumentFragment +++++++++++++++++++++++++++
 
 constructor TdomDocumentFragment.create(const aOwner: TdomDocument);
@@ -9835,6 +9631,8 @@ begin
   // Do nothing.
 end;
 
+
+
 //+++++++++++++++++++++++++ TdomXPathNamespace ++++++++++++++++++++++++++++
 
 constructor TdomXPathNamespace.create(const aOwnerSet: TdomXPathNodeSetResult;
@@ -9842,14 +9640,14 @@ constructor TdomXPathNamespace.create(const aOwnerSet: TdomXPathNodeSetResult;
   const aNamespaceUri,
   aPrefix: wideString);
 begin
-  if not (IsXmlPrefix(aPrefix) or (aPrefix = '')) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if ((aPrefix = 'xmlns') and not (aNamespaceURI = 'http://www.w3.org/2000/xmlns/')) then
-    raise ENamespace_Err.create('Namespace error.');
-  if (aNamespaceURI = '') and (aPrefix <> '') then
-    raise ENamespace_Err.create('Namespace error.');
-  if (aPrefix = 'xml') and (aNamespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
+  if not (IsXmlPrefix(aPrefix) or (aPrefix = ''))
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if ((aPrefix = 'xmlns') and not (aNamespaceURI = 'http://www.w3.org/2000/xmlns/'))
+    then raise ENamespace_Err.create('Namespace error.');
+  if (aNamespaceURI = '') and (aPrefix <> '')
+    then raise ENamespace_Err.create('Namespace error.');
+  if (aPrefix = 'xml') and (aNamespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
   inherited create(aOwnerSet);
   FAllowedChildTypes := [];
   setReadOnly(true);
@@ -9860,10 +9658,9 @@ end;
 
 function TdomXPathNamespace.getDocument: TdomDocument;
 begin
-  if assigned(FOwnerElement) then
-    result := FOwnerElement.referenceDocument
-  else
-    result := nil;
+  if assigned(FOwnerElement)
+    then result := FOwnerElement.referenceDocument
+  else result := nil;
 end;
 
 function TdomXPathNamespace.getExpandedName: wideString;
@@ -9913,11 +9710,12 @@ end;
 
 function TdomXPathNamespace.lookupNamespaceURI(const aPrefix: wideString): wideString;
 begin
-  if Assigned(OwnerElement) then
-    Result := OwnerElement.LookupNamespaceURI(APrefix)
-  else
-    Result := inherited LookupNamespaceURI(APrefix);
+  if Assigned(OwnerElement)
+    then Result := OwnerElement.LookupNamespaceURI(APrefix)
+  else Result := inherited LookupNamespaceURI(APrefix);
 end;
+
+
 
 //++++++++++++++++++++++++++++ TdomDocument +++++++++++++++++++++++++++++++
 
@@ -9925,15 +9723,15 @@ constructor TdomDocument.create(const aOwner: TDomImplementation;
   const aDoctype: TdomDocumentType);
 begin
   if assigned(aDoctype) then begin
-    if not assigned(aOwner) then
-      raise EWrong_Document_Err.create('Wrong document error.');
-    if assigned(aDoctype.referenceDocument) or (aOwner.documentTypes.IndexOf(aDoctype) = -1) then
-      raise EWrong_Document_Err.create('Wrong document error.');
+    if not assigned(aOwner)
+      then raise EWrong_Document_Err.create('Wrong document error.');
+    if assigned(aDoctype.referenceDocument) or (aOwner.documentTypes.IndexOf(aDoctype) = -1)
+      then raise EWrong_Document_Err.create('Wrong document error.');
   end;
   inherited create(nil);
   FDomImpl := aOwner;
-  if assigned(aDoctype) then
-    aDoctype.attachOwnerDocument(self);
+  if assigned(aDoctype)
+    then aDoctype.attachOwnerDocument(self);
   FNodeValue := '';
   FSystemId := '';
   FXmlEncoding := '';
@@ -9969,8 +9767,8 @@ begin
   FCreatedElementsNodeLists.free;
   FCreatedElementsNodeListNSs.free;
   FIDs.free;
-  if assigned(doctype) then
-    doctype.detachOwnerDocument;
+  if assigned(doctype)
+    then doctype.detachOwnerDocument;
   inherited destroy;
 end;
 
@@ -10088,11 +9886,11 @@ procedure TdomDocument.doAttrModified(const sourceNode: TdomNode;
 begin
   FModified := true;
   try
-    if assigned(FOnAttrModified) then
-      FOnAttrModified(self, sourceNode, attrChange, relatedAttr);
+    if assigned(FOnAttrModified)
+      then FOnAttrModified(self, sourceNode, attrChange, relatedAttr);
   finally
-    if assigned(domImplementation) then
-      domImplementation.doAttrModified(sourceNode, attrChange, relatedAttr);
+    if assigned(domImplementation)
+      then domImplementation.doAttrModified(sourceNode, attrChange, relatedAttr);
   end;
 end;
 
@@ -10122,11 +9920,11 @@ procedure TdomDocument.doCharacterDataModified(node: TdomNode);
 begin
   FModified := true;
   try
-    if assigned(FOnCharacterDataModified) then
-      FOnCharacterDataModified(self, node);
+    if assigned(FOnCharacterDataModified)
+      then FOnCharacterDataModified(self, node);
   finally
-    if assigned(domImplementation) then
-      domImplementation.doCharacterDataModified(node);
+    if assigned(domImplementation)
+      then domImplementation.doCharacterDataModified(node);
   end;
 end;
 
@@ -10134,11 +9932,11 @@ procedure TdomDocument.doNodeClearing(node: TdomNode);
 begin
   FModified := true;
   try
-    if assigned(FOnNodeClearing) then
-      FOnNodeClearing(self, node);
+    if assigned(FOnNodeClearing)
+      then FOnNodeClearing(self, node);
   finally
-    if assigned(domImplementation) then
-      domImplementation.doNodeClearing(node);
+    if assigned(domImplementation)
+      then domImplementation.doNodeClearing(node);
     notifyIterators(node, neClearing);
   end;
 end;
@@ -10147,11 +9945,11 @@ procedure TdomDocument.doNodeInserted(node: TdomNode);
 begin
   FModified := true;
   try
-    if assigned(FOnNodeInserted) then
-      FOnNodeInserted(self, node);
+    if assigned(FOnNodeInserted)
+      then FOnNodeInserted(self, node);
   finally
-    if assigned(domImplementation) then
-      domImplementation.doNodeInserted(node);
+    if assigned(domImplementation)
+      then domImplementation.doNodeInserted(node);
   end;
 end;
 
@@ -10159,11 +9957,11 @@ procedure TdomDocument.doNodeRemoving(node: TdomNode);
 begin
   FModified := true;
   try
-    if assigned(FOnNodeRemoving) then
-      FOnNodeRemoving(self, node);
+    if assigned(FOnNodeRemoving)
+      then FOnNodeRemoving(self, node);
   finally
-    if assigned(domImplementation) then
-      domImplementation.doNodeRemoving(node);
+    if assigned(domImplementation)
+      then domImplementation.doNodeRemoving(node);
     notifyIterators(node, neRemoving);
   end;
 end;
@@ -10225,10 +10023,9 @@ end;
 function TdomDocument.hasAttrDef(const elementType,
   attributeName: wideString): boolean;
 begin
-  if Assigned(DtdModel) then
-    result := Assigned(DtdModel.findASAttributeDecl(elementType, attributeName))
-  else
-    result := False;
+  if Assigned(DtdModel)
+    then result := Assigned(DtdModel.findASAttributeDecl(elementType, attributeName))
+  else result := False;
 end;
 
 function TdomDocument.hasAttrEnum(const elementType,
@@ -10258,10 +10055,9 @@ var
 begin
   if Assigned(DtdModel) then begin
     entityDecl := DtdModel.findASEntityDecl(entityName);
-    if assigned(entityDecl) then
-      result := not entityDecl.isParsedEntity
-    else
-      result := false;
+    if assigned(entityDecl)
+      then result := not entityDecl.isParsedEntity
+    else result := false;
   end else
     Result := False;
 end;
@@ -10292,30 +10088,30 @@ var
   newChild: TdomNode;
   oldAttr: TdomAttr;
 begin
-  if not assigned(importedNode) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(importedNode)
+    then raise ENot_Supported_Err.create('Not supported error.');
   case importedNode.NodeType of
     ntAttribute_Node:
       with importedNode do begin
-        if isNamespaceNode then
-          result := createAttributeNS(namespaceURI, nodeName)
-        else
-          result := createAttribute(nodeName);
+        if isNamespaceNode
+          then result := createAttributeNS(namespaceURI, nodeName)
+        else result := createAttribute(nodeName);
         result.FNodeValue := FNodeValue;
       end;
     ntCDATA_Section_Node:
       Result := createCDATASection((importedNode as TdomCDATASection).Data);
     ntComment_Node:
       Result := createComment((importedNode as TdomComment).Data);
-    ntDocument_Fragment_Node: begin
+    ntDocument_Fragment_Node:
+      begin
         Result := createDocumentFragment;
-        if deep then
-          for i := 0 to pred(importedNode.ChildNodes.Length) do begin
+        if deep then for i := 0 to pred(importedNode.ChildNodes.Length) do begin
             newChild := importNode(importedNode.ChildNodes.Item(i), true);
             Result.appendChild(newChild);
           end;
       end;
-    ntElement_Node: begin
+    ntElement_Node:
+      begin
         with importedNode do begin
           if isNamespaceNode then begin
             result := createElementNS(namespaceURI, nodeName);
@@ -10341,8 +10137,7 @@ begin
         end; {if ... else ...}
 
         // Duplicating child nodes:
-        if deep then
-          for i := 0 to pred(importedNode.ChildNodes.Length) do begin
+        if deep then for i := 0 to pred(importedNode.ChildNodes.Length) do begin
             newChild := importNode(importedNode.ChildNodes.Item(i), true);
             Result.appendChild(newChild);
           end;
@@ -10353,13 +10148,13 @@ begin
         (result as TdomEntity).inputEncoding := inputEncoding;
         (result as TdomEntity).xmlEncoding := xmlEncoding;
         (result as TdomEntity).xmlVersion := xmlVersion;
-        if deep then
-          for i := 0 to pred(childNodes.length) do begin
+        if deep then for i := 0 to pred(childNodes.length) do begin
             newChild := importNode(childNodes.Item(i), true);
             result.appendChild(newChild);
           end;
       end;
-    ntEntity_Reference_Node: begin
+    ntEntity_Reference_Node:
+      begin
         Result := createEntityReference(importedNode.NodeName);
         (result as TdomEntityReference).expand;
       end;
@@ -10384,20 +10179,17 @@ var
 begin
   if assigned(DtdModel) then begin
     attrDecl := DtdModel.findASAttributeDecl(elementType, attributeName);
-    if assigned(attrDecl) then
-      result := attrDecl.attrType
-    else
-      result := AS_STRING_DATATYPE;
-  end else
-    result := AS_STRING_DATATYPE;
+    if assigned(attrDecl)
+      then result := attrDecl.attrType
+    else result := AS_STRING_DATATYPE;
+  end else result := AS_STRING_DATATYPE;
 end;
 
 function TdomDocument.getBaseUri: wideString;
 begin
-  if IsUriAbsoluteURIWideStr(documentUri) then
-    Result := documentUri
-  else
-    Result := '';
+  if IsUriAbsoluteURIWideStr(documentUri)
+    then Result := documentUri
+  else Result := '';
 end;
 
 function TdomDocument.getContentType(const elementType: wideString): TdomASContentType;
@@ -10406,12 +10198,10 @@ var
 begin
   if Assigned(DtdModel) then begin
     elmtDecl := DtdModel.findASElementDecl(elementType);
-    if assigned(elmtDecl) then
-      result := elmtDecl.contentType
-    else
-      result := AS_UNKNOWN_CONTENTTYPE;
-  end else
-    result := AS_UNKNOWN_CONTENTTYPE;
+    if assigned(elmtDecl)
+      then result := elmtDecl.contentType
+    else result := AS_UNKNOWN_CONTENTTYPE;
+  end else result := AS_UNKNOWN_CONTENTTYPE;
 end;
 
 function TdomDocument.getDoctypeDecl: TdomDocumentTypeDecl;
@@ -10436,10 +10226,10 @@ end;
 
 procedure TdomDocument.initDoc(const tagName: wideString);
 begin
-  if not IsXmlName(tagName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if assigned(DocumentElement) then
-    raise EHierarchy_Request_Err.create('Hierarchy request error.');
+  if not IsXmlName(tagName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if assigned(DocumentElement)
+    then raise EHierarchy_Request_Err.create('Hierarchy request error.');
   appendChild(CreateElement(tagName));
 end;
 
@@ -10448,23 +10238,22 @@ procedure TdomDocument.initDocNS(const namespaceURI,
 var
   prfx, localName: wideString;
 begin
-  if not IsXmlName(qualifiedName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(qualifiedName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   if not xmlExtractPrefixAndLocalName(qualifiedName, prfx, localName) then begin
-    if not IsXmlName(qualifiedName) then
-      raise EInvalid_Character_Err.create('Invalid character error.')
-    else
-      raise ENamespace_Err.create('Namespace error.');
+    if not IsXmlName(qualifiedName)
+      then raise EInvalid_Character_Err.create('Invalid character error.')
+    else raise ENamespace_Err.create('Namespace error.');
   end;
   if (((prfx = 'xmlns') or (qualifiedName = 'xmlns'))
-    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/')) then
-    raise ENamespace_Err.create('Namespace error.');
-  if (namespaceURI = '') and (prfx <> '') then
-    raise ENamespace_Err.create('Namespace error.');
-  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-    raise ENamespace_Err.create('Namespace error.');
-  if assigned(DocumentElement) then
-    raise EHierarchy_Request_Err.create('Hierarchy request error.');
+    and not (namespaceURI = 'http://www.w3.org/2000/xmlns/'))
+    then raise ENamespace_Err.create('Namespace error.');
+  if (namespaceURI = '') and (prfx <> '')
+    then raise ENamespace_Err.create('Namespace error.');
+  if (prfx = 'xml') and (namespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+    then raise ENamespace_Err.create('Namespace error.');
+  if assigned(DocumentElement)
+    then raise EHierarchy_Request_Err.create('Hierarchy request error.');
   appendChild(CreateElementNS(namespaceURI, qualifiedName));
 end;
 
@@ -10536,10 +10325,9 @@ begin
         IS_TEXT:
           if IsXmlWhiteSpace(S[i]) then begin // White space?
             text.addWideChar(SPACE)
-          end else if S[i] = '&' then
-            kindOfToken := IS_REFSTART
-          else
-            text.addWideChar(S[i]);
+          end else if S[i] = '&'
+            then kindOfToken := IS_REFSTART
+          else text.addWideChar(S[i]);
         IS_REFSTART:
           if S[i] = '#' then begin
             referenceName := '&#';
@@ -10553,8 +10341,7 @@ begin
             referenceName := concat(referenceName, ';');
             text.addWideString(XmlCharRefToStr(referenceName));
             kindOfToken := IS_TEXT;
-          end else
-            referenceName := concat(referenceName, wideString(S[i]));
+          end else referenceName := concat(referenceName, wideString(S[i]));
         IS_ENTITYREF:
           if S[i] = ';' then begin
             getReplacementText(referenceName, replacementText, error);
@@ -10563,8 +10350,7 @@ begin
             end else
               raise EConvertError.CreateFmt('&%S; cannot be resolved.', [referenceName]);
             kindOfToken := IS_TEXT;
-          end else
-            referenceName := concat(referenceName, wideString(S[i]));
+          end else referenceName := concat(referenceName, wideString(S[i]));
       end; {case ...}
     end; {for ...}
     case kindOfToken of
@@ -10609,8 +10395,8 @@ begin
   for i := 1 to length(S) do begin
     case kindOfToken of
       IS_TEXT:
-        if S[i] = '&' then
-          kindOfToken := IS_REFSTART;
+        if S[i] = '&'
+          then kindOfToken := IS_REFSTART;
       IS_REFSTART:
         if S[i] = '#' then begin
           kindOfToken := IS_CHARREF;
@@ -10619,18 +10405,16 @@ begin
           referenceName := wideString(S[i]);
         end;
       IS_CHARREF:
-        if S[i] = ';' then
-          kindOfToken := IS_TEXT;
+        if S[i] = ';'
+          then kindOfToken := IS_TEXT;
       IS_ENTITYREF:
         if S[i] = ';' then begin
           if not assigned(DtdModel) then
             raise EConvertError.create('Entity reference cannot be resolved.');
           result := DtdModel.refersToExternalEntity(referenceName);
-          if result then
-            exit;
+          if result then exit;
           kindOfToken := IS_TEXT;
-        end else
-          referenceName := concat(referenceName, wideString(S[i]));
+        end else referenceName := concat(referenceName, wideString(S[i]));
     end; {case ...}
   end; {for ...}
   case kindOfToken of
@@ -10655,8 +10439,8 @@ begin
   for i := 1 to length(S) do begin
     case kindOfToken of
       IS_TEXT:
-        if S[i] = '&' then
-          kindOfToken := IS_REFSTART;
+        if S[i] = '&'
+          then kindOfToken := IS_REFSTART;
       IS_REFSTART:
         if S[i] = '#' then begin
           kindOfToken := IS_CHARREF;
@@ -10665,25 +10449,21 @@ begin
           referenceName := wideString(S[i]);
         end;
       IS_CHARREF:
-        if S[i] = ';' then
-          kindOfToken := IS_TEXT;
+        if S[i] = ';'
+          then kindOfToken := IS_TEXT;
       IS_ENTITYREF:
         if S[i] = ';' then begin
-          if assigned(DtdModel) then
-            entDecl := DtdModel.findASEntityDecl(referenceName)
-          else
-            entDecl := nil;
+          if assigned(DtdModel)
+            then entDecl := DtdModel.findASEntityDecl(referenceName)
+          else entDecl := nil;
           if assigned(entDecl) then begin
             result := DtdModel.refersToLTEntity(entDecl);
           end else if isXmlPredefinedEntityName(referenceName) then begin
             result := false;
-          end else
-            raise EConvertError.create('Entity reference cannot be resolved.');
-          if result then
-            exit;
+          end else raise EConvertError.create('Entity reference cannot be resolved.');
+          if result then exit;
           kindOfToken := IS_TEXT;
-        end else
-          referenceName := concat(referenceName, wideString(S[i]));
+        end else referenceName := concat(referenceName, wideString(S[i]));
     end; {case ...}
   end; {for ...}
   case kindOfToken of
@@ -10701,11 +10481,10 @@ procedure TdomDocument.freeTreeWalker(var TreeWalker: TdomTreeWalker);
 var
   TreeWalkerIndex: integer;
 begin
-  if not assigned(TreeWalker) then
-    exit;
+  if not assigned(TreeWalker) then exit;
   TreeWalkerIndex := FCreatedTreeWalkers.IndexOf(TreeWalker);
-  if TreeWalkerIndex = -1 then
-    raise EWrong_Document_Err.create('Wrong document error.');
+  if TreeWalkerIndex = -1
+    then raise EWrong_Document_Err.create('Wrong document error.');
   FCreatedTreeWalkers.Delete(TreeWalkerIndex);
   TreeWalker.free;
   TreeWalker := nil;
@@ -10713,20 +10492,18 @@ end;
 
 function TdomDocument.getDtdModel: TdomASModelCollection;
 begin
-  if Assigned(DoctypeDecl) then
-    Result := DoctypeDecl.dtdModel
-  else
-    Result := nil;
+  if Assigned(DoctypeDecl)
+    then Result := DoctypeDecl.dtdModel
+  else Result := nil;
 end;
 
 function TdomDocument.getElementById(const elementId: wideString): TdomElement;
 var
   index: integer;
 begin
-  if IDs.find(elementId, index) then
-    result := TdomAttr(IDs.objects[index]).ownerElement
-  else
-    result := nil;
+  if IDs.find(elementId, index)
+    then result := TdomAttr(IDs.objects[index]).ownerElement
+  else result := nil;
 end;
 
 function TdomDocument.getElementsByTagName(const tagName: wideString): TdomNodeList;
@@ -10734,10 +10511,8 @@ var
   i: integer;
 begin
   for i := 0 to FCreatedElementsNodeLists.Count - 1 do
-    if TdomElementsNodeList(FCreatedElementsNodeLists[i]).FQueryName = tagName then begin
-      Result := TdomElementsNodeList(FCreatedElementsNodeLists[i]);
-      exit;
-    end;
+    if TdomElementsNodeList(FCreatedElementsNodeLists[i]).FQueryName = tagName
+      then begin Result := TdomElementsNodeList(FCreatedElementsNodeLists[i]); exit; end;
   Result := TdomElementsNodeList.create(tagName, self);
   FCreatedElementsNodeLists.add(Result);
 end;
@@ -10750,10 +10525,8 @@ var
 begin
   for i := 0 to FCreatedElementsNodeListNSs.Count - 1 do begin
     nl := TdomElementsNodeListNS(FCreatedElementsNodeListNSs[i]);
-    if (nl.FQueryNamespaceURI = namespaceURI) and (nl.FQueryLocalName = localName) then begin
-      Result := nl;
-      exit;
-    end;
+    if (nl.FQueryNamespaceURI = namespaceURI) and (nl.FQueryLocalName = localName)
+      then begin Result := nl; exit; end;
   end;
   Result := TdomElementsNodeListNS.create(namespaceURI, localName, self);
   FCreatedElementsNodeListNSs.add(Result);
@@ -10761,10 +10534,9 @@ end;
 
 function TdomDocument.prepareAttributes: boolean;
 begin
-  if Assigned(DocumentElement) then
-    Result := PrepareAttributes2(DocumentElement)
-  else
-    Result := True;
+  if Assigned(DocumentElement)
+    then Result := PrepareAttributes2(DocumentElement)
+  else Result := True;
 end;
 
 function TdomDocument.prepareAttributes2(const node: TdomNode): boolean;
@@ -10783,6 +10555,7 @@ begin
       if isNamespaceNode then
         result := False;
 
+
       // Step 1: Remove all TdomAttr nodes attached to this element whose
       //         'specified' property is 'false'.
 
@@ -10791,6 +10564,7 @@ begin
         if not attr.specified then
           attr.free; // Removes and frees the attribute node.
       end;
+
 
       // Step 2: Create and add missing fixed and default TdomAttr nodes with
       //         'specified' set to 'false'.
@@ -10851,10 +10625,9 @@ end;
 
 function TdomDocument.resolveEntityReferences(const opt: TdomEntityResolveOption): integer;
 begin
-  if assigned(documentElement) then
-    result := documentElement.resolveEntityReferences(opt)
-  else
-    result := 0;
+  if assigned(documentElement)
+    then result := documentElement.resolveEntityReferences(opt)
+  else result := 0;
 end;
 
 function TdomDocument.CreateNodeIterator(const root: TdomNode;
@@ -10870,8 +10643,7 @@ function TdomDocument.CreateTreeWalker(const root: TdomNode;
   whatToShow: TdomWhatToShow;
   nodeFilter: TdomNodeFilter;
   entityReferenceExpansion: boolean): TdomTreeWalker;
-begin
-  ;
+begin;
   Result := TdomTreeWalker.create(root, whatToShow, nodeFilter, entityReferenceExpansion);
   FCreatedTreeWalkers.add(Result);
 end;
@@ -10927,8 +10699,7 @@ begin
     // Second parse only for IDREF and IDREFS:
     if not ValidateIDREFS then
       Result := False;
-  end else
-    IDs.Clear;
+  end else IDs.Clear;
 end;
 
 function TdomDocument.validateAttr(const node: TdomAttr): TXmlErrorType;
@@ -10980,19 +10751,22 @@ begin
       if hasAttrDef(OwnerElement.nodeName, nodename) then begin
         case getAttrType(OwnerElement.nodeName, nodename) of
 
-          AS_STRING_DATATYPE: begin
+          AS_STRING_DATATYPE:
+            begin
             // VC: XML Schema Part 2: Datatypes: Strings
               if not isXMLChars(attriValue) then
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
             end;
 
-          AS_NOTATION_DATATYPE: begin
+          AS_NOTATION_DATATYPE:
+            begin
             // VC: Notation Attributes (XML 1.0, § 3.3.1)
               if not hasAttrEnum(OwnerElement.nodeName, nodename, attriValue) then
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
             end;
 
-          AS_ID_DATATYPE: begin
+          AS_ID_DATATYPE:
+            begin
               if isXMLName(attriValue) then begin
                 try
                   IDs.addObject(attriValue, node);
@@ -11008,7 +10782,8 @@ begin
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
             end;
 
-          AS_ENTITY_DATATYPE: begin
+          AS_ENTITY_DATATYPE:
+            begin
             // VC: Entity Name (XML 1.0, § 3.3.1)
               if isXMLName(attriValue) then begin
                 if not hasUnparsedEntity(attriValue) then
@@ -11017,11 +10792,11 @@ begin
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
             end;
 
-          AS_ENTITIES_DATATYPE: begin
+          AS_ENTITIES_DATATYPE:
+            begin
             // VC: Entity Name (XML 1.0, § 3.3.1)
               if isXMLNames(attriValue) then begin
-                startIndex := 1;
-                indexCount := 0;
+                startIndex := 1; indexCount := 0;
                 for i := 1 to length(attriValue) do begin
                   if attriValue[i] = SPACE then begin
                     if not hasUnparsedEntity(copy(attriValue, startIndex, IndexCount)) then begin
@@ -11030,8 +10805,7 @@ begin
                     end;
                     startIndex := succ(i);
                     indexCount := 0;
-                  end else
-                    inc(indexCount);
+                  end else inc(indexCount);
                 end;
                 if not hasUnparsedEntity(copy(attriValue, startIndex, IndexCount)) then
                   result := ET_TARGET_UNPARSED_ENTITY_NOT_FOUND;
@@ -11039,7 +10813,8 @@ begin
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
             end;
 
-          AS_NMTOKEN_DATATYPE: begin
+          AS_NMTOKEN_DATATYPE:
+            begin
               if isXmlNmtoken(attriValue) then begin
               // VC: Enumeration (XML 1.0, § 3.3.1)
                 if not hasAttrEnum(OwnerElement.nodeName, nodename, attriValue) then
@@ -11049,7 +10824,8 @@ begin
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
             end;
 
-          AS_NMTOKENS_DATATYPE: begin
+          AS_NMTOKENS_DATATYPE:
+            begin
             // VC: Name Token (XML 1.0, § 3.3.1)
               if not isXmlNmtokens(attriValue) then
                 result := ET_ATTRIBUTE_TYPE_MISMATCH;
@@ -11081,10 +10857,9 @@ begin
 
   with node do begin
 
-    if Assigned(DtdModel) then
-      elmDecl := DtdModel.findASElementDecl(nodeName)
-    else
-      elmDecl := nil;
+    if Assigned(DtdModel)
+      then elmDecl := DtdModel.findASElementDecl(nodeName)
+    else elmDecl := nil;
 
     // VC: Element Valid (XML 1.0, § 3)
     if not assigned(elmDecl) then begin
@@ -11114,7 +10889,8 @@ begin
 
                   case attrDecl.constraintType of
 
-                    AVC_DEFAULT: begin
+                    AVC_DEFAULT:
+                      begin
                         textAttr := getAttributeNode(attrDecl.name);
                         if not assigned(textAttr) then begin
                           newAttrValue := self.DtdModel.normalizeAttributeDeclValue(attrDecl, error);
@@ -11136,7 +10912,8 @@ begin
                         end;
                       end;
 
-                    AVC_FIXED: {// VC: Fixed Attribute Default (XML 1.0, § 3.3.2)} begin
+                    AVC_FIXED: // VC: Fixed Attribute Default (XML 1.0, § 3.3.2)
+                      begin
                         newAttrValue := self.DtdModel.normalizeAttributeDeclValue(attrDecl, error);
                         if error = ET_NONE then begin
                           textAttr := getAttributeNode(attrDecl.name);
@@ -11163,7 +10940,8 @@ begin
                         end;
                       end;
 
-                    AVC_REQUIRED: {// VC: Required Attribute (XML 1.0, § 3.3.2)} begin
+                    AVC_REQUIRED: // VC: Required Attribute (XML 1.0, § 3.3.2)
+                      begin
                         if not hasAttribute(attrDecl.name) then begin
                           result := ET_REQUIRED_ATTRIBUTE_NOT_FOUND;
                           exit;
@@ -11197,10 +10975,9 @@ var
 begin
   with node do begin
 
-    if Assigned(DtdModel) then
-      elmDecl := DtdModel.findASElementDecl(nodeName)
-    else
-      elmDecl := nil;
+    if Assigned(DtdModel)
+      then elmDecl := DtdModel.findASElementDecl(nodeName)
+    else elmDecl := nil;
 
     // VC: Element Valid (XML 1.0, § 3)
     if not assigned(elmDecl) then begin
@@ -11227,7 +11004,8 @@ begin
     try
       case elmDecl.ContentType of
 
-        AS_EMPTY_CONTENTTYPE: begin
+        AS_EMPTY_CONTENTTYPE:
+          begin
             nodeToTest := treeWalker.firstChild;
             while assigned(nodeToTest) do begin
               if not ((nodeToTest.nodeType = ntText_Node) and (nodeToTest.nodeValue = '')) then begin
@@ -11238,7 +11016,8 @@ begin
             end; {while ...}
           end;
 
-        AS_ELEMENT_CONTENTTYPE: begin
+        AS_ELEMENT_CONTENTTYPE:
+          begin
             elementNames := TUtilsWideStringList.create;
             try
               ok := true;
@@ -11263,15 +11042,14 @@ begin
                 nodeToTest := treeWalker.nextSibling;
               end; {while ...}
               if ok then begin
-                if not assigned(elmDecl.contentModel) then
-                  raise EParserException.create('Internal Parser error.');
+                if not assigned(elmDecl.contentModel)
+                  then raise EParserException.create('Internal Parser error.');
                 index := 0;
                 contentModelOk := elmDecl.contentModel.validateNames(elementnames, index, isNonDeterministic);
                 if isNonDeterministic then begin
                   result := ET_NONDETERMINISTIC_ELEMENT_CONTENT_MODEL;
                   exit;
-                end else
-                  ok := contentModelOk and (index = elementnames.count);
+                end else ok := contentModelOk and (index = elementnames.count);
               end; {if ok ...}
             finally
               elementnames.free;
@@ -11282,7 +11060,8 @@ begin
             end; {if ...}
           end;
 
-        AS_MIXED_CONTENTTYPE: begin
+        AS_MIXED_CONTENTTYPE:
+          begin
             elementnames := TUtilsWideStringList.create;
             try
               ok := true;
@@ -11303,8 +11082,8 @@ begin
               end; {while ...}
 
               if ok then begin
-                if not assigned(elmDecl.contentModel) then
-                  raise EParserException.create('Internal Parser error.');
+                if not assigned(elmDecl.contentModel)
+                  then raise EParserException.create('Internal Parser error.');
                 if (elmDecl.contentModel.contentModelType = AS_CHOICE_CM) and
                   (elmDecl.contentModel.subModels.length = 0) then begin // Is PCDATA only?
                   if elementnames.count > 0 then begin
@@ -11317,8 +11096,7 @@ begin
                   if isNonDeterministic then begin
                     result := ET_NONDETERMINISTIC_ELEMENT_CONTENT_MODEL;
                     exit;
-                  end else
-                    ok := contentModelOk and (index = elementnames.count);
+                  end else ok := contentModelOk and (index = elementnames.count);
                 end; {if ... else ...}
               end; {if ok ...}
 
@@ -11355,10 +11133,9 @@ begin
     if not isXmlPredefinedEntityName(nodeName) then begin
 
       // VC: Entity declared (XML 1.0, § 4.1)
-      if Assigned(DtdModel) then
-        entDecl := DtdModel.findASEntityDecl(nodeName)
-      else
-        entDecl := nil;
+      if Assigned(DtdModel)
+        then entDecl := DtdModel.findASEntityDecl(nodeName)
+      else entDecl := nil;
       if not assigned(entDecl) then begin
         result := ET_ENTITY_DECL_NOT_FOUND;
         exit;
@@ -11413,6 +11190,8 @@ begin
     Result := ET_NONE;
 end;
 
+
+
 //+++++++++++++++++++++++++ TdomASObjectList +++++++++++++++++++++++++++++
 
 constructor TdomASObjectList.create;
@@ -11458,10 +11237,9 @@ function TdomASObjectList.insertBefore(const newNode,
 begin
   Result := newNode;
   with FNodeList do
-    if assigned(refNode) then
-      insert(indexOf(refNode), newNode)
-    else
-      add(newNode);
+    if assigned(refNode)
+      then insert(indexOf(refNode), newNode)
+    else add(newNode);
 end;
 
 function TdomASObjectList.removeASNode(const oldNode: TdomASObject): TdomASObject;
@@ -11472,11 +11250,12 @@ end;
 
 function TdomASObjectList.item(const index: integer): TdomASObject;
 begin
-  if (index < 0) or (index >= FNodeList.count) then
-    Result := nil
-  else
-    Result := TdomASObject(FNodeList.Items[index]);
+  if (index < 0) or (index >= FNodeList.count)
+    then Result := nil
+  else Result := TdomASObject(FNodeList.Items[index]);
 end;
+
+
 
 //+++++++++++++++++++++++++ TdomASNamedObjectMap +++++++++++++++++++++++++
 
@@ -11517,28 +11296,28 @@ end;
 
 function TdomASNamedObjectMap.item(const index: integer): TdomASObject;
 begin
-  if (index < 0) or (index >= FObjectList.count) then
-    Result := nil
-  else
-    Result := TdomASObject(FObjectList.Items[index]);
+  if (index < 0) or (index >= FObjectList.count)
+    then Result := nil
+  else Result := TdomASObject(FObjectList.Items[index]);
 end;
 
 function TdomASNamedObjectMap.RemoveNamedItem(const name: wideString): TdomASObject;
 begin
   Result := getNamedItem(name);
-  if not assigned(Result) then
-    raise ENot_Found_Err.create('Not found error.');
+  if not assigned(Result)
+    then raise ENot_Found_Err.create('Not found error.');
   FObjectList.Remove(Result);
 end;
 
 function TdomASNamedObjectMap.SetNamedItem(const arg: TdomASObject): TdomASObject;
 begin
-  if assigned(GetNamedItem(arg.name)) then
-    Result := RemoveNamedItem(arg.name)
-  else
-    Result := nil;
+  if assigned(GetNamedItem(arg.name))
+    then Result := RemoveNamedItem(arg.name)
+  else Result := nil;
   FObjectList.Add(arg);
 end;
+
+
 
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //+++++++++++++++++++++++++ TdomASObjectListNS +++++++++++++++++++++++++++++
@@ -11586,10 +11365,9 @@ function TdomASObjectListNS.insertBefore(const newNode,
 begin
   Result := newNode;
   with FNodeList do
-    if assigned(refNode) then
-      insert(indexOf(refNode), newNode)
-    else
-      add(newNode);
+    if assigned(refNode)
+      then insert(indexOf(refNode), newNode)
+    else add(newNode);
 end;
 
 function TdomASObjectListNS.removeASNode(const oldNode: TdomASObjectNS): TdomASObjectNS;
@@ -11600,11 +11378,12 @@ end;
 
 function TdomASObjectListNS.item(const index: integer): TdomASObjectNS;
 begin
-  if (index < 0) or (index >= FNodeList.count) then
-    Result := nil
-  else
-    Result := TdomASObjectNS(FNodeList.Items[index]);
+  if (index < 0) or (index >= FNodeList.count)
+    then Result := nil
+  else Result := TdomASObjectNS(FNodeList.Items[index]);
 end;
+
+
 
 //++++++++++++++++++++++++ TdomASNamedObjectMapNS ++++++++++++++++++++++++
 
@@ -11647,30 +11426,30 @@ end;
 
 function TdomASNamedObjectMapNS.item(const index: integer): TdomASObjectNS;
 begin
-  if (index < 0) or (index >= FObjectList.count) then
-    Result := nil
-  else
-    Result := TdomASObjectNS(FObjectList.Items[index]);
+  if (index < 0) or (index >= FObjectList.count)
+    then Result := nil
+  else Result := TdomASObjectNS(FObjectList.Items[index]);
 end;
 
 function TdomASNamedObjectMapNS.RemoveNamedItem(const namespaceURI,
   localName: wideString): TdomASObjectNS;
 begin
   Result := getNamedItem(namespaceURI, localName);
-  if not assigned(Result) then
-    raise ENot_Found_Err.create('Node not found error.');
+  if not assigned(Result)
+    then raise ENot_Found_Err.create('Node not found error.');
   FObjectList.Remove(Result);
 end;
 
 function TdomASNamedObjectMapNS.SetNamedItem(const arg: TdomASObjectNS): TdomASObjectNS;
 begin
-  if assigned(GetNamedItem(arg.namespaceURI, arg.localName)) then
-    Result := RemoveNamedItem(arg.namespaceURI, arg.localName)
-  else
-    Result := nil;
+  if assigned(GetNamedItem(arg.namespaceURI, arg.localName))
+    then Result := RemoveNamedItem(arg.namespaceURI, arg.localName)
+  else Result := nil;
   FObjectList.Add(arg);
 end;
 {$ENDIF}
+
+
 
 //++++++++++++++++++++++ TdomASModelCollection ++++++++++++++++++++++++++
 
@@ -11739,10 +11518,9 @@ begin
 
                 if attrDecl.constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                   attValue := normalizeAttributeDeclValue(attrDecl, error);
-                  if error = ET_NONE then
-                    result.Add(attrDecl.name, attValue)
-                  else
-                    listComplete := False;
+                  if error = ET_NONE
+                    then result.Add(attrDecl.name, attValue)
+                  else listComplete := False;
                 end;
 
               end; {if ...}
@@ -11769,8 +11547,7 @@ begin
   with ASModels do
     for i := 0 to pred(length) do begin
       result := TdomASModel(Items[i]).findASAttributeDecl(elementName, attributeName);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -11782,8 +11559,7 @@ begin
   with ASModels do
     for i := 0 to pred(length) do begin
       result := TdomASModel(Items[i]).findASElementDecl(name);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -11795,8 +11571,7 @@ begin
   with ASModels do
     for i := 0 to pred(length) do begin
       result := TdomASModel(Items[i]).findASEntityDecl(name);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -11854,18 +11629,16 @@ begin
   with ASModels do
     for i := 0 to pred(length) do begin
       result := TdomASModel(Items[i]).findASNotationDecl(name);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
 function TdomASModelCollection.getDomImplementation: TDomImplementation;
 begin
   if Assigned(OwnerDocType) then begin
-    if Assigned(OwnerDocType.OwnerDocument) then
-      Result := OwnerDocType.OwnerDocument.domImplementation
-    else
-      Result := nil;
+    if Assigned(OwnerDocType.OwnerDocument)
+      then Result := OwnerDocType.OwnerDocument.domImplementation
+    else Result := nil;
   end else
     Result := nil;
 end;
@@ -11920,13 +11693,10 @@ begin
         indexpos := -1;
         for j := i + 1 to system.length(attrDecl.defaultValue) do begin
           SChar2 := WideChar((PWideChar(attrDecl.defaultValue) + j - 1)^);
-          if SChar2 = ';' then begin
-            indexpos := j;
-            break;
-          end;
+          if SChar2 = ';' then begin indexpos := j; break; end;
         end;
-        if indexpos = -1 then
-          error := ET_INVALID_ATTRIBUTE_DECL; // '&' without closing ';'
+        if indexpos = -1
+          then error := ET_INVALID_ATTRIBUTE_DECL; // '&' without closing ';'
         ref := copy(attrDecl.defaultValue, i, indexpos - i + 1);
         if IsXmlEntityRef(ref) then begin
           entName := copy(ref, 2, system.length(ref) - 2);
@@ -11938,8 +11708,7 @@ begin
             end else if pos('<', S) > 0 then begin
               error := ET_LT_IN_ATTRIBUTE_VALUE;
               break;
-            end else
-              content.addWideString(S);
+            end else content.addWideString(S);
           end else
             break;
         end else if IsXmlCharRef(ref) then begin
@@ -11949,16 +11718,14 @@ begin
           break;
         end;
         i := indexpos;
-      end else if IsXmlWhiteSpace(SChar) then
-        content.addWideChar(SPACE)
-      else
-        content.addWideChar(SChar);
+      end else if IsXmlWhiteSpace(SChar)
+        then content.addWideChar(SPACE)
+      else content.addWideChar(SChar);
       inc(i);
     end; {while ...}
-    if error = ET_NONE then
-      Result := content.value
-    else
-      Result := '';
+    if error = ET_NONE
+      then Result := content.value
+    else Result := '';
   finally
     content.free;
   end;
@@ -11972,8 +11739,8 @@ function TdomASModelCollection.refersToItself(const entDecl: TdomASEntityDecl;
 var
   previousEntities: TUtilsWideStringList;
 begin
-  if not assigned(entDecl) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(entDecl)
+    then raise ENot_Supported_Err.create('Not supported error.');
 
   result := false;
   previousEntities := TUtilsWideStringList.create;
@@ -12012,8 +11779,7 @@ begin
     end;
   end else if isXmlPredefinedEntityName(entityName) then begin
     result := false;
-  end else
-    raise EConvertError.create('Entity reference cannot be resolved.');
+  end else raise EConvertError.create('Entity reference cannot be resolved.');
 end;
 
 function TdomASModelCollection.refersToLTEntity(const entDecl: TdomASEntityDecl): boolean;
@@ -12022,8 +11788,8 @@ function TdomASModelCollection.refersToLTEntity(const entDecl: TdomASEntityDecl)
 var
   previousEntities: TUtilsWideStringList;
 begin
-  if not assigned(entDecl) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(entDecl)
+    then raise ENot_Supported_Err.create('Not supported error.');
 
   result := false;
   previousEntities := TUtilsWideStringList.create;
@@ -12045,8 +11811,8 @@ function TdomASModelCollection.refersToUnparsedEntity(const entDecl: TdomASEntit
 var
   previousEntities: TUtilsWideStringList;
 begin
-  if not assigned(entDecl) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(entDecl)
+    then raise ENot_Supported_Err.create('Not supported error.');
 
   result := false;
   previousEntities := TUtilsWideStringList.create;
@@ -12082,15 +11848,13 @@ begin
       1: result := entityType = AS_EXTERNAL_ENTITY;
       2: result := not isParsedEntity;
       3: begin
-          if usability = AS_UNRESOLVED then
-            resolve; // Try to resolve an unresolved entity.
+          if usability = AS_UNRESOLVED then resolve; // Try to resolve an unresolved entity.
           result := ContainsLT <> T_FALSE;
         end;
     else
       raise ESyntax_Err.create('Syntax error in TdomASModelCollection.refersToXyz');
     end;
-    if result then
-      exit;
+    if result then exit;
 
     with EntityRefs do
       for i := 0 to pred(Count) do begin
@@ -12098,9 +11862,9 @@ begin
         if (previousEntities.indexOf(WideStrings[i]) = -1) then begin
           dereferencedEntityDecl := findASEntityDecl(WideStrings[i]);
           if not assigned(dereferencedEntityDecl) then begin
-            if not allowUnresolvableEntities then
-              if not isXmlPredefinedEntityName(WideStrings[i]) then
-                raise EConvertError.create('Entity reference cannot be resolved.');
+            if not allowUnresolvableEntities
+              then if not isXmlPredefinedEntityName(WideStrings[i])
+              then raise EConvertError.create('Entity reference cannot be resolved.');
           end else begin
             updatedEntities := TUtilsWideStringList.create;
             try
@@ -12119,8 +11883,7 @@ begin
             result := true; // circular reference
         end;
 
-        if result then
-          exit;
+        if result then exit;
       end;
 
   end; {with ...}
@@ -12137,10 +11900,9 @@ begin
   try
     if assigned(domImplementation) then begin
       result := domImplementation.handleError(self, error);
-    end else if error.severity = DOM_SEVERITY_FATAL_ERROR then
-      result := false
-    else
-      result := true;
+    end else if error.severity = DOM_SEVERITY_FATAL_ERROR
+      then result := false
+    else result := true;
   finally
     error.free;
   end;
@@ -12197,8 +11959,8 @@ begin
               if contentType = AS_MIXED_CONTENTTYPE then begin // xxx Add support for AS_STRICT_MIXED_CONTENTTYPE
                 if not assigned(contentModel) then begin
                   result := false;
-                  if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl) then
-                    exit;
+                  if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl)
+                    then exit;
                 end else begin
                   with contentModel do
                     if contentModelType = AS_CHOICE_CM then begin
@@ -12207,28 +11969,27 @@ begin
                         for k := 0 to pred(length) do begin
                           if item(k).objectType <> AS_CONTENT_MODEL then begin
                             result := false;
-                            if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl)
+                              then exit;
                           end else begin
                             with TdomASContentModel(item(k)) do
                               if contentModelType <> AS_ELEMENT_CM then begin
                                 result := false;
-                                if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl) then
-                                  exit;
+                                if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl)
+                                  then exit;
                               end else begin
                                 if enumerationTypes.find(name, dummy) then begin
                                   result := false;
-                                  if not sendErrorNotification(ET_DUPLICATE_NAME_IN_MIXED_CONTENT, elmtDecl) then
-                                    exit;
-                                end else
-                                  enumerationTypes.add(name);
+                                  if not sendErrorNotification(ET_DUPLICATE_NAME_IN_MIXED_CONTENT, elmtDecl)
+                                    then exit;
+                                end else enumerationTypes.add(name);
                               end; {if ... else ...}
                           end; {if ... else ...}
                         end; {for k ...}
                     end else begin
                       result := false;
-                      if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl) then
-                        exit;
+                      if not sendErrorNotification(ET_ELEMENT_WITH_ILLEGAL_MIXED_CONTENT, elmtDecl)
+                        then exit;
                     end; {if ... else ...}
                 end; {if ... else ...}
               end; {if ...}
@@ -12244,11 +12005,11 @@ begin
         for j := 0 to pred(length) do
           with TdomASEntityDecl(item(j)) do
             // VC: Notation Declared (XML 1.0, § 4.2.2)
-            if not isParsedEntity then
-              if not assigned(findASNotationDecl(notationName)) then begin
+            if not isParsedEntity
+              then if not assigned(findASNotationDecl(notationName)) then begin
                 result := false;
-                if not self.sendErrorNotification(ET_UNDECLARED_NOTATION_NAME, TdomASEntityDecl(item(j))) then
-                  exit;
+                if not self.sendErrorNotification(ET_UNDECLARED_NOTATION_NAME, TdomASEntityDecl(item(j)))
+                  then exit;
               end;
 
   // Validiate Attribute Declarations:
@@ -12276,144 +12037,148 @@ begin
                 with attrDecl do
                   case attrType of
 
-                    AS_ID_DATATYPE: begin
+                    AS_ID_DATATYPE:
+                      begin
                       // VC: One ID per Element Type (XML 1.0, § 3.3.1)
                         if IdNames.find(elmtDecl.name, dummy) then begin
                           result := false;
-                          if not sendErrorNotification(ET_DUPLICATE_ID_ON_ELEMENT_TYPE, TdomASAttributeDecl(item(k))) then
-                            exit;
-                        end else
-                          IdNames.add(elmtDecl.name);
+                          if not sendErrorNotification(ET_DUPLICATE_ID_ON_ELEMENT_TYPE, TdomASAttributeDecl(item(k)))
+                            then exit;
+                        end else IdNames.add(elmtDecl.name);
                       // VC: ID Attribute Default (XML 1.0, § 3.3.1)
                         if not (constraintType in [AVC_IMPLIED, AVC_REQUIRED]) then begin
                           result := false;
-                          if not sendErrorNotification(ET_ID_NEITHER_IMPLIED_NOR_REQUIRED, TdomASAttributeDecl(item(k))) then
-                            exit;
+                          if not sendErrorNotification(ET_ID_NEITHER_IMPLIED_NOR_REQUIRED, TdomASAttributeDecl(item(k)))
+                            then exit;
                         end;
                       end;
 
-                    AS_NOTATION_DATATYPE: begin
+                    AS_NOTATION_DATATYPE:
+                      begin
                         notationTokens.clear;
                         with enumeration do begin
                           for m := 0 to pred(count) do begin
                           // VC: Notation Attributes (XML 1.0, § 3.3.1)
                             if not assigned(findASNotationDecl(wideStrings[m])) then begin
                               result := false;
-                              if not sendErrorNotification(ET_UNDECLARED_NOTATION_NAME, attrDecl) then
-                                exit;
+                              if not sendErrorNotification(ET_UNDECLARED_NOTATION_NAME, attrDecl)
+                                then exit;
                             end;
                           // VC: No Duplicate Tokens (XML 1.0, 2nd ed., erratum 2)
                             if notationTokens.find(wideStrings[m], dummy) then begin
                               result := false;
-                              if not sendErrorNotification(ET_DUPLICATE_NOTATION_TOKEN, attrDecl) then
-                                exit;
-                            end else
-                              notationTokens.add(wideStrings[m]);
+                              if not sendErrorNotification(ET_DUPLICATE_NOTATION_TOKEN, attrDecl)
+                                then exit;
+                            end else notationTokens.add(wideStrings[m]);
                           end; {for ...}
                         end; {with ...}
 
                       // VC: One Notation per Element Type (XML 1.0, § 3.3.1)
                         if NotationNames.find(elmtDecl.name, dummy) then begin
                           result := false;
-                          if not sendErrorNotification(ET_DUPLICATE_NOTATION_ON_ELEMENT_TYPE, attrDecl) then
-                            exit;
-                        end else
-                          NotationNames.add(elmtDecl.name);
+                          if not sendErrorNotification(ET_DUPLICATE_NOTATION_ON_ELEMENT_TYPE, attrDecl)
+                            then exit;
+                        end else NotationNames.add(elmtDecl.name);
 
                       // VC: No Notation on Empty Element (XML 1.0, § 3.3.1)
                         if elmtDecl.contentType = AS_EMPTY_CONTENTTYPE then begin
                           result := false;
-                          if not sendErrorNotification(ET_NOTATION_ON_EMPTY_ELEMENT, attrDecl) then
-                            exit;
+                          if not sendErrorNotification(ET_NOTATION_ON_EMPTY_ELEMENT, attrDecl)
+                            then exit;
                         end;
                       end; {AS_NOTATION_DATATYPE ...}
 
-                    AS_IDREF_DATATYPE: begin
+                    AS_IDREF_DATATYPE:
+                      begin
                       // VC: IDREF (XML 1.0, § 3.3.1)
                         if constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                           normalizedValue := normalizeAttributeDeclValue(attrDecl, normalizationError);
                           FurtherAttrNormalization(normalizedValue);
                           if normalizationError <> ET_NONE then begin
                             result := false;
-                            if not sendErrorNotification(normalizationError, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(normalizationError, attrDecl)
+                              then exit;
                           end;
                           if not isXMLName(normalizedValue) then begin
                             result := false;
-                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl)
+                              then exit;
                           end;
                         end;
                       end;
 
-                    AS_IDREFS_DATATYPE: begin
+                    AS_IDREFS_DATATYPE:
+                      begin
                       // VC: IDREF (XML 1.0, § 3.3.1)
                         if constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                           normalizedValue := normalizeAttributeDeclValue(attrDecl, normalizationError);
                           FurtherAttrNormalization(normalizedValue);
                           if normalizationError <> ET_NONE then begin
                             result := false;
-                            if not sendErrorNotification(normalizationError, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(normalizationError, attrDecl)
+                              then exit;
                           end;
                           if not isXMLNames(normalizedValue) then begin
                             result := false;
-                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl)
+                              then exit;
                           end;
                         end;
                       end;
 
-                    AS_ENTITY_DATATYPE: begin
+                    AS_ENTITY_DATATYPE:
+                      begin
                       // VC: Entity Name (XML 1.0, § 3.3.1)
                         if constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                           normalizedValue := normalizeAttributeDeclValue(attrDecl, normalizationError);
                           FurtherAttrNormalization(normalizedValue);
                           if normalizationError <> ET_NONE then begin
                             result := false;
-                            if not sendErrorNotification(normalizationError, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(normalizationError, attrDecl)
+                              then exit;
                           end;
                           if not isXMLName(normalizedValue) then begin
                             result := false;
-                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl)
+                              then exit;
                           end;
                         end;
                       end;
 
-                    AS_ENTITIES_DATATYPE: begin
+                    AS_ENTITIES_DATATYPE:
+                      begin
                       // VC: Entity Name (XML 1.0, § 3.3.1)
                         if constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                           normalizedValue := normalizeAttributeDeclValue(attrDecl, normalizationError);
                           FurtherAttrNormalization(normalizedValue);
                           if normalizationError <> ET_NONE then begin
                             result := false;
-                            if not sendErrorNotification(normalizationError, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(normalizationError, attrDecl)
+                              then exit;
                           end;
                           if not isXMLNames(normalizedValue) then begin
                             result := false;
-                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl)
+                              then exit;
                           end;
                         end;
                       end;
 
-                    AS_NMTOKEN_DATATYPE: begin
+                    AS_NMTOKEN_DATATYPE:
+                      begin
                       // VC: name Token (XML 1.0, § 3.3.1)
                         if constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                           normalizedValue := normalizeAttributeDeclValue(attrDecl, normalizationError);
                           FurtherAttrNormalization(normalizedValue);
                           if normalizationError <> ET_NONE then begin
                             result := false;
-                            if not sendErrorNotification(normalizationError, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(normalizationError, attrDecl)
+                              then exit;
                           end;
                           if not isXmlNmtoken(normalizedValue) then begin
                             result := false;
-                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl)
+                              then exit;
                           end;
                         end;
 
@@ -12423,28 +12188,28 @@ begin
                           for m := 0 to pred(count) do begin
                             if EnumerationTokens.find(wideStrings[m], dummy) then begin
                               result := false;
-                              if not sendErrorNotification(ET_DUPLICATE_ENUMERATION_TOKEN, attrDecl) then
-                                exit;
-                            end else
-                              EnumerationTokens.add(wideStrings[m]);
+                              if not sendErrorNotification(ET_DUPLICATE_ENUMERATION_TOKEN, attrDecl)
+                                then exit;
+                            end else EnumerationTokens.add(wideStrings[m]);
                           end; {for ...}
                         end; {with ...}
                       end;
 
-                    AS_NMTOKENS_DATATYPE: begin
+                    AS_NMTOKENS_DATATYPE:
+                      begin
                       // VC: name Token (XML 1.0, § 3.3.1)
                         if constraintType in [AVC_DEFAULT, AVC_FIXED] then begin
                           normalizedValue := normalizeAttributeDeclValue(attrDecl, normalizationError);
                           FurtherAttrNormalization(normalizedValue);
                           if normalizationError <> ET_NONE then begin
                             result := false;
-                            if not sendErrorNotification(normalizationError, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(normalizationError, attrDecl)
+                              then exit;
                           end;
                           if not isXmlNmtokens(normalizedValue) then begin
                             result := false;
-                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl) then
-                              exit;
+                            if not sendErrorNotification(ET_ATTRIBUTE_DEFAULT_TYPE_MISMATCH, attrDecl)
+                              then exit;
                           end;
                         end;
                       end;
@@ -12460,13 +12225,15 @@ begin
   end;
 end;
 
+
+
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //+++++++++++++++++++++ TdomASModelCollectionNS +++++++++++++++++++++++++
 
 constructor TdomASModelCollectionNS.create(const aOwner: TdomDocument);
 begin
-  if not assigned(aOwner) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(aOwner)
+    then raise ENot_Supported_Err.create('Not supported error.');
   inherited create;
   FASModelsNS := TList.Create;
   FOwnerDocument := aOwner;
@@ -12481,12 +12248,12 @@ end;
 
 function TdomASModelCollectionNS.add(const model: TdomASModelNS): integer;
 begin
-  if not assigned(model) then
-    raise ENot_Supported_Err.create('Not supported error.');
-  if model.domImplementation <> ownerDocument.domImplementation then
-    raise EWrong_DOM_Implementation_Err.create('Wrong DOM implementation error.');
-  if FASModelsNS.indexOf(model) > -1 then
-    raise EInuse_Err.create('Inuse ASModel error.');
+  if not assigned(model)
+    then raise ENot_Supported_Err.create('Not supported error.');
+  if model.domImplementation <> ownerDocument.domImplementation
+    then raise EWrong_DOM_Implementation_Err.create('Wrong DOM implementation error.');
+  if FASModelsNS.indexOf(model) > -1
+    then raise EInuse_Err.create('Inuse ASModel error.');
   result := FASModelsNS.Add(model);
   model.ownerCollections.Add(self);
 end;
@@ -12513,8 +12280,7 @@ begin
   with FASModelsNS do
     for i := 0 to pred(length) do begin
       result := TdomASModelNS(Items[i]).findASAttributeDecl(elementNamespaceURI, elementLocalName, attributeNamespaceURI, attributeLocalName);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -12527,8 +12293,7 @@ begin
   with FASModelsNS do
     for i := 0 to pred(length) do begin
       result := TdomASModelNS(Items[i]).findASElementDecl(namespaceURI, localname);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -12541,8 +12306,7 @@ begin
   with FASModelsNS do
     for i := 0 to pred(length) do begin
       result := TdomASModelNS(Items[i]).findASEntityDecl(namespaceURI, localname);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -12555,8 +12319,7 @@ begin
   with FASModelsNS do
     for i := 0 to pred(length) do begin
       result := TdomASModelNS(Items[i]).findASNotationDecl(namespaceURI, localname);
-      if assigned(result) then
-        break;
+      if assigned(result) then break;
     end;
 end;
 
@@ -12573,24 +12336,26 @@ end;
 procedure TdomASModelCollectionNS.insert(const index: integer;
   model: TdomASModelNS);
 begin
-  if not assigned(model) then
-    raise ENot_Supported_Err.create('Not supported error.');
-  if model.domImplementation <> ownerDocument.domImplementation then
-    raise EWrong_DOM_Implementation_Err.create('Wrong DOM implementation error.');
-  if FASModelsNS.indexOf(model) > -1 then
-    raise EInuse_Err.create('Inuse ASModel error.');
+  if not assigned(model)
+    then raise ENot_Supported_Err.create('Not supported error.');
+  if model.domImplementation <> ownerDocument.domImplementation
+    then raise EWrong_DOM_Implementation_Err.create('Wrong DOM implementation error.');
+  if FASModelsNS.indexOf(model) > -1
+    then raise EInuse_Err.create('Inuse ASModel error.');
   FASModelsNS.insert(index, model);
   model.ownerCollections.Add(self);
 end;
 
 function TdomASModelCollectionNS.remove(const model: TdomASModelNS): integer;
 begin
-  if not assigned(model) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(model)
+    then raise ENot_Supported_Err.create('Not supported error.');
   result := FASModelsNS.remove(model);
   model.ownerCollections.remove(self);
 end;
 {$ENDIF}
+
+
 
 //+++++++++++++++++++++++++++ TdomASObject +++++++++++++++++++++++++++++++
 
@@ -12608,6 +12373,8 @@ begin
   result := FName;
 end;
 
+
+
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //+++++++++++++++++++++++ TdomCustomASObjectNS +++++++++++++++++++++++++++
 
@@ -12618,6 +12385,8 @@ begin
   FOwnerModel := aOwner;
 end;
 
+
+
 //++++++++++++++++++++++++++ TdomASObjectNS ++++++++++++++++++++++++++++++
 
 constructor TdomASObjectNS.create(const aOwner: TdomASModelNS;
@@ -12626,20 +12395,20 @@ constructor TdomASObjectNS.create(const aOwner: TdomASModelNS;
   aLocalName: wideString);
 begin
   if (aNamespaceURI <> '') or (aPrefix <> '') or (aLocalName <> '') then begin
-    if not isXmlLocalPart(aLocalName) then
-      raise EInvalid_Character_Err.create('Invalid character error.');
+    if not isXmlLocalPart(aLocalName)
+      then raise EInvalid_Character_Err.create('Invalid character error.');
     if aPrefix <> '' then begin
-      if aNamespaceURI = '' then
-        raise ENamespace_Err.create('Namespace error.');
-      if not isXmlPrefix(aPrefix) then
-        raise ENamespace_Err.create('Namespace error.');
-      if (aPrefix = 'xmlns') and (aNamespaceURI <> 'http://www.w3.org/2000/xmlns/') then
-        raise ENamespace_Err.create('Namespace error.');
-      if (aPrefix = 'xml') and (aNamespaceURI <> 'http://www.w3.org/XML/1998/namespace') then
-        raise ENamespace_Err.create('Namespace error.');
+      if aNamespaceURI = ''
+        then raise ENamespace_Err.create('Namespace error.');
+      if not isXmlPrefix(aPrefix)
+        then raise ENamespace_Err.create('Namespace error.');
+      if (aPrefix = 'xmlns') and (aNamespaceURI <> 'http://www.w3.org/2000/xmlns/')
+        then raise ENamespace_Err.create('Namespace error.');
+      if (aPrefix = 'xml') and (aNamespaceURI <> 'http://www.w3.org/XML/1998/namespace')
+        then raise ENamespace_Err.create('Namespace error.');
     end;
-    if (aLocalName = 'xmlns') and (aNamespaceURI <> 'http://www.w3.org/2000/xmlns/') then
-      raise ENamespace_Err.create('Namespace error.');
+    if (aLocalName = 'xmlns') and (aNamespaceURI <> 'http://www.w3.org/2000/xmlns/')
+      then raise ENamespace_Err.create('Namespace error.');
   end;
   inherited create(aOwner);
   FNameSpaceURI := aNamespaceURI;
@@ -12650,12 +12419,13 @@ end;
 
 function TdomASObjectNS.getName: wideString;
 begin
-  if FPrefix = '' then
-    result := FLocalName
-  else
-    result := concat(FPrefix, ':', FLocalName);
+  if FPrefix = ''
+    then result := FLocalName
+  else result := concat(FPrefix, ':', FLocalName);
 end;
 {$ENDIF}
+
+
 
 //+++++++++++++++++++++++++++ TdomASContentModel +++++++++++++++++++++++++++
 
@@ -12663,10 +12433,9 @@ constructor TdomASContentModel.create(const aOwnerElementDecl: TdomASElementDecl
   const aName: wideString;
   const aContentModelType: TdomASContentModelType);
 begin
-  if aContentModelType = AS_ELEMENT_CM then
-    inherited create(aOwnerElementDecl.ownerModel as TdomASModel, aName)
-  else
-    inherited create(aOwnerElementDecl.ownerModel as TdomASModel, '');
+  if aContentModelType = AS_ELEMENT_CM
+    then inherited create(aOwnerElementDecl.ownerModel as TdomASModel, aName)
+  else inherited create(aOwnerElementDecl.ownerModel as TdomASModel, '');
 
   case aContentModelType of
 
@@ -12701,8 +12470,8 @@ end;
 
 function TdomASContentModel.appendSubModel(const newCM: TdomASContentModel): TdomASContentModel;
 begin
-  if newCM.FInuse then
-    raise EInuse_Err.create('Content model in use error.');
+  if newCM.FInuse
+    then raise EInuse_Err.create('Content model in use error.');
   result := (FSubModels.appendASNode(newCM) as TdomASContentModel);
   newCM.FInuse := true;
 end;
@@ -12710,16 +12479,16 @@ end;
 function TdomASContentModel.insertBeforeSubModel(const newCM,
   refCM: TdomASContentModel): TdomASContentModel;
 begin
-  if newCM.FInuse then
-    raise EInuse_Err.create('Content model in use error.');
+  if newCM.FInuse
+    then raise EInuse_Err.create('Content model in use error.');
   result := (FSubModels.insertBefore(newCM, refCM) as TdomASContentModel);
   newCM.FInuse := true;
 end;
 
 function TdomASContentModel.removeSubModel(const oldCM: TdomASContentModel): TdomASContentModel;
 begin
-  if FSubModels.indexof(oldCM) = -1 then
-    raise ENot_Found_Err.create('Node not found error.');
+  if FSubModels.indexof(oldCM) = -1
+    then raise ENot_Found_Err.create('Node not found error.');
   result := (FSubModels.removeASNode(oldCM) as TdomASContentModel);
   oldCM.FInuse := false;
 end;
@@ -12752,30 +12521,28 @@ begin
         end;
         restindex := tempindex;
       end;
-    end else if isNonDeterministic then
-      break;
+    end else if isNonDeterministic then break;
   end;
 
   case freq of
 
-    AS_REQUIRED_FRQ: begin
+    AS_REQUIRED_FRQ:
+      begin
         if matched then begin
           index := restindex;
           result := true;
-        end else
-          result := false;
+        end else result := false;
       end;
 
-    AS_OPTIONAL_FRQ: begin
-        if matched then
-          index := restindex;
+    AS_OPTIONAL_FRQ:
+      begin
+        if matched then index := restindex;
         result := true;
       end;
 
   end; {case ...}
 
-  if isNonDeterministic then
-    result := false;
+  if isNonDeterministic then result := false;
 end;
 
 function TdomASContentModel.validateElementNames(const source: TUtilsWideStringList;
@@ -12788,22 +12555,20 @@ begin
 
   case freq of
 
-    AS_REQUIRED_FRQ: begin
-        if index = source.count then
-          exit;
+    AS_REQUIRED_FRQ:
+      begin
+        if index = source.count then exit;
         if source[index] = name then begin
           inc(index);
           result := true;
-        end else
-          result := false;
+        end else result := false;
       end;
 
-    AS_OPTIONAL_FRQ: begin
+    AS_OPTIONAL_FRQ:
+      begin
         result := true;
-        if index = source.count then
-          exit;
-        if source[index] = name then
-          Inc(index);
+        if index = source.count then exit;
+        if source[index] = name then Inc(index);
       end;
 
   end; {case ...}
@@ -12843,29 +12608,27 @@ begin
     AS_OPTIONAL_FRQ:
       result := validateNames2(source, index, AS_OPTIONAL_FRQ, isNonDeterministic);
 
-    AS_ONE_OR_MORE_FRQ: begin
+    AS_ONE_OR_MORE_FRQ:
+      begin
         result := validateNames2(source, index, AS_REQUIRED_FRQ, isNonDeterministic);
         if result then begin
           tempindex := index;
           while tempindex < source.count do begin
-            if not validateNames2(source, tempindex, AS_REQUIRED_FRQ, isNonDeterministic) then
-              break;
-            if index = tempindex then
-              break; // Test for expressions of the form: (foo*)+
+            if not validateNames2(source, tempindex, AS_REQUIRED_FRQ, isNonDeterministic) then break;
+            if index = tempindex then break; // Test for expressions of the form: (foo*)+
             index := tempindex;
           end;
         end;
       end;
 
-    AS_ZERO_OR_MORE_FRQ: begin
+    AS_ZERO_OR_MORE_FRQ:
+      begin
         result := validateNames2(source, index, AS_OPTIONAL_FRQ, isNonDeterministic);
         if result then begin
           tempindex := index;
           while tempindex < source.count do begin
-            if not validateNames2(source, tempindex, AS_REQUIRED_FRQ, isNonDeterministic) then
-              break;
-            if index = tempindex then
-              break; // Test for expressions of the form: (foo*)* or (foo+)*
+            if not validateNames2(source, tempindex, AS_REQUIRED_FRQ, isNonDeterministic) then break;
+            if index = tempindex then break; // Test for expressions of the form: (foo*)* or (foo+)*
             index := tempindex;
           end;
         end;
@@ -12873,8 +12636,7 @@ begin
 
   end; {case ...}
 
-  if isNonDeterministic then
-    result := false;
+  if isNonDeterministic then result := false;
 end;
 
 function TdomASContentModel.validateSequenceNames(const source: TUtilsWideStringList;
@@ -12893,31 +12655,31 @@ begin
   ok := false;
   for i := 0 to pred(subModels.length) do begin
     ok := (subModels.item(i) as TdomASContentModel).validateNames(source, tempindex, isNonDeterministic);
-    if not ok then
-      break;
+    if not ok then break;
   end;
 
   case freq of
 
-    AS_REQUIRED_FRQ: begin
+    AS_REQUIRED_FRQ:
+      begin
         if ok then begin
           index := tempindex;
           result := true;
-        end else
-          result := false;
+        end else result := false;
       end;
 
-    AS_OPTIONAL_FRQ: begin
-        if ok then
-          index := tempindex;
+    AS_OPTIONAL_FRQ:
+      begin
+        if ok then index := tempindex;
         result := true;
       end;
 
   end; {case ...}
 
-  if isNonDeterministic then
-    result := false;
+  if isNonDeterministic then result := false;
 end;
+
+
 
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //++++++++++++++++++++++++++ TdomASContentModelNS ++++++++++++++++++++++++++
@@ -12959,8 +12721,8 @@ end;
 
 function TdomASContentModelNS.appendSubModel(const newCM: TdomASContentModelNS): TdomASContentModelNS;
 begin
-  if newCM.FInuse then
-    raise EInuse_Err.create('Content model in use error.');
+  if newCM.FInuse
+    then raise EInuse_Err.create('Content model in use error.');
   result := (FSubModels.appendASNode(newCM) as TdomASContentModelNS);
   newCM.FInuse := true;
 end;
@@ -12973,34 +12735,36 @@ end;
 function TdomASContentModelNS.insertBeforeSubModel(const newCM,
   refCM: TdomASContentModelNS): TdomASContentModelNS;
 begin
-  if newCM.FInuse then
-    raise EInuse_Err.create('Content model in use error.');
+  if newCM.FInuse
+    then raise EInuse_Err.create('Content model in use error.');
   result := (FSubModels.insertBefore(newCM, refCM) as TdomASContentModelNS);
   newCM.FInuse := true;
 end;
 
 function TdomASContentModelNS.removeSubModel(const oldCM: TdomASContentModelNS): TdomASContentModelNS;
 begin
-  if FSubModels.indexof(oldCM) = -1 then
-    raise ENot_Found_Err.create('Node not found error.');
+  if FSubModels.indexof(oldCM) = -1
+    then raise ENot_Found_Err.create('Node not found error.');
   result := (FSubModels.removeASNode(oldCM) as TdomASContentModelNS);
   oldCM.FInuse := false;
 end;
 
 procedure TdomASContentModelNS.setMaxOccurs(const value: integer);
 begin
-  if (value < 0) or ((contentModelType = AS_ALL_CM) and (value > 1)) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if (value < 0) or ((contentModelType = AS_ALL_CM) and (value > 1))
+    then raise ENot_Supported_Err.create('Not supported error.');
   FMaxOccurs := value;
 end;
 
 procedure TdomASContentModelNS.setMinOccurs(const value: integer);
 begin
-  if (value < 0) or ((contentModelType = AS_ALL_CM) and (value > 1)) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if (value < 0) or ((contentModelType = AS_ALL_CM) and (value > 1))
+    then raise ENot_Supported_Err.create('Not supported error.');
   FMinOccurs := value;
 end;
 {$ENDIF}
+
+
 
 //+++++++++++++++++++++++++ TdomASAttributeDecl ++++++++++++++++++++++++++
 
@@ -13029,6 +12793,8 @@ begin
   inherited;
 end;
 
+
+
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //++++++++++++++++++++++++ TdomASAttributeDeclNS +++++++++++++++++++++++++
 
@@ -13037,8 +12803,8 @@ constructor TdomASAttributeDeclNS.create(const aOwnerElementDecl: TdomASElementD
   aPrefix,
   aLocalName: wideString);
 begin
-  if aLocalName = '' then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if aLocalName = ''
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwnerElementDecl.ownerModel as TdomASModelNS, aNamespaceURI, aPrefix, aLocalName);
   FObjectType := AS_ATTRIBUTE_DECLARATION;
   FAttrType := AS_STRING_DATATYPE;
@@ -13055,6 +12821,8 @@ begin
 end;
 {$ENDIF}
 
+
+
 //+++++++++++++++++++++++++++ TdomASEntityDecl +++++++++++++++++++++++++++
 
 constructor TdomASEntityDecl.create(const aOwner: TdomASModel;
@@ -13064,8 +12832,8 @@ constructor TdomASEntityDecl.create(const aOwner: TdomASModel;
   aSystemId,
   aNotationName: wideString);
 begin
-  if not IsXmlName(aName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(aName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner, aName);
 
   FObjectType := AS_ENTITY_DECLARATION;
@@ -13093,10 +12861,9 @@ end;
 
 function TdomASEntityDecl.getEntityType: TdomASEntityType;
 begin
-  if (FPublicId = '') and (FSystemId = '') and (FNotationName = '') then
-    result := AS_INTERNAL_ENTITY
-  else
-    result := AS_EXTERNAL_ENTITY;
+  if (FPublicId = '') and (FSystemId = '') and (FNotationName = '')
+    then result := AS_INTERNAL_ENTITY
+  else result := AS_EXTERNAL_ENTITY;
 end;
 
 function TdomASEntityDecl.getIsParsedEntity: boolean;
@@ -13129,13 +12896,14 @@ begin
                 or invalidEncoding
                 or not (declType in [DT_TEXT_DECLARATION,
                 DT_XML_OR_TEXT_DECLARATION,
-                  DT_UNSPECIFIED]) then
-                result := false
+                  DT_UNSPECIFIED])
+                then result := false
               else begin
                 Content := TUtilsCustomWideStr.create;
                 try
                   Next;
-                  while not Eof do begin
+                  while not Eof do
+                  begin
                     Content.AddUCS4Char(CurrentCodePoint);
                     Next;
                   end;
@@ -13155,8 +12923,7 @@ begin
       end; {if ...}
 
     end; {if ...}
-  end else
-    Result := True;
+  end else Result := True;
 end;
 
 procedure TdomASEntityDecl.setReplacementText(const S: wideString);
@@ -13214,6 +12981,8 @@ begin
   end; {if ...}
 end;
 
+
+
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //++++++++++++++++++++++++++ TdomASEntityDeclNS ++++++++++++++++++++++++++
 
@@ -13226,8 +12995,8 @@ constructor TdomASEntityDeclNS.create(const aOwner: TdomASModelNS;
   aSystemId,
   aNotationName: wideString);
 begin
-  if aLocalName = '' then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if aLocalName = ''
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner, aNamespaceURI, aPrefix, aLocalName);
 
   FObjectType := AS_ENTITY_DECLARATION;
@@ -13276,10 +13045,9 @@ end;
 
 function TdomASEntityDeclNS.getEntityType: TdomASEntityType;
 begin
-  if (FPublicId = '') and (FSystemId = '') then
-    result := AS_INTERNAL_ENTITY
-  else
-    result := AS_EXTERNAL_ENTITY;
+  if (FPublicId = '') and (FSystemId = '')
+    then result := AS_INTERNAL_ENTITY
+  else result := AS_EXTERNAL_ENTITY;
 end;
 
 function TdomASEntityDeclNS.getIsParsedEntity: boolean;
@@ -13293,6 +13061,8 @@ begin
 end;
 {$ENDIF}
 
+
+
 //++++++++++++++++++++++++++ TdomASNotationDecl ++++++++++++++++++++++++++
 
 constructor TdomASNotationDecl.create(const aOwner: TdomASModel;
@@ -13300,17 +13070,19 @@ constructor TdomASNotationDecl.create(const aOwner: TdomASModel;
   aPublicId,
   aSystemId: wideString);
 begin
-  if not IsXmlName(aName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlPubidChars(aPublicId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlSystemChars(aSystemId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(aName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlPubidChars(aPublicId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlSystemChars(aSystemId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner, aName);
   FObjectType := AS_NOTATION_DECLARATION;
   FPublicId := aPublicId;
   FSystemId := aSystemId;
 end;
+
+
 
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //+++++++++++++++++++++++++ TdomASNotationDeclNS +++++++++++++++++++++++++
@@ -13322,12 +13094,12 @@ constructor TdomASNotationDeclNS.create(const aOwner: TdomASModelNS;
   aPublicId,
   aSystemId: wideString);
 begin
-  if aLocalName = '' then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlPubidChars(aPublicId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlSystemChars(aSystemId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if aLocalName = ''
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlPubidChars(aPublicId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlSystemChars(aSystemId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner, aNamespaceURI, aPrefix, aLocalName);
   FObjectType := AS_NOTATION_DECLARATION;
   FPublicId := aPublicId;
@@ -13335,14 +13107,16 @@ begin
 end;
 {$ENDIF}
 
+
+
 //++++++++++++++++++++++++++ TdomASElementDecl +++++++++++++++++++++++++++
 
 constructor TdomASElementDecl.create(const aOwner: TdomASModel;
   const aName: wideString;
   const aContentType: TdomASContentType);
 begin
-  if not IsXmlName(aName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not IsXmlName(aName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner, aName);
 
   FContentType := AS_UNKNOWN_CONTENTTYPE; // First set FContentType to AS_UNKNOWN_CONTENTTYPE, ...
@@ -13390,8 +13164,8 @@ procedure TdomASElementDecl.freeAndNilContentModel(var cm: TdomASContentModel);
 var
   submdl: TdomASContentModel;
 begin
-  if cm.FInuse then
-    raise EInuse_Err.create('Content model in use error.');
+  if cm.FInuse
+    then raise EInuse_Err.create('Content model in use error.');
   // First recursively free the submodels:
   with cm do
     with subModels do
@@ -13414,8 +13188,7 @@ begin
     FAttributeDeclarations.removeNamedItem(name);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASElementDecl.replaceContentModel(const newContentModel: TdomASContentModel): TdomASContentModel;
@@ -13425,16 +13198,16 @@ begin
     exit;
   end;
   if assigned(newContentModel) then begin
-    if newContentModel.ownerModel <> ownerModel then
-      raise EAS_Wrong_Element_Decl_Err.create('Wrong element declaration error.');
-    if not (newContentModel.contentModelType in FAllowedChildTypes) then
-      raise ENot_Supported_Err.create('Not supported error.');
-    if newContentModel.FInuse then
-      raise EInuse_Err.create('Content model in use error.');
+    if newContentModel.ownerModel <> ownerModel
+      then raise EAS_Wrong_Element_Decl_Err.create('Wrong element declaration error.');
+    if not (newContentModel.contentModelType in FAllowedChildTypes)
+      then raise ENot_Supported_Err.create('Not supported error.');
+    if newContentModel.FInuse
+      then raise EInuse_Err.create('Content model in use error.');
     newContentModel.FInuse := true;
   end;
-  if assigned(FContentModel) then
-    FContentModel.FInuse := false;
+  if assigned(FContentModel)
+    then FContentModel.FInuse := false;
   result := FContentModel;
   FContentModel := newContentModel;
 end;
@@ -13458,8 +13231,8 @@ end;
 
 procedure TdomASElementDecl.setContentType(const value: TdomASContentType);
 begin
-  if FContentType <> AS_UNKNOWN_CONTENTTYPE then
-    raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
+  if FContentType <> AS_UNKNOWN_CONTENTTYPE
+    then raise ENo_Modification_Allowed_Err.create('No modification allowed error.');
   FContentType := value;
   case value of
     AS_ANY_CONTENTTYPE,
@@ -13476,6 +13249,8 @@ begin
   end;
 end;
 
+
+
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //+++++++++++++++++++++++++ TdomASElementDeclNS ++++++++++++++++++++++++++
 
@@ -13485,8 +13260,8 @@ constructor TdomASElementDeclNS.create(const aOwner: TdomASModelNS;
   aLocalName: wideString;
   const aContentType: TdomASContentType);
 begin
-  if aLocalName = '' then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if aLocalName = ''
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(aOwner, aNamespaceURI, aPrefix, aLocalName);
   case aContentType of
     AS_ANY_CONTENTTYPE,
@@ -13539,8 +13314,8 @@ procedure TdomASElementDeclNS.freeAndNilContentModel(var cm: TdomASContentModelN
 var
   submdl: TdomASContentModelNS;
 begin
-  if cm.FInuse then
-    raise EInuse_Err.create('Content model in use error.');
+  if cm.FInuse
+    then raise EInuse_Err.create('Content model in use error.');
   // First recursively free the submodels:
   with cm do
     with subModels do
@@ -13564,17 +13339,16 @@ begin
     FAttributeDeclarations.removeNamedItem(namespaceURI, localName);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASElementDeclNS.replaceContentModel(const newContentModel: TdomASContentModelNS): TdomASContentModelNS;
 begin
   if assigned(newContentModel) then begin
-    if newContentModel.ownerModel <> ownerModel then
-      raise EAS_Wrong_Element_Decl_Err.create('Wrong element declaration error.');
-    if not (newContentModel.contentModelType in FAllowedChildTypes) then
-      raise ENot_Supported_Err.create('Not supported error.');
+    if newContentModel.ownerModel <> ownerModel
+      then raise EAS_Wrong_Element_Decl_Err.create('Wrong element declaration error.');
+    if not (newContentModel.contentModelType in FAllowedChildTypes)
+      then raise ENot_Supported_Err.create('Not supported error.');
   end;
   FContentModel.FInuse := false;
   result := FContentModel;
@@ -13597,6 +13371,8 @@ begin
   end;
 end;
 {$ENDIF}
+
+
 
 //+++++++++++++++++++++++++++++ TdomASModel +++++++++++++++++++++++++++++
 
@@ -13638,10 +13414,9 @@ var
   elDecl: TdomASElementDecl;
 begin
   elDecl := findASElementDecl(elementName);
-  if assigned(elDecl) then
-    result := elDecl.findASAttributeDecl(attributeName)
-  else
-    result := nil;
+  if assigned(elDecl)
+    then result := elDecl.findASAttributeDecl(attributeName)
+  else result := nil;
 end;
 
 function TdomASModel.findASElementDecl(const name: wideString): TdomASElementDecl;
@@ -13678,8 +13453,7 @@ begin
     FElementDeclarations.removeNamedItem(name);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASModel.removeASEntityDecl(const name: wideString): boolean;
@@ -13691,8 +13465,7 @@ begin
     FEntityDeclarations.removeNamedItem(name);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASModel.removeASNotationDecl(const name: wideString): boolean;
@@ -13704,8 +13477,7 @@ begin
     FNotationDeclarations.removeNamedItem(name);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASModel.setASElementDecl(const name: wideString;
@@ -13717,8 +13489,7 @@ begin
     if elementDecl.contentType = AS_UNKNOWN_CONTENTTYPE then begin
       elementDecl.contentType := contentType;
       result := true;
-    end else
-      result := false;
+    end else result := false;
   end else begin
     elementDecl := TdomASElementDecl.create(self, name, contentType);
     FElementDeclarations.setNamedItem(elementDecl);
@@ -13758,6 +13529,8 @@ begin
   end;
 end;
 
+
+
 {$IFDEF INCLUDE_NAMESPACE_ABSTRACT_SCHEMA_MODEL}
 //++++++++++++++++++++++++++ TdomCustomASModelNS ++++++++++++++++++++++++++
 
@@ -13773,6 +13546,8 @@ begin
   FOwnerCollections.free;
   inherited;
 end;
+
+
 
 //++++++++++++++++++++++++++++ TdomASModelNS ++++++++++++++++++++++++++++
 
@@ -13819,10 +13594,9 @@ var
   elDecl: TdomASElementDeclNS;
 begin
   elDecl := findASElementDecl(elementNamespaceURI, elementLocalName);
-  if assigned(elDecl) then
-    result := elDecl.findASAttributeDecl(attributeNamespaceURI, attributeLocalName)
-  else
-    result := nil;
+  if assigned(elDecl)
+    then result := elDecl.findASAttributeDecl(attributeNamespaceURI, attributeLocalName)
+  else result := nil;
 end;
 
 function TdomASModelNS.findASElementDecl(const aNamespaceURI,
@@ -13853,8 +13627,7 @@ begin
     FElementDeclarations.removeNamedItem(aNamespaceURI, aLocalName);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASModelNS.removeASEntityDecl(const aNamespaceURI,
@@ -13867,8 +13640,7 @@ begin
     FEntityDeclarations.removeNamedItem(aNamespaceURI, aLocalName);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASModelNS.removeASNotationDecl(const aNamespaceURI,
@@ -13881,8 +13653,7 @@ begin
     FNotationDeclarations.removeNamedItem(aNamespaceURI, aLocalName);
     obj.Free;
     result := true;
-  end else
-    result := false;
+  end else result := false;
 end;
 
 function TdomASModelNS.setASElementDecl(const aNamespaceURI,
@@ -13938,6 +13709,8 @@ begin
 end;
 {$ENDIF}
 
+
+
 // +++++++++++++++++++++++++++ TXmlSourceCode ++++++++++++++++++++++++++
 
 procedure TXmlSourceCode.calculatePieceOffset(const startItem: integer);
@@ -13945,22 +13718,22 @@ var
   os, i: integer;
 begin
   if (startItem < count) and (startItem >= 0) then begin
-    if startItem = 0 then
-      os := 0
+    if startItem = 0
+      then os := 0
     else begin
-      if not assigned(Items[startItem - 1]) then begin
+      if not assigned(Items[startItem - 1])
+        then begin
         pack;
         exit;
-      end else
-        with TXmlSourceCodePiece(Items[startItem - 1]) do
+      end else with TXmlSourceCodePiece(Items[startItem - 1]) do
           os := FOffset + length(FText);
     end;
     for i := startItem to count - 1 do
-      if not assigned(Items[i]) then begin
+      if not assigned(Items[i])
+        then begin
         pack;
         exit;
-      end else
-        with TXmlSourceCodePiece(Items[i]) do begin
+      end else with TXmlSourceCodePiece(Items[i]) do begin
           FOffset := os;
           os := os + length(FText);
         end;
@@ -13976,15 +13749,13 @@ begin
     if assigned(Items[i]) then
       with TXmlSourceCodePiece(Items[i]) do
         if (pieceType = xmlStartTag) or (pieceType = xmlEmptyElementTag) then begin
-          if pieceType = xmlStartTag then
-            k := length(text) - 1
-          else
-            k := length(text) - 2;
+          if pieceType = xmlStartTag
+            then k := length(text) - 1
+          else k := length(text) - 2;
           j := 1;
           while j < k do begin
             inc(j);
-            if IsXmlWhiteSpace(text[j]) then
-              break;
+            if IsXmlWhiteSpace(text[j]) then break;
             Result := concat(Result, wideString(WideChar(text[j])));
           end;
           exit;
@@ -14010,12 +13781,10 @@ end;
 function TXmlSourceCode.Add(Item: pointer): Integer;
 begin
   if assigned(Item) then begin
-    if not assigned(TXmlSourceCodePiece(Item).FOwner) then
-      TXmlSourceCodePiece(Item).FOwner := self
-    else
-      Error('Inuse source code piece error.', -1);
-  end else
-    Error('Item not assigned error.', -1);
+    if not assigned(TXmlSourceCodePiece(Item).FOwner)
+      then TXmlSourceCodePiece(Item).FOwner := self
+    else Error('Inuse source code piece error.', -1);
+  end else Error('Item not assigned error.', -1);
   Result := inherited Add(Item);
   calculatePieceOffset(Result);
 end;
@@ -14038,8 +13807,7 @@ var
   i: integer;
 begin
   for i := 0 to count - 1 do
-    if assigned(Items[i]) then
-      TXmlSourceCodePiece(Items[i]).free;
+    if assigned(Items[i]) then TXmlSourceCodePiece(Items[i]).free;
   inherited clear;
 end;
 
@@ -14069,14 +13837,12 @@ var
 begin
   // xxx This search routine is not optimized.
   Result := nil;
-  if pos < 1 then
-    exit;
+  if pos < 1 then exit;
   for i := 0 to count - 1 do
     if not assigned(Items[i]) then begin
       pack;
       Result := getPieceAtPos(pos);
-    end else
-      with TXmlSourceCodePiece(Items[i]) do begin
+    end else with TXmlSourceCodePiece(Items[i]) do begin
         if (FOffset + length(FText)) >= pos then begin
           Result := TXmlSourceCodePiece(Items[i]);
           exit;
@@ -14087,12 +13853,10 @@ end;
 procedure TXmlSourceCode.Insert(Index: Integer; Item: pointer);
 begin
   if assigned(Item) then begin
-    if not assigned(TXmlSourceCodePiece(Item).FOwner) then
-      TXmlSourceCodePiece(Item).FOwner := self
-    else
-      Error('Inuse source code piece error.', -1);
-  end else
-    Error('Item not assigned error.', -1);
+    if not assigned(TXmlSourceCodePiece(Item).FOwner)
+      then TXmlSourceCodePiece(Item).FOwner := self
+    else Error('Inuse source code piece error.', -1);
+  end else Error('Item not assigned error.', -1);
   inherited Insert(Index, item);
   calculatePieceOffset(index);
 end;
@@ -14132,6 +13896,8 @@ begin
   calculatePieceOffset(0);
 end;
 
+
+
 // ++++++++++++++++++++++++ TXmlSourceCodePiece ++++++++++++++++++++++++
 
 constructor TXmlSourceCodePiece.create(const pt: TdomPieceType);
@@ -14141,6 +13907,8 @@ begin
   FOffset := 0;
   FOwner := nil;
 end;
+
+
 
 // +++++++++++++++++++++++ TStandardResourceResolver +++++++++++++++++++++++
 
@@ -14188,10 +13956,9 @@ begin
   result := nil;
 
   // Calculate absolute system identifier:
-  if ResolveRelativeUriWideStr(ABaseUri, systemId, Uri) then
-    systemId := Uri
-  else
-    systemId := '';
+  if ResolveRelativeUriWideStr(ABaseUri, systemId, Uri)
+    then systemId := Uri
+  else systemId := '';
 
   if assigned(FOnResolveResource) then
     FOnResolveResource(self, resourceType, namespaceURI, publicId, systemId, result, certifiedText);
@@ -14205,6 +13972,8 @@ begin
     end;
   end;
 end;
+
+
 
 { TXmlCustomInputSource }
 
@@ -14313,8 +14082,7 @@ begin
           Result := False;
           Exit;
         end; {if ... else ...}
-      end else
-        DeclType := DT_TEXT_DECLARATION;
+      end else DeclType := DT_TEXT_DECLARATION;
 
       // EncodingDecl:
       if CurrentCharInfo.CodePoint = $0065 then begin // 'e'
@@ -14360,8 +14128,7 @@ begin
         if declType = DT_TEXT_DECLARATION then begin
           Result := False;
           Exit;
-        end else
-          DeclType := DT_XML_DECLARATION;
+        end else DeclType := DT_XML_DECLARATION;
       end; {if ... else ...}
 
       // SDDecl:
@@ -14427,8 +14194,7 @@ begin
         if declType = DT_TEXT_DECLARATION then begin
           Result := False;
           Exit;
-        end else
-          DeclType := DT_XML_DECLARATION;
+        end else DeclType := DT_XML_DECLARATION;
       end; {if ...}
 
       // '?>':
@@ -14448,8 +14214,8 @@ begin
 
             if ((ByteOrderMarkType = TUTF16BECodec) and (NewCodecClass <> TUTF16BECodec) and (NewCodecClass <> TUCS2Codec)) or
               ((ByteOrderMarkType = TUTF16LECodec) and (NewCodecClass <> TUTF16LECodec)) or
-              ((ByteOrderMarkType = TUTF8Codec) and (NewCodecClass <> TUTF8Codec)) then
-              InvalidEnc := True; // Byte order mark does not fit to encoding declaration.
+              ((ByteOrderMarkType = TUTF8Codec) and (NewCodecClass <> TUTF8Codec))
+              then InvalidEnc := True; // Byte order mark does not fit to encoding declaration.
             SetCodecClass(NewCodecClass);
 
           end else begin
@@ -14498,6 +14264,8 @@ function TXmlInputSource.GetPreviousCodePoint: UCS4Char;
 begin
   Result := PreviousCharInfo.CodePoint;
 end;
+
+
 
 { TXmlCustomTokenizer }
 
@@ -14579,11 +14347,12 @@ end;
 
 function TXmlCustomTokenizer.GetUri: WideString;
 begin
-  if Assigned(FInputSource) then
-    Result := FInputSource.SystemId
-  else
-    Result := '';
+  if Assigned(FInputSource)
+    then Result := FInputSource.SystemId
+  else Result := '';
 end;
+
+
 
 { TXmlDocTokenizer }
 
@@ -14591,10 +14360,9 @@ constructor TXmlDocTokenizer.create(const aInputSource: TXmlInputSource;
   const aTabWidth: cardinal);
 begin
   inherited;
-  if Assigned(AInputSource) then
-    FTokenType := XML_START_OF_SOURCE_TOKEN
-  else
-    FTokenType := XML_END_OF_SOURCE_TOKEN;
+  if Assigned(AInputSource)
+    then FTokenType := XML_START_OF_SOURCE_TOKEN
+  else FTokenType := XML_END_OF_SOURCE_TOKEN;
 end;
 
 procedure TXmlDocTokenizer.next;
@@ -14634,8 +14402,7 @@ var
   subEndMarker, SubStartMarker: wideString;
   SQ_Open, DQ_Open, Bracket_Open: boolean;
 begin
-  if FTokenType = XML_END_OF_SOURCE_TOKEN then
-    exit;
+  if FTokenType = XML_END_OF_SOURCE_TOKEN then exit;
 
   FTokenValue.Clear;
   FErrorType := ET_NONE;
@@ -14681,7 +14448,8 @@ begin
                 while FInputSource.NextCodePoint <> STRING_TERMINATOR_CODE do begin
                   FInputSource.Next;
                   if (FInputSource.CurrentCodePoint = QM_CODE) and
-                    (FInputSource.NextCodePoint = GT_CODE) then begin
+                    (FInputSource.NextCodePoint = GT_CODE)
+                    then begin
                 // '?>' found:
                     FTokenEnd := FInputSource.PreviousCharInfo;
                     FInputSource.Next;
@@ -14768,8 +14536,7 @@ begin
                       // '>' found:
                             FInputSource.Next;
                             exit;
-                          end else
-                            FTokenValue.addUCS4Char(RS_BRACKET_CODE);
+                          end else FTokenValue.addUCS4Char(RS_BRACKET_CODE);
                         end;
                         FTokenValue.addUCS4Char(FInputSource.CurrentCodePoint);
                       end;
@@ -14801,7 +14568,8 @@ begin
                           and (not DQ_Open)
                           and (not SQ_Open)
                           and (not Bracket_Open)
-                          and (SubEndMarker = '') then begin
+                          and (SubEndMarker = '')
+                          then begin
                           FTokenEnd := FInputSource.PreviousCharInfo;
                           Exit;
                         end;
@@ -14834,20 +14602,17 @@ begin
                               end;
                               if (FInputSource.CurrentCodePoint = RS_BRACKET_CODE) // ']'
                                 and (not SQ_Open)
-                                and (not DQ_Open) then
-                                Bracket_Open := false;
+                                and (not DQ_Open)
+                                then Bracket_Open := false;
                             end; {if not ...}
                           end else begin {if BracketOpened ... }
                             if (FInputSource.CurrentCodePoint = LS_BRACKET_CODE) // '['
                               and (not SQ_Open)
-                              and (not DQ_Open) then
-                              Bracket_Open := true;
+                              and (not DQ_Open) then Bracket_Open := true;
                           end; {if BracketOpened ... else ...}
 
-                        end else begin
-                          ; {if (SubEndMarker = '') ...}
-                          if FTokenValue.endsWith(SubEndMarker) then
-                            SubEndMarker := '';
+                        end else begin; {if (SubEndMarker = '') ...}
+                          if FTokenValue.endsWith(SubEndMarker) then SubEndMarker := '';
                         end; {if (SubEndMarker = '') ... else ...}
 
                       end;
@@ -14984,7 +14749,8 @@ begin
             FTokenStart := FInputSource.NextCharInfo;
             if IsXmlLetterCodePoint(FInputSource.NextCodePoint) or
               (FInputSource.NextCodePoint = COLON_CODE) or
-              (FInputSource.NextCodePoint = LOW_LINE_CODE) then begin
+              (FInputSource.NextCodePoint = LOW_LINE_CODE)
+              then begin
               FInputSource.Next;
               FTokenValue.addUCS4Char(FInputSource.CurrentCodePoint);
               while IsXmlNameCharCodePoint(FInputSource.NextCodePoint) do begin
@@ -15030,6 +14796,8 @@ begin
   end; {try ...}
 end;
 
+
+
 { TXmlDoctypeDeclTokenizer }
 
 constructor TXmlDoctypeDeclTokenizer.create(const aInputSource: TXmlInputSource;
@@ -15038,15 +14806,15 @@ begin
   inherited;
   if assigned(aInputSource) then begin
     if aInputSource.hasMalformedDecl
-      or not (aInputSource.declType in [DT_UNSPECIFIED]) then begin
+      or not (aInputSource.declType in [DT_UNSPECIFIED])
+      then begin
       FTokenType := DOCTYPE_END_OF_SOURCE_TOKEN;
       FErrorType := ET_INVALID_MARKUP_DECL;
     end else begin
       FTokenType := DOCTYPE_START_OF_SOURCE_TOKEN;
       FErrorType := ET_NONE;
     end;
-  end else
-    FTokenType := DOCTYPE_END_OF_SOURCE_TOKEN;
+  end else FTokenType := DOCTYPE_END_OF_SOURCE_TOKEN;
 end;
 
 procedure TXmlDoctypeDeclTokenizer.next;
@@ -15081,8 +14849,7 @@ var
   QuoteCode: UCS4Char;
   SQ_Open: Boolean;
 begin
-  if FTokenType = DOCTYPE_END_OF_SOURCE_TOKEN then
-    Exit;
+  if FTokenType = DOCTYPE_END_OF_SOURCE_TOKEN then Exit;
 
   FTokenValue.Clear;
   FErrorType := ET_NONE;
@@ -15092,7 +14859,8 @@ begin
   try
 
     case FTokenType of
-      DOCTYPE_INTSUBSET_TOKEN: begin
+      DOCTYPE_INTSUBSET_TOKEN:
+        begin
           // Skip whitespace:
           while isXmlWhiteSpaceCodePoint(FInputSource.NextCodePoint) do
             FInputSource.Next;
@@ -15107,18 +14875,21 @@ begin
           end;
         end;
 
-      DOCTYPE_NAME_TOKEN: begin
+      DOCTYPE_NAME_TOKEN:
+        begin
           // Skip optional whitespace:
           while isXmlWhiteSpaceCodePoint(FInputSource.NextCodePoint) do
             FInputSource.Next;
 
           case FInputSource.NextCodePoint of
-            STRING_TERMINATOR_CODE: begin
+            STRING_TERMINATOR_CODE:
+              begin
                 FInputSource.Next;
                 FTokenEnd := FInputSource.PreviousCharInfo;
                 FTokenType := DOCTYPE_END_OF_SOURCE_TOKEN;
               end;
-            CAPITAL_P_CODE: {// 'P' --> 'PUBLIC' found.} begin
+            CAPITAL_P_CODE: // 'P' --> 'PUBLIC' found.
+              begin
                 FInputSource.Next;
                 FTokenStart := FInputSource.CurrentCharInfo;
                 for I := 0 to 4 do
@@ -15172,7 +14943,8 @@ begin
                 FInputSource.Next;
 
               end;
-            CAPITAL_S_CODE: {// 'S' --> 'SYSTEM' found.} begin
+            CAPITAL_S_CODE: // 'S' --> 'SYSTEM' found.
+              begin
                 FInputSource.Next;
                 FTokenStart := FInputSource.CurrentCharInfo;
                 for I := 0 to 4 do
@@ -15187,7 +14959,8 @@ begin
                 FTokenType := DOCTYPE_PUBID_TOKEN;
                 Self.Next;
               end;
-            LS_BRACKET_CODE: {// '[' found.} begin
+            LS_BRACKET_CODE: // '[' found.
+              begin
                 FTokenType := DOCTYPE_SYSID_TOKEN;
                 Self.Next;
               end;
@@ -15200,7 +14973,8 @@ begin
 
         end;
 
-      DOCTYPE_PUBID_TOKEN: begin
+      DOCTYPE_PUBID_TOKEN:
+        begin
           FTokenType := DOCTYPE_SYSID_TOKEN;
           FTokenStart := FInputSource.NextCharInfo;
 
@@ -15241,7 +15015,8 @@ begin
           FInputSource.Next;
         end;
 
-      DOCTYPE_START_OF_SOURCE_TOKEN: begin
+      DOCTYPE_START_OF_SOURCE_TOKEN:
+        begin
           FTokenType := DOCTYPE_NAME_TOKEN;
 
           // Test for leading whitespace:
@@ -15274,18 +15049,21 @@ begin
           FTokenEnd := FInputSource.CurrentCharInfo;
         end;
 
-      DOCTYPE_SYSID_TOKEN: begin
+      DOCTYPE_SYSID_TOKEN:
+        begin
           // Skip optional whitespace:
           while isXmlWhiteSpaceCodePoint(FInputSource.NextCodePoint) do
             FInputSource.Next;
 
           case FInputSource.NextCodePoint of
-            STRING_TERMINATOR_CODE: begin
+            STRING_TERMINATOR_CODE:
+              begin
                 FInputSource.Next;
                 FTokenEnd := FInputSource.PreviousCharInfo;
                 FTokenType := DOCTYPE_END_OF_SOURCE_TOKEN;
               end;
-            LS_BRACKET_CODE: {// '[' found.} begin
+            LS_BRACKET_CODE: // '[' found.
+              begin
                 FTokenType := DOCTYPE_INTSUBSET_TOKEN;
                 FInputSource.Next;
                 FTokenStart := FInputSource.NextCharInfo;
@@ -15351,7 +15129,8 @@ begin
                         DQ_Open := True;
                       SQ_CODE: // '''
                         SQ_Open := True;
-                      RS_BRACKET_CODE: {// ']'} begin
+                      RS_BRACKET_CODE: // ']'
+                        begin
                           FTokenEnd := FInputSource.PreviousCharInfo;
                           Exit;
                         end;
@@ -15385,6 +15164,8 @@ begin
   end; {try ...}
 end;
 
+
+
 { TXmlDtdTokenizer }
 
 constructor TXmlDtdTokenizer.create(const aInputSource: TXmlInputSource;
@@ -15397,7 +15178,8 @@ begin
       if aInputSource.hasMalformedDecl
         or not (aInputSource.declType in [DT_TEXT_DECLARATION,
         DT_XML_OR_TEXT_DECLARATION,
-          DT_UNSPECIFIED]) then begin
+          DT_UNSPECIFIED])
+        then begin
         FTokenType := DTD_END_OF_SOURCE_TOKEN;
         FErrorType := ET_INVALID_TEXT_DECL;
       end else if aInputSource.invalidEncoding then begin
@@ -15409,7 +15191,8 @@ begin
       end;
     end else begin
       if aInputSource.hasMalformedDecl
-        or not (aInputSource.declType in [DT_UNSPECIFIED]) then begin
+        or not (aInputSource.declType in [DT_UNSPECIFIED])
+        then begin
         FTokenType := DTD_END_OF_SOURCE_TOKEN;
         FErrorType := ET_INVALID_MARKUP_DECL;
       end else begin
@@ -15417,8 +15200,7 @@ begin
         FErrorType := ET_NONE;
       end;
     end;
-  end else
-    FTokenType := DTD_END_OF_SOURCE_TOKEN;
+  end else FTokenType := DTD_END_OF_SOURCE_TOKEN;
 end;
 
 procedure TXmlDtdTokenizer.next;
@@ -15455,8 +15237,7 @@ var
   SQ_Open: boolean;
   DQ_Open: boolean;
 begin
-  if FTokenType = DTD_END_OF_SOURCE_TOKEN then
-    exit;
+  if FTokenType = DTD_END_OF_SOURCE_TOKEN then exit;
 
   FTokenValue.Clear;
   FTokenType := DTD_INVALID_MARKUP_TOKEN;
@@ -15481,7 +15262,8 @@ begin
                 while FInputSource.NextCodePoint <> STRING_TERMINATOR_CODE do begin
                   FInputSource.Next;
                   if (FInputSource.CurrentCodePoint = QM_CODE) and
-                    (FInputSource.NextCodePoint = GT_CODE) then begin
+                    (FInputSource.NextCodePoint = GT_CODE)
+                    then begin
                 // '?>' found:
                     FTokenEnd := FInputSource.PreviousCharInfo;
                     FInputSource.Next;
@@ -15635,6 +15417,7 @@ begin
                     Exit;
                   end;
 
+
                   if FInputSource.NextCodePoint = PERCENT_CODE then begin
                 // Test for possible parameter entity reference
                     FInputSource.Next;
@@ -15646,7 +15429,8 @@ begin
                       FErrorType := ET_WHITESPACE_EXPECTED;
                       case FTokenType of
                         DTD_ELEMENT_DECL_TOKEN: FClue := '<!ELEMENT ';
-                        DTD_ENTITY_DECL_TOKEN: begin
+                        DTD_ENTITY_DECL_TOKEN:
+                          begin
                             FErrorType := ET_INVALID_PARAMETER_ENTITY_DECL;
                             FClue := '<!ENTITY %';
                           end;
@@ -15746,8 +15530,7 @@ begin
           if FInputSource.NextCodePoint = STRING_TERMINATOR_CODE then begin
             FErrorType := ET_UNCLOSED_PARAMETER_ENTITY_REF;
             FClue := ';';
-          end else
-            FInputSource.Next;
+          end else FInputSource.Next;
         end;
 
       // End of Conditional Section found:
@@ -15798,7 +15581,8 @@ begin
     end;
 
   except
-    on EConvertError do begin
+    on EConvertError do
+    begin
       FTokenEnd := FInputSource.CurrentCharInfo;
       FErrorType := ET_INVALID_CHARACTER;
     end;
@@ -15816,8 +15600,7 @@ const
 var
   N: Integer;
 begin
-  if FTokenType = DTD_END_OF_SOURCE_TOKEN then
-    exit;
+  if FTokenType = DTD_END_OF_SOURCE_TOKEN then exit;
 
   FTokenValue.Clear;
   FTokenType := DTD_INVALID_MARKUP_TOKEN;
@@ -15853,10 +15636,9 @@ begin
             if FInputSource.NextCodePoint = GT_CODE then begin
               // ']]>' --> Conditional section end found:
               FInputSource.Next;
-              if N = 0 then
-                FTokenType := DTD_END_OF_CONDITIONAL_SECTION_TOKEN
-              else
-                Dec(N);
+              if N = 0
+                then FTokenType := DTD_END_OF_CONDITIONAL_SECTION_TOKEN
+              else Dec(N);
             end;
           end;
 
@@ -15878,8 +15660,8 @@ constructor TXmlCustomSubsetTokenizer.create(const aInputSource: TXmlInputSource
   const aTabWidth: cardinal;
   const aPERepository: TdomPERepository);
 begin
-  if not assigned(aPERepository) then
-    raise ENot_Supported_Err.create('Not supported error.');
+  if not assigned(aPERepository)
+    then raise ENot_Supported_Err.create('Not supported error.');
   inherited create;
   FPERepository := aPERepository;
   FPEStrStream := nil;
@@ -15887,10 +15669,9 @@ begin
   FPETokenizer := nil;
 
   FXmlDtdTokenizer := TXmlDtdTokenizer.create(AInputSource, ATabWidth, GetXmlDeclarationAllowed);
-  if FXmlDtdTokenizer.tokenType = DTD_START_OF_SOURCE_TOKEN then
-    FTokenType := DTD_ABSTRACT_START_OF_SOURCE_TOKEN
-  else
-    FTokenType := DTD_ABSTRACT_END_OF_SOURCE_TOKEN;
+  if FXmlDtdTokenizer.tokenType = DTD_START_OF_SOURCE_TOKEN
+    then FTokenType := DTD_ABSTRACT_START_OF_SOURCE_TOKEN
+  else FTokenType := DTD_ABSTRACT_END_OF_SOURCE_TOKEN;
   FErrorType := FXmlDtdTokenizer.errorType; // Value depents on wellformedness of the XML declaration (if any).
 
   FLocator := FXmlDtdTokenizer;
@@ -15927,17 +15708,14 @@ begin
   try
     if not ((PubId = '') and (SysId = '')) then begin
       if isXmlSystemChars(sysId) and isXmlPubidChars(pubId) then begin
-        if PERepository.add(PEName, baseUri, PubId, SysId) then
-          Result := ET_NONE
-        else
-          Result := ET_DOUBLE_PARAMETER_ENTITY_DECL;
-      end else
-        Result := ET_INVALID_PARAMETER_ENTITY_DECL;
+        if PERepository.add(PEName, baseUri, PubId, SysId)
+          then Result := ET_NONE
+        else Result := ET_DOUBLE_PARAMETER_ENTITY_DECL;
+      end else Result := ET_INVALID_PARAMETER_ENTITY_DECL;
     end else begin
-      if PERepository.add(PEName, EntityValue) then
-        Result := ET_NONE
-      else
-        Result := ET_DOUBLE_PARAMETER_ENTITY_DECL;
+      if PERepository.add(PEName, EntityValue)
+        then Result := ET_NONE
+      else Result := ET_DOUBLE_PARAMETER_ENTITY_DECL;
     end;
   except
     Result := ET_INVALID_PARAMETER_ENTITY_DECL;
@@ -15963,58 +15741,51 @@ end;
 
 function TXmlCustomSubsetTokenizer.getClue: wideString;
 begin
-  if Assigned(FPETokenizer) then
-    result := FPETokenizer.clue
-  else
-    result := FClue;
+  if Assigned(FPETokenizer)
+    then result := FPETokenizer.clue
+  else result := FClue;
 end;
 
 function TXmlCustomSubsetTokenizer.getErrorType: TXmlErrorType;
 begin
-  if Assigned(FPETokenizer) then
-    result := FPETokenizer.errorType
-  else
-    result := FErrorType;
+  if Assigned(FPETokenizer)
+    then result := FPETokenizer.errorType
+  else result := FErrorType;
 end;
 
 function TXmlCustomSubsetTokenizer.getSystemId: wideString;
 begin
-  if Assigned(FPEInputSource) then
-    result := FPEInputSource.SystemId
-  else
-    result := FXmlDtdTokenizer.GetUri;
+  if Assigned(FPEInputSource)
+    then result := FPEInputSource.SystemId
+  else result := FXmlDtdTokenizer.GetUri;
 end;
 
 function TXmlCustomSubsetTokenizer.getTabWidth: integer;
 begin
-  if Assigned(FPETokenizer) then
-    result := FPETokenizer.tabWidth
-  else
-    result := FXmlDtdTokenizer.TabWidth;
+  if Assigned(FPETokenizer)
+    then result := FPETokenizer.tabWidth
+  else result := FXmlDtdTokenizer.TabWidth;
 end;
 
 function TXmlCustomSubsetTokenizer.getTokenData: wideString;
 begin
-  if Assigned(FPETokenizer) then
-    result := FPETokenizer.tokenData
-  else
-    result := FTokenData;
+  if Assigned(FPETokenizer)
+    then result := FPETokenizer.tokenData
+  else result := FTokenData;
 end;
 
 function TXmlCustomSubsetTokenizer.getTokenName: wideString;
 begin
-  if Assigned(FPETokenizer) then
-    result := FPETokenizer.tokenName
-  else
-    result := FTokenName;
+  if Assigned(FPETokenizer)
+    then result := FPETokenizer.tokenName
+  else result := FTokenName;
 end;
 
 function TXmlCustomSubsetTokenizer.getTokenType: TXmlDtdAbstractTokenType;
 begin
-  if Assigned(FPETokenizer) then
-    result := FPETokenizer.tokenType
-  else
-    result := FTokenType;
+  if Assigned(FPETokenizer)
+    then result := FPETokenizer.tokenType
+  else result := FTokenType;
 end;
 
 function TXmlCustomSubsetTokenizer.initializePETokenizer(const PEName: wideString;
@@ -16029,8 +15800,7 @@ begin
   Assert(FPEStrStream = nil);
 
   Result := PERepository.ResolvePE(PEName, S, pubId, sysId);
-  if Result <> ET_NONE then
-    exit;
+  if Result <> ET_NONE then exit;
   S := concat(wideString(#$FEFF), S); // Add byte order mark.
   FPEStrStream := TUtilsWideStringStream.create(S);
   try
@@ -16058,16 +15828,14 @@ begin
   i := 1;
   len := length(Source);
   while i <= len do begin
-    if IsXmlWhiteSpace(Source[i]) then
-      break;
+    if IsXmlWhiteSpace(Source[i]) then break;
     inc(i);
   end;
   Name := copy(Source, 1, i - 1);
 
   // Find Data:
   while i <= len do begin
-    if not IsXmlWhiteSpace(Source[i]) then
-      break;
+    if not IsXmlWhiteSpace(Source[i]) then break;
     inc(i);
   end;
   Data := copy(Source, i, len - i + 1);
@@ -16148,6 +15916,8 @@ begin
   Result := FLocator.Uri;
 end;
 
+
+
 { TXmlExtSubsetTokenizer }
 
 constructor TXmlExtSubsetTokenizer.create(const aInputSource: TXmlInputSource;
@@ -16216,8 +15986,7 @@ begin
           resultStr.AddUCS4Char(PERCENT_CODE);
           Dec(P);
         end;
-      end else
-        resultStr.AddWideChar(P^);
+      end else resultStr.AddWideChar(P^);
       Inc(P);
     end;
     result := resultStr.Value;
@@ -16435,8 +16204,7 @@ var
       // Skip white space:
       i := 2;
       while i <= len do begin
-        if not IsXmlWhiteSpace(Source[i]) then
-          break;
+        if not IsXmlWhiteSpace(Source[i]) then break;
         inc(i);
       end;
 
@@ -16462,8 +16230,7 @@ var
     // Find Name:
     j := i + 1;
     while j <= len do begin
-      if IsXmlWhiteSpace(Source[j]) then
-        break;
+      if IsXmlWhiteSpace(Source[j]) then break;
       inc(j);
     end;
     ATokenName := copy(Source, i, j - i);
@@ -16471,8 +16238,7 @@ var
     // Skip white space:
     i := j;
     while i <= len do begin
-      if not IsXmlWhiteSpace(Source[i]) then
-        break;
+      if not IsXmlWhiteSpace(Source[i]) then break;
       inc(i);
     end;
 
@@ -16483,8 +16249,7 @@ var
 begin
   if Assigned(FPETokenizer) then begin // Get next token from Parameter Entity?
     FPETokenizer.Next;
-    if FPETokenizer.TokenType <> DTD_ABSTRACT_END_OF_SOURCE_TOKEN then
-      Exit;
+    if FPETokenizer.TokenType <> DTD_ABSTRACT_END_OF_SOURCE_TOKEN then Exit;
     FinalizePETokenizer;
   end;
 
@@ -16590,8 +16355,7 @@ begin
             FTokenType := DTD_ABSTRACT_PARAMETER_ENTITY_REF_TOKEN;
             FTokenName := FXmlDtdTokenizer.TokenValue;
             FTokenData := '';
-          end else
-            Next;
+          end else Next;
         end;
 
       DTD_PI_TOKEN: begin
@@ -16618,12 +16382,10 @@ begin
               FTokenName := '';
               FTokenData := '';
               FTokenType := translate(FXmlDtdTokenizer.TokenType);
-            end else if FXmlDtdTokenizer.TokenType = DTD_END_OF_CONDITIONAL_SECTION_TOKEN then
-              Next
-            else
-              FErrorType := ET_INVALID_CONDITIONAL_SECTION;
-          end else
-            FErrorType := ET_INVALID_CONDITIONAL_SECTION;
+            end else if FXmlDtdTokenizer.TokenType = DTD_END_OF_CONDITIONAL_SECTION_TOKEN
+              then Next
+            else FErrorType := ET_INVALID_CONDITIONAL_SECTION;
+          end else FErrorType := ET_INVALID_CONDITIONAL_SECTION;
         end;
 
       DTD_START_OF_SOURCE_TOKEN: begin
@@ -16635,6 +16397,8 @@ begin
     end;
   end;
 end;
+
+
 
 { TXmlIntSubsetTokenizer }
 
@@ -16687,8 +16451,7 @@ procedure TXmlIntSubsetTokenizer.next;
       // Skip white space:
       i := 2;
       while i <= len do begin
-        if not IsXmlWhiteSpace(Source[i]) then
-          break;
+        if not IsXmlWhiteSpace(Source[i]) then break;
         inc(i);
       end;
 
@@ -16714,8 +16477,7 @@ procedure TXmlIntSubsetTokenizer.next;
     // Find Name:
     j := i + 1;
     while j <= len do begin
-      if IsXmlWhiteSpace(Source[j]) then
-        break;
+      if IsXmlWhiteSpace(Source[j]) then break;
       inc(j);
     end;
     ATokenName := copy(Source, i, j - i);
@@ -16723,8 +16485,7 @@ procedure TXmlIntSubsetTokenizer.next;
     // Skip white space:
     i := j;
     while i <= len do begin
-      if not IsXmlWhiteSpace(Source[i]) then
-        break;
+      if not IsXmlWhiteSpace(Source[i]) then break;
       inc(i);
     end;
 
@@ -16735,8 +16496,7 @@ procedure TXmlIntSubsetTokenizer.next;
 begin
   if Assigned(FPETokenizer) then begin // Get next token from Parameter Entity?
     FPETokenizer.Next;
-    if FPETokenizer.TokenType <> DTD_ABSTRACT_END_OF_SOURCE_TOKEN then
-      Exit;
+    if FPETokenizer.TokenType <> DTD_ABSTRACT_END_OF_SOURCE_TOKEN then Exit;
     FinalizePETokenizer;
   end;
 
@@ -16820,8 +16580,7 @@ begin
               FTokenType := DTD_ABSTRACT_PARAMETER_ENTITY_REF_TOKEN;
               FTokenName := FXmlDtdTokenizer.TokenValue;
               FTokenData := '';
-            end else
-              Next;
+            end else Next;
           end else begin
             FTokenType := DTD_ABSTRACT_PARAMETER_ENTITY_REF_TOKEN;
             FTokenName := FXmlDtdTokenizer.TokenValue;
@@ -16851,6 +16610,8 @@ begin
   end;
 end;
 
+
+
 // +++++++++++++++++++++++++ TXmlOutputSource +++++++++++++++++++++++++
 
 constructor TXmlOutputSource.create(const stream: TStream;
@@ -16869,10 +16630,9 @@ end;
 
 function TXmlOutputSource.getCodecClass: TUnicodeCodecClass;
 begin
-  if Assigned(FCodec) then
-    Result := TUnicodeCodecClass(FCodec.ClassType)
-  else
-    Result := nil;
+  if Assigned(FCodec)
+    then Result := TUnicodeCodecClass(FCodec.ClassType)
+  else Result := nil;
 end;
 
 function TXmlOutputSource.getWriteLFOption: TCodecWriteLFOption;
@@ -16887,14 +16647,12 @@ begin
   if Assigned(FCodec) then begin
     oldWriteLFOption := FCodec.WriteLFOption;
     FCodec.Free;
-  end else
-    oldWriteLFOption := lwCRLF; // default LFTranscoding.
+  end else oldWriteLFOption := lwCRLF; // default LFTranscoding.
   if Assigned(Value) then begin
     FCodec := Value.Create;
     FCodec.OnWrite := WriteEventHandler;
     FCodec.WriteLFOption := oldWriteLFOption;
-  end else
-    FCodec := nil;
+  end else FCodec := nil;
 end;
 
 procedure TXmlOutputSource.setWriteLFOption(const value: TCodecWriteLFOption);
@@ -16913,6 +16671,8 @@ procedure TXmlOutputSource.writeUCS4Char(const C: UCS4Char;
 begin
   FCodec.WriteUCS4Char(C, ByteCount);
 end;
+
+
 
 // ++++++++++++++++++++++++++ TdomError ++++++++++++++++++++++++++
 
@@ -16969,8 +16729,7 @@ begin
         StartColumnNumber, StartLineNumber, EndByteNumber, EndCharNumber,
         EndColumnNumber, EndLineNumber, Uri, RelatedASObject, RelatedNode,
         ACode)
-  else
-    Create(ARelatedException, -1, -1, -1, -1, -1, -1, -1, -1, '', nil, nil, ACode);
+  else Create(ARelatedException, -1, -1, -1, -1, -1, -1, -1, -1, '', nil, nil, ACode);
 end;
 
 function TdomError.CloneError: TdomError;
@@ -17013,12 +16772,11 @@ end;
 
 function TdomError.GetSeverity: TdomSeverity;
 begin
-  if RelatedException in ET_FATAL_ERRORS then
-    result := DOM_SEVERITY_FATAL_ERROR
-  else if RelatedException in ET_ERRORS then
-    result := DOM_SEVERITY_ERROR
-  else
-    result := DOM_SEVERITY_WARNING;
+  if RelatedException in ET_FATAL_ERRORS
+    then result := DOM_SEVERITY_FATAL_ERROR
+  else if RelatedException in ET_ERRORS
+    then result := DOM_SEVERITY_ERROR
+  else result := DOM_SEVERITY_WARNING;
 end;
 
 function TdomError.GetStartByteNumber: Int64;
@@ -17045,6 +16803,8 @@ function TdomError.GetUri: WideString;
 begin
   Result := FUri;
 end;
+
+
 
 // ++++++++++++++++++++++++++++ TdomPERepository +++++++++++++++++++++++++++++
 
@@ -17077,8 +16837,7 @@ begin
       newPEInfoObj.free;
       raise;
     end; {try ...}
-  end else
-    Result := False;
+  end else Result := False;
 end;
 
 function TdomPERepository.add(const name,
@@ -17097,8 +16856,7 @@ begin
       newPEInfoObj.free;
       raise;
     end; {try ...}
-  end else
-    Result := False;
+  end else Result := False;
 end;
 
 procedure TdomPERepository.clear;
@@ -17130,9 +16888,10 @@ begin
       sysId := '';
       Result := ET_UNRESOLVABLE_PARAMETER_ENTITY_REFERENCE;
     end;
-  end else
-    Result := ET_PARAMETER_ENTITY_DECL_NOT_FOUND;
+  end else Result := ET_PARAMETER_ENTITY_DECL_NOT_FOUND;
 end;
+
+
 
 // ++++++++++++++++++++++ TdomPEInfoObject ++++++++++++++++++++++
 
@@ -17142,8 +16901,8 @@ constructor TdomPEInfoObject.create(const aOwner: TdomPERepository;
 begin
   if not assigned(aOwner) then
     raise EAccessViolation.create('AOwner not specified.');
-  if not isXmlName(entityName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlName(entityName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(nil);
   FRepository := aOwner;
   FEntityType := etInternal_Entity;
@@ -17161,12 +16920,12 @@ constructor TdomPEInfoObject.createExtParsed(const aOwner: TdomPERepository;
 begin
   if not assigned(aOwner) then
     raise EAccessViolation.create('AOwner not specified.');
-  if not isXmlName(entityName) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlSystemChars(sysId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
-  if not isXmlPubidChars(pubId) then
-    raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlName(entityName)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlSystemChars(sysId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
+  if not isXmlPubidChars(pubId)
+    then raise EInvalid_Character_Err.create('Invalid character error.');
   inherited create(nil);
   FBaseUri := aBaseUri;
   FRepository := aOwner;
@@ -17182,10 +16941,9 @@ var
   Uri: WideString;
 begin
   // Calculate absolute system identifier:
-  if ResolveRelativeUriWideStr(BaseUri, SystemId, Uri) then
-    Result := Uri
-  else
-    Result := '';
+  if ResolveRelativeUriWideStr(BaseUri, SystemId, Uri)
+    then Result := Uri
+  else Result := '';
 end;
 
 function TdomPEInfoObject.getLiteralValue: wideString;
@@ -17218,10 +16976,12 @@ begin
             if invalidEncoding then
               raise EParserException.Create('Encoding not supported.');
 
+
             Content := TUtilsCustomWideStr.create;
             try
               Next;
-              while not Eof do begin
+              while not Eof do
+              begin
                 Content.AddUCS4Char(CurrentCodePoint);
                 Next;
               end;
@@ -17237,17 +16997,17 @@ begin
       finally
         stream.free;
       end; {try ...}
-    end else
-      raise EParserException.Create('Unresolveable parameter entity.');
+    end else raise EParserException.Create('Unresolveable parameter entity.');
 
-  end else
-    result := FLiteralValue;
+  end else result := FLiteralValue;
 end;
 
 function TdomPEInfoObject.getNodeName: wideString;
 begin
   result := FNodeName;
 end;
+
+
 
 // +++++++++++++++++++++++++++++++ TXmlSignal +++++++++++++++++++++++++++++++
 
@@ -17299,7 +17059,8 @@ end;
 constructor TXmlSignal.CreateFromLocator(const AReader: TXmlCustomReader;
   const Location: IDomLocator);
 begin
-  if Assigned(Location) then
+  if Assigned(Location)
+    then
     with Location do
       Self.Create(AReader, StartByteNumber, StartCharNumber,
         StartColumnNumber, StartLineNumber, EndByteNumber, EndCharNumber,
@@ -17382,10 +17143,9 @@ end;
 procedure TXmlCDATASignal.CheckWellformedness(out XmlErrorType: TXmlErrorType;
   out Flaw: WideString);
 begin
-  if IsXmlCData(Data) then
-    XmlErrorType := ET_NONE
-  else
-    XmlErrorType := ET_INVALID_CDATA_SECTION;
+  if IsXmlCData(Data)
+    then XmlErrorType := ET_NONE
+  else XmlErrorType := ET_INVALID_CDATA_SECTION;
   Flaw := '';
 end;
 
@@ -17675,8 +17435,7 @@ begin
               end;
               Text := '';
               InEntity := False;
-            end else
-              Text := Concat(Text, WideString(AttValue[J]));
+            end else Text := Concat(Text, WideString(AttValue[J]));
           end else begin
             if AttValue[J] = '&' then begin
               InEntity := True;
@@ -17916,8 +17675,7 @@ begin
             end;
             Text := '';
             InEntity := False;
-          end else
-            Text := Concat(Text, WideString(DefaultValue[J]));
+          end else Text := Concat(Text, WideString(DefaultValue[J]));
         end else begin
           if DefaultValue[J] = '&' then begin
             InEntity := True;
@@ -18201,6 +17959,8 @@ begin
   Result := [ssDtd];
 end;
 
+
+
 // ++++++++++++++++++++++++++++ TXmlCustomHandler ++++++++++++++++++++++++++++
 
 procedure TXmlCustomHandler.sendErrorNotification(const target: TXmlCustomReader;
@@ -18215,13 +17975,15 @@ begin
   end;
 end;
 
+
+
 // +++++++++++++++++++++++++++ TXmlStandardHandler +++++++++++++++++++++++++++
 
 procedure TXmlStandardHandler.Notification(AComponent: TComponent; operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FNextHandler) then
-    FNextHandler := nil;
+  if (Operation = opRemove) and (AComponent = FNextHandler)
+    then FNextHandler := nil;
 end;
 
 procedure TXmlStandardHandler.processSignal(const signal: TXmlSignal);
@@ -18237,6 +17999,8 @@ begin
     FOnSignaled(Self, Signal);
 end;
 
+
+
 // +++++++++++++++++++++++++++++ TXmlHandlerItem +++++++++++++++++++++++++++++
 
 function TXmlHandlerItem.getXmlHandler: TXmlCustomHandler;
@@ -18251,11 +18015,11 @@ end;
 
 procedure TXmlHandlerItem.Assign(Source: TPersistent);
 begin
-  if Source is TXmlHandlerItem then
-    XmlHandler := TXmlHandlerItem(Source).XmlHandler
-  else
-    inherited Assign(Source);
+  if Source is TXmlHandlerItem
+    then XmlHandler := TXmlHandlerItem(Source).XmlHandler
+  else inherited Assign(Source);
 end;
+
 
 // +++++++++++++++++++++++++++++++ TXmlHandlers ++++++++++++++++++++++++++++++
 
@@ -18289,30 +18053,30 @@ procedure TXmlHandlers.Assign(Source: TPersistent);
 var
   I: Integer;
 begin
-  if Source = Self then
-    Exit;
+  if Source = Self then Exit;
   if Source is TStrings then begin
     Clear;
     with TStrings(Source) do
       for I := 0 to Pred(Count) do
-        if Assigned(Objects[I]) then
-          if Objects[I] is TXmlCustomHandler then
-            Self.Add.XmlHandler := TXmlCustomHandler(Objects[I]);
-  end else
-    inherited Assign(Source);
+        if Assigned(Objects[I])
+          then if Objects[I] is TXmlCustomHandler
+          then Self.Add.XmlHandler := TXmlCustomHandler(Objects[I]);
+  end else inherited Assign(Source);
 end;
 
 function TXmlHandlers.FindHandlerItem(AHandler: TXmlCustomHandler): TXmlHandlerItem;
 var
   I: Integer;
 begin
-  for I := 0 to Pred(Count) do begin
+  for I := 0 to Pred(Count) do
+  begin
     Result := TXmlHandlerItem(inherited GetItem(I));
-    if Result.FXmlHandler = AHandler then
-      Exit;
+    if Result.FXmlHandler = AHandler then Exit;
   end;
   Result := nil;
 end;
+
+
 
 // +++++++++++++++++++++++++++++ TXmlDistributor +++++++++++++++++++++++++++++
 
@@ -18345,8 +18109,7 @@ begin
   if not (csDestroying in ComponentState) and (Operation = opRemove) then begin
     if (AComponent is TXmlCustomHandler) then begin
       HandlerItem := NextHandlers.FindHandlerItem(TXmlCustomHandler(AComponent));
-      if HandlerItem <> nil then
-        HandlerItem.XmlHandler := nil;
+      if HandlerItem <> nil then HandlerItem.XmlHandler := nil;
     end;
   end;
 end;
@@ -18360,8 +18123,7 @@ begin
   OK := True;
   with NextHandlers do begin
     for I := 0 to Pred(Count) do begin
-      if not Assigned(Items[I].XmlHandler) then
-        Continue;
+      if not Assigned(Items[I].XmlHandler) then Continue;
       SignalCopy := Signal.CloneSignal(Signal.Reader); // We use a copy of the signal,
       try // because subsequent Signal Handlers
         Items[I].XmlHandler.ProcessSignal(SignalCopy); // might change the singnal's properties.
@@ -18389,6 +18151,8 @@ procedure TXmlDistributor.writeData(Writer: TWriter);
 begin
   Writer.WriteCollection(NextHandlers);
 end;
+
+
 
 // +++++++++++++++++++++++ TXmlWFTestHandler +++++++++++++++++++++++
 
@@ -18418,8 +18182,7 @@ procedure TXmlWFTestHandler.ProcessSignal(const Signal: TXmlSignal);
     if FDoctypeFound then begin
       AXmlErrorType := ET_DOUBLE_DOCTYPE;
       AFlaw := DoctypeSignal.DoctypeName;
-    end else begin
-      ;
+    end else begin;
       FDoctypeFound := True;
       if FRootProcessingStatus <> rsBeforeRoot then begin
         AXmlErrorType := ET_WRONG_ORDER;
@@ -18486,18 +18249,22 @@ begin
             Flaw := TXmlCDATASignal(Signal).Data;
           end;
         end else
+
           if Signal is TXmlDoctypeSignal then begin
             CheckDoctypeSignal(TXmlDoctypeSignal(Signal), XmlErrorType, Flaw);
           end else
+
             if Signal is TXmlEndElementSignal then begin
               CheckEndElementSignal(TXmlEndElementSignal(Signal), XmlErrorType, Flaw);
             end else
+
               if Signal is TXmlEntityRefSignal then begin
                 if FRootProcessingStatus <> rsInRoot then begin
                   XmlErrorType := ET_NOT_IN_ROOT;
                   Flaw := concat('&', TXmlEntityRefSignal(Signal).EntityName, ';');
                 end;
               end else
+
                 if Signal is TXmlPCDATASignal then begin
                   if FRootProcessingStatus <> rsInRoot then begin
                     if TXmlPCDATASignal(Signal).CharRefGenerated then begin
@@ -18509,9 +18276,11 @@ begin
                     end;
                   end;
                 end else
+
                   if Signal is TXmlSkippedEntitySignal then begin
         // xxx Test for wellformedness?
                   end else
+
                     if Signal is TXmlStartElementSignal then begin
                       if FRootProcessingStatus = rsAfterRoot then begin
                         XmlErrorType := ET_DOUBLE_ROOT_ELEMENT;
@@ -18521,12 +18290,15 @@ begin
                         FTagStack.Add(TXmlStartElementSignal(Signal).TagName);
                       end;
                     end else
+
                       if Signal is TXmlStartPrefixMappingSignal then begin
                         FPrefixStack.Add(TXmlStartPrefixMappingSignal(Signal).Prefix);
                       end else
+
                         if Signal is TXmlEndPrefixMappingSignal then begin
                           CheckEndPrefixMappingSignal(TXmlEndPrefixMappingSignal(Signal), XmlErrorType, Flaw);
                         end else
+
                           if Signal is TXmlCompletedSignal then begin
                             case FRootProcessingStatus of
                               rsBeforeRoot: begin
@@ -18536,15 +18308,18 @@ begin
                               rsInRoot: begin
                                   XmlErrorType := ET_MISSING_END_TAG;
                                   Flaw := ''; // xxx Return the name of the missing end tag?
-                                end else
+                                end
+                            else
                               FDoctypeFound := False;
                               FRootProcessingStatus := rsBeforeRoot;
                             end;
                             FActivityStatus := asInactive;
                           end else
+
                             if Signal is TXmlAbortedSignal then begin
                               Reset;
                             end else
+
                               if not (ssDoc in Signal.Scope) then
                                 raise EParserException.Create('Internal Parser Exception');
       end;
@@ -18554,22 +18329,28 @@ begin
         if Signal is TXmlDoctypeSignal then begin
           CheckDoctypeSignal(TXmlDoctypeSignal(Signal), XmlErrorType, Flaw);
         end else
+
           if Signal is TXmlEndElementSignal then begin
             CheckEndElementSignal(TXmlEndElementSignal(Signal), XmlErrorType, Flaw);
           end else
+
             if Signal is TXmlSkippedEntitySignal then begin
         // xxx Test for wellformedness?
             end else
+
               if Signal is TXmlStartElementSignal then begin
                 FRootProcessingStatus := rsInRoot;
                 FTagStack.Add(TXmlStartElementSignal(Signal).TagName);
               end else
+
                 if Signal is TXmlStartPrefixMappingSignal then begin
                   FPrefixStack.Add(TXmlStartPrefixMappingSignal(Signal).Prefix);
                 end else
+
                   if Signal is TXmlEndPrefixMappingSignal then begin
                     CheckEndPrefixMappingSignal(TXmlEndPrefixMappingSignal(Signal), XmlErrorType, Flaw);
                   end else
+
                     if Signal is TXmlCompletedSignal then begin
                       if FRootProcessingStatus = rsInRoot then begin
                         XmlErrorType := ET_MISSING_END_TAG;
@@ -18580,9 +18361,11 @@ begin
                       end;
                       FActivityStatus := asInactive;
                     end else
+
                       if Signal is TXmlAbortedSignal then begin
                         Reset;
                       end else
+
                         if not (ssDoc in Signal.Scope) then
                           raise EParserException.Create('Internal Parser Exception');
       end;
@@ -18606,6 +18389,7 @@ begin
           FDoctypeFound := False;
           FRootProcessingStatus := rsBeforeRoot;
         end else
+
           if (Signal is TXmlStartDocumentFragmentSignal) then begin
             FActivityStatus := asDocFragActive;
             FPrefixStack.Clear;
@@ -18613,12 +18397,15 @@ begin
             FDoctypeFound := False;
             FRootProcessingStatus := rsBeforeRoot;
           end else
+
             if Signal is TXmlStartExtDtdSignal then begin
               FActivityStatus := asExtDtdActive;
             end else
+
               if Signal is TXmlStartIntDtdSignal then begin
                 FActivityStatus := asIntDtdActive;
               end else
+
                 if Signal is TXmlAbortedSignal then begin
                   Reset;
                 end else
@@ -18641,8 +18428,8 @@ end;
 procedure TXmlWFTestHandler.Notification(AComponent: TComponent; operation: TOperation);
 begin
   inherited notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FNextHandler) then
-    FNextHandler := nil;
+  if (Operation = opRemove) and (AComponent = FNextHandler)
+    then FNextHandler := nil;
 end;
 
 procedure TXmlWFTestHandler.Reset;
@@ -18653,6 +18440,8 @@ begin
   FPrefixStack.Clear;
   FTagStack.Clear;
 end;
+
+
 
 // ++++++++++++++++++++++++++++ TXmlDomBuilder ++++++++++++++++++++++++++++
 
@@ -18701,6 +18490,8 @@ begin
         writePCDATA(signal.Reader, signal, TXmlCDATASignal(signal).Data);
     end; {if assigned(FRefNode) ...}
   end else
+
+
     if signal is TXmlCommentSignal then begin
       if FKeepComments then begin
         if assigned(FRefNode) then begin
@@ -18714,6 +18505,8 @@ begin
         end; {if assigned(FRefNode) ...}
       end; {if FKeepComments ...}
     end else
+
+
       if signal is TXmlDoctypeSignal then begin
         if FKeepDocumentTypeDecl then begin
           if assigned(FRefNode) then begin
@@ -18747,14 +18540,20 @@ begin
           end; {if assigned(FRefNode) ...}
         end; {if FKeepDocumentTypeDecl ...}
       end else
+
+
         if signal is TXmlEndElementSignal then begin
           if assigned(FRefNode) then
             FRefNode := FRefNode.ParentNode;
         end else
+
+
           if signal is TXmlEndPrefixMappingSignal then begin
             with FPrefixUriList do
               delete(pred(length));
           end else
+
+
             if signal is TXmlEntityRefSignal then begin
               if assigned(FRefNode) then begin
                 if KeepEntityRefs or not isXmlPredefinedEntityName(TXmlEntityRefSignal(signal).EntityName) then begin
@@ -18780,11 +18579,15 @@ begin
                 end; {if ... else}
               end; {if assigned(FRefNode) ...}
             end else
+
+
               if signal is TXmlPCDATASignal then begin
                 if assigned(FRefNode) then
                   if FRefNode.NodeType <> ntDocument_Node then
                     writePCDATA(signal.Reader, signal, TXmlPCDATASignal(signal).Data);
               end else
+
+
                 if signal is TXmlProcessingInstructionSignal then begin
                   if assigned(FRefNode) then begin
                     newPI := FRefNode.referenceDocument.CreateProcessingInstruction(TXmlProcessingInstructionSignal(signal).Target, TXmlProcessingInstructionSignal(signal).Data);
@@ -18796,9 +18599,13 @@ begin
                     end;
                   end; {if assigned(FRefNode) ...}
                 end else
+
+
                   if signal is TXmlSkippedEntitySignal then begin
     // notifications through skippedEntity() are being ignored.
                   end else
+
+
                     if signal is TXmlStartDocumentSignal then begin
                       FPrefixUriList.clear;
 
@@ -18814,9 +18621,13 @@ begin
                         end;
                       end;
                     end else
+
+
                       if signal is TXmlStartDocumentFragmentSignal then begin
                         FPrefixUriList.clear;
                       end else
+
+
                         if signal is TXmlStartElementSignal then begin
                           if assigned(FRefNode) then begin
 
@@ -18873,13 +18684,18 @@ begin
 
                           end; {if assigned(FRefNode) ...}
                         end else
+
+
                           if signal is TXmlStartPrefixMappingSignal then begin
                             FPrefixUriList.add(TXmlStartPrefixMappingSignal(signal).Prefix,
                               TXmlStartPrefixMappingSignal(signal).Uri);
                           end else
+
+
                             if Signal is TXmlAbortedSignal then begin
                               Reset;
                             end else
+
                               if not (ssDoc in signal.Scope) then
                                 raise EParserException.create('Internal Parser Exception');
 
@@ -18896,8 +18712,8 @@ procedure TXmlDomBuilder.WritePCDATA(const sender: TXmlCustomReader;
 var
   newPcdata: TdomText;
 begin
-  if assigned(FRefNode.LastChild) and (FRefNode.LastChild.NodeType = ntText_Node) then
-    (FRefNode.LastChild as TdomText).appendData(data)
+  if assigned(FRefNode.LastChild) and (FRefNode.LastChild.NodeType = ntText_Node)
+    then (FRefNode.LastChild as TdomText).appendData(data)
   else begin
     newPcdata := FRefNode.referenceDocument.CreateTextNode(data);
     try
@@ -18908,6 +18724,8 @@ begin
     end; {try ...}
   end;
 end;
+
+
 
 // ++++++++++++++++++++++++++ TXmlASBuilder +++++++++++++++++++++++++++
 
@@ -18936,27 +18754,26 @@ begin
     dummy := copy(content, 1, length(content) - 1);
     content := dummy;
   end;
-  if length(content) = 0 then
-    raise EParserException.create('Parser error.');
-  if wideChar(content[length(content)]) <> ')' then
-    raise EParserException.create('Parser error.');
+  if length(content) = 0
+    then raise EParserException.create('Parser error.');
+  if wideChar(content[length(content)]) <> ')'
+  then raise EParserException.create('Parser error.');
   XMLTruncRoundBrackets(content, dummy, Error);
-  if Error or (dummy = '') then
-    raise EParserException.create('Parser error.');
+  if Error or (dummy = '')
+    then raise EParserException.create('Parser error.');
   content := dummy;
   newASContentModel := refASElementDecl.createContentModel('', AS_CHOICE_CM);
   newASContentModel.frequency := freq;
   refASElementDecl.replaceContentModel(newASContentModel);
   if content = '#PCDATA' then begin
-    if (freq <> AS_REQUIRED_FRQ) and (freq <> AS_ZERO_OR_MORE_FRQ) then
-      raise EParserException.create('Parser error.');
+    if (freq <> AS_REQUIRED_FRQ) and (freq <> AS_ZERO_OR_MORE_FRQ)
+      then raise EParserException.create('Parser error.');
     exit;
   end;
-  if freq <> AS_ZERO_OR_MORE_FRQ then
-    raise EParserException.create('Parser error.');
+  if freq <> AS_ZERO_OR_MORE_FRQ
+    then raise EParserException.create('Parser error.');
   separator := pos(wideString('|'), content);
-  if separator = 0 then
-    raise EParserException.create('Parser error.');
+  if separator = 0 then raise EParserException.create('Parser error.');
   dummy := trimWhitespace(copy(content, separator + 1, length(content) - separator));
   content := dummy;
   while content <> '' do begin
@@ -18968,11 +18785,9 @@ begin
       piece := trimWhitespace(copy(content, 1, separator - 1));
       dummy := trimWhitespace(copy(content, separator + 1, length(content) - separator));
       content := dummy;
-      if content = '' then
-        raise EParserException.create('Parser error.');
+      if content = '' then raise EParserException.create('Parser error.');
     end; {if ...}
-    if not IsXmlName(piece) then
-      raise EParserException.create('Parser error.');
+    if not IsXmlName(piece) then raise EParserException.create('Parser error.');
     newASContentModel.subModels.appendASNode(refASElementDecl.createContentModel(piece, AS_ELEMENT_CM));
   end; {while ...}
 end;
@@ -19002,15 +18817,14 @@ begin
     freq := AS_ONE_OR_MORE_FRQ;
     dummy := copy(content, 1, length(content) - 1);
     content := dummy;
-  end else
-    freq := AS_REQUIRED_FRQ;
-  if length(content) = 0 then
-    raise EParserException.create('Parser error.');
-  if wideChar(content[length(content)]) <> ')' then
-    raise EParserException.create('Parser error.');
+  end else freq := AS_REQUIRED_FRQ;
+  if length(content) = 0
+    then raise EParserException.create('Parser error.');
+  if wideChar(content[length(content)]) <> ')'
+  then raise EParserException.create('Parser error.');
   XMLTruncRoundBrackets(content, dummy, Error);
-  if Error or (dummy = '') then
-    raise EParserException.create('Parser error.');
+  if Error or (dummy = '')
+    then raise EParserException.create('Parser error.');
   content := dummy;
 
   bracketNr := 0;
@@ -19024,23 +18838,23 @@ begin
       SeparatorChar := '|';
       break;
     end; {if ...}
-    if content[i] = '(' then
-      inc(bracketNr);
+    if content[i] = '(' then inc(bracketNr);
     if content[i] = ')' then begin
-      if bracketNr = 0 then
-        raise EParserException.create('Parser error.');
+      if bracketNr = 0 then raise EParserException.create('Parser error.');
       dec(bracketNr);
     end;
   end; {for ...}
 
   if SeparatorChar = ',' then begin
     case refASObject.objectType of
-      AS_CONTENT_MODEL: begin
+      AS_CONTENT_MODEL:
+        begin
           newASContentModel_1 := (refASObject as TdomASContentModel).ownerElementDecl.createContentModel('', AS_SEQUENCE_CM);
           newASContentModel_1.frequency := freq;
           (refASObject as TdomASContentModel).subModels.appendASNode(newASContentModel_1);
         end;
-      AS_ELEMENT_DECLARATION: begin
+      AS_ELEMENT_DECLARATION:
+        begin
           newASContentModel_1 := (refASObject as TdomASElementDecl).createContentModel('', AS_SEQUENCE_CM);
           newASContentModel_1.frequency := freq;
           (refASObject as TdomASElementDecl).replaceContentModel(newASContentModel_1);
@@ -19050,12 +18864,14 @@ begin
     end;
   end else begin
     case refASObject.objectType of
-      AS_CONTENT_MODEL: begin
+      AS_CONTENT_MODEL:
+        begin
           newASContentModel_1 := (refASObject as TdomASContentModel).ownerElementDecl.createContentModel('', AS_CHOICE_CM);
           newASContentModel_1.frequency := freq;
           (refASObject as TdomASContentModel).subModels.appendASNode(newASContentModel_1);
         end;
-      AS_ELEMENT_DECLARATION: begin
+      AS_ELEMENT_DECLARATION:
+        begin
           newASContentModel_1 := (refASObject as TdomASElementDecl).createContentModel('', AS_CHOICE_CM);
           newASContentModel_1.frequency := freq;
           (refASObject as TdomASElementDecl).replaceContentModel(newASContentModel_1);
@@ -19070,21 +18886,17 @@ begin
   j := 1;
   while i < length(content) do begin
     inc(i);
-    if content[i] = '(' then
-      inc(bracketNr);
+    if content[i] = '(' then inc(bracketNr);
     if content[i] = ')' then begin
-      if bracketNr = 0 then
-        raise EParserException.create('Parser error.');
+      if bracketNr = 0 then raise EParserException.create('Parser error.');
       dec(bracketNr);
     end;
     if ((content[i] = SeparatorChar) and (bracketNr = 0)) or
       (i = length(content)) then begin
-      if bracketNr > 0 then
-        raise EParserException.create('Parser error.');
-      if i = length(content) then
-        piece := trimWhitespace(copy(content, j, i + 1 - j))
-      else
-        piece := trimWhitespace(copy(content, j, i - j));
+      if bracketNr > 0 then raise EParserException.create('Parser error.');
+      if i = length(content)
+        then piece := trimWhitespace(copy(content, j, i + 1 - j))
+      else piece := trimWhitespace(copy(content, j, i - j));
       j := i + 1;
 
       if piece[1] = '(' then begin
@@ -19102,10 +18914,9 @@ begin
           freq := AS_ONE_OR_MORE_FRQ;
           dummy := copy(piece, 1, length(piece) - 1);
           piece := dummy;
-        end else
-          freq := AS_REQUIRED_FRQ;
-        if not IsXmlName(piece) then
-          raise EParserException.create('Parser error.');
+        end else freq := AS_REQUIRED_FRQ;
+        if not IsXmlName(piece)
+          then raise EParserException.create('Parser error.');
         newASContentModel_2 := newASContentModel_1.ownerElementDecl.createContentModel(piece, AS_ELEMENT_CM);
         newASContentModel_2.frequency := freq;
         newASContentModel_1.subModels.appendASNode(newASContentModel_2);
@@ -19144,18 +18955,20 @@ begin
           TXmlAttributeDefinitionSignal(Signal).AttributeName);
     end;
   end else
+
     if Signal is TXmlElementTypeDeclarationSignal then begin
       ContSpec := TrimWhitespace(TXmlElementTypeDeclarationSignal(Signal).Data);
       ContspecType := AS_ELEMENT_CONTENTTYPE;
-      if ContSpec = 'EMPTY' then
-        ContspecType := AS_EMPTY_CONTENTTYPE
-      else if ContSpec = 'ANY' then
-        ContspecType := AS_ANY_CONTENTTYPE
-      else if Pos('#PCDATA', ContSpec) > 0 then
-        ContspecType := AS_MIXED_CONTENTTYPE;
+      if ContSpec = 'EMPTY'
+        then ContspecType := AS_EMPTY_CONTENTTYPE
+      else if ContSpec = 'ANY'
+        then ContspecType := AS_ANY_CONTENTTYPE
+      else if Pos('#PCDATA', ContSpec) > 0
+        then ContspecType := AS_MIXED_CONTENTTYPE;
       try
         if FASModel.SetASElementDecl(TXmlElementTypeDeclarationSignal(Signal).ElementName,
-          ContspecType, NewElementDecl) then begin
+          ContspecType, NewElementDecl)
+          then begin
           case contspecType of
             AS_MIXED_CONTENTTYPE: InsertMixedContent(Signal.Reader, NewElementDecl, ContSpec);
             AS_ELEMENT_CONTENTTYPE: InsertChildrenContent(Signal.Reader, NewElementDecl, ContSpec);
@@ -19169,6 +18982,7 @@ begin
           TXmlElementTypeDeclarationSignal(Signal).ElementName);
       end; {try ...}
     end else
+
       if Signal is TXmlEntityDeclarationSignal then begin
         if FASModel.SetASEntityDecl(TXmlEntityDeclarationSignal(Signal).EntityName,
           ResolveCharRefs(TXmlEntityDeclarationSignal(Signal).EntityValue),
@@ -19183,6 +18997,7 @@ begin
           SendErrorNotification(Signal.Reader, ET_DOUBLE_ENTITY_DECL, Signal,
             TXmlEntityDeclarationSignal(Signal).EntityName);
       end else
+
         if Signal is TXmlNotationDeclarationSignal then begin
           if not FASModel.SetASNotationDecl(TXmlNotationDeclarationSignal(Signal).NotationName,
             TXmlNotationDeclarationSignal(Signal).PublicId,
@@ -19191,15 +19006,20 @@ begin
             SendErrorNotification(Signal.Reader, ET_DUPLICATE_NOTATION_DECL, Signal,
               TXmlNotationDeclarationSignal(Signal).NotationName);
         end else
+
           if Signal is TXmlStartExtDtdSignal then begin
             FASModel.Location := TXmlStartExtDtdSignal(Signal).SystemId;
           end else
+
             if Signal is TXmlStartIntDtdSignal then begin
               FASModel.Location := TXmlStartIntDtdSignal(Signal).SystemId;
             end else
+
               if not (ssDtd in Signal.Scope) then
                 raise EParserException.Create('Internal Parser Exception');
 end;
+
+
 
 // ++++++++++++++++++++++++ TXmlStreamBuilder ++++++++++++++++++++++++++
 
@@ -19268,19 +19088,17 @@ end;
 
 function TXmlStreamBuilder.getCurrentCodecClass: TUnicodeCodecClass;
 begin
-  if assigned(FOutputSource) then
-    Result := FOutputSource.codecClass
-  else
-    Result := nil;
+  if assigned(FOutputSource)
+    then Result := FOutputSource.codecClass
+  else Result := nil;
 end;
 
 procedure TXmlStreamBuilder.putCurrentCodecClass(const value: TUnicodeCodecClass);
 begin
   if assigned(FOutputSource) then begin
-    if assigned(value) then
-      FOutputSource.codecClass := value
-    else
-      FOutputSource.codecClass := TUTF8Codec;
+    if assigned(value)
+      then FOutputSource.codecClass := value
+    else FOutputSource.codecClass := TUTF8Codec;
   end;
 end;
 
@@ -19342,10 +19160,8 @@ begin
       if UseByteOrderMark and assigned(FOutputSource) then begin
         byteCount := 3;
         FOutputSource.write(UTF_8_BOM, 3);
-      end else
-        byteCount := 0;
-    end else
-      byteCount := 0;
+      end else byteCount := 0;
+    end else byteCount := 0;
   except
     raise EParserException.Create('Signal Processing Exception');
   end;
@@ -19371,14 +19187,15 @@ begin
 
       // Test for UTF-16 surrogates and recalculate UCS-4 codepoint if necessary:
       case UCS4 of
-        $D800..$DBFF: {// High surrogate of Unicode character [$10000..$10FFFF]} begin
-            if I = length(S) {// End of WideString --> No low surrogate found} then
-              raise EWriteError.Create(ERROR_STR);
+        $D800..$DBFF: // High surrogate of Unicode character [$10000..$10FFFF]
+          begin
+            if I = length(S) // End of WideString --> No low surrogate found
+              then raise EWriteError.Create(ERROR_STR);
             HighSurrogate := S[I];
             Inc(I);
             LowSurrogate := S[I];
-            if not IsUtf16LowSurrogate(LowSurrogate) {// No low surrogate found} then
-              raise EWriteError.Create(ERROR_STR);
+            if not IsUtf16LowSurrogate(LowSurrogate) // No low surrogate found
+              then raise EWriteError.Create(ERROR_STR);
 
             UCS4 := UTF16SurrogateToInt(HighSurrogate, LowSurrogate);
           end;
@@ -19411,7 +19228,8 @@ begin
         TAB: begin
             Inc(FTabCount);
             Inc(FColumnCount);
-          end else
+          end
+      else
         Inc(FColumnCount);
       end;
       FByteCount := FByteCount + BytesUsed;
@@ -19421,8 +19239,7 @@ begin
     end; {while ...}
 
   except
-    on EConvertError do
-      raise EWriteError.Create(ERROR_STR);
+    on EConvertError do raise EWriteError.Create(ERROR_STR);
   end;
 end;
 
@@ -19433,8 +19250,7 @@ procedure TXmlStreamBuilder.WriteWideStrings(const Sender: TXmlCustomReader;
 var
   I: Longint;
 begin
-  if not Assigned(FOutputSource) then
-    Exit;
+  if not Assigned(FOutputSource) then Exit;
   for I := 0 to High(XmlStrgs) do begin
     try
       WriteWideString(XmlStrgs[I], UseCharRefs);
@@ -19534,10 +19350,9 @@ procedure TXmlStreamBuilder.WriteCommentSignal(const Signal: TXmlCommentSignal);
 begin
   DoBeforeWrite(xmlComment, Signal);
   with Signal do begin
-    if FOpenElementsCount > 0 then
-      WriteWideStrings(Reader, Signal, ['<!--', Data, '-->'], False)
-    else
-      WriteWideStrings(Reader, Signal, ['<!--', Data, '-->'#10], False);
+    if FOpenElementsCount > 0
+      then WriteWideStrings(Reader, Signal, ['<!--', Data, '-->'], False)
+    else WriteWideStrings(Reader, Signal, ['<!--', Data, '-->'#10], False);
   end;
   DoAfterWrite(xmlComment, Signal);
 end;
@@ -19556,19 +19371,16 @@ begin
       if PublicId <> '' then
         WriteWideStrings(Reader, Signal, [WideString(' PUBLIC "'), PublicId, WideString('"')], False);
     end else begin
-      if pos(DQ, SystemId) = 0 then
-        Qm := DQ
-      else
-        Qm := SQ;
-      if PublicId = '' then
-        WriteWideStrings(Reader, Signal, [WideString(' SYSTEM '), Qm, SystemId, Qm], False)
-      else
-        WriteWideStrings(Reader, Signal, [WideString(' PUBLIC "'), PublicId, WideString('" '), qm, SystemId, qm], False);
+      if pos(DQ, SystemId) = 0
+        then Qm := DQ
+      else Qm := SQ;
+      if PublicId = ''
+        then WriteWideStrings(Reader, Signal, [WideString(' SYSTEM '), Qm, SystemId, Qm], False)
+      else WriteWideStrings(Reader, Signal, [WideString(' PUBLIC "'), PublicId, WideString('" '), qm, SystemId, qm], False);
     end;
-    if Length(data) = 0 then
-      WriteWideStrings(Reader, Signal, [' >'#10], False)
-    else
-      WriteWideStrings(Reader, Signal, [' [', Data, '] >'#10], False);
+    if Length(data) = 0
+      then WriteWideStrings(Reader, Signal, [' >'#10], False)
+    else WriteWideStrings(Reader, Signal, [' [', Data, '] >'#10], False);
   end;
   DoAfterWrite(xmlDoctype, Signal);
 end;
@@ -19636,15 +19448,13 @@ begin
   DoBeforeWrite(xmlProcessingInstruction, Signal);
   with Signal do begin
     if data = '' then begin
-      if FOpenElementsCount > 0 then
-        WriteWideStrings(Reader, Signal, ['<?', Target, '?>'], False)
-      else
-        WriteWideStrings(Reader, Signal, ['<?', Target, '?>'#10], False);
+      if FOpenElementsCount > 0
+        then WriteWideStrings(Reader, Signal, ['<?', Target, '?>'], False)
+      else WriteWideStrings(Reader, Signal, ['<?', Target, '?>'#10], False);
     end else begin
-      if FOpenElementsCount > 0 then
-        WriteWideStrings(Reader, Signal, ['<?', Target, ' ', data, '?>'], False)
-      else
-        WriteWideStrings(Reader, Signal, ['<?', Target, ' ', data, '?>'#10], False);
+      if FOpenElementsCount > 0
+        then WriteWideStrings(Reader, Signal, ['<?', Target, ' ', data, '?>'], False)
+      else WriteWideStrings(Reader, Signal, ['<?', Target, ' ', data, '?>'#10], False);
     end;
   end;
   DoAfterWrite(xmlProcessingInstruction, Signal);
@@ -19670,10 +19480,9 @@ begin
     FTabCount := 0;
     NewEncName := EncodingName;
     if DefaultEncoding = '' then begin
-      if NewEncName = '' then
-        NewCodecClass := TUTF8Codec
-      else
-        NewCodecClass := StrToEncoding(NewEncName);
+      if NewEncName = ''
+        then NewCodecClass := TUTF8Codec
+      else NewCodecClass := StrToEncoding(NewEncName);
     end else begin
       NewEncName := DefaultEncoding;
       NewCodecClass := DefaultCodecClass;
@@ -19688,10 +19497,9 @@ begin
       WriteByteOrderMark(Reader, Signal, FByteCount);
 
       if IncludeXmlDecl then begin
-        if Version = '' then
-          WriteWideStrings(Reader, Signal, ['<?xml version="1.0"'], False)
-        else
-          WriteWideStrings(Reader, Signal, ['<?xml version="', Version, '"'], False);
+        if Version = ''
+          then WriteWideStrings(Reader, Signal, ['<?xml version="1.0"'], False)
+        else WriteWideStrings(Reader, Signal, ['<?xml version="', Version, '"'], False);
         if CurrentEncoding <> '' then
           WriteWideStrings(Reader, Signal, [' encoding="', CurrentEncoding, '"'], False);
         case StandaloneDecl of
@@ -19723,10 +19531,9 @@ begin
     NewEncName := EncodingName;
 
     if DefaultEncoding = '' then begin
-      if NewEncName = '' then
-        NewCodecClass := TUTF8Codec
-      else
-        NewCodecClass := StrToEncoding(NewEncName);
+      if NewEncName = ''
+        then NewCodecClass := TUTF8Codec
+      else NewCodecClass := StrToEncoding(NewEncName);
     end else begin
       NewEncName := DefaultEncoding;
       NewCodecClass := DefaultCodecClass;
@@ -19778,8 +19585,7 @@ procedure TXmlStreamBuilder.WriteAttributeDefinitionSignal(const Signal: TXmlAtt
       AS_NMTOKENS_DATATYPE: Result := 'NMTOKENS';
       AS_NOTATION_DATATYPE: Result := 'NOTATION';
     else
-      raise EConvertError.Create('Datatype conversion not supported');
-      ;
+      raise EConvertError.Create('Datatype conversion not supported'); ;
     end;
   end;
 
@@ -19808,10 +19614,9 @@ begin
       AVC_REQUIRED: WriteWideStrings(Reader, Signal, [' #REQUIRED'], False);
     end;
     if Constraint in [AVC_DEFAULT, AVC_FIXED] then
-      if Pos(DQ, DefaultValue) > 0 then
-        WriteWideStrings(Reader, Signal, [' ', SQ, DefaultValue, SQ, #10], False)
-      else
-        WriteWideStrings(Reader, Signal, [' ', DQ, DefaultValue, DQ, #10], False);
+      if Pos(DQ, DefaultValue) > 0
+        then WriteWideStrings(Reader, Signal, [' ', SQ, DefaultValue, SQ, #10], False)
+      else WriteWideStrings(Reader, Signal, [' ', DQ, DefaultValue, DQ, #10], False);
   end;
 end;
 
@@ -19833,24 +19638,21 @@ begin
   with Signal do begin
     WriteWideStrings(Reader, Signal, [#10'<!ENTITY ', EntityName, ' '], False);
     if ((PublicId = '') and (SystemId = '')) then begin
-      if Pos(DQ, entityValue) > 0 then
-        WriteWideStrings(Reader, Signal, [SQ, EntityValue, SQ], False)
-      else
-        WriteWideStrings(Reader, Signal, [DQ, EntityValue, DQ], False);
+      if Pos(DQ, entityValue) > 0
+        then WriteWideStrings(Reader, Signal, [SQ, EntityValue, SQ], False)
+      else WriteWideStrings(Reader, Signal, [DQ, EntityValue, DQ], False);
     end else begin
       if PublicId = '' then begin
-        if Pos(DQ, SystemId) > 0 then
-          WriteWideStrings(Reader, Signal, ['SYSTEM ', SQ, SystemId, SQ], False)
-        else
-          WriteWideStrings(Reader, Signal, ['SYSTEM ', DQ, SystemId, DQ], False);
+        if Pos(DQ, SystemId) > 0
+          then WriteWideStrings(Reader, Signal, ['SYSTEM ', SQ, SystemId, SQ], False)
+        else WriteWideStrings(Reader, Signal, ['SYSTEM ', DQ, SystemId, DQ], False);
       end else begin
         if SystemId = '' then begin
           WriteWideStrings(Reader, Signal, [' PUBLIC "', PublicId, '"'], False);
         end else begin
-          if Pos(DQ, SystemId) > 0 then
-            WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" ', SQ, SystemId, SQ], False)
-          else
-            WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" "', SystemId, '"'], False);
+          if Pos(DQ, SystemId) > 0
+            then WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" ', SQ, SystemId, SQ], False)
+          else WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" "', SystemId, '"'], False);
         end;
       end; {if ...}
       if NotationName <> '' then
@@ -19870,18 +19672,16 @@ begin
   with Signal do begin
     WriteWideStrings(Reader, Signal, [#10'<!NOTATION ', NotationName, ' '], False);
     if PublicId = '' then begin
-      if Pos(DQ, SystemId) > 0 then
-        WriteWideStrings(Reader, Signal, ['SYSTEM ', SQ, SystemId, SQ], False)
-      else
-        WriteWideStrings(Reader, Signal, ['SYSTEM ', DQ, SystemId, DQ], False);
+      if Pos(DQ, SystemId) > 0
+        then WriteWideStrings(Reader, Signal, ['SYSTEM ', SQ, SystemId, SQ], False)
+      else WriteWideStrings(Reader, Signal, ['SYSTEM ', DQ, SystemId, DQ], False);
     end else begin
       if SystemId = '' then begin
         WriteWideStrings(Reader, Signal, [' PUBLIC "', PublicId, '"'], False);
       end else begin
-        if Pos(DQ, SystemId) > 0 then
-          WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" ', SQ, SystemId, SQ], False)
-        else
-          WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" "', SystemId, '"'], False);
+        if Pos(DQ, SystemId) > 0
+          then WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" ', SQ, SystemId, SQ], False)
+        else WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" "', SystemId, '"'], False);
       end;
     end; {if ...}
     WriteWideStrings(Reader, Signal, ['>'], False);
@@ -19898,24 +19698,21 @@ begin
   with Signal do begin
     WriteWideStrings(Reader, Signal, [#10'<!ENTITY % ', entityName, ' '], False);
     if ((PublicId = '') and (SystemId = '')) then begin
-      if Pos(DQ, entityValue) > 0 then
-        WriteWideStrings(Reader, Signal, [SQ, entityValue, SQ], False)
-      else
-        WriteWideStrings(Reader, Signal, [DQ, entityValue, DQ], False);
+      if Pos(DQ, entityValue) > 0
+        then WriteWideStrings(Reader, Signal, [SQ, entityValue, SQ], False)
+      else WriteWideStrings(Reader, Signal, [DQ, entityValue, DQ], False);
     end else begin
       if PublicId = '' then begin
-        if Pos(DQ, SystemId) > 0 then
-          WriteWideStrings(Reader, Signal, ['SYSTEM ', SQ, SystemId, SQ], False)
-        else
-          WriteWideStrings(Reader, Signal, ['SYSTEM ', DQ, SystemId, DQ], False);
+        if Pos(DQ, SystemId) > 0
+          then WriteWideStrings(Reader, Signal, ['SYSTEM ', SQ, SystemId, SQ], False)
+        else WriteWideStrings(Reader, Signal, ['SYSTEM ', DQ, SystemId, DQ], False);
       end else begin
         if SystemId = '' then begin
           WriteWideStrings(Reader, Signal, [' PUBLIC "', PublicId, '"'], False);
         end else begin
-          if Pos(DQ, SystemId) > 0 then
-            WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" ', SQ, SystemId, SQ], False)
-          else
-            WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" "', SystemId, '"'], False);
+          if Pos(DQ, SystemId) > 0
+            then WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" ', SQ, SystemId, SQ], False)
+          else WriteWideStrings(Reader, Signal, ['PUBLIC "', PublicId, '" "', SystemId, '"'], False);
         end;
       end;
     end;
@@ -19939,10 +19736,9 @@ begin
 
     NewEncName := EncodingName;
     if DefaultEncoding = '' then begin
-      if NewEncName = '' then
-        NewCodecClass := TUTF8Codec
-      else
-        NewCodecClass := StrToEncoding(NewEncName);
+      if NewEncName = ''
+        then NewCodecClass := TUTF8Codec
+      else NewCodecClass := StrToEncoding(NewEncName);
     end else begin
       NewEncName := DefaultEncoding;
       NewCodecClass := DefaultCodecClass;
@@ -19956,10 +19752,9 @@ begin
       WriteByteOrderMark(Reader, Signal, FByteCount);
 
       if IncludeXmlDecl then begin
-        if Version = '' then
-          WriteWideStrings(Reader, Signal, ['<?xml version="1.0"'], False)
-        else
-          WriteWideStrings(Reader, Signal, ['<?xml version="', Version, '"'], False);
+        if Version = ''
+          then WriteWideStrings(Reader, Signal, ['<?xml version="1.0"'], False)
+        else WriteWideStrings(Reader, Signal, ['<?xml version="', Version, '"'], False);
         if NewEncName <> '' then
           WriteWideStrings(Reader, Signal, [' encoding="', NewEncName, '"'], False);
         WriteWideStrings(Reader, Signal, ['?>'#10], False);
@@ -19994,6 +19789,8 @@ begin
   FOpenElementsCount := 0;
 end;
 
+
+
 // +++++++++++++++++++++++++ TXmlCustomReader ++++++++++++++++++++++++++
 
 constructor TXmlCustomReader.Create(AOwner: TComponent);
@@ -20005,27 +19802,25 @@ end;
 
 function TXmlCustomReader.getTabWidth: integer;
 begin
-  if Assigned(FDOMImpl) then
-    Result := FDOMImpl.TabWidth
-  else
-    Result := 1;
+  if Assigned(FDOMImpl)
+    then Result := FDOMImpl.TabWidth
+  else Result := 1;
 end;
 
 procedure TXmlCustomReader.SetDomImpl(const Impl: TDomImplementation);
 begin
-  if FDOMImpl = Impl then
-    Exit;
+  if FDOMImpl = Impl then Exit;
 {$IFDEF VER140+}
-  if Assigned(FDOMImpl) then
-    FDOMImpl.RemoveFreeNotification(Self);
+  if Assigned(FDOMImpl)
+    then FDOMImpl.RemoveFreeNotification(Self);
 {$ENDIF}
 {$IFDEF LINUX}
-  if Assigned(FDOMImpl) then
-    FDOMImpl.RemoveFreeNotification(Self);
+  if Assigned(FDOMImpl)
+    then FDOMImpl.RemoveFreeNotification(Self);
 {$ENDIF}
   FDOMImpl := Impl;
-  if Assigned(Impl) then
-    Impl.FreeNotification(Self);
+  if Assigned(Impl)
+    then Impl.FreeNotification(Self);
 end;
 
 procedure TXmlCustomReader.Notification(AComponent: TComponent;
@@ -20033,10 +19828,8 @@ procedure TXmlCustomReader.Notification(AComponent: TComponent;
 begin
   inherited Notification(AComponent, Operation);
   if Operation = opRemove then begin
-    if AComponent = FNextHandler then
-      FNextHandler := nil;
-    if AComponent = FDOMImpl then
-      FDOMImpl := nil;
+    if AComponent = FNextHandler then FNextHandler := nil;
+    if AComponent = FDOMImpl then FDOMImpl := nil;
   end;
 end;
 
@@ -20054,10 +19847,9 @@ begin
 
     if Assigned(FDomImpl) then begin
       Ok := FDomImpl.HandleError(Self, Error);
-    end else if Error.Severity = DOM_SEVERITY_FATAL_ERROR then
-      Ok := False
-    else
-      Ok := True;
+    end else if Error.Severity = DOM_SEVERITY_FATAL_ERROR
+      then Ok := False
+    else Ok := True;
 
     if not Ok then
       raise EParserException.Create('Signal Processing Exception');
@@ -20065,6 +19857,8 @@ begin
     Error.Free;
   end;
 end;
+
+
 
 // ++++++++++++++++++++++ TXmlStandardDocReader ++++++++++++++++++++++++
 
@@ -20287,10 +20081,9 @@ begin
   if Assigned(NextHandler) then begin
     XmlStartElementSignal := TXmlStartElementSignal.CreateFromLocator(Self, Locator);
     try
-      if FPrefixMapping or FSuppressXmlns then
-        WriteStartElementXmlns(locator, content, tagName, XmlStartElementSignal.Attributes) // xxx Replace individual parameters with TXmlStartElementSignal object parameter.
-      else
-        WriteStartElementSimple(locator, content, tagName, XmlStartElementSignal.Attributes); // xxx Ditto.
+      if FPrefixMapping or FSuppressXmlns
+        then WriteStartElementXmlns(locator, content, tagName, XmlStartElementSignal.Attributes) // xxx Replace individual parameters with TXmlStartElementSignal object parameter.
+      else WriteStartElementSimple(locator, content, tagName, XmlStartElementSignal.Attributes); // xxx Ditto.
       XmlStartElementSignal.TagName := TagName;
       NextHandler.ProcessSignal(XmlStartElementSignal);
     finally
@@ -20432,9 +20225,9 @@ begin
     attrNameLength := 0;
     while not IsXmlWhiteSpace(tail^) and not (tail^ in [NULL, EQ]) do begin
       inc(attrNameLength);
-      if attrNameLength <= 6 then
-        if tail^ <> XMLNS[attrNameLength] then
-          isXmlns := false;
+      if attrNameLength <= 6
+        then if tail^ <> XMLNS[attrNameLength]
+        then isXmlns := false;
       inc(tail);
     end;
     setString(attrName, head, attrNameLength);
@@ -20488,10 +20281,9 @@ begin
         pfxUriList.add(namespacePrefix);
         writeStartPrefixMapping(locator, xmlExtractLocalName(attrName), attrValue);
       end;
-      if not FSuppressXmlns then
-        attrList.add(attrName, attrValue);
-    end else
-      attrList.add(attrName, attrValue);
+      if not FSuppressXmlns
+        then attrList.add(attrName, attrValue);
+    end else attrList.add(attrName, attrValue);
 
     // Skip white space:
     head := tail;
@@ -20578,10 +20370,9 @@ begin
   if Assigned(NextHandler) then begin
     XmlStartElementSignal := TXmlStartElementSignal.CreateFromLocator(Self, Locator);
     try
-      if FPrefixMapping or FSuppressXmlns then
-        WriteStartElementXmlns(Locator, Content, TagName, XmlStartElementSignal.Attributes)
-      else
-        WriteStartElementSimple(Locator, Content, TagName, XmlStartElementSignal.Attributes);
+      if FPrefixMapping or FSuppressXmlns
+        then WriteStartElementXmlns(Locator, Content, TagName, XmlStartElementSignal.Attributes)
+      else WriteStartElementSimple(Locator, Content, TagName, XmlStartElementSignal.Attributes);
       XmlStartElementSignal.TagName := TagName;
       NextHandler.processSignal(XmlStartElementSignal);
       WriteEndElement(Locator, TagName);
@@ -20634,12 +20425,11 @@ begin
   StrStream := TUtilsWideStringStream.Create(S);
   try
     with Locator do
-      if StartColumnNumber = 0 {// Indicates a starting LF} then
-        InputSrc := TXmlInputSource.Create(StrStream, '', URI, 4096,
+      if StartColumnNumber = 0 // Indicates a starting LF
+        then InputSrc := TXmlInputSource.Create(StrStream, '', URI, 4096,
           'UTF-16LE', False, StartByteNumber, StartCharNumber - 1,
           StartColumnNumber - 1, 0, StartLineNumber - 1)
-      else
-        InputSrc := TXmlInputSource.Create(StrStream, '', URI, 4096,
+      else InputSrc := TXmlInputSource.Create(StrStream, '', URI, 4096,
           'UTF-16LE', False, StartByteNumber, StartCharNumber - 1,
           StartColumnNumber - 1, 0, StartLineNumber);
     try
@@ -20659,7 +20449,8 @@ begin
                 PubidLiteral := TokenValue;
               DOCTYPE_SYSID_TOKEN:
                 SystemLiteral := TokenValue;
-              DOCTYPE_INTSUBSET_TOKEN: begin
+              DOCTYPE_INTSUBSET_TOKEN:
+                begin
                   IntDtdByteNumber := DoctypeDeclTokenizer.GetStartByteNumber;
                   IntDtdCharNumber := DoctypeDeclTokenizer.GetStartCharNumber - 1;
                   IntDtdColumn := DoctypeDeclTokenizer.GetStartColumnNumber - 1;
@@ -20781,6 +20572,8 @@ begin
   end;
 end;
 
+
+
 // +++++++++++++++++++++ TXmlStandardDtdReader +++++++++++++++++++++
 
 constructor TXmlStandardDtdReader.create(AOwner: TComponent);
@@ -20880,44 +20673,35 @@ begin
   attName := '';
   rest := '';
 
-  if Length(Decl) = 0 then begin
-    result := false;
-    exit;
-  end;
+  if Length(Decl) = 0
+    then begin result := false; exit; end;
   i := 1;
 
   {White-space?}
   while IsXmlWhiteSpace(Decl[i]) do begin
     inc(i);
-    if i > length(Decl) then begin
-      result := false;
-      exit;
-    end;
+    if i > length(Decl)
+      then begin result := false; exit; end;
   end;
   j := i;
 
   {AttName?}
   while not IsXmlWhiteSpace(Decl[i]) do begin
     inc(i);
-    if i > length(Decl) then begin
-      result := false;
-      exit;
-    end;
+    if i > length(Decl)
+      then begin result := false; exit; end;
   end;
   attName := copy(Decl, j, i - j);
 
   {White-space?}
   while IsXmlWhiteSpace(Decl[i]) do begin
     inc(i);
-    if i > length(Decl) then begin
-      result := false;
-      exit;
-    end;
+    if i > length(Decl)
+      then begin result := false; exit; end;
   end;
   j := i;
 
-  if Decl[j] = '(' then
-    FindEnumeration := true;
+  if Decl[j] = '(' then FindEnumeration := true;
 
   {AttType?}
   if FindEnumeration then begin
@@ -20925,89 +20709,67 @@ begin
   end else begin
     while not IsXmlWhiteSpace(Decl[i]) do begin
       inc(i);
-      if i > length(Decl) then begin
-        result := false;
-        exit;
-      end;
+      if i > length(Decl)
+        then begin result := false; exit; end;
     end;
-    if not StrToDataType(copy(Decl, j, i - j), attType) then begin
-      result := false;
-      exit;
-    end;
+    if not StrToDataType(copy(Decl, j, i - j), attType)
+      then begin result := false; exit; end;
     if attType = AS_NOTATION_DATATYPE then
       FindEnumeration := true;
 
     {White-space?}
     while IsXmlWhiteSpace(Decl[i]) do begin
       inc(i);
-      if i > length(Decl) then begin
-        result := false;
-        exit;
-      end;
+      if i > length(Decl)
+        then begin result := false; exit; end;
     end;
     j := i;
   end; {if ...}
 
   {Bracket?}
   if FindEnumeration then begin
-    if Decl[j] <> '(' then begin
-      result := false;
-      exit;
-    end;
+    if Decl[j] <> '('
+      then begin result := false; exit; end;
     while not (Decl[i] = ')') do begin
       inc(i);
-      if i >= length(Decl) then begin
-        result := false;
-        exit;
-      end;
+      if i >= length(Decl)
+        then begin result := false; exit; end;
     end;
     Enumeration := copy(Decl, j, i - j + 1);
 
     {White-space?}
     inc(i);
-    if not IsXmlWhiteSpace(Decl[i]) then begin
-      result := false;
-      exit;
-    end;
+    if not IsXmlWhiteSpace(Decl[i])
+      then begin result := false; exit; end;
     while IsXmlWhiteSpace(Decl[i]) do begin
       inc(i);
-      if i > length(Decl) then begin
-        result := false;
-        exit;
-      end;
+      if i > length(Decl)
+        then begin result := false; exit; end;
     end;
     j := i;
   end; {if ...}
 
-  if Decl[j] = '#' then
-    FindConstraint := true
-  else
-    FindDefaultValue := true;
+  if Decl[j] = '#'
+    then FindConstraint := true
+  else FindDefaultValue := true;
 
   {Constraint?}
   if FindConstraint then begin
     while not IsXmlWhiteSpace(Decl[i]) do begin
       inc(i);
-      if i > length(Decl) then
-        break;
+      if i > length(Decl) then break;
     end; {while ...}
-    if not StrToConstaintType(copy(Decl, j, i - j), constraint) then begin
-      result := false;
-      exit;
-    end;
+    if not StrToConstaintType(copy(Decl, j, i - j), constraint)
+      then begin result := false; exit; end;
     if constraint = AVC_FIXED then begin
       FindDefaultValue := true;
       {White-space?}
-      if i > length(Decl) then begin
-        result := false;
-        exit;
-      end;
+      if i > length(Decl)
+        then begin result := false; exit; end;
       while IsXmlWhiteSpace(Decl[i]) do begin
         inc(i);
-        if i > length(Decl) then begin
-          result := false;
-          exit;
-        end;
+        if i > length(Decl)
+          then begin result := false; exit; end;
       end; {while ...}
       j := i;
     end; {if ...}
@@ -21015,22 +20777,16 @@ begin
 
   {DefaultValue?}
   if FindDefaultValue then begin
-    if i = length(Decl) then begin
-      result := false;
-      exit;
-    end;
+    if i = length(Decl)
+      then begin result := false; exit; end;
     QuoteType := Decl[i];
-    if not ((QuoteType = '"') or (QuoteType = #$0027)) then begin
-      result := false;
-      exit;
-    end;
+    if not ((QuoteType = '"') or (QuoteType = #$0027))
+      then begin result := false; exit; end;
     inc(i);
     while not (Decl[i] = QuoteType) do begin
       inc(i);
-      if i > length(Decl) then begin
-        result := false;
-        exit;
-      end;
+      if i > length(Decl)
+        then begin result := false; exit; end;
     end; {while ...}
     defaultValue := copy(Decl, j + 1, i - j - 1);
     inc(i);
@@ -21081,10 +20837,9 @@ begin
 
   // Keep track of the element types of attribute-list declarations and warn the
   // application when detecting a duplicate:
-  if FAttrListDeclNames.IndexOf(ElementName) = -1 then
-    FAttrListDeclNames.Add(ElementName)
-  else
-    SendErrorNotification(ET_DOUBLE_ATTLISTDECL, Locator, ElementName);
+  if FAttrListDeclNames.IndexOf(ElementName) = -1
+    then FAttrListDeclNames.Add(ElementName)
+  else SendErrorNotification(ET_DOUBLE_ATTLISTDECL, Locator, ElementName);
 
   if Assigned(NextHandler) then begin
 
@@ -21393,10 +21148,9 @@ begin
       with InputSource do
         writeStartExtDtd(Tokenizer, inputEncoding, publicId, systemId, xmlVersion, xmlEncoding);
       with Tokenizer do
-        if errorType = ET_NONE then
-          parseloop(Tokenizer)
-        else
-          sendErrorNotification(errorType, Tokenizer, tokenName + ' ' + tokenData);
+        if errorType = ET_NONE
+          then parseloop(Tokenizer)
+        else sendErrorNotification(errorType, Tokenizer, tokenName + ' ' + tokenData);
       writeCompleted(Tokenizer);
     except
       SendAbortedSignal(Tokenizer);
@@ -21418,10 +21172,9 @@ begin
       writeStartIntDtd(Tokenizer, inputSource.systemId);
       with Tokenizer do begin
         resolvePEs := PERefTreatment = PT_PARSE;
-        if errorType = ET_NONE then
-          parseloop(Tokenizer)
-        else
-          sendErrorNotification(errorType, Tokenizer, tokenName + ' ' + tokenData);
+        if errorType = ET_NONE
+          then parseloop(Tokenizer)
+        else sendErrorNotification(errorType, Tokenizer, tokenName + ' ' + tokenData);
       end;
       writeCompleted(Tokenizer);
     except
@@ -21442,6 +21195,8 @@ begin
   FXmlErrorDetected := False;
 end;
 
+
+
 // +++++++++++++++++++++++ TXmlStandardDomReader +++++++++++++++++++++++
 
 constructor TXmlStandardDomReader.create(AOwner: TComponent);
@@ -21460,12 +21215,10 @@ end;
 function TXmlStandardDomReader.getSystemId: wideString;
 begin
   if assigned(contextNode) then begin
-    if assigned(contextNode.referenceDocument) then
-      result := contextNode.referenceDocument.documentUri
-    else
-      result := '';
-  end else
-    result := '';
+    if assigned(contextNode.referenceDocument)
+      then result := contextNode.referenceDocument.documentUri
+    else result := '';
+  end else result := '';
 end;
 
 procedure TXmlStandardDomReader.parseloop(const sourceNode: TdomNode);
@@ -21708,8 +21461,7 @@ procedure TXmlStandardDomReader.WritePCDATA(const content: wideString);
 var
   XmlPCDATASignal: TXmlPCDATASignal;
 begin
-  if content = '' then
-    Exit;
+  if content = '' then Exit;
 
   if Assigned(NextHandler) then begin
     XmlPCDATASignal := TXmlPCDATASignal.Create(Self, 0, 0, 0, 1, 0, 0, 0, 1, getSystemId, nil, contextNode);
@@ -21822,10 +21574,9 @@ begin
     end else begin
       FContextNode := nil;
       with sourceNode.referenceDocument do
-        if xmlEncoding = '' then
-          writeStartDocumentFragment(inputEncoding)
-        else
-          writeStartDocumentFragment(xmlEncoding);
+        if xmlEncoding = ''
+          then writeStartDocumentFragment(inputEncoding)
+        else writeStartDocumentFragment(xmlEncoding);
     end;
 
     parseloop(sourceNode);
@@ -21838,6 +21589,8 @@ begin
   end; {try ...}
 end;
 
+
+
 // +++++++++++++++++++++++++ TXmlCustomParser +++++++++++++++++++++++++
 
 constructor TXmlCustomParser.create(aOwner: TComponent);
@@ -21848,27 +21601,28 @@ end;
 
 procedure TXmlCustomParser.setDomImpl(const impl: TDomImplementation);
 begin
-  if FDOMImpl = impl then
-    exit;
+  if FDOMImpl = impl then exit;
 {$IFDEF VER140+}
-  if assigned(FDOMImpl) then
-    FDOMImpl.RemoveFreeNotification(Self);
+  if assigned(FDOMImpl)
+    then FDOMImpl.RemoveFreeNotification(Self);
 {$ENDIF}
 {$IFDEF LINUX}
-  if assigned(FDOMImpl) then
-    FDOMImpl.RemoveFreeNotification(Self);
+  if assigned(FDOMImpl)
+    then FDOMImpl.RemoveFreeNotification(Self);
 {$ENDIF}
   FDOMImpl := impl;
-  if assigned(impl) then
-    impl.FreeNotification(Self);
+  if assigned(impl)
+    then impl.FreeNotification(Self);
 end;
 
 procedure TXmlCustomParser.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FDomImpl) then
-    FDomImpl := nil;
+  if (Operation = opRemove) and (AComponent = FDomImpl)
+    then FDomImpl := nil;
 end;
+
+
 
 { TXmlToDomParser }
 
@@ -21942,8 +21696,8 @@ end;
 
 procedure TXmlToDomParser.setBufferSize(const value: integer);
 begin
-  if value < 1024 then
-    raise ENot_Supported_Err.create('BufferSize must not be less than 1024.');
+  if value < 1024
+    then raise ENot_Supported_Err.create('BufferSize must not be less than 1024.');
   FBufferSize := value;
 end;
 
@@ -21974,10 +21728,9 @@ var
 begin
   error := TdomError.createFromLocator(xmlErrorType, nil, '');
   try
-    if assigned(FDomImpl) then
-      result := FDomImpl.handleError(self, error)
-    else
-      result := not (error.severity = DOM_SEVERITY_FATAL_ERROR);
+    if assigned(FDomImpl)
+      then result := FDomImpl.handleError(self, error)
+    else result := not (error.severity = DOM_SEVERITY_FATAL_ERROR);
   finally
     error.free;
   end;
@@ -22055,8 +21808,7 @@ begin
     finally
       Stream.Free;
     end;
-  end else
-    Result := nil;
+  end else Result := nil;
 end;
 
 function TXmlToDomParser.parseWideString(const str: wideString;
@@ -22067,8 +21819,7 @@ var
   WStrStream: TUtilsWideStringStream;
   S: wideString;
 begin
-  if str = '' then
-    raise EAccessViolation.create('Empty string.');
+  if str = '' then raise EAccessViolation.create('Empty string.');
   if str[1] = #$FEFF then begin // Byte Order Mark?
     WStrStream := TUtilsWideStringStream.create(str);
   end else begin
@@ -22098,7 +21849,8 @@ begin
   if inputSource.hasMalformedDecl
     or not (inputSource.declType in [DT_XML_DECLARATION,
     DT_XML_OR_TEXT_DECLARATION,
-      DT_UNSPECIFIED]) then begin
+      DT_UNSPECIFIED])
+    then begin
     sendErrorNotification(ET_INVALID_XML_DECL);
     raise EParserException.create('Parser error.');
   end;
@@ -22132,6 +21884,8 @@ begin
   FResolvePEs := Value;
 end;
 
+
+
 { TDtdToASParser }
 
 constructor TDtdToASParser.create(aOwner: TComponent);
@@ -22159,8 +21913,7 @@ procedure TDtdToASParser.extDtdSourceCodeToAS(const ExtDtdSourceCode: TXmlSource
   sysId: wideString;
   const target: TdomASModel);
 begin
-  if not assigned(extDtdSourceCode) then
-    raise EAccessViolation.create('Source code not specified.');
+  if not assigned(extDtdSourceCode) then raise EAccessViolation.create('Source code not specified.');
   extDtdWideStringToAS(extDtdSourceCode.text, pubId, sysId, target);
 end;
 
@@ -22171,8 +21924,7 @@ procedure TDtdToASParser.extDtdStreamToAS(const stream: TStream;
 var
   InputSrc: TXmlInputSource;
 begin
-  if not assigned(stream) then
-    raise EAccessViolation.create('Stream not specified.');
+  if not assigned(stream) then raise EAccessViolation.create('Stream not specified.');
   FASBuilder.ASModel := target;
   InputSrc := TXmlInputSource.create(Stream, PubId, SysId, FBufferSize, 'UTF-8',
     False, 0, 0, 0, 0, 1); // xxx implement default encoding?   xxx Change offsetFromBeginning parameter?
@@ -22180,7 +21932,8 @@ begin
     if InputSrc.hasMalformedDecl
       or not (InputSrc.declType in [DT_TEXT_DECLARATION,
       DT_XML_OR_TEXT_DECLARATION,
-        DT_UNSPECIFIED]) then begin
+        DT_UNSPECIFIED])
+      then begin
       sendErrorNotification(ET_INVALID_TEXT_DECL);
       raise EParserException.create('Parser error.');
     end else begin
@@ -22204,8 +21957,7 @@ procedure TDtdToASParser.extDtdStringToAS(const str: string;
 var
   StrStream: TStringStream;
 begin
-  if str = '' then
-    raise EAccessViolation.create('Empty string.');
+  if str = '' then raise EAccessViolation.create('Empty string.');
   StrStream := TStringStream.create(str);
   try
     extDtdStreamToAS(StrStream, pubId, sysId, target);
@@ -22221,8 +21973,7 @@ procedure TDtdToASParser.extDtdWideStringToAS(str: wideString;
 var
   WStrStream: TUtilsWideStringStream;
 begin
-  if str = '' then
-    raise EAccessViolation.create('Empty string.');
+  if str = '' then raise EAccessViolation.create('Empty string.');
   if str[1] <> #$FEFF then
     str := concat(wideString(#$FEFF), str);
   WStrStream := TUtilsWideStringStream.create(str);
@@ -22247,8 +21998,7 @@ procedure TDtdToASParser.intDtdSourceCodeToAS(const intDtdSourceCode: TXmlSource
   intSubsetStartLine: Int64;
   const target: TdomASModel);
 begin
-  if not assigned(intDtdSourceCode) then
-    raise EAccessViolation.create('Source code not specified.');
+  if not assigned(intDtdSourceCode) then raise EAccessViolation.create('Source code not specified.');
   intDtdWideStringToAS(intDtdSourceCode.text, pubId, sysId,
     intSubsetStartByteNumber, intSubsetStartCharNumber, intSubsetStartColumn,
     intSubsetStartLine, target);
@@ -22265,8 +22015,7 @@ procedure TDtdToASParser.intDtdStreamToAS(const stream: TStream;
 var
   InputSrc: TXmlInputSource;
 begin
-  if not assigned(stream) then
-    raise EAccessViolation.create('Stream not specified.');
+  if not assigned(stream) then raise EAccessViolation.create('Stream not specified.');
   FASBuilder.ASModel := target;
   InputSrc := TXmlInputSource.create(stream, pubId, sysId, FBufferSize, 'UTF-8',
     False, intSubsetStartByteNumber, intSubsetStartCharNumber,
@@ -22275,7 +22024,8 @@ begin
     if InputSrc.hasMalformedDecl
       or not (InputSrc.declType in [DT_TEXT_DECLARATION,
       DT_XML_OR_TEXT_DECLARATION,
-        DT_UNSPECIFIED]) then begin
+        DT_UNSPECIFIED])
+      then begin
       sendErrorNotification(ET_INVALID_TEXT_DECL);
       raise EParserException.create('Parser error.');
     end else begin
@@ -22303,8 +22053,7 @@ procedure TDtdToASParser.intDtdStringToAS(const str: string;
 var
   StrStream: TStringStream;
 begin
-  if str = '' then
-    raise EAccessViolation.create('Empty string.');
+  if str = '' then raise EAccessViolation.create('Empty string.');
   StrStream := TStringStream.create(str);
   try
     intDtdStreamToAS(StrStream, pubId, sysId, intSubsetStartByteNumber,
@@ -22326,8 +22075,7 @@ procedure TDtdToASParser.intDtdWideStringToAS(str: wideString;
 var
   WStrStream: TUtilsWideStringStream;
 begin
-  if Str = '' then
-    raise EAccessViolation.Create('Empty string.');
+  if Str = '' then raise EAccessViolation.Create('Empty string.');
   if Str[1] <> #$FEFF then
     Str := concat(WideString(#$FEFF), Str);
   WStrStream := TUtilsWideStringStream.Create(Str);
@@ -22404,10 +22152,9 @@ begin
   try
     if assigned(FDomImpl) then begin
       result := FDomImpl.handleError(self, error);
-    end else if error.severity = DOM_SEVERITY_FATAL_ERROR then
-      result := false
-    else
-      result := true;
+    end else if error.severity = DOM_SEVERITY_FATAL_ERROR
+      then result := false
+    else result := true;
   finally
     error.free;
   end;
@@ -22415,8 +22162,8 @@ end;
 
 procedure TDtdToASParser.setBufferSize(const value: integer);
 begin
-  if value < 1024 then
-    raise ENot_Supported_Err.create('BufferSize must not be less than 1024.');
+  if value < 1024
+    then raise ENot_Supported_Err.create('BufferSize must not be less than 1024.');
   FBufferSize := value;
 end;
 
@@ -22430,6 +22177,8 @@ procedure TDtdToASParser.setPERefTreatment(const Value: TdomPERefTreatment);
 begin
   FDtdReader.PERefTreatment := value;
 end;
+
+
 
 { TDomToXmlParser }
 
@@ -22484,8 +22233,8 @@ end;
 
 procedure TDomToXmlParser.setBufferSize(const value: integer);
 begin
-  if value < 1024 then
-    raise ENot_Supported_Err.create('BufferSize must not be less than 1024.');
+  if value < 1024
+    then raise ENot_Supported_Err.create('BufferSize must not be less than 1024.');
   FBufferSize := value;
 end;
 
@@ -22511,10 +22260,9 @@ end;
 
 procedure TDomToXmlParser.setStrictErrorChecking(const value: boolean);
 begin
-  if value then
-    FDomReader.NextHandler := FWFTestHandler
-  else
-    FDomReader.NextHandler := FStreamBuilder;
+  if value
+    then FDomReader.NextHandler := FWFTestHandler
+  else FDomReader.NextHandler := FStreamBuilder;
 end;
 
 {$IFNDEF LINUX}
@@ -22541,21 +22289,20 @@ function TDomToXmlParser.writeToStream(const wnode: TdomNode;
 var
   outputSource: TXmlOutputSource;
 begin
-  if not assigned(FDOMImpl) then
-    raise EAccessViolation.create('DOMImplementation not specified.');
-  if not assigned(destination) then
-    raise EAccessViolation.create('Destination stream not specified.');
-  if not assigned(wnode) then
-    raise EAccessViolation.create('Source node not specified.');
+  if not assigned(FDOMImpl)
+    then raise EAccessViolation.create('DOMImplementation not specified.');
+  if not assigned(destination)
+    then raise EAccessViolation.create('Destination stream not specified.');
+  if not assigned(wnode)
+    then raise EAccessViolation.create('Source node not specified.');
 
   FDomReader.DOMImpl := FDOMImpl;
 {$IFDEF LINUX}
   FStreamBuilder.defaultEncoding := encoding; // Raises an ENot_Supported_Err, if the specified encoding is not supported
 {$ELSE}
-  if UseActiveCodePage then
-    FStreamBuilder.defaultEncoding := GetSystemEncodingName
-  else
-    FStreamBuilder.defaultEncoding := encoding; // Raises an ENot_Supported_Err, if the specified encoding is not supported
+  if UseActiveCodePage
+    then FStreamBuilder.defaultEncoding := GetSystemEncodingName
+  else FStreamBuilder.defaultEncoding := encoding; // Raises an ENot_Supported_Err, if the specified encoding is not supported
 {$ENDIF}
   outputSource := TXmlOutputSource.create(destination, FBufferSize);
   try
@@ -22596,6 +22343,8 @@ begin
     xmlStream.free;
   end;
 end;
+
+
 
 {XPath Function Library -- see XPath 1.0, sec. 4}
 
@@ -22705,8 +22454,7 @@ begin
     if exprResult is TdomXPathNodeSetResult then begin
       for i := 0 to Pred(TdomXPathNodeSetResult(exprResult).length) do
         AddId(idList, TdomXPathNodeSetResult(exprResult).item(i).XPathStringValue);
-    end else
-      AddId(idList, exprResult.asWideString);
+    end else AddId(idList, exprResult.asWideString);
 
     // Find Id nodes:
     result := TdomXPathNodeSetResult.create;
@@ -22750,10 +22498,9 @@ begin
       if length = 0 then begin
         result := TdomXPathStringResult.create('');
       end else begin
-        if item(0) is TdomProcessingInstruction then
-          result := TdomXPathStringResult.create(TdomProcessingInstruction(item(0)).Target)
-        else
-          result := TdomXPathStringResult.create(TdomNode(item(0)).LocalName);
+        if item(0) is TdomProcessingInstruction
+          then result := TdomXPathStringResult.create(TdomProcessingInstruction(item(0)).Target)
+        else result := TdomXPathStringResult.create(TdomNode(item(0)).LocalName);
       end;
     end;
   finally
@@ -22780,10 +22527,9 @@ begin
       raise EXPath_Invalid_Function_Call_Err.createFmt('Argument mismatch error in %s(): Expression does not evaluate to node-set.', ['namespace-uri']);
     with exprResult do begin
       axisType := XPATH_FORWARD_AXIS;
-      if length = 0 then
-        result := TdomXPathStringResult.create('')
-      else
-        result := TdomXPathStringResult.create(TdomNode(item(0)).NamespaceUri);
+      if length = 0
+        then result := TdomXPathStringResult.create('')
+      else result := TdomXPathStringResult.create(TdomNode(item(0)).NamespaceUri);
     end;
   finally
     exprResult.free;
@@ -22809,10 +22555,9 @@ begin
       raise EXPath_Invalid_Function_Call_Err.createFmt('Argument mismatch error in %s(): Expression does not evaluate to node-set.', ['name']);
     with exprResult do begin
       axisType := XPATH_FORWARD_AXIS;
-      if length = 0 then
-        result := TdomXPathStringResult.create('')
-      else
-        result := TdomXPathStringResult.create(TdomNode(item(0)).expandedName);
+      if length = 0
+        then result := TdomXPathStringResult.create('')
+      else result := TdomXPathStringResult.create(TdomNode(item(0)).expandedName);
     end;
   finally
     exprResult.free;
@@ -22905,10 +22650,9 @@ begin
     S2_Result := TdomXPathExpr(arguments[1]).evaluate(contextNode, contextPosition, contextSize);
     if not ((S1_Result is TdomXPathStringResult) and (S2_Result is TdomXPathStringResult)) then
       raise EXPath_Invalid_Function_Call_Err.createFmt('Argument mismatch error in %s(): Expression does not evaluate to string.', ['contains']);
-    if length(S2_Result.asWideString) = 0 then
-      result := TdomXPathBooleanResult.create(true)
-    else
-      result := TdomXPathBooleanResult.create(
+    if length(S2_Result.asWideString) = 0
+      then result := TdomXPathBooleanResult.create(true)
+    else result := TdomXPathBooleanResult.create(
         Pos(S2_Result.asWideString, S1_Result.asWideString) > 0
         );
   finally
@@ -22957,10 +22701,9 @@ begin
     S2_Result := TdomXPathExpr(arguments[1]).evaluate(contextNode, contextPosition, contextSize);
     if not ((S1_Result is TdomXPathStringResult) and (S2_Result is TdomXPathStringResult)) then
       raise EXPath_Invalid_Function_Call_Err.createFmt('Argument mismatch error in %s(): Expression does not evaluate to string.', ['substring-after']);
-    if length(S2_Result.asWideString) = 0 then
-      result := TdomXPathStringResult.create(S1_Result.asWideString)
-    else
-      result := TdomXPathStringResult.create(
+    if length(S2_Result.asWideString) = 0
+      then result := TdomXPathStringResult.create(S1_Result.asWideString)
+    else result := TdomXPathStringResult.create(
         Copy(S1_Result.asWideString,
         Pos(S2_Result.asWideString, S1_Result.asWideString)
         + length(S2_Result.asWideString),
@@ -22999,15 +22742,15 @@ begin
 
       if IsNaN(N1_Result.asNumber) or
         IsInfinite(N1_Result.asNumber) or
-        IsNaN(N2_Result.asNumber) then begin
+        IsNaN(N2_Result.asNumber)
+        then begin
         result := TdomXPathStringResult.create('');
       end else if IsInfinite(N2_Result.asNumber) then begin
-        if Sign(N2_Result.asNumber) = 1 then
-          result := TdomXPathStringResult.create(Copy(S1_Result.asWideString,
+        if Sign(N2_Result.asNumber) = 1
+          then result := TdomXPathStringResult.create(Copy(S1_Result.asWideString,
             Trunc(XPathRound(N1_Result.asNumber)),
             length(S1_Result.asWideString)))
-        else
-          result := TdomXPathStringResult.create('');
+        else result := TdomXPathStringResult.create('');
       end else begin
         I := Max(Trunc(XPathRound((N1_Result.asNumber))), 1);
         L := Trunc(XPathRound((N1_Result.asNumber)) + XPathRound((N2_Result.asNumber))) - I;
@@ -23019,10 +22762,9 @@ begin
       if IsNaN(N1_Result.asNumber) then begin
         result := TdomXPathStringResult.create('');
       end else if IsInfinite(N1_Result.asNumber) then begin
-        if Sign(N1_Result.asNumber) = 1 then
-          result := TdomXPathStringResult.create('')
-        else
-          result := TdomXPathStringResult.create(S1_Result.asWideString);
+        if Sign(N1_Result.asNumber) = 1
+          then result := TdomXPathStringResult.create('')
+        else result := TdomXPathStringResult.create(S1_Result.asWideString);
       end else
         result := TdomXPathStringResult.create(Copy(S1_Result.asWideString,
           Trunc(XPathRound(N1_Result.asNumber)),
@@ -23268,10 +23010,9 @@ begin
     if not (exprResult is TdomXPathNumberResult) then
       raise EXPath_Invalid_Function_Call_Err.createFmt('Argument mismatch error in %s(): Expression does not evaluate to a number.', ['floor']);
     with exprResult do
-      if IsNaN(asNumber) or IsInfinite(asNumber) then
-        Result := TdomXPathNumberResult.create(asNumber)
-      else
-        Result := TdomXPathNumberResult.create(Floor(asNumber));
+      if IsNaN(asNumber) or IsInfinite(asNumber)
+        then Result := TdomXPathNumberResult.create(asNumber)
+      else Result := TdomXPathNumberResult.create(Floor(asNumber));
   finally
     exprResult.free;
   end;
@@ -23291,10 +23032,9 @@ begin
     if not (exprResult is TdomXPathNumberResult) then
       raise EXPath_Invalid_Function_Call_Err.createFmt('Argument mismatch error in %s(): Expression does not evaluate to a number.', ['ceiling']);
     with exprResult do
-      if IsNaN(asNumber) or IsInfinite(asNumber) then
-        Result := TdomXPathNumberResult.create(asNumber)
-      else
-        Result := TdomXPathNumberResult.create(Ceil(asNumber));
+      if IsNaN(asNumber) or IsInfinite(asNumber)
+        then Result := TdomXPathNumberResult.create(asNumber)
+      else Result := TdomXPathNumberResult.create(Ceil(asNumber));
   finally
     exprResult.free;
   end;
@@ -23324,8 +23064,8 @@ end;
 constructor TdomXPathTokenizer.create(const expression: wideString;
   const xpathVersion: wideString);
 begin
-  if xpathVersion <> '1.0' then
-    raise ENot_Supported_Err.CreateFmt('XPath version "%S" not supproted.', [xpathVersion]);
+  if xpathVersion <> '1.0'
+    then raise ENot_Supported_Err.CreateFmt('XPath version "%S" not supproted.', [xpathVersion]);
   FExpression := expression;
   FLastSymbol := XPATH_INVALID_TOKEN; // Use XPATH_INVALID_TOKEN as a dummy value
   FPosition := 0;
@@ -23343,12 +23083,11 @@ begin
   result := false;
   for i := FPosition + 1 to pred(length(FExpression)) do begin
     if FExpression[i] = #$3A then begin
-      if FExpression[i + 1] = #$3A then
-        result := true;
+      if FExpression[i + 1] = #$3A
+        then result := true;
       exit;
     end;
-    if not isXmlWhiteSpace(FExpression[i]) then
-      exit;
+    if not isXmlWhiteSpace(FExpression[i]) then exit;
   end;
 end;
 
@@ -23370,10 +23109,9 @@ begin
     read(FSymbolCache, FValueCache, FPositionCache);
     FCacheIsActive := true;
   end;
-  if FSymbolCache = symbol then
-    result := true
-  else
-    result := false;
+  if FSymbolCache = symbol
+    then result := true
+  else result := false;
 end;
 
 function TdomXPathTokenizer.leftParanthesisFollows: boolean;
@@ -23386,8 +23124,7 @@ begin
       result := true;
       exit;
     end;
-    if not isXmlWhiteSpace(FExpression[i]) then
-      exit;
+    if not isXmlWhiteSpace(FExpression[i]) then exit;
   end;
 end;
 
@@ -23592,8 +23329,7 @@ begin
                 while (ord(S) in [$30..$39]) or ((S = #$2E) and not DecimalPointFound) do begin
                   inc(FPosition);
                   value := concat(value, wideString(S));
-                  if S = #$2E then
-                    DecimalPointFound := true;
+                  if S = #$2E then DecimalPointFound := true;
                   lookAheadNextWideChar(S);
                 end;
               end;
@@ -23661,8 +23397,8 @@ begin
               while IsXmlNCNameChar(S) do begin
                 inc(FPosition);
                 value := concat(value, wideString(S));
-                if not lookAheadNextWideChar(S) then
-                  break;
+                if not lookAheadNextWideChar(S)
+                  then break;
               end;
               if S = #$3A then begin // ':' ?
                 inc(FPosition);
@@ -23687,8 +23423,8 @@ begin
                   while IsXmlNCNameChar(S) do begin
                     inc(FPosition);
                     value := concat(value, wideString(S));
-                    if not self.lookAheadNextWideChar(S) then
-                      break;
+                    if not self.lookAheadNextWideChar(S)
+                      then break;
                   end;
                 end;
               end;
@@ -23718,7 +23454,8 @@ begin
                 XPATH_GREATER_THAN_OPERATOR_TOKEN,
                 XPATH_GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN,
                 XPATH_INVALID_TOKEN // = no preceding token
-                ] then begin
+                ]
+                then begin
                 symbol := XPATH_NAME_TEST_TOKEN;
                 FLastSymbol := XPATH_NAME_TEST_TOKEN;
                 value := '*';
@@ -23744,8 +23481,8 @@ begin
           while IsXmlNCNameChar(S) do begin
             inc(FPosition);
             value := concat(value, wideString(S));
-            if not lookAheadNextWideChar(S) then
-              break;
+            if not lookAheadNextWideChar(S)
+              then break;
           end;
 
           if not (FLastSymbol in [XPATH_LEFT_PARENTHESIS_TOKEN,
@@ -23769,7 +23506,8 @@ begin
               XPATH_GREATER_THAN_OPERATOR_TOKEN,
               XPATH_GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN,
               XPATH_INVALID_TOKEN // = no preceding token
-              ]) then begin
+              ])
+            then begin
             if value = 'and' then begin
               symbol := XPATH_AND_OPERATOR_TOKEN;
               FLastSymbol := XPATH_AND_OPERATOR_TOKEN;
@@ -23884,8 +23622,8 @@ begin
               while IsXmlNCNameChar(S) do begin
                 inc(FPosition);
                 value := concat(value, wideString(S));
-                if not self.lookAheadNextWideChar(S) then
-                  break;
+                if not self.lookAheadNextWideChar(S)
+                  then break;
               end;
             end;
           end;
@@ -24022,11 +23760,10 @@ end;
 
 procedure TdomXPathNodeSetResult.add(const node: TdomNode);
 begin
-  if node.nodeType = ntXPath_Namespace_Node then
-    with node as TdomXPathNamespace do
+  if node.nodeType = ntXPath_Namespace_Node
+    then with node as TdomXPathNamespace do
       addXPathNamespace(OwnerElement, NamespaceUri, Prefix)
-  else
-    FList.Add(node);
+  else FList.Add(node);
 end;
 
 procedure TdomXPathNodeSetResult.addSubtree(const node: TdomNode);
@@ -24113,8 +23850,7 @@ begin
     result := ''
   end else if axisType = XPATH_FORWARD_AXIS then begin
     result := item(0).XPathStringValue;
-  end else
-    result := item(length).XPathStringValue;
+  end else result := item(length).XPathStringValue;
 end;
 
 function TdomXPathNodeSetResult.createXPathNamespace(const aOwnerElement: TdomElement;
@@ -24151,19 +23887,17 @@ end;
 procedure TdomXPathNodeSetResult.insert(const index: integer;
   const node: TdomNode);
 begin
-  if node.nodeType = ntXPath_Namespace_Node then
-    with node as TdomXPathNamespace do
+  if node.nodeType = ntXPath_Namespace_Node
+    then with node as TdomXPathNamespace do
       FList.Insert(index, createXPathNamespace(OwnerElement, NamespaceUri, Prefix))
-  else
-    FList.Insert(index, node);
+  else FList.Insert(index, node);
 end;
 
 function TdomXPathNodeSetResult.item(const index: integer): TdomNode;
 begin
-  if (index < 0) or (index >= FList.Count) then
-    result := nil
-  else
-    result := TdomNode(FList.List^[index]);
+  if (index < 0) or (index >= FList.Count)
+    then result := nil
+  else result := TdomNode(FList.List^[index]);
 end;
 
 function TdomXPathNodeSetResult.length: integer;
@@ -24178,8 +23912,7 @@ var
   treePosition: TdomTreePosition;
   equivalentItems: TList;
 begin
-  if nodeSet = self then
-    exit;
+  if nodeSet = self then exit;
   nodeSet.axisType := axisType;
   x := 0;
   y := 0;
@@ -24197,8 +23930,8 @@ begin
         end else if (Tree_Position_Following in treePosition) then begin
           inc(x);
           for i := pred(equivalentItems.Count) downto 0 do
-            if (Tree_Position_Same_Node in item(x).compareTreePosition(equivalentItems[i])) then
-              equivalentItems.Delete(i);
+            if (Tree_Position_Same_Node in item(x).compareTreePosition(equivalentItems[i]))
+              then equivalentItems.Delete(i);
         end else if (Tree_Position_Disconnected in treePosition) then begin
           for i := 0 to pred(equivalentItems.Count) do begin
             insert(x, equivalentItems[i]);
@@ -24228,8 +23961,8 @@ begin
         end else if (Tree_Position_Preceding in treePosition) then begin
           inc(x);
           for i := pred(equivalentItems.Count) downto 0 do
-            if (Tree_Position_Same_Node in item(x).compareTreePosition(equivalentItems[i])) then
-              equivalentItems.Delete(i);
+            if (Tree_Position_Same_Node in item(x).compareTreePosition(equivalentItems[i]))
+              then equivalentItems.Delete(i);
         end else if (Tree_Position_Disconnected in treePosition) then begin
           for i := 0 to pred(equivalentItems.Count) do begin
             insert(x, equivalentItems[i]);
@@ -24259,8 +23992,8 @@ begin
         end;
       end;
       for i := pred(equivalentItems.Count) downto 0 do
-        if (Tree_Position_Same_Node in item(x).compareTreePosition(equivalentItems[i])) then
-          equivalentItems.Delete(i);
+        if (Tree_Position_Same_Node in item(x).compareTreePosition(equivalentItems[i]))
+          then equivalentItems.Delete(i);
       inc(x);
     end;
 
@@ -24306,21 +24039,18 @@ var
   i: integer;
 begin
   if Source is TdomXPathNodeSetResult then begin
-    if Source = self then
-      exit;
+    if Source = self then exit;
     clear;
     axisType := TdomXPathNodeSetResult(Source).axisType;
     for i := 0 to pred(TdomXPathNodeSetResult(Source).length) do
       add(TdomXPathNodeSetResult(Source).item(i));
   end else if Source is TXPathExpression then begin
-    if TXPathExpression(Source).FXPathResult = self then
-      exit;
+    if TXPathExpression(Source).FXPathResult = self then exit;
     clear;
     axisType := TXPathExpression(Source).resultAxisType;
     for i := 0 to pred(TXPathExpression(Source).resultLength) do
       add(TXPathExpression(Source).resultNode(i));
-  end else
-    inherited Assign(Source);
+  end else inherited Assign(Source);
 end;
 
 { TdomXPathBooleanResult }
@@ -24338,18 +24068,16 @@ end;
 
 function TdomXPathBooleanResult.asNumber: double;
 begin
-  if asBoolean then
-    result := 1
-  else
-    result := 0;
+  if asBoolean
+    then result := 1
+  else result := 0;
 end;
 
 function TdomXPathBooleanResult.asWideString: wideString;
 begin
-  if asBoolean then
-    result := 'true'
-  else
-    result := 'false';
+  if asBoolean
+    then result := 'true'
+  else result := 'false';
 end;
 
 function TdomXPathBooleanResult.resultType: TdomXPathResultType;
@@ -24380,12 +24108,10 @@ begin
   if isNaN(asNumber) then begin
     result := 'NaN';
   end else if IsInfinite(asNumber) then begin
-    if sign(asNumber) = 1 then
-      result := 'Infinity'
-    else
-      result := '-Infinity';
-  end else
-    result := FloatToStr(asNumber);
+    if sign(asNumber) = 1
+      then result := 'Infinity'
+    else result := '-Infinity';
+  end else result := FloatToStr(asNumber);
 end;
 
 function TdomXPathNumberResult.resultType: TdomXPathResultType;
@@ -24600,13 +24326,15 @@ begin
                 tokenizer.isFollowing(XPATH_GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_IS_EQUAL_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_IS_NOT_EQUAL_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_AND_OPERATOR_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_AND_OPERATOR_TOKEN)
+                then begin
                 // Operator of higher precedence is following, so we postpone building the expression.
                 stack.push(lastSyntaxNode);
                 break;
               end;
               if (stack.peek(0) is TdomXPathOrOperator) and
-                ((stack.peek(1) is TdomXPathOrExpr)) then begin
+                ((stack.peek(1) is TdomXPathOrExpr))
+                then begin
                 // XPath 1.0, prod. [21]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathOrExpr.create(self, ''); // Create OrExpr.
@@ -24622,23 +24350,27 @@ begin
             end else if (lastSyntaxNode is TdomXPathAndOperator) or
               (lastSyntaxNode is TdomXPathComma) or
               (lastSyntaxNode is TdomXPathCommercialAt) or
-              (lastSyntaxNode is TdomXPathCustomAxisName) then begin
+              (lastSyntaxNode is TdomXPathCustomAxisName)
+              then begin
               stack.push(lastSyntaxNode);
               break;
             end else if (lastSyntaxNode is TdomXPathDivExpr) or
               (lastSyntaxNode is TdomXPathModExpr) or
-              (lastSyntaxNode is TdomXPathMultiplyExpr) then begin
+              (lastSyntaxNode is TdomXPathMultiplyExpr)
+              then begin
               if tokenizer.isFollowing(XPATH_SHEFFER_STROKE_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_MULTIPLY_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_DIV_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_MOD_OPERATOR_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_MOD_OPERATOR_TOKEN)
+                then begin
                 // Operator of higher precedence is following, so we postpone building the expression.
                 stack.push(lastSyntaxNode);
                 break;
               end;
               if (stack.peek(0) is TdomXPathPlusOperator) and
                 ((stack.peek(1) is TdomXPathPlusExpr) or
-                (stack.peek(1) is TdomXPathMinusExpr)) then begin
+                (stack.peek(1) is TdomXPathMinusExpr))
+                then begin
                 // XPath 1.0, prod. [25]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathPlusExpr.create(self, ''); // Create PlusExpr.
@@ -24647,7 +24379,8 @@ begin
                 lastSyntaxNode := newSyntaxNode;
               end else if (stack.peek(0) is TdomXPathMinusOperator) and
                 ((stack.peek(1) is TdomXPathPlusExpr) or
-                (stack.peek(1) is TdomXPathMinusExpr)) then begin
+                (stack.peek(1) is TdomXPathMinusExpr))
+                then begin
                 // XPath 1.0, prod. [25]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathMinusExpr.create(self, ''); // Create MinusExpr.
@@ -24661,7 +24394,8 @@ begin
                 lastSyntaxNode := newSyntaxNode;
               end;
             end else if (lastSyntaxNode is TdomXPathDivOperator) or
-              (lastSyntaxNode is TdomXPathDoubleColon) then begin
+              (lastSyntaxNode is TdomXPathDoubleColon)
+              then begin
               stack.push(lastSyntaxNode);
               break;
             end else if lastSyntaxNode is TdomXPathDoubleDot then begin
@@ -24677,7 +24411,8 @@ begin
             end else if lastSyntaxNode is TdomXPathFilterExpr then begin
               // XPath 1.0, prod. [19]:
               if tokenizer.isFollowing(XPATH_SLASH_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_LEFT_SQUARE_BRACKET_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_LEFT_SQUARE_BRACKET_TOKEN)
+                then begin
                 // A Slash or Predicate is following, so we postpone building the PathExpr.
                 stack.push(lastSyntaxNode);
                 break;
@@ -24691,7 +24426,8 @@ begin
             end else if (lastSyntaxNode is TdomXPathGreaterThanExpr) or
               (lastSyntaxNode is TdomXPathGreaterThanOrEqualExpr) or
               (lastSyntaxNode is TdomXPathLessThanExpr) or
-              (lastSyntaxNode is TdomXPathLessThanOrEqualExpr) then begin
+              (lastSyntaxNode is TdomXPathLessThanOrEqualExpr)
+              then begin
               if tokenizer.isFollowing(XPATH_SHEFFER_STROKE_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_MULTIPLY_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_DIV_OPERATOR_TOKEN) or
@@ -24701,14 +24437,16 @@ begin
                 tokenizer.isFollowing(XPATH_LESS_THAN_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_LESS_THAN_OR_EQUAL_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_GREATER_THAN_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN)
+                then begin
                 // Operator of higher precedence is following, so we postpone building the expression.
                 stack.push(lastSyntaxNode);
                 break;
               end;
               if (stack.peek(0) is TdomXPathIsEqualOperator) and
                 ((stack.peek(1) is TdomXPathIsEqualExpr) or
-                (stack.peek(1) is TdomXPathIsNotEqualExpr)) then begin
+                (stack.peek(1) is TdomXPathIsNotEqualExpr))
+                then begin
                 // XPath 1.0, prod. [23]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathIsEqualExpr.create(self, ''); // Create IsEqualExpr.
@@ -24717,7 +24455,8 @@ begin
                 lastSyntaxNode := newSyntaxNode;
               end else if (stack.peek(0) is TdomXPathIsNotEqualOperator) and
                 ((stack.peek(1) is TdomXPathIsEqualExpr) or
-                (stack.peek(1) is TdomXPathIsNotEqualExpr)) then begin
+                (stack.peek(1) is TdomXPathIsNotEqualExpr))
+                then begin
                 // XPath 1.0, prod. [23]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathIsNotEqualExpr.create(self, ''); // Create IsNotEqualExpr.
@@ -24731,11 +24470,13 @@ begin
                 lastSyntaxNode := newSyntaxNode;
               end;
             end else if (lastSyntaxNode is TdomXPathGreaterThanOperator) or
-              (lastSyntaxNode is TdomXPathGreaterThanOrEqualOperator) then begin
+              (lastSyntaxNode is TdomXPathGreaterThanOrEqualOperator)
+              then begin
               stack.push(lastSyntaxNode);
               break;
             end else if (lastSyntaxNode is TdomXPathIsEqualExpr) or
-              (lastSyntaxNode is TdomXPathIsNotEqualExpr) then begin
+              (lastSyntaxNode is TdomXPathIsNotEqualExpr)
+              then begin
               if tokenizer.isFollowing(XPATH_SHEFFER_STROKE_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_MULTIPLY_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_DIV_OPERATOR_TOKEN) or
@@ -24747,13 +24488,15 @@ begin
                 tokenizer.isFollowing(XPATH_GREATER_THAN_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_IS_EQUAL_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_IS_NOT_EQUAL_OPERATOR_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_IS_NOT_EQUAL_OPERATOR_TOKEN)
+                then begin
                 // Operator of higher precedence is following, so we postpone building the expression.
                 stack.push(lastSyntaxNode);
                 break;
               end;
               if (stack.peek(0) is TdomXPathAndOperator) and
-                ((stack.peek(1) is TdomXPathAndExpr)) then begin
+                ((stack.peek(1) is TdomXPathAndExpr))
+                then begin
                 // XPath 1.0, prod. [22]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathAndExpr.create(self, ''); // Create AndExpr.
@@ -24771,13 +24514,15 @@ begin
               (lastSyntaxNode is TdomXPathLeftParenthesis) or
               (lastSyntaxNode is TdomXPathLeftSquareBracket) or
               (lastSyntaxNode is TdomXPathLessThanOperator) or
-              (lastSyntaxNode is TdomXPathLessThanOrEqualOperator) then begin
+              (lastSyntaxNode is TdomXPathLessThanOrEqualOperator)
+              then begin
               stack.push(lastSyntaxNode);
               break;
             end else if lastSyntaxNode is TdomXPathLiteral then begin
               if (stack.peek(0) is TdomXPathLeftParenthesis) and
                 (stack.peek(1) is TdomXPathNodeTypePI) and
-                tokenizer.isFollowing(XPATH_RIGHT_PARENTHESIS_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_RIGHT_PARENTHESIS_TOKEN)
+                then begin
                 // Literal is part of a processing-instruction node test,
                 // so we postpone building the expression.
                 stack.push(lastSyntaxNode);
@@ -24789,13 +24534,15 @@ begin
                 lastSyntaxNode := newSyntaxNode;
               end;
             end else if (lastSyntaxNode is TdomXPathMinusExpr) or
-              (lastSyntaxNode is TdomXPathPlusExpr) then begin
+              (lastSyntaxNode is TdomXPathPlusExpr)
+              then begin
               if tokenizer.isFollowing(XPATH_SHEFFER_STROKE_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_MULTIPLY_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_DIV_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_MOD_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_PLUS_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_MINUS_OPERATOR_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_MINUS_OPERATOR_TOKEN)
+                then begin
                 // Operator of higher precedence is following, so we postpone building the expression.
                 stack.push(lastSyntaxNode);
                 break;
@@ -24804,7 +24551,8 @@ begin
                 ((stack.peek(1) is TdomXPathLessThanExpr) or
                 (stack.peek(1) is TdomXPathLessThanOrEqualExpr) or
                 (stack.peek(1) is TdomXPathGreaterThanExpr) or
-                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr)) then begin
+                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr))
+                then begin
                 // XPath 1.0, prod. [24]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathLessThanExpr.create(self, ''); // Create LessThanExpr.
@@ -24815,7 +24563,8 @@ begin
                 ((stack.peek(1) is TdomXPathLessThanExpr) or
                 (stack.peek(1) is TdomXPathLessThanOrEqualExpr) or
                 (stack.peek(1) is TdomXPathGreaterThanExpr) or
-                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr)) then begin
+                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr))
+                then begin
                 // XPath 1.0, prod. [24]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathLessThanOrEqualExpr.create(self, ''); // Create LessThanOrEqualExpr.
@@ -24826,7 +24575,8 @@ begin
                 ((stack.peek(1) is TdomXPathLessThanExpr) or
                 (stack.peek(1) is TdomXPathLessThanOrEqualExpr) or
                 (stack.peek(1) is TdomXPathGreaterThanExpr) or
-                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr)) then begin
+                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr))
+                then begin
                 // XPath 1.0, prod. [24]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathGreaterThanExpr.create(self, ''); // Create GreaterThanExpr.
@@ -24837,7 +24587,8 @@ begin
                 ((stack.peek(1) is TdomXPathLessThanExpr) or
                 (stack.peek(1) is TdomXPathLessThanOrEqualExpr) or
                 (stack.peek(1) is TdomXPathGreaterThanExpr) or
-                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr)) then begin
+                (stack.peek(1) is TdomXPathGreaterThanOrEqualExpr))
+                then begin
                 // XPath 1.0, prod. [24]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathGreaterThanOrEqualExpr.create(self, ''); // Create GreaterThanOrEqualExpr.
@@ -24852,7 +24603,8 @@ begin
               end;
             end else if (lastSyntaxNode is TdomXPathMinusOperator) or
               (lastSyntaxNode is TdomXPathModOperator) or
-              (lastSyntaxNode is TdomXPathMultiplyOperator) then begin
+              (lastSyntaxNode is TdomXPathMultiplyOperator)
+              then begin
               stack.push(lastSyntaxNode);
               break;
             end else if lastSyntaxNode is TdomXPathNameTest then begin
@@ -24896,7 +24648,8 @@ begin
             end else if (lastSyntaxNode is TdomXPathNodeTypeComment) or
               (lastSyntaxNode is TdomXPathNodeTypeNode) or
               (lastSyntaxNode is TdomXPathNodeTypePI) or
-              (lastSyntaxNode is TdomXPathNodeTypeText) then begin
+              (lastSyntaxNode is TdomXPathNodeTypeText)
+              then begin
               stack.push(lastSyntaxNode);
               break;
             end else if lastSyntaxNode is TdomXPathNumber then begin
@@ -24918,7 +24671,8 @@ begin
                 tokenizer.isFollowing(XPATH_IS_EQUAL_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_IS_NOT_EQUAL_OPERATOR_TOKEN) or
                 tokenizer.isFollowing(XPATH_AND_OPERATOR_TOKEN) or
-                tokenizer.isFollowing(XPATH_OR_OPERATOR_TOKEN) then begin
+                tokenizer.isFollowing(XPATH_OR_OPERATOR_TOKEN)
+                then begin
                 // Operator of higher precedence is following, so we postpone building the expression.
                 stack.push(lastSyntaxNode);
                 break;
@@ -24938,7 +24692,8 @@ begin
                 break;
               end;
               if (stack.peek(0) is TdomXPathShefferStrokeOperator) and
-                (stack.peek(1) is TdomXPathUnionExpr) then begin
+                (stack.peek(1) is TdomXPathUnionExpr)
+                then begin
                 stack.pop.free;
                 newSyntaxNode := TdomXPathUnionExpr.create(self, ''); // Create UnionExpr.
                 newSyntaxNode.left := stack.pop; // Append UnionExpr.
@@ -25020,14 +24775,16 @@ begin
                 ((stack.peek(1) is TdomXPathNodeTypeComment) or
                 (stack.peek(1) is TdomXPathNodeTypeNode) or
                 (stack.peek(1) is TdomXPathNodeTypePI) or
-                (stack.peek(1) is TdomXPathNodeTypeText)) then begin
+                (stack.peek(1) is TdomXPathNodeTypeText))
+                then begin
                 lastSyntaxNode.free;
                 lastSyntaxNode := TdomXPathNodeTest.create(self, '');
                 stack.pop.free;
                 lastSyntaxNode.left := stack.pop;
               end else if (stack.peek(0) is TdomXPathLiteral) and
                 (stack.peek(1) is TdomXPathLeftParenthesis) and
-                (stack.peek(2) is TdomXPathNodeTypePI) then begin
+                (stack.peek(2) is TdomXPathNodeTypePI)
+                then begin
                 lastSyntaxNode.free;
                 lastSyntaxNode := TdomXPathNodeTest.create(self, ''); // Create NodeTest
                 PILiteral := stack.pop;
@@ -25037,7 +24794,8 @@ begin
                 lastSyntaxNode.left := nodeTypePI; // Append NodeTypePI to NodeTest
               end else if (stack.peek(0) is TdomXPathExpr) and
                 (stack.peek(1) is TdomXPathLeftParenthesis) and not
-                (stack.peek(2) is TdomXPathFunctionName) then begin
+                (stack.peek(2) is TdomXPathFunctionName)
+                then begin
                 lastSyntaxNode.free;
                 newSyntaxNode := TdomXPathPrimaryExpr.create(self, ''); // Create PrimaryExpr.
                 newSyntaxNode.left := stack.pop; // Append Expr.
@@ -25056,7 +24814,8 @@ begin
                   end;
                 end;
                 if (stack.peek(0) is TdomXPathLeftParenthesis) and
-                  (stack.peek(1) is TdomXPathFunctionName) then begin
+                  (stack.peek(1) is TdomXPathFunctionName)
+                  then begin
                   // XPath 1.0, prod. [15]:
                   lastSyntaxNode.free;
                   stack.pop.free; // Remove LeftParenthesis from stack.
@@ -25075,7 +24834,8 @@ begin
             end else if lastSyntaxNode is TdomXPathRightSquareBracket then begin
               // XPath 1.0, prod. [8] and [9]:
               if (stack.peek(0) is TdomXPathExpr) and
-                (stack.peek(1) is TdomXPathLeftSquareBracket) then begin
+                (stack.peek(1) is TdomXPathLeftSquareBracket)
+                then begin
                 lastSyntaxNode.free;
                 lastSyntaxNode := TdomXPathPredicate.create(self, ''); // Create Predicate.
                 lastSyntaxNode.left := stack.pop; // Append Expr.
@@ -25109,7 +24869,8 @@ begin
               if ((not assigned(stack.peek(0))) or
                 (stack.peek(0) is TdomXPathShefferStrokeOperator)) and
                 (tokenizer.isFollowing(XPATH_END_OF_TEXT_TOKEN) or
-                tokenizer.isFollowing(XPATH_SHEFFER_STROKE_OPERATOR_TOKEN)) then begin
+                tokenizer.isFollowing(XPATH_SHEFFER_STROKE_OPERATOR_TOKEN))
+                then begin
                 lastSyntaxNode.free;
                 lastSyntaxNode := TdomXPathPathExpr.create(self, ''); // Create PathExpr.
                 lastSyntaxNode.left := TdomXPathAbsoluteLocationPath.create(self, ''); // Create and append AbsolutLocationPath.
@@ -25136,7 +24897,8 @@ begin
                     break;
                   end;
                 end else if (not assigned(stack.peek(1))) or
-                  (stack.peek(1) is TdomXPathShefferStrokeOperator) then begin
+                  (stack.peek(1) is TdomXPathShefferStrokeOperator)
+                  then begin
                   // XPath 1.0, prod. [2]:
                   stack.pop.free;
                   newSyntaxNode := TdomXPathPathExpr.create(self, ''); // Create PathExpr.
@@ -25166,7 +24928,8 @@ begin
                 (stack.peek(1) is TdomXPathDivExpr) or
                 (stack.peek(1) is TdomXPathModExpr) or
                 (stack.peek(1) is TdomXPathUnaryExpr) or
-                (stack.peek(1) is TdomXPathUnionExpr)) then begin
+                (stack.peek(1) is TdomXPathUnionExpr))
+                then begin
                 // XPath 1.0, prod. [27]:
                 newSyntaxNode := TdomXPathUnaryExpr.create(self, ''); // Create UnaryExpr.
                 newSyntaxNode.left := stack.pop; // Append MinusOperator.
@@ -25175,7 +24938,8 @@ begin
               end else if (stack.peek(0) is TdomXPathMultiplyOperator) and
                 ((stack.peek(1) is TdomXPathMultiplyExpr) or
                 (stack.peek(1) is TdomXPathDivExpr) or
-                (stack.peek(1) is TdomXPathModExpr)) then begin
+                (stack.peek(1) is TdomXPathModExpr))
+                then begin
                 // XPath 1.0, prod. [26]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathMultiplyExpr.create(self, ''); // Create MultiplyExpr.
@@ -25185,7 +24949,8 @@ begin
               end else if (stack.peek(0) is TdomXPathDivOperator) and
                 ((stack.peek(1) is TdomXPathMultiplyExpr) or
                 (stack.peek(1) is TdomXPathDivExpr) or
-                (stack.peek(1) is TdomXPathModExpr)) then begin
+                (stack.peek(1) is TdomXPathModExpr))
+                then begin
                 // XPath 1.0, prod. [26]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathDivExpr.create(self, ''); // Create DivExpr.
@@ -25195,7 +24960,8 @@ begin
               end else if (stack.peek(0) is TdomXPathModOperator) and
                 ((stack.peek(1) is TdomXPathMultiplyExpr) or
                 (stack.peek(1) is TdomXPathDivExpr) or
-                (stack.peek(1) is TdomXPathModExpr)) then begin
+                (stack.peek(1) is TdomXPathModExpr))
+                then begin
                 // XPath 1.0, prod. [26]:
                 stack.pop.free;
                 newSyntaxNode := TdomXPathModExpr.create(self, ''); // Create ModExpr.
@@ -25232,11 +24998,11 @@ begin
       // and does the stack hold exactly one root node of type TdomXPathExpr?
       if (symbol = XPATH_END_OF_TEXT_TOKEN) and
         (stack.length = 1) and
-        (stack.peek(0) is TdomXPathExpr) then begin
+        (stack.peek(0) is TdomXPathExpr)
+        then begin
         FRootExpr := TdomXPathExpr(stack.pop);
         result := true;
-      end else
-        result := false;
+      end else result := false;
 
     finally
       stack.free; // Remark: Frees also all object still in the stack.
@@ -25248,10 +25014,9 @@ end;
 
 function TdomXPathSyntaxTree.getContextNode: TdomNode;
 begin
-  if assigned(ownerXPathExpression) then
-    result := ownerXPathExpression.contextNode
-  else
-    result := nil;
+  if assigned(ownerXPathExpression)
+    then result := ownerXPathExpression.contextNode
+  else result := nil;
 end;
 
 { TXPathExpression }
@@ -25281,8 +25046,7 @@ begin
     result := TdomXPathNumberResult.create(resultAsNumber);
   end else if resultType = TdomXPathStringResult then begin
     result := TdomXPathStringResult.create(resultAsWideString);
-  end else
-    raise ENot_Supported_Err.create('Not supported error.');
+  end else raise ENot_Supported_Err.create('Not supported error.');
 end;
 
 function TXPathExpression.evaluate: boolean;
@@ -25302,70 +25066,61 @@ end;
 
 function TXPathExpression.hasNodeSetResult: boolean;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.length > 0
-  else
-    result := false;
+  if assigned(FXPathResult)
+    then result := FXPathResult.length > 0
+  else result := false;
 end;
 
 function TXPathExpression.prepare: boolean;
 begin
   if isValid = T_UNKNOWN then begin
     result := FSyntaxTree.prepare(FExpression);
-    if result then
-      FIsValid := T_TRUE
-    else
-      FIsValid := T_FALSE;
-  end else
-    result := FIsValid = T_TRUE;
+    if result
+      then FIsValid := T_TRUE
+    else FIsValid := T_FALSE;
+  end else result := FIsValid = T_TRUE;
 end;
 
 function TXPathExpression.resultAsBoolean: boolean;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.asBoolean
-  else
-    result := false;
+  if assigned(FXPathResult)
+    then result := FXPathResult.asBoolean
+  else result := false;
 end;
 
 function TXPathExpression.resultAsNumber: double;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.asNumber
-  else
-    result := NaN;
+  if assigned(FXPathResult)
+    then result := FXPathResult.asNumber
+  else result := NaN;
 end;
 
 function TXPathExpression.resultAsWideString: wideString;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.asWideString
-  else
-    result := '';
+  if assigned(FXPathResult)
+    then result := FXPathResult.asWideString
+  else result := '';
 end;
 
 function TXPathExpression.resultAxisType: TdomXPathAxisType;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.axisType
-  else
-    result := XPATH_FORWARD_AXIS;
+  if assigned(FXPathResult)
+    then result := FXPathResult.axisType
+  else result := XPATH_FORWARD_AXIS;
 end;
 
 function TXPathExpression.resultLength: integer;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.length
-  else
-    result := 0;
+  if assigned(FXPathResult)
+    then result := FXPathResult.length
+  else result := 0;
 end;
 
 function TXPathExpression.resultNode(const index: integer): TdomNode;
 begin
-  if assigned(FXPathResult) then
-    result := FXPathResult.item(index)
-  else
-    result := nil;
+  if assigned(FXPathResult)
+    then result := FXPathResult.item(index)
+  else result := nil;
 end;
 
 procedure TXPathExpression.setContextNode(const node: TdomNode);
@@ -25425,10 +25180,9 @@ var
   index: integer;
 begin
   index := pred(FNodeList.count) - offset;
-  if (index < 0) or (index >= FNodeList.count) then
-    result := nil
-  else
-    result := TdomXPathSyntaxNode(FNodeList.List^[index]);
+  if (index < 0) or (index >= FNodeList.count)
+    then result := nil
+  else result := TdomXPathSyntaxNode(FNodeList.List^[index]);
 end;
 
 function TdomXPathSyntaxNodeStack.pop: TdomXPathSyntaxNode;
@@ -25466,10 +25220,9 @@ begin
     right := step;
     result := true;
   end else begin
-    if right is TdomXPathStep then
-      result := TdomXPathStep(right).addStep(step)
-    else
-      result := false;
+    if right is TdomXPathStep
+      then result := TdomXPathStep(right).addStep(step)
+    else result := false;
   end;
 end;
 
@@ -25477,21 +25230,18 @@ function TdomXPathStep.evaluate(const oldSnapshotResult: TdomXPathNodeSetResult)
 var
   newResult: TdomXPathNodeSetResult;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
   if left is TdomXPathCustomAxisName then begin
 
     if oldSnapshotResult.length > 0 then begin
       newResult := TdomXPathCustomAxisName(left).evaluate(oldSnapshotResult);
-      if right is TdomXPathStep then
-        result := TdomXPathStep(right).evaluate(newResult)
-      else
-        result := newResult;
-    end else
-      result := oldSnapshotResult;
+      if right is TdomXPathStep
+        then result := TdomXPathStep(right).evaluate(newResult)
+      else result := newResult;
+    end else result := oldSnapshotResult;
 
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathCustomAxisName }
@@ -25514,37 +25264,33 @@ var
   begin
     if assigned(right) then begin
       if right is TdomXPathPredicate then begin
-        if snapshot.length > 0 then
-          result := TdomXPathPredicate(right).evaluate(snapshot)
-        else
-          result := snapshot;
+        if snapshot.length > 0
+          then result := TdomXPathPredicate(right).evaluate(snapshot)
+        else result := snapshot;
       end else begin
         snapshot.free;
         raise EXPath_Type_Err.create('XPath type error.');
       end;
-    end else
-      result := snapshot;
+    end else result := snapshot;
   end;
 
   function evaluateNodeTest(const snapshot: TdomXPathNodeSetResult): TdomXPathNodeSetResult;
   begin
     if assigned(left) then begin
       if left is TdomXPathNodeTest then begin
-        if snapshot.length > 0 then
-          result := TdomXPathNodeTest(left).evaluate(snapshot, FPrincipalNodeType)
-        else
-          result := snapshot;
+        if snapshot.length > 0
+          then result := TdomXPathNodeTest(left).evaluate(snapshot, FPrincipalNodeType)
+        else result := snapshot;
       end else begin
         snapshot.free;
         raise EXPath_Type_Err.create('XPath type error.');
       end;
-    end else
-      raise EXPath_Type_Err.create('XPath type error.');
+    end else raise EXPath_Type_Err.create('XPath type error.');
   end;
 
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
   try
     result := TdomXPathNodeSetResult.create;
     try
@@ -25699,8 +25445,7 @@ begin
         nil,
       false) do begin
       n := NextNode;
-      if n = contextNode then
-        n := NextNode;
+      if n = contextNode then n := NextNode;
       while assigned(n) do begin
         result.add(n);
         n := NextNode;
@@ -25761,8 +25506,8 @@ begin
               (q.nodeType = ntEntity_Reference_Node)) and
               ((p.nodeType = ntText_Node) or
               (p.nodeType = ntCDATA_Section_Node) or
-              (p.nodeType = ntEntity_Reference_Node))) then
-              result.addSubtree(p);
+              (p.nodeType = ntEntity_Reference_Node)))
+              then result.addSubtree(p);
             q := p;
             p.nextSibling;
           end;
@@ -25791,8 +25536,8 @@ begin
               (q.nodeType = ntEntity_Reference_Node)) and
               ((p.nodeType = ntText_Node) or
               (p.nodeType = ntCDATA_Section_Node) or
-              (p.nodeType = ntEntity_Reference_Node))) then
-              result.add(p);
+              (p.nodeType = ntEntity_Reference_Node)))
+              then result.add(p);
             q := p;
             p.nextSibling;
           end;
@@ -25831,8 +25576,7 @@ begin
 
       cNode := contextNode;
       while assigned(cNode) do begin
-        if cNode.nodeType <> ntElement_Node then
-          break;
+        if cNode.nodeType <> ntElement_Node then break;
         with cNode.Attributes do
           for I := 0 to Pred(Length) do
             with TdomAttr(Item(I)) do
@@ -25873,8 +25617,8 @@ begin
     else
       n := nil;
     end;
-    if assigned(n) then
-      result.add(n);
+    if assigned(n)
+      then result.add(n);
   end;
 end;
 
@@ -25908,8 +25652,8 @@ var
                 (p.nodeType = ntEntity_Reference_Node)) and
                 ((q.nodeType = ntText_Node) or
                 (q.nodeType = ntCDATA_Section_Node) or
-                (q.nodeType = ntEntity_Reference_Node))) then
-                snapshot.addSubtree(p);
+                (q.nodeType = ntEntity_Reference_Node)))
+                then snapshot.addSubtree(p);
               p := q;
             end else begin
               snapshot.addSubtree(p);
@@ -25971,8 +25715,8 @@ begin
                 (p.nodeType = ntEntity_Reference_Node)) and
                 ((q.nodeType = ntText_Node) or
                 (q.nodeType = ntCDATA_Section_Node) or
-                (q.nodeType = ntEntity_Reference_Node))) then
-                result.add(p);
+                (q.nodeType = ntEntity_Reference_Node)))
+                then result.add(p);
               p := q;
             end else begin
               result.add(p);
@@ -25990,8 +25734,8 @@ function TdomXPathAxisNameSelf.getAxisNodeSnapshot(const contextNode: TdomNode):
 begin
   result := TdomXPathNodeSetResult.create;
   result.axisType := axisType;
-  if assigned(contextNode) then
-    result.add(contextNode);
+  if assigned(contextNode)
+    then result.add(contextNode);
 end;
 
 { TdomXPathNodeTest }
@@ -25999,8 +25743,8 @@ end;
 function TdomXPathNodeTest.evaluate(const oldSnapshotResult: TdomXPathNodeSetResult;
   const principalNodeType: TdomNodeType): TdomXPathNodeSetResult;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
 
   if left is TdomXPathNameTest then begin
     result := TdomXPathNameTest(left).evaluate(oldSnapshotResult, principalNodeType);
@@ -26028,8 +25772,8 @@ var
   predicateResultAsBoolean: TdomXPathBooleanResult;
   contextPosition: integer;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
   if not (left is TdomXPathExpr) then begin
     oldSnapshotResult.free;
     raise EXPath_Type_Err.create('XPath type error.');
@@ -26083,8 +25827,7 @@ function TdomXPathExpr.evaluate(const contextNode: TdomNode;
 begin
   if (left is TdomXPathOrExpr) then begin
     result := TdomXPathOrExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathPrimaryExpr }
@@ -26103,8 +25846,7 @@ begin
     result := TdomXPathNumber(left).evaluate;
   end else if (left is TdomXPathFunctionCall) then begin
     result := TdomXPathFunctionCall(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathFunctionCall }
@@ -26138,12 +25880,9 @@ begin
       raise ENamespace_Err.CreateFmt('Namespace URI of prefix ''%S'' not found.',
         [FPrefix]);
 
-    if assigned(ownerSyntaxTree) then
-      with ownerSyntaxTree do
-        if assigned(contextNode) then
-          with contextNode do
-            if assigned(ownerDocument) then
-              with ownerDocument do
+    if assigned(ownerSyntaxTree) then with ownerSyntaxTree do
+        if assigned(contextNode) then with contextNode do
+            if assigned(ownerDocument) then with ownerDocument do
                 if assigned(domImplementation) then
                   domImplementation.DoRequestXPathFunctionResult(
                     NsUri, FLocalName, contextNode, contextPosition, contextSize, arguments, result
@@ -26162,12 +25901,10 @@ end;
 function TdomXPathFunctionCall.lookupNamespaceURI: wideString;
 begin
   if assigned(ownerSyntaxTree) then begin
-    if assigned(ownerSyntaxTree.contextNode) then
-      Result := ownerSyntaxTree.contextNode.lookupNamespaceURI(FPrefix)
-    else
-      Result := '';
-  end else
-    Result := '';
+    if assigned(ownerSyntaxTree.contextNode)
+      then Result := ownerSyntaxTree.contextNode.lookupNamespaceURI(FPrefix)
+    else Result := '';
+  end else Result := '';
 end;
 
 procedure TdomXPathFunctionCall.setFunctionName(const aFunctionName: wideString);
@@ -26231,10 +25968,8 @@ begin
         FXPathFunction := XPathFunctionCeiling;
       end else if FLocalName = 'round' then begin
         FXPathFunction := XPathFunctionRound;
-      end else
-        FXPathFunction := nil;
-    end else
-      FXPathFunction := nil;
+      end else FXPathFunction := nil;
+    end else FXPathFunction := nil;
   end;
 end;
 
@@ -26260,11 +25995,10 @@ begin
   end else if (left is TdomXPathPathExpr) and not assigned(right) then begin
 
     result := TdomXPathPathExpr(left).evaluate(contextNode, contextPosition, contextSize);
-    if result is TdomXPathNodeSetResult then
-      result.axisType := XPATH_FORWARD_AXIS;
+    if result is TdomXPathNodeSetResult
+      then result.axisType := XPATH_FORWARD_AXIS;
 
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathPathExpr }
@@ -26275,10 +26009,9 @@ begin
     right := step;
     result := true;
   end else begin
-    if right is TdomXPathStep then
-      result := TdomXPathStep(right).addStep(step)
-    else
-      result := false;
+    if right is TdomXPathStep
+      then result := TdomXPathStep(right).addStep(step)
+    else result := false;
   end;
 end;
 
@@ -26297,26 +26030,24 @@ begin
         raise EXPath_Type_Err.create('XPath type error.');
       end;
       result := TdomXPathStep(right).evaluate(TdomXPathNodeSetResult(newResult));
-    end else
-      result := newResult;
+    end else result := newResult;
   end else if left is TdomXPathAbsoluteLocationPath then begin
     // Absolute location path:
-    if not assigned(contextNode) then
-      raise EXPath_Type_Err.create('XPath type error.');
-    if not assigned(contextNode.referenceDocument) then
-      raise EXPath_Type_Err.create('XPath type error.');
+    if not assigned(contextNode)
+      then raise EXPath_Type_Err.create('XPath type error.');
+    if not assigned(contextNode.referenceDocument)
+      then raise EXPath_Type_Err.create('XPath type error.');
     newResult := TdomXPathNodeSetResult.create;
     TdomXPathNodeSetResult(newResult).add(contextNode.referenceDocument);
-    if right is TdomXPathStep then
-      result := TdomXPathStep(right).evaluate(TdomXPathNodeSetResult(newResult))
-    else
-      result := newResult;
+    if right is TdomXPathStep
+      then result := TdomXPathStep(right).evaluate(TdomXPathNodeSetResult(newResult))
+    else result := newResult;
   end else begin
     // Relative location path:
-    if not (right is TdomXPathStep) then
-      raise EXPath_Type_Err.create('XPath type error.');
-    if not assigned(contextNode) then
-      raise EXPath_Type_Err.create('XPath type error.');
+    if not (right is TdomXPathStep)
+      then raise EXPath_Type_Err.create('XPath type error.');
+    if not assigned(contextNode)
+      then raise EXPath_Type_Err.create('XPath type error.');
     newResult := TdomXPathNodeSetResult.create;
     TdomXPathNodeSetResult(newResult).add(contextNode);
     result := TdomXPathStep(right).evaluate(TdomXPathNodeSetResult(newResult))
@@ -26331,7 +26062,8 @@ function TdomXPathFilterExpr.evaluate(const contextNode: TdomNode;
 var
   newResult: TdomXPathCustomResult;
 begin
-  if (left is TdomXPathFilterExpr) and (right is TdomXPathPredicate) then begin
+  if (left is TdomXPathFilterExpr) and (right is TdomXPathPredicate)
+    then begin
     // Filter expression plus predicate:
     newResult := TdomXPathFilterExpr(left).evaluate(contextNode, contextPosition, contextSize);
     if not (newResult is TdomXPathNodeSetResult) then begin
@@ -26342,15 +26074,14 @@ begin
     // A predicate filters the node-set with respect to the child axis,
     // so the axis always has to be a forward axis, no matter what axis
     // the previous expression required:
-    if newResult is TdomXPathNodeSetResult then
-      newResult.axisType := XPATH_FORWARD_AXIS;
+    if newResult is TdomXPathNodeSetResult
+      then newResult.axisType := XPATH_FORWARD_AXIS;
 
     result := TdomXPathPredicate(right).evaluate(TdomXPathNodeSetResult(newResult));
   end else if (left is TdomXPathPrimaryExpr) and not assigned(right) then begin
     // PrimaryExpr:
     result := TdomXPathPrimaryExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathOrExpr }
@@ -26371,8 +26102,7 @@ begin
     end;
   end else if (left is TdomXPathAndExpr) then begin
     result := TdomXPathAndExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathAndExpr }
@@ -26393,8 +26123,7 @@ begin
     end;
   end else if left is TdomXPathEqualityExpr then begin
     result := TdomXPathEqualityExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathIsEqualExpr }
@@ -26444,7 +26173,8 @@ begin
           exit;
         end else if (rightResult is TdomXPathNumberResult) or
           (rightResult is TdomXPathBooleanResult) or
-          (rightResult is TdomXPathStringResult) then begin
+          (rightResult is TdomXPathStringResult)
+          then begin
           stringResult := XPathStringFunc(rightResult);
           for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
             if TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue = stringResult.asWideString then begin
@@ -26458,37 +26188,36 @@ begin
           exit;
         end;
       end else if (leftResult is TdomXPathBooleanResult) or
-        (rightResult is TdomXPathBooleanResult) then begin
+        (rightResult is TdomXPathBooleanResult)
+        then begin
         leftBoolean := XPathBooleanFunc(leftResult);
         rightBoolean := XPathBooleanFunc(rightResult);
-        if leftBoolean.asBoolean = rightBoolean.asBoolean then
-          result := TdomXPathBooleanResult.create(true)
-        else
-          result := TdomXPathBooleanResult.create(false);
+        if leftBoolean.asBoolean = rightBoolean.asBoolean
+          then result := TdomXPathBooleanResult.create(true)
+        else result := TdomXPathBooleanResult.create(false);
         leftResult := leftBoolean; // Re-assignment is required for correct
         rightResult := rightBoolean; // freeing the TdomXPathCustomResult below.
       end else if (leftResult is TdomXPathNumberResult) or
-        (rightResult is TdomXPathNumberResult) then begin
+        (rightResult is TdomXPathNumberResult)
+        then begin
         leftNumber := XPathNumberFunc(leftResult);
         rightNumber := XPathNumberFunc(rightResult);
 {$IFDEF VER140+}
         ExceptionMaskBackup := SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow, exUnderflow, exPrecision]);
 {$ENDIF}
         try
-          if leftNumber.asNumber = rightNumber.asNumber then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+          if leftNumber.asNumber = rightNumber.asNumber
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$IFDEF VER140+}
         finally
           SetExceptionMask(ExceptionMaskBackup);
 {$ELSE}
         except
           if (isNaN(leftNumber.asNumber) and isNaN(rightNumber.asNumber)) or
-            (sign(leftNumber.asNumber) = sign(rightNumber.asNumber)) then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+            (sign(leftNumber.asNumber) = sign(rightNumber.asNumber))
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$ENDIF}
         end;
         leftResult := leftNumber; // Re-assignment is required for correct
@@ -26496,10 +26225,9 @@ begin
       end else begin
         leftString := XPathStringFunc(leftResult);
         rightString := XPathStringFunc(rightResult);
-        if leftString.asWideString = rightString.asWideString then
-          result := TdomXPathBooleanResult.create(true)
-        else
-          result := TdomXPathBooleanResult.create(false);
+        if leftString.asWideString = rightString.asWideString
+          then result := TdomXPathBooleanResult.create(true)
+        else result := TdomXPathBooleanResult.create(false);
         leftResult := leftString; // Re-assignment is required for correct
         rightResult := rightString; // freeing the TdomXPathCustomResult below.
       end;
@@ -26510,8 +26238,7 @@ begin
     end;
   end else if left is TdomXPathRelationalExpr then begin
     result := TdomXPathRelationalExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathIsNotEqualExpr }
@@ -26561,7 +26288,8 @@ begin
           exit;
         end else if (rightResult is TdomXPathNumberResult) or
           (rightResult is TdomXPathBooleanResult) or
-          (rightResult is TdomXPathStringResult) then begin
+          (rightResult is TdomXPathStringResult)
+          then begin
           stringResult := XPathStringFunc(rightResult);
           for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
             if TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue <> stringResult.asWideString then begin
@@ -26575,27 +26303,27 @@ begin
           exit;
         end;
       end else if (leftResult is TdomXPathBooleanResult) or
-        (rightResult is TdomXPathBooleanResult) then begin
+        (rightResult is TdomXPathBooleanResult)
+        then begin
         leftBoolean := XPathBooleanFunc(leftResult);
         rightBoolean := XPathBooleanFunc(rightResult);
-        if leftBoolean.asBoolean <> rightBoolean.asBoolean then
-          result := TdomXPathBooleanResult.create(true)
-        else
-          result := TdomXPathBooleanResult.create(false);
+        if leftBoolean.asBoolean <> rightBoolean.asBoolean
+          then result := TdomXPathBooleanResult.create(true)
+        else result := TdomXPathBooleanResult.create(false);
         leftResult := leftBoolean; // Re-assignment is required for correct
         rightResult := rightBoolean; // freeing the TdomXPathCustomResult below.
       end else if (leftResult is TdomXPathNumberResult) or
-        (rightResult is TdomXPathNumberResult) then begin
+        (rightResult is TdomXPathNumberResult)
+        then begin
         leftNumber := XPathNumberFunc(leftResult);
         rightNumber := XPathNumberFunc(rightResult);
 {$IFDEF VER140+}
         ExceptionMaskBackup := SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow, exUnderflow, exPrecision]);
 {$ENDIF}
         try
-          if leftNumber.asNumber <> rightNumber.asNumber then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+          if leftNumber.asNumber <> rightNumber.asNumber
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$IFDEF VER140+}
         finally
           SetExceptionMask(ExceptionMaskBackup);
@@ -26603,10 +26331,9 @@ begin
         except
           if (isNaN(leftNumber.asNumber) and not isNaN(rightNumber.asNumber)) or
             (isNaN(rightNumber.asNumber) and not isNaN(leftNumber.asNumber)) or
-            (sign(leftNumber.asNumber) <> sign(rightNumber.asNumber)) then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+            (sign(leftNumber.asNumber) <> sign(rightNumber.asNumber))
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$ENDIF}
         end;
         leftResult := leftNumber; // Re-assignment is required for correct
@@ -26614,10 +26341,9 @@ begin
       end else begin
         leftString := XPathStringFunc(leftResult);
         rightString := XPathStringFunc(rightResult);
-        if leftString.asWideString <> rightString.asWideString then
-          result := TdomXPathBooleanResult.create(true)
-        else
-          result := TdomXPathBooleanResult.create(false);
+        if leftString.asWideString <> rightString.asWideString
+          then result := TdomXPathBooleanResult.create(true)
+        else result := TdomXPathBooleanResult.create(false);
         leftResult := leftString; // Re-assignment is required for correct
         rightResult := rightString; // freeing the TdomXPathCustomResult below.
       end;
@@ -26628,8 +26354,7 @@ begin
     end;
   end else if left is TdomXPathRelationalExpr then begin
     result := TdomXPathRelationalExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathLessThanExpr }
@@ -26654,7 +26379,8 @@ begin
       rightResult := TdomXPathAdditiveExpr(right).evaluate(contextNode, contextPosition, contextSize);
 
       if (leftResult is TdomXPathNodeSetResult) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           leftResultString := TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue;
           for j := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
@@ -26669,7 +26395,8 @@ begin
       end else if (leftResult is TdomXPathNodeSetResult) and
         ((rightResult is TdomXPathNumberResult) or
         (rightResult is TdomXPathBooleanResult) or
-        (rightResult is TdomXPathStringResult)) then begin
+        (rightResult is TdomXPathStringResult))
+        then begin
         stringResult := XPathStringFunc(rightResult);
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           if TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue < stringResult.asWideString then begin
@@ -26684,7 +26411,8 @@ begin
       end else if ((leftResult is TdomXPathNumberResult) or
         (leftResult is TdomXPathBooleanResult) or
         (leftResult is TdomXPathStringResult)) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         stringResult := XPathStringFunc(leftResult);
         for i := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
           if stringResult.asWideString < TdomXPathNodeSetResult(rightResult).item(i).XPathStringValue then begin
@@ -26703,10 +26431,9 @@ begin
         ExceptionMaskBackup := SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow, exUnderflow, exPrecision]);
 {$ENDIF}
         try
-          if leftNumber.asNumber < rightNumber.asNumber then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+          if leftNumber.asNumber < rightNumber.asNumber
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$IFDEF VER140+}
         finally
           SetExceptionMask(ExceptionMaskBackup);
@@ -26725,8 +26452,7 @@ begin
     end;
   end else if left is TdomXPathAdditiveExpr then begin
     result := TdomXPathAdditiveExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathLessThanOrEqualExpr }
@@ -26751,7 +26477,8 @@ begin
       rightResult := TdomXPathAdditiveExpr(right).evaluate(contextNode, contextPosition, contextSize);
 
       if (leftResult is TdomXPathNodeSetResult) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           leftResultString := TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue;
           for j := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
@@ -26766,7 +26493,8 @@ begin
       end else if (leftResult is TdomXPathNodeSetResult) and
         ((rightResult is TdomXPathNumberResult) or
         (rightResult is TdomXPathBooleanResult) or
-        (rightResult is TdomXPathStringResult)) then begin
+        (rightResult is TdomXPathStringResult))
+        then begin
         stringResult := XPathStringFunc(rightResult);
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           if TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue <= stringResult.asWideString then begin
@@ -26781,7 +26509,8 @@ begin
       end else if ((leftResult is TdomXPathNumberResult) or
         (leftResult is TdomXPathBooleanResult) or
         (leftResult is TdomXPathStringResult)) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         stringResult := XPathStringFunc(leftResult);
         for i := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
           if stringResult.asWideString <= TdomXPathNodeSetResult(rightResult).item(i).XPathStringValue then begin
@@ -26800,10 +26529,9 @@ begin
         ExceptionMaskBackup := SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow, exUnderflow, exPrecision]);
 {$ENDIF}
         try
-          if leftNumber.asNumber <= rightNumber.asNumber then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+          if leftNumber.asNumber <= rightNumber.asNumber
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$IFDEF VER140+}
         finally
           SetExceptionMask(ExceptionMaskBackup);
@@ -26811,10 +26539,9 @@ begin
         except
           if (isNaN(leftNumber.asNumber) and not isNaN(rightNumber.asNumber)) or
             (isNaN(rightNumber.asNumber) and not isNaN(leftNumber.asNumber)) or
-            (sign(leftNumber.asNumber) <> sign(rightNumber.asNumber)) then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+            (sign(leftNumber.asNumber) <> sign(rightNumber.asNumber))
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$ENDIF}
         end;
         leftResult := leftNumber; // Re-assignment is required for correct
@@ -26827,8 +26554,7 @@ begin
     end;
   end else if left is TdomXPathAdditiveExpr then begin
     result := TdomXPathAdditiveExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathGreaterThanExpr }
@@ -26853,7 +26579,8 @@ begin
       rightResult := TdomXPathAdditiveExpr(right).evaluate(contextNode, contextPosition, contextSize);
 
       if (leftResult is TdomXPathNodeSetResult) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           leftResultString := TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue;
           for j := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
@@ -26868,7 +26595,8 @@ begin
       end else if (leftResult is TdomXPathNodeSetResult) and
         ((rightResult is TdomXPathNumberResult) or
         (rightResult is TdomXPathBooleanResult) or
-        (rightResult is TdomXPathStringResult)) then begin
+        (rightResult is TdomXPathStringResult))
+        then begin
         stringResult := XPathStringFunc(rightResult);
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           if TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue > stringResult.asWideString then begin
@@ -26883,7 +26611,8 @@ begin
       end else if ((leftResult is TdomXPathNumberResult) or
         (leftResult is TdomXPathBooleanResult) or
         (leftResult is TdomXPathStringResult)) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         stringResult := XPathStringFunc(leftResult);
         for i := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
           if stringResult.asWideString > TdomXPathNodeSetResult(rightResult).item(i).XPathStringValue then begin
@@ -26902,10 +26631,9 @@ begin
         ExceptionMaskBackup := SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow, exUnderflow, exPrecision]);
 {$ENDIF}
         try
-          if leftNumber.asNumber > rightNumber.asNumber then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+          if leftNumber.asNumber > rightNumber.asNumber
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$IFDEF VER140+}
         finally
           SetExceptionMask(ExceptionMaskBackup);
@@ -26924,8 +26652,7 @@ begin
     end;
   end else if left is TdomXPathAdditiveExpr then begin
     result := TdomXPathAdditiveExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathGreaterThanOrEqualExpr }
@@ -26950,7 +26677,8 @@ begin
       rightResult := TdomXPathAdditiveExpr(right).evaluate(contextNode, contextPosition, contextSize);
 
       if (leftResult is TdomXPathNodeSetResult) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           leftResultString := TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue;
           for j := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
@@ -26965,7 +26693,8 @@ begin
       end else if (leftResult is TdomXPathNodeSetResult) and
         ((rightResult is TdomXPathNumberResult) or
         (rightResult is TdomXPathBooleanResult) or
-        (rightResult is TdomXPathStringResult)) then begin
+        (rightResult is TdomXPathStringResult))
+        then begin
         stringResult := XPathStringFunc(rightResult);
         for i := 0 to pred(TdomXPathNodeSetResult(leftResult).length) do begin
           if TdomXPathNodeSetResult(leftResult).item(i).XPathStringValue >= stringResult.asWideString then begin
@@ -26980,7 +26709,8 @@ begin
       end else if ((leftResult is TdomXPathNumberResult) or
         (leftResult is TdomXPathBooleanResult) or
         (leftResult is TdomXPathStringResult)) and
-        (rightResult is TdomXPathNodeSetResult) then begin
+        (rightResult is TdomXPathNodeSetResult)
+        then begin
         stringResult := XPathStringFunc(leftResult);
         for i := 0 to pred(TdomXPathNodeSetResult(rightResult).length) do begin
           if stringResult.asWideString >= TdomXPathNodeSetResult(rightResult).item(i).XPathStringValue then begin
@@ -26999,10 +26729,9 @@ begin
         ExceptionMaskBackup := SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow, exUnderflow, exPrecision]);
 {$ENDIF}
         try
-          if leftNumber.asNumber >= rightNumber.asNumber then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+          if leftNumber.asNumber >= rightNumber.asNumber
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$IFDEF VER140+}
         finally
           SetExceptionMask(ExceptionMaskBackup);
@@ -27010,10 +26739,9 @@ begin
         except
           if (isNaN(leftNumber.asNumber) and not isNaN(rightNumber.asNumber)) or
             (isNaN(rightNumber.asNumber) and not isNaN(leftNumber.asNumber)) or
-            (sign(leftNumber.asNumber) <> sign(rightNumber.asNumber)) then
-            result := TdomXPathBooleanResult.create(true)
-          else
-            result := TdomXPathBooleanResult.create(false);
+            (sign(leftNumber.asNumber) <> sign(rightNumber.asNumber))
+            then result := TdomXPathBooleanResult.create(true)
+          else result := TdomXPathBooleanResult.create(false);
 {$ENDIF}
         end;
         leftResult := leftNumber; // Re-assignment is required for correct
@@ -27026,8 +26754,7 @@ begin
     end;
   end else if left is TdomXPathAdditiveExpr then begin
     result := TdomXPathAdditiveExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathPlusExpr }
@@ -27065,8 +26792,7 @@ begin
     end;
   end else if left is TdomXPathMultiplicativeExpr then begin
     result := TdomXPathMultiplicativeExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathMinusExpr }
@@ -27104,8 +26830,7 @@ begin
     end;
   end else if left is TdomXPathMultiplicativeExpr then begin
     result := TdomXPathMultiplicativeExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathMultiplyExpr }
@@ -27143,8 +26868,7 @@ begin
     end;
   end else if left is TdomXPathUnaryExpr then begin
     result := TdomXPathUnaryExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathDivExpr }
@@ -27182,8 +26906,7 @@ begin
     end;
   end else if left is TdomXPathUnaryExpr then begin
     result := TdomXPathUnaryExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathModExpr }
@@ -27221,8 +26944,7 @@ begin
     end;
   end else if left is TdomXPathUnaryExpr then begin
     result := TdomXPathUnaryExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathUnaryExpr }
@@ -27257,8 +26979,7 @@ begin
     end;
   end else if left is TdomXPathUnionExpr then begin
     result := TdomXPathUnionExpr(left).evaluate(contextNode, contextPosition, contextSize);
-  end else
-    raise EXPath_Type_Err.create('XPath type error.');
+  end else raise EXPath_Type_Err.create('XPath type error.');
 end;
 
 { TdomXPathLiteral }
@@ -27297,12 +27018,9 @@ begin
     raise ENamespace_Err.CreateFmt('Namespace URI of prefix ''%S'' not found.',
       [FPrefix]);
 
-  if assigned(ownerSyntaxTree) then
-    with ownerSyntaxTree do
-      if assigned(contextNode) then
-        with contextNode do
-          if assigned(ownerDocument) then
-            with ownerDocument do
+  if assigned(ownerSyntaxTree) then with ownerSyntaxTree do
+      if assigned(contextNode) then with contextNode do
+          if assigned(ownerDocument) then with ownerDocument do
               if assigned(domImplementation) then
                 domImplementation.DoRequestXPathVariable(ownerXPathExpression, NsUri, FLocalName, result);
 
@@ -27313,12 +27031,10 @@ end;
 function TdomXPathVariableReference.lookupNamespaceURI: wideString;
 begin
   if assigned(ownerSyntaxTree) then begin
-    if assigned(ownerSyntaxTree.contextNode) then
-      Result := ownerSyntaxTree.contextNode.lookupNamespaceURI(FPrefix)
-    else
-      Result := '';
-  end else
-    Result := '';
+    if assigned(ownerSyntaxTree.contextNode)
+      then Result := ownerSyntaxTree.contextNode.lookupNamespaceURI(FPrefix)
+    else Result := '';
+  end else Result := '';
 end;
 
 { TdomXPathNameTest }
@@ -27345,8 +27061,8 @@ var
   NsUri: wideString;
   i: integer;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
 
   if value = '*' then begin
 
@@ -27406,12 +27122,10 @@ end;
 function TdomXPathNameTest.lookupNamespaceURI: wideString;
 begin
   if assigned(ownerSyntaxTree) then begin
-    if assigned(ownerSyntaxTree.contextNode) then
-      Result := ownerSyntaxTree.contextNode.lookupNamespaceURI(FPrefix)
-    else
-      Result := '';
-  end else
-    Result := '';
+    if assigned(ownerSyntaxTree.contextNode)
+      then Result := ownerSyntaxTree.contextNode.lookupNamespaceURI(FPrefix)
+    else Result := '';
+  end else Result := '';
 end;
 
 { TdomXPathNodeTypeComment }
@@ -27420,14 +27134,14 @@ function TdomXPathNodeTypeComment.evaluate(const oldSnapshotResult: TdomXPathNod
 var
   i: integer;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
 
   with oldSnapshotResult do begin
     i := pred(length);
     while i >= 0 do begin
-      if item(i).nodeType <> ntComment_Node then
-        Delete(i);
+      if item(i).nodeType <> ntComment_Node
+        then Delete(i);
       dec(i);
     end;
   end;
@@ -27441,8 +27155,8 @@ function TdomXPathNodeTypePI.evaluate(const oldSnapshotResult: TdomXPathNodeSetR
 var
   i: integer;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
 
   if assigned(left) then begin
     if left is TdomXPathLiteral then begin
@@ -27451,8 +27165,8 @@ begin
         while i >= 0 do begin
           with item(i) do
             if (nodeType <> ntProcessing_Instruction_Node) or
-              (nodeValue <> TdomXPathLiteral(left).value) then
-              Delete(i);
+              (nodeValue <> TdomXPathLiteral(left).value)
+              then Delete(i);
           dec(i);
         end;
       end;
@@ -27464,8 +27178,8 @@ begin
     with oldSnapshotResult do begin
       i := pred(length);
       while i >= 0 do begin
-        if item(i).nodeType <> ntProcessing_Instruction_Node then
-          Delete(i);
+        if item(i).nodeType <> ntProcessing_Instruction_Node
+          then Delete(i);
         dec(i);
       end;
     end;
@@ -27480,14 +27194,14 @@ function TdomXPathNodeTypeText.evaluate(const oldSnapshotResult: TdomXPathNodeSe
 var
   i: integer;
 begin
-  if not assigned(oldSnapshotResult) then
-    raise EXPath_Type_Err.create('XPath type error.');
+  if not assigned(oldSnapshotResult)
+    then raise EXPath_Type_Err.create('XPath type error.');
 
   with oldSnapshotResult do begin
     i := pred(length);
     while i >= 0 do begin
-      if not (item(i).nodeType in [ntText_Node, ntCDATA_Section_Node, ntEntity_Reference_Node]) then
-        Delete(i);
+      if not (item(i).nodeType in [ntText_Node, ntCDATA_Section_Node, ntEntity_Reference_Node])
+        then Delete(i);
       dec(i);
     end;
   end;

@@ -2921,7 +2921,7 @@ type
 
     property Reader: TXmlCustomReader read FReader;
 
-    { IDomLocator interface properties: }// xxx Revisit
+    { IDomLocator interface properties: } // xxx Revisit
     property EndByteNumber: Int64 read GetEndByteNumber;
     property EndCharNumber: Int64 read GetEndCharNumber;
     property EndColumnNumber: Int64 read GetEndColumnNumber;
