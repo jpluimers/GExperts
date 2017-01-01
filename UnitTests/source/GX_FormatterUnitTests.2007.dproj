@@ -1,4 +1,5 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{29a50c38-e85b-424f-86b6-68e259c53afd}</ProjectGuid>
     <MainSource>GX_FormatterUnitTests.dpr</MainSource>
@@ -70,6 +71,9 @@
     <DCCReference Include="..\..\Source\Formatter\GX_CodeFormatterConfigHandler.pas" />
     <DCCReference Include="..\..\Source\Formatter\GX_CodeFormatterDefaultSettings.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_GenericUtils.pas" />
+    <DCCReference Include="..\dunit\DUnitConsts.pas" />
+    <DCCReference Include="..\dunit\GUITestRunner.pas" />
+    <DCCReference Include="..\dunit\TestFramework.pas" />
     <DCCReference Include="DelForExTestFiles.pas" />
     <DCCReference Include="DelForExTestOldNew.pas" />
   </ItemGroup>

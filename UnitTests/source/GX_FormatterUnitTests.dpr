@@ -36,8 +36,9 @@
 program GX_FormatterUnitTests;
 
 uses
-  TestFramework,
-  GUITestRunner,
+  DUnitConsts in '..\dunit\DUnitConsts.pas',
+  TestFramework in '..\dunit\TestFramework.pas',
+  GUITestRunner in '..\dunit\GUITestRunner.pas',
   DelForExTestOldNew in 'DelForExTestOldNew.pas',
   DelForExTestFiles in 'DelForExTestFiles.pas',
   GX_CodeFormatterDefaultSettings in '..\..\Source\Formatter\GX_CodeFormatterDefaultSettings.pas',
