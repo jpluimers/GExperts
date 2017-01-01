@@ -26,6 +26,7 @@ type
     function GetConfigDirBS: string;
     procedure SetUp; override;
     procedure TearDown; override;
+    procedure ExecuteDoubleClickAction; override;
   published
     procedure testAbstractSealedClass;
     procedure testAngledBrackets;
@@ -97,6 +98,7 @@ type
     procedure testCurlyHalfCommentEndCurrentlyFails;
     procedure testIfThenElse2CurrentlyFails;
     procedure testComplexCurrentlyFails;
+    procedure testCurlyBracesInWhileCurrentlyFails;
   end;
 
 type
@@ -145,10 +147,40 @@ type
 implementation
 
 uses
+  Windows,
+  ShellAPI,
+  StrUtils,
   Dialogs,
   GX_CodeFormatterConfigHandler;
 
 { TTestTestfiles }
+
+procedure TTestTestfiles.ExecuteDoubleClickAction;
+const
+  CURRENTLY_FAILS = 'CurrentlyFails';
+var
+  s: string;
+  Filename: string;
+  InFile: string;
+  ExpectedFile: string;
+  OutputFile: string;
+  Params: string;
+begin
+  // 'testStarCommentAtEol'
+  s := Self.FTestName;
+  Assert(StartsText('test', s));
+  s := Copy(s, 5);
+  if EndsText(CURRENTLY_FAILS, s) then
+    s := Copy(s, 1, Length(s) - Length(CURRENTLY_FAILS));
+
+  Filename := 'testfile_' + s + '.pas';
+  InFile := 'testcases\input\' + Filename;
+  ExpectedFile := 'testcases\expected-' + GetResultDir + '\' + Filename;
+  OutputFile := 'testcases\output-' + GetResultDir + '\' + Filename;
+  Params := Format('"%s" "%s"', [ExpectedFile, OutputFile]);
+  ShellExecute(0, '', PChar('C:\Program Files (x86)\Beyond Compare 3\bcompare.exe'),
+    PChar(Params), '', SW_NORMAL);
+end;
 
 function TTestTestfiles.GetConfigDirBS: string;
 begin
@@ -201,11 +233,11 @@ begin
   InFile := 'testcases\input\' + Filename;
   ExpectedFile := 'testcases\expected-' + GetResultDir + '\' + Filename;
   if not FileExists(InFile) then begin
-    ExpectedException := EFileDoesNotExist;
+//    ExpectedException := EFileDoesNotExist;
     raise EFileDoesNotExist.Create('Input file does not exist');
   end;
   if not FileExists(ExpectedFile) then begin
-    ExpectedException := EFileDoesNotExist;
+//    ExpectedException := EFileDoesNotExist;
     raise EFileDoesNotExist.Create('Expected file does not exist');
   end;
 
@@ -577,6 +609,11 @@ end;
 procedure TTestTestfiles.testCommentEnd;
 begin
   TestFile('CommentEnd');
+end;
+
+procedure TTestTestfiles.testCurlyBracesInWhileCurrentlyFails;
+begin
+  TestFile('CurlyBracesInWhile');
 end;
 
 procedure TTestTestfiles.testCurlyHalfCommentEndCurrentlyFails;
