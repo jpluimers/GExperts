@@ -235,6 +235,8 @@ type
     function  GetAllowedLeak: Integer;
     function  GetAllowedLeaksIterator: TListIterator;
     property  AllowedLeaksIterator: TListIterator read GetAllowedLeaksIterator;
+
+    procedure ExecuteDoubleClickAction;
   end;
 
 
@@ -440,6 +442,8 @@ type
     procedure SetAllowedLeakArray(AllowedList: array of Integer);
     function  GetAllowedLeak: Integer; // Is the iterator returned below
     function  GetAllowedLeaksIterator: TListIterator;
+
+    procedure ExecuteDoubleClickAction; virtual;
   public
     constructor Create(AName: string);
     destructor Destroy; override;
@@ -2188,6 +2192,11 @@ begin
   if (msg <> '') then
     msg := msg + ', ';
   Result := Format( sExpAndActualFmt, [msg, expected])
+end;
+
+procedure TAbstractTest.ExecuteDoubleClickAction;
+begin
+  // do nothing
 end;
 
 function TAbstractTest.NotSameErrorMessage(expected, actual, msg: string): WideString;

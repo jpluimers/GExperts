@@ -305,6 +305,7 @@ type
     procedure TestCaseIgnoreSetUpTearDownLeaksMenuItemClick(Sender: TObject);
     procedure TestCaseIgnoreSetUpTearDownLeaksMenuItemDrawItem(Sender: TObject;
       ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+    procedure FailureListViewDblClick(Sender: TObject);
   private
     FNoCheckExecutedPtyOverridden: Boolean;
     FMemLeakDetectedPtyOverridden: Boolean;
@@ -1320,6 +1321,14 @@ begin
   begin
     TestTree.Selected := TTreeNode(FailureListView.Selected.data);
   end;
+end;
+
+procedure TGUITestRunner.FailureListViewDblClick(Sender: TObject);
+var
+  Test: ITest;
+begin
+  Test := NodeToTest(TestTree.Selected);
+  Test.ExecuteDoubleClickAction;
 end;
 
 procedure TGUITestRunner.FailureListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);

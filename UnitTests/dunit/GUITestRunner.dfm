@@ -386,6 +386,7 @@ object GUITestRunner: TGUITestRunner
           TabOrder = 2
           ViewStyle = vsReport
           OnClick = FailureListViewClick
+          OnDblClick = FailureListViewDblClick
           OnSelectItem = FailureListViewSelectItem
         end
       end
