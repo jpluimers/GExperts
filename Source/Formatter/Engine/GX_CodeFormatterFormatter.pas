@@ -217,7 +217,8 @@ begin
   rType := _CurrentToken.ReservedType;
   wType := _CurrentToken.WordType;
 
-  { TODO -otwm : This doesn't really belong here, it has nothing to do with spacing }
+  { TODO -otwm : This doesn't really belong here, it has nothing to do with spacing
+                 it also unnecessarily sets each token's case three times }
   if not (rType in NoReservedTypes) then
     _CurrentToken.ExpressionCase := Settings.ReservedCase
   else if rType in StandardDirectives then
@@ -1350,6 +1351,8 @@ var
         UppercaseCompilerDirective(FCurrentToken);
     end;
 
+    // This is to prevent additional spaces between } and the following token
+    // But what if this is desired?
     if not (FCurrentToken.ReservedType = rtComment) then
       FPrevToken := FCurrentToken;
   end;
