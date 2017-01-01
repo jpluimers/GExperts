@@ -8,4 +8,3 @@ begin
    { testcomment
 } s := '';
 end;
-
