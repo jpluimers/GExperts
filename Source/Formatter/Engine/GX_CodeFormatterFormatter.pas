@@ -327,10 +327,6 @@ begin
     and (wType in [wtWord, wtNumber, wtHexNumber]) then
     _CurrentToken.SetSpace([spBefore], True);
 
-  if (_PrevToken.ReservedType = rtComment)
-    and (wType in [wtWord, wtNumber, wtHexNumber]) then
-    _CurrentToken.SetSpace([spBefore], True);
-
   if _CurrentToken.Space(spBefore) and _PrevToken.Space(spAfter) then
     _PrevToken.SetSpace([spAfter], False); { avoid double spaces }
 end;
@@ -564,7 +560,9 @@ begin
   if GetToken(FTokenIdx - 1, FPrevToken) and (FPrevToken.ReservedType = rtComment)
     and FPrevToken.GetExpression(PrevExpression) and (PrevExpression[1] = '/') then begin
     // fix for situation with a // comment on prev line: begin becomes part of the comment
-    if not FPrevToken.ChangeComment('{') then begin
+    if FPrevToken.ChangeComment('{') then begin
+      FPrevToken.SetSpace([spAfter], true);
+    end else begin
       i := 0;
       Token := nil;
 
@@ -1351,9 +1349,6 @@ var
         UppercaseCompilerDirective(FCurrentToken);
     end;
 
-    // This is to prevent additional spaces between } and the following token
-    // But what if this is desired?
-    if not (FCurrentToken.ReservedType = rtComment) then
       FPrevToken := FCurrentToken;
   end;
 
