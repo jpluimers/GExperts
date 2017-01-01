@@ -92,11 +92,11 @@ type
     procedure testTypeOf;
     procedure testNestedEventType;
     procedure TestUnicode;
+    procedure testCurlyBracesInWhile;
     procedure testAnonymousCurrentlyFails;
     procedure testCurlyHalfCommentEndCurrentlyFails;
     procedure testIfThenElse2CurrentlyFails;
     procedure testComplexCurrentlyFails;
-    procedure testCurlyBracesInWhileCurrentlyFails;
   end;
 
 type
@@ -599,7 +599,7 @@ begin
   TestFile('CommentEnd');
 end;
 
-procedure TTestTestfiles.testCurlyBracesInWhileCurrentlyFails;
+procedure TTestTestfiles.testCurlyBracesInWhile;
 begin
   TestFile('CurlyBracesInWhile');
 end;
