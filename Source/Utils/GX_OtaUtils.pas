@@ -320,6 +320,11 @@ function GxOtaGetCurrentProjectFileName(NormalizeBdsProj: Boolean = False): stri
 // a file extension and without path information.
 function GxOtaGetCurrentProjectName: string;
 
+// Returns the output directory of the given project
+// taken from http://cc.embarcadero.com/item/19823
+// (Ondrey Kelle)
+function GxOtaGetProjectOutputDir(Project: IOTAProject): string;
+
 // Returns reference to the IDE's project group;
 // returns Nil if there is no project group.
 function GxOtaGetProjectGroup: IOTAProjectGroup;
@@ -1419,6 +1424,30 @@ begin
     Result := ChangeFileExt(Result, '');
   end;
 end;
+
+function GxOtaGetProjectOutputDir(Project: IOTAProject): string;
+// taken from http://cc.embarcadero.com/item/19823
+// (Ondrey Kelle)
+begin
+  if Project.ProjectOptions.Values['GenPackage'] then begin
+    // package project
+    // use project options if specified
+    Result := Project.ProjectOptions.Values['PkgDllDir'];
+    // otherwise use environment options
+    if Result = '' then
+      Result := (BorlandIDEServices as IOTAServices).GetEnvironmentOptions.Values['PackageDPLOutput'];
+  end else begin
+    // non-package project, use project options
+    Result := Project.ProjectOptions.Values['OutputDir'];
+  end;
+
+  // default is the project's path
+  if Result = '' then
+    Result := ExtractFilePath(Project.FileName);
+
+  Result := IncludeTrailingPathDelimiter(Result);
+end;
+
 
 function GxOtaGetProjectGroupFileName: string;
 var

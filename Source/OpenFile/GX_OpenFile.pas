@@ -32,10 +32,12 @@ type
     FRecursiveDirSearch: Boolean;
     FCommonSearchDone: Boolean;
     FSearchPathDone: Boolean;
+    FMapFiles: TStringList;
     procedure PathSearchComplete;
     procedure CommonSearchComplete;
     procedure GetCommonDCUFiles;
     procedure AddCurrentProjectFiles(PathUnits: TStringList);
+    procedure AddCurrentMapFiles(PathUnits: TStringList);
   protected
     procedure GetSearchPath(Paths: TStrings); virtual;
   public
@@ -43,6 +45,7 @@ type
     constructor Create;
     destructor Destroy; override;
     property ProjectFiles: TStringList read FProjectFiles write FProjectFiles;
+    property MapFiles: TStringList read FMapFiles;
     procedure Terminate;
     property CommonFiles: TStringList read FCommonFiles write FCommonFiles;
     property CommonDCUFiles: TStringList read FCommonDCUFiles write FCommonDCUFiles;
@@ -115,6 +118,11 @@ type
     pnlButtonsRight: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
+    tabMap: TTabSheet;
+    pnlMap: TPanel;
+    lvMap: TListView;
+    pnlMapFooter: TPanel;
+    btnMapAddToFavs: TButton;
     procedure tmrFilterTimer(Sender: TObject);
     procedure actHelpExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -140,6 +148,7 @@ type
     procedure actFavDeleteFromFavoritesExecute(Sender: TObject);
     procedure actClearRecentListExecute(Sender: TObject);
     procedure pcUnitsResize(Sender: TObject);
+    procedure tabMapShow(Sender: TObject);
   private
     FAvailableFiles: TAvailableFiles;
     FInitialFileType: string;
@@ -189,7 +198,7 @@ implementation
 uses
   SysUtils, Menus, Graphics, Windows, ToolsAPI,
   GX_IdeUtils, GX_SharedImages, GX_Experts, GX_ConfigurationInfo, GX_OtaUtils,
-  GX_GxUtils, GX_dzVclUtils;
+  GX_GxUtils, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils;
 
 resourcestring
   SOpenUnitMenuName = 'OpenFile';
@@ -413,12 +422,14 @@ begin
   FCommonDCUFiles := TStringList.Create;
   FProjectFiles := TStringList.Create;
   FSearchPathFiles := TStringList.Create;
+  FMapFiles := TStringList.Create;
 end;
 
 destructor TAvailableFiles.Destroy;
 begin
   OnFindComplete := nil;
   HaltThreads;
+  FreeAndNil(FMapFiles);
   FreeAndNil(FFileMasks);
   FreeAndNil(FCommonFiles);
   FreeAndNil(FCommonDCUFiles);
@@ -436,6 +447,7 @@ begin
   FCommonFiles.Clear;
   FCommonDCUFiles.Clear;
   FProjectFiles.Clear;
+  FMapFiles.Clear;
   FSearchPathFiles.Clear;
   FSearchPathDone := False;
   FCommonSearchDone := False;
@@ -468,6 +480,7 @@ begin
   if False then // Not needed yet (only needed for uses clause manager?)
     GetCommonDCUFiles;
   AddCurrentProjectFiles(FProjectFiles);
+  AddCurrentMapFiles(FMapFiles);
 end;
 
 procedure TAvailableFiles.PathSearchComplete;
@@ -565,6 +578,60 @@ begin
     finally
       FreeAndNil(CurrentProjectFiles);
       FreeAndNil(FileExtensions);
+    end;
+  end;
+end;
+
+procedure TAvailableFiles.AddCurrentMapFiles(PathUnits: TStringList);
+var
+  ExtensionIndex: Integer;
+  Project: IOTAProject;
+  ProjectFilename: string;
+  i: Integer;
+  Reader: TMapFileReader;
+  FileExtensions: TStringList;
+  FileName: string;
+  FilenameOnly: string;
+  FilenameExt: string;
+  OutputDir: string;
+  MapFile: string;
+  PathsToUse: TStringList;
+  PathIdx: Integer;
+begin
+  Project := GxOtaGetCurrentProject;
+  if Assigned(Project) then begin
+    OutputDir := GxOtaGetProjectOutputDir(Project);
+    ProjectFilename := GxOtaGetProjectFileName(Project);
+    MapFile := AddSlash(OutputDir) + ExtractFilename(ProjectFilename);
+    MapFile := ChangeFileExt(MapFile, '.map');
+    MapFile := TFileSystem.ExpandFileNameRelBaseDir(MapFile, ExtractFileDir(ProjectFilename));
+    if FileExists(MapFile) then begin
+      FileExtensions := nil;
+      PathsToUse := nil;
+      Reader := TMapFileReader.Create(MapFile);
+      try
+        FileExtensions := TStringList.Create;
+        // This will allow semi-colon separated lists at the user GUI level
+        // D5 has no way to separate ; into TStrings.
+        FileExtensions.CommaText := StringReplace(FFileExtensions, ';', ',', [rfReplaceAll]);
+        PathsToUse := TStringList.Create;
+        GetSearchPath(PathsToUse);
+        for i := 0 to Reader.Units.Count - 1 do begin
+          FileNameOnly := Reader.Units[i];
+          for ExtensionIndex := 0 to FileExtensions.Count - 1 do begin
+            FilenameExt := ChangeFileExt(FilenameOnly, ExtractFileExt(FileExtensions[ExtensionIndex]));
+            for PathIdx := 0 to PathsToUse.Count - 1 do begin
+              Filename := AddSlash(PathsToUse[PathIdx]) + FilenameExt;
+              if FileExists(FileName) then
+                PathUnits.Add(ExpandFileName(FileName));
+            end;
+          end;
+        end;
+      finally
+        FreeAndNil(PathsToUse);
+        FreeAndNil(Reader);
+        FreeAndNil(FileExtensions);
+      end;
     end;
   end;
 end;
@@ -962,6 +1029,12 @@ begin
     FCurrentFilePaths := CurrentFileType.Favorites;
 end;
 
+procedure TfmOpenFile.tabMapShow(Sender: TObject);
+begin
+  CurrentListView := lvMap;
+  FCurrentFilePaths := AvailableFiles.MapFiles;
+end;
+
 procedure TfmOpenFile.tabRecentShow(Sender: TObject);
 begin
   CurrentListView := lvRecent;
@@ -1016,6 +1089,8 @@ begin
     lvCommon.Columns.Assign(Source.Columns);
   if Source <> lvProjects then
     lvProjects.Columns.Assign(Source.Columns);
+  if Source <> lvMap then
+    lvMap.Columns.Assign(Source.Columns);
   if Source <> lvRecent then
     lvRecent.Columns.Assign(Source.Columns);
 end;

@@ -156,6 +156,55 @@ object fmOpenFile: TfmOpenFile
           end
         end
       end
+      object tabMap: TTabSheet
+        Caption = '&Map'
+        ImageIndex = 5
+        OnShow = tabMapShow
+        object pnlMap: TPanel
+          Left = 0
+          Top = 0
+          Width = 601
+          Height = 351
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 3
+          FullRepaint = False
+          TabOrder = 0
+          object lvMap: TListView
+            Left = 3
+            Top = 3
+            Width = 595
+            Height = 345
+            Align = alClient
+            Columns = <>
+            DragMode = dmAutomatic
+            HideSelection = False
+            MultiSelect = True
+            ReadOnly = True
+            RowSelect = True
+            TabOrder = 0
+            ViewStyle = vsReport
+            OnDblClick = FileListDoubleClick
+          end
+        end
+        object pnlMapFooter: TPanel
+          Left = 0
+          Top = 351
+          Width = 601
+          Height = 33
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 1
+          object btnMapAddToFavs: TButton
+            Left = 4
+            Top = 3
+            Width = 135
+            Height = 25
+            Action = actAddToFavorites
+            TabOrder = 0
+          end
+        end
+      end
       object tabCommon: TTabSheet
         Caption = '&VCL/RTL'
         ImageIndex = 1
