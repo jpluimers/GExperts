@@ -581,7 +581,7 @@ var
   AbsoluteDir: string;
   RelativeDir: string;
 begin
-  ProjectFile := GxOtaGetCurrentProjectFileName(True);
+  ProjectFile := GxOtaGetCurrentProjectFileName(False);
   if ProjectFile = '' then
     Exit; //==>
   ProjectDir := ExtractFilePath(ProjectFile);
