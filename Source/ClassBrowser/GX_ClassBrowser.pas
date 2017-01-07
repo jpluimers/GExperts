@@ -128,6 +128,7 @@ type
     mitViewProtected: TMenuItem;
     mitViewPublic: TMenuItem;
     mitViewPublished: TMenuItem;
+    timKeyDelay: TTimer;
     procedure tvBrowseChange(Sender: TObject; Node: TTreeNode);
     procedure pnlDataResize(Sender: TObject);
     procedure lvInfoChange(Sender: TObject; Item: TListItem; Change: TItemChange);
@@ -163,6 +164,8 @@ type
     procedure edtMemberFilterChange(Sender: TObject);
     procedure edtMemberFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure edtClassFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtClassFilterChange(Sender: TObject);
+    procedure timKeyDelayTimer(Sender: TObject);
   private
     FProjectNotifier: TBaseIdeNotifier;
     FIsFirstInvocation: Boolean;
@@ -185,6 +188,7 @@ type
     FLastFind: string;
     FLastHitTestItemIdx: Integer;
     FLastHitTestSubItemIdx: Integer;
+    FTreeFilter: string;
 
     procedure EndParse(Sender: TObject);
     procedure ParseFile(Sender: TObject; const FileName: string; FileIndex, FileCount: Integer);
@@ -322,20 +326,17 @@ begin
   if AnsiCompareText(FLastProject, ProjectName) = 0 then
     Exit;
   FLastProject := ProjectName;
-  Node := tvBrowse.Items.Add(nil, ExtractFileName(FLastProject));
+  Node := tvBrowse.Items.Add(nil, ExtractFileName(ProjectName));
   Node.ImageIndex := ImageIndexClosedFolder;
   Node.SelectedIndex := ImageIndexOpenFolder;
   Item := ClassList.Add;
-  with Item do
-  begin
-    Item.IsProject := True;
-    Item.Directory := ExtractFilePath(ProjectName);
-    Item.Name := ExtractPureFileName(ProjectName);
-    if FileExists(Item.GenerateFilename(Item.Directory)) then
-      Item.LoadFromFile(Item.Directory)
-    else
-      Item.Load;
-  end;
+  Item.IsProject := True;
+  Item.Directory := ExtractFilePath(ProjectName);
+  Item.Name := ExtractPureFileName(ProjectName);
+  if FileExists(Item.GenerateFilename(Item.Directory)) then
+    Item.LoadFromFile(Item.Directory)
+  else
+    Item.Load;
   Node.Data := Item;
   LoadObjects(Item, Node);
 end;
@@ -529,20 +530,20 @@ var
   INode: TTreeNode;
   i: Integer;
   NodeText: string;
+  ClassInfo: TBrowseClassInfoCollection;
 begin
   for i := 0 to Item.ClassCount-1 do
   begin
-    if FViewUnitNames then
-    begin
-      with Item.ClassItem[i] do
-        NodeText := SourceName + '.' + Name;
-    end
-    else
-      NodeText := Item.ClassItem[i].Name;
-
-    INode := tvBrowse.Items.AddChildObject(ONode, NodeText, Item.ClassItem[i]);
-    INode.ImageIndex := ImageIndexGear;
-    INode.SelectedIndex := ImageIndexGear;
+    ClassInfo := Item.ClassItem[i];
+    if (FTreeFilter='') or StrContains(FTreeFilter, ClassInfo.Name, False) then begin
+      if FViewUnitNames then
+        NodeText := ClassInfo.SourceName + '.' + ClassInfo.Name
+      else
+        NodeText := ClassInfo.Name;
+      INode := tvBrowse.Items.AddChildObject(ONode, NodeText, Item.ClassItem[i]);
+      INode.ImageIndex := ImageIndexGear;
+      INode.SelectedIndex := ImageIndexGear;
+    end;
   end;
 end;
 
@@ -708,6 +709,13 @@ begin
             IntToStr(Ord(M.cOverride)) + #9 + FilterTab(M.DName);
 end;
 
+procedure TfmClassBrowser.timKeyDelayTimer(Sender: TObject);
+begin
+  timKeyDelay.Enabled := False;
+  FTreeFilter := edtClassFilter.Text;
+  LoadAllObjects;
+end;
+
 procedure TfmClassBrowser.tvBrowseChange(Sender: TObject; Node: TTreeNode);
 resourcestring
   SSourceModule = 'Source module: %s  (%d ms)';
@@ -833,6 +841,12 @@ begin
        scInherit.Controls[i].Invalidate;
     scInherit.Invalidate;
   end;
+end;
+
+procedure TfmClassBrowser.edtClassFilterChange(Sender: TObject);
+begin
+  timKeyDelay.Enabled := False;
+  timKeyDelay.Enabled := True;
 end;
 
 procedure TfmClassBrowser.edtClassFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

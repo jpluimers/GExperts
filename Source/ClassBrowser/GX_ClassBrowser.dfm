@@ -271,6 +271,7 @@ object fmClassBrowser: TfmClassBrowser
         Width = 121
         Height = 22
         TabOrder = 0
+        OnChange = edtClassFilterChange
         OnKeyDown = edtClassFilterKeyDown
       end
       object tbnSeparator1: TToolButton
@@ -681,5 +682,11 @@ object fmClassBrowser: TfmClassBrowser
       ImageIndex = 56
       OnExecute = actGenericViewNewFilterExecute
     end
+  end
+  object timKeyDelay: TTimer
+    Interval = 300
+    OnTimer = timKeyDelayTimer
+    Left = 104
+    Top = 40
   end
 end
