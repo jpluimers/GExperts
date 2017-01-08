@@ -147,6 +147,10 @@ begin
   end;
 
   frm := TForm(_Form);
+
+  if Assigned(frm.FindComponent(LB_UNIT_POSITIONS)) then
+    Exit;
+
   if not TryGetBevel(frm, 0, 'Bevel1', Bevel1) then
     Exit;
   if not TryGetWinControl(frm, 2, 'LineInput', TWinControl(FLineInput)) then
@@ -156,8 +160,6 @@ begin
   if not TryGetButton(frm, 4, 'CancelButton', CancelButton) then
     Exit;
   if not TryGetButton(frm, 5, 'HelpButton', HelpButton) then
-    Exit;
-  if Assigned(frm.FindComponent(LB_UNIT_POSITIONS)) then
     Exit;
 
   frm.Height := 240;
