@@ -70,11 +70,14 @@ end;
 function TryCutAt(const _SubStr: string; var _Str: string): Boolean;
 var
   StartPos: Integer;
+  p: integer;
 begin
   StartPos := Pos(_SubStr, _Str);
   Result := (StartPos > 0);
-  if Result then
-    _Str := Copy(_Str, StartPos + Length(_SubStr));
+  if Result then begin
+    p := StartPos + Length(_SubStr);
+    _Str := Copy(_Str, p, Length(_Str) - p + 1);
+  end;
 end;
 
 procedure TMapFileReader.ParseSegments(_StartIdx: Integer);
