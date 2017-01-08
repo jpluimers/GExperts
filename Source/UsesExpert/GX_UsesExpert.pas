@@ -18,6 +18,7 @@ type
     FAvailTabIndex: Integer;
     FReplaceFileUseUnit: Boolean;
     FOrigFileAddUnitExecute: TNotifyEvent;
+    FReadMap: Boolean;
     procedure InternalExecute;
     function FindAction(out _Action: TBasicAction): Boolean;
   protected
@@ -161,6 +162,7 @@ type
     FOldToNewUnitNameMap: TStringList;
     procedure GetCommonFiles;
     procedure GetProjectFiles;
+    function TryGetMapFiles: Boolean;
     procedure AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean);
     procedure AddToIntfSection(const UnitName: string);
     procedure DeleteFromIntfSection(const UnitName: string);
@@ -198,13 +200,15 @@ type
     FFavoriteUnits: TStringList;
     FSearchPathUnits: TStringList;
     FUsesExpert: TUsesExpert;
+  public
+    constructor Create(_Owner: TComponent; _UsesExpert: TUsesExpert); reintroduce;
   end;
 
 implementation
 
 uses
   SysUtils, Messages, Windows, Graphics, ToolsAPI,
-  GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils,
+  GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils,
   GX_UsesExpertOptions, GX_MessageBox;
 
 {$R *.dfm}
@@ -319,7 +323,7 @@ var
   Found: boolean;
 begin
   Found := FindAction(act);
-  if TfmUsesExpertOptions.Execute(Application, Found, FSingleActionMode, FReplaceFileUseUnit) then begin
+  if TfmUsesExpertOptions.Execute(Application, Found, FReadMap, FSingleActionMode, FReplaceFileUseUnit) then begin
     SaveSettings;
     if Found then begin
       if FReplaceFileUseUnit then begin
@@ -341,7 +345,7 @@ var
   Bitmap: TBitmap;
 begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
-  Form := TfmUsesManager.Create(Application);
+  Form := TfmUsesManager.Create(Application, Self);
   try
     Bitmap := GetBitmap;
     if Assigned(Bitmap) then
@@ -370,6 +374,7 @@ begin
   FFavoriteUnits.CommaText := Settings.ReadString('Favorites', '');
   FSingleActionMode := Settings.ReadBool('SingleActionMode', False);
   FReplaceFileUseUnit := Settings.ReadBool('ReplaceFileUseUnit', False);
+  FReadMap := Settings.ReadBool('ReadMap', True);
   FAvailTabIndex := Settings.ReadInteger('AvailTabIndex', 0);
 end;
 
@@ -379,10 +384,17 @@ begin
   Settings.WriteString('Favorites', FFavoriteUnits.CommaText);
   Settings.WriteBool('SingleActionMode', FSingleActionMode);
   Settings.WriteBool('ReplaceFileUseUnit', FReplaceFileUseUnit);
+  Settings.WriteBool('ReadMap', FReadMap);
   Settings.WriteInteger('AvailTabIndex', FAvailTabIndex);
 end;
 
-{ TfmEditUsesExpert }
+{ TfmUsesManager }
+
+constructor TfmUsesManager.Create(_Owner: TComponent; _UsesExpert: TUsesExpert);
+begin
+  FUsesExpert := _UsesExpert;
+  inherited Create(_Owner);
+end;
 
 procedure TfmUsesManager.GetProjectFiles;
 var
@@ -391,18 +403,48 @@ var
   i: Integer;
   FileName: string;
 begin
-  IProject := GxOtaGetCurrentProject;
-  if not Assigned(IProject) then
-    Exit;
-  for i := 0 to IProject.GetModuleCount - 1 do
-  begin
-    IModuleInfo := IProject.GetModule(i);
-    Assert(IModuleInfo <> nil);
+  FProjectUnits.Clear;
+  if not FUsesExpert.FReadMap or not TryGetMapFiles then begin
+    IProject := GxOtaGetCurrentProject;
+    if not Assigned(IProject) then
+      Exit;
+    for i := 0 to IProject.GetModuleCount - 1 do begin
+      IModuleInfo := IProject.GetModule(i);
+      Assert(IModuleInfo <> nil);
 
-    FileName := IModuleInfo.FileName;
-    // We don't want blank names, packages, etc.
-    if IsPas(FileName) then
-      FProjectUnits.Add(ExtractPureFileName(FileName));
+      FileName := IModuleInfo.FileName;
+      // We don't want blank names, packages, etc.
+      if IsPas(FileName) then
+        FProjectUnits.Add(ExtractPureFileName(FileName));
+    end;
+  end;
+end;
+
+function TfmUsesManager.TryGetMapFiles: boolean;
+var
+  Project: IOTAProject;
+  ProjectFilename: string;
+  Reader: TMapFileReader;
+  OutputDir: string;
+  MapFile: string;
+begin
+  Result := False;
+  Project := GxOtaGetCurrentProject;
+  if not Assigned(Project) then
+    Exit;
+  OutputDir := GxOtaGetProjectOutputDir(Project);
+  ProjectFilename := GxOtaGetProjectFileName(Project);
+  MapFile := AddSlash(OutputDir) + ExtractFilename(ProjectFilename);
+  MapFile := ChangeFileExt(MapFile, '.map');
+  MapFile := TFileSystem.ExpandFileNameRelBaseDir(MapFile, ExtractFileDir(ProjectFilename));
+  if not FileExists(MapFile) then
+    Exit;
+  Reader := TMapFileReader.Create(MapFile);
+  try
+    FProjectUnits.Assign(Reader.Units);
+    Result := (FProjectUnits.Count > 0)
+  finally
+    FreeAndNil(Reader);
   end;
 end;
 

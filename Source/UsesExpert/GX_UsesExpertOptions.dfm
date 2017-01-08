@@ -4,8 +4,8 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Uses Clause Manager Options'
-  ClientHeight = 97
-  ClientWidth = 249
+  ClientHeight = 113
+  ClientWidth = 289
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,14 +15,23 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
   OldCreateOrder = False
   Position = poScreenCenter
   DesignSize = (
-    249
-    97)
+    289
+    113)
   PixelsPerInch = 96
   TextHeight = 13
-  object chkSingleActionMode: TCheckBox
+  object chkReadMap: TCheckBox
     Left = 8
     Top = 8
-    Width = 233
+    Width = 273
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Read project units from map file rather than .dpr'
+    TabOrder = 0
+  end
+  object chkSingleActionMode: TCheckBox
+    Left = 8
+    Top = 32
+    Width = 273
     Height = 17
     Hint = 
       'If enabled, OK will add the currently selected unit on the right' +
@@ -32,12 +41,12 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Caption = 'Single action/quic&k add mode'
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 0
+    TabOrder = 1
   end
   object chkReplaceFileUnit: TCheckBox
     Left = 8
-    Top = 32
-    Width = 233
+    Top = 56
+    Width = 273
     Height = 17
     Hint = 
       'If enabled, the menu entry File -> Use Unit will call the GExper' +
@@ -46,11 +55,11 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Caption = 'Replace IDE File, Use Unit feature'
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 1
+    TabOrder = 2
   end
   object btnOK: TButton
-    Left = 88
-    Top = 64
+    Left = 128
+    Top = 80
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -58,17 +67,17 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 2
+    TabOrder = 3
   end
   object btnCancel: TButton
-    Left = 168
-    Top = 64
+    Left = 208
+    Top = 80
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 3
+    TabOrder = 4
   end
 end
