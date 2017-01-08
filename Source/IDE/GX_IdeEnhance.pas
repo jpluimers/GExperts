@@ -79,12 +79,16 @@ type
     procedure SetEnhanceToolProperties(const Value: Boolean);
     function GetEnhanceInstallPackages: Boolean;
     procedure SetEnhanceInstallPackages(const Value: Boolean);
-    function GetEnhanceGotoDialog: boolean;
+    function GetEnhanceGotoDialog: Boolean;
     procedure SetEnhanceGotoDialog(const Value: Boolean);
     function GetIdeFormsAllowResize: Boolean;
     function GetIdeFormsRememberPosition: Boolean;
     procedure SetIdeFormsAllowResize(const Value: Boolean);
     procedure SetIdeFormsRememberPosition(const Value: Boolean);
+    function GetOIHideHotCmds: boolean;
+    procedure SetOIHideHotCmds(const Value: Boolean);
+    function GetOIHideDescPane: boolean;
+    procedure SetOIHideDescPane(const Value: boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -115,6 +119,9 @@ type
     property AutoSaveInterval: Integer read FAutoSaveInterval write SetAutoSaveInterval;
     property CPFontEnabled: Boolean read FCPFontEnabled write SetCPFontEnabled;
     property CPFont: TFont read FCPFont;
+    // Object Inspector
+    property OIHideHotCmds: boolean read GetOIHideHotCmds write SetOIHideHotCmds;
+    property OIHideDescPane: boolean read GetOIHideDescPane write SetOIHideDescPane;
     // Component palette
     property CPMultiLine: Boolean read FCPMultiLine write SetCPMultiLine;
     property CPHotTracking: Boolean read FCPHotTracking write FCPHotTracking;
@@ -142,7 +149,7 @@ uses
   GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo, 
   GX_IdeSearchPathEnhancer, GX_IdeProjectOptionsEnhancer,
   GX_IdeToolPropertiesEnhancer, GX_IdeInstallPackagesEnhancer, 
-  GX_IdeGotoEnhancer;
+  GX_IdeGotoEnhancer, GX_IdeObjectInspectorEnhancer;
 
 { TIdeEnhancements }
 
@@ -262,10 +269,13 @@ begin
     // File saving
     AutoSave := ExpSettings.ReadBool('AutoSave', False);
     AutoSaveInterval := ExpSettings.ReadInteger('AutoSaveInterval', 5);
-    // Fonts
+
+    // Object Inspector
     ExpSettings.LoadFont('OIFont', OIFont);
     OIFontEnabled := ExpSettings.ReadBool('EnableOIFont', False);
     OICustomFontNames := ExpSettings.ReadBool('OICustomFontNames', False);
+    OIHideDescPane := ExpSettings.ReadBool('ObjectInspectorHideDescPane', False);
+    OIHideHotCmds := ExpSettings.ReadBool('ObjectInspectorHideHotCmds', False);
 
     // Component palette
     CPFontEnabled := ExpSettings.ReadBool('EnableCPFont', False);
@@ -316,6 +326,9 @@ begin
     ExpSettings.WriteBool('OICustomFontNames', OICustomFontNames);
 
     ExpSettings.SaveFont('OIFont', OIFont);
+
+    ExpSettings.WriteBool('ObjectInspectorHideHotCmds', OIHideHotCmds);
+    ExpSettings.WriteBool('ObjectInspectorHideDescPane', OIHideDescPane);
 
     // Component palette
     ExpSettings.SaveFont('CPFont', CPFont);
@@ -780,6 +793,26 @@ end;
 function TIdeEnhancements.GetMultiLineTabDockHost: Boolean;
 begin
   Result := (FMultiLineTabDockHostManager <> nil);
+end;
+
+function TIdeEnhancements.GetOIHideDescPane: boolean;
+begin
+  Result := TGxIdeObjectInspectorEnhancer.GetHideDescriptionPane;
+end;
+
+procedure TIdeEnhancements.SetOIHideDescPane(const Value: boolean);
+begin
+  TGxIdeObjectInspectorEnhancer.SetHideDescriptionPane(Value);
+end;
+
+function TIdeEnhancements.GetOIHideHotCmds: boolean;
+begin
+  Result :=  TGxIdeObjectInspectorEnhancer.GetHideHotCmds;
+end;
+
+procedure TIdeEnhancements.SetOIHideHotCmds(const Value: Boolean);
+begin
+  TGxIdeObjectInspectorEnhancer.SetHideHotCmds(Value);
 end;
 
 procedure TIdeEnhancements.SetMultiLineTabDockHost(const Value: Boolean);

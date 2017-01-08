@@ -227,16 +227,16 @@ object fmConfiguration: TfmConfiguration
           end
         end
         object gbxTabDockHost: TGroupBox
-          Left = 272
+          Left = 288
           Top = 8
-          Width = 257
+          Width = 249
           Height = 105
           Caption = 'Tab Dock &Hosts'
           TabOrder = 1
           object chkMultiLineTabDockHost: TCheckBox
             Left = 8
             Top = 22
-            Width = 241
+            Width = 233
             Height = 17
             Caption = 'Enable multiline tabs for docked forms'
             TabOrder = 0
@@ -245,23 +245,23 @@ object fmConfiguration: TfmConfiguration
           object chkDefaultMultiLineTabDockHost: TCheckBox
             Left = 24
             Top = 41
-            Width = 225
+            Width = 217
             Height = 17
             Caption = 'Default to multiline tabs'
             TabOrder = 1
           end
         end
         object gbxCompPalette: TGroupBox
-          Left = 8
-          Top = 288
-          Width = 521
+          Left = 264
+          Top = 264
+          Width = 273
           Height = 159
           Caption = 'Component &Palette'
-          TabOrder = 3
+          TabOrder = 4
           object chkCPMultiLine: TCheckBox
             Left = 8
             Top = 18
-            Width = 505
+            Width = 257
             Height = 17
             Caption = 'Multiline tabs'
             TabOrder = 0
@@ -270,7 +270,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPAsButtons: TCheckBox
             Left = 8
             Top = 75
-            Width = 505
+            Width = 257
             Height = 17
             Caption = 'Show tabs as buttons'
             TabOrder = 3
@@ -279,7 +279,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPTabsInPopup: TCheckBox
             Left = 8
             Top = 114
-            Width = 505
+            Width = 257
             Height = 17
             Caption = 'Add popup menu/button with tab names'
             TabOrder = 5
@@ -288,7 +288,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPFlat: TCheckBox
             Left = 24
             Top = 94
-            Width = 489
+            Width = 241
             Height = 17
             Caption = 'Flat buttons'
             TabOrder = 4
@@ -296,7 +296,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPTabsInPopupAlphaSort: TCheckBox
             Left = 24
             Top = 133
-            Width = 489
+            Width = 241
             Height = 19
             Caption = 'Show tab names in alphabetical order'
             TabOrder = 6
@@ -304,7 +304,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPScrollOpposite: TCheckBox
             Left = 24
             Top = 37
-            Width = 489
+            Width = 241
             Height = 17
             Caption = 'Scroll &opposite'
             TabOrder = 1
@@ -312,7 +312,7 @@ object fmConfiguration: TfmConfiguration
           object chkCPRaggedRight: TCheckBox
             Left = 24
             Top = 56
-            Width = 489
+            Width = 241
             Height = 17
             Caption = 'Ragged &right'
             TabOrder = 2
@@ -321,8 +321,8 @@ object fmConfiguration: TfmConfiguration
         object gbxIDEForms: TGroupBox
           Left = 8
           Top = 115
-          Width = 521
-          Height = 169
+          Width = 529
+          Height = 142
           Caption = 'IDE'
           TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
@@ -340,14 +340,6 @@ object fmConfiguration: TfmConfiguration
             ShowHint = True
             TabOrder = 0
             OnClick = chkEnhanceDialogsClick
-          end
-          object chkOIFontNames: TCheckBox
-            Left = 8
-            Top = 136
-            Width = 505
-            Height = 17
-            Caption = 'Show object inspector font names using the font'
-            TabOrder = 7
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
@@ -396,6 +388,38 @@ object fmConfiguration: TfmConfiguration
             Height = 17
             Caption = 'Enhance Goto dialog'
             TabOrder = 6
+          end
+        end
+        object gbxObjectInspector: TGroupBox
+          Left = 8
+          Top = 264
+          Width = 249
+          Height = 159
+          Caption = 'Object Inspector'
+          TabOrder = 3
+          object chkOIFontNames: TCheckBox
+            Left = 8
+            Top = 22
+            Width = 233
+            Height = 17
+            Caption = 'Show font names using the font'
+            TabOrder = 0
+          end
+          object chkOIHideHotCmds: TCheckBox
+            Left = 8
+            Top = 41
+            Width = 233
+            Height = 17
+            Caption = 'Hide Quick Action Panel'
+            TabOrder = 1
+          end
+          object chkOIHideDescPane: TCheckBox
+            Left = 8
+            Top = 60
+            Width = 233
+            Height = 17
+            Caption = 'Hide Description Panel'
+            TabOrder = 2
           end
         end
       end

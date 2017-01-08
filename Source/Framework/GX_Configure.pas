@@ -55,7 +55,6 @@ type
     btnAppBuilder: TButton;
     gbxIDEForms: TGroupBox;
     chkEnhanceDialogs: TCheckBox;
-    chkOIFontNames: TCheckBox;
     gbxFonts: TGroupBox;
     btnOIFont: TButton;
     btnCPFont: TButton;
@@ -102,6 +101,10 @@ type
     btnImport: TButton;
     btnExport: TButton;
     chkEnhanceGotoDialog: TCheckBox;
+    gbxObjectInspector: TGroupBox;
+    chkOIFontNames: TCheckBox;
+    chkOIHideHotCmds: TCheckBox;
+    chkOIHideDescPane: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -409,12 +412,15 @@ begin
   // File saving
   chkAutoSave.Checked := IdeEnhancements.AutoSave;
   udMinutes.Position := IdeEnhancements.AutoSaveInterval;
-  // Fonts
+
+  // Object Inspector
   chkOIFontEnabled.Checked := IdeEnhancements.OIFontEnabled;
   FOIFont.Assign(IdeEnhancements.OIFont);
   chkOIFontNames.Checked := IdeEnhancements.OICustomFontNames;
-
+  chkOIHideHotCmds.Checked := IdeEnhancements.OIHideHotCmds;
+  chkOIHideDescPane.Checked := IdeEnhancements.OIHideDescPane;
   chkFontEnabledClick(Self);
+
   chkAutoSaveClick(chkAutoSave);
   chkCPAsButtonsClick(chkCPAsButtons);
   chkCPTabsInPopupClick(chkCPTabsInPopup);
@@ -512,10 +518,13 @@ begin
   // File saving
   IdeEnhancements.AutoSave := chkAutoSave.Checked;
   IdeEnhancements.AutoSaveInterval := udMinutes.Position;
-  // Fonts
+
+  // Object Inspector
   IdeEnhancements.OIFontEnabled := chkOIFontEnabled.Checked;
   IdeEnhancements.OIFont.Assign(FOIFont);
   IdeEnhancements.OICustomFontNames := chkOIFontNames.Checked;
+  IdeEnhancements.OIHideHotCmds := chkOIHideHotCmds.Checked;
+  IdeEnhancements.OIHideDescPane := chkOIHideDescPane.Checked;
 
   IdeEnhancements.SaveSettings;
 end;
@@ -574,11 +583,23 @@ begin
     gbxTabDockHost.Visible := False;
   end;
 
+{$IFNDEF GX_VER210_up} // RAD Studio 2010 (15; BDS 7)
+  // These controls were introduced in Delphi 2010
+  chkOIHideHotCmds.Visible := False;
+  chkOIHideDescPane.Visible := False;
+{$ENDIF}
+{$IFDEF GX_VER300_up} // RAD Studio 10 Seattle (24; BDS 17)
+  // From Delphi 10 on they can be turned on and off in the Object Inspector context menu
+  chkOIHideHotCmds.Visible := False;
+  chkOIHideDescPane.Visible := False;
+{$ENDIF}
+
   if not ComponentPaletteAvailable then begin
     gbxCompPalette.Visible := False;
     // these are on the debug tab and normally not visible
     btnCPFont.Visible := False;
     chkCPFontEnabled.Visible := False;
+    gbxObjectInspector.Width := gbxCompPalette.Left + gbxCompPalette.Width - gbxObjectInspector.Left;
   end;
 end;
 
