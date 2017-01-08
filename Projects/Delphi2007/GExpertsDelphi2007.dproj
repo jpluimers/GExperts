@@ -392,6 +392,7 @@
     </DCCReference>
     <DCCReference Include="..\..\source\IDE\GX_IdeEnhance.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdeFormEnhancer.pas" />
+    <DCCReference Include="..\..\Source\IDE\GX_IdeGotoEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdePackageRenameDlg.pas">
       <Form>fmIdxPackageRenameDlg</Form>
@@ -520,6 +521,7 @@
     <DCCReference Include="..\..\source\Utils\GX_BookmarkList.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzClassUtils.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzMapFileReader.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzOsUtils.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzPackageInfo.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzQuicksort.pas" />
