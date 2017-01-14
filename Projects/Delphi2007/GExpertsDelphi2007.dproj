@@ -120,9 +120,6 @@
     <DelphiCompile Include="GExpertsDelphi2007.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <RcCompile Include="..\..\images\GXIcons.rc">
-      <Form>'..\..\images\GXIcons.res'</Form>
-    </RcCompile>
     <DCCReference Include="..\..\Source\AutoTodo\GX_AutoTodoDone.pas">
       <Form>fmAutoTodoDone</Form>
     </DCCReference>
@@ -390,10 +387,18 @@
     <DCCReference Include="..\..\source\IDEDocking\GX_IdeDock.pas">
       <Form>fmIdeDockForm</Form>
     </DCCReference>
+    <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventFavoriteEdit.pas">
+      <Form>f_IdeBuildEventFavoriteEdit</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdeEnhance.pas" />
+    <DCCReference Include="..\..\Source\IDE\GX_IdeFavoritesList.pas">
+      <Form>f_GxIdeFavoritesList</Form>
+    </DCCReference>
     <DCCReference Include="..\..\source\IDE\GX_IdeFormEnhancer.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeGotoEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas" />
+    <DCCReference Include="..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdePackageRenameDlg.pas">
       <Form>fmIdxPackageRenameDlg</Form>
     </DCCReference>
@@ -401,9 +406,6 @@
     <DCCReference Include="..\..\source\IDE\GX_IdeSearchPathEnhancer.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas">
       <Form>f_IdeSearchPathFavoriteEdit</Form>
-    </DCCReference>
-    <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavorites.pas">
-      <Form>f_SarchPathFavorites</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\IDE\GX_IdeToolPropertiesEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_MultilineHost.pas" />
@@ -536,5 +538,8 @@
     <DCCReference Include="..\..\source\Utils\GX_OtaUtils.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_VCLFixPack.pas" />
     <DCCReference Include="..\..\source\Utils\GX_XmlUtils.pas" />
+    <RcCompile Include="..\..\images\GXIcons.rc">
+      <Form>..\..\images\GXIcons.res</Form>
+    </RcCompile>
   </ItemGroup>
 </Project>

@@ -1,7 +1,5 @@
 library GExpertsBDS2006;
 
-{$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
-{$R *.res}
 {$E dll}
 
 uses
@@ -210,7 +208,7 @@ uses
   GX_dzOsUtils in '..\..\Source\Utils\GX_dzOsUtils.pas',
   GX_dzPackageInfo in '..\..\Source\Utils\GX_dzPackageInfo.pas',
   GX_PeInfoPrint in '..\..\Source\PeInfo\GX_PeInfoPrint.pas' {f_PeInfoPrint},
-  GX_IdeSearchPathFavorites in '..\..\Source\IDE\GX_IdeSearchPathFavorites.pas' {f_SarchPathFavorites},
+  GX_IdeFavoritesList in '..\..\Source\IDE\GX_IdeFavoritesList.pas' {f_GxIdeFavoritesList},
   GX_IdeSearchPathFavoriteEdit in '..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas' {f_IdeSearchPathFavoriteEdit},
   GX_ReselectDesktop in '..\..\Source\Experts\GX_ReselectDesktop.pas',
   GX_eWarn in '..\..\Source\Editor\GX_eWarn.pas' {fmConfigureWarning},
@@ -218,7 +216,12 @@ uses
   GX_eConvertStrings in '..\..\Source\Editor\GX_eConvertStrings.pas' {fmEConvertStrings},
   GX_IdeGotoEnhancer in '..\..\Source\IDE\GX_IdeGotoEnhancer.pas',
   GX_dzMapFileReader in '..\..\Source\Utils\GX_dzMapFileReader.pas',
-  GX_IdeObjectInspectorEnhancer in '..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas';
+  GX_IdeObjectInspectorEnhancer in '..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas',
+  GX_IdeBuildEventFavoriteEdit in '..\..\Source\IDE\GX_IdeBuildEventFavoriteEdit.pas' {f_IdeBuildEventFavoriteEdit},
+  GX_IdeBuildEventsEnhancer in '..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas';
+
+{$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
+{$R *.res}
 
 begin
 end.

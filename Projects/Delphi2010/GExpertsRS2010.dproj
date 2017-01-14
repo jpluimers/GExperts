@@ -61,9 +61,6 @@
 			<DelphiCompile Include="GExpertsRS2010.dpr">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<RcCompile Include="..\..\images\GXIcons.rc">
-				<Form>GXIcons.res</Form>
-			</RcCompile>
 			<DCCReference Include="..\..\source\Framework\GX_About.pas">
 				<Form>fmAbout</Form>
 			</DCCReference>
@@ -459,8 +456,8 @@
 			<DCCReference Include="..\..\Source\PeInfo\GX_PeInfoPrint.pas">
 				<Form>f_PeInfoPrint</Form>
 			</DCCReference>
-			<DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavorites.pas">
-				<Form>f_SarchPathFavorites</Form>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeFavoritesList.pas">
+				<Form>f_GxIdeFavoritesList</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas">
 				<Form>f_IdeSearchPathFavoriteEdit</Form>
@@ -477,6 +474,14 @@
 			</DCCReference>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeGotoEnhancer.pas"/>
 			<DCCReference Include="..\..\Source\Utils\GX_dzMapFileReader.pas"/>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas"/>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventFavoriteEdit.pas">
+				<Form>f_IdeBuildEventFavoriteEdit</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+			<RcCompile Include="..\..\images\GXIcons.rc">
+				<Form>GXIcons.res</Form>
+			</RcCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
