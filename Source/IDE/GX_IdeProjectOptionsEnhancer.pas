@@ -96,15 +96,11 @@ type
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
-    //    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
-    function TryFindHistoryComboBox(_SettingsControl: TWinControl; _GrpBoxIdx:
-      Integer;
+    function TryFindHistoryComboBox(_SettingsControl: TWinControl; _GrpBoxIdx: Integer;
       const _Name: string; out _cmb: TWinControl): Boolean;
-    function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl:
-      TWinControl): Boolean;
+    function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl: TWinControl): Boolean;
     procedure ShiftCtrlO(_Sender: TObject);
     procedure ShiftCtrlT(_Sender: TObject);
-    //    function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -143,21 +139,7 @@ begin
   inherited;
 end;
 
-//procedure TProjectOptionsEnhancer.HandleControlChanged(_Sender: TObject; _Form: TCustomForm;
-//  _Control: TWinControl);
-//var
-//  cmp: TComponent;
-//begin
-//  cmp := _Form.FindComponent('HostAppInput');
-//  if Assigned(cmp) and (cmp.ClassName = 'THistoryPropComboBox') then begin
-//    TComboboxDropHandler.Create(cmp);
-//    TIDEFormEnhancements.UnregisterControlChangeCallback(FControlCallbackHandle);
-//    FControlCallbackHandle := nil;
-//  end;
-//end;
-
-function CheckControl(_Parent: TWinControl; _Idx: Integer; const _ClassName:
-  string;
+function CheckControl(_Parent: TWinControl; _Idx: Integer; const _ClassName: string;
   out _AsWinCtrl: TWinControl): Boolean;
 var
   Ctrl: TControl;
@@ -223,8 +205,7 @@ begin
 {$ENDIF}{$ENDIF}{$ENDIF}
 end;
 
-function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsControl:
-  TWinControl;
+function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsControl: TWinControl;
   _GrpBoxIdx: Integer; const _Name: string; out _cmb: TWinControl): Boolean;
 var
   wctrl: TWinControl;
@@ -295,8 +276,7 @@ const
   RUN_PARAMS_DIALOG_NAME = 'RunParamsDlg';
 {$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
 
-procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form:
-  TCustomForm);
+procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 
   function TryHookCombo(_SettingsPanel: TWinControl; _Index: Integer; const
     _Name: string): Boolean;
@@ -354,7 +334,6 @@ begin
     end;
   end;
 
-  //  FControlCallbackHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
   if not TryGetSettingsControl(_Form, SettingsControl) then
     Exit;
 
