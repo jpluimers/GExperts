@@ -125,7 +125,7 @@ end;
 
 function TBuildEventsEnhancer.IsBuildEventsForm(_Form: TCustomForm): Boolean;
 const
-{$IFDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
+{$IFDEF GX_VER230_up} // RAD Studio XE 2 (17; BDS 9)
   DIALOG_CLASS = 'TBuildEventPropEditor';
   DIALOG_NAME = 'BuildEventPropEditor';
 {$ELSE}
