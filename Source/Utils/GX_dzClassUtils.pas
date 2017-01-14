@@ -23,9 +23,42 @@ procedure TStringList_MakeIndex(_sl: TStringList);
 
 procedure TGXUnicodeStringList_MakeIndex(_sl: TGXUnicodeStringList);
 
-function TStrings_ValueFromIndex(_st: TStrings; _Idx: integer): string;
+function TStrings_ValueFromIndex(_st: TStrings; _Idx: Integer): string;
+
+///<summary>
+/// Like TComponent.FindComponent but optionally search recursively because in the IDE
+/// sometimes not all controls are owned by the form (e.g. in the Project Options dialog).
+/// This will do a depth first search.
+/// Name can be an empty string, which will return the first component with an empty name.</sumamry>
+function TComponent_FindComponent(_Owner: TComponent; const _Name: string; _Recursive: Boolean;
+  out _Found: TComponent): Boolean;
 
 implementation
+
+function TComponent_FindComponent(_Owner: TComponent; const _Name: string; _Recursive: Boolean;
+  out _Found: TComponent): Boolean;
+var
+  i: Integer;
+  comp: TComponent;
+begin
+  if (_Owner = nil) then begin
+    Result := False;
+    Exit;
+  end;
+  Result := True;
+  for i := 0 to _Owner.ComponentCount - 1 do begin
+    comp := _Owner.Components[i];
+    if SameText(comp.Name, _Name) then begin
+      _Found := comp;
+      Exit;
+    end;
+    if _Recursive then begin
+      if TComponent_FindComponent(comp, _Name, _Recursive, _Found) then
+        Exit;
+    end;
+  end;
+  Result := False;
+end;
 
 procedure TStrings_GetAsSortedList(_st: TStrings; _sl: TStringList; _Duplicates: TDuplicates = dupAccept);
 begin
@@ -37,7 +70,7 @@ begin
   TStringList_MakeIndex(_sl);
 end;
 
-function TStrings_ValueFromIndex(_st: TStrings; _Idx: integer): string;
+function TStrings_ValueFromIndex(_st: TStrings; _Idx: Integer): string;
 var
   Name: string;
 begin
@@ -49,27 +82,26 @@ end;
 
 procedure TStringList_MakeIndex(_sl: TStringList);
 var
-  i: integer;
+  i: Integer;
 begin
   Assert(Assigned(_sl));
 
   _sl.Sorted := False;
   for i := 0 to _sl.Count - 1 do
     _sl.Objects[i] := POinter(i + 1);
-  _sl.Sorted := true;
+  _sl.Sorted := True;
 end;
 
 procedure TGXUnicodeStringList_MakeIndex(_sl: TGXUnicodeStringList);
 var
-  i: integer;
+  i: Integer;
 begin
   Assert(Assigned(_sl));
 
   _sl.Sorted := False;
   for i := 0 to _sl.Count - 1 do
     _sl.Objects[i] := POinter(i + 1);
-  _sl.Sorted := true;
+  _sl.Sorted := True;
 end;
 
 end.
-
