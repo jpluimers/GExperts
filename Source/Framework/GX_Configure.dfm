@@ -36,7 +36,7 @@ object fmConfiguration: TfmConfiguration
       Align = alClient
       HotTrack = True
       MultiLine = True
-      TabIndex = 0
+      TabIndex = 3
       TabOrder = 0
       OnChange = pcConfigChange
       object tshExperts: TTabSheet
@@ -253,7 +253,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 264
-          Top = 264
+          Top = 280
           Width = 273
           Height = 159
           Caption = 'Component &Palette'
@@ -322,7 +322,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 115
           Width = 529
-          Height = 142
+          Height = 158
           Caption = 'IDE'
           TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
@@ -400,7 +400,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxObjectInspector: TGroupBox
           Left = 8
-          Top = 264
+          Top = 280
           Width = 249
           Height = 159
           Caption = 'Object Inspector'
