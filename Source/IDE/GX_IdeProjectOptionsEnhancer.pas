@@ -5,7 +5,8 @@ unit GX_IdeProjectOptionsEnhancer;
 interface
 
 uses
-  SysUtils;
+  SysUtils,
+  Forms;
 
 type
   TGxIdeProjectOptionsEnhancer = class
@@ -13,6 +14,8 @@ type
     class function GetEnabled: Boolean; // static;
     class procedure SetEnabled(const Value: Boolean); //static;
   end;
+
+function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
 
 implementation
 
@@ -22,7 +25,6 @@ uses
   Controls,
   StdCtrls,
   ExtCtrls,
-  Forms,
   ActnList,
   Menus,
   GX_IdeFormEnhancer,
@@ -95,7 +97,6 @@ type
     ///<summary>
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-    function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
     function TryFindHistoryComboBox(_SettingsControl: TWinControl; _GrpBoxIdx: Integer;
       const _Name: string; out _cmb: TWinControl): Boolean;
     function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl: TWinControl): Boolean;
@@ -249,32 +250,17 @@ const
     0, 1, -1, -1
 {$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
     );
-
-{$IFDEF GX_VER230_up} // RAD Studio XE 2 (17; BDS 9)
+const
+{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
   RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
   RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
-{$ELSE}{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
-  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
-  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
-{$ELSE}{$IFDEF GX_VER210_up} // RAD Studio 2010 (15; BDS 7)
-  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
-  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
-{$ELSE}{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
-  RUN_PARAMS_DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
-  RUN_PARAMS_DIALOG_NAME = 'DelphiProjectOptionsDialog';
-{$ELSE}{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
-  RUN_PARAMS_DIALOG_CLASS = 'TProjectOptionsDialog';
-  RUN_PARAMS_DIALOG_NAME = 'ProjectOptionsDialog';
 {$ELSE}{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
   RUN_PARAMS_DIALOG_CLASS = 'TProjectOptionsDialog';
   RUN_PARAMS_DIALOG_NAME = 'ProjectOptionsDialog';
-{$ELSE}{$IFDEF GX_VER150_up} // Delphi 7
-  RUN_PARAMS_DIALOG_CLASS = 'TRunParamsDlg';
-  RUN_PARAMS_DIALOG_NAME = 'RunParamsDlg';
 {$ELSE}{$IFDEF GX_VER140_up} // Delphi 6
   RUN_PARAMS_DIALOG_CLASS = 'TRunParamsDlg';
   RUN_PARAMS_DIALOG_NAME = 'RunParamsDlg';
-{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
+{$ENDIF}{$ENDIF}{$ENDIF}
 
 procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 
@@ -351,8 +337,7 @@ begin
   TWinControl_SetFocus(FConfigCombo);
 end;
 
-function TProjectOptionsEnhancer.IsProjectOptionsForm(_Form: TCustomForm):
-  Boolean;
+function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
 begin
   Result := (_Form.ClassName = RUN_PARAMS_DIALOG_CLASS) and (_Form.Name =
     RUN_PARAMS_DIALOG_NAME);
