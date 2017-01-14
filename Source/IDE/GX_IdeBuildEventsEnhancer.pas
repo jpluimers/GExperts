@@ -26,6 +26,12 @@ implementation
 
 {$IFDEF GX_EnableBuildEventsEnhancer}
 
+{$UNDEF HAS_OLD_STYLE_PAGE}
+{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+{$IFNDEF GX_VER230_up} // RAD Studio XE 2 (17; BDS 9)
+{$DEFINE HAS_OLD_STYLE_PAGE}
+{$ENDIF}{$ENDIF}
+
 uses
   Controls,
   Menus,
@@ -58,7 +64,10 @@ type
     procedure SaveSettings;
     function ConfigurationKey: string;
     procedure EditEntry(_Sender: TWinControl; var _Name, _Value: string; var _OK: Boolean);
+{$IFDEF HAS_OLD_STYLE_PAGE}
     procedure InitBuildEvent(_Form: TForm; const _BtnName, _MemoName: string);
+    procedure InitProjectOptions(_Form: TForm);
+{$ENDIF HAS_OLD_STYLE_PAGE}
     procedure InitFavoritesMenu(_Owner: TFavHandler; _pm: TPopupMenu);
   public
 
@@ -201,6 +210,16 @@ begin
   Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
 end;
 
+{$IFDEF HAS_OLD_STYLE_PAGE}
+
+{$UNDEF INCREASE_MEMO_HEIGHT}
+{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
+// In later versions, the memo is much larger already, but in Delphi 2007 it can only show
+// two lines. Make it at least three lines.
+{$DEFINE INCREASE_MEMO_HEIGHT}
+{$ENDIF}{$ENDIF}
+
 procedure TBuildEventsEnhancer.InitBuildEvent(_Form: TForm; const _BtnName, _MemoName: string);
 var
   Cmp: TComponent;
@@ -216,18 +235,45 @@ begin
   if not TComponent_FindComponent(_Form, _MemoName, True, Cmp) or not (Cmp is TMemo) then
     Exit;
   Memo := TMemo(Cmp);
-{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
-{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
-  // In later versions, the memo is much larger already, but in Delphi 2007 it can only show
-  // two lines. Make it three lines.
+{$IFDEF INCREASE_MEMO_HEIGHT}
   Memo.Height := Memo.Height + 12;
   Memo.Anchors := Memo.Anchors + [akBottom];
   Memo.Parent.Anchors := Memo.Parent.Anchors + [akBottom];
-{$ENDIF}{$ENDIF}
+{$ENDIF}
 
   Handler := TFavHandler.Create(Button.Parent, Self, 'GX' + _BtnName, Memo, Button);
   Handler.FFavBtn.TabOrder := Button.TabOrder + 1;
 end;
+
+procedure TBuildEventsEnhancer.InitProjectOptions(_Form: TForm);
+{$IFDEF INCREASE_MEMO_HEIGHT}
+var
+  Cmp: TComponent;
+  pPreBuild: TPanel;
+  pPostBuild: TPanel;
+  pPreLink: TPanel;
+{$ENDIF INCREASE_MEMO_HEIGHT}
+begin
+  InitBuildEvent(_Form, 'bEditPreBuild', 'mPreBuildCommands');
+  InitBuildEvent(_Form, 'bEditPostBuild', 'mPostBuildCommands');
+  InitBuildEvent(_Form, 'bEditPreLink', 'mPreLinkCommands');
+{$IFDEF INCREASE_MEMO_HEIGHT}
+  if TComponent_FindComponent(_Form, 'pPreLink', True, Cmp) and (Cmp is TPanel)
+    and not TPanel(Cmp).Visible then begin
+    pPreLink := TPanel(Cmp);
+    if TComponent_FindComponent(_Form, 'pPreBuild', True, Cmp) and (Cmp is TPanel) then begin
+      pPreBuild := TPanel(Cmp);
+      if TComponent_FindComponent(_Form, 'pPostBuild', True, Cmp) and (Cmp is TPanel) then begin
+        pPreBuild.Height := pPreBuild.Height + pPreLink.Height div 2;
+        pPostBuild := TPanel(Cmp);
+        pPostBuild.Top := pPreBuild.Top + pPreBuild.Height + 8;
+        pPostBuild.Height := pPostBuild.Height + pPreLink.Height div 2;
+      end;
+    end;
+  end;
+{$ENDIF INCREASE_MEMO_HEIGHT}
+end;
+{$ENDIF HAS_OLD_STYLE_PAGE}
 
 procedure TBuildEventsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 var
@@ -236,33 +282,8 @@ var
   OkButton: TButton;
   CancelButton: TButton;
   Handler: TFavHandler;
-  pPreBuild: TPanel;
-  pPostBuild: TPanel;
-  pPreLink: TPanel;
 begin
-  if IsProjectOptionsForm(_Form) then begin
-    frm := _Form as TForm;
-    InitBuildEvent(frm, 'bEditPreBuild', 'mPreBuildCommands');
-    InitBuildEvent(frm, 'bEditPostBuild', 'mPostBuildCommands');
-    InitBuildEvent(frm, 'bEditPreLink', 'mPreLinkCommands');
-{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
-{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
-    if TComponent_FindComponent(_Form, 'pPreLink', True, Cmp) and (Cmp is TPanel)
-      and not TPanel(Cmp).Visible then begin
-      pPreLink := TPanel(Cmp);
-      if TComponent_FindComponent(_Form, 'pPreBuild', True, Cmp) and (Cmp is TPanel) then begin
-        pPreBuild := TPanel(Cmp);
-        if TComponent_FindComponent(_Form, 'pPostBuild', True, Cmp) and (Cmp is TPanel) then begin
-          pPreBuild.Height := pPreBuild.Height + pPreLink.Height div 2;
-          pPostBuild := TPanel(Cmp);
-          pPostBuild.Top := pPreBuild.Top + pPreBuild.Height + 8;
-          pPostBuild.Height := pPostBuild.Height + pPreLink.Height div 2;
-        end;
-      end;
-    end;
-{$ENDIF}{$ENDIF}
-
-  end else if IsBuildEventsForm(_Form) then begin
+  if IsBuildEventsForm(_Form) then begin
     frm := _Form as TForm;
     if TComponent_FindComponent(frm, 'GX' + 'OkButton', True, Cmp) then
       Exit;
@@ -279,7 +300,15 @@ begin
     Handler.FFavBtn.Top := OkButton.Top;
     Handler.FFavBtn.Left := OkButton.Left - (CancelButton.Left - OkButton.Left);
     Handler.FFavBtn.TabOrder := OkButton.TabOrder;
+    Exit;
   end;
+
+{$IFDEF HAS_OLD_STYLE_PAGE}
+  if IsProjectOptionsForm(_Form) then begin
+    frm := _Form as TForm;
+    InitProjectOptions(frm);
+  end;
+{$ENDIF HAS_OLD_STYLE_PAGE}
 end;
 
 procedure TBuildEventsEnhancer.InitFavoritesMenu(_Owner: TFavHandler; _pm: TPopupMenu);
