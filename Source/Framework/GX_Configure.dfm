@@ -389,6 +389,14 @@ object fmConfiguration: TfmConfiguration
             Caption = 'Enhance Goto dialog'
             TabOrder = 6
           end
+          object chkEnhanceBuildEventsDialog: TCheckBox
+            Left = 24
+            Top = 136
+            Width = 489
+            Height = 17
+            Caption = 'Enhance Build Events dialog'
+            TabOrder = 7
+          end
         end
         object gbxObjectInspector: TGroupBox
           Left = 8

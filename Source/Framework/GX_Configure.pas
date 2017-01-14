@@ -105,6 +105,7 @@ type
     chkOIFontNames: TCheckBox;
     chkOIHideHotCmds: TCheckBox;
     chkOIHideDescPane: TCheckBox;
+    chkEnhanceBuildEventsDialog: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -404,6 +405,7 @@ begin
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   chkEnhanceGotoDialog.Checked := IdeEnhancements.EnhanceGotoDialog;
+  chkEnhanceBuildEventsDialog.Checked := IdeEnhancements.EnhanceBuildEventsDialog;
   UpdateIdeDialogCheckboxes;
 
   chkCPFontEnabled.Checked := IdeEnhancements.CPFontEnabled;
@@ -508,6 +510,7 @@ begin
   IdeEnhancements.EnhanceInstallPackages := chkEnhanceInstallPackages.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
   IdeEnhancements.EnhanceGotoDialog := chkEnhanceGotoDialog.Checked;
+  IdeEnhancements.EnhanceBuildEventsDialog := chkEnhanceBuildEventsDialog.Checked;
 
   // Menus
   ConfigInfo.PlaceGxMainMenuInToolsMenu := chkPlaceGxMainMenuInToolsMenu.Checked;
@@ -583,6 +586,9 @@ begin
     gbxTabDockHost.Visible := False;
   end;
 
+{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+  chkEnhanceBuildEventsDialog.Visible := False;
+{$ENDIF}
 {$IFNDEF GX_VER210_up} // RAD Studio 2010 (15; BDS 7)
   // These controls were introduced in Delphi 2010
   chkOIHideHotCmds.Visible := False;
