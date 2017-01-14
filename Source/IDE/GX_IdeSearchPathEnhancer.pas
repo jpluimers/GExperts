@@ -32,8 +32,9 @@ uses
   GX_dzFileUtils,
   GX_OtaUtils,
   GX_dzSelectDirectoryFix,
-  GX_IdeSearchPathFavorites,
-  GX_ConfigurationInfo;
+  GX_IdeFavoritesList,
+  GX_ConfigurationInfo,
+  GX_IdeSearchPathFavoriteEdit;
 
 type
   ///<summary>
@@ -103,6 +104,7 @@ type
     procedure SaveSettings;
     function ConfigurationKey: string;
     procedure PageControlChange(_Sender: TObject);
+    procedure EditEntry(_Sender: TWinControl; var _Name, _Value: string; var _OK: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -528,10 +530,18 @@ begin
 end;
 
 procedure TSearchPathEnhancer.FavoritesPmConfigureClick(_Sender: TObject);
+resourcestring
+  SFavSearchPaths = 'Favorite Search Paths';
 begin
-  Tf_SarchPathFavorites.Execute(FForm, FFavorites);
+  Tf_GxIdeFavoritesList.Execute(FForm, SFavSearchPaths, EditEntry, FFavorites);
   SaveSettings;
   InitFavoritesMenu;
+end;
+
+procedure TSearchPathEnhancer.EditEntry(_Sender: TWinControl;
+  var _Name, _Value: string; var _OK: Boolean);
+begin
+  _OK := Tf_IdeSearchPathFavoriteEdit.Execute(_Sender, _Name, _Value)
 end;
 
 procedure TSearchPathEnhancer.FavoritesPmHandleFavoriteClick(_Sender: TObject);
@@ -560,16 +570,16 @@ end;
 function StartsText(const ASubText, AText: string): Boolean;
 var
   P: PChar;
-  L, L2: Integer;
+  l, L2: Integer;
 begin
   P := PChar(AText);
-  L := Length(ASubText);
+  l := Length(ASubText);
   L2 := Length(AText);
-  if L > L2 then
+  if l > L2 then
     Result := False
   else
     Result := CompareString(LOCALE_USER_DEFAULT, NORM_IGNORECASE,
-      P, L, PChar(ASubText), L) = 2;
+      P, l, PChar(ASubText), l) = 2;
 end;
 {$ENDIF}
 

@@ -1,21 +1,14 @@
-inherited f_SarchPathFavorites: Tf_SarchPathFavorites
+inherited f_GxIdeFavoritesList: Tf_GxIdeFavoritesList
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
-  Caption = ' Favorite Search Paths'
+  Caption = 'Favorite Search Paths'
   ClientHeight = 305
   ClientWidth = 417
   ParentFont = False
   Position = poOwnerFormCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object l_Favorites: TLabel
-    Left = 8
-    Top = 8
-    Width = 45
-    Height = 13
-    Caption = 'Favorites'
-  end
   object b_Close: TButton
     Left = 336
     Top = 272
@@ -29,9 +22,9 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
   end
   object lv_Favorites: TListView
     Left = 8
-    Top = 24
+    Top = 8
     Width = 313
-    Height = 273
+    Height = 289
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -39,7 +32,7 @@ inherited f_SarchPathFavorites: Tf_SarchPathFavorites
         Width = 100
       end
       item
-        Caption = 'Path'
+        Caption = 'Value'
         Width = 200
       end>
     ReadOnly = True
