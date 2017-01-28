@@ -51,8 +51,8 @@ object fmConfiguration: TfmConfiguration
         object pnlGeneral: TPanel
           Left = 0
           Top = 0
-          Width = 591
-          Height = 454
+          Width = 599
+          Height = 461
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -60,7 +60,7 @@ object fmConfiguration: TfmConfiguration
           object gbxLocations: TGroupBox
             Left = 8
             Top = 8
-            Width = 575
+            Width = 583
             Height = 169
             Align = alTop
             Caption = 'File Locations'
@@ -93,7 +93,7 @@ object fmConfiguration: TfmConfiguration
               FocusControl = edHelpFile
             end
             object sbVCLDir: TButton
-              Left = 566
+              Left = 550
               Top = 40
               Width = 21
               Height = 21
@@ -103,7 +103,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbVCLDirClick
             end
             object sbConfigDir: TButton
-              Left = 566
+              Left = 550
               Top = 88
               Width = 21
               Height = 21
@@ -113,7 +113,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbConfigDirClick
             end
             object sbHelpFile: TButton
-              Left = 566
+              Left = 550
               Top = 136
               Width = 21
               Height = 21
@@ -125,7 +125,7 @@ object fmConfiguration: TfmConfiguration
             object edVCLPath: TEdit
               Left = 12
               Top = 40
-              Width = 554
+              Width = 533
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 0
@@ -133,7 +133,7 @@ object fmConfiguration: TfmConfiguration
             object edConfigPath: TEdit
               Left = 12
               Top = 88
-              Width = 554
+              Width = 533
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 2
@@ -141,7 +141,7 @@ object fmConfiguration: TfmConfiguration
             object edHelpFile: TEdit
               Left = 12
               Top = 136
-              Width = 554
+              Width = 525
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 4
