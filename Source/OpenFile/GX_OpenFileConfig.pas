@@ -67,6 +67,7 @@ type
   public
     MatchAnywhere: Boolean;
     DefaultFileType: string;
+    ShowMapTab: Boolean;
     IDEOverride: TIDEOverride;
     FileTypes: TFileTypes;
     ConfigurationKey: string;
@@ -118,6 +119,7 @@ type
     cbxDefaultFileTypes: TComboBox;
     chkMatchAnywhere: TCheckBox;
     chkCustomDirectoryList: TCheckBox;
+    chkMapTab: TCheckBox;
     procedure chkCustomDirectoryListClick(Sender: TObject);
     procedure btnTypeAddClick(Sender: TObject);
     procedure lbxTypeListClick(Sender: TObject);
@@ -329,6 +331,7 @@ begin
   Assert(Assigned(Settings));
   FileTypes.Clear;
   MatchAnywhere := Settings.ReadBool('MatchAnywhere', True);
+  ShowMapTab := Settings.ReadBool('ShowMapTab', False);
   IDEOverride.Text := Settings.ReadString('IDEOverride', '');
   DefaultFileType := Settings.ReadString('DefaultFileType', '');
   NumFileTypes := Settings.ReadInteger('NumberFileTypes', 0);
@@ -372,6 +375,7 @@ var
 begin
   // Do not localize any of the following lines
   Settings.WriteBool('MatchAnywhere', MatchAnywhere);
+  Settings.WriteBool('ShowMapTab', ShowMapTab);
   Settings.WriteString('DefaultFileType', DefaultFileType);
   Settings.WriteInteger('NumberFileTypes', FileTypes.Count);
   Settings.WriteString('IDEOverride', IDEOverride.CommaText);
@@ -619,6 +623,7 @@ begin
   Assert(Assigned(Settings));
   Settings.MatchAnywhere := chkMatchAnywhere.Checked;
   Settings.DefaultFileType := cbxDefaultFileTypes.Text;
+  Settings.ShowMapTab := chkMapTab.Checked;
 
   IDEOverride.Clear;
   IDEOverride.OverrideOpenUnit := chkOverrideViewUnit.Checked;
@@ -636,6 +641,7 @@ begin
   Assert(Assigned(Settings));
   FSettings := Settings;
   chkMatchAnywhere.Checked := Settings.MatchAnywhere;
+  chkMapTab.Checked := Settings.ShowMapTab;
 
   for i := 0 to FileTypes.Count - 1 do
     lbxTypeList.Items.Add(FileTypes[i].FileTypeName);

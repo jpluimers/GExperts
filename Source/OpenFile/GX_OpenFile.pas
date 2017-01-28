@@ -33,6 +33,7 @@ type
     FCommonSearchDone: Boolean;
     FSearchPathDone: Boolean;
     FMapFiles: TStringList;
+    FMapFileSearch: boolean;
     procedure PathSearchComplete;
     procedure CommonSearchComplete;
     procedure GetCommonDCUFiles;
@@ -54,6 +55,7 @@ type
     property FileExtension: string read FFileExtensions write FFileExtensions;
     property SearchPaths: TStrings read FSearchPaths write FSearchPaths;
     property RecursiveDirSearch: Boolean read FRecursiveDirSearch write FRecursiveDirSearch;
+    property MapFileSearch: boolean read FMapFileSearch write FMapFileSearch;
     procedure HaltThreads;
   end;
 
@@ -183,12 +185,15 @@ type
     procedure ResizeListViewColumns;
     procedure SetCurrentListView(const Value: TListView);
     procedure lvFavoriteFilesDropped(Sender: TObject; Files: TStrings);
+    procedure SetMapTabVisible(const Value: Boolean);
+    function GetMapTabVisible: Boolean;
     property CurrentListView: TListView read FCurrentListView write SetCurrentListView;
   public
     property ActivePageIndex: Integer read GetActivePageIndex write SetActivePageIndex;
     property AvailableFiles: TAvailableFiles read FAvailableFiles write FAvailableFiles;
     property InitialFileType: string read FInitialFileType write FInitialFileType;
     property MatchAnywhere: Boolean read GetMatchAnywhere write SetMatchAnywhere;
+    property MapTabVisible: Boolean read GetMapTabVisible write SetMapTabVisible;
   end;
 
 implementation
@@ -480,7 +485,8 @@ begin
   if False then // Not needed yet (only needed for uses clause manager?)
     GetCommonDCUFiles;
   AddCurrentProjectFiles(FProjectFiles);
-  AddCurrentMapFiles(FMapFiles);
+  if MapFileSearch then
+    AddCurrentMapFiles(FMapFiles);
 end;
 
 procedure TAvailableFiles.PathSearchComplete;
@@ -923,6 +929,16 @@ begin
   FilterVisibleUnits;
 end;
 
+function TfmOpenFile.GetMapTabVisible: Boolean;
+begin
+  Result := tabMap.TabVisible;
+end;
+
+procedure TfmOpenFile.SetMapTabVisible(const Value: Boolean);
+begin
+  tabMap.TabVisible := Value;
+end;
+
 function TfmOpenFile.GetMatchAnywhere: Boolean;
 begin
   Result := tbnMatchAnywhere.Down;
@@ -992,6 +1008,7 @@ begin
   if not CurrentFileType.CustomDirectories then
     AvailableFiles.SearchPaths.Clear;
   AvailableFiles.RecursiveDirSearch := CurrentFileType.Recursive;
+  AvailableFiles.MapFileSearch := MapTabVisible;
   AvailableFiles.Execute;
   FilterVisibleUnits;
 end;
@@ -1178,6 +1195,7 @@ procedure TfmOpenFile.InitializeFromSettings;
 var
   SelectedFileType: string;
 begin
+  MapTabVisible := Settings.ShowMapTab;
   SelectedFileType := '';
   if cbxType.ItemIndex > -1 then
     SelectedFileType := cbxType.Items[cbxType.ItemIndex];
@@ -1194,6 +1212,7 @@ begin
   try
     GExSettings.LoadForm(Self, ConfigurationKey + '\Window');
     FFileColumnWidth := GExSettings.ReadInteger(ConfigurationKey, 'FileColumnWidth', lvSearchPath.Columns[0].Width);
+    MapTabVisible := GExSettings.ReadBool(ConfigurationKey, 'ShowMapTab', False);
   finally
     FreeAndNil(GExSettings);
   end;

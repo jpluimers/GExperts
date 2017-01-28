@@ -248,7 +248,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
         ImageIndex = 1
         object gbxIDEMenuItems: TGroupBox
           Left = 16
-          Top = 113
+          Top = 161
           Width = 323
           Height = 144
           Caption = 'IDE Menu Item Overrides'
@@ -331,7 +331,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           Left = 16
           Top = 12
           Width = 323
-          Height = 87
+          Height = 133
           Caption = 'General Settings'
           TabOrder = 0
           object lblDefault: TLabel
@@ -358,6 +358,14 @@ object fmOpenFileConfig: TfmOpenFileConfig
             Height = 17
             Caption = 'Match typed string anywhere in the file names'
             TabOrder = 0
+          end
+          object chkMapTab: TCheckBox
+            Left = 20
+            Top = 88
+            Width = 301
+            Height = 17
+            Caption = 'Show Map tab with files from project'#39's .map file'
+            TabOrder = 2
           end
         end
       end
