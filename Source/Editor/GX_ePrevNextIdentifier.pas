@@ -177,7 +177,8 @@ begin
   EditRead := TEditReader.Create(SourceEditor.FileName);
   try
     FSource := EditRead.GetText;
-    CharPos :=   EditRead.GetCurrentCharPos;
+    FSource := AdjustLineBreaks(FSource, tlbsCRLF);
+    CharPos := EditRead.GetCurrentCharPos;
     FPosition := LinePosToCharPos(Point(CharPos.CharIndex + 1, CharPos.Line), FSource);
   finally
     FreeAndNil(EditRead);

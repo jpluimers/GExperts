@@ -96,7 +96,7 @@ begin
   EditRead := TEditReader.Create(FileName);
   try
     FileContent := EditRead.GetText;
-
+    FileContent := AdjustLineBreaks(FileContent, tlbsCRLF);
     CharPos :=EditRead.GetCurrentCharPos;
     Result := LinePosToCharPos(Point(CharPos.CharIndex + 1, CharPos.Line), FileContent);
   finally
