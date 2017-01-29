@@ -325,6 +325,12 @@ function GxOtaGetCurrentProjectName: string;
 // (Ondrey Kelle)
 function GxOtaGetProjectOutputDir(Project: IOTAProject): string;
 
+///<summary>
+/// Tries to find the current project's map file
+/// @param MapFile will contain full path name of the map file, only valid if result is true
+/// @returns true, if a current project exists and the map file could be found </summary>
+function GxOtaGetCurrentMapFileName(out MapFile: string): boolean;
+
 // Returns reference to the IDE's project group;
 // returns Nil if there is no project group.
 function GxOtaGetProjectGroup: IOTAProjectGroup;
@@ -1448,6 +1454,24 @@ begin
   Result := IncludeTrailingPathDelimiter(Result);
 end;
 
+function GxOtaGetCurrentMapFileName(out MapFile: string): boolean;
+var
+  Project: IOTAProject;
+  OutputDir: string;
+  ProjectFilename: string;
+begin
+  Result := False;
+  Project := GxOtaGetCurrentProject;
+  if Assigned(Project) then begin
+    OutputDir := GxOtaGetProjectOutputDir(Project);
+    ProjectFilename := GxOtaGetProjectFileName(Project);
+    MapFile := AddSlash(OutputDir) + ExtractFilename(ProjectFilename);
+    MapFile := ChangeFileExt(MapFile, '.map');
+    MapFile := TFileSystem.ExpandFileNameRelBaseDir(MapFile, ExtractFileDir(ProjectFilename));
+    Result := FileExists(MapFile);
+  end else
+    MapFile := '';
+end;
 
 function GxOtaGetProjectGroupFileName: string;
 var
