@@ -397,7 +397,7 @@ object fmOpenFile: TfmOpenFile
         Alignment = taRightJustify
         Anchors = [akTop, akRight]
         Caption = '&Type'
-        FocusControl = edtFilter
+        FocusControl = cbxType
       end
       object edtFilter: TEdit
         Left = 50
