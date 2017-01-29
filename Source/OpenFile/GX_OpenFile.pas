@@ -7,7 +7,7 @@ interface
 uses
   Classes, Controls, Forms, Actions, ActnList, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls, GX_GenericUtils, ToolWin, Messages,
-  GX_OpenFileConfig, GX_BaseForm;
+  GX_OpenFileConfig, GX_BaseForm, GX_ReadMapFileThread;
 
 const
   UM_REFRESHLIST = WM_USER + 746;
@@ -25,6 +25,7 @@ type
     FOnFindComplete: TThreadMethod;
     FSearchPathThread: TFileFindThread;
     FCommonThread: TFileFindThread;
+    FMapFileThread: TReadMapFileThread;
     FFileMasks: TStringList;
     FCommonFileMask: string;
     FFileExtensions: string;
@@ -34,11 +35,13 @@ type
     FSearchPathDone: Boolean;
     FMapFiles: TStringList;
     FMapFileSearch: boolean;
+    FMapSearchDone: Boolean;
     procedure PathSearchComplete;
     procedure CommonSearchComplete;
     procedure GetCommonDCUFiles;
     procedure AddCurrentProjectFiles(PathUnits: TStringList);
-    procedure AddCurrentMapFiles(PathUnits: TStringList);
+    procedure MapSearchComplete;
+    procedure CheckOnFindComplete;
   protected
     procedure GetSearchPath(Paths: TStrings); virtual;
   public
@@ -442,12 +445,14 @@ begin
   FreeAndNil(FSearchPathFiles);
   FreeAndNil(FSearchPathThread);
   FreeAndNil(FCommonThread);
+  FreeAndNil(FMapFileThread);
   inherited;
 end;
 
 procedure TAvailableFiles.Execute;
 var
   PathsToUse: TStringList;
+  SearchPath: TStringList;
 begin
   FCommonFiles.Clear;
   FCommonDCUFiles.Clear;
@@ -456,37 +461,55 @@ begin
   FSearchPathFiles.Clear;
   FSearchPathDone := False;
   FCommonSearchDone := False;
+  FMapSearchDone := False;
 
-  FreeAndNil(FSearchPathThread);
-  FSearchPathThread := TFileFindThread.Create;
+  SearchPath := TStringList.create;
+  try
+    GetSearchPath(SearchPath);
 
-  // This will allow semi-colon separated lists at the user GUI level
-  // D5 has no way to separate ; using TStrings.
-  FSearchPathThread.FileMasks.CommaText := StringReplace(FFileExtensions, ';', ',', [rfReplaceAll]);
+    FreeAndNil(FSearchPathThread);
+    FSearchPathThread := TFileFindThread.Create;
 
-  if FRecursiveDirSearch then
-    PathsToUse := FSearchPathThread.RecursiveSearchDirs
-  else
-    PathsToUse := FSearchPathThread.SearchDirs;
+    // This will allow semi-colon separated lists at the user GUI level
+    // D5 has no way to separate ; using TStrings.
+    FSearchPathThread.FileMasks.CommaText := StringReplace(FFileExtensions, ';', ',', [rfReplaceAll]);
 
-  GetSearchPath(PathsToUse);
-  AppendStrings(PathsToUse, FSearchPaths);
-  FSearchPathThread.OnFindComplete := PathSearchComplete;
-  FSearchPathThread.StartFind;
+    if FRecursiveDirSearch then
+      PathsToUse := FSearchPathThread.RecursiveSearchDirs
+    else
+      PathsToUse := FSearchPathThread.SearchDirs;
 
-  FreeAndNil(FCommonThread);
-  FCommonThread := TFileFindThread.Create;
-  FCommonThread.RecursiveSearchDirs.Add(ExtractFilePath(GetIdeRootDirectory) + AddSlash('Source'));
-  FCommonThread.FileMasks.CommaText := '*.pas,*.cpp,*.cs,*.inc,*.dfm';
-  FCommonThread.OnFindComplete := CommonSearchComplete;
-  FCommonThread.StartFind;
+    PathsToUse.Assign(SearchPath);
+    AppendStrings(PathsToUse, FSearchPaths);
+    FSearchPathThread.OnFindComplete := PathSearchComplete;
+    FSearchPathThread.StartFind;
+
+    FreeAndNil(FMapFileThread);
+    if MapFileSearch then begin
+      FMapFileThread := TReadMapFileThread.Create;
+      FMapFileThread.SearchPath.Assign(SearchPath);
+      // This will allow semi-colon separated lists at the user GUI level
+      // D5 has no way to separate ; using TStrings.
+      FMapFileThread.FileExtensions.CommaText := StringReplace(FFileExtensions, ';', ',', [rfReplaceAll]);
+      FMapFileThread.OnFindComplete := MapSearchComplete;
+      FMapFileThread.StartFind;
+    end else
+      FMapSearchDone := True;
+
+    FreeAndNil(FCommonThread);
+    FCommonThread := TFileFindThread.Create;
+    FCommonThread.RecursiveSearchDirs.Add(ExtractFilePath(GetIdeRootDirectory) + AddSlash('Source'));
+    FCommonThread.FileMasks.CommaText := '*.pas,*.cpp,*.cs,*.inc,*.dfm';
+    FCommonThread.OnFindComplete := CommonSearchComplete;
+    FCommonThread.StartFind;
+  finally
+    FreeAndNil(SearchPath);
+  end;
 
   FCommonFileMask := FFileExtensions;
   if False then // Not needed yet (only needed for uses clause manager?)
     GetCommonDCUFiles;
   AddCurrentProjectFiles(FProjectFiles);
-  if MapFileSearch then
-    AddCurrentMapFiles(FMapFiles);
 end;
 
 procedure TAvailableFiles.PathSearchComplete;
@@ -517,8 +540,7 @@ begin
     FreeAndNil(PathFiles);
     FreeAndNil(PathUnits);
   end;
-  if FCommonSearchDone and Assigned(FOnFindComplete) then
-    FOnFindComplete;
+  CheckOnFindComplete;
 end;
 
 procedure TAvailableFiles.CommonSearchComplete;
@@ -530,7 +552,24 @@ begin
   finally
     FCommonThread.ReleaseResults;
   end;
-  if FSearchPathDone and Assigned(FOnFindComplete) then
+  CheckOnFindComplete;
+end;
+
+procedure TAvailableFiles.MapSearchComplete;
+begin
+  FMapFileThread.LockResults;
+  try
+     MapFiles.Assign(FMapFileThread.Results);
+     FMapSearchDone := True;
+  finally
+    FMapFileThread.ReleaseResults;
+  end;
+  CheckOnFindComplete;
+end;
+
+procedure TAvailableFiles.CheckOnFindComplete;
+begin
+  if FCommonSearchDone and FSearchPathDone and FMapSearchDone and Assigned(FOnFindComplete) then
     FOnFindComplete;
 end;
 
@@ -588,60 +627,6 @@ begin
   end;
 end;
 
-procedure TAvailableFiles.AddCurrentMapFiles(PathUnits: TStringList);
-var
-  ExtensionIndex: Integer;
-  Project: IOTAProject;
-  ProjectFilename: string;
-  i: Integer;
-  Reader: TMapFileReader;
-  FileExtensions: TStringList;
-  FileName: string;
-  FilenameOnly: string;
-  FilenameExt: string;
-  OutputDir: string;
-  MapFile: string;
-  PathsToUse: TStringList;
-  PathIdx: Integer;
-begin
-  Project := GxOtaGetCurrentProject;
-  if Assigned(Project) then begin
-    OutputDir := GxOtaGetProjectOutputDir(Project);
-    ProjectFilename := GxOtaGetProjectFileName(Project);
-    MapFile := AddSlash(OutputDir) + ExtractFilename(ProjectFilename);
-    MapFile := ChangeFileExt(MapFile, '.map');
-    MapFile := TFileSystem.ExpandFileNameRelBaseDir(MapFile, ExtractFileDir(ProjectFilename));
-    if FileExists(MapFile) then begin
-      FileExtensions := nil;
-      PathsToUse := nil;
-      Reader := TMapFileReader.Create(MapFile);
-      try
-        FileExtensions := TStringList.Create;
-        // This will allow semi-colon separated lists at the user GUI level
-        // D5 has no way to separate ; into TStrings.
-        FileExtensions.CommaText := StringReplace(FFileExtensions, ';', ',', [rfReplaceAll]);
-        PathsToUse := TStringList.Create;
-        GetSearchPath(PathsToUse);
-        for i := 0 to Reader.Units.Count - 1 do begin
-          FileNameOnly := Reader.Units[i];
-          for ExtensionIndex := 0 to FileExtensions.Count - 1 do begin
-            FilenameExt := ChangeFileExt(FilenameOnly, ExtractFileExt(FileExtensions[ExtensionIndex]));
-            for PathIdx := 0 to PathsToUse.Count - 1 do begin
-              Filename := AddSlash(PathsToUse[PathIdx]) + FilenameExt;
-              if FileExists(FileName) then
-                PathUnits.Add(ExpandFileName(FileName));
-            end;
-          end;
-        end;
-      finally
-        FreeAndNil(PathsToUse);
-        FreeAndNil(Reader);
-        FreeAndNil(FileExtensions);
-      end;
-    end;
-  end;
-end;
-
 procedure TAvailableFiles.GetSearchPath(Paths: TStrings);
 begin
   GxOtaGetEffectiveLibraryPath(Paths);
@@ -665,6 +650,11 @@ begin
   Cursor := TempHourGlassCursor;
   StopThread(FSearchPathThread);
   StopThread(FCommonThread);
+  if Assigned(FMapFileThread) then begin
+    FMapFileThread.OnFindComplete := nil;
+    FMapFileThread.Terminate;
+    FMapFileThread.WaitFor;
+  end;
 end;
 
 { TOpenFileNotifier }
@@ -922,6 +912,7 @@ procedure TAvailableFiles.Terminate;
 begin
   FSearchPathThread.Terminate;
   FCommonThread.Terminate;
+  FMapFileThread.Terminate;
 end;
 
 procedure TfmOpenFile.actMatchPrefixExecute(Sender: TObject);
