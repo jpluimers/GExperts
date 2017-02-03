@@ -1,5 +1,7 @@
 unit GX_ReadMapFileThread;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
