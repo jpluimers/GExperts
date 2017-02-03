@@ -30,6 +30,7 @@ type
   public
     procedure LoadFromFile(const FileName: string); override;
     procedure SaveToFile(const FileName: string); override;
+    procedure SortLogical;
   end;
 
   TGXUnicodeChar = Char;
@@ -763,10 +764,10 @@ uses
   ShellAPI, ShlObj, ActiveX, StrUtils, Math,
   GX_dzSelectDirectoryFix;
 
-{$IFNDEF HAS_SHLWAPI}
 const
   shlwapi32 = 'shlwapi.dll';
 
+{$IFNDEF HAS_SHLWAPI}
 // Manually import ShLwApi routines in Delphi 7 and earlier (supported in W2K or later)
 function PathCombine(szDest: PChar; lpszDir, lpszFile: PChar): PChar; stdcall;
   external shlwapi32 name 'PathCombineA';
@@ -775,6 +776,9 @@ function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
   pszTo: PChar; dwAttrTo: DWORD): BOOL; stdcall;
   external shlwapi32 name 'PathRelativePathToA';
 {$ENDIF}
+
+function StrCmpLogicalW(psz1, psz2: PChar): Integer; stdcall;
+  external shlwapi32 name 'StrCmpLogicalW';
 
 type
   TTempHourClassCursor = class(TInterfacedObject, IInterface)
@@ -1271,6 +1275,11 @@ end;
 
 { TGXStringList }
 
+function GXCompareStringsLogical(List: TStringList; Index1, Index2: Integer): Integer;
+begin
+  Result := StrCmpLogicalW(PChar(List[Index1]), PChar(List[Index2]));
+end;
+
 procedure TGXStringList.LoadFromFile(const FileName: string);
 begin
   LoadedEncoding := GetFileEncoding(FileName);
@@ -1283,6 +1292,14 @@ begin
     SaveToFile(FileName, LoadedEncoding)
   else
     inherited SaveToFile(FileName);
+end;
+
+procedure TGXStringList.SortLogical;
+begin
+  if CheckWin32Version(5, 1) then // Windows XP and up
+    CustomSort(GXCompareStringsLogical)
+  else
+    Self.Sort;
 end;
 
 {$ELSE not UNICODE}

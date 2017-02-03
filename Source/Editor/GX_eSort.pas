@@ -35,7 +35,7 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_EditorExpert, GX_eSelectionEditorExpert, StrUtils;
+  GX_EditorExpert, GX_eSelectionEditorExpert, GX_GenericUtils, StrUtils;
 
 { TfmeSortConfig }
 
@@ -111,7 +111,7 @@ function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
   end;
 
 var
-  TrimList, SortedList: TStringList;
+  TrimList, SortedList: TGXStringList;
   i: Integer;
   SortOrder: TESortOrder;
   Direction: integer;
@@ -127,26 +127,26 @@ begin
 
     // The trim mess here is so we can ignore whitespace when sorting
     SortedList := nil;
-    TrimList := TStringList.Create;
+    TrimList := TGXStringList.Create;
     try
-      SortedList := TStringList.Create;
+      SortedList := TGXStringList.Create;
       for i := 0 to Lines.Count - 1 do begin
         s := TrimLeft(Lines[i]);
         if IgnoreFunction then
           if not StripPrefix('procedure ', s) then
             StripPrefix('function ', s);
         TrimList.AddObject(s, TObject(i));
-      end;  
+      end;
       case SortOrder of
         esoAscending: begin
           i := 0;
           Direction := 1;
-          TrimList.Sort;
+          TrimList.SortLogical;
         end;
         esoDescending: begin
           i := TrimList.Count - 1;
           Direction := -1;
-          TrimList.Sort;
+          TrimList.SortLogical;
         end
       else // esoReverse:
         i := TrimList.Count - 1;
