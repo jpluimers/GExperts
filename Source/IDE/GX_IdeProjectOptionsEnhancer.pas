@@ -28,7 +28,8 @@ uses
   ActnList,
   Menus,
   GX_IdeFormEnhancer,
-  GX_dzVclUtils;
+  GX_dzVclUtils,
+  GX_IdeDialogEnhancer;
 
 type
   TComboboxDropHandler = class(TComponent)
@@ -88,23 +89,18 @@ begin
 end;
 
 type
-  TProjectOptionsEnhancer = class
+  TProjectOptionsEnhancer = class(TIdeDialogEnhancer)
   private
-    FFormCallbackHandle: TFormChangeHandle;
-    FControlCallbackHandle: TControlChangeHandle;
     FOkBtn: TButton;
     FConfigCombo: TCustomCombo;
-    ///<summary>
-    /// frm can be nil </summary>
-    procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function TryFindHistoryComboBox(_SettingsControl: TWinControl; _GrpBoxIdx: Integer;
       const _Name: string; out _cmb: TWinControl): Boolean;
     function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl: TWinControl): Boolean;
     procedure ShiftCtrlO(_Sender: TObject);
     procedure ShiftCtrlT(_Sender: TObject);
-  public
-    constructor Create;
-    destructor Destroy; override;
+  protected
+    function IsDesiredForm(_Form: TCustomForm): Boolean; override;
+    procedure EnhanceForm(_Form: TForm); override;
   end;
 
 var
@@ -128,16 +124,9 @@ end;
 
 { TProjectOptionsEnhancer }
 
-constructor TProjectOptionsEnhancer.Create;
+function TProjectOptionsEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
-  inherited Create;
-  FFormCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
-end;
-
-destructor TProjectOptionsEnhancer.Destroy;
-begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FFormCallbackHandle);
-  inherited;
+  Result := IsProjectOptionsForm(_Form);
 end;
 
 function CheckControl(_Parent: TWinControl; _Idx: Integer; const _ClassName: string;
@@ -262,7 +251,7 @@ const
   RUN_PARAMS_DIALOG_NAME = 'RunParamsDlg';
 {$ENDIF}{$ENDIF}{$ENDIF}
 
-procedure TProjectOptionsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
+procedure TProjectOptionsEnhancer.EnhanceForm(_Form: TForm);
 
   function TryHookCombo(_SettingsPanel: TWinControl; _Index: Integer; const
     _Name: string): Boolean;
@@ -288,14 +277,6 @@ var
   al: TActionList;
   lbl: TLabel;
 begin
-  if not IsProjectOptionsForm(_Form) then begin
-    if Assigned(FControlCallbackHandle) then begin
-      TIDEFormEnhancements.UnregisterControlChangeCallback(FControlCallbackHandle);
-      FControlCallbackHandle := nil;
-    end;
-    Exit;
-  end;
-
   if _Form.FindComponent(GX_ACTION_LIST) = nil then begin
     al := TActionList.Create(_Form);
     al.Name := GX_ACTION_LIST;

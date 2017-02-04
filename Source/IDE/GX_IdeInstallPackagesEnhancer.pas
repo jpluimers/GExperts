@@ -15,8 +15,8 @@ type
 implementation
 
 uses
-  GX_IdeFormEnhancer,
-  GX_OtaUtils,
+  Windows,
+  Classes,
   StrUtils,
   Forms,
   ExtCtrls,
@@ -25,21 +25,18 @@ uses
   CheckLst,
   Dialogs,
   ShellApi,
-  Windows,
   Registry,
+  GX_OtaUtils,
+  GX_IdeFormEnhancer,
   GX_GenericUtils,
-  Classes,
-  GX_IdeUtils;
+  GX_IdeUtils,
+  GX_IdeDialogEnhancer;
 
 type
-  TInstallPackagesEnhancer = class
+  TInstallPackagesEnhancer = class(TIdeDialogEnhancer)
   private
-    FFormCallbackHandle: TFormChangeHandle;
     FPkgListBox: TCheckListBox;
     FPkgNameLabel: TLabel;
-    ///<summary>
-    /// frm can be nil </summary>
-    procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
     function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
     function IsPackageChecklistForm(_Form: TCustomForm): Boolean;
     procedure EnhancePackageChecklistForm(_Form: TCustomForm);
@@ -53,11 +50,12 @@ type
       out _BtnPanel: TPanel; out _AddBtn: TButton; out _ChkLst: TCheckListBox;
       out _NamePnl: TPanel;
       out _NameLabel: TLabel): Boolean;
-    procedure EnhanceForm(_Form: TCustomForm; _BtnParent: TWinControl;
-      _AddBtn: TButton; _FilenamePanel: TPanel);
+    procedure doEnhanceForm(_Form: TCustomForm; _BtnParent: TWinControl;
+      _AddBtn: TButton; _FilenamePanel: TPanel); overload;
+  protected
+    function IsDesiredForm(_Form: TCustomForm): Boolean; override;
+    procedure EnhanceForm(_Form: TForm); overload; override;
   public
-    constructor Create;
-    destructor Destroy; override;
   end;
 
 var
@@ -81,19 +79,13 @@ end;
 
 { TInstallPackagesEnhancer }
 
-constructor TInstallPackagesEnhancer.Create;
+function TInstallPackagesEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
-  inherited Create;
-  FFormCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
+  Result := IsProjectOptionsForm(_Form) or
+    IsPackageChecklistForm(_Form);
 end;
 
-destructor TInstallPackagesEnhancer.Destroy;
-begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FFormCallbackHandle);
-  inherited;
-end;
-
-procedure TInstallPackagesEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
+procedure TInstallPackagesEnhancer.EnhanceForm(_Form: TForm);
 begin
   if IsProjectOptionsForm(_Form) then begin
     EnhanceProjectOptionsForm(_Form);
@@ -129,7 +121,7 @@ begin
     ctrl := _Form.Controls[i];
     if (ctrl.ClassName = 'TPanel') and (ctrl.Name = 'Panel2') then begin
       wctrl := TWinControl(ctrl);
-       Break;
+      Break;
     end;
   end;
   if not Assigned(wctrl) then
@@ -140,7 +132,7 @@ begin
   else if (wctrl.ControlCount > 1) and (wctrl.Controls[1].ClassName = 'TPropertySheetControl') then
     ctrl := wctrl.Controls[1]
   else
-    exit;
+    Exit;
   wctrl := TWinControl(ctrl);
 
   PackageInstall := nil;
@@ -148,7 +140,7 @@ begin
     ctrl := wctrl.Controls[i];
     if ctrl.ClassName = 'TPackageInstall' then begin
       PackageInstall := TWinControl(ctrl);
-      break;
+      Break;
     end;
   end;
   if (PackageInstall = nil) or (PackageInstall.ControlCount < 1) then
@@ -201,7 +193,7 @@ end;
 //             -> [4] ButtonComponents: TButton
 //             -> [5] EditButton: TButton
 
-procedure TInstallPackagesEnhancer.EnhanceForm(_Form: TCustomForm; _BtnParent: TWinControl;
+procedure TInstallPackagesEnhancer.doEnhanceForm(_Form: TCustomForm; _BtnParent: TWinControl;
   _AddBtn: TButton; _FilenamePanel: TPanel);
 resourcestring
   rcSelectAModule = 'Open an explorer window with this package selected.';
@@ -226,7 +218,7 @@ begin
 
   cmp := _FilenamePanel.FindComponent(ExplorerButtonName);
   if Assigned(cmp) then
-    exit; // the button already exists
+    Exit; // the button already exists
 
   SelectBtn := TButton.Create(_FilenamePanel);
   SelectBtn.Name := ExplorerButtonName;
@@ -247,7 +239,7 @@ var
 begin
   if not TryGetPackageInstallControlsOnProjectOptions(_Form, grp, AddBtn, FPkgListBox, pnl, FPkgNameLabel) then
     Exit;
-  EnhanceForm(_Form, grp, AddBtn, pnl);
+  doEnhanceForm(_Form, grp, AddBtn, pnl);
 end;
 
 procedure TInstallPackagesEnhancer.b_SelectClick(_Sender: TObject);
@@ -309,7 +301,7 @@ var
 begin
   if not TryGetPackageInstallControlsOnPackageChecklist(_Form, BtnParent, AddBtn, FPkgListBox, FilenamePanel, FPkgNameLabel) then
     Exit;
-  EnhanceForm(_Form, BtnParent, AddBtn, FilenamePanel);
+  doEnhanceForm(_Form, BtnParent, AddBtn, FilenamePanel);
 end;
 
 function TInstallPackagesEnhancer.TryGetPackageInstallControlsOnPackageChecklist(_Form: TCustomForm;

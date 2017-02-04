@@ -6,9 +6,7 @@ interface
 
 uses
   SysUtils,
-  Classes,
-  StdCtrls,
-  Forms;
+  Classes;
 
 type
   TGxIdeApplicationSettingsEnhancer = class
@@ -22,6 +20,8 @@ implementation
 uses
   Controls,
   Menus,
+  StdCtrls,
+  Forms,
   Dialogs,
   Types,
   ComCtrls,
@@ -33,23 +33,18 @@ uses
   GX_ConfigurationInfo,
   GX_IdeBuildEventFavoriteEdit,
   GX_dzClassUtils,
-  GX_VerDepConst;
+  GX_VerDepConst,
+  GX_IdeDialogEnhancer;
 
 type
-  TIdeAppSettingsEnhancer = class
+  TIdeAppSettingsEnhancer = class(TIdeDialogEnhancer)
   private
-    FFormCallbackHandle: TFormChangeHandle;
     FSuffixEdit: TEdit;
-
-    ///<summary>
-    /// frm can be nil </summary>
-    procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-    procedure InitProjectOptions(_Form: TForm);
     procedure btnSetSuffixClick(_Sender: TObject);
-    function IsProjectOptionsForm(_Form: TCustomForm): Boolean;
+  protected
+    procedure EnhanceForm(_Form: TForm); override;
+    function IsDesiredForm(_Form: TCustomForm): Boolean; override;
   public
-    constructor Create;
-    destructor Destroy; override;
   end;
 
 var
@@ -57,19 +52,7 @@ var
 
 { TIdeAppSettingsEnhancer }
 
-constructor TIdeAppSettingsEnhancer.Create;
-begin
-  inherited Create;
-  FFormCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
-end;
-
-destructor TIdeAppSettingsEnhancer.Destroy;
-begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FFormCallbackHandle);
-  inherited;
-end;
-
-procedure TIdeAppSettingsEnhancer.InitProjectOptions(_Form: TForm);
+procedure TIdeAppSettingsEnhancer.EnhanceForm(_Form: TForm);
 var
   Cmp: TComponent;
   btn: TButton;
@@ -100,20 +83,10 @@ begin
   FSuffixEdit.Text := (_Sender as TButton).Caption;
 end;
 
-function TIdeAppSettingsEnhancer.IsProjectOptionsForm(_Form: TCustomForm): Boolean;
+function TIdeAppSettingsEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
   Result := (_Form.ClassName = 'TDelphiProjectOptionsDialog') and (_Form.Name = 'DelphiProjectOptionsDialog')
     or (_Form.ClassName = 'TProjectOptionsDialog') and (_Form.Name = 'ProjectOptionsDialog');
-end;
-
-procedure TIdeAppSettingsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-var
-  frm: TForm;
-begin
-  if IsProjectOptionsForm(_Form) then begin
-    frm := _Form as TForm;
-    InitProjectOptions(frm);
-  end;
 end;
 
 { TGxIdeApplicationSettingsEnhancer }

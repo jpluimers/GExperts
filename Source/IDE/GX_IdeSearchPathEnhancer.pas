@@ -6,9 +6,7 @@ interface
 
 uses
   SysUtils,
-  Classes,
-  StdCtrls,
-  Forms;
+  Classes;
 
 type
   TGxIdeSearchPathEnhancer = class
@@ -22,6 +20,8 @@ implementation
 uses
   Windows,
   Controls,
+  StdCtrls,
+  Forms,
   Menus,
   Buttons,
   ActnList,
@@ -34,7 +34,8 @@ uses
   GX_dzSelectDirectoryFix,
   GX_IdeFavoritesList,
   GX_ConfigurationInfo,
-  GX_IdeSearchPathFavoriteEdit;
+  GX_IdeSearchPathFavoriteEdit,
+  GX_IdeDialogEnhancer;
 
 type
   ///<summary>
@@ -48,9 +49,8 @@ type
   end;
 
 type
-  TSearchPathEnhancer = class
+  TSearchPathEnhancer = class(TIdeDialogEnhancer)
   private
-    FCallbackHandle: TFormChangeHandle;
     FForm: TCustomForm;
     FListbox: TListbox;
     FMemo: TMemo;
@@ -81,10 +81,6 @@ type
     procedure BrowseBtnClick(_Sender: TObject);
 {$ENDIF GX_VER300_up}
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
-    ///<summary>
-    /// frm can be nil </summary>
-    procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-    function IsSearchPathForm(_Form: TCustomForm): Boolean;
     function TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
     procedure HandleMemoChange(_Sender: TObject);
     procedure UpBtnClick(_Sender: TObject);
@@ -99,16 +95,18 @@ type
     procedure FavoritesPmConfigureClick(_Sender: TObject);
     procedure InitFavoritesMenu;
     procedure FavoritesPmHandleFavoriteClick(_Sender: TObject);
-    procedure SetEnabled(const Value: Boolean);
     procedure LoadSettings;
     procedure SaveSettings;
     function ConfigurationKey: string;
     procedure PageControlChange(_Sender: TObject);
     procedure EditEntry(_Sender: TWinControl; var _Name, _Value: string; var _OK: Boolean);
+  protected
+    function IsDesiredForm(_Form: TCustomForm): Boolean; override;
+    procedure EnhanceForm(_Form: TForm); override;
   public
     constructor Create;
     destructor Destroy; override;
-    property Enabled: Boolean read FEnabled write SetEnabled;
+    property Enabled: Boolean read FEnabled write FEnabled;
   end;
 
 var
@@ -146,8 +144,6 @@ end;
 
 destructor TSearchPathEnhancer.Destroy;
 begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FCallbackHandle);
-
   FreeAndNil(FFavorites);
   inherited;
 end;
@@ -197,7 +193,7 @@ var
   frm: TCustomForm;
 begin
   frm := Screen.ActiveCustomForm;
-  if not IsSearchPathForm(frm) then
+  if not IsDesiredForm(frm) then
     Exit;
 
   if _Sender is TEdit then
@@ -318,14 +314,16 @@ begin
   Result := True;
 end;
 
-function TSearchPathEnhancer.IsSearchPathForm(_Form: TCustomForm): Boolean;
+function TSearchPathEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
-  if Assigned(_Form) then begin
-    Result := True;
-    if MatchesDlg(_Form, ProjectSearchPathDlg) then
-      Exit; //==>
-    if MatchesDlg(_Form, LibrarySearchPathDlg) then
-      Exit; //==>
+  if FEnabled then begin
+    if Assigned(_Form) then begin
+      Result := True;
+      if MatchesDlg(_Form, ProjectSearchPathDlg) then
+        Exit; //==>
+      if MatchesDlg(_Form, LibrarySearchPathDlg) then
+        Exit; //==>
+    end;
   end;
   Result := False;
 end;
@@ -334,26 +332,15 @@ type
   TCustomButtonHack = class(TCustomButton)
   end;
 
-procedure TSearchPathEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
+procedure TSearchPathEnhancer.EnhanceForm(_Form: TForm);
 var
   TheActionList: TActionList;
-
-  function TryFindBitBtn(const _BtnName: string; out _Btn: TCustomButton): Boolean;
-  var
-    cmp: TComponent;
-  begin
-    cmp := _Form.FindComponent(_BtnName);
-    Result := Assigned(cmp) and (cmp is TBitBtn);
-    if Result then
-      _Btn := cmp as TBitBtn;
-  end;
 
   function TryFindButton(const _BtnName: string; out _Btn: TCustomButton): Boolean;
   var
     cmp: TComponent;
   begin
-    cmp := _Form.FindComponent(_BtnName);
-    Result := Assigned(cmp) and (cmp is TButton);
+    Result := TryFindComponent(_Form, _BtnName, cmp, TButton);
     if Result then
       _Btn := cmp as TButton
     else
@@ -364,6 +351,7 @@ var
     _OnExecute: TNotifyEvent; _Shortcut: TShortCut; out _Btn: TCustomButton; out _OnClick: TNotifyEvent);
   var
     act: TAction;
+    cmp: TComponent;
   begin
     // Unfortunately we can't just assign the button's OnClick event to the
     // OnExecute event of the action because Delphi apparently assigns the
@@ -371,12 +359,17 @@ var
     // by inspecting the Sender parameter. So, instead we save the OnClick
     // event, assign our own event to OnExecute and there call the original
     // OnClick event with the original Sender parameter.
-    if TryFindBitBtn(_BtnName, _Btn) or TryFindButton(_BtnName, _Btn) then begin
-      _OnClick := TCustomButtonHack(_Btn).OnClick;
-      act := TActionlist_Append(TheActionList, '', _OnExecute, _Shortcut);
-      act.Hint := _Caption;
-      _Btn.Action := act;
-      _Btn.ShowHint := True;
+    _Btn := nil;
+    _OnClick := nil;
+    if TryFindComponent(_Form, _BtnName, cmp, nil) then begin
+      if (cmp is TButton) or (cmp is TBitBtn) then begin
+        _Btn := cmp as TCustomButton;
+        _OnClick := TCustomButtonHack(_Btn).OnClick;
+        act := TActionlist_Append(TheActionList, '', _OnExecute, _Shortcut);
+        act.Hint := _Caption;
+        _Btn.Action := act;
+        _Btn.ShowHint := True;
+      end;
     end;
   end;
 
@@ -384,12 +377,10 @@ var
   cmp: TComponent;
   btn: TCustomButton;
 begin
-  if not FEnabled then
-    Exit;
-  if not IsSearchPathForm(_Form) or not TryGetElementEdit(_Form, FEdit) then
+  if not TryGetElementEdit(_Form, FEdit) then
     Exit;
 
-  if _Form.FindComponent('TheActionList') = nil then begin
+  if _Form.FindComponent('GXTheActionList') = nil then begin
     FForm := _Form;
     TEdit_ActivateAutoComplete(FEdit, [acsFileSystem], [actSuggest]);
     TWinControl_ActivateDropFiles(FEdit, HandleFilesDropped);
@@ -399,7 +390,7 @@ begin
       FListbox := TListbox(cmp);
 
       TheActionList := TActionList.Create(_Form);
-      TheActionList.Name := 'TheActionList';
+      TheActionList.Name := 'GXTheActionList';
 
         // Assign shortcuts to the Up/Down buttons via actions
       AssignActionToButton('UpButton', 'Move Up', UpBtnClick, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
@@ -710,15 +701,6 @@ begin
   TrySetButtonVisibility(FMakeRelativeBtn, SwitchedToMemo);
 end;
 
-procedure TSearchPathEnhancer.SetEnabled(const Value: Boolean);
-begin
-  FEnabled := Value;
-  if FEnabled then begin
-    if not Assigned(FCallbackHandle) then
-      FCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
-  end;
-end;
-
 procedure TSearchPathEnhancer.UpBtnClick(_Sender: TObject);
 var
   LineIdx: Integer;
@@ -790,7 +772,6 @@ begin
 end;
 
 initialization
-  TheSearchPathEnhancer := TSearchPathEnhancer.Create;
 finalization
   FreeAndNil(TheSearchPathEnhancer);
 end.

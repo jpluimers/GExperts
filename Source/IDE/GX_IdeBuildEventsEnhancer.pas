@@ -11,9 +11,7 @@ interface
 
 uses
   SysUtils,
-  Classes,
-  StdCtrls,
-  Forms;
+  Classes;
 
 type
   TGxIdeBuildEventsEnhancer = class
@@ -35,30 +33,28 @@ implementation
 uses
   Controls,
   Menus,
+  StdCtrls,
+  Forms,
   Dialogs,
   Types,
+  ComCtrls,
+  ExtCtrls,
   GX_IdeProjectOptionsEnhancer,
   GX_dzVclUtils,
   GX_IdeFormEnhancer,
   GX_IdeFavoritesList,
   GX_ConfigurationInfo,
   GX_IdeBuildEventFavoriteEdit,
-  ComCtrls,
   GX_dzClassUtils,
-  ExtCtrls;
+  GX_IdeDialogEnhancer;
 
 type
   TFavHandler = class;
 
-  TBuildEventsEnhancer = class
+  TBuildEventsEnhancer = class(TIdeDialogEnhancer)
   private
-    FFormCallbackHandle: TFormChangeHandle;
     FFavorites: TStringList;
 
-    ///<summary>
-    /// frm can be nil </summary>
-    procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-    function IsBuildEventsForm(_Form: TCustomForm): Boolean;
     procedure FavoritesPmConfigure(_Owner: TFavHandler);
     procedure LoadSettings;
     procedure SaveSettings;
@@ -68,11 +64,13 @@ type
     procedure InitBuildEvent(_Form: TForm; const _BtnName, _MemoName: string);
     procedure InitProjectOptions(_Form: TForm);
 {$ENDIF HAS_OLD_STYLE_PAGE}
+    function IsBuildEventsForm(_Form: TCustomForm): Boolean;
     procedure InitFavoritesMenu(_Owner: TFavHandler; _pm: TPopupMenu);
+  protected
+    function IsDesiredForm(_Form: TCustomForm): Boolean; override;
+    procedure EnhanceForm(_Form: TForm); override;
   public
-
     constructor Create;
-
     destructor Destroy; override;
   end;
 
@@ -144,15 +142,13 @@ var
 
 constructor TBuildEventsEnhancer.Create;
 begin
-  inherited Create;
   FFavorites := TStringList.Create;
   LoadSettings;
-  FFormCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
+  inherited Create;
 end;
 
 destructor TBuildEventsEnhancer.Destroy;
 begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FFormCallbackHandle);
   FreeAndNil(FFavorites);
   inherited;
 end;
@@ -208,6 +204,14 @@ const
 {$ENDIF}
 begin
   Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
+end;
+
+function TBuildEventsEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
+begin
+  Result := IsBuildEventsForm(_Form)
+{$IFDEF HAS_OLD_STYLE_PAGE}
+  or IsProjectOptionsForm(_Form);
+{$ENDIF}
 end;
 
 {$IFDEF HAS_OLD_STYLE_PAGE}
@@ -275,7 +279,7 @@ begin
 end;
 {$ENDIF HAS_OLD_STYLE_PAGE}
 
-procedure TBuildEventsEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
+procedure TBuildEventsEnhancer.EnhanceForm(_Form: TForm);
 var
   frm: TForm;
   Cmp: TComponent;

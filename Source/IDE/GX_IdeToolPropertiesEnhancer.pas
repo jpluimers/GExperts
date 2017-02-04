@@ -6,9 +6,7 @@ interface
 
 uses
   SysUtils,
-  Classes,
-  StdCtrls,
-  Forms;
+  Classes;
 
 type
   TGxIdeToolPropertiesEnhancer = class
@@ -20,25 +18,22 @@ type
 implementation
 
 uses
+  Controls,
+  StdCtrls,
+  Forms,
+  Messages,
   GX_IdeFormEnhancer,
-  GX_dzVclUtils, Controls, Messages;
+  GX_dzVclUtils,
+  GX_IdeDialogEnhancer;
 
 type
-  TToolPropertiesEnhancer = class
+  TToolPropertiesEnhancer = class(TIdeDialogEnhancer)
   private
-    FCallbackHandle: TFormChangeHandle;
-    FIsAutocompleteEnabled: Boolean;
-//    FControlChangedHandle: TControlChangeHandle;
-    ///<summary>
-    /// frm can be nil </summary>
-    procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
-    function IsToolPropertiesForm(_Form: TCustomForm): Boolean;
     procedure HandleFilesDropped(_Sender: TObject; _Files: TStrings);
-    function TryFindEdit(_Form: TCustomForm; const _Name: string; out _ed: TEdit): Boolean;
-//    procedure HandleControlChanged(_Sender: TObject; _Form: TCustomForm; _Control: TWinControl);
+  protected
+    function IsDesiredForm(_Form: TCustomForm): Boolean; override;
+    procedure EnhanceForm(_Form: TForm); override;
   public
-    constructor Create;
-    destructor Destroy; override;
   end;
 
 var
@@ -62,76 +57,46 @@ end;
 
 { TToolPropertiesEnhancer }
 
-constructor TToolPropertiesEnhancer.Create;
-begin
-  inherited Create;
-  FCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged);
-end;
-
-destructor TToolPropertiesEnhancer.Destroy;
-begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FCallbackHandle);
-  inherited;
-end;
-
 procedure TToolPropertiesEnhancer.HandleFilesDropped(_Sender: TObject; _Files: TStrings);
 var
   frm: TCustomForm;
   ed: TEdit;
 begin
   frm := Screen.ActiveCustomForm;
-  if not IsToolPropertiesForm(frm) then
+  if not IsDesiredForm(frm) then
     Exit;
   ed := _Sender as TEdit;
   ed.Text := _Files[0];
   if ed.Name = 'edProgram' then
-    if TryFindEdit(frm, 'edWorkingDir', ed) then
+    if TryFindComponent(frm, 'edWorkingDir', TComponent(ed), TEdit) then
       ed.Text := ExtractFileDir(_Files[0]);
 end;
 
-function TToolPropertiesEnhancer.IsToolPropertiesForm(_Form: TCustomForm): Boolean;
+function TToolPropertiesEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
-  Result := False;
-  if not Assigned(_Form) then
-    Exit;
-  if not _Form.ClassNameIs('TTransEditDlg')
-    or not SameText(_Form.Name, 'TransEditDlg') then
-    Exit;
-  Result := True;
+  Result := _Form.ClassNameIs('TTransEditDlg')
+    and SameText(_Form.Name, 'TransEditDlg');
 end;
 
-function TToolPropertiesEnhancer.TryFindEdit(_Form: TCustomForm; const _Name: string; out _ed: TEdit): Boolean;
-begin
-  _ed := TEdit(_Form.FindComponent(_Name));
-  Result := Assigned(_ed);
-end;
-
-procedure TToolPropertiesEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
+procedure TToolPropertiesEnhancer.EnhanceForm(_Form: TForm);
 var
   ed: TEdit;
 begin
-  if not IsToolPropertiesForm(_Form) then begin
-//    TIDEFormEnhancements.UnregisterControlChangeCallback(FControlChangedHandle);
-//    FControlChangedHandle := nil;
-    FIsAutocompleteEnabled := False;
-    Exit;
-  end;
-
 // Drop files only works in Delphi 6 and 7 while autocomplete works in all versions.
 // The "new" IDE apparently does something to TEdits that prevent them to receive WM_DROPFILES
 // messages.
 // I tried to use this for re-registering the drop files handler but it did not help:
 //  FControlChangedHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
 
-  if TryFindEdit(_Form, 'edProgram', ed) then begin
+  if TryFindComponent(_Form, 'edProgram', TComponent(ed), TEdit) then begin
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
   end;
-  if TryFindEdit(_Form, 'edWorkingDir', ed) then begin
+  if TryFindComponent(_Form, 'edWorkingDir', TComponent(ed), TEdit) then begin
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
   end;
-  if TryFindEdit(_Form, 'edParameters', ed) then begin
+  if TryFindComponent(_Form, 'edParameters', TComponent(ed), TEdit) then begin
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
   end;
