@@ -48,6 +48,15 @@ type
     FMultiLineTabDockHostManager: TGxMultiLineTabDockHostsManager;
     FMultiLineTabManager: TMultiLineTabManager;
 
+    FIdeFormsAllowResize: Boolean;
+    FIdeFormsRememberPosition: Boolean;
+    FEnhanceApplicationSettingsDialog: Boolean;
+    FEnhanceBuildEventsDialog: Boolean;
+    FEnhanceSearchPath: Boolean;
+    FEnhanceInstallPackages: Boolean;
+    FEnhanceToolProperties: Boolean;
+    FEnhanceGotoDialog: Boolean;
+
     procedure InstallMultiLineComponentTabs;
     procedure RemoveMultiLineComponentTabs;
     procedure AddTabsToPopup(Sender: TObject);
@@ -73,25 +82,17 @@ type
     function ConfigurationKey: string;
     procedure SetEnhanceIDEForms(const Value: Boolean);
     function GetEnhanceIDEForms: Boolean;
-    function GetEnhanceSearchPath: Boolean;
-    procedure SetEnhanceSearchPath(const Value: Boolean);
-    function GetEnhanceToolProperties: Boolean;
+    procedure SetEnhanceSearchPath(Value: Boolean);
     procedure SetEnhanceToolProperties(const Value: Boolean);
-    function GetEnhanceInstallPackages: Boolean;
     procedure SetEnhanceInstallPackages(const Value: Boolean);
-    function GetEnhanceGotoDialog: Boolean;
     procedure SetEnhanceGotoDialog(const Value: Boolean);
-    function GetIdeFormsAllowResize: Boolean;
-    function GetIdeFormsRememberPosition: Boolean;
     procedure SetIdeFormsAllowResize(const Value: Boolean);
     procedure SetIdeFormsRememberPosition(const Value: Boolean);
     function GetOIHideHotCmds: boolean;
     procedure SetOIHideHotCmds(const Value: Boolean);
     function GetOIHideDescPane: boolean;
     procedure SetOIHideDescPane(const Value: boolean);
-    function GetEnhanceBuildEventsDialog: boolean;
     procedure SetEnhanceBuildEventsDialog(const Value: boolean);
-    function GetEnhanceApplicationSettingsDialog: boolean;
     procedure SetEnhanceApplicationSettingsDialog(const Value: boolean);
   public
     constructor Create;
@@ -103,21 +104,21 @@ type
 
     // IDE
     property EnhanceIDEForms: Boolean read GetEnhanceIDEForms write SetEnhanceIDEForms;
-    property IdeFormsAllowResize: Boolean read GetIdeFormsAllowResize write SetIdeFormsAllowResize;
-    property IdeFormsRememberPosition: Boolean read GetIdeFormsRememberPosition write SetIdeFormsRememberPosition;
+    property IdeFormsAllowResize: Boolean read FIdeFormsAllowResize write SetIdeFormsAllowResize;
+    property IdeFormsRememberPosition: Boolean read FIdeFormsRememberPosition write SetIdeFormsRememberPosition;
 
     // Install Packages dialog
-    property EnhanceInstallPackages: boolean read GetEnhanceInstallPackages write SetEnhanceInstallPackages;
+    property EnhanceInstallPackages: boolean read FEnhanceInstallPackages write SetEnhanceInstallPackages;
     // Search path
-    property EnhanceSearchPath: Boolean read GetEnhanceSearchPath write SetEnhanceSearchPath;
+    property EnhanceSearchPath: Boolean read FEnhanceSearchPath write SetEnhanceSearchPath;
     // Tool Options dialog
-    property EnhanceToolProperties: Boolean read GetEnhanceToolProperties write SetEnhanceToolProperties;
+    property EnhanceToolProperties: Boolean read FEnhanceToolProperties write SetEnhanceToolProperties;
     // Goto dialog
-    property EnhanceGotoDialog: Boolean read GetEnhanceGotoDialog write SetEnhanceGotoDialog;
+    property EnhanceGotoDialog: Boolean read FEnhanceGotoDialog write SetEnhanceGotoDialog;
     // Build Events dialog
-    property  EnhanceBuildEventsDialog: boolean read GetEnhanceBuildEventsDialog write SetEnhanceBuildEventsDialog;
+    property  EnhanceBuildEventsDialog: boolean read FEnhanceBuildEventsDialog write SetEnhanceBuildEventsDialog;
     // Application Settings dialog
-    property EnhanceApplicationSettingsDialog: boolean read GetEnhanceApplicationSettingsDialog write SetEnhanceApplicationSettingsDialog;
+    property EnhanceApplicationSettingsDialog: boolean read FEnhanceApplicationSettingsDialog write SetEnhanceApplicationSettingsDialog;
     // Fonts
     property OIFontEnabled: Boolean read FOIFontEnabled write SetOIFontEnabled;
     property OIFont: TFont read FOIFont;
@@ -213,55 +214,62 @@ end;
 
 procedure TIdeEnhancements.SetEnhanceInstallPackages(const Value: Boolean);
 begin
-  TGxIdeInstallPackagesEnhancer.SetEnabled(Value);
+  FEnhanceInstallPackages := Value;
+  TGxIdeInstallPackagesEnhancer.SetEnabled(Value and EnhanceIDEForms);
 end;
 
-procedure TIdeEnhancements.SetEnhanceSearchPath(const Value: Boolean);
+procedure TIdeEnhancements.SetEnhanceSearchPath(Value: Boolean);
 begin
+  FEnhanceSearchPath := Value;
+  Value := Value and EnhanceIDEForms;
   TGxIdeSearchPathEnhancer.SetEnabled(Value);
   TGxIdeProjectOptionsEnhancer.SetEnabled(Value);
 end;
 
 procedure TIdeEnhancements.SetEnhanceToolProperties(const Value: Boolean);
 begin
-  TGxIdeToolPropertiesEnhancer.SetEnabled(Value);
+  FEnhanceToolProperties := Value;
+  TGxIdeToolPropertiesEnhancer.SetEnabled(Value and EnhanceIDEForms);
 end;
 
 procedure TIdeEnhancements.SetEnhanceBuildEventsDialog(const Value: boolean);
 begin
-  TGxIdeBuildEventsEnhancer.SetEnabled(Value);
+  FEnhanceBuildEventsDialog := Value;
+  TGxIdeBuildEventsEnhancer.SetEnabled(Value and EnhanceIDEForms);
 end;
 
 procedure TIdeEnhancements.SetEnhanceApplicationSettingsDialog(const Value: boolean);
 begin
-  TGxIdeApplicationSettingsEnhancer.SetEnabled(Value);
+  FEnhanceApplicationSettingsDialog := Value;
+  TGxIdeApplicationSettingsEnhancer.SetEnabled(Value and EnhanceIDEForms);
 end;
 
 procedure TIdeEnhancements.SetEnhanceGotoDialog(const Value: Boolean);
 begin
-  TGxIdeGotoEnhancer.SetEnabled(Value);
+  FEnhanceGotoDialog := Value;
+  TGxIdeGotoEnhancer.SetEnabled(Value and EnhanceIDEForms);
 end;
 
 procedure TIdeEnhancements.SetIdeFormsAllowResize(const Value: Boolean);
 begin
-  TIDEFormEnhancements.SetAllowResize(Value);
+  FIdeFormsAllowResize := Value;
+  TIDEFormEnhancements.SetAllowResize(Value and EnhanceIDEForms);
 end;
 
 procedure TIdeEnhancements.SetIdeFormsRememberPosition(const Value: Boolean);
 begin
-  TIDEFormEnhancements.SetRememberPosition(Value);
+  FIdeFormsRememberPosition := Value;
+  TIDEFormEnhancements.SetRememberPosition(Value and EnhanceIDEForms);
 end;
 
 destructor TIdeEnhancements.Destroy;
 begin
-  if IsStandAlone then
-    Exit;
+  if not IsStandAlone then begin
+    Remove;
 
-  Remove;
-
-  FreeAndNil(FOIFont);
-  FreeAndNil(FCPFont);
-
+    FreeAndNil(FOIFont);
+    FreeAndNil(FCPFont);
+  end;
   inherited Destroy;
 end;
 
@@ -778,49 +786,9 @@ begin
   Result := GX_MultilineHost.DefaultToMultiLine;
 end;
 
-function TIdeEnhancements.GetEnhanceApplicationSettingsDialog: boolean;
-begin
-  Result := TGxIdeApplicationSettingsEnhancer.GetEnabled;
-end;
-
-function TIdeEnhancements.GetEnhanceBuildEventsDialog: boolean;
-begin
-  Result := TGxIdeBuildEventsEnhancer.GetEnabled;
-end;
-
-function TIdeEnhancements.GetEnhanceGotoDialog: boolean;
-begin
-  Result := TGxIdeGotoEnhancer.GetEnabled;
-end;
-
 function TIdeEnhancements.GetEnhanceIDEForms: Boolean;
 begin
   Result := TIDEFormEnhancements.GetEnabled;
-end;
-
-function TIdeEnhancements.GetEnhanceInstallPackages: Boolean;
-begin
-  Result := TGxIdeInstallPackagesEnhancer.GetEnabled;
-end;
-
-function TIdeEnhancements.GetEnhanceSearchPath: Boolean;
-begin
-  Result := TGxIdeSearchPathEnhancer.GetEnabled;
-end;
-
-function TIdeEnhancements.GetEnhanceToolProperties: Boolean;
-begin
-   Result := TGxIdeToolPropertiesEnhancer.GetEnabled;
-end;
-
-function TIdeEnhancements.GetIdeFormsAllowResize: Boolean;
-begin
-  Result := TIDEFormEnhancements.GetAllowResize;
-end;
-
-function TIdeEnhancements.GetIdeFormsRememberPosition: Boolean;
-begin
-  Result := TIDEFormEnhancements.GetRememberPosition;
 end;
 
 function TIdeEnhancements.GetMultiLineTabDockHost: Boolean;
