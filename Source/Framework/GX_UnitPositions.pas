@@ -35,6 +35,8 @@ resourcestring
   SUnitName = 'unit';
   SProgramName = 'program';
   SLibraryName = 'library';
+  SPackageName = 'package';
+  SRequiresName = 'requires';
   SInterfaceName = 'interface';
   SInterfaceUsesName = 'interface uses';
   SImplementationName = 'implementation';
@@ -113,6 +115,11 @@ begin
           FPosList.AddObject(SLibraryName, TObject(FParser.TokenPos));
           IsProgramOrLibrary := True;
         end;
+      tkPackage:
+        begin
+          FPosList.AddObject(SPackageName, TObject(FParser.TokenPos));
+          IsProgramOrLibrary := True;
+        end;
       tkUnit:
         FPosList.AddObject(SUnitName, TObject(FParser.TokenPos));
       tkFinalization:
@@ -131,6 +138,10 @@ begin
         begin
           Section := sImplementation;
           FPosList.AddObject(SImplementationName, TObject(FParser.TokenPos));
+        end;
+      tkRequires:
+        begin
+          FPosList.AddObject(SRequiresName, TObject(FParser.TokenPos));
         end;
       tkUses:
         begin
