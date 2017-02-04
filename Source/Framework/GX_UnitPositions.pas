@@ -37,6 +37,7 @@ resourcestring
   SLibraryName = 'library';
   SPackageName = 'package';
   SRequiresName = 'requires';
+  SContainsName = 'contains';
   SInterfaceName = 'interface';
   SInterfaceUsesName = 'interface uses';
   SImplementationName = 'implementation';
@@ -138,6 +139,10 @@ begin
         begin
           Section := sImplementation;
           FPosList.AddObject(SImplementationName, TObject(FParser.TokenPos));
+        end;
+      tkContains:
+        begin
+          FPosList.AddObject(SContainsName, TObject(FParser.TokenPos));
         end;
       tkRequires:
         begin
