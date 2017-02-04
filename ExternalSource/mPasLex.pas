@@ -99,9 +99,9 @@ type
     tkKeyString, tkLabel, tkLibrary, tkLower, tkLowerEqual, tkMessage, tkMinus,
     tkMod, tkName, tkNear, tkNil, tkNodefault, tkNone, tkNot, tkNotEqual, tkNull,
     tkNumber, tkObject, tkOf, tkOn, tkOperator, tkOr, tkOut, tkOverload, tkOverride,
-    tkPacked, tkPascal, tkPlus, tkPoint, tkPointerSymbol, tkPrivate, tkProcedure,
+    tkPackage, tkPacked, tkPascal, tkPlus, tkPoint, tkPointerSymbol, tkPrivate, tkProcedure,
     tkProgram, tkProperty, tkProtected, tkPublic, tkPublished, tkRaise, tkRead,
-    tkReadonly, tkRecord, tkRegister, tkReintroduce, tkRepeat, tkResident,
+    tkReadonly, tkRecord, tkRegister, tkReintroduce, tkRepeat, tkRequires, tkResident,
     tkResourcestring, tkRoundClose, tkRoundOpen, tkSafecall, tkSemiColon, tkSet,
     tkShl, tkShr, tkSlash, tkSlashesComment, tkSquareClose, tkSquareOpen,
     tkSpace, tkStar, tkStdcall, tkStored, tkString, tkStringresource, tkSymbol,
@@ -193,6 +193,7 @@ type
     function Func105: TTokenKind;
     function Func106: TTokenKind;
     function Func108: TTokenKind;
+    function Func112: TTokenKind;
     function Func117: TTokenKind;
     function Func126: TTokenKind;
     function Func129: TTokenKind;
@@ -396,6 +397,7 @@ begin
       105: fIdentFuncTable[i] := Func105;
       106: fIdentFuncTable[i] := Func106;
       108: fIdentFuncTable[i] := Func108;
+      112: fIdentFuncTable[i] := Func112;
       117: fIdentFuncTable[i] := Func117;
       126: fIdentFuncTable[i] := Func126;
       129: fIdentFuncTable[i] := Func129;
@@ -560,7 +562,8 @@ end;
 
 function TmwPasLex.Func44: TTokenKind;
 begin
-  if KeyComp('Set') then Result := tkSet else Result := tkIdentifier;
+  if KeyComp('Set') then Result := tkSet else
+    if KeyComp('Package') then Result := tkPackage else Result := tkIdentifier;
 end;
 
 function TmwPasLex.Func45: TTokenKind;
@@ -841,6 +844,11 @@ end;
 function TmwPasLex.Func108: TTokenKind;
 begin
   if KeyComp('Operator') then Result := tkOperator else Result := tkIdentifier;
+end;
+
+function TmwPasLex.Func112: TTokenKind;
+begin
+  if KeyComp('Requires') then Result := tkRequires else Result := tkIdentifier;
 end;
 
 function TmwPasLex.Func117: TTokenKind;
