@@ -218,7 +218,10 @@ uses
   GX_dzMapFileReader in '..\..\Source\Utils\GX_dzMapFileReader.pas',
   GX_IdeObjectInspectorEnhancer in '..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas',
   GX_IdeBuildEventFavoriteEdit in '..\..\Source\IDE\GX_IdeBuildEventFavoriteEdit.pas' {f_IdeBuildEventFavoriteEdit},
-  GX_IdeBuildEventsEnhancer in '..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas';
+  GX_IdeBuildEventsEnhancer in '..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas',
+  GX_ReadMapFileThread in '..\..\Source\Utils\GX_ReadMapFileThread.pas',
+  GX_IdeApplicationSettingsEnhancer in '..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas',
+  GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *.res}
