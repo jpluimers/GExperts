@@ -89,7 +89,7 @@ type
   TTokenKind = (tkAbsolute, tkAbstract, tkAddressOp, tkAnd, tkAnsiComment,
     tkArray, tkAs, tkAt, tkAsciiChar, tkAsm, tkAssembler, tkAssign, tkAutomated,
     tkBegin, tkBadString, tkBorComment, tkCase, tkCdecl, tkClass, tkColon,
-    tkComma, tkCompDirect, tkConst, tkConstructor, tkCRLF, tkCRLFCo, tkDefault,
+    tkComma, tkCompDirect, tkContains, tkConst, tkConstructor, tkCRLF, tkCRLFCo, tkDefault,
     tkDestructor, tkDispid, tkDispinterface, tkDiv, tkDo, tkDoubleAddressOp,
     tkDotDot, tkDownto, tkDynamic, tkElse, tkEnd, tkEqual, tkError, tkExcept,
     tkExport, tkExports, tkExternal, tkFar, tkFile, tkFinalization, tkFinally,
@@ -774,7 +774,8 @@ end;
 
 function TmwPasLex.Func95: TTokenKind;
 begin
-  if KeyComp('Absolute') then Result := tkAbsolute else Result := tkIdentifier;
+  if KeyComp('Absolute') then Result := tkAbsolute else
+    if KeyComp('Contains') then Result := tkContains else Result := tkIdentifier;
 end;
 
 function TmwPasLex.Func96: TTokenKind;
