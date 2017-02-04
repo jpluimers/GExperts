@@ -111,7 +111,7 @@ function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
   end;
 
 var
-  TrimList, SortedList: TGXStringList;
+  TrimList, SortedList: TGXUnicodeStringList;
   i: Integer;
   SortOrder: TESortOrder;
   Direction: integer;
@@ -127,9 +127,9 @@ begin
 
     // The trim mess here is so we can ignore whitespace when sorting
     SortedList := nil;
-    TrimList := TGXStringList.Create;
+    TrimList := TGXUnicodeStringList.Create;
     try
-      SortedList := TGXStringList.Create;
+      SortedList := TGXUnicodeStringList.Create;
       for i := 0 to Lines.Count - 1 do begin
         s := TrimLeft(Lines[i]);
         if IgnoreFunction then
@@ -157,7 +157,8 @@ begin
         i := i + Direction;
       end;
       Lines.Clear;
-      Lines.AddStrings(SortedList);
+      for i := 0 to SortedList.Count - 1 do
+        Lines.add(SortedList[i]);
     finally
       FreeAndNil(SortedList);
       FreeAndNil(TrimList);

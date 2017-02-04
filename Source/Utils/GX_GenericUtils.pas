@@ -41,7 +41,10 @@ type
   TGXUnicodeChar = WideChar;
   PGXUnicodeChar = PWideChar;
   TGXUnicodeString = WideString;
-  TGXUnicodeStringList = TUnicodeStringList; // SynEdit TUnicodeStringList in D2007 and lower
+  TGXUnicodeStringList = class(TUnicodeStringList)
+    // SynEdit TUnicodeStringList in D2007 and lower
+    procedure SortLogical;
+  end;
   {$ENDIF}
 
   TGXSyntaxHighlighter = (gxpPlaceHolder, gxpNone, gxpPAS, gxpCPP, gxpHTML, gxpSQL, gxpCS, gxpXML);
@@ -777,7 +780,7 @@ function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
   external shlwapi32 name 'PathRelativePathToA';
 {$ENDIF}
 
-function StrCmpLogicalW(psz1, psz2: PChar): Integer; stdcall;
+function StrCmpLogicalW(psz1, psz2: PWideChar): Integer; stdcall;
   external shlwapi32 name 'StrCmpLogicalW';
 
 type
@@ -1326,6 +1329,22 @@ begin
   Result := AnsiChar(C) in LocaleIdentifierChars; // Includes '_'
   {$ENDIF}
 end;
+
+{ TGXUnicodeStringList }
+
+function GXCompareStringsLogical(AString1, AString2: UnicodeString): Integer;
+begin
+  Result := StrCmpLogicalW(PWideChar(AString1), PWideChar(AString2));
+end;
+
+procedure TGXUnicodeStringList.SortLogical;
+begin
+  if CheckWin32Version(5, 1) then // Windows XP and up
+    CustomSort(GXCompareStringsLogical)
+  else
+    Self.Sort;
+end;
+
 {$ENDIF not UNICODE}
 
 function IsCharWhiteSpace(C: Char): Boolean;
