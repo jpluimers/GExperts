@@ -322,7 +322,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 115
           Width = 529
-          Height = 158
+          Height = 176
           Caption = 'IDE'
           TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
@@ -397,10 +397,18 @@ object fmConfiguration: TfmConfiguration
             Caption = 'Enhance Build Events dialog'
             TabOrder = 7
           end
+          object chkEnhanceApplicationSettingsDialog: TCheckBox
+            Left = 24
+            Top = 155
+            Width = 489
+            Height = 17
+            Caption = 'Enhance Application Settings dialog'
+            TabOrder = 8
+          end
         end
         object gbxObjectInspector: TGroupBox
           Left = 8
-          Top = 280
+          Top = 296
           Width = 249
           Height = 159
           Caption = 'Object Inspector'

@@ -91,6 +91,8 @@ type
     procedure SetOIHideDescPane(const Value: boolean);
     function GetEnhanceBuildEventsDialog: boolean;
     procedure SetEnhanceBuildEventsDialog(const Value: boolean);
+    function GetEnhanceApplicationSettingsDialog: boolean;
+    procedure SetEnhanceApplicationSettingsDialog(const Value: boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -113,7 +115,9 @@ type
     // Goto dialog
     property EnhanceGotoDialog: Boolean read GetEnhanceGotoDialog write SetEnhanceGotoDialog;
     // Build Events dialog
-    property  EnhanceBuildEventsDialog: boolean read GetEnhanceBuildEventsDialog write SetEnhanceBuildEventsDialog; 
+    property  EnhanceBuildEventsDialog: boolean read GetEnhanceBuildEventsDialog write SetEnhanceBuildEventsDialog;
+    // Application Settings dialog
+    property EnhanceApplicationSettingsDialog: boolean read GetEnhanceApplicationSettingsDialog write SetEnhanceApplicationSettingsDialog;
     // Fonts
     property OIFontEnabled: Boolean read FOIFontEnabled write SetOIFontEnabled;
     property OIFont: TFont read FOIFont;
@@ -153,7 +157,8 @@ uses
   GX_GenericUtils, GX_GxUtils, GX_IdeUtils, GX_OtaUtils, GX_ConfigurationInfo, 
   GX_IdeSearchPathEnhancer, GX_IdeProjectOptionsEnhancer,
   GX_IdeToolPropertiesEnhancer, GX_IdeInstallPackagesEnhancer, 
-  GX_IdeGotoEnhancer, GX_IdeObjectInspectorEnhancer, GX_IdeBuildEventsEnhancer;
+  GX_IdeGotoEnhancer, GX_IdeObjectInspectorEnhancer, GX_IdeBuildEventsEnhancer, 
+  GX_IdeApplicationSettingsEnhancer;
 
 { TIdeEnhancements }
 
@@ -227,6 +232,11 @@ begin
   TGxIdeBuildEventsEnhancer.SetEnabled(Value);
 end;
 
+procedure TIdeEnhancements.SetEnhanceApplicationSettingsDialog(const Value: boolean);
+begin
+  TGxIdeApplicationSettingsEnhancer.SetEnabled(Value);
+end;
+
 procedure TIdeEnhancements.SetEnhanceGotoDialog(const Value: Boolean);
 begin
   TGxIdeGotoEnhancer.SetEnabled(Value);
@@ -275,6 +285,7 @@ begin
     EnhanceInstallPackages := ExpSettings.ReadBool('EnhanceInstallPackages', False);
     EnhanceGotoDialog := ExpSettings.ReadBool('EnhanceGotoDialog', False);
     EnhanceBuildEventsDialog := ExpSettings.ReadBool('EnhanceBuildEventsDialog', False);
+    EnhanceApplicationSettingsDialog := ExpSettings.ReadBool('EnhanceApplicationSettingsDialog', False);
 
     // File saving
     AutoSave := ExpSettings.ReadBool('AutoSave', False);
@@ -328,6 +339,7 @@ begin
     ExpSettings.WriteBool('EnhanceInstallPackages', EnhanceInstallPackages);
     ExpSettings.WriteBool('EnhanceGotoDialog', EnhanceGotoDialog);
     ExpSettings.WriteBool('EnhanceBuildEventsDialog', EnhanceBuildEventsDialog);
+    ExpSettings.WriteBool('EnhanceApplicationSettingsDialog', EnhanceApplicationSettingsDialog);
 
     // File saving
     ExpSettings.WriteBool('AutoSave', AutoSave);
@@ -764,6 +776,11 @@ end;
 function TIdeEnhancements.GetDefaultMultiLineTabDockHost: Boolean;
 begin
   Result := GX_MultilineHost.DefaultToMultiLine;
+end;
+
+function TIdeEnhancements.GetEnhanceApplicationSettingsDialog: boolean;
+begin
+  Result := TGxIdeApplicationSettingsEnhancer.GetEnabled;
 end;
 
 function TIdeEnhancements.GetEnhanceBuildEventsDialog: boolean;
