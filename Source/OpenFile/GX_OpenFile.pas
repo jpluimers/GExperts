@@ -912,7 +912,8 @@ procedure TAvailableFiles.Terminate;
 begin
   FSearchPathThread.Terminate;
   FCommonThread.Terminate;
-  FMapFileThread.Terminate;
+  if Assigned(FMapFileThread) then
+    FMapFileThread.Terminate;
 end;
 
 procedure TfmOpenFile.actMatchPrefixExecute(Sender: TObject);
