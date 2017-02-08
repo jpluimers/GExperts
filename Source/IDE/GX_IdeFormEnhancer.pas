@@ -37,7 +37,8 @@ implementation
 
 uses Windows, Dialogs, ExtCtrls,
   ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
-  GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils, GX_EventHook;
+  GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils, GX_EventHook,
+  GX_dzVclUtils;
 
 type
   THackForm = class(TCustomForm);
@@ -92,6 +93,7 @@ type
     procedure MakeReplaceFormResizable(Form: TCustomForm);
     procedure MakePasEnvironmentDialogResizable(Form: TCustomForm);
     procedure ForceVisibleToBeSizable(WndHandle: HWND);
+    procedure MakeConnEditFormResizable(Form: TCustomForm);
   end;
 
   TManagedFormList = class(TObjectList)
@@ -190,7 +192,9 @@ const
     (
       FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;'
         + 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
-        + 'TCppProjOptsDlg;TPasEnvironmentDialog;TReopenMenuPropertiesDialog';
+        + 'TCppProjOptsDlg;TPasEnvironmentDialog;TReopenMenuPropertiesDialog;'
+        + 'TActionListDesigner;TFieldsEditor;TDBGridColumnsEditor;TConnEditForm;'
+        + 'TDriverSettingsForm';
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;
@@ -411,6 +415,34 @@ begin
   end;
 end;
 
+procedure TManagedForm.MakeConnEditFormResizable(Form: TCustomForm);
+var
+  cmp: TComponent;
+begin
+  // There are two forms with that name. The one shown for TAdoConnection is not resizable
+  cmp := Form.FindComponent('SourceofConnection');
+  if not Assigned(cmp) or not (cmp is TGroupBox) then
+    Exit; // it's not the TAdoConnection one, we don't need to do anything
+  TGroupBox(cmp).Anchors := [akLeft, akTop, akRight];
+
+  cmp := Form.FindComponent('DataLinkFile');
+  TComboBox(cmp).Anchors := [akLeft, akTop, akRight];
+  cmp := Form.FindComponent('Browse');
+  TButton(cmp).Anchors := [akTop, akRight];
+
+  cmp := Form.FindComponent('ConnectionString');
+  TEdit(cmp).Anchors := [akLeft, akTop, akRight];
+  cmp := Form.FindComponent('Build');
+  TButton(cmp).Anchors := [akTop, akRight];
+
+  cmp := Form.FindComponent('OkButton');
+  TButton(cmp).Anchors := [akBottom, akRight];
+  cmp := Form.FindComponent('CancelButton');
+  TButton(cmp).Anchors := [akBottom, akRight];
+  cmp := Form.FindComponent('HelpButton');
+  TButton(cmp).Anchors := [akBottom, akRight];
+end;
+
 procedure TManagedForm.MakePasEnvironmentDialogResizable(Form: TCustomForm);
 var
   VariableOptionsFrame: TWinControl;
@@ -510,6 +542,7 @@ var
 begin
   Assert(Assigned(Form));
   if MakeResizable and (Form.BorderStyle <> bsSizeable) then begin
+    TControl_SetMinConstraints(Form);
     WasShowing := (fsShowing in TCustomFormHack(Form).FFormState);
     if WasShowing then
       Exclude(TCustomFormHack(Form).FFormState, fsShowing);
@@ -524,6 +557,8 @@ begin
       MakeSearchFormResizable(Form)
     else if Form.ClassName = 'TRplcDialog' then
       MakeReplaceFormResizable(Form)
+    else if Form.Classname = 'TConnEditForm' then
+      MakeConnEditFormResizable(Form)
     else if Form.ClassName = 'TPasEnvironmentDialog' then
       MakePasEnvironmentDialogResizable(Form);
     if WasShowing then begin
