@@ -109,9 +109,12 @@ procedure THotkey_SetHotkey(_hk: THotKey; _ShortCut: TShortCut);
 /// distinguish between Ctrl+Left and Ctrl+NUM4 </summary>
 function THotkey_GetHotkey(_hk: THotKey): TShortCut;
 
-///<summary> Sets the control's Constraints.MinHeight und Constraints.MinWidth properties
-///          to the control's Width and Height. </summary>
-procedure TControl_SetMinConstraints(_Control: TControl);
+///<summary>
+/// Sets the control's Constraints.MinHeight und Constraints.MinWidth properties
+/// to the control's Width and Height.
+/// @param FixedHeight if true, the form's MaxHeight will also be set, so that the height
+///                    cannot be changed </summary>
+procedure TControl_SetMinConstraints(_Control: TControl; _FixedHeight: Boolean = False);
 
 ///<summary> sets the with of a ComboBox's dropdown  in pixels </summary>
 procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
@@ -826,10 +829,12 @@ begin
   TListItems_ClearWithObjects(_lv.Items);
 end;
 
-procedure TControl_SetMinConstraints(_Control: TControl);
+procedure TControl_SetMinConstraints(_Control: TControl; _FixedHeight: Boolean = False);
 begin
   _Control.Constraints.MinHeight := _Control.Height;
   _Control.Constraints.MinWidth := _Control.Width;
+  if _FixedHeight then
+    _Control.Constraints.MaxHeight := _Control.Height;
 end;
 
 procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
@@ -865,7 +870,7 @@ begin
       for i := 0 to sl.Count - 1 do
         if StartsText(_Item, sl[i]) then begin
           Result := i;
-          break;
+          Break;
         end;
     finally
       FreeAndNil(sl);
@@ -1231,14 +1236,14 @@ begin
     for i := Low(STD_KEYS) to High(STD_KEYS) do begin
       if Key = STD_KEYS[i] then begin
         Key := EXT_KEYS[i];
-        break;
+        Break;
       end;
     end;
   end else begin
     for i := Low(EXT_KEYS) to High(EXT_KEYS) do begin
       if Key = EXT_KEYS[i] then begin
         Key := STD_KEYS[i];
-        break;
+        Break;
       end;
     end;
   end;
