@@ -253,7 +253,7 @@ object fmConfiguration: TfmConfiguration
         end
         object gbxCompPalette: TGroupBox
           Left = 264
-          Top = 280
+          Top = 296
           Width = 273
           Height = 159
           Caption = 'Component &Palette'
@@ -386,24 +386,24 @@ object fmConfiguration: TfmConfiguration
             Top = 117
             Width = 489
             Height = 17
-            Caption = 'Enhance Goto dialog'
+            Caption = 'Enhance Goto dialog with list of source locations'
             TabOrder = 6
           end
           object chkEnhanceBuildEventsDialog: TCheckBox
             Left = 24
-            Top = 136
-            Width = 489
-            Height = 17
-            Caption = 'Enhance Build Events dialog'
-            TabOrder = 7
-          end
-          object chkEnhanceApplicationSettingsDialog: TCheckBox
-            Left = 24
             Top = 155
             Width = 489
             Height = 17
-            Caption = 'Enhance Application Settings dialog'
+            Caption = 'Enhance Build Events dialog'
             TabOrder = 8
+          end
+          object chkEnhanceApplicationSettingsDialog: TCheckBox
+            Left = 24
+            Top = 136
+            Width = 489
+            Height = 17
+            Caption = 'Enhance Application Settings dialog with version button'
+            TabOrder = 7
           end
         end
         object gbxObjectInspector: TGroupBox
