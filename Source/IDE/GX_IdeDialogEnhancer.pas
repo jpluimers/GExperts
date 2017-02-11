@@ -74,13 +74,7 @@ end;
 function TIdeDialogEnhancer.TryFindComponent(_Owner: TComponent; const _CmpName: string; out _Cmp: TComponent;
   _CmpClass: TComponentClass = nil): Boolean;
 begin
-  if TComponent_FindComponent(_Owner, _CmpName, True, _Cmp) then begin
-    if Assigned(_CmpClass) then
-      Result := (_Cmp is _CmpClass)
-    else
-      Result := True;
-  end else
-    Result := False;
+  Result := TComponent_FindComponent(_Owner, _CmpName, True, _Cmp, _CmpClass);
 end;
 
 end.

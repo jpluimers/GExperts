@@ -31,33 +31,45 @@ function TStrings_ValueFromIndex(_st: TStrings; _Idx: Integer): string;
 /// This will do a depth first search.
 /// Name can be an empty string, which will return the first component with an empty name.</sumamry>
 function TComponent_FindComponent(_Owner: TComponent; const _Name: string; _Recursive: Boolean;
-  out _Found: TComponent): Boolean;
+  out _Found: TComponent; _CmpClass: TComponentClass = nil): Boolean;
+
+///<summary>
+/// Checks both, the code and data pointer of a Method and returns true, if both are equal </summary>
+function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
 
 implementation
 
+function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
+begin
+  Result := (TMethod(_Method1).Code = TMethod(_Method2).Code)
+    and (TMethod(_Method1).Data = TMethod(_Method2).Data);
+end;
+
 function TComponent_FindComponent(_Owner: TComponent; const _Name: string; _Recursive: Boolean;
-  out _Found: TComponent): Boolean;
+  out _Found: TComponent; _CmpClass: TComponentClass = nil): Boolean;
 var
   i: Integer;
   comp: TComponent;
 begin
-  if (_Owner = nil) then begin
-    Result := False;
+  Result := False;
+  if (_Owner = nil) then
     Exit;
-  end;
-  Result := True;
+
   for i := 0 to _Owner.ComponentCount - 1 do begin
     comp := _Owner.Components[i];
     if SameText(comp.Name, _Name) then begin
-      _Found := comp;
-      Exit;
+      Result := not Assigned(_CmpClass) or (comp is _CmpClass);
+      if Result then begin
+        _Found := comp;
+        Exit;
+      end;
     end;
     if _Recursive then begin
-      if TComponent_FindComponent(comp, _Name, _Recursive, _Found) then
+      Result := TComponent_FindComponent(comp, _Name, _Recursive, _Found, _CmpClass);
+      if Result then
         Exit;
     end;
   end;
-  Result := False;
 end;
 
 procedure TStrings_GetAsSortedList(_st: TStrings; _sl: TStringList; _Duplicates: TDuplicates = dupAccept);

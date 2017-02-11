@@ -38,7 +38,7 @@ implementation
 uses Windows, Dialogs, ExtCtrls,
   ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
   GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils, GX_EventHook,
-  GX_dzVclUtils;
+  GX_dzVclUtils, GX_dzClassUtils;
 
 type
   THackForm = class(TCustomForm);
@@ -94,6 +94,7 @@ type
     procedure MakePasEnvironmentDialogResizable(Form: TCustomForm);
     procedure ForceVisibleToBeSizable(WndHandle: HWND);
     procedure MakeConnEditFormResizable(Form: TCustomForm);
+    procedure MakePakComponentsDlgResizable(Form: TCustomForm);
   end;
 
   TManagedFormList = class(TObjectList)
@@ -194,7 +195,7 @@ const
         + 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
         + 'TCppProjOptsDlg;TPasEnvironmentDialog;TReopenMenuPropertiesDialog;'
         + 'TActionListDesigner;TFieldsEditor;TDBGridColumnsEditor;TConnEditForm;'
-        + 'TDriverSettingsForm';
+        + 'TDriverSettingsForm;TPakComponentsDlg';
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;
@@ -443,6 +444,28 @@ begin
   TButton(cmp).Anchors := [akBottom, akRight];
 end;
 
+procedure TManagedForm.MakePakComponentsDlgResizable(Form: TCustomForm);
+var
+  InstalledGroupBox: TGroupBox;
+  ComponentsListBox: TListBox;
+  OKButton: TButton;
+  Button1: TButton; // Help button
+  Cancel: TButton;
+begin
+  if not TComponent_FindComponent(Form, 'InstalledGroupBox', False, TComponent(InstalledGroupBox), TGroupBox)
+    or not TComponent_FindComponent(Form, 'ComponentsListBox', False, TComponent(ComponentsListBox), TListBox)
+    or not TComponent_FindComponent(Form, 'OKButton', False, TComponent(OKButton), TButton)
+    or not TComponent_FindComponent(Form, 'Button1', False, TComponent(Button1), TButton)
+    or not TComponent_FindComponent(Form, 'Cancel', False, TComponent(Cancel), TButton) then
+    Exit;
+
+  InstalledGroupBox.Anchors := [akTop, akLeft, akRight, akBottom];
+  ComponentsListBox.Anchors := [akTop, akLeft, akRight, akBottom];
+  OKButton.Anchors := [akRight, akBottom];
+  Button1.Anchors := [akRight, akBottom];
+  Cancel.Visible := False;
+end;
+
 procedure TManagedForm.MakePasEnvironmentDialogResizable(Form: TCustomForm);
 var
   VariableOptionsFrame: TWinControl;
@@ -539,10 +562,11 @@ end;
 procedure TManagedForm.DoMakeResizable(Form: TCustomForm);
 var
   WasShowing: boolean;
+  ClsName: string;
 begin
   Assert(Assigned(Form));
   if MakeResizable and (Form.BorderStyle <> bsSizeable) then begin
-    TControl_SetMinConstraints(Form);
+    ClsName := Form.ClassName;
     WasShowing := (fsShowing in TCustomFormHack(Form).FFormState);
     if WasShowing then
       Exclude(TCustomFormHack(Form).FFormState, fsShowing);
@@ -553,14 +577,16 @@ begin
       Form.HandleNeeded;
     end;
     Handle := Form.Handle;
-    if Form.ClassName = 'TSrchDialog' then
+    if ClsName = 'TSrchDialog' then
       MakeSearchFormResizable(Form)
-    else if Form.ClassName = 'TRplcDialog' then
+    else if ClsName = 'TRplcDialog' then
       MakeReplaceFormResizable(Form)
-    else if Form.Classname = 'TConnEditForm' then
+    else if ClsName = 'TConnEditForm' then
       MakeConnEditFormResizable(Form)
-    else if Form.ClassName = 'TPasEnvironmentDialog' then
-      MakePasEnvironmentDialogResizable(Form);
+    else if ClsName = 'TPasEnvironmentDialog' then
+      MakePasEnvironmentDialogResizable(Form)
+    else if ClsName = 'TPakComponentsDlg' then
+      MakePakComponentsDlgResizable(Form);
     if WasShowing then begin
       SendMessage(Handle, CM_SHOWINGCHANGED, 0, 0);
     end;
@@ -640,6 +666,7 @@ end;
 destructor TFormChangeManager.Destroy;
 var
   i: Integer;
+  Form: THackForm;
 begin
   // unhook first, to be sure none of these hooks is being called after we freed our lists
   if Assigned(FScreenActiveControlChangeHook) then
@@ -662,13 +689,26 @@ begin
 
   FreeAndNil(FManagedForms); // This frees/unhooks any managed form objects
 
-  inherited;
-end;
+  // we have a problem here:
+  // Some forms get a new handle while in the FManagedForms list. The unhooking
+  // code in TManagedForm.Destroy checks for the form's class name and its handle,
+  // so it is possible that a form that is to be unhooked will not be found
+  // and will keep the OnDestroy event pointing to FormDestroy. This can than
+  // throw an access violation when these forms get destroyed.
+  // To prevent that, we go through Screen.CustomForms and check whether any form's
+  // OnDestroy event still points to FormDestroy. If it does, we set it to NIL.
+  // An alternative would be to make TMangedForm descend from TComponent
+  // and create it with the form it manages as the owner. So it would
+  // be destroyed whenever the form gets destroyed without having to
+  // check for the Screen.CustomForms list for class name and handle.
+  // but that might create new problems.
+  for I := 0 to Screen.CustomFormCount - 1 do begin
+    Form := THackForm(Screen.CustomForms[i]);
+    if IsSameMethod(Form.OnDestroy, FormDestroy) then
+      Form.OnDestroy := nil;
+  end;
 
-function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
-begin
-  result := (TMethod(_Method1).Code = TMethod(_Method2).Code)
-    and (TMethod(_Method1).Data = TMethod(_Method2).Data);
+  inherited;
 end;
 
 procedure TFormChangeManager.HookActiveControlChanged;
@@ -803,8 +843,13 @@ begin
     ManagedForm.CollapseTreeNodes := Changes.CollapseTreeNodes;
     ManagedForm.ResizePictureDialogs := Changes.ResizePictureDialogs;
     ManagedForm.ComboDropDownCount := Changes.ComboDropDownCount;
-    ManagedForm.OldDestroy := THackForm(Form).OnDestroy;
-    THackForm(Form).OnDestroy := FormDestroy;
+    // There are some forms that the IDE does not destroy but opens and closes so they get
+    // a different handle all the time. If we don't catch them here, we will assign
+    // FormDestroy to ManagedForm.OldDestroy and cause a stack overflow on destruction.
+    if not IsSameMethod(THackForm(Form).OnDestroy, FormDestroy) then begin
+      ManagedForm.OldDestroy := THackForm(Form).OnDestroy;
+      THackForm(Form).OnDestroy := FormDestroy;
+    end;
     FManagedForms.Add(ManagedForm);
     ModifyForm(Form, ManagedForm);
   end;
@@ -894,13 +939,15 @@ function TFormChangeManager.ShouldManageForm(Form: TCustomForm;
 var
   i: Integer;
   Control: TControl;
+  ClsName: string;
 begin
   Assert(Assigned(Form));
   Result := False;
+  ClsName := Form.ClassName;
   if (csDesigning in Form.ComponentState)
-    or StringInArray(Form.ClassName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) then
+    or StringInArray(ClsName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) then
     Exit;
-  if (Form.ClassName = 'TAboutBox') then  // Or TAboutBoxHiColor in D7-
+  if (ClsName = 'TAboutBox') then  // Or TAboutBoxHiColor in D7-
   begin
     if RunningDelphi8OrGreater then
     begin
@@ -926,7 +973,7 @@ begin
 {$ENDIF}
   for i := Low(FormsToChange) to High(FormsToChange) do
   begin
-    if StrContains(Form.ClassName + ';', FormsToChange[i].FormClassNames + ';') then
+    if StrContains(ClsName + ';', FormsToChange[i].FormClassNames + ';') then
     begin
       if not IsManagingForm(Form) then
       begin
@@ -980,10 +1027,13 @@ begin
   for i := Count - 1 downto 0 do
   begin
     ManagedForm := GetForm(i);
-    if (ManagedForm.FormClassName = Form.ClassName) and (ManagedForm.Handle = Form.Handle) then
-    begin
-      Result := ManagedForm;
-      Break;
+    if (ManagedForm.FormClassName = Form.ClassName) then begin
+      if (ManagedForm.Handle = Form.Handle) then
+      begin
+        Result := ManagedForm;
+        Break;
+      end else
+        asm nop end; // put breakpoint for debugging here
     end;
   end;
 end;
