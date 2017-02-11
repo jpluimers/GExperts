@@ -31,6 +31,7 @@ type
      ideRS10,
      ideRS101, // Rad Studio 10.1 Berlin
      ideRS101U1, // Rad Studio 10.1 Berlin Update 1
+     ideRS101U2, // Rad Studio 10.1 Berlin Update 2
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -806,14 +807,29 @@ end;
   Delphi 10.1 Berlin
   File                 File Version    Size       Modified Time
   delphicoreide240.bpl
-  coreide240.bpl
+  coreide240.bpl       24.0.22858.6822
   bds.exe
   dcldb240.bpl
+
+  Delphi 10.1 Berlin Update 1
+  File                 File Version    Size       Modified Time
+  delphicoreide240.bpl
+  coreide240.bpl       24.0.24468.8770
+  bds.exe
+  dcldb240.bpl
+
+  Delphi 10.1 Berlin Update 2
+  File                 File Version    Size       Modified Time
+  delphicoreide240.bpl 24.0.25048.9432
+  coreide240.bpl       24.0.25048.9432
+  bds.exe              24.0.25048.9432
+  dcldb240.bpl         24.0.25048.9432
 }
 function GetRS101Version: TBorlandIdeVersion;
 const
   CoreIde2400: TVersionNumber = (Minor: 24; Major: 0; Build: 6822; Release: 22858);
   CoreIde2400Upd1: TVersionNumber = (Minor: 24; Major: 0; Build: 8770; Release: 24468);
+  CoreIde2400Upd2: TVersionNumber = (Minor: 24; Major: 0; Build: 9432; Release: 25048);
 var
   CoreIdeFileVersion: TVersionNumber;
   VersionNumber: Integer;
@@ -823,6 +839,10 @@ begin
   VersionNumber := CompareVersionNumber(CoreIde2400Upd1, CoreIde2400);
   if VersionNumber >= 0 then begin
     Result := ideRS101U1;
+  end;
+  VersionNumber := CompareVersionNumber(CoreIde2400Upd2, CoreIde2400);
+  if VersionNumber >= 0 then begin
+    Result := ideRS101U2;
   end;
 end;
 
@@ -932,7 +952,7 @@ begin
 
   {$IFDEF VER310}
     Result := GetRS101Version;
-    Assert(Result in [ideRS101, ideRS101U1]);
+    Assert(Result in [ideRS101, ideRS101U1, ideRS101U2]);
   {$ENDIF VER310}
 
   if Result = ideUnknown then
