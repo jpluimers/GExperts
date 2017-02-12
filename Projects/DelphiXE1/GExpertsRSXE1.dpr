@@ -221,7 +221,8 @@ uses
   GX_IdeBuildEventsEnhancer in '..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas',
   GX_ReadMapFileThread in '..\..\Source\Utils\GX_ReadMapFileThread.pas',
   GX_IdeApplicationSettingsEnhancer in '..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas',
-  GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas';
+  GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
+  GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *.res}
