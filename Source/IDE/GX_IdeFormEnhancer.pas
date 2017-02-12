@@ -89,7 +89,7 @@ type
   end;
 
 const
-  FormsToChange: array[0..8] of TFormChanges = (
+  FormsToChange: array[0..9] of TFormChanges = (
     (
       FormClassNames: 'TSrchDialog';
       FormEnhancer: TManagedFormSrchDialog;
@@ -127,7 +127,19 @@ const
       ComboDropDownCount: 15;
     ),
     (
-      FormClassNames: 'TImageListEditor;TPictureEditorDlg';
+      FormClassNames: 'TImageListEditor';
+      FormEnhancer: TManagedFormImageListEditor;
+      MakeResizable: True;
+      RememberSize: True;
+      RememberWidth: False;
+      RememberPosition: True;
+      RememberSplitterPosition: False;
+      CollapseTreeNodes: '';
+      ResizePictureDialogs: True;
+      ComboDropDownCount: 15;
+    ),
+    (
+      FormClassNames: 'TPictureEditorDlg';
       FormEnhancer: TManagedForm;
       MakeResizable: False;
       RememberSize: False;
