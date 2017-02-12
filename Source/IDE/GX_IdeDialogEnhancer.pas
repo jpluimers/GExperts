@@ -20,8 +20,6 @@ type
     /// frm can be nil </summary>
     procedure HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
   protected
-    function TryFindComponent(_Owner: TComponent; const _CmpName: string; out _Cmp: TComponent;
-      _CmpClass: TComponentClass = nil): Boolean;
     function IsDesiredForm(_Form: TCustomForm): Boolean; virtual;
     procedure EnhanceForm(_Form: TForm); virtual;
   public
@@ -69,12 +67,6 @@ end;
 function TIdeDialogEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
   Result := False;
-end;
-
-function TIdeDialogEnhancer.TryFindComponent(_Owner: TComponent; const _CmpName: string; out _Cmp: TComponent;
-  _CmpClass: TComponentClass = nil): Boolean;
-begin
-  Result := TComponent_FindComponent(_Owner, _CmpName, True, _Cmp, _CmpClass);
 end;
 
 end.

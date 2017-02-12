@@ -28,6 +28,7 @@ uses
   ExtCtrls,
   Classes,
   GX_OtaUtils,
+  GX_dzClassUtils,
   GX_UnitPositions,
   GX_IdeFormEnhancer,
   GX_IdeDialogEnhancer;
@@ -91,18 +92,18 @@ var
   i: Integer;
   cmp: TComponent;
 begin
-  if TryFindComponent(_Form, LB_UNIT_POSITIONS, cmp) then
+  if TComponent_FindComponent(_Form, LB_UNIT_POSITIONS, True, cmp) then
     Exit;
 
-  if not TryFindComponent(_Form, 'Bevel1', TComponent(Bevel1), TBevel) then
+  if not TComponent_FindComponent(_Form, 'Bevel1', True, TComponent(Bevel1), TBevel) then
     Exit;
-  if not TryFindComponent(_Form, 'LineInput', TComponent(FLineInput), TWinControl) then
+  if not TComponent_FindComponent(_Form, 'LineInput', True, TComponent(FLineInput), TWinControl) then
     Exit;
-  if not TryFindComponent(_Form, 'OKButton', TComponent(OkButton), TButton) then
+  if not TComponent_FindComponent(_Form, 'OKButton', True, TComponent(OkButton), TButton) then
     Exit;
-  if not TryFindComponent(_Form, 'CancelButton', TComponent(CancelButton), TButton) then
+  if not TComponent_FindComponent(_Form, 'CancelButton', True, TComponent(CancelButton), TButton) then
     Exit;
-  if not TryFindComponent(_Form, 'HelpButton', TComponent(HelpButton), TButton) then
+  if not TComponent_FindComponent(_Form, 'HelpButton', True, TComponent(HelpButton), TButton) then
     Exit;
 
   _Form.Height := 240;

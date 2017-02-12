@@ -24,6 +24,7 @@ uses
   Messages,
   GX_IdeFormEnhancer,
   GX_dzVclUtils,
+  GX_dzClassUtils,
   GX_IdeDialogEnhancer;
 
 type
@@ -68,7 +69,7 @@ begin
   ed := _Sender as TEdit;
   ed.Text := _Files[0];
   if ed.Name = 'edProgram' then
-    if TryFindComponent(frm, 'edWorkingDir', TComponent(ed), TEdit) then
+    if TComponent_FindComponent(frm, 'edWorkingDir', True, TComponent(ed), TEdit) then
       ed.Text := ExtractFileDir(_Files[0]);
 end;
 
@@ -88,15 +89,15 @@ begin
 // I tried to use this for re-registering the drop files handler but it did not help:
 //  FControlChangedHandle := TIDEFormEnhancements.RegisterControlChangeCallback(HandleControlChanged);
 
-  if TryFindComponent(_Form, 'edProgram', TComponent(ed), TEdit) then begin
+  if TComponent_FindComponent(_Form, 'edProgram', True, TComponent(ed), TEdit) then begin
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
   end;
-  if TryFindComponent(_Form, 'edWorkingDir', TComponent(ed), TEdit) then begin
+  if TComponent_FindComponent(_Form, 'edWorkingDir', True, TComponent(ed), TEdit) then begin
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
   end;
-  if TryFindComponent(_Form, 'edParameters', TComponent(ed), TEdit) then begin
+  if TComponent_FindComponent(_Form, 'edParameters', True, TComponent(ed), TEdit) then begin
     TWinControl_ActivateDropFiles(ed, HandleFilesDropped);
     TEdit_ActivateAutoComplete(ed, [acsFileSystem], [actSuggest]);
   end;

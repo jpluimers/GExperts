@@ -29,6 +29,7 @@ uses
   ComCtrls,
   GX_IdeFormEnhancer,
   GX_dzVclUtils,
+  GX_dzClassUtils,
   GX_dzFileUtils,
   GX_OtaUtils,
   GX_dzSelectDirectoryFix,
@@ -337,14 +338,8 @@ var
   TheActionList: TActionList;
 
   function TryFindButton(const _BtnName: string; out _Btn: TCustomButton): Boolean;
-  var
-    cmp: TComponent;
   begin
-    Result := TryFindComponent(_Form, _BtnName, cmp, TButton);
-    if Result then
-      _Btn := cmp as TButton
-    else
-      _Btn := nil;
+    Result := TComponent_FindComponent(_Form, _BtnName, True, TComponent(_Btn), TButton);
   end;
 
   procedure AssignActionToButton(const _BtnName: string; const _Caption: string;
@@ -361,7 +356,7 @@ var
     // OnClick event with the original Sender parameter.
     _Btn := nil;
     _OnClick := nil;
-    if TryFindComponent(_Form, _BtnName, cmp, nil) then begin
+    if TComponent_FindComponent(_Form, _BtnName, True, cmp) then begin
       if (cmp is TButton) or (cmp is TBitBtn) then begin
         _Btn := cmp as TCustomButton;
         _OnClick := TCustomButtonHack(_Btn).OnClick;
