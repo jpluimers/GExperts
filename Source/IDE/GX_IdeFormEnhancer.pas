@@ -140,11 +140,11 @@ const
     ),
     (
       FormClassNames: 'TPictureEditorDlg';
-      FormEnhancer: TManagedForm;
-      MakeResizable: False;
-      RememberSize: False;
+      FormEnhancer: TManagedFormPictureEditDlg;
+      MakeResizable: True;
+      RememberSize: True;
       RememberWidth: False;
-      RememberPosition: False;
+      RememberPosition: True;
       RememberSplitterPosition: False;
       CollapseTreeNodes: '';
       ResizePictureDialogs: True;

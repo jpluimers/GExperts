@@ -65,6 +65,12 @@ type
   end;
 
 type
+  TManagedFormPictureEditDlg = class(TManagedForm)
+  protected
+    procedure MakeComponentsResizable; override;
+  end;
+
+type
   TManagedFormSrchDialog = class(TManagedForm)
   protected
     procedure MakeComponentsResizable; override;
@@ -251,8 +257,8 @@ end;
 { TManagedFormImageListEditor }
 
 procedure TManagedFormImageListEditor.MakeComponentsResizable;
-var
 {$IFNDEF GX_VER150_up} // Delphi 7
+var
   ImageGroup: TGroupBox;
   TransparentColor: TComboBox;
   FillColor: TComboBox;
@@ -285,7 +291,7 @@ begin
     or not TComponent_FindComponent(FForm, 'Apply', False, TComponent(ApplyBtn), TButton)
     or not TComponent_FindComponent(FForm, 'Help', False, TComponent(HelpBtn), TButton) then
     Exit; //==>
-    
+
   // unfortunately we must restrict the height, otherwise the sort order of the icons gets
   // messed up. It's probably possible to fix that, but that's quite a lot of work for
   // the oldest supported IDE Delphi 6
@@ -308,6 +314,39 @@ begin
   ApplyBtn.Anchors := [akRight, akTop];
   HelpBtn.Anchors := [akRight, akTop];
 {$ENDIF}
+end;
+
+{ TManagedFormPictureEditDlg }
+
+procedure TManagedFormPictureEditDlg.MakeComponentsResizable;
+var
+  GroupBox1: TGroupBox;
+  ImagePanel: TPanel;
+  LoadBtn: TButton;
+  SaveBtn: TButton;
+  ClearBtn: TButton;
+  OkBtn: TButton;
+  CancelBtn: TButton;
+  HelpBtn: TButton;
+begin
+  if not TComponent_FindComponent(FForm, 'GroupBox1', False, TComponent(GroupBox1), TGroupBox)
+    or not TComponent_FindComponent(FForm, 'ImagePanel', False, TComponent(ImagePanel), TPanel)
+    or not TComponent_FindComponent(FForm, 'Load', False, TComponent(LoadBtn), TButton)
+    or not TComponent_FindComponent(FForm, 'Save', False, TComponent(SaveBtn), TButton)
+    or not TComponent_FindComponent(FForm, 'Clear', False, TComponent(ClearBtn), TButton)
+    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OkBtn), TButton)
+    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelBtn), TButton)
+    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpBtn), TButton) then
+    Exit; //==>
+
+  GroupBox1.Anchors := [akLeft, akTop, akRight, akBottom];
+  ImagePanel.Anchors := [akLeft, akTop, akRight, akBottom];
+  LoadBtn.Anchors := [akRight, akBottom];
+  SaveBtn.Anchors := [akRight, akBottom];
+  ClearBtn.Anchors := [akRight, akBottom];
+  OkBtn.Anchors := [akRight, akTop];
+  CancelBtn.Anchors := [akRight, akTop];
+  HelpBtn.Anchors := [akRight, akTop];
 end;
 
 procedure TManagedFormSrchDialog.MakeComponentsResizable;
