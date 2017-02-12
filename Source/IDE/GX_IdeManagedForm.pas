@@ -1,0 +1,592 @@
+unit GX_IdeManagedForm;
+
+interface
+
+{$I GX_CondDefine.inc}
+
+uses
+  SysUtils,
+  Classes,
+  Controls,
+  Forms,
+  ExtCtrls,
+  Windows;
+
+type
+  TManagedForm = class;
+  TManagedFormClass = class of TManagedForm;
+
+  TFormChanges = record
+    // Source-defined
+    FormClassNames: string;
+    FormEnhancer: TManagedFormClass;
+    MakeResizable: Boolean;
+    RememberSize: Boolean;
+    RememberWidth: Boolean;
+    RememberPosition: Boolean;
+    RememberSplitterPosition: Boolean;
+    CollapseTreeNodes: string;
+    ResizePictureDialogs: Boolean;
+    ComboDropDownCount: Integer;
+  end;
+
+  TManagedForm = class(TComponent)
+  private
+    FForm: TForm;
+    FMinHeight: Integer; // if negative: Height is fixed
+    FMinWidth: Integer;
+    FOrigOnDestroy: TNotifyEvent;
+    function GetRegistryKey: string;
+    function FindSplitPanel: TCustomPanel;
+    procedure SetComboDropDownCount(Control: TControl);
+    procedure DoMakeResizable;
+    procedure DoCollapseTreeNodes;
+    procedure DoSaveFormState;
+    procedure DoLoadFormState;
+    procedure DoResizePictureDialogs;
+    procedure DoComboDropDownCount;
+    procedure FormCanResize(Sender: TObject; var NewWidth,
+      NewHeight: Integer; var Resize: Boolean);
+    procedure ForceVisibleToBeSizable(WndHandle: HWND);
+    procedure FormDestroy(Sender: TObject);
+  protected
+    procedure MakeComponentsResizable; virtual;
+  public
+    FFormChanges: TFormChanges;
+    class function GenerateName(const _FormName: string): string;
+    constructor Create(_Owner: TComponent); override;
+    procedure Init(const _FormChanges: TFormChanges);
+  end;
+
+type
+  TManagedFormSrchDialog = class(TManagedForm)
+  protected
+    procedure MakeComponentsResizable; override;
+  end;
+
+type
+  TManagedFormRplcDialog = class(TManagedForm)
+  protected
+    procedure MakeComponentsResizable; override;
+  end;
+
+type
+  TManagedFormConnEditForm = class(TManagedForm)
+  protected
+    procedure MakeComponentsResizable; override;
+  end;
+
+type
+  TManagedFormPakComponentsDlg = class(TManagedForm)
+  protected
+    procedure MakeComponentsResizable; override;
+  end;
+
+type
+  TManagedFormPasEnvironmentDialog = class(TManagedForm)
+  private
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+    FItems: TStringList;
+{$ENDIF}
+  protected
+    procedure MakeComponentsResizable; override;
+  public
+    constructor Create(_Owner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses
+  ComCtrls,
+  TypInfo,
+  ExtDlgs,
+  Dialogs,
+  StdCtrls,
+  GX_ConfigurationInfo,
+  GX_GenericUtils,
+  GX_dzClassUtils;
+
+const
+  WidthIdent = 'Width';
+  HeightIdent = 'Height';
+  TopIdent = 'Top';
+  LeftIdent = 'Left';
+  SplitPosIdent = 'SplitPos';
+
+type
+  TCustomFormHack = class(TCustomForm)
+  end;
+
+{ TGxIdeFormEnhancerBase }
+
+class function TManagedForm.GenerateName(const _FormName: string): string;
+begin
+  Result := 'GXManagedForm_' + _FormName;
+end;
+
+constructor TManagedForm.Create(_Owner: TComponent);
+begin
+  inherited Create(_Owner);
+  FForm := _Owner as TForm;
+  Name := GenerateName(FForm.Name)
+end;
+
+function TManagedForm.FindSplitPanel: TCustomPanel;
+var
+  i: Integer;
+  Control: TControl;
+begin
+  Assert(Assigned(FForm));
+
+  Result := nil;
+  for i := 0 to FForm.ControlCount - 1 do begin
+    Control := FForm.Controls[i];
+    if (Control is TCustomPanel) and (Control.Align = alLeft) then begin
+      Result := Control as TCustomPanel;
+      Break;
+    end;
+  end;
+end;
+
+function TManagedForm.GetRegistryKey: string;
+begin
+  Result := AddSlash(ConfigInfo.GExpertsIdeRootRegistryKey) + 'IDEForms';
+end;
+
+procedure TManagedForm.DoCollapseTreeNodes;
+var
+  LeftPanel: TCustomPanel;
+  Node: TTreeNode;
+  Nodes: TStringList;
+  i: Integer;
+begin
+  if IsEmpty(FFormChanges.CollapseTreeNodes) then
+    Exit;
+  Nodes := TStringList.Create;
+  try
+    AnsiStrTok(FFormChanges.CollapseTreeNodes, ';', Nodes);
+    for i := 0 to Nodes.Count - 1 do begin
+      Node := nil;
+      LeftPanel := FindSplitPanel;
+      if LeftPanel.ControlCount > 0 then
+        if LeftPanel.Controls[0] is TTreeView then
+          Node := FindTreeNode(LeftPanel.Controls[0] as TTreeView, Nodes[i]);
+      if Assigned(Node) then
+        Node.Collapse(False);
+    end;
+  finally
+    FreeAndNil(Nodes);
+  end;
+end;
+
+procedure TManagedForm.SetComboDropDownCount(Control: TControl);
+begin
+  if StrContains('Combo', Control.ClassName) or StrContains('ColorBox', Control.ClassName) then begin
+    if TypInfo.IsPublishedProp(Control, 'DropDownCount') then
+      if TypInfo.PropIsType(Control, 'DropDownCount', tkInteger) then
+        if GetPropValue(Control, 'DropDownCount', False) < FFormChanges.ComboDropDownCount then
+          TypInfo.SetPropValue(Control, 'DropDownCount', FFormChanges.ComboDropDownCount);
+  end;
+end;
+
+procedure TManagedForm.DoComboDropDownCount;
+begin
+  if FFormChanges.ComboDropDownCount > 0 then
+    IterateOverControls(FForm, SetComboDropDownCount);
+end;
+
+procedure TManagedForm.DoLoadFormState;
+var
+  Settings: TGExpertsSettings;
+  Section: string;
+  Panel: TCustomPanel;
+  Flags: TFormSaveFlags;
+begin
+  Assert(Assigned(FForm));
+  Settings := TGExpertsSettings.Create(GetRegistryKey);
+  try
+    Section := FForm.ClassName;
+    Flags := [];
+    if FFormChanges.RememberSize then
+      Include(Flags, fsSize);
+    if FFormChanges.RememberPosition then
+      Include(Flags, fsPosition);
+    if Flags <> [] then begin
+      Settings.LoadForm(FForm, Section, Flags);
+      EnsureFormVisible(FForm);
+    end;
+
+    if FFormChanges.RememberSplitterPosition then begin
+      Panel := FindSplitPanel;
+      if Assigned(Panel) then
+        Panel.Width := Settings.ReadInteger(Section, SplitPosIdent, Panel.Width);
+    end;
+
+    if FFormChanges.RememberWidth and (not FFormChanges.RememberSize) then begin
+      FForm.Width := Settings.ReadInteger(Section, WidthIdent, FForm.Width);
+      if not FFormChanges.RememberPosition then
+        CenterForm(FForm);
+    end;
+  finally
+    FreeAndNil(Settings);
+  end;
+end;
+
+procedure TManagedForm.FormCanResize(Sender: TObject; var NewWidth, NewHeight: Integer;
+  var Resize: Boolean);
+begin
+  if NewWidth < FMinWidth then
+    NewWidth := FMinWidth;
+  if (FMinHeight < 0) or (NewHeight < FMinHeight) then
+    NewHeight := Abs(FMinHeight);
+end;
+
+procedure TManagedFormSrchDialog.MakeComponentsResizable;
+{$IFNDEF GX_VER150_up} // Delphi 7
+var
+  PageControl: TPageControl;
+  SearchText: TComboBox;
+  FileSearchText: TComboBox;
+  GroupBox4: TGroupBox; // stupid developer forgot to give it a meaningful name :-(
+  DirSpec: TComboBox;
+  BrowseButton: TButton;
+  OKButton: TButton;
+  CancelButton: TButton;
+  HelpButton: TButton;
+{$ENDIF}
+begin
+{$IFNDEF GX_VER150_up} // Delphi 7
+  // This is only ever called in Delphi6 because the Search form of later
+  // versions is already resizable.
+  if not TComponent_FindComponent(FForm, 'PageControl', False, TComponent(PageControl), TPageControl)
+    or not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'FileSearchText', False, TComponent(FileSearchText), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'GroupBox4', False, TComponent(GroupBox4), TGroupBox)
+    or not TComponent_FindComponent(FForm, 'DirSpec', False, TComponent(DirSpec), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'BrowseButton', False, TComponent(BrowseButton), TButton)
+    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
+    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
+    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpButton), TButton) then
+    Exit;
+
+  FMinHeight := -FMinHeight;
+
+  PageControl.Anchors := [akLeft, akTop, akRight, akBottom];
+  SearchText.Anchors := [akLeft, akRight, akTop];
+  FileSearchText.Anchors := [akLeft, akRight, akTop];
+  GroupBox4.Anchors := [akLeft, akRight, akTop];
+  DirSpec.Anchors := [akLeft, akRight, akTop];
+  BrowseButton.Anchors := [akRight, akBottom];
+  OKButton.Anchors := [akRight, akBottom];
+  CancelButton.Anchors := [akRight, akBottom];
+  HelpButton.Anchors := [akRight, akBottom];
+{$ENDIF}
+end;
+
+procedure TManagedFormRplcDialog.MakeComponentsResizable;
+{$IFNDEF GX_VER150_up} // Delphi 7
+var
+  SearchText: TComboBox;
+  ReplaceText: TComboBox;
+  OKButton: TButton;
+  ChangeAll: TButton;
+  CancelButton: TButton;
+  HelpButton: TButton;
+{$ENDIF}
+begin
+{$IFNDEF GX_VER150_up} // Delphi 7
+  // This is only ever called in Delphi6 because the Replace form of later
+  // versions is already resizable.
+  if not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'ReplaceText', False, TComponent(ReplaceText), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
+    or not TComponent_FindComponent(FForm, 'ChangeAll', False, TComponent(ChangeAll), TButton)
+    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
+    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpButton), TButton) then
+    Exit;
+
+  FMinHeight := -FMinHeight;
+
+  SearchText.Anchors := [akLeft, akRight, akTop];
+  ReplaceText.Anchors := [akLeft, akRight, akTop];
+  OKButton.Anchors := [akRight, akBottom];
+  ChangeAll.Anchors := [akRight, akBottom];
+  CancelButton.Anchors := [akRight, akBottom];
+  HelpButton.Anchors := [akRight, akBottom];
+{$ENDIF}
+end;
+
+procedure TManagedFormConnEditForm.MakeComponentsResizable;
+var
+  SourceOfConnection: TGroupBox;
+  DataLinkFile: TComboBox;
+  Browse: TButton;
+  ConnectionString: TEdit;
+  Build: TButton;
+  OKButton: TButton;
+  CancelButton: TButton;
+  HelpButton: TButton;
+begin
+  // There are two forms with that name. The one shown for TAdoConnection is not resizable
+  if not TComponent_FindComponent(FForm, 'SourceOfConnection', False, TComponent(SourceOfConnection), TGroupBox)
+    or not TComponent_FindComponent(FForm, 'DataLinkFile', False, TComponent(DataLinkFile), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'Browse', False, TComponent(Browse), TButton)
+    or not TComponent_FindComponent(FForm, 'ConnectionString', False, TComponent(ConnectionString), TEdit)
+    or not TComponent_FindComponent(FForm, 'Build', False, TComponent(Build), TButton)
+    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
+    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
+    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpButton), TButton) then
+    Exit; // it's not the TAdoConnection one, we don't need to do anything
+
+  FMinHeight := -FMinHeight;
+
+  SourceOfConnection.Anchors := [akLeft, akTop, akRight];
+  DataLinkFile.Anchors := [akLeft, akTop, akRight];
+  Browse.Anchors := [akTop, akRight];
+  ConnectionString.Anchors := [akLeft, akTop, akRight];
+  Build.Anchors := [akTop, akRight];
+  OKButton.Anchors := [akBottom, akRight];
+  CancelButton.Anchors := [akBottom, akRight];
+  HelpButton.Anchors := [akBottom, akRight];
+end;
+
+procedure TManagedFormPakComponentsDlg.MakeComponentsResizable;
+var
+  InstalledGroupBox: TGroupBox;
+  ComponentsListBox: TListBox;
+  OKButton: TButton;
+  Button1: TButton; // Help button
+  Cancel: TButton;
+begin
+  if not TComponent_FindComponent(FForm, 'InstalledGroupBox', False, TComponent(InstalledGroupBox), TGroupBox)
+    or not TComponent_FindComponent(FForm, 'ComponentsListBox', False, TComponent(ComponentsListBox), TListBox)
+    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
+    or not TComponent_FindComponent(FForm, 'Button1', False, TComponent(Button1), TButton)
+    or not TComponent_FindComponent(FForm, 'Cancel', False, TComponent(Cancel), TButton) then
+    Exit;
+
+  InstalledGroupBox.Anchors := [akTop, akLeft, akRight, akBottom];
+  ComponentsListBox.Anchors := [akTop, akLeft, akRight, akBottom];
+  OKButton.Anchors := [akRight, akBottom];
+  Button1.Anchors := [akRight, akBottom];
+  Cancel.Visible := False;
+end;
+
+constructor TManagedFormPasEnvironmentDialog.Create(_Owner: TComponent);
+begin
+  inherited;
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  FItems := TStringList.Create;
+{$ENDIF}
+end;
+
+destructor TManagedFormPasEnvironmentDialog.Destroy;
+begin
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  FreeAndNil(FItems);
+{$ENDIF}
+  inherited;
+end;
+
+procedure TManagedFormPasEnvironmentDialog.MakeComponentsResizable;
+// This is called in Delphi6 and Delphi 7 because the Environment form of later
+// versions is already resizable.
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+var
+  VariableOptionsFrame: TWinControl;
+
+  function IsInVarOptionsFrame(_cmp: TComponent): Boolean;
+  begin
+    Result := Assigned(VariableOptionsFrame) and (_cmp is TControl);
+    if Result then
+      Result := VariableOptionsFrame.ContainsControl(TControl(_cmp));
+  end;
+
+  procedure HandleComponent(_cmp: TComponent);
+  var
+    i: Integer;
+  begin
+    if _cmp.ClassNameIs('TVariableOptionsFrame') then begin
+      if SameText(_cmp.Name, 'VariableOptionsFrame') then begin
+        VariableOptionsFrame := TWinControl(_cmp);
+        VariableOptionsFrame.Align := alClient;
+      end;
+    end else if _cmp is TPageControl then begin
+      TPageControl(_cmp).Anchors := [akLeft, akTop, akRight, akBottom];
+    end else if _cmp is TPanel then begin
+      if SameText(_cmp.Name, 'ToolListPanel') or IsInVarOptionsFrame(_cmp) then
+        TPanel(_cmp).Anchors := [akLeft, akTop, akRight, akBottom];
+    end else if _cmp is TButton then begin
+      TButton(_cmp).Anchors := [akRight, akBottom];
+    end else if _cmp is TColorBox then begin
+      if SameText(_cmp.Name, 'cbColorPicker') then
+        TColorBox(_cmp).Anchors := [akLeft, akBottom];
+    end else if _cmp is TCustomCombobox then begin
+      if SameText(_cmp.Name, 'ecLibraryPath') or SameText(_cmp.Name, 'ecDLLOutput')
+        or SameText(_cmp.Name, 'ecDCPOutput') or SameText(_cmp.Name, 'ecBrowsing') then begin
+        TComboBox(_cmp).Anchors := [akLeft, akRight, akTop];
+      end;
+    end else if _cmp is TGroupBox then begin
+      if SameText(_cmp.Name, 'GroupBox10') or SameText(_cmp.Name, 'Repository') then begin
+        TGroupBox(_cmp).Anchors := [akLeft, akTop, akRight];
+      end else if SameText(_cmp.Name, 'gbColors') then begin
+        TGroupBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+      end else if IsInVarOptionsFrame(_cmp) then begin
+        if SameText(_cmp.Name, 'GroupBox1') then begin
+          TGroupBox(_cmp).Anchors := [akLeft, akTop, akBottom, akRight];
+        end else if SameText(_cmp.Name, 'GroupBox2') then begin
+          TGroupBox(_cmp).Anchors := [akLeft, akBottom, akRight];
+        end;
+      end;
+    end else if _cmp is TListBox then begin
+      if SameText(_cmp.Name, 'lbColors') then begin
+        TListBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+      end else if SameText(_cmp.Name, 'PageListBox') then begin
+        TListBox(_cmp).Anchors := [akLeft, akTop, akBottom];
+        if (TListBox(_cmp).Items.Count = 0) and (FItems.Count <> 0) then
+          TListBox(_cmp).Items.Assign(FItems);
+      end;
+    end else if _cmp.ClassNameIs('TPropEdit') then begin
+      if SameText(_cmp.Name, 'ecRepositoryDir') then begin
+        TCustomEdit(_cmp).Anchors := [akLeft, akTop, akRight];
+      end;
+    end else if _cmp.ClassNameIs('THintListView') then begin
+      if IsInVarOptionsFrame(_cmp) then
+        TWinControl(_cmp).Anchors := [akLeft, akTop, akRight];
+    end;
+    for i := 0 to _cmp.ComponentCount - 1 do begin
+      HandleComponent(_cmp.Components[i]);
+    end;
+  end;
+{$ENDIF}
+begin
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  HandleComponent(FForm);
+{$ENDIF}
+end;
+
+procedure TManagedForm.ForceVisibleToBeSizable(WndHandle: HWND);
+begin
+  // this is taken from http://stackoverflow.com/a/34255563/49925
+  SetWindowLong(WndHandle, GWL_STYLE,
+    GetWindowLong(WndHandle, GWL_STYLE) and not WS_POPUP or WS_THICKFRAME);
+  SetWindowLong(WndHandle, GWL_EXSTYLE,
+    GetWindowLong(WndHandle, GWL_EXSTYLE) and not WS_EX_DLGMODALFRAME);
+  InsertMenu(GetSystemMenu(WndHandle, False), 1, MF_STRING or MF_BYPOSITION, SC_SIZE, 'Size');
+  SetWindowPos(WndHandle, 0, 0, 0, 0, 0,
+    SWP_NOSIZE or SWP_NOMOVE or SWP_NOZORDER or SWP_FRAMECHANGED);
+  DrawMenuBar(WndHandle);
+end;
+
+procedure TManagedForm.DoMakeResizable;
+var
+  WasShowing: Boolean;
+  ClsName: string;
+begin
+  Assert(Assigned(FForm));
+
+  if FFormChanges.MakeResizable and (FForm.BorderStyle <> bsSizeable) then begin
+    ClsName := FForm.ClassName;
+    WasShowing := (fsShowing in TCustomFormHack(FForm).FFormState);
+    if WasShowing then
+      Exclude(TCustomFormHack(FForm).FFormState, fsShowing);
+    if WasShowing then begin
+      ForceVisibleToBeSizable(FForm.Handle);
+    end else begin
+      FForm.BorderStyle := bsSizeable;
+      FForm.HandleNeeded;
+    end;
+    FMinHeight := FForm.Height;
+    FMinWidth := FForm.Width;
+    FForm.OnCanResize := FormCanResize;
+    MakeComponentsResizable;
+    if WasShowing then begin
+      SendMessage(FForm.Handle, CM_SHOWINGCHANGED, 0, 0);
+    end;
+  end;
+end;
+
+procedure TManagedForm.DoResizePictureDialogs;
+var
+  i: Integer;
+  PictureDialog: TOpenPictureDialog;
+  cmp: TComponent;
+begin
+  Assert(Assigned(FForm));
+
+  if FFormChanges.ResizePictureDialogs then begin
+    for i := 0 to FForm.ComponentCount - 1 do begin
+      cmp := FForm.Components[i];
+      if cmp is TOpenPictureDialog then begin
+        PictureDialog := TOpenPictureDialog(cmp);
+        PictureDialog.Options := PictureDialog.Options + [ofEnableSizing];
+      end;
+    end;
+  end;
+end;
+
+procedure TManagedForm.DoSaveFormState;
+var
+  Settings: TGExpertsSettings;
+  Section: string;
+  Panel: TCustomPanel;
+begin
+  Assert(Assigned(FForm));
+
+  Settings := TGExpertsSettings.Create(GetRegistryKey);
+  try
+    Section := FForm.ClassName;
+    if FFormChanges.RememberSize then begin
+      Settings.WriteInteger(Section, WidthIdent, FForm.Width);
+      Settings.WriteInteger(Section, HeightIdent, FForm.Height);
+    end;
+    if FFormChanges.RememberPosition then begin
+      Settings.WriteInteger(Section, TopIdent, FForm.Top);
+      Settings.WriteInteger(Section, LeftIdent, FForm.Left);
+    end;
+    if FFormChanges.RememberSplitterPosition then begin
+      Panel := FindSplitPanel;
+      if Assigned(Panel) then
+        Settings.WriteInteger(Section, SplitPosIdent, Panel.Width)
+      else
+        Settings.DeleteKey(Section, SplitPosIdent);
+    end;
+    if FFormChanges.RememberWidth and (not FFormChanges.RememberSize) then
+      Settings.WriteInteger(Section, WidthIdent, FForm.Width);
+  finally
+    FreeAndNil(Settings);
+  end;
+end;
+
+procedure TManagedForm.Init(const _FormChanges: TFormChanges);
+begin
+  Assert(Assigned(FForm));
+
+  FFormChanges := _FormChanges;
+  FOrigOnDestroy := FForm.OnDestroy;
+  FForm.OnDestroy := FormDestroy;
+
+  DoMakeResizable;
+  DoLoadFormState;
+  DoCollapseTreeNodes;
+  DoResizePictureDialogs;
+  DoComboDropDownCount;
+end;
+
+procedure TManagedForm.FormDestroy(Sender: TObject);
+begin
+  Assert(Assigned(FForm));
+  Assert(FForm = Sender);
+
+  FForm.OnDestroy := FOrigOnDestroy;
+  FOrigOnDestroy := nil;
+  DoSaveFormState;
+end;
+
+procedure TManagedForm.MakeComponentsResizable;
+begin
+  // does nothing, is overridden in decendant forms if necessary
+end;
+
+end.
