@@ -89,7 +89,7 @@ type
   end;
 
 const
-  FormsToChange: array[0..9] of TFormChanges = (
+  FormsToChange: array[0..10] of TFormChanges = (
     (
       FormClassNames: 'TSrchDialog';
       FormEnhancer: TManagedFormSrchDialog;
@@ -164,6 +164,18 @@ const
       CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
+    ),
+    (
+      FormClassNames: 'TDelphiProjectOptionsDialog';
+      FormEnhancer: TManagedForm;
+      MakeResizable: True;
+      RememberSize: True;
+      RememberWidth: False;
+      RememberPosition: True;
+      RememberSplitterPosition: True;
+      CollapseTreeNodes: '';
+      ResizePictureDialogs: False;
+      ComboDropDownCount: 0; // changing the dropdown count seems to result in intermittent invalid pointer operations in Delphi 10.1
     ),
     (
       FormClassNames: 'TPasEnvironmentDialog';
