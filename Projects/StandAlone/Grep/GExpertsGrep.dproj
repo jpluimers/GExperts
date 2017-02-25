@@ -73,5 +73,7 @@
     <DelphiCompile Include="GExpertsGrep.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="..\..\..\Source\Framework\GX_StandAloneLoadDLL.pas" />
+    <DCCReference Include="GrepMain.pas" />
   </ItemGroup>
 </Project>
