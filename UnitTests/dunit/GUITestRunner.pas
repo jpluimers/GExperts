@@ -45,7 +45,7 @@ uses
   Math,
   Graphics, Controls, Forms, 
   ComCtrls, ExtCtrls, StdCtrls, ImgList, Buttons, Menus, ActnList,
-  Classes, IniFiles, ToolWin, DUnitConsts, System.Actions, System.ImageList;
+  Classes, IniFiles, ToolWin, DUnitConsts, Actions, ImageList;
 
 
 
