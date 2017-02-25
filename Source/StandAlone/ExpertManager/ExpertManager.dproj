@@ -20,6 +20,12 @@
     <DCC_ImageBase>500000</DCC_ImageBase>
     <DCC_Define>RELEASE</DCC_Define>
     <DCC_Description>GExperts IDE Expert Manager</DCC_Description>
+    <DCC_ExeOutput>..\..\..\Binaries</DCC_ExeOutput>
+    <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+    <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
+    <DCC_HppOutput>.\dcu</DCC_HppOutput>
+    <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
+    <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Version>7.0</Version>
@@ -32,7 +38,7 @@
     <DCC_ImageBase>500000</DCC_ImageBase>
     <DCC_Define>DEBUG</DCC_Define>
     <DCC_Description>GExperts IDE Expert Manager</DCC_Description>
-    <DCC_ExeOutput>D:\source\_sourceforge\gexperts\Binaries</DCC_ExeOutput>
+    <DCC_ExeOutput>..\..\..\Binaries</DCC_ExeOutput>
     <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
     <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
     <DCC_HppOutput>.\dcu</DCC_HppOutput>
