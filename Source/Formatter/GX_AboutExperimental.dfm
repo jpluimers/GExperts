@@ -57,7 +57,9 @@ inherited fmAboutExperimental: TfmAboutExperimental
     Width = 385
     Height = 14
     Cursor = crHandPoint
-    Hint = 'http://www.aew.wur.nl/UK/Delforexp/'
+    Hint = 
+      'http://web.archive.org/web/20121115141650/http://www.aew.wur.nl/' +
+      'UK/Delforexp'
     Alignment = taCenter
     AutoSize = False
     Caption = 'Code formatter based on DelForExp by Egbert van Nes'
