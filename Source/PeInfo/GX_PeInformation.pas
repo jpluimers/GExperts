@@ -937,29 +937,34 @@ var
   PEExpertStandAlone: TPEExpert;
   fn: string;
 begin
-  {$IFOPT D+}SendDebug('Showing PE Information'); {$ENDIF}
-  PEExpertStandAlone := nil;
-  InitSharedResources;
   try
-    {$IFOPT D+} SendDebug('Created CodeLib window'); {$ENDIF}
-    PEExpertStandAlone := TPEExpert.Create;
-    PEExpertStandAlone.LoadSettings;
-    fmPeInformation := TfmPeInformation.Create(nil);
-    if Assigned(CmdLine)  then begin
-      fn := string(cmdline);
-      if fn <> '' then
-        fmPeInformation.LoadPEInfo(fn);
-    end;
-    fmPeInformation.ShowModal;
-    PEExpertStandAlone.SaveSettings;
-  finally
+    {$IFOPT D+}SendDebug('Showing PE Information');{$ENDIF}
+    PEExpertStandAlone := nil;
+    InitSharedResources;
+    try
+      {$IFOPT D+}SendDebug('Created CodeLib window');{$ENDIF}
+      PEExpertStandAlone := TPEExpert.Create;
+      PEExpertStandAlone.LoadSettings;
+      fmPeInformation := TfmPeInformation.Create(nil);
+      if Assigned(CmdLine) then begin
+        fn := string(CmdLine);
+        if fn <> '' then
+          fmPeInformation.LoadPEInfo(fn);
+      end;
+      fmPeInformation.ShowModal;
+      PEExpertStandAlone.SaveSettings;
+    finally
     // Destroying the form will result in an access violation in
     // TfmIdeDockForm.Destroy which I could not debug and prevent properly.
     // Just setting it to nil creates a memory leak, but we are shutting down anyway.
     // -- 2016-06-05 twm
-    fmPeInformation := nil;
-    FreeAndNil(PEExpertStandAlone);
-    FreeSharedResources;
+      fmPeInformation := nil;
+      FreeAndNil(PEExpertStandAlone);
+      FreeSharedResources;
+    end;
+  except
+    on e: exception do
+      Application.ShowException(e);
   end;
 end;
 
