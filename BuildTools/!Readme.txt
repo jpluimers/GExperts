@@ -1,5 +1,5 @@
 These are some executables and scripts used in Building
-the experimental GExpert versions.
+the experimental GExperts versions.
 
 The scripts are written by myself (twm)
 
