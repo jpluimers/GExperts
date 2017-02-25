@@ -3,7 +3,7 @@ program ExpertManager;
 uses
   Windows,
   SysUtils,
-  GX_VerDepConst in '..\..\Framework\GX_VerDepConst.pas',
+  GX_VerDepConst in '..\..\..\Source\Framework\GX_VerDepConst.pas',
   GExpertsDllSelection in 'GExpertsDllSelection.pas' {frGEXpertsDllSelection};
 
 {$R *_icon.res}
