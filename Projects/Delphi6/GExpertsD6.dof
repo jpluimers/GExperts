@@ -87,7 +87,6 @@ OriginalFilename=GExpertsD6.dll
 ProductName=GExperts for Delphi
 ProductVersion=1.38
 Comments=Open Source
-CompileDate=Monday, September 29, 2008 12:24 AM
 
 [Excluded Packages]
 c:\delphi\delphi6\Bin\dclib60.bpl=InterBase Data Access Components
