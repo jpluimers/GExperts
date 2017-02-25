@@ -18,7 +18,8 @@ type
 
 type
   IGExpertsDll = interface
-    function GetProcAddress(const _EntryPoint: string): pointer;
+    function GetProcAddress(const _EntryPoint: AnsiString): pointer;
+    function DllName: string;
   end;
 
 function LoadGExpertsDll(const _DllName: string): IGExpertsDll;
@@ -26,12 +27,16 @@ function LoadAnyGExpertsDLL: IGExpertsDll;
 
 implementation
 
+uses
+  Forms;
+
 type
   TGExpertsDll = class(TInterfacedObject, IGExpertsDll)
   private
     FDllHandle: HMODULE;
     FDllName: string;
-    function GetProcAddress(const _EntryPoint: string): pointer;
+    function GetProcAddress(const _EntryPoint: AnsiString): pointer;
+    function DllName: string;
   public
     constructor Create(const _DllName: string);
     destructor Destroy; override;
@@ -79,9 +84,13 @@ end;
 { TGExpertsDll }
 
 constructor TGExpertsDll.Create(const _DllName: string);
+var
+  Path: string;
 begin
   inherited Create;
-  FDllName := _DllName;
+  Path := ExtractFilePath(Application.ExeName);
+  Path := IncludeTrailingPathDelimiter(Path);
+  FDllName := Path + _DllName;
   FDllHandle := SysUtils.SafeLoadLibrary(_DllName);
   if FDllHandle = 0 then
     raise ELoadFailed.CreateFmt('Could not load library %s.', [FDllName]);
@@ -93,7 +102,12 @@ begin
   inherited;
 end;
 
-function TGExpertsDll.GetProcAddress(const _EntryPoint: string): pointer;
+function TGExpertsDll.DllName: string;
+begin
+  Result := FDllName;
+end;
+
+function TGExpertsDll.GetProcAddress(const _EntryPoint: AnsiString): pointer;
 begin
   Result := Windows.GetProcAddress(FDllHandle, PAnsiChar(_EntryPoint));
   if not Assigned(Result) then
