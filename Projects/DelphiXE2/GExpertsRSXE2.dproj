@@ -47,10 +47,9 @@
 			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Winapi;System.Win;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE2;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE2;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE2.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
 			<VerInfo_Locale>1033</VerInfo_Locale>
-			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
 			<VerInfo_MinorVer>3</VerInfo_MinorVer>
 			<VerInfo_DLL>true</VerInfo_DLL>
-			<OutputExt>dll</OutputExt>
 			<VerInfo_Release>8</VerInfo_Release>
 			<DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
@@ -71,6 +70,9 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
 			<DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+			<PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
+call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)
+$(PreBuildEvent)]]></PreBuildEvent>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_DebugInformation>False</DCC_DebugInformation>
@@ -101,7 +103,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
 			<Debugger_RunParams>-ns</Debugger_RunParams>
-			<Debugger_HostApplication>D:\IDE\Delphi XE2\bin\bds.exe</Debugger_HostApplication>
+			<Debugger_HostApplication>C:\Delphi\DelphiXE2\bin\bds.exe</Debugger_HostApplication>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -555,7 +557,7 @@
 						<Parameters Name="HostApplication">D:\IDE\Delphi XE2\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">3</VersionInfo>
@@ -599,4 +601,20 @@
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
+		<PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win32'">
+			<PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)&amp;&amp;call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+			<PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+			<PreLinkEvent/>
+			<PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+			<PostBuildEvent/>
+			<PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win32'">
+			<PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)&amp;&amp;call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+			<PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+			<PreLinkEvent/>
+			<PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+			<PostBuildEvent/>
+			<PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+		</PropertyGroup>
 	</Project>

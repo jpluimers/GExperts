@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{FCFABDD7-526A-4FC6-8809-72A25446A427}</ProjectGuid>
 			<MainSource>GExpertsRS2010.dpr</MainSource>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
@@ -495,6 +495,10 @@
 			</BuildConfiguration>
 		</ItemGroup>
 		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<PropertyGroup>
+			<PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
+call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)]]></PreBuildEvent>
+		</PropertyGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType>VCLApplication</Borland.ProjectType>
@@ -508,10 +512,10 @@
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 						<Parameters Name="RunParams">-ns -np</Parameters>
-						<Parameters Name="HostApplication">D:\IDE\Delphi 2010\bin\bds.exe</Parameters>
+						<Parameters Name="HostApplication">C:\Delphi\Delphi2010\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">3</VersionInfo>

@@ -506,6 +506,10 @@
 		</ItemGroup>
 		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
 		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<PropertyGroup>
+			<PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
+call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)]]></PreBuildEvent>
+		</PropertyGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType>VCLApplication</Borland.ProjectType>
@@ -516,10 +520,10 @@
 					</Source>
 					<Parameters>
 						<Parameters Name="RunParams">-ns</Parameters>
-						<Parameters Name="HostApplication">D:\IDE\Delphi XE\bin\bds.exe</Parameters>
+						<Parameters Name="HostApplication">C:\Delphi\DelphiXE\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">3</VersionInfo>

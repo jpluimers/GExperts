@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.1</ProjectVersion>
+        <ProjectVersion>18.2</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -64,6 +64,9 @@
         <GenDll>true</GenDll>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
+call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)
+$(PreBuildEvent)]]></PreBuildEvent>
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
@@ -73,7 +76,7 @@
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_HostApplication>C:\IDE\Delphi 10.1\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>C:\Delphi\Delphi_10_1\bin\bds.exe</Debugger_HostApplication>
         <Debugger_RunParams>-ns</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -84,7 +87,7 @@
         <DCC_Optimize>False</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_HostApplication>C:\IDE\Delphi 10.1\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>C:\Delphi\Delphi_10_1\bin\bds.exe</Debugger_HostApplication>
         <Debugger_RunParams>-ns</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
@@ -514,6 +517,10 @@
             <Form>f_IdeBuildEventFavoriteEdit</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_ReadMapFileThread.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
@@ -538,6 +545,7 @@
                     <Source Name="MainSource">GExpertsRS101.dpr</Source>
                 </Source>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\17.0\Bpl\SortProjects.bpl">Sort Projects plugin</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k230.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp230.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>

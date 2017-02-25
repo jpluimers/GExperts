@@ -1,5 +1,6 @@
 [FileVersion]
 Version=6.0
+
 [Compiler]
 A=8
 B=0
@@ -30,6 +31,7 @@ Z=1
 ShowHints=1
 ShowWarnings=1
 UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=actnlist;Themes=Controls
+
 [Linker]
 MapFile=0
 OutputObjs=0
@@ -40,6 +42,7 @@ MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=5242880
 ExeDescription=
+
 [Directories]
 OutputDir=..\..\DLLs
 UnitOutputDir=dcu
@@ -50,14 +53,16 @@ Packages=rtl;vcl;vclx;vclsmp;designide
 Conditionals=
 DebugSourceDirs=
 UsePackages=1
+
 [Parameters]
 RunParams=-ns
-HostApplication=D:\IDE\Delphi 6\Bin\delphi32.exe
+HostApplication=C:\Delphi\Delphi6\Bin\delphi32.exe
 Launcher=
 UseLauncher=0
 DebugCWD=
+
 [Version Info]
-IncludeVerInfo=1
+IncludeVerInfo=0
 AutoIncBuild=0
 MajorVer=1
 MinorVer=3
@@ -70,6 +75,7 @@ Private=0
 DLL=1
 Locale=1033
 CodePage=1252
+
 [Version Info Keys]
 CompanyName=Erik Berry and the GExperts Development Team
 FileDescription=GExperts for Delphi 6
@@ -82,24 +88,13 @@ ProductName=GExperts for Delphi
 ProductVersion=1.38
 Comments=Open Source
 CompileDate=Monday, September 29, 2008 12:24 AM
+
 [Excluded Packages]
-C:\Windows\SysWOW64\ibevnt60.bpl=Borland Interbase Event Alerter Component
+c:\delphi\delphi6\Bin\dclib60.bpl=InterBase Data Access Components
+c:\delphi\delphi6\Bin\dclclxdb60.bpl=Borland CLX Database Components
+C:\Delphi\Delphi6\bin\dclclxstd60.bpl=Borland CLX Standard Components
+
 [HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=1
-Item0=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit
-[HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=dcu
-[HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=..\..\DLLs
-[Warnings]
-SymbolDeprecated=1
-SymbolLibrary=1
-SymbolPlatform=1
-UnitLibrary=1
-UnitPlatform=1
-UnitDeprecated=1
+Count=2
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=actnlist;Themes=Controls
+Item1=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;

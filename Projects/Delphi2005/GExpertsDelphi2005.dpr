@@ -224,8 +224,8 @@ uses
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas';
 
-{$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'} // if you get an error here, run the __build_project.cmd script first
-{$R *.res}
+{$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
+{$R *_version.res} // if you get an error here, run the __build_project.cmd script first
 
 begin
 end.

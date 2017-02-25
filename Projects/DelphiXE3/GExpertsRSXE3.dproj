@@ -3,7 +3,7 @@
         <ProjectGuid>{1109E7A4-31BB-4DBB-945A-4F305C67DFEB}</ProjectGuid>
         <MainSource>GExpertsRSXE3.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>None</FrameworkType>
@@ -62,7 +62,6 @@
         <DCC_E>false</DCC_E>
         <DCC_K>false</DCC_K>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
-        <OutputExt>dll</OutputExt>
         <Manifest_File>None</Manifest_File>
         <GenDll>true</GenDll>
         <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
@@ -73,7 +72,7 @@
         <DCC_N>false</DCC_N>
         <DCC_F>false</DCC_F>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_OSX32)'!=''">
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
@@ -82,6 +81,9 @@
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
+call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)
+$(PreBuildEvent)]]></PreBuildEvent>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE3;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE3;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE3.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
@@ -601,4 +603,20 @@
     </ProjectExtensions>
     <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
     <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win32'">
+        <PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)&amp;&amp;call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent/>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win32'">
+        <PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)&amp;&amp;call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent/>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
 </Project>

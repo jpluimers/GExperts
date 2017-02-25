@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{84D8A48D-40DE-46E2-B5D2-562447ADAEB5}</ProjectGuid>
         <MainSource>GExpertsRSXE4.dpr</MainSource>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <ProjectVersion>14.6</ProjectVersion>
         <Base>True</Base>
@@ -48,7 +48,6 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_DLL>true</VerInfo_DLL>
-        <OutputExt>dll</OutputExt>
         <VerInfo_Release>8</VerInfo_Release>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
@@ -70,6 +69,9 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
+call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)
+$(PreBuildEvent)]]></PreBuildEvent>
         <Debugger_RunParams>-ns</Debugger_RunParams>
         <Debugger_HostApplication>D:\IDE\Delphi XE4\bin\bds.exe</Debugger_HostApplication>
     </PropertyGroup>
@@ -553,7 +555,7 @@
                     <Parameters Name="HostApplication">D:\IDE\Delphi XE4\bin\bds.exe</Parameters>
                 </Parameters>
                 <VersionInfo>
-                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
                     <VersionInfo Name="AutoIncBuild">False</VersionInfo>
                     <VersionInfo Name="MajorVer">1</VersionInfo>
                     <VersionInfo Name="MinorVer">3</VersionInfo>
@@ -594,4 +596,20 @@
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
+    <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win32'">
+        <PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)&amp;&amp;call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent/>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win32'">
+        <PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)&amp;&amp;call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent/>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
 </Project>

@@ -131,7 +131,7 @@
 		</Directories>
 		<Parameters>
 			<Parameters Name="RunParams" Type="String">-np -ns</Parameters>
-			<Parameters Name="HostApplication" Type="String">D:\Borland\BDS2006\Bin\bds.exe</Parameters>
+			<Parameters Name="HostApplication" Type="String">c:\Delphi\Delphi2006\Bin\bds.exe</Parameters>
 			<Parameters Name="Launcher" Type="String"></Parameters>
 			<Parameters Name="UseLauncher" Type="Boolean">False</Parameters>
 			<Parameters Name="DebugCWD" Type="String"></Parameters>
@@ -178,7 +178,8 @@
 			<Language Name="ActiveLang" Type="String"></Language>
 			<Language Name="ProjectLang" Type="String">$00000000</Language>
 			<Language Name="RootDir" Type="String"></Language>
-		</Language>  <Excluded_Packages>
+		</Language>
+    <Excluded_Packages>
       <Excluded_Packages Name="d:\borland\dexter\bin\dclado100.bpl">Borland ADO DB Components</Excluded_Packages>
       <Excluded_Packages Name="d:\borland\dexter\Bin\dclsmp100.bpl">Borland Sample Components</Excluded_Packages>
       <Excluded_Packages Name="d:\borland\dexter\Bin\dclIndyProtocols100.bpl">Indy 10 Protocols Design Time</Excluded_Packages>

@@ -2,6 +2,8 @@ library GExpertsBDS2006;
 
 {$E dll}
 
+{%File '_prebuild.cmd'}
+
 uses
   GX_About in '..\..\source\Framework\GX_About.pas' {fmAbout},
   GX_ActionBroker in '..\..\source\Framework\GX_ActionBroker.pas',
@@ -225,7 +227,7 @@ uses
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
-{$R *.res}
+{$R *_version.res}
 
 begin
 end.

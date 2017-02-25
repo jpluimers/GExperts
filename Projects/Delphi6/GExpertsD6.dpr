@@ -225,7 +225,7 @@ uses
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
-{$R *.res}
+{$R *_version.res}
 
 end.
 
