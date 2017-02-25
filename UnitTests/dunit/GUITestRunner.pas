@@ -45,7 +45,7 @@ uses
   Math,
   Graphics, Controls, Forms, 
   ComCtrls, ExtCtrls, StdCtrls, ImgList, Buttons, Menus, ActnList,
-  Classes, IniFiles, ToolWin, DUnitConsts;
+  Classes, IniFiles, ToolWin, DUnitConsts, System.Actions, System.ImageList;
 
 
 
@@ -1233,7 +1233,7 @@ begin
   FTests := TInterfaceList.Create;
   LoadConfiguration;
 
-  TimeSeparator := ':';
+//  TimeSeparator := ':';
   SetUpStateImages;
   SetupCustomShortcuts;
   TestTree.Items.Clear;
