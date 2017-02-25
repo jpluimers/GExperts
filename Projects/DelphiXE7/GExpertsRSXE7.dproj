@@ -49,7 +49,7 @@
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;System.Win;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE7;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE7;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE7.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CFBundleName=</VerInfo_Keys>
-        <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">

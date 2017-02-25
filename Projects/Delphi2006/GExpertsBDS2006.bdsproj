@@ -119,7 +119,7 @@
 			<Linker Name="GenerateHpps">False</Linker>
 		</Linker>
 		<Directories>
-			<Directories Name="OutputDir" Type="String">..\..\DLLs</Directories>
+			<Directories Name="OutputDir" Type="String">..\..\Binaries</Directories>
 			<Directories Name="UnitOutputDir" Type="String">dcu</Directories>
 			<Directories Name="PackageDLLOutputDir" Type="String"></Directories>
 			<Directories Name="PackageDCPOutputDir" Type="String"></Directories>

@@ -42,7 +42,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
         <Manifest_File>None</Manifest_File>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
@@ -53,7 +53,7 @@
         <VerInfo_DLL>true</VerInfo_DLL>
         <VerInfo_Release>8</VerInfo_Release>
         <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_DependencyCheckOutputName>..\..\DLLs\GExpertsRSXE5.dll</DCC_DependencyCheckOutputName>
+        <DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE5.dll</DCC_DependencyCheckOutputName>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <UsePackages>true</UsePackages>
         <DCC_Platform>x86</DCC_Platform>

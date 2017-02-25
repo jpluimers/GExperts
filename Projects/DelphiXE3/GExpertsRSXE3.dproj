@@ -64,7 +64,7 @@
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <Manifest_File>None</Manifest_File>
         <GenDll>true</GenDll>
-        <DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE3;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE3;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE3.dll;ProductName=GExperts for RAD Studio ;ProductVersion=1.38;Comments=Open Source;CFBundleName=;CFBundleDisplayName=;CFBundleIdentifier=;CFBundleVersion=;CFBundlePackageType=;CFBundleSignature=;CFBundleAllowMixedLocalizations=;CFBundleExecutable=</VerInfo_Keys>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
         <DCC_ImageBase>00400000</DCC_ImageBase>

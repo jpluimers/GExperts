@@ -44,7 +44,7 @@ ImageBase=5242880
 ExeDescription=
 
 [Directories]
-OutputDir=..\..\DLLs
+OutputDir=..\..\Binaries
 UnitOutputDir=dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=

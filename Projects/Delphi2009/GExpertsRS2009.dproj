@@ -5,7 +5,7 @@
 			<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 			<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<DCC_DependencyCheckOutputName>..\..\DLLs\GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Release</Config>
 		</PropertyGroup>
@@ -27,10 +27,10 @@
 			<DCC_StringChecks>off</DCC_StringChecks>
 			<DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
-			<DCC_ExeOutput>..\..\DLLs</DCC_ExeOutput>
+			<DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
 			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DcuOutput>dcu</DCC_DcuOutput>
-			<DCC_DependencyCheckOutputName>..\..\DLLs\GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
 			<UsePackages>true</UsePackages>
 			<GenDll>true</GenDll>
 			<DCC_UsePackage>rtl;vcl;vclx;designide</DCC_UsePackage>
