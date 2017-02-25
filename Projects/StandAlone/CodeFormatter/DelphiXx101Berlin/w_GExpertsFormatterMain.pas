@@ -54,6 +54,9 @@ implementation
 
 {$R *.dfm}
 
+uses
+  GX_StandAloneLoadDLL;
+
 type
   TFormatFileFunc = function(_FileName: PChar): Boolean;
   TFormatFilesFunc = function(_FileNames: PChar): Boolean;
@@ -70,38 +73,29 @@ var
   FormatFiles: TFormatFilesFunc = nil;
   ConfigureFormatter: TConfigureFormatterProc = nil;
   AboutFormatter: TAboutFormatterProc = nil;
-  HModule: THandle;
+  Dll: IGExpertsDll;
 
 function LoadGExperts(out _DllName: string): Boolean;
 var
   Path: string;
-  sr: TSearchRec;
 begin
-  Result := False;
-  Path := ExtractFilePath(Application.ExeName);
-  Path := IncludeTrailingPathDelimiter(Path);
-  if FindFirst(Path + 'GExperts*.dll', faNormal, sr) <> 0 then begin
-    ShowMessage(Format('Could not find GExperts*.dll in path %s.', [Path]));
-    Exit;
-  end;
-
   try
-    _DllName := sr.Name;
-    HModule := SafeLoadLibrary(_DllName);
-    if HModule = 0 then begin
-      ShowMessage('Could not load GExperts*.dll');
-      Exit;
+    Dll := LoadAnyGExpertsDLL;
+  except
+    on e: exception do begin
+      Application.ShowException(e);
+      Result := False;
+      Exit; //==>
     end;
-  finally
-    FindClose(sr);
   end;
 
+  _DllName := Dll.DllName;
   Result := True;
 
-  FormatFile := GetProcAddress(HModule, EntryPoint_FormatFile);
-  FormatFiles := GetProcAddress(HModule, EntryPoint_FormatFiles);
-  ConfigureFormatter := GetProcAddress(HModule, EntryPoint_ConfigureFormatter);
-  AboutFormatter := GetProcAddress(HModule, EntryPoint_AboutFormatter);
+  FormatFile := Dll.GetProcAddress(EntryPoint_FormatFile);
+  FormatFiles := Dll.GetProcAddress(EntryPoint_FormatFiles);
+  ConfigureFormatter := Dll.GetProcAddress(EntryPoint_ConfigureFormatter);
+  AboutFormatter := Dll.GetProcAddress(EntryPoint_AboutFormatter);
 end;
 
 procedure Interactive(const _DllName: string);
@@ -144,25 +138,13 @@ end;
 
 procedure Main;
 var
-  DLLName: string;
+  DllName: string;
 begin
-  if LoadGExperts(DLLName) then begin
-    try
-      if ParamCount = 0 then begin
-        if not Assigned(@FormatFile) then begin
-          ShowMessage(Format('%s does not export entry point %s.', [DLLName, EntryPoint_FormatFile]));
-          Exit;
-        end;
-        Interactive(DLLName);
-      end else begin
-        if not Assigned(@FormatFiles) then begin
-          ShowMessage(Format('%s does not export entry point %s.', [DLLName, EntryPoint_FormatFiles]));
-          Exit;
-        end;
-        Batch;
-      end;
-    finally
-      FreeLibrary(HModule);
+  if LoadGExperts(DllName) then begin
+    if ParamCount = 0 then begin
+      Interactive(DllName);
+    end else begin
+      Batch;
     end;
   end;
 end;
