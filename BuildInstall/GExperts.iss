@@ -216,11 +216,11 @@ Source: ..\Documentation\GExperts.chm; DestDir: {app}; Flags: ignoreversion
 Source: ..\Binaries\{#DLLName}; DestDir: {app}; Flags: ignoreversion
 Source: ..\ExternalSource\DbugIntf.pas; DestDir: {app}; Flags: ignoreversion
 Source: ..\Documentation\Readme.txt; DestDir: {app}; Flags: isreadme ignoreversion
-Source: ..\Release\FormatterSettings-Borland.ini; DestDir: {app}; Flags: ignoreversion
-Source: ..\Release\FormatterSettings-DelForEx.ini; DestDir: {app}; Flags: ignoreversion
-Source: ..\Release\FormatterSettings-headwork.ini; DestDir: {app}; Flags: ignoreversion
-Source: ..\Release\FormatterSettings-twm.ini; DestDir: {app}; Flags: ignoreversion
-Source: ..\Release\preview.pas; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\FormatterSettings-Borland.ini; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\FormatterSettings-DelForEx.ini; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\FormatterSettings-headwork.ini; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\FormatterSettings-twm.ini; DestDir: {app}; Flags: ignoreversion
+Source: ..\Binaries\preview.pas; DestDir: {app}; Flags: ignoreversion
 
 [Icons]
 Name: {group}\Debug Window; Filename: {app}\GExpertsDebugWindow.exe
