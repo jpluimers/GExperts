@@ -80,17 +80,20 @@ begin
   Result := False;
   Path := ExtractFilePath(Application.ExeName);
   Path := IncludeTrailingPathDelimiter(Path);
-  if FindFirst(Path + 'GExperts*.dll', faNormal, sr) = 0 then begin
-    try
-      _DllName := sr.Name;
-      HModule := SafeLoadLibrary(_DllName);
-      if HModule = 0 then begin
-        ShowMessage('Could not load GExperts*.dll');
-        Exit;
-      end;
-    finally
-      FindClose(sr);
+  if FindFirst(Path + 'GExperts*.dll', faNormal, sr) <> 0 then begin
+    ShowMessage(Format('Could not find GExperts*.dll in path %s.', [Path]));
+    Exit;
+  end;
+
+  try
+    _DllName := sr.Name;
+    HModule := SafeLoadLibrary(_DllName);
+    if HModule = 0 then begin
+      ShowMessage('Could not load GExperts*.dll');
+      Exit;
     end;
+  finally
+    FindClose(sr);
   end;
 
   Result := True;
