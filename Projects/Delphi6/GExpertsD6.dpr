@@ -222,7 +222,8 @@ uses
   GX_ReadMapFileThread in '..\..\Source\Utils\GX_ReadMapFileThread.pas',
   GX_IdeApplicationSettingsEnhancer in '..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas',
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
-  GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas';
+  GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
+  GX_PerfectLayout in '..\..\Source\Legacy\GX_PerfectLayout.pas' {fmPerfectLayout};
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res}
