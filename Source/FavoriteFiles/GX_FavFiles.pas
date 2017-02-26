@@ -13,6 +13,7 @@ type
     MainMenu: TMainMenu;
     mitFile: TMenuItem;
     mitNewFile: TMenuItem;
+    mitAddCurrentFile: TMenuItem;
     mitNewFolder: TMenuItem;
     mitFileDelete: TMenuItem;
     mitFileSep2: TMenuItem;
@@ -37,6 +38,7 @@ type
     mitTreeProperties: TMenuItem;
     pmuFiles: TPopupMenu;
     mitFNewFile: TMenuItem;
+    mitFAddCurrentFile: TMenuItem;
     mitFDelete: TMenuItem;
     mitFExecute: TMenuItem;
     mitCSep2: TMenuItem;
@@ -60,12 +62,14 @@ type
     actFileProperties: TAction;
     actFileDelete: TAction;
     actFileNewFile: TAction;
+    actAddCurrentFile: TAction;
     actFileNewFolder: TAction;
     actHelpHelp: TAction;
     actHelpContents: TAction;
     actHelpAbout: TAction;
     ToolBar: TToolBar;
     tbnFileNewFile: TToolButton;
+    tbAddCurrentFile: TToolButton;
     tbnFileDelete: TToolButton;
     tbnSep1: TToolButton;
     tbnFileProperties: TToolButton;
@@ -148,6 +152,7 @@ type
     procedure actFileMoveUpExecute(Sender: TObject);
     procedure actFileMoveDownExecute(Sender: TObject);
     procedure mitFileCollectionsClick(Sender: TObject);
+    procedure actAddCurrentFileExecute(Sender: TObject);
   private
     FFileViewer: TFileViewer;
     FEntryFile: string;
@@ -181,6 +186,7 @@ type
     procedure EditFile;
     function GetDefaultEntryFileName: string;
     procedure SetEntryFile(const Value: string);
+    procedure AddFileToCurrentFolder(const AFileName: string);
     property EntryFile: string read FEntryFile write SetEntryFile;
     property MRUEntryFiles: TStrings read FMRUEntryFiles;
     function GetShowPreview: Boolean;
@@ -998,6 +1004,50 @@ begin
       Result := etShell;
 end;
 
+procedure TfmFavFiles.AddFileToCurrentFolder(const AFileName: string);
+var
+  mFile: TGXFile;
+  LItem: TListItem;
+  Folder: TGXFolder;
+  Cursor: IInterface;
+begin
+  if (tvFolders.Selected = nil) or (AFileName = '') then
+    Exit;
+
+  LItem := nil;
+  Folder := GetFolder(tvFolders.Selected);
+  Cursor := TempHourGlassCursor;
+  ListView.Items.BeginUpdate;
+  try
+    mFile := TGXFile.Create(Folder);
+    try
+      mFile.FileName := MakeFileNameRelative(AFileName);
+      mFile.Description := MakeFileNameAbsolute(AFileName);
+      mFile.DName := ExtractFileName(AFileName);
+      mFile.ExecType := UpperFileExtToExecType(ExtractUpperFileExt(AFileName));
+      mFile.ExecProg := '';
+      LItem := ListView.Items.Add;
+      FileToListItem(mFile, LItem);
+    except
+      on E: Exception do
+      begin
+        FreeAndNil(mFile);
+        raise;
+      end;
+    end;
+    FModified := True;
+  finally
+    ListView.Items.EndUpdate;
+  end;
+  if Assigned(LItem) then
+  begin
+    ListView.Selected := nil;
+    ListView.Selected := LItem; //FI:W508 - Assignment has side effects
+    ListView.ItemFocused := LItem;
+    ListView.Selected.MakeVisible(False);
+  end;
+end;
+
 procedure TfmFavFiles.AddFilesToCurrentFolder(Files: TStrings);
 var
   mFile: TGXFile;
@@ -1180,6 +1230,26 @@ end;
 procedure TfmFavFiles.actHelpContentsExecute(Sender: TObject);
 begin
   GxContextHelpContents(Self);
+end;
+
+procedure TfmFavFiles.actAddCurrentFileExecute(Sender: TObject);
+var
+  Folder: TGXFolder;
+  fn: string;
+begin
+  if tvFolders.Selected = nil then
+    Exit;
+  Folder := GetFolder(tvFolders.Selected);
+  case Folder.FolderType of
+    ftNormal: dlgGetFiles.FilterIndex := 11;
+    ftSource: dlgGetFiles.FilterIndex := 1;
+  else
+    Exit;
+  end;
+  fn := GxOtaGetCurrentSourceFile;
+  if IsForm(fn) then
+    fn := GxOtaGetBaseModuleFileName(fn);
+  AddFileToCurrentFolder(fn);
 end;
 
 procedure TfmFavFiles.actFileDeleteExecute(Sender: TObject);

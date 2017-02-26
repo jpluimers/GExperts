@@ -140,71 +140,76 @@ object fmFavFiles: TfmFavFiles
     ParentShowHint = False
     ShowHint = True
     TabOrder = 3
-    object tbnFileNewFile: TToolButton
+    object tbAddCurrentFile: TToolButton
       Left = 0
+      Top = 0
+      Action = actAddCurrentFile
+    end
+    object tbnFileNewFile: TToolButton
+      Left = 23
       Top = 0
       Action = actFileNewFile
     end
     object tbnFileNewFolder: TToolButton
-      Left = 23
+      Left = 46
       Top = 0
       Action = actFileNewFolder
     end
     object tbnFileDelete: TToolButton
-      Left = 46
+      Left = 69
       Top = 0
       Action = actFileDelete
     end
     object tbnSep1: TToolButton
-      Left = 69
+      Left = 92
       Top = 0
       Width = 8
       ImageIndex = 2
       Style = tbsSeparator
     end
     object tbnNavLevelUp: TToolButton
-      Left = 77
+      Left = 100
       Top = 0
       Action = actNavLevelUp
     end
     object tbnSep2: TToolButton
-      Left = 100
+      Left = 123
       Top = 0
       Width = 8
       ImageIndex = 3
       Style = tbsSeparator
     end
     object tbnFileProperties: TToolButton
-      Left = 108
+      Left = 131
       Top = 0
       Action = actFileProperties
     end
     object tbnSep3: TToolButton
-      Left = 131
+      Left = 154
       Top = 0
       Width = 8
       ImageIndex = 4
       Style = tbsSeparator
     end
     object tbnNavExpand: TToolButton
-      Left = 139
+      Left = 162
       Top = 0
       Action = actNavExpand
     end
     object tbnNavContract: TToolButton
-      Left = 162
+      Left = 185
       Top = 0
       Action = actNavContract
     end
     object tbnSep4: TToolButton
-      Left = 185
+      Left = 208
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnHelpHelp: TToolButton
-      Left = 193
+      Left = 216
       Top = 0
       Action = actHelpHelp
     end
@@ -217,6 +222,9 @@ object fmFavFiles: TfmFavFiles
       Caption = '&File'
       object mitNewFile: TMenuItem
         Action = actFileNewFile
+      end
+      object mitAddCurrentFile: TMenuItem
+        Action = actAddCurrentFile
       end
       object mitNewFolder: TMenuItem
         Action = actFileNewFolder
@@ -612,6 +620,9 @@ object fmFavFiles: TfmFavFiles
     object mitFNewFile: TMenuItem
       Action = actFileNewFile
     end
+    object mitFAddCurrentFile: TMenuItem
+      Action = actAddCurrentFile
+    end
     object mitFDelete: TMenuItem
       Action = actFileDelete
     end
@@ -715,6 +726,13 @@ object fmFavFiles: TfmFavFiles
       ImageIndex = 35
       ShortCut = 32781
       OnExecute = actFilePropertiesExecute
+    end
+    object actAddCurrentFile: TAction
+      Category = 'File'
+      Caption = 'Current File'
+      Hint = 'Current File'
+      ImageIndex = 19
+      OnExecute = actAddCurrentFileExecute
     end
     object actFileDelete: TAction
       Category = 'File'
