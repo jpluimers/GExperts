@@ -131,7 +131,7 @@ const
   CommentEnd = '}';
 {$ENDIF GX_DELPHI}
 
-  DefaultMacros: array[0..10] of TMacroDetails = (
+  DefaultMacros: array[0..11] of TMacroDetails = (
     ( // 0
       Name: '_';
       Desc: 'embed _() for gettext()';
@@ -243,6 +243,17 @@ const
         'begin' + sLineBreak +
         '  %SELECTION%' + sLineBreak +
         'end;';
+    ),
+    ( // 11 from http://delphisorcery.blogspot.de/2015/02/type-less-how-to-use-gexperts-macro.html
+      Name: 'queue';
+      Desc: 'Wrap the selected code into a TThread.Queue call';
+      InsertPos: tipCursorPos;
+      Text:
+        'TThread.Queue(nil,' + sLineBreak +
+        '  procedure' + sLineBreak +
+        '  begin' + sLineBreak +
+        '    %SELECTION%|' + sLineBreak +
+        '  end);'
     )
     );
 
