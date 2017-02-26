@@ -619,6 +619,9 @@ begin
 {$ifndef GX_VER300_up}
   chkHideNavbar.Visible := False;
 {$endif}
+{$ifdef GX_VER310_up}
+  chkHideNavbar.Visible := False;
+{$endif}
 end;
 
 procedure TfmConfiguration.chkFontEnabledClick(Sender: TObject);
