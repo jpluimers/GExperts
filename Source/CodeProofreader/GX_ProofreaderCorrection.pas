@@ -1,5 +1,4 @@
-unit
- GX_ProofreaderCorrection;
+unit GX_ProofreaderCorrection;
 
 {$I GX_CondDefine.inc}
 
