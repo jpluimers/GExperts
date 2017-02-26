@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, CheckLst, ExtCtrls, ActnList, Menus,
-  GX_Experts, GX_ConfigurationInfo, GX_BaseForm;
+  GX_Experts, GX_ConfigurationInfo, GX_BaseForm, Actions;
 
 type
   TCleanExpert = class;
@@ -376,37 +376,43 @@ var
     EnsureStringInList(Strings, Path);
   end;
 
+
   procedure AddProjectDir(const OptionName: string);
+{$IFNDEF GX_VER200_up} // Delphi 2009
+  // Delphi < 2009 does not know this constant
+  const
+    varUString  = $0102; { Unicode string 258 } {not OLE compatible }
+{$ENDIF}
   var
     DirectoryVariant: Variant;
     Directory: string;
     ProjectDir: string;
   begin
     if GxOtaGetActiveProjectOption(OptionName, DirectoryVariant) then
-      if (VarType(DirectoryVariant) = varString) or
-         (VarType(DirectoryVariant) = varOleStr) then
-      begin
-        Directory := DirectoryVariant;
-        if Trim(Directory) <> '' then
-        begin
-          if IsPathAbsolute(Directory) then
+        case VarType(DirectoryVariant) of
+          varString, varOleStr, varUString: begin
+          Directory := DirectoryVariant;
+          if Trim(Directory) <> '' then
           begin
-            if not SysUtils.DirectoryExists(Directory) then
-              Exit;
-          end
-          else
-          begin
-            ProjectDir := ExtractFileDir(GxOtaGetCurrentProjectFileName);
-            if ProjectDir <> '' then
+            if IsPathAbsolute(Directory) then
             begin
-              Directory := AddSlash(ProjectDir) + Directory;
               if not SysUtils.DirectoryExists(Directory) then
                 Exit;
             end
             else
-              Exit;
+            begin
+              ProjectDir := ExtractFileDir(GxOtaGetCurrentProjectFileName);
+              if ProjectDir <> '' then
+              begin
+                Directory := AddSlash(ProjectDir) + Directory;
+                if not SysUtils.DirectoryExists(Directory) then
+                  Exit;
+              end
+              else
+                Exit;
+            end;
+            AddPathToStrings(Directory);
           end;
-          AddPathToStrings(Directory);
         end;
       end;
   end;
@@ -457,8 +463,8 @@ const // We will never localize these strings.
     '.tds' + sLineBreak + '.tmp' + sLineBreak + '.$*'  + sLineBreak + '.~*'  + sLineBreak +
     '.#??' + sLineBreak + '.ddp' + sLineBreak + '.rsm' + sLineBreak + '.map' + sLineBreak +
     '.pdb' + sLineBreak + '.gex' + sLineBreak +'.~xfm' + sLineBreak + '.~nfm'+ sLineBreak +
-    '.~bdsproj'+ sLineBreak + '.~dproj'+ sLineBreak + '.~bdsgroup' + sLineBreak + '.~groupproj' + sLineBreak + '.identcache' + sLineBreak +
-    '.dcuil' + sLineBreak + '.dcpil';
+    '.~bdsproj'+ sLineBreak + '.~dproj'+ sLineBreak + '.~bdsgroup' + sLineBreak +
+    '.~groupproj' + sLineBreak + '.identcache' + sLineBreak + '.dcuil' + sLineBreak + '.dcpil';
 var
   i, j: Integer;
 begin
