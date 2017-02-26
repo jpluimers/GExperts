@@ -449,7 +449,7 @@ begin
     begin
       Component := RootComponent.GetComponent(IndexComponents);
       if Assigned(Component) then
-        Result := Result or CheckAndSetComponent(ModuleFileName, Component);
+        Result := CheckAndSetComponent(ModuleFileName, Component) or Result;
     end;
   end;
 end;
