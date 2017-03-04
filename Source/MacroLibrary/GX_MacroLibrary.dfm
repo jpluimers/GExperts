@@ -322,6 +322,12 @@ object fmMacroLibrary: TfmMacroLibrary
       Hint = 'Automatically prompt for a name when stopping recording'
       OnExecute = actPromptForNameExecute
     end
+    object actShowContent: TAction
+      Category = 'View'
+      Caption = 'Show Content (experimental)'
+      Hint = 'Show Content (experimental)'
+      OnExecute = actShowContentExecute
+    end
   end
   object mnuMacroPop: TPopupMenu
     Left = 112
@@ -389,6 +395,9 @@ object fmMacroLibrary: TfmMacroLibrary
     end
     object mitShowDescription: TMenuItem
       Action = actViewDescription
+    end
+    object miShowContent: TMenuItem
+      Action = actShowContent
     end
     object mitSep5: TMenuItem
       Caption = '-'

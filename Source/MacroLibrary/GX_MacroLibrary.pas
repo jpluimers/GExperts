@@ -27,6 +27,7 @@ type
     procedure LoadFromFile(const FileName: string);
     procedure SaveToXML(Node: IXMLElement);
     procedure LoadFromXML(Node: IXMLElement);
+    function TryDecode(AStrings: TStrings): boolean;
     property TimeStamp: TDateTime read FTimeStamp write FTimeStamp;
     property Name: string read FName write FName;
     property Description: string read FDescription write FDescription;
@@ -99,6 +100,8 @@ type
     actPromptForName: TAction;
     mitPromptforName: TMenuItem;
     mitSep5: TMenuItem;
+    actShowContent: TAction;
+    miShowContent: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvMacrosDblClick(Sender: TObject);
     procedure actEditCopyExecute(Sender: TObject);
@@ -124,6 +127,7 @@ type
     procedure actHelpExecute(Sender: TObject);
     procedure lvMacrosInfoTip(Sender: TObject; Item: TListItem; var InfoTip: String);
     procedure actPromptForNameExecute(Sender: TObject);
+    procedure actShowContentExecute(Sender: TObject);
   private
     FDataList: TList;
     FSBWidth: Integer;
@@ -191,7 +195,7 @@ uses
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
   GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math, GX_IdeUtils,
-  GX_MessageBox;
+  GX_MessageBox, Consts;
 
 type
   TIDEMacroBugMessage = class(TGxMsgBoxAdaptor)
@@ -347,6 +351,116 @@ begin
   Value.Position := 0;
   FStream.LoadFromStream(Value);
   FStream.Position := 0;
+end;
+
+// http://blog.dummzeuch.de/2017/03/04/interpreting-delphi-ide-keyboard-macros/
+
+type
+  TMenuKeyCap = (
+    mkcBkSp, mkcTab, mkcEsc, mkcEnter, mkcSpace, mkcPgUp,
+    mkcPgDn, mkcEnd, mkcHome, mkcLeft, mkcUp, mkcRight,
+    mkcDown, mkcIns, mkcDel, mkcShift, mkcCtrl, mkcAlt);
+
+var // these resource strings are declared in unit Consts
+  MenuKeyCaps: array[TMenuKeyCap] of string = (
+    SmkcBkSp, SmkcTab, SmkcEsc, SmkcEnter, SmkcSpace, SmkcPgUp,
+    SmkcPgDn, SmkcEnd, SmkcHome, SmkcLeft, SmkcUp, SmkcRight,
+    SmkcDown, SmkcIns, SmkcDel, SmkcShift, SmkcCtrl, SmkcAlt);
+
+function KeyCodeToText(Code: Word; Modifier: Word): string;
+var
+  LoByte: Byte;
+begin
+  Result := Format('unkown (%.4x)', [Code]);
+  if (Modifier and $88) <> 0 then begin
+    // special keys
+    Result := '';
+    if (Modifier and $10) <> 0 then
+      Result := Result + MenuKeyCaps[mkcCtrl];
+    if (Modifier and $40) <> 0 then
+      Result := Result + MenuKeyCaps[mkcShift];
+    if (Modifier and $20) <> 0 then
+      Result := Result + MenuKeyCaps[mkcAlt];
+    LoByte := (Code and $FF);
+    case LoByte of
+      // $00..$07
+      $08, $09: // backspace / tab
+        Result := Result + MenuKeyCaps[TMenuKeyCap(Ord(mkcBkSp) + LoByte - $08)];
+      $0D: Result := Result + MenuKeyCaps[mkcEnter];
+      $1B: Result := Result + MenuKeyCaps[mkcEsc];
+      // $1B..$1F ?
+      $20..$28: // space and various special characters
+        Result := Result + MenuKeyCaps[TMenuKeyCap(Ord(mkcSpace) + LoByte - $20)];
+      // $29..$2C ?
+      $2D..$2E: // Ins, Del
+        Result := Result + MenuKeyCaps[TMenuKeyCap(Ord(mkcIns) + LoByte - $2D)];
+      // $2F ?
+      $30..$39: // 0..9
+        Result := Result + Chr(LoByte - $30 + Ord('0'));
+      $41..$5A: // A..Z
+        Result := Result + Chr(LoByte - $41 + Ord('A'));
+      $60..$69: Result := Result + Chr(LoByte - $60 + Ord('0'));
+      $70..$87: Result := Result + 'F' + IntToStr(LoByte - $6F);
+    end;
+  end else begin
+    LoByte := (Code and $FF);
+    case LoByte of
+      // $00..$07
+      $08, $09: // backspace / tab
+        Result := MenuKeyCaps[TMenuKeyCap(Ord(mkcBkSp) + LoByte - $08)];
+      $0D: Result := MenuKeyCaps[mkcEnter];
+      $1B: Result := MenuKeyCaps[mkcEsc];
+      // $1B..$1F ?
+      $20..$7E: Result := Chr(LoByte);
+      $7F: Result := MenuKeyCaps[mkcDel];
+      $80..$FF: Result := Chr(LoByte);
+    end;
+  end;
+end;
+
+function TMacroInfo.TryDecode(AStrings: TStrings): Boolean;
+
+  function Read(var Buffer; Count: Longint): Boolean;
+  begin
+    Result := (FStream.Read(Buffer, Count) = Count);
+  end;
+
+var
+  Magic: Longword;
+  Flag: Byte;
+  HiWord: Word;
+  LoWord: Word;
+  Start: string;
+  s: string;
+begin
+  Start := '';
+  Result := False;
+  FStream.Position := 0;
+  if not Read(Magic, SizeOf(Magic)) or (Magic <> $524F5054) then
+    Exit;
+  if not Read(Flag, SizeOf(Flag)) then
+    Exit;
+  while Flag = $01 do begin
+    if not Read(LoWord, SizeOf(LoWord)) then
+      Exit;
+    if not Read(HiWord, SizeOf(HiWord)) then
+      Exit;
+    s := KeyCodeToText(LoWord, HiWord);
+    if Length(s) = 1 then
+      Start := Start + s
+    else begin
+      if Start <> '' then begin
+        AStrings.Add(Start);
+        Start := '';
+      end;
+      AStrings.Add(s);
+    end;
+    if not Read(Flag, SizeOf(Flag)) then
+      Exit;
+  end;
+  if Start <> '' then
+    AStrings.Add(Start);
+  Result := True;
 end;
 
 { TfmMacroLibrary }
@@ -647,6 +761,24 @@ begin
     if Assigned(Item) then
       mmoMacroDescription.Text := MacroInfoForItem(Item).Description;
   UpdateMemoState;
+end;
+
+procedure TfmMacroLibrary.actShowContentExecute(Sender: TObject);
+var
+  Item: TListItem;
+  sl: TStringList;
+begin
+  Item := lvMacros.Selected;
+  if not Assigned(Item) then
+    Exit;
+  sl := TStringList.Create;
+  try
+    if not MacroInfoForItem(Item).TryDecode(sl) then
+      Exit;
+    MessageDlg(sl.Text, mtInformation, [mbOK], 0);
+  finally
+    FreeAndNil(sl);
+  end;
 end;
 
 procedure TfmMacroLibrary.UpdateMemoState;
