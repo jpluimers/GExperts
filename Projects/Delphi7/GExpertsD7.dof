@@ -30,7 +30,7 @@ Y=1
 Z=1
 ShowHints=1
 ShowWarnings=1
-UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist
+UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;ImageList=Controls
 NamespacePrefix=
 SymbolDeprecated=1
 SymbolLibrary=1
@@ -136,18 +136,3 @@ OriginalFilename=GExpertsD7.dll
 ProductName=GExperts for Delphi
 ProductVersion=1.38
 Comments=Open Source
-
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;Actions=Actnlist
-
-[HistoryLists\hlSearchPath]
-Count=1
-Item0=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit
-[HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=dcu
-
-[HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=..\..\DLLs
