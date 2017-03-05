@@ -30,7 +30,7 @@ Y=1
 Z=1
 ShowHints=1
 ShowWarnings=1
-UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=actnlist;Themes=Controls
+UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=actnlist;Themes=Controls;ImageList=Controls
 
 [Linker]
 MapFile=0
@@ -92,8 +92,3 @@ Comments=Open Source
 c:\delphi\delphi6\Bin\dclib60.bpl=InterBase Data Access Components
 c:\delphi\delphi6\Bin\dclclxdb60.bpl=Borland CLX Database Components
 C:\Delphi\Delphi6\bin\dclclxstd60.bpl=Borland CLX Standard Components
-
-[HistoryLists\hlUnitAliases]
-Count=2
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=actnlist;Themes=Controls
-Item1=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
