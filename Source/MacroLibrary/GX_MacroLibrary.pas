@@ -6,10 +6,10 @@ interface
 
 uses
   Windows, SysUtils, Classes,
-  GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker,
+  GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker, GX_GenericUtils,
   Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Menus, OmniXML,
-  ComCtrls, GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI;
+  ComCtrls, GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI, ImageList, Actions;
 
 type
   TMacroInfo = class(TObject)
@@ -27,7 +27,7 @@ type
     procedure LoadFromFile(const FileName: string);
     procedure SaveToXML(Node: IXMLElement);
     procedure LoadFromXML(Node: IXMLElement);
-    function TryDecode(AStrings: TStrings): boolean;
+    function TryDecode(AStrings: TGXUnicodeStringList): boolean;
     property TimeStamp: TDateTime read FTimeStamp write FTimeStamp;
     property Name: string read FName write FName;
     property Description: string read FDescription write FDescription;
@@ -192,7 +192,7 @@ implementation
 
 uses
   ActiveX,
-  GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
+  GX_GxUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
   GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math, GX_IdeUtils,
   GX_MessageBox, Consts;
@@ -367,7 +367,7 @@ var // these resource strings are declared in unit Consts
     SmkcPgDn, SmkcEnd, SmkcHome, SmkcLeft, SmkcUp, SmkcRight,
     SmkcDown, SmkcIns, SmkcDel, SmkcShift, SmkcCtrl, SmkcAlt);
 
-function KeyCodeToText(Code: Word; Modifier: Word): string;
+function KeyCodeToText(Code: Word; Modifier: Word): TGXUnicodeString;
 var
   LoByte: Byte;
 begin
@@ -403,22 +403,22 @@ begin
       $70..$87: Result := Result + 'F' + IntToStr(LoByte - $6F);
     end;
   end else begin
-    LoByte := (Code and $FF);
-    case LoByte of
-      // $00..$07
-      $08, $09: // backspace / tab
-        Result := MenuKeyCaps[TMenuKeyCap(Ord(mkcBkSp) + LoByte - $08)];
-      $0D: Result := MenuKeyCaps[mkcEnter];
-      $1B: Result := MenuKeyCaps[mkcEsc];
-      // $1B..$1F ?
-      $20..$7E: Result := Chr(LoByte);
-      $7F: Result := MenuKeyCaps[mkcDel];
-      $80..$FF: Result := Chr(LoByte);
-    end;
+    if Code = $0008 then
+      Result := MenuKeyCaps[mkcBkSp]
+    else if Code = $0009 then
+      Result := MenuKeyCaps[mkcTab]
+    else if Code = $000D then
+      Result := MenuKeyCaps[mkcEnter]
+    else if Code = $001B then
+      Result := MenuKeyCaps[mkcEsc]
+    else if Code = $007F then
+      Result := MenuKeyCaps[mkcDel]
+    else
+      Result := WideChar(Code);
   end;
 end;
 
-function TMacroInfo.TryDecode(AStrings: TStrings): Boolean;
+function TMacroInfo.TryDecode(AStrings: TGXUnicodeStringList): Boolean;
 
   function Read(var Buffer; Count: Longint): Boolean;
   begin
@@ -430,8 +430,8 @@ var
   Flag: Byte;
   HiWord: Word;
   LoWord: Word;
-  Start: string;
-  s: string;
+  Start: TGXUnicodeString;
+  s: TGXUnicodeString;
 begin
   Start := '';
   Result := False;
@@ -766,16 +766,20 @@ end;
 procedure TfmMacroLibrary.actShowContentExecute(Sender: TObject);
 var
   Item: TListItem;
-  sl: TStringList;
+  sl: TGXUnicodeStringList;
+  mi: TMacroInfo;
+  ws: WideString;
 begin
   Item := lvMacros.Selected;
   if not Assigned(Item) then
     Exit;
-  sl := TStringList.Create;
+  sl := TGXUnicodeStringList.Create;
   try
-    if not MacroInfoForItem(Item).TryDecode(sl) then
+    mi := MacroInfoForItem(Item);
+    if not mi.TryDecode(sl) then
       Exit;
-    MessageDlg(sl.Text, mtInformation, [mbOK], 0);
+    ws := mi.FName;
+    MessageBoxW(Handle, PWideChar(sl.Text), PWideChar(ws), MB_ICONINFORMATION or MB_OK);
   finally
     FreeAndNil(sl);
   end;
