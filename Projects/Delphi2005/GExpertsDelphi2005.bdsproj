@@ -44,7 +44,7 @@
 			<Compiler Name="Z" Type="Integer">1</Compiler>
 			<Compiler Name="ShowHints" Type="Boolean">True</Compiler>
 			<Compiler Name="ShowWarnings" Type="Boolean">True</Compiler>
-			<Compiler Name="UnitAliases" Type="String">WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist</Compiler>
+			<Compiler Name="UnitAliases" Type="String">WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;ImageList=Controls</Compiler>
 			<Compiler Name="NamespacePrefix" Type="String"></Compiler>
 			<Compiler Name="GenerateDocumentation" Type="Boolean">False</Compiler>
 			<Compiler Name="DefaultNamespace" Type="String"></Compiler>
