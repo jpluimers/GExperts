@@ -5,11 +5,49 @@ unit GX_MacroLibrary;
 interface
 
 uses
-  Windows, SysUtils, Classes,
-  GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker, GX_GenericUtils,
+  Windows, SysUtils, Classes, Consts,
   Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, Menus, OmniXML,
-  ComCtrls, GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI, ImageList, Actions;
+  ComCtrls, StdCtrls, ExtCtrls, Menus,
+  OmniXML,
+  GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker, GX_GenericUtils,
+  GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI, ImageList, Actions;
+
+type
+  TMacroSpecialKey = (
+    mskInvalid,
+    mskBkSp, mskTab, mskEsc, mskEnter,
+    mskPgUp, mskPgDn, mskEnd, mskHome, mskLeft, mskUp, mskRight, mskDown,
+    mskIns, mskDel,
+    mskF1, mskF2, mskF3, mskF4, mskF5, mskF6, mskF7, mskF8, mskF9, mskF10, mskF11, mskF12);
+
+var // these resource strings are declared in unit Consts
+  MacroSpecialKeyStrings: array[TMacroSpecialKey] of string = (
+    srUnknown,
+    SmkcBkSp, SmkcTab, SmkcEsc, SmkcEnter,
+    SmkcPgUp, SmkcPgDn, SmkcEnd, SmkcHome, SmkcLeft, SmkcUp, SmkcRight, SmkcDown,
+    SmkcIns, SmkcDel,
+    'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12');
+
+type
+  TMacroKey = packed record
+    case byte of
+    0: (
+      Code: Word;
+      Modifier: Word;
+    );
+    1: (
+      wc: WideChar;
+    );
+    3: (
+      Full: LongWord;
+    );
+    4: (
+      LoByte: Byte;
+    );
+    5: (
+      AsPointer: Pointer;
+    );
+  end;
 
 type
   TMacroInfo = class(TObject)
@@ -21,13 +59,19 @@ type
     procedure SetStream(const Value: TStream);
     function GetStream: TStream;
   public
+    class function EncodeMacroKey(wc: WideChar; Special: TMacroSpecialKey;
+      Ctrl, Shift, Alt: Boolean): TMacroKey;
+    class procedure DecodeMacroKey(MacroKey: TMacroKey;
+      out wc: WideChar; out Special: TMacroSpecialKey; out Ctrl, Shift, Alt: Boolean);
+    class function MacroKeyToText(MacroKey: TMacroKey): TGXUnicodeString;
+    class function TryDecode(AStream: TStream; AStrings: TGXUnicodeStringList): Boolean; overload;
     constructor Create;
     destructor Destroy; override;
     procedure SaveToFile(const FileName: string);
     procedure LoadFromFile(const FileName: string);
     procedure SaveToXML(Node: IXMLElement);
     procedure LoadFromXML(Node: IXMLElement);
-    function TryDecode(AStrings: TGXUnicodeStringList): boolean;
+    function TryDecode(AStrings: TGXUnicodeStringList): boolean; overload;
     property TimeStamp: TDateTime read FTimeStamp write FTimeStamp;
     property Name: string read FName write FName;
     property Description: string read FDescription write FDescription;
@@ -195,7 +239,7 @@ uses
   GX_GxUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
   GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math, GX_IdeUtils,
-  GX_MessageBox, Consts;
+  GX_MessageBox;
 
 type
   TIDEMacroBugMessage = class(TGxMsgBoxAdaptor)
@@ -355,105 +399,162 @@ end;
 
 // http://blog.dummzeuch.de/2017/03/04/interpreting-delphi-ide-keyboard-macros/
 
-type
-  TMenuKeyCap = (
-    mkcBkSp, mkcTab, mkcEsc, mkcEnter, mkcSpace, mkcPgUp,
-    mkcPgDn, mkcEnd, mkcHome, mkcLeft, mkcUp, mkcRight,
-    mkcDown, mkcIns, mkcDel, mkcShift, mkcCtrl, mkcAlt);
-
-var // these resource strings are declared in unit Consts
-  MenuKeyCaps: array[TMenuKeyCap] of string = (
-    SmkcBkSp, SmkcTab, SmkcEsc, SmkcEnter, SmkcSpace, SmkcPgUp,
-    SmkcPgDn, SmkcEnd, SmkcHome, SmkcLeft, SmkcUp, SmkcRight,
-    SmkcDown, SmkcIns, SmkcDel, SmkcShift, SmkcCtrl, SmkcAlt);
-
-function KeyCodeToText(Code: Word; Modifier: Word): TGXUnicodeString;
-var
-  LoByte: Byte;
+class procedure TMacroInfo.DecodeMacroKey(MacroKey: TMacroKey;
+  out wc: WideChar; out Special: TMacroSpecialKey; out Ctrl, Shift, Alt: Boolean);
 begin
-  Result := Format('unkown (%.4x)', [Code]);
-  if (Modifier and $88) <> 0 then begin
-    // special keys
-    Result := '';
-    if (Modifier and $10) <> 0 then
-      Result := Result + MenuKeyCaps[mkcCtrl];
-    if (Modifier and $40) <> 0 then
-      Result := Result + MenuKeyCaps[mkcShift];
-    if (Modifier and $20) <> 0 then
-      Result := Result + MenuKeyCaps[mkcAlt];
-    LoByte := (Code and $FF);
-    case LoByte of
-      // $00..$07
-      $08, $09: // backspace / tab
-        Result := Result + MenuKeyCaps[TMenuKeyCap(Ord(mkcBkSp) + LoByte - $08)];
-      $0D: Result := Result + MenuKeyCaps[mkcEnter];
-      $1B: Result := Result + MenuKeyCaps[mkcEsc];
-      // $1B..$1F ?
-      $20..$28: // space and various special characters
-        Result := Result + MenuKeyCaps[TMenuKeyCap(Ord(mkcSpace) + LoByte - $20)];
-      // $29..$2C ?
-      $2D..$2E: // Ins, Del
-        Result := Result + MenuKeyCaps[TMenuKeyCap(Ord(mkcIns) + LoByte - $2D)];
-      // $2F ?
-      $30..$39: // 0..9
-        Result := Result + Chr(LoByte - $30 + Ord('0'));
-      $41..$5A: // A..Z
-        Result := Result + Chr(LoByte - $41 + Ord('A'));
-      $60..$69: Result := Result + Chr(LoByte - $60 + Ord('0'));
-      $70..$87: Result := Result + 'F' + IntToStr(LoByte - $6F);
-    end;
-  end else begin
-    if Code = $0008 then
-      Result := MenuKeyCaps[mkcBkSp]
-    else if Code = $0009 then
-      Result := MenuKeyCaps[mkcTab]
-    else if Code = $000D then
-      Result := MenuKeyCaps[mkcEnter]
-    else if Code = $001B then
-      Result := MenuKeyCaps[mkcEsc]
-    else if Code = $007F then
-      Result := MenuKeyCaps[mkcDel]
+  Special := mskInvalid;
+  wc :=#0;
+  // special keys
+  Ctrl := (MacroKey.Modifier and $10) <> 0;
+  Shift := (MacroKey.Modifier and $40) <> 0;
+  Alt := (MacroKey.Modifier and $20) <> 0;
+  if (MacroKey.Modifier and $0088) = $0088 then begin
+    case MacroKey.Code of
+      // $0000..$0020 -> invalid
+      $0021..$0028: // mskPgUp .. mskDown
+        Special := TMacroSpecialKey(Ord(mskPgUp) + MacroKey.LoByte - $0021);
+      // $29..$2C -> invalid
+      $002D:
+        Special := mskIns;
+      $002E:
+        Special := mskDel;
+      // $2F..$6F  -> invalid
+      $0070..$0087: // mskF1 .. mskF12
+        Special := TMacroSpecialKey(Ord(mskF1) + MacroKey.LoByte - $006F);
+      // $88..$FF -> invalid
     else
-      Result := WideChar(Code);
+      asm nop end; // invalid
+    end;
+  end else if MacroKey.Modifier = $0080 then begin
+    case MacroKey.Code of
+      $0008:
+        Special := mskBkSp;
+      $0009:
+        Special := mskTab;
+      $000D:
+       Special := mskEnter;
+    else
+      asm nop end; // invalid
+    end;
+  end else if MacroKey.Modifier <> 0 then begin
+    asm nop end; // invalid
+  end else begin
+    if (MacroKey.Code < $001F) then
+      asm nop end // invalid
+    else if MacroKey.Code = $001F then
+      Special := mskEsc
+    else if MacroKey.Code = $007F then
+      asm nop end // invalid
+    else
+      wc := MacroKey.wc;
   end;
 end;
 
-function TMacroInfo.TryDecode(AStrings: TGXUnicodeStringList): Boolean;
+class function TMacroInfo.EncodeMacroKey(wc: WideChar; Special: TMacroSpecialKey; Ctrl, Shift, Alt: Boolean): TMacroKey;
+begin
+  Result.Full := 0;
+  case Special of
+    mskInvalid: begin
+        Result.wc := wc;
+      end;
+    mskBkSp: begin
+      Result.Code := $0008;
+      Result.Modifier := $0080;
+    end;
+    mskTab:  begin
+      Result.Code := $0009;
+      Result.Modifier := $0080;
+    end;
+    mskEsc:  begin
+      Result.Code := $001F;
+    end;
+    mskEnter: begin
+      Result.Code := $000D;
+      Result.Modifier := $0080;
+    end;
+    mskPgUp..mskDown: begin
+        Result.Code := Ord(Special) - Ord(mskPgUp) + $0021;
+        Result.Modifier := $0088;
+      end;
+    mskIns: begin
+        Result.Code := $002D;
+        Result.Modifier := $0088;
+      end;
+    mskDel: begin
+        Result.Code := $002E;
+        Result.Modifier := $0088;
+      end;
+    mskF1..mskF12: begin
+      Result.Code := Ord(Special) - Ord(mskF1) + $0070;
+      Result.Modifier := $0088;
+    end;
+  end;
+  if Ctrl then
+    Result.Modifier := Result.Modifier or $10;
+  if Shift then
+    Result.Modifier := Result.Modifier or $40;
+  if Alt then
+    Result.Modifier := Result.Modifier or $20;
+end;
+
+class function TMacroInfo.MacroKeyToText(MacroKey: TMacroKey): TGXUnicodeString;
+var
+  wc: WideChar;
+  Special: TMacroSpecialKey;
+  Ctrl: Boolean;
+  Shift: Boolean;
+  Alt: Boolean;
+begin
+  DecodeMacroKey(MacroKey, wc, Special, Ctrl, Shift, Alt);
+  if Special = mskInvalid then begin
+    if wc <> #0 then
+      Result := wc
+    else
+      Result := Format('unkown (%.4x)', [MacroKey.Code]);
+  end else begin
+    Result := MacroSpecialKeyStrings[Special];
+    if Ctrl then
+      Result := SmkcCtrl + Result;
+    if Shift then
+      Result := SmkcShift + Result;
+    if Alt then
+      Result := SmkcAlt + Result;
+  end;
+end;
+
+class function TMacroInfo.TryDecode(AStream: TStream; AStrings: TGXUnicodeStringList): boolean;
 
   function Read(var Buffer; Count: Longint): Boolean;
   begin
-    Result := (FStream.Read(Buffer, Count) = Count);
+    Result := (AStream.Read(Buffer, Count) = Count);
   end;
 
 var
   Magic: Longword;
   Flag: Byte;
-  HiWord: Word;
-  LoWord: Word;
+  MacroKey: TMacroKey;
   Start: TGXUnicodeString;
   s: TGXUnicodeString;
 begin
   Start := '';
   Result := False;
-  FStream.Position := 0;
+  AStream.Position := 0;
   if not Read(Magic, SizeOf(Magic)) or (Magic <> $524F5054) then
     Exit;
   if not Read(Flag, SizeOf(Flag)) then
     Exit;
   while Flag = $01 do begin
-    if not Read(LoWord, SizeOf(LoWord)) then
+    if not Read(MacroKey, SizeOf(MacroKey)) then
       Exit;
-    if not Read(HiWord, SizeOf(HiWord)) then
-      Exit;
-    s := KeyCodeToText(LoWord, HiWord);
-    if Length(s) = 1 then
-      Start := Start + s
-    else begin
+    s := MacroKeyToText(MacroKey);
+    if Length(s) = 1 then begin
+      Start := Start + s;
+    end else begin
       if Start <> '' then begin
         AStrings.Add(Start);
         Start := '';
       end;
-      AStrings.Add(s);
+      AStrings.AddObject(s, MacroKey.AsPointer);
     end;
     if not Read(Flag, SizeOf(Flag)) then
       Exit;
@@ -461,6 +562,11 @@ begin
   if Start <> '' then
     AStrings.Add(Start);
   Result := True;
+end;
+
+function TMacroInfo.TryDecode(AStrings: TGXUnicodeStringList): Boolean;
+begin
+  Result := TryDecode(FStream, AStrings);
 end;
 
 { TfmMacroLibrary }
@@ -768,7 +874,6 @@ var
   Item: TListItem;
   sl: TGXUnicodeStringList;
   mi: TMacroInfo;
-  ws: WideString;
 begin
   Item := lvMacros.Selected;
   if not Assigned(Item) then
@@ -778,8 +883,7 @@ begin
     mi := MacroInfoForItem(Item);
     if not mi.TryDecode(sl) then
       Exit;
-    ws := mi.FName;
-    MessageBoxW(Handle, PWideChar(sl.Text), PWideChar(ws), MB_ICONINFORMATION or MB_OK);
+    TfmMacroLibraryNamePrompt.Execute(Self, mi.FName, mi.FDescription, sl);
   finally
     FreeAndNil(sl);
   end;
@@ -965,30 +1069,42 @@ end;
 procedure TfmMacroLibrary.AddToMacroLibrary(CR: IOTARecord);
 var
   Stream: IStream;
+  MemStream: TMemoryStream;
   Info: TMacroInfo;
   MacroName: string;
   MacroDesc: string;
+  sl: TGXUnicodeStringList;
 begin
-  MacroName := UnknownName + Format('%2.2d', [FDataList.Count]);
-  MacroDesc := '';
-  if FPromptForName then begin
-    if not TfmMacroLibraryNamePrompt.Execute(Self, MacroName, MacroDesc, FPromptForName) then
-      Exit;
+  sl := nil;
+  MemStream := TMemoryStream.Create;
+  try
+    MacroName := UnknownName + Format('%2.2d', [FDataList.Count]);
+    MacroDesc := '';
+    Stream := TStreamAdapter.Create(MemStream);
+    CR.WriteToStream(Stream);
+    sl := TGXUnicodeStringList.Create;
+    if not TMacroInfo.TryDecode(MemStream, sl) then
+      sl.Clear;
+    if FPromptForName then begin
+      if not TfmMacroLibraryNamePrompt.Execute(Self, True, MacroName, MacroDesc, sl, FPromptForName) then
+        Exit;
+    end;
+
+    Info := TMacroInfo.Create;
+    FDataList.Insert(0, Info);
+    Info.Name := MacroName;
+    Info.Description := MacroDesc;
+    Info.TimeStamp := Now;
+    Info.Stream := MemStream;
+
+    InsertMacro(0, Info);
+    SelectFirstMacro;
+
+    SaveMacros;
+  finally
+    FreeAndNil(sl);
+    FreeAndNil(MemStream)
   end;
-
-  Info := TMacroInfo.Create;
-  FDataList.Insert(0, Info);
-  Info.Name := MacroName;
-  Info.Description := MacroDesc;
-  Info.TimeStamp := Now;
-
-  Stream := TStreamAdapter.Create(Info.Stream);
-  CR.WriteToStream(Stream);
-
-  InsertMacro(0, Info);
-  SelectFirstMacro;
-
-  SaveMacros;
 end;
 
 procedure TfmMacroLibrary.FormCreate(Sender: TObject);

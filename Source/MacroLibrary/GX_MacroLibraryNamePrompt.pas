@@ -3,8 +3,21 @@ unit GX_MacroLibraryNamePrompt;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, GX_BaseForm;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  ExtCtrls,
+  SynUnicode,
+  SynMemo,
+  GX_BaseForm,
+  GX_GenericUtils;
 
 type
   TfmMacroLibraryNamePrompt = class(TfmBaseForm)
@@ -15,31 +28,54 @@ type
     btnCancel: TButton;
     lblMacroDesc: TLabel;
     mmoMacroDescription: TMemo;
+    pnlMacro: TPanel;
+    btnDelete: TButton;
+    btnEdit: TButton;
+    btnAdd: TButton;
+    lblMacroKeystrokes: TLabel;
+    procedure btnEditClick(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure btnAddClick(Sender: TObject);
+  private
+    FMemo: TSynMemo;
+    procedure SetData(const AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList;
+      AShowCheckbox: Boolean);
+    procedure GetData(out AMacroName, AMacroDesc: string);
+    procedure HandleOnSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean;
+      var FG, BG: TColor);
   public
+    class function Execute(AOwner: TComponent; AShowCheckbox: Boolean;
+      var AMacroName, AMacroDesc: string;
+      AMacro: TGXUnicodeStringList; var APromptForName: Boolean): Boolean; overload;
     class function Execute(AOwner: TComponent; var AMacroName, AMacroDesc: string;
-      var APromptForName: Boolean): Boolean;
+      AMacro: TGXUnicodeStringList): Boolean; overload;
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
+
+uses
+  SynEdit,
+  GX_dzVclUtils,
+  GX_MacroLibraryEditEntry,
+  GX_MacroLibrary;
 
 {$R *.dfm}
 
 { TTfmMacroLibraryNamePrompt }
 
-class function TfmMacroLibraryNamePrompt.Execute(AOwner: TComponent;
-  var AMacroName, AMacroDesc: string; var APromptForName: Boolean): Boolean;
+class function TfmMacroLibraryNamePrompt.Execute(AOwner: TComponent; AShowCheckbox: Boolean;
+  var AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList;
+  var APromptForName: Boolean): Boolean;
 var
   Form: TfmMacroLibraryNamePrompt;
 begin
   Form := TfmMacroLibraryNamePrompt.Create(AOwner);
   try
-    Form.edtMacroName.Text := AMacroName;
-    Form.mmoMacroDescription.Lines.Text := AMacroDesc;
-    Form.chkDoNotShowAgain.Checked := False;
+    Form.SetData(AMacroName, AMacroDesc, AMacro, AShowCheckbox);
     Result := (Form.ShowModal = mrOk);
     if Result then begin
-      AMacroName := Form.edtMacroName.Text;
-      AMacroDesc := Form.mmoMacroDescription.Lines.Text;
+      Form.GetData(AMacroName, AMacroDesc);
     end;
     // The checkbox is always evaluated
     APromptForName := not Form.chkDoNotShowAgain.Checked;
@@ -48,5 +84,97 @@ begin
   end;
 end;
 
-end.
+class function TfmMacroLibraryNamePrompt.Execute(AOwner: TComponent; var AMacroName,
+  AMacroDesc: string; AMacro: TGXUnicodeStringList): Boolean;
+var
+  DummBool: Boolean;
+begin
+  Result := Execute(AOwner, False, AMacroName, AMacroDesc, AMacro, DummBool)
+end;
 
+constructor TfmMacroLibraryNamePrompt.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  TControl_SetMinConstraints(Self);
+
+  pnlMacro.BevelOuter := bvNone;
+
+  FMemo := TSynMemo.Create(Self);
+  FMemo.Align := alClient;
+  FMemo.Parent := pnlMacro;
+  FMemo.Gutter.Visible := False;
+  FMemo.ReadOnly := True;
+  FMemo.Font.Height := -11;
+  FMemo.Font.Name := 'Courier New';
+  FMemo.ActiveLineColor := $D0FFFF;
+  FMemo.OnSpecialLineColors := HandleOnSpecialLineColors;
+  FMemo.Options := FMemo.Options - [eoScrollPastEol, eoScrollPastEof, eoEnhanceHomeKey, eoEnhanceEndKey];
+end;
+
+procedure TfmMacroLibraryNamePrompt.btnAddClick(Sender: TObject);
+begin
+//
+end;
+
+procedure TfmMacroLibraryNamePrompt.btnDeleteClick(Sender: TObject);
+var
+  LineIdx: Integer;
+begin
+  LineIdx := FMemo.CaretY - 1;
+  if (LineIdx < 0) or (LineIdx >= FMemo.Lines.Count) then
+    Exit;
+  FMemo.Lines.Delete(LineIdx);
+end;
+
+procedure TfmMacroLibraryNamePrompt.btnEditClick(Sender: TObject);
+var
+  LineIdx: Integer;
+  s: TGXUnicodeString;
+  Macro: TMacroKey;
+begin
+  LineIdx := FMemo.CaretY - 1;
+  if (LineIdx < 0) or (LineIdx >= FMemo.Lines.Count) then
+    Exit;
+  s := FMemo.Lines[LineIdx];
+  Macro.AsPointer := FMemo.Lines.Objects[LineIdx];
+  if TfmEditMacroItem.Execute(Self, s, Macro) then begin
+    if s = '' then
+      s := TMacroInfo.MacroKeyToText(Macro);
+    FMemo.Lines[LineIdx] := s;
+    FMemo.Lines.Objects[LineIdx] := Macro.AsPointer;
+  end;
+end;
+
+procedure TfmMacroLibraryNamePrompt.HandleOnSpecialLineColors(Sender: TObject; Line: Integer;
+  var Special: Boolean; var FG, BG: TColor);
+var
+  MacroEntry: LongWord;
+begin
+  Dec(Line); // Line is one-based
+  if (Line < 0) or (Line >= FMemo.Lines.Count) then
+    Exit;
+  MacroEntry := LongWord(FMemo.Lines.Objects[Line]);
+  if (MacroEntry and $FFFF0000) <> 0 then begin
+    Special := True;
+    FG := clBlue;
+  end;
+end;
+
+procedure TfmMacroLibraryNamePrompt.GetData(out AMacroName, AMacroDesc: string);
+begin
+  AMacroName := edtMacroName.Text;
+  AMacroDesc := mmoMacroDescription.Lines.Text;
+end;
+
+procedure TfmMacroLibraryNamePrompt.SetData(const AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList;
+  AShowCheckbox: Boolean);
+begin
+  chkDoNotShowAgain.Visible := AShowCheckbox;
+  edtMacroName.Text := AMacroName;
+  mmoMacroDescription.Lines.Text := AMacroDesc;
+  chkDoNotShowAgain.Checked := False;
+  FMemo.Lines := AMacro;
+end;
+
+end.

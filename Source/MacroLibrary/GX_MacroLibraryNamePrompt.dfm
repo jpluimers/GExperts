@@ -1,11 +1,9 @@
 object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   Left = 320
   Top = 249
-  BorderIcons = []
-  BorderStyle = bsDialog
   Caption = 'Macro Library'
-  ClientHeight = 178
-  ClientWidth = 353
+  ClientHeight = 417
+  ClientWidth = 425
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -33,48 +31,99 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Caption = 'Macro Description'
     FocusControl = mmoMacroDescription
   end
+  object lblMacroKeystrokes: TLabel
+    Left = 8
+    Top = 144
+    Width = 271
+    Height = 13
+    Caption = 'Macro Keystrokes (saving changes not yet implemented)'
+  end
   object edtMacroName: TEdit
     Left = 8
     Top = 24
-    Width = 329
+    Width = 409
     Height = 21
+    Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
-    Text = 'edtMacroName'
   end
   object chkDoNotShowAgain: TCheckBox
     Left = 8
-    Top = 144
-    Width = 169
-    Height = 17
+    Top = 384
+    Width = 249
+    Height = 25
+    Anchors = [akLeft, akBottom]
     Caption = 'Do not show this dialog again'
     TabOrder = 2
   end
   object btnOK: TButton
-    Left = 184
-    Top = 144
+    Left = 264
+    Top = 384
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 3
+    TabOrder = 7
   end
   object btnCancel: TButton
-    Left = 264
-    Top = 144
+    Left = 344
+    Top = 384
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 8
   end
   object mmoMacroDescription: TMemo
     Left = 8
     Top = 72
-    Width = 331
+    Width = 409
     Height = 57
+    Anchors = [akLeft, akTop, akRight]
+    BevelEdges = [beLeft, beTop, beBottom]
     ScrollBars = ssVertical
     TabOrder = 1
+  end
+  object pnlMacro: TPanel
+    Left = 8
+    Top = 160
+    Width = 329
+    Height = 217
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    BevelEdges = [beLeft, beTop, beBottom]
+    Caption = 'Macro content goes here'
+    Color = clWindow
+    TabOrder = 3
+    TabStop = True
+  end
+  object btnDelete: TButton
+    Left = 344
+    Top = 200
+    Width = 75
+    Height = 25
+    Caption = 'Delete'
+    TabOrder = 6
+    OnClick = btnDeleteClick
+  end
+  object btnEdit: TButton
+    Left = 344
+    Top = 168
+    Width = 75
+    Height = 25
+    Caption = 'Edit'
+    TabOrder = 5
+    OnClick = btnEditClick
+  end
+  object btnAdd: TButton
+    Left = 344
+    Top = 136
+    Width = 75
+    Height = 25
+    Caption = 'Add'
+    TabOrder = 4
+    OnClick = btnAddClick
   end
 end
