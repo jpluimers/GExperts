@@ -26,7 +26,7 @@
     <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
     <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ObjPath>
     <DCC_IncludePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_IncludePath>
-    <DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=ActnList</DCC_UnitAlias>
+    <DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=ActnList;ImageList=ImgList</DCC_UnitAlias>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Version>7.0</Version>
@@ -442,6 +442,9 @@ call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
     </DCCReference>
     <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryConfig.pas">
       <Form>fmGxMacroLibraryConfig</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
+      <Form>fmEditMacroItem</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas">
       <Form>fmMacroLibraryNamePrompt</Form>
