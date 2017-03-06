@@ -105,6 +105,7 @@ uses
   GX_MacroLibraryNamePrompt in '..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas' {fmMacroLibraryNamePrompt},
   GX_MacroLibraryConfig in '..\..\source\MacroLibrary\GX_MacroLibraryConfig.pas' {fmGxMacroLibraryConfig},
   GX_MacroParser in '..\..\source\Framework\GX_MacroParser.pas',
+  GX_MacroLibraryEditEntry in '..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas' {fmEditMacroItem},
   GX_MacroSelect in '..\..\source\MacroTemplates\GX_MacroSelect.pas' {fmMacroSelect},
   GX_MacroTemplateEdit in '..\..\source\MacroTemplates\GX_MacroTemplateEdit.pas' {fmMacroTemplateEdit},
   GX_MacroTemplates in '..\..\source\MacroTemplates\GX_MacroTemplates.pas' {fmMacroTemplates},

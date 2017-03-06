@@ -102,6 +102,7 @@ uses
   GX_MacroExpandNotifier in '..\..\source\MacroTemplates\GX_MacroExpandNotifier.pas',
   GX_MacroFile in '..\..\source\MacroTemplates\GX_MacroFile.pas',
   GX_MacroLibrary in '..\..\source\MacroLibrary\GX_MacroLibrary.pas' {fmMacroLibrary},
+  GX_MacroLibraryEditEntry in '..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas' {fmEditMacroItem},
   GX_MacroLibraryNamePrompt in '..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas' {fmMacroLibraryNamePrompt},
   GX_MacroLibraryConfig in '..\..\source\MacroLibrary\GX_MacroLibraryConfig.pas' {fmGxMacroLibraryConfig},
   GX_MacroParser in '..\..\source\Framework\GX_MacroParser.pas',
