@@ -86,6 +86,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCC_IncludePath>..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_IncludePath)</DCC_IncludePath>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<VerInfo_Build>8</VerInfo_Build>
 			<VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE2;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE2;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE2.dll;ProductName=GExperts for RAD Studio XE2;ProductVersion=1.38;Comments=Open Source;CompileDate=</VerInfo_Keys>
 		</PropertyGroup>
@@ -527,6 +528,13 @@ $(PreBuildEvent)]]></PreBuildEvent>
 				<Form>f_IdeBuildEventFavoriteEdit</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+			<DCCReference Include="..\..\Source\Utils\GX_ReadMapFileThread.pas"/>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
+			<DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
+				<Form>fmEditMacroItem</Form>
+			</DCCReference>
 			<RcCompile Include="..\..\images\GXIcons.rc">
 				<Form>GXIcons.res</Form>
 			</RcCompile>
