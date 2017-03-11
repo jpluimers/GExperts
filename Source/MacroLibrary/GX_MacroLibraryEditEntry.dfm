@@ -1,5 +1,4 @@
 inherited fmEditMacroItem: TfmEditMacroItem
-  BorderIcons = [biSystemMenu, biMinimize, biMaximize, biHelp]
   BorderStyle = bsDialog
   Caption = 'Edit Macro Item'
   ClientHeight = 177
