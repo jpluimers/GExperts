@@ -805,12 +805,16 @@ begin
 end;
 
 procedure TfmMacroLibrary.ActionsUpdate(Action: TBasicAction; var Handled: Boolean);
+var
+  IsMacroSelected: Boolean;
 begin
+  IsMacroSelected := HaveSelectedMacro;
   actEditClear.Enabled   := lvMacros.Items.Count > 0;
-  actEditDelete.Enabled  := HaveSelectedMacro;
-  actEditCopy.Enabled    := HaveSelectedMacro;
-  actEditRename.Enabled  := HaveSelectedMacro;
-  actFileSave.Enabled    := HaveSelectedMacro;
+  actEditDelete.Enabled  := IsMacroSelected;
+  actEditCopy.Enabled    := IsMacroSelected;
+  actEditRename.Enabled  := IsMacroSelected;
+  actFileSave.Enabled    := IsMacroSelected;
+  actShowContent.Enabled := IsMacroSelected;
   actEditSuspend.Checked := FSuspended;
   actRecord.Checked      := GxOtaEditorIsRecordingMacro;
   actViewToolbar.Checked := Toolbar.Visible;
