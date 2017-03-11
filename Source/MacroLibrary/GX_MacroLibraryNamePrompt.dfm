@@ -1,8 +1,9 @@
 object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   Left = 320
   Top = 249
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Macro Library'
-  ClientHeight = 417
+  ClientHeight = 386
   ClientWidth = 425
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -48,7 +49,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   end
   object chkDoNotShowAgain: TCheckBox
     Left = 8
-    Top = 384
+    Top = 355
     Width = 249
     Height = 25
     Anchors = [akLeft, akBottom]
@@ -57,7 +58,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   end
   object btnOK: TButton
     Left = 264
-    Top = 384
+    Top = 352
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -68,7 +69,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   end
   object btnCancel: TButton
     Left = 344
-    Top = 384
+    Top = 352
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -91,9 +92,8 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Left = 8
     Top = 160
     Width = 329
-    Height = 217
+    Height = 185
     Anchors = [akLeft, akTop, akRight, akBottom]
-    BevelEdges = [beLeft, beTop, beBottom]
     Caption = 'Macro content goes here'
     Color = clWindow
     TabOrder = 3
@@ -104,6 +104,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 224
     Width = 75
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Delete'
     TabOrder = 6
     OnClick = btnDeleteClick
@@ -113,6 +114,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 160
     Width = 75
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Edit'
     TabOrder = 4
     OnClick = btnEditClick
@@ -122,6 +124,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 192
     Width = 75
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Insert'
     TabOrder = 5
     OnClick = btnInsertClick
@@ -131,6 +134,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 256
     Width = 75
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Append'
     TabOrder = 7
     OnClick = btnAppendClick
