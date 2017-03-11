@@ -12,6 +12,9 @@ uses
   GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker, GX_GenericUtils,
   GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI, ImageList, Actions;
 
+const
+  KeyboardMacroMagic = $524F5054;
+
 type
   TMacroSpecialKey = (
     mskInvalid,
@@ -72,6 +75,7 @@ type
     procedure SaveToXML(Node: IXMLElement);
     procedure LoadFromXML(Node: IXMLElement);
     function TryDecode(AStrings: TGXUnicodeStringList): boolean; overload;
+    procedure Encode(AStrings: TGXUnicodeStringList);
     property TimeStamp: TDateTime read FTimeStamp write FTimeStamp;
     property Name: string read FName write FName;
     property Description: string read FDescription write FDescription;
@@ -539,7 +543,7 @@ begin
   Start := '';
   Result := False;
   AStream.Position := 0;
-  if not Read(Magic, SizeOf(Magic)) or (Magic <> $524F5054) then
+  if not Read(Magic, SizeOf(Magic)) or (Magic <> KeyboardMacroMagic) then
     Exit;
   if not Read(Flag, SizeOf(Flag)) then
     Exit;
@@ -567,6 +571,38 @@ end;
 function TMacroInfo.TryDecode(AStrings: TGXUnicodeStringList): Boolean;
 begin
   Result := TryDecode(FStream, AStrings);
+end;
+
+procedure TMacroInfo.Encode(AStrings: TGXUnicodeStringList);
+const
+  KeyByte: Byte = $01;
+  EndByte: Byte = $00;
+var
+  Magic: LongWord;
+  i: Integer;
+  MacroKey: TMacroKey;
+  ws: TGXUnicodeString;
+  j: Integer;
+begin
+  FStream.Clear;
+  Magic := KeyboardMacroMagic;
+  FStream.WriteBuffer(Magic, SizeOf(Magic));
+  for i := 0 to AStrings.Count - 1 do begin
+    MacroKey.AsPointer := AStrings.Objects[i];
+    if MacroKey.Full <> 0 then begin
+      FStream.WriteBuffer(KeyByte, SizeOf(KeyByte));
+      FStream.WriteBuffer(MacroKey.Full, SizeOf(MacroKey.Full));
+    end else begin
+      ws := AStrings[i];
+      for j := 1 to Length(ws) do begin
+        MacroKey.Full := 0;
+        MacroKey.wc := ws[j];
+        FStream.WriteBuffer(KeyByte, SizeOf(KeyByte));
+        FStream.WriteBuffer(MacroKey.Full, SizeOf(MacroKey.Full));
+      end;
+    end;
+  end;
+  FStream.WriteBuffer(EndByte, SizeOf(EndByte));
 end;
 
 { TfmMacroLibrary }
@@ -884,6 +920,7 @@ begin
     if not mi.TryDecode(sl) then
       Exit;
     TfmMacroLibraryNamePrompt.Execute(Self, mi.FName, mi.FDescription, sl);
+    mi.Encode(sl);
   finally
     FreeAndNil(sl);
   end;

@@ -31,16 +31,18 @@ type
     pnlMacro: TPanel;
     btnDelete: TButton;
     btnEdit: TButton;
-    btnAdd: TButton;
+    btnInsert: TButton;
     lblMacroKeystrokes: TLabel;
+    btnAppend: TButton;
     procedure btnEditClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
-    procedure btnAddClick(Sender: TObject);
+    procedure btnInsertClick(Sender: TObject);
+    procedure btnAppendClick(Sender: TObject);
   private
     FMemo: TSynMemo;
     procedure SetData(const AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList;
       AShowCheckbox: Boolean);
-    procedure GetData(out AMacroName, AMacroDesc: string);
+    procedure GetData(out AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList);
     procedure HandleOnSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean;
       var FG, BG: TColor);
   public
@@ -75,7 +77,7 @@ begin
     Form.SetData(AMacroName, AMacroDesc, AMacro, AShowCheckbox);
     Result := (Form.ShowModal = mrOk);
     if Result then begin
-      Form.GetData(AMacroName, AMacroDesc);
+      Form.GetData(AMacroName, AMacroDesc, AMacro);
     end;
     // The checkbox is always evaluated
     APromptForName := not Form.chkDoNotShowAgain.Checked;
@@ -112,9 +114,40 @@ begin
   FMemo.Options := FMemo.Options - [eoScrollPastEol, eoScrollPastEof, eoEnhanceHomeKey, eoEnhanceEndKey];
 end;
 
-procedure TfmMacroLibraryNamePrompt.btnAddClick(Sender: TObject);
+procedure TfmMacroLibraryNamePrompt.btnInsertClick(Sender: TObject);
+var
+  LineIdx: Integer;
+  s: TGXUnicodeString;
+  Macro: TMacroKey;
 begin
-//
+  LineIdx := FMemo.CaretY - 1;
+  if (LineIdx < 0) or (LineIdx >= FMemo.Lines.Count) then
+    Exit;
+  s := '';
+  Macro.Full := 0;
+  if TfmEditMacroItem.Execute(Self, s, Macro) then begin
+    if s = '' then
+      s := TMacroInfo.MacroKeyToText(Macro);
+    FMemo.Lines.Insert(LineIdx, s);
+    FMemo.Lines.Objects[LineIdx] := Macro.AsPointer;
+  end;
+end;
+
+procedure TfmMacroLibraryNamePrompt.btnAppendClick(Sender: TObject);
+var
+  LineIdx: Integer;
+  s: TGXUnicodeString;
+  Macro: TMacroKey;
+begin
+  s := '';
+  Macro.Full := 0;
+  if TfmEditMacroItem.Execute(Self, s, Macro) then begin
+    if s = '' then
+      s := TMacroInfo.MacroKeyToText(Macro);
+    LineIdx := FMemo.Lines.Count;
+    FMemo.Lines.Append(s);
+    FMemo.Lines.Objects[LineIdx] := Macro.AsPointer;
+  end;
 end;
 
 procedure TfmMacroLibraryNamePrompt.btnDeleteClick(Sender: TObject);
@@ -161,10 +194,12 @@ begin
   end;
 end;
 
-procedure TfmMacroLibraryNamePrompt.GetData(out AMacroName, AMacroDesc: string);
+procedure TfmMacroLibraryNamePrompt.GetData(out AMacroName, AMacroDesc: string;
+  AMacro: TGXUnicodeStringList);
 begin
   AMacroName := edtMacroName.Text;
   AMacroDesc := mmoMacroDescription.Lines.Text;
+  AMacro.Assign(FMemo.Lines);
 end;
 
 procedure TfmMacroLibraryNamePrompt.SetData(const AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList;

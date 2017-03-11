@@ -12,6 +12,8 @@ inherited fmEditMacroItem: TfmEditMacroItem
     Top = 24
     Width = 289
     Height = 25
+    BevelInner = bvLowered
+    BevelOuter = bvLowered
     Caption = 'Edit field goes here'
     TabOrder = 1
   end

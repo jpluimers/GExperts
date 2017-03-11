@@ -34,9 +34,9 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   object lblMacroKeystrokes: TLabel
     Left = 8
     Top = 144
-    Width = 271
+    Width = 85
     Height = 13
-    Caption = 'Macro Keystrokes (saving changes not yet implemented)'
+    Caption = 'Macro Keystrokes'
   end
   object edtMacroName: TEdit
     Left = 8
@@ -64,7 +64,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 7
+    TabOrder = 8
   end
   object btnCancel: TButton
     Left = 344
@@ -75,7 +75,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 8
+    TabOrder = 9
   end
   object mmoMacroDescription: TMemo
     Left = 8
@@ -101,7 +101,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   end
   object btnDelete: TButton
     Left = 344
-    Top = 200
+    Top = 224
     Width = 75
     Height = 25
     Caption = 'Delete'
@@ -110,20 +110,29 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   end
   object btnEdit: TButton
     Left = 344
-    Top = 168
+    Top = 160
     Width = 75
     Height = 25
     Caption = 'Edit'
-    TabOrder = 5
+    TabOrder = 4
     OnClick = btnEditClick
   end
-  object btnAdd: TButton
+  object btnInsert: TButton
     Left = 344
-    Top = 136
+    Top = 192
     Width = 75
     Height = 25
-    Caption = 'Add'
-    TabOrder = 4
-    OnClick = btnAddClick
+    Caption = 'Insert'
+    TabOrder = 5
+    OnClick = btnInsertClick
+  end
+  object btnAppend: TButton
+    Left = 344
+    Top = 256
+    Width = 75
+    Height = 25
+    Caption = 'Append'
+    TabOrder = 7
+    OnClick = btnAppendClick
   end
 end

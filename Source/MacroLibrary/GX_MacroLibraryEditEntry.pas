@@ -38,6 +38,7 @@ type
     procedure SetData(const _Item: TGXUnicodeString; const _Macro: TMacroKey);
     procedure GetData(out _Item: TGXUnicodeString; out _Macro: TMacroKey);
     procedure SynEditOnEnter(Sender: TObject);
+    procedure EditKeyUpDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   public
     class function Execute(_Owner: TWinControl; var _Item: TGXUnicodeString; var _Macro: TMacroKey): Boolean;
     constructor Create(_Owner: TComponent); override;
@@ -84,11 +85,19 @@ begin
   FEdit.Font.Name := 'Courier New';
   FEdit.ScrollBars := ssNone;
   FEdit.OnEnter := SynEditOnEnter;
+  FEdit.OnKeyDown := EditKeyUpDown;
+  FEdit.OnKeyUp := EditKeyUpDown;
 
   Items := cmbSpecialKey.Items;
   Items.Clear;
   for mks := Succ(Low(TMacroSpecialKey)) to High(TMacroSpecialKey) do
     Items.AddObject(MacroSpecialKeyStrings[mks], Pointer(mks));
+end;
+
+procedure TfmEditMacroItem.EditKeyUpDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+    Key := 0;
 end;
 
 procedure TfmEditMacroItem.cmbSpecialKeyEnter(Sender: TObject);
@@ -104,10 +113,20 @@ end;
 procedure TfmEditMacroItem.GetData(out _Item: TGXUnicodeString; out _Macro: TMacroKey);
 var
   IntValue: Integer;
+  i: Integer;
+  ws: TGXUnicodeString;
+  c: TGXUnicodeChar;
 begin
   _Macro.Full := 0;
   if rbText.Checked then begin
-    _Item := FEdit.Text;
+    ws := FEdit.Text;
+    // filter out any special keys (I hope I got them all, but users are so inventive ...)
+    _Item := '';
+    for i := 1 to Length(ws) do begin
+      c := ws[i];
+      if (c <> #13) and (c <> #10) and (c <> #9) then
+        _Item := _Item + c;
+    end;
   end else begin
     _Item := '';
     if TComboBox_GetSelectedObject(cmbSpecialKey, IntValue) then
