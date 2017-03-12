@@ -14,6 +14,8 @@ uses
   Dialogs,
   StdCtrls,
   ExtCtrls,
+  ActnList,
+  Menus,
   SynUnicode,
   SynMemo,
   GX_BaseForm,
@@ -34,10 +36,20 @@ type
     btnInsert: TButton;
     lblMacroKeystrokes: TLabel;
     btnAppend: TButton;
-    procedure btnEditClick(Sender: TObject);
-    procedure btnDeleteClick(Sender: TObject);
-    procedure btnInsertClick(Sender: TObject);
-    procedure btnAppendClick(Sender: TObject);
+    TheActionList: TActionList;
+    actEdit: TAction;
+    actInsert: TAction;
+    actDelete: TAction;
+    actAppend: TAction;
+    pmKeystrokes: TPopupMenu;
+    miEdit: TMenuItem;
+    miInsert: TMenuItem;
+    miDelete: TMenuItem;
+    miAppend: TMenuItem;
+    procedure actEditExecute(Sender: TObject);
+    procedure actInsertExecute(Sender: TObject);
+    procedure actDeleteExecute(Sender: TObject);
+    procedure actAppendExecute(Sender: TObject);
   private
     FMemo: TSynMemo;
     procedure SetData(const AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList;
@@ -45,6 +57,8 @@ type
     procedure GetData(out AMacroName, AMacroDesc: string; AMacro: TGXUnicodeStringList);
     procedure HandleOnSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean;
       var FG, BG: TColor);
+    procedure MemoOnEnter(Sender: TObject);
+    procedure MemoOnExit(Sender: TObject);
   public
     class function Execute(AOwner: TComponent; AShowCheckbox: Boolean;
       var AMacroName, AMacroDesc: string;
@@ -110,11 +124,24 @@ begin
   FMemo.Font.Height := -11;
   FMemo.Font.Name := 'Courier New';
   FMemo.ActiveLineColor := $D0FFFF;
+  FMemo.OnEnter := MemoOnEnter;
+  fmemo.onexit := MemoOnExit;
   FMemo.OnSpecialLineColors := HandleOnSpecialLineColors;
   FMemo.Options := FMemo.Options - [eoScrollPastEol, eoScrollPastEof, eoEnhanceHomeKey, eoEnhanceEndKey];
+  FMemo.PopupMenu := pmKeystrokes;
 end;
 
-procedure TfmMacroLibraryNamePrompt.btnInsertClick(Sender: TObject);
+procedure TfmMacroLibraryNamePrompt.MemoOnEnter(Sender: TObject);
+begin
+  TheActionList.State := asNormal;
+end;
+
+procedure TfmMacroLibraryNamePrompt.MemoOnExit(Sender: TObject);
+begin
+  TheActionList.State := asSuspended;
+end;
+
+procedure TfmMacroLibraryNamePrompt.actInsertExecute(Sender: TObject);
 var
   LineIdx: Integer;
   s: TGXUnicodeString;
@@ -133,7 +160,7 @@ begin
   end;
 end;
 
-procedure TfmMacroLibraryNamePrompt.btnAppendClick(Sender: TObject);
+procedure TfmMacroLibraryNamePrompt.actAppendExecute(Sender: TObject);
 var
   LineIdx: Integer;
   s: TGXUnicodeString;
@@ -150,7 +177,7 @@ begin
   end;
 end;
 
-procedure TfmMacroLibraryNamePrompt.btnDeleteClick(Sender: TObject);
+procedure TfmMacroLibraryNamePrompt.actDeleteExecute(Sender: TObject);
 var
   LineIdx: Integer;
 begin
@@ -160,7 +187,7 @@ begin
   FMemo.Lines.Delete(LineIdx);
 end;
 
-procedure TfmMacroLibraryNamePrompt.btnEditClick(Sender: TObject);
+procedure TfmMacroLibraryNamePrompt.actEditExecute(Sender: TObject);
 var
   LineIdx: Integer;
   s: TGXUnicodeString;

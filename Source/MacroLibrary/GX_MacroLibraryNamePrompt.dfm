@@ -2,7 +2,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
   Left = 320
   Top = 249
   BorderIcons = [biSystemMenu, biMaximize]
-  Caption = 'Macro Library'
+  Caption = 'Keyboard Macro Library'
   ClientHeight = 386
   ClientWidth = 425
   Color = clBtnFace
@@ -21,7 +21,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 8
     Width = 59
     Height = 13
-    Caption = 'Macro Name'
+    Caption = 'Macro &Name'
     FocusControl = edtMacroName
   end
   object lblMacroDesc: TLabel
@@ -29,7 +29,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 56
     Width = 85
     Height = 13
-    Caption = 'Macro Description'
+    Caption = 'Macro &Description'
     FocusControl = mmoMacroDescription
   end
   object lblMacroKeystrokes: TLabel
@@ -54,7 +54,7 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Do not show this dialog again'
-    TabOrder = 2
+    TabOrder = 7
   end
   object btnOK: TButton
     Left = 264
@@ -96,47 +96,84 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Macro content goes here'
     Color = clWindow
-    TabOrder = 3
-    TabStop = True
+    TabOrder = 2
   end
   object btnDelete: TButton
     Left = 344
     Top = 224
     Width = 75
     Height = 25
+    Action = actDelete
     Anchors = [akTop, akRight]
-    Caption = 'Delete'
-    TabOrder = 6
-    OnClick = btnDeleteClick
+    TabOrder = 5
   end
   object btnEdit: TButton
     Left = 344
     Top = 160
     Width = 75
     Height = 25
+    Action = actEdit
     Anchors = [akTop, akRight]
-    Caption = 'Edit'
-    TabOrder = 4
-    OnClick = btnEditClick
+    TabOrder = 3
   end
   object btnInsert: TButton
     Left = 344
     Top = 192
     Width = 75
     Height = 25
+    Action = actInsert
     Anchors = [akTop, akRight]
-    Caption = 'Insert'
-    TabOrder = 5
-    OnClick = btnInsertClick
+    TabOrder = 4
   end
   object btnAppend: TButton
     Left = 344
     Top = 256
     Width = 75
     Height = 25
+    Action = actAppend
     Anchors = [akTop, akRight]
-    Caption = 'Append'
-    TabOrder = 7
-    OnClick = btnAppendClick
+    TabOrder = 6
+  end
+  object TheActionList: TActionList
+    State = asSuspended
+    Left = 200
+    Top = 192
+    object actEdit: TAction
+      Caption = 'Edit'
+      ShortCut = 113
+      OnExecute = actEditExecute
+    end
+    object actInsert: TAction
+      Caption = 'Insert'
+      ShortCut = 16457
+      OnExecute = actInsertExecute
+    end
+    object actDelete: TAction
+      Caption = 'Delete'
+      ShortCut = 16452
+      OnExecute = actDeleteExecute
+    end
+    object actAppend: TAction
+      Caption = 'Append'
+      ShortCut = 16458
+      OnExecute = actAppendExecute
+    end
+  end
+  object pmKeystrokes: TPopupMenu
+    Left = 88
+    Top = 200
+    object miEdit: TMenuItem
+      Action = actEdit
+    end
+    object miInsert: TMenuItem
+      Action = actInsert
+    end
+    object miDelete: TMenuItem
+      Action = actDelete
+    end
+    object miAppend: TMenuItem
+      Action = actAppend
+      ShortCut = 24649
+    end
   end
 end
