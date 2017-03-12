@@ -137,18 +137,20 @@ type
     actRecord: TAction;
     actPlayback: TAction;
     mitRename: TMenuItem;
+    tbEdit: TToolButton;
     pnlDescription: TPanel;
     tbnSep5: TToolButton;
     tbnHelp: TToolButton;
     actHelp: TAction;
     actEditRename: TAction;
+    actFileClose: TAction;
     mmoMacroDescription: TMemo;
     lblMacroDesc: TLabel;
     Splitter: TSplitter;
     actPromptForName: TAction;
     mitPromptforName: TMenuItem;
     mitSep5: TMenuItem;
-    actShowContent: TAction;
+    actEditMacro: TAction;
     miShowContent: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvMacrosDblClick(Sender: TObject);
@@ -175,7 +177,8 @@ type
     procedure actHelpExecute(Sender: TObject);
     procedure lvMacrosInfoTip(Sender: TObject; Item: TListItem; var InfoTip: String);
     procedure actPromptForNameExecute(Sender: TObject);
-    procedure actShowContentExecute(Sender: TObject);
+    procedure actEditMacroExecute(Sender: TObject);
+    procedure actFileCloseExecute(Sender: TObject);
   private
     FDataList: TList;
     FSBWidth: Integer;
@@ -262,7 +265,7 @@ const
   MacroElement = 'Macro';
 
 resourcestring
-  SMacroLibCaption = 'Macro &Library';
+  SMacroLibCaption = '&Keyboard Macro Library';
 
 const
   UnknownName = 'Unknown';
@@ -812,9 +815,9 @@ begin
   actEditClear.Enabled   := lvMacros.Items.Count > 0;
   actEditDelete.Enabled  := IsMacroSelected;
   actEditCopy.Enabled    := IsMacroSelected;
+  actEditMacro.Enabled := IsMacroSelected;
   actEditRename.Enabled  := IsMacroSelected;
   actFileSave.Enabled    := IsMacroSelected;
-  actShowContent.Enabled := IsMacroSelected;
   actEditSuspend.Checked := FSuspended;
   actRecord.Checked      := GxOtaEditorIsRecordingMacro;
   actViewToolbar.Checked := Toolbar.Visible;
@@ -909,7 +912,7 @@ begin
   UpdateMemoState;
 end;
 
-procedure TfmMacroLibrary.actShowContentExecute(Sender: TObject);
+procedure TfmMacroLibrary.actEditMacroExecute(Sender: TObject);
 var
   Item: TListItem;
   sl: TGXUnicodeStringList;
@@ -982,6 +985,11 @@ begin
       Info.SaveToFile(dlgSave.FileName);
     end;
   end;
+end;
+
+procedure TfmMacroLibrary.actFileCloseExecute(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TfmMacroLibrary.actFileLoadExecute(Sender: TObject);
@@ -1274,7 +1282,9 @@ end;
 
 function TIDEMacroBugMessage.GetMessage: string;
 begin
-  Result := 'RAD Studio 2009 and RAD Studio 2010 before update 2 have bugs preventing record and playback of macros using this tool.  See QC 78289 for more details: http://qc.embarcadero.com/wc/qcmain.aspx?d=78289';
+  Result := 'RAD Studio 2009 and RAD Studio 2010 before update 2 have bugs preventing record'
+  +' and playback of macros using this tool. '
+  +' See QC 78289 for more details: http://qc.embarcadero.com/wc/qcmain.aspx?d=78289';
 end;
 
 initialization

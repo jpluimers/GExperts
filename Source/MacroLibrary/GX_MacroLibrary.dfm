@@ -3,7 +3,7 @@ object fmMacroLibrary: TfmMacroLibrary
   Top = 252
   ActiveControl = lvMacros
   AutoScroll = False
-  Caption = 'Macro Library'
+  Caption = 'Keyboard Macro Library'
   ClientHeight = 377
   ClientWidth = 331
   Color = clBtnFace
@@ -106,8 +106,13 @@ object fmMacroLibrary: TfmMacroLibrary
       Top = 0
       Action = actEditDelete
     end
-    object tbnSep2: TToolButton
+    object tbEdit: TToolButton
       Left = 100
+      Top = 0
+      Action = actEditMacro
+    end
+    object tbnSep2: TToolButton
+      Left = 123
       Top = 0
       Width = 8
       Caption = 'tbnSep2'
@@ -115,12 +120,12 @@ object fmMacroLibrary: TfmMacroLibrary
       Style = tbsSeparator
     end
     object tbnCopy: TToolButton
-      Left = 108
+      Left = 131
       Top = 0
       Action = actEditCopy
     end
     object tbnSep3: TToolButton
-      Left = 131
+      Left = 154
       Top = 0
       Width = 8
       Caption = 'tbnSep3'
@@ -128,17 +133,17 @@ object fmMacroLibrary: TfmMacroLibrary
       Style = tbsSeparator
     end
     object tbnSave: TToolButton
-      Left = 139
+      Left = 162
       Top = 0
       Action = actFileSave
     end
     object tbnLoad: TToolButton
-      Left = 162
+      Left = 185
       Top = 0
       Action = actFileLoad
     end
     object tbnSep4: TToolButton
-      Left = 185
+      Left = 208
       Top = 0
       Width = 8
       Caption = 'tbnSep4'
@@ -146,14 +151,14 @@ object fmMacroLibrary: TfmMacroLibrary
       Style = tbsSeparator
     end
     object btnSuspend: TToolButton
-      Left = 193
+      Left = 216
       Top = 0
       Action = actEditSuspend
       AllowAllUp = True
       Style = tbsCheck
     end
     object tbnSep5: TToolButton
-      Left = 216
+      Left = 239
       Top = 0
       Width = 8
       Caption = 'tbnSep5'
@@ -161,7 +166,7 @@ object fmMacroLibrary: TfmMacroLibrary
       Style = tbsSeparator
     end
     object tbnHelp: TToolButton
-      Left = 224
+      Left = 247
       Top = 0
       Action = actHelp
     end
@@ -322,11 +327,19 @@ object fmMacroLibrary: TfmMacroLibrary
       Hint = 'Automatically prompt for a name when stopping recording'
       OnExecute = actPromptForNameExecute
     end
-    object actShowContent: TAction
-      Category = 'View'
-      Caption = 'Show Content (experimental)'
-      Hint = 'Show Content (experimental)'
-      OnExecute = actShowContentExecute
+    object actEditMacro: TAction
+      Category = 'Edit'
+      Caption = 'Edit'
+      Hint = 'Edit'
+      ImageIndex = 38
+      ShortCut = 8305
+      OnExecute = actEditMacroExecute
+    end
+    object actFileClose: TAction
+      Category = 'File'
+      Caption = 'Close'
+      ShortCut = 27
+      OnExecute = actFileCloseExecute
     end
   end
   object mnuMacroPop: TPopupMenu
@@ -340,6 +353,9 @@ object fmMacroLibrary: TfmMacroLibrary
     end
     object mitDelete: TMenuItem
       Action = actEditDelete
+    end
+    object miShowContent: TMenuItem
+      Action = actEditMacro
     end
     object mitRename: TMenuItem
       Action = actEditRename
@@ -395,9 +411,6 @@ object fmMacroLibrary: TfmMacroLibrary
     end
     object mitShowDescription: TMenuItem
       Action = actViewDescription
-    end
-    object miShowContent: TMenuItem
-      Action = actShowContent
     end
     object mitSep5: TMenuItem
       Caption = '-'
