@@ -11,7 +11,7 @@ GExperts is quite simple:
 4. call "__build_project.cmd"
 
 If I haven't made a mistake, this script should then compile a GExpertsXxx.dll
-to the folder "dlls" respectively.
+to the folder "Binaries" respectively.
 
 Alternatively you can call "__build.cmd" in the root of the source tree followed by a Delphi version:
 
@@ -47,4 +47,7 @@ necessary to install the experimental GExperts.
 
 **Dependencies**
 
-"__build.cmd" and "__build_project.cmd" require the Delphi versions you want to compile for.
+"__build.cmd" and "__build_project.cmd" of course require the Delphi versions
+you want to compile for. Note that some Editions (e.g. "Starter") do not come
+with the required command line compiler, so the build scripts won't work with
+them. But you can always open the projects in the IDE and compile them there.
