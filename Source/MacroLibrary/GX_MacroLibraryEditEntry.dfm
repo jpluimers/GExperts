@@ -1,6 +1,6 @@
 inherited fmEditMacroItem: TfmEditMacroItem
   BorderStyle = bsDialog
-  Caption = 'Edit Macro Item'
+  Caption = 'Edit Macro Keystrokes'
   ClientHeight = 177
   ClientWidth = 321
   Position = poOwnerFormCenter
