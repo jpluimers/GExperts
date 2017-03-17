@@ -195,6 +195,16 @@ end;
 procedure TManagedForm.SetComboDropDownCount(Control: TControl);
 begin
   if StrContains('Combo', Control.ClassName) or StrContains('ColorBox', Control.ClassName) then begin
+    // Fix issue #26:
+    // Exclude some controls from being changed:
+    if (Control is TCustomComboBox)
+      and (
+      SameText(Control.ClassName, 'TTargetsComboBox')
+      or SameText(Control.Name, 'cbPlatformConfigurations')
+      or SameText(Control.Name, 'cbConfig')
+      ) then begin
+      Exit;
+    end;
     if TypInfo.IsPublishedProp(Control, 'DropDownCount') then
       if TypInfo.PropIsType(Control, 'DropDownCount', tkInteger) then
         if GetPropValue(Control, 'DropDownCount', False) < FFormChanges.ComboDropDownCount then
