@@ -42,6 +42,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
         <Manifest_File>None</Manifest_File>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE4;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE4;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE4.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
@@ -313,6 +314,9 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibrary.pas">
             <Form>fmMacroLibrary</Form>
         </DCCReference>
+        <DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
+            <Form>fmEditMacroItem</Form>
+        </DCCReference>
         <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas">
             <Form>fmMacroLibraryNamePrompt</Form>
         </DCCReference>
@@ -525,6 +529,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <Form>f_IdeBuildEventFavoriteEdit</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_ReadMapFileThread.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>GXIcons.res</Form>
         </RcCompile>

@@ -29,6 +29,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Release>8</VerInfo_Release>
         <UsePackages>true</UsePackages>
@@ -281,6 +282,9 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibrary.pas">
             <Form>fmMacroLibrary</Form>
         </DCCReference>
+        <DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
+            <Form>fmEditMacroItem</Form>
+        </DCCReference>
         <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas">
             <Form>fmMacroLibraryNamePrompt</Form>
         </DCCReference>
@@ -494,6 +498,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <Form>f_IdeBuildEventFavoriteEdit</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_ReadMapFileThread.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>GXIcons.res</Form>
         </RcCompile>
