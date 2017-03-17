@@ -15,6 +15,7 @@ uses
   StdCtrls,
   ExtCtrls,
   ActnList,
+  Actions,
   Menus,
   SynUnicode,
   SynMemo,
