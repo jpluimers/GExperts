@@ -3644,15 +3644,35 @@ resourcestring
 var
   OldErrorMode: UINT;
   BrowseRoot: WideString;
+{$IFDEF GX_VER185_up}
+  fo: TFileOpenDialog;
+{$ENDIF}
 begin
-  OldErrorMode := SetErrorMode(SEM_FAILCRITICALERRORS);
-  try
-    BrowseRoot := '';
-    if Owner = nil then
-      Owner := Screen.ActiveCustomForm;
-    Result := dzSelectDirectory(SSelDir, BrowseRoot, Dir, Owner);
-  finally
-    SetErrorMode(OldErrorMode);
+  if Owner = nil then
+    Owner := Screen.ActiveCustomForm;
+{$IFDEF GX_VER185_up}
+  if IsWindowsVistaOrLater then begin
+    fo := TFileOpenDialog.Create(Owner);
+    try
+      fo.Options := [fdoPickFolders];
+      fo.Title := SSelDir;
+      fo.FileName := Dir;
+      Result := fo.Execute;
+      if Result then
+        Dir := fo.FileName;
+    finally
+      FreeAndNil(fo);
+    end;
+  end else
+{$ENDIF}
+  begin
+    OldErrorMode := SetErrorMode(SEM_FAILCRITICALERRORS);
+    try
+      BrowseRoot := '';
+      Result := dzSelectDirectory(SSelDir, BrowseRoot, Dir, Owner);
+    finally
+      SetErrorMode(OldErrorMode);
+    end;
   end;
 end;
 
