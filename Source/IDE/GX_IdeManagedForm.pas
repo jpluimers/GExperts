@@ -193,23 +193,34 @@ begin
 end;
 
 procedure TManagedForm.SetComboDropDownCount(Control: TControl);
+var
+  ClsName: string;
+  CtrlName: string;
 begin
-  if StrContains('Combo', Control.ClassName) or StrContains('ColorBox', Control.ClassName) then begin
-    // Fix issue #26:
-    // Exclude some controls from being changed:
-    if (Control is TCustomComboBox)
-      and (
-      SameText(Control.ClassName, 'TTargetsComboBox')
-      or SameText(Control.Name, 'cbPlatformConfigurations')
-      or SameText(Control.Name, 'cbConfig')
-      ) then begin
-      Exit;
-    end;
-    if TypInfo.IsPublishedProp(Control, 'DropDownCount') then
-      if TypInfo.PropIsType(Control, 'DropDownCount', tkInteger) then
-        if GetPropValue(Control, 'DropDownCount', False) < FFormChanges.ComboDropDownCount then
-          TypInfo.SetPropValue(Control, 'DropDownCount', FFormChanges.ComboDropDownCount);
+  ClsName := Control.ClassName;
+  if not StrContains('Combo', ClsName) and not StrContains('ColorBox', ClsName) then
+    Exit;
+
+  CtrlName := Control.Name;
+
+  // Fix issue #26:
+  // Exclude some controls from being changed:
+  if (Control is TCustomComboBox)
+    and (
+    SameText(CtrlName, 'TTargetsComboBox')
+    or SameText(CtrlName, 'cbPlatformConfigurations')
+    or SameText(CtrlName, 'cbConfig')
+    ) then begin
+    Exit;
   end;
+  if (Control is TCustomComboboxEx)
+    and SameText(CtrlName, 'cbPlatformConfigurations') then
+    Exit;
+
+  if TypInfo.IsPublishedProp(Control, 'DropDownCount') then
+    if TypInfo.PropIsType(Control, 'DropDownCount', tkInteger) then
+      if TypInfo.GetPropValue(Control, 'DropDownCount', False) < FFormChanges.ComboDropDownCount then
+        TypInfo.SetPropValue(Control, 'DropDownCount', FFormChanges.ComboDropDownCount);
 end;
 
 procedure TManagedForm.DoComboDropDownCount;
