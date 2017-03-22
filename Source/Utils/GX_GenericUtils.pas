@@ -3656,7 +3656,8 @@ begin
     try
       fo.Options := [fdoPickFolders];
       fo.Title := SSelDir;
-      fo.FileName := Dir;
+      fo.DefaultFolder := Dir;
+      fo.FileName := '';
       Result := fo.Execute;
       if Result then
         Dir := fo.FileName;
