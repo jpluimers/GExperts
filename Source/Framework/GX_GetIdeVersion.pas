@@ -32,6 +32,7 @@ type
      ideRS101, // Rad Studio 10.1 Berlin
      ideRS101U1, // Rad Studio 10.1 Berlin Update 1
      ideRS101U2, // Rad Studio 10.1 Berlin Update 2
+     ideRS102, // Rad Studio 10.2 Tokyo
      // C# Builder
      ideCSB100,
      // C++Builder
@@ -846,6 +847,21 @@ begin
   end;
 end;
 
+{
+  Delphi 10.2 Tokyo
+  File                 File Version    Size       Modified Time
+  delphicoreide250.bpl 25.0.26309.314
+  coreide250.bpl       25.0.26309.314
+  bds.exe              25.0.26309.314
+  dcldb250.bpl         25.0.26309.314
+}
+function GetRS102Version: TBorlandIdeVersion;
+const
+  CoreIde2500: TVersionNumber = (Minor: 25; Major: 0; Build: 314; Release: 26309);
+begin
+  Result := ideRS102;
+end;
+
 function GetBorlandIdeVersion: TBorlandIdeVersion;
 begin
   // We only actually detect the version once per session.
@@ -954,6 +970,11 @@ begin
     Result := GetRS101Version;
     Assert(Result in [ideRS101, ideRS101U1, ideRS101U2]);
   {$ENDIF VER310}
+
+  {$IFDEF VER320}
+    Result := GetRS102Version;
+    Assert(Result in [ideRS102]);
+  {$ENDIF VER320}
 
   if Result = ideUnknown then
     MessageDlg('Unknown IDE major version detected.  Please update GX_GetIdeVersion.pas.', mtError, [mbOK], 0);
