@@ -22,6 +22,7 @@ call :makeinst RSXE7
 call :makeinst RSXE8
 call :makeinst RS100 RS10
 call :makeinst RS101 RS10.1
+call :makeinst RS102 RS10.2
 pause
 goto :eof
 

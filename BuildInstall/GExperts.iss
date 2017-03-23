@@ -174,7 +174,15 @@
   #define IDERegVer    "18"
   #define RegCompany   "Embarcadero"
 #endif
-
+#ifdef RS102
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
+  #define IDEVer       "10.2"
+  #define DLLSuffix    "RS102"
+  #define IDERegName   "BDS"
+  #define IDERegVer    "19"
+  #define RegCompany   "Embarcadero"
+#endif
 
 #ifndef IDEShortName
   #error Usage: "isppcc.exe GExperts.iss /dDelphi7 /dVersion=1.38"
