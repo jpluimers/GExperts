@@ -82,7 +82,7 @@
                                     {$IF CompilerVersion >= 31}
                                       {$DEFINE GX_VER310_up}  // RAD Studio 10.1 Berlin (25; BDS 18)
                                       {$IF CompilerVersion >= 32}
-                                        {$DEFINE GX_VER320_up}  // RAD Studio 10.2 Tokyo(26; BDS 19)
+                                        {$DEFINE GX_VER320_up}  // RAD Studio 10.2 Tokyo (26; BDS 19)
                                       {$IFEND}
                                     {$IFEND}
                                   {$IFEND}
