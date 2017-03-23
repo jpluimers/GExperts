@@ -6,7 +6,8 @@ interface
 
 uses
   GX_FavUtil, DropTarget, FileView, Windows, SysUtils, Classes, Controls, Forms,
-  ComCtrls, Menus, ExtCtrls, ImgList, ActnList, ToolWin, Dialogs, GX_BaseForm;
+  ComCtrls, Menus, ExtCtrls, ImgList, ActnList, ToolWin, Dialogs, Actions,
+  ImageList, GX_BaseForm;
 
 type
   TfmFavFiles = class(TfmBaseForm)
@@ -1014,7 +1015,9 @@ begin
   if (tvFolders.Selected = nil) or (AFileName = '') then
     Exit;
 
+{$IFNDEF GX_VER320_up} // RAD Studio 10.2 Tokyo(26; BDS 19) doesn't need this
   LItem := nil;
+{$ENDIF}
   Folder := GetFolder(tvFolders.Selected);
   Cursor := TempHourGlassCursor;
   ListView.Items.BeginUpdate;
@@ -1039,6 +1042,7 @@ begin
   finally
     ListView.Items.EndUpdate;
   end;
+
   if Assigned(LItem) then
   begin
     ListView.Selected := nil;

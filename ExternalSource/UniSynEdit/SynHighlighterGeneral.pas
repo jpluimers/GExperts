@@ -762,7 +762,9 @@ begin
   try
     r.RootKey := RootKey;
     if r.OpenKey(Key,true) then begin
+{$IFNDEF VER320} // Delphi 10.2 Tokyo / BDS 19 does not need this
       Result := true;
+{$ENDIF}
       r.WriteString('KeyWords', KeyWords.Text);
       Result := inherited SaveToRegistry(RootKey, Key);
     end

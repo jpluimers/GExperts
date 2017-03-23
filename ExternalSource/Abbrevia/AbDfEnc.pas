@@ -808,7 +808,9 @@ begin
          'Deflate: aHelper.Options must enable some kind of archiving');
 
   {$IFDEF DefeatWarnings}
+    {$IFNDEF VER320} // Delphi 10.2 Tokyo / BDS 19 does not need this
   Result := 0;
+    {$ENDIF}
   {$ENDIF}
 
   {prepare for the try..finally}
