@@ -5,6 +5,7 @@ unit GX_IdeProjectOptionsEnhancer;
 interface
 
 uses
+  Windows,
   SysUtils,
   Forms;
 
@@ -84,7 +85,7 @@ var
   s: ThisString;
 begin
   s := _Files[0];
-  FCmb.Perform(WM_SETTEXT, 0, Integer(PThisChar(s)));
+  FCmb.Perform(WM_SETTEXT, 0, LPARAM(PThisChar(s)));
   FCmb.Perform(CM_TEXTCHANGED, 0, 0);
 end;
 
