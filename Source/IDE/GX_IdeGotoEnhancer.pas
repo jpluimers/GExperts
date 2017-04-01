@@ -145,7 +145,7 @@ type
 
 procedure TCombobox_SetText(_cmb: TWinControl; const _Text: TStringType);
 begin
-  _cmb.Perform(WM_SETTEXT, 0, Longint(PCharType(_Text)));
+  _cmb.Perform(WM_SETTEXT, 0, LPARAM(PCharType(_Text)));
   _cmb.Perform(CM_TEXTCHANGED, 0, 0);
 end;
 
