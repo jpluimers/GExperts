@@ -3630,7 +3630,7 @@ end;
 
 function CanCreateFile(const FileName: string): Boolean;
 var
-  Handle: Integer;
+  Handle: THandle;
 begin
   Result := False;
   if DirectoryExists(ExtractFileDir(FileName)) then begin

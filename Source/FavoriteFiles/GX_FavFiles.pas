@@ -805,7 +805,7 @@ end;
 
 procedure TfmFavFiles.SetupSystemImageLists;
 var
-  AHandle: DWord;
+  AHandle: THandle;
   FileInfo: TSHFileInfo;
 begin
   // Who is responsible for freeing that returned handle?

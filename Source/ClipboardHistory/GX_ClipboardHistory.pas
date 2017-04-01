@@ -819,7 +819,7 @@ procedure TfmClipboardHistory.WmDrawClipBoard;
 var
   ItemCount: Integer;
   ClipText: string;
-  Handle: Cardinal;
+  Handle: THandle;
   DataSize: Cardinal;
 begin
   if IgnoreClip then
