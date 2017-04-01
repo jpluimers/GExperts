@@ -100,7 +100,7 @@ begin
 
   _sl.Sorted := False;
   for i := 0 to _sl.Count - 1 do
-    _sl.Objects[i] := POinter(i + 1);
+    _sl.Objects[i] := Pointer(i + 1);
   _sl.Sorted := True;
 end;
 
@@ -112,7 +112,7 @@ begin
 
   _sl.Sorted := False;
   for i := 0 to _sl.Count - 1 do
-    _sl.Objects[i] := POinter(i + 1);
+    _sl.Objects[i] := Pointer(i + 1);
   _sl.Sorted := True;
 end;
 
