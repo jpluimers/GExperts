@@ -20,6 +20,7 @@ call :dobuild XE7
 call :dobuild XE8
 call :dobuild Xx10Seattle
 call :dobuild Xx101Berlin
+call :dobuild Xx102
 
 goto :eof
 
