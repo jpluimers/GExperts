@@ -151,7 +151,7 @@ end;
 
 procedure TCombobox_SelectAll(_cmb: TWinControl);
 begin
-  SendMessage(_cmb.Handle, CB_SETEDITSEL, 0, Integer($FFFF0000));
+  SendMessage(_cmb.Handle, CB_SETEDITSEL, 0, LPARAM($FFFF0000));
 end;
 
 function TCombobox_DroppedDown(_cmb: TWinControl): Boolean;

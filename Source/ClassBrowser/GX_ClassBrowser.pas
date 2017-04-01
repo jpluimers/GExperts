@@ -10,7 +10,7 @@ interface
 uses
   Windows, GX_ClassMgr, GX_ClassParsing, GX_Experts, GX_OtaUtils, GX_EnhancedEditor,
   Classes, Controls, Buttons, StdCtrls, Forms, Dialogs, ActnList, ToolWin, ToolsAPI,
-  Graphics, Menus, ExtCtrls, ComCtrls, ImgList, GX_BaseForm;
+  Actions, Graphics, Menus, ExtCtrls, ComCtrls, ImgList, GX_BaseForm;
 
 type
   TInfoViewMode = (vmList, vmTree);
@@ -817,7 +817,7 @@ var
   ShapeLeft: Integer;
   L: Integer;
 begin
-  SendMessage(scInherit.Handle, WM_SETREDRAW, Integer(False), 0);
+  SendMessage(scInherit.Handle, WM_SETREDRAW, WPARAM(False), 0);
   try
     tshInherit.Width := pcMain.ActivePage.Width;
     tshInherit.Height := pcMain.ActivePage.Height;
@@ -836,7 +836,7 @@ begin
           with TShape(scInherit.Controls[i]) do
             SetBounds(ShapeLeft, Top, 2, 20);
   finally
-    SendMessage(scInherit.Handle, WM_SETREDRAW, Integer(True), 0);
+    SendMessage(scInherit.Handle, WM_SETREDRAW, WPARAM(True), 0);
     for i := 0 to scInherit.ControlCount - 1 do
        scInherit.Controls[i].Invalidate;
     scInherit.Invalidate;
@@ -1060,7 +1060,7 @@ var
     APanel.Visible := True;
     APanel.Parent := scInherit;
     APanel.OnClick := ClickInheritancePanel;
-    SendMessage(APanel.Handle, WM_SETREDRAW, Integer(True), 0);
+    SendMessage(APanel.Handle, WM_SETREDRAW, WPARAM(True), 0);
     APanel.BorderWidth := 1;
     APanel.FullRepaint := False;
     APanel.Caption := PanelText;
@@ -1104,7 +1104,7 @@ begin
     GetInheritedList(Inheritlist, DrawClassName);
 
     scInherit.DisableAutoRange;
-    SendMessage(scInherit.Handle, WM_SETREDRAW, Integer(False), 0);
+    SendMessage(scInherit.Handle, WM_SETREDRAW, WPARAM(False), 0);
     try
       while scInherit.ControlCount > 0 do
         scInherit.Controls[0].Free;
@@ -1138,7 +1138,7 @@ begin
 
     finally
       scInherit.EnableAutoRange;
-      SendMessage(scInherit.Handle, WM_SETREDRAW, Integer(True), 0);
+      SendMessage(scInherit.Handle, WM_SETREDRAW, WPARAM(True), 0);
 
       for i := 0 to scInherit.ControlCount-1 do
         scInherit.Controls[i].Invalidate;
