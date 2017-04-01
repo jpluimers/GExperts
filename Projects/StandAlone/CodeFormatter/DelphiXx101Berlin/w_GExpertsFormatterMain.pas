@@ -76,8 +76,6 @@ var
   Dll: IGExpertsDll;
 
 function LoadGExperts(out _DllName: string): Boolean;
-var
-  Path: string;
 begin
   try
     Dll := LoadAnyGExpertsDLL;
