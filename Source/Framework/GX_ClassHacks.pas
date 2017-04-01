@@ -13,7 +13,8 @@ implementation
 
 uses
   Windows,
-  SysUtils;
+  SysUtils,
+  GX_GenericUtils;
 
 function GetClassReference(const ClassName: string; const ImplementationModule: string): TClass;
 type
@@ -68,8 +69,8 @@ var
   function InRangeOrNil(const APointer, PLowerBound, PUpperBound: Pointer): Boolean;
   begin
     Result := (APointer = nil) or
-                ((Integer(PLowerBound) <= Integer(APointer)) and
-                 (Integer(APointer) <= Integer(PUpperBound)));
+                ((NativeInt(PLowerBound) <= NativeInt(APointer)) and
+                 (NativeInt(APointer) <= NativeInt(PUpperBound)));
   end;
 
 var

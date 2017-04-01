@@ -407,7 +407,7 @@ begin
   while (I < 0) or (Vmt[I] <> nil) do
   begin
     P := Vmt[I];
-    if (P <> OldProc) and (Integer(P) > $10000) and not IsBadReadPtr(P, 6) then
+    if (P <> OldProc) and (NativeInt(P) > $10000) and not IsBadReadPtr(P, 6) then
       P := GetActualAddr(P);
     if P = OldProc then
     begin

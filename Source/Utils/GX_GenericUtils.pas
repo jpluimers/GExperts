@@ -22,6 +22,11 @@ const
 resourcestring
   SAllAlphaNumericChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
+{$IFNDEF GX_VER160_up}
+type
+  NativeInt = integer;
+{$ENDIF ~GX_VER160_up}
+
 type
   {$IFDEF UNICODE}
   TGXStringList = class(TStringList)

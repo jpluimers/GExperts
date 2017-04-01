@@ -923,13 +923,19 @@ begin
   Result := TComboBox_GetSelectedObject(_cmb, idx, _Obj, _FocusControl);
 end;
 
+{$IFNDEF GX_VER160_up}
+type
+  NativeInt = integer;
+{$ENDIF ~GX_VER160_up}
+
+
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean;
 var
   Obj: Pointer;
 begin
   Result := TComboBox_GetSelectedObject(_cmb, Obj, _FocusControl);
   if Result then
-    _ObjAsInt := Integer(Obj);
+    _ObjAsInt := NativeInt(Obj);
 end;
 
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _Idx: Integer;
@@ -964,7 +970,7 @@ var
 begin
   Result := TComboBox_GetSelectedObject(_cmb, _Item, Obj, _FocusControl);
   if Result then
-    _ObjAsInt := Integer(Obj);
+    _ObjAsInt := NativeInt(Obj);
 end;
 
 function TComboBox_GetSelectedObjectDef(_cmb: TCustomComboBox; _Default: Integer;

@@ -199,7 +199,7 @@ begin
     FWords.GetLines(sl);
     TGXUnicodeStringList_MakeIndex(sl);
     sl.Find(s, Idx);
-    FWords.CaretXY := Point(0, Integer(sl.Objects[Idx]) - 1);
+    FWords.CaretXY := Point(0, NativeInt(sl.Objects[Idx]) - 1);
   finally
     FreeAndNil(sl);
   end;

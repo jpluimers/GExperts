@@ -287,7 +287,7 @@ var
 begin
   Result := FWords.Find(LowerCase(_s), Idx);
   if Result then
-    _ReservedType := TReservedType(Integer(FWords.Objects[Idx]));
+    _ReservedType := TReservedType(NativeInt(FWords.Objects[Idx]));
 end;
 
 initialization

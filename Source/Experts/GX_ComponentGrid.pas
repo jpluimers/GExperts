@@ -6,7 +6,7 @@ interface
 
 uses
   GX_Experts, Classes, Controls, Forms, Grids, SortGrid,
-  StdCtrls, ComCtrls, ActnList, ToolWin, GX_BaseForm;
+  StdCtrls, ComCtrls, ActnList, Actions, ToolWin, GX_BaseForm;
 
 type
   TfmComponentGrid = class(TfmBaseForm)
@@ -379,7 +379,7 @@ begin
 
   for Row := 1 to StringGrid.RowCount - 1 do
   begin
-    ComponentIndex := Integer(StringGrid.Objects[0, Row]);
+    ComponentIndex := NativeInt(StringGrid.Objects[0, Row]);
 
     AComponent := FComponentList.Items[ComponentIndex] as IOTAComponent;
     Assert(Assigned(AComponent));

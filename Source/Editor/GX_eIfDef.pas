@@ -16,6 +16,7 @@ uses
   ExtCtrls,
   Graphics,
   ActnList,
+  Actions,
   Menus,
   Messages,
   Contnrs,
@@ -358,7 +359,7 @@ var
 begin
   r := FStringGrid.Row;
   if (r >= FStringGrid.FixedRows) and (r < FStringGrid.RowCount) then
-    Result := Integer(FStringGrid.Objects[0, r])
+    Result := NativeInt(FStringGrid.Objects[0, r])
   else
     Result := 0;
 end;

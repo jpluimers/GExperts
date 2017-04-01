@@ -190,7 +190,7 @@ begin
             // due to the IDE using UTF-8 we need to convert PatchPos to line and offset
             // and then convert line and offset to the Offset into the edit buffer
             for i := 0 to Patches.Count - 1 do begin
-              PatchPos := Integer(Patches.Objects[i]);
+              PatchPos := NativeInt(Patches.Objects[i]);
               cp := OffsToCP.CalcCursorPos(PatchPos);
               Offset := EditView.CharPosToPos(PointToCharPos(cp));
               Patches.Objects[i] := Pointer(Offset);
@@ -203,7 +203,7 @@ begin
           Writer := SourceEditor.CreateUndoableWriter;
           CurPos := 0;
           for i := 0 to Patches.Count - 1 do begin
-            PatchPos := Integer(Patches.Objects[i]);
+            PatchPos := NativeInt(Patches.Objects[i]);
             if PatchPos > CurPos then begin
               Writer.CopyTo(PatchPos);
               CurPos := PatchPos;

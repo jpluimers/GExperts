@@ -221,7 +221,7 @@ begin
     for i := 0 to List.Count - 1 do
     begin
       Menu := TMenuItem.Create(nil);
-      Menu.Tag := Integer(List.Objects[i]);
+      Menu.Tag := NativeInt(List.Objects[i]);
       Menu.Caption := List.Strings[i];
 
       if (i > 0) and (Cardinal(i) mod CalculateColumnCount = 0) then

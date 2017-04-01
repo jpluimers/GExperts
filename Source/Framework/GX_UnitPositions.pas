@@ -29,7 +29,7 @@ type
 implementation
 
 uses
-  SysUtils, GX_OtaUtils;
+  SysUtils, GX_OtaUtils, GX_GenericUtils;
 
 resourcestring
   SUnitName = 'unit';
@@ -77,7 +77,7 @@ end;
 function TUnitPositions.GetPosition(Index: Integer): TUnitPosition;
 begin
   Result.Name := FPosList[Index];
-  Result.Position := Integer(FPosList.Objects[Index]);
+  Result.Position := NativeInt(FPosList.Objects[Index]);
 end;
 
 procedure TUnitPositions.GetPositions;

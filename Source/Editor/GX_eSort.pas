@@ -153,7 +153,7 @@ begin
         Direction := -1;
       end;
       while (i >= 0) and (i < TrimList.Count) do begin
-        SortedList.Add(Lines[Integer(TrimList.Objects[i])]);
+        SortedList.Add(Lines[NativeInt(TrimList.Objects[i])]);
         i := i + Direction;
       end;
       Lines.Clear;
