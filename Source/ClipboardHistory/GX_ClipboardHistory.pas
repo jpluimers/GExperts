@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, ExtCtrls, Menus,
-  ComCtrls, ActnList, ToolWin,
+  ComCtrls, ActnList, Actions, ToolWin,
   GX_Experts, GX_ConfigurationInfo, GX_IdeDock;
 
 type
