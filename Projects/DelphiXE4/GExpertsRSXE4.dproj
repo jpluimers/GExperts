@@ -55,7 +55,7 @@
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
-        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE4.dll</DCC_DependencyCheckOutputName>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <UsePackages>true</UsePackages>

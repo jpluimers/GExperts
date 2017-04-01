@@ -119,7 +119,7 @@
 			<Directories Name="UnitOutputDir" Type="String">dcu</Directories>
 			<Directories Name="PackageDLLOutputDir" Type="String"></Directories>
 			<Directories Name="PackageDCPOutputDir" Type="String"></Directories>
-			<Directories Name="SearchPath" Type="String">..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</Directories>
+			<Directories Name="SearchPath" Type="String">..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</Directories>
 			<Directories Name="Packages" Type="String">vcl;rtl;vclx;designide</Directories>
 			<Directories Name="Conditionals" Type="String"></Directories>
 			<Directories Name="DebugSourceDirs" Type="String"></Directories>
@@ -163,7 +163,6 @@
 			<VersionInfoKeys Name="ProductName" Type="String">GExperts for Delphi 2005</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion" Type="String">1.38</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
-			<VersionInfoKeys Name="CompileDate">Monday, April 09, 2007 1:11 AM</VersionInfoKeys>
 		</VersionInfoKeys>
 		<Language>
 			<Language Name="ActiveLang" Type="String"></Language>

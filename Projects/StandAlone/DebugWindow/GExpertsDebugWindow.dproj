@@ -1,4 +1,5 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{1d77cf08-2dfd-43e7-9d11-1badca15d032}</ProjectGuid>
     <MainSource>GExpertsDebugWindow.dpr</MainSource>
@@ -17,10 +18,10 @@
     <DCC_TypedAtParameter>True</DCC_TypedAtParameter>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_ImageBase>500000</DCC_ImageBase>
-    <DCC_UnitSearchPath>..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_UnitSearchPath>
-    <DCC_ResourcePath>..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_ResourcePath>
-    <DCC_ObjPath>..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_ObjPath>
-    <DCC_IncludePath>..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_IncludePath>
+    <DCC_UnitSearchPath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_IncludePath>
     <DCC_Define>RELEASE</DCC_Define>
     <DCC_Description>GExperts Debug Window</DCC_Description>
     <DCC_ExeOutput>..\..\..\binaries</DCC_ExeOutput>

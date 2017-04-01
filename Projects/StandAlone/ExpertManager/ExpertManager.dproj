@@ -26,6 +26,10 @@
     <DCC_HppOutput>.\dcu</DCC_HppOutput>
     <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
     <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
+    <DCC_UnitSearchPath>..\..\..\Source\Include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\..\Source\Include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\..\Source\Include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\..\Source\Include</DCC_IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Version>7.0</Version>

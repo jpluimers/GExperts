@@ -30,7 +30,7 @@
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
 			<DCC_DcuOutput>dcu</DCC_DcuOutput>
-			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>GExpertsRSXE1.dll</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<UsePackages>true</UsePackages>
@@ -555,7 +555,6 @@ call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)]]></PreBuildEvent>
 						<VersionInfoKeys Name="ProductName">GExperts for RAD Studio</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductVersion">1.38</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
-						<VersionInfoKeys Name="CompileDate">Sunday, November 22, 2015 12:21 PM</VersionInfoKeys>
 					</VersionInfoKeys>
 					<Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclDataSnapServer150.bpl">Embarcadero DBExpress DataSnap Server Components</Excluded_Packages>

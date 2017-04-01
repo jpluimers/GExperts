@@ -44,7 +44,7 @@
 			<Compiler Name="Z" Type="Integer">1</Compiler>
 			<Compiler Name="ShowHints" Type="Boolean">True</Compiler>
 			<Compiler Name="ShowWarnings" Type="Boolean">True</Compiler>
-			<Compiler Name="UnitAliases" Type="String">WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;Imagelist=Controls</Compiler>
+			<Compiler Name="UnitAliases" Type="String">WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;ImageList=Controls</Compiler>
 			<Compiler Name="NamespacePrefix" Type="String"></Compiler>
 			<Compiler Name="GenerateDocumentation" Type="Boolean">False</Compiler>
 			<Compiler Name="DefaultNamespace" Type="String"></Compiler>
@@ -106,7 +106,7 @@
 			<Compiler Name="CodePage"></Compiler>
 		</Compiler>
 		<Linker>
-			<Linker Name="MapFile" Type="Integer">3</Linker>
+			<Linker Name="MapFile" Type="Integer">0</Linker>
 			<Linker Name="OutputObjs" Type="Integer">0</Linker>
 			<Linker Name="ConsoleApp" Type="Integer">1</Linker>
 			<Linker Name="DebugInfo" Type="Boolean">False</Linker>
@@ -123,7 +123,7 @@
 			<Directories Name="UnitOutputDir" Type="String">dcu</Directories>
 			<Directories Name="PackageDLLOutputDir" Type="String"></Directories>
 			<Directories Name="PackageDCPOutputDir" Type="String"></Directories>
-			<Directories Name="SearchPath" Type="String">..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\unisynedit</Directories>
+			<Directories Name="SearchPath" Type="String">..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</Directories>
 			<Directories Name="Packages" Type="String">vcl;rtl;vclx;designide</Directories>
 			<Directories Name="Conditionals" Type="String"></Directories>
 			<Directories Name="DebugSourceDirs" Type="String"></Directories>
@@ -172,7 +172,6 @@
 			<VersionInfoKeys Name="ProductName" Type="String">GExperts for BDS 2006</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion" Type="String">1.38</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
-			<VersionInfoKeys Name="CompileDate">Wednesday, June 20, 2007 2:54 PM</VersionInfoKeys>
 		</VersionInfoKeys>
 		<Language>
 			<Language Name="ActiveLang" Type="String"></Language>

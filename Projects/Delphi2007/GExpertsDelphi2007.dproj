@@ -22,10 +22,10 @@
     <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
     <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
     <DCC_HppOutput>.\dcu</DCC_HppOutput>
-    <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_UnitSearchPath>
-    <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
-    <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ObjPath>
-    <DCC_IncludePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_IncludePath>
+    <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_IncludePath>
     <DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=ActnList;ImageList=ImgList</DCC_UnitAlias>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -35,10 +35,10 @@
     <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
     <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
     <DCC_HppOutput>.\dcu</DCC_HppOutput>
-    <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_UnitSearchPath>
-    <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ResourcePath>
-    <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_ObjPath>
-    <DCC_IncludePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit</DCC_IncludePath>
+    <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include</DCC_IncludePath>
     <DCC_Optimize>False</DCC_Optimize>
     <DCC_IntegerOverflowCheck>True</DCC_IntegerOverflowCheck>
     <DCC_RangeChecking>True</DCC_RangeChecking>

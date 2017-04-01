@@ -28,7 +28,7 @@
 			<DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
-			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DcuOutput>dcu</DCC_DcuOutput>
 			<DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRS2009.dll</DCC_DependencyCheckOutputName>
 			<UsePackages>true</UsePackages>
@@ -549,7 +549,6 @@ call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)]]></PreBuildEvent>
 						<VersionInfoKeys Name="ProductName">GExperts for RAD Studio</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductVersion">1.38</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
-						<VersionInfoKeys Name="CompileDate">Wednesday, September 24, 2008 4:46 PM</VersionInfoKeys>
 					</VersionInfoKeys>
 					<Source>
 						<Source Name="MainSource">GExpertsRS2009.dpr</Source>
