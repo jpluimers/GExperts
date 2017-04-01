@@ -476,35 +476,36 @@ var
   IKeyboardServices: IOTAKeyboardServices;
   IKeyboardBinding: IOTAKeyboardBinding;
 begin
-  Assert(FKeyboardBindingIndex = InvalidIndex);
-
-  // XE5, and probably older versions, will AV when you add a keyboard binding
-  // (IKeyboardServices.AddKeyboardBinding), when Delphi is shutting down.
-  // The AV is in a TMenuItem which is nil.
-  if Assigned(Application) and (csDestroying in Application.ComponentState) then
+  // Starting with Delphi XE3 apparently this gets called again from within
+  // the call to IKeyboardServices.AddKeyboardBinding, so FKeyboardBindingIndex
+  // isn't set. Therefore this workaround: It prevents the second call
+  // and the resulting exception(s)
+  if FInstallingKeyboardBinding then
     Exit;
 
-  if FShortCutList.Count > 0 then
-  begin
+  FInstallingKeyboardBinding := True;
+  try
+    // XE5, and probably older versions, will AV when you add a keyboard binding
+    // (IKeyboardServices.AddKeyboardBinding), when Delphi is shutting down.
+    // The AV is in a TMenuItem which is nil.
+    if Assigned(Application) and (csDestroying in Application.ComponentState) then
+      Exit;
+
+    if not ConfigInfo.EnableKeyboardShortcuts then
+      Exit;
+
+    if FShortCutList.Count = 0 then
+      Exit;
+
+    Assert(FKeyboardBindingIndex = InvalidIndex);
+
     IKeyboardServices := GxOtaGetKeyboardServices;
+    Assert(Assigned(IKeyboardServices));
+
     IKeyboardBinding := TGxKeyboardBinding.Create(Self);
     FKeyboardName := IKeyboardBinding.Name;
-
-    Assert(Assigned(IKeyboardServices));
     try
-      // Starting with Delphi XE3 apparently this gets called again from within
-      // the call to IKeyboardServices.AddKeyboardBinding, so FKeyboardBindingIndex
-      // isn't set. Therefore this workaround: It prevents the second call
-      // and the resulting exception(s)
-      if not FInstallingKeyboardBinding then begin
-        try
-          FInstallingKeyboardBinding := true;
-          if ConfigInfo.EnableKeyboardShortcuts then
-            FKeyboardBindingIndex := IKeyboardServices.AddKeyboardBinding(IKeyboardBinding);
-        finally
-          FInstallingKeyboardBinding := false;
-        end;
-      end;
+      FKeyboardBindingIndex := IKeyboardServices.AddKeyboardBinding(IKeyboardBinding);
     except
       on E: Exception do
       begin
@@ -512,6 +513,8 @@ begin
         raise E.Create('Error registering keyboard shortcuts with IDE: ' +E.Message);
       end;
     end;
+  finally
+    FInstallingKeyboardBinding := False;
   end;
 end;
 
