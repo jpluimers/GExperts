@@ -5,7 +5,7 @@ unit GX_ProcedureList;
 interface
 
 uses
-  SysUtils, Classes, ActnList, Dialogs, ComCtrls, ToolWin, StdCtrls,
+  SysUtils, Classes, ActnList, Actions, Dialogs, ComCtrls, ToolWin, StdCtrls,
   Controls, ExtCtrls, Messages, Forms, GX_EnhancedEditor,
   GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm;
 
