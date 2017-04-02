@@ -7,6 +7,8 @@ interface
 
 {$I GX_CondDefine.inc}
 
+{$DEFINE DoShowProgressForm}
+
 uses
   Windows, GX_ClassMgr, GX_ClassParsing, GX_Experts, GX_OtaUtils, GX_EnhancedEditor,
   Classes, Controls, Buttons, StdCtrls, Forms, Dialogs, ActnList, ToolWin, ToolsAPI,
@@ -463,8 +465,13 @@ var
           NodeText := AClassItem.Name;
 
         ANode := tvBrowse.Items.AddChildObject(INode, NodeText, AClassItem);
-        ANode.ImageIndex := ImageIndexGear;
-        ANode.SelectedIndex := ImageIndexGear;
+        if AClassItem.ObjectType = cieClass then begin
+          ANode.ImageIndex := ImageIndexGear;
+          ANode.SelectedIndex := ImageIndexGear;
+        end else begin
+          ANode.ImageIndex := ImageIndexInterface;
+          ANode.SelectedIndex := ImageIndexInterface;
+        end;
 
         TempClassList.Delete(j);
 
@@ -506,8 +513,13 @@ begin
           NodeText := ClassInfoCollItem.Name;
 
         Node := tvBrowse.Items.AddChildObject(ONode, NodeText, ClassInfoCollItem);
-        Node.ImageIndex := ImageIndexGear;
-        Node.SelectedIndex := ImageIndexGear;
+        if ClassInfoCollItem.ObjectType = cieClass then begin
+          Node.ImageIndex := ImageIndexGear;
+          Node.SelectedIndex := ImageIndexGear;
+        end else begin
+          Node.ImageIndex := ImageIndexInterface;
+          Node.SelectedIndex := ImageIndexInterface;
+        end;
 
         TempClassList.Delete(i);
 
@@ -540,9 +552,14 @@ begin
         NodeText := ClassInfo.SourceName + '.' + ClassInfo.Name
       else
         NodeText := ClassInfo.Name;
-      INode := tvBrowse.Items.AddChildObject(ONode, NodeText, Item.ClassItem[i]);
-      INode.ImageIndex := ImageIndexGear;
-      INode.SelectedIndex := ImageIndexGear;
+      INode := tvBrowse.Items.AddChildObject(ONode, NodeText, ClassInfo);
+      if ClassInfo.ObjectType = cieClass then begin
+        INode.ImageIndex := ImageIndexGear;
+        INode.SelectedIndex := ImageIndexGear;
+      end else begin
+        INode.ImageIndex := ImageIndexInterface;
+        INode.SelectedIndex := ImageIndexInterface;
+      end;
     end;
   end;
 end;
@@ -552,24 +569,11 @@ procedure TfmClassBrowser.ParseFile(Sender: TObject; const FileName: string;
 resourcestring
   SParsingProgress = 'Parsing classes in %s ...';
 begin
-{$DEFINE DoShowProgressForm}
 {$IFDEF DoShowProgressForm}
   if fmProgress = nil then
-  begin
-    fmProgress := TfmClassParsing.Create(Self);
-    with fmProgress do
-    begin
-      Progress.Position := 0;
-      Progress.Min := 0;
-      Progress.Max := FileCount;
-      Show;
-    end;
-  end;
+    fmProgress := TfmClassParsing.CreateAndShow(Self, FileCount);
   if Assigned(fmProgress) then
-  begin
-    fmProgress.lblParsing.Caption := Format(SParsingProgress, [ExtractFileName(FileName)]);
-    fmprogress.Progress.Position := FileIndex;
-  end;
+    fmProgress.SetProgress(Format(SParsingProgress, [ExtractFileName(FileName)]), FileIndex);
   Application.ProcessMessages;
 {$ENDIF DoShowProgressForm}
 end;
@@ -1008,6 +1012,11 @@ var
         begin
           OInfo := TBrowseClassInfoCollection(Node.Data);
           Result := OInfo.DerivedFrom;
+          if SameText(Result, Comp) then begin
+            // prevent infinite loop for IInterface and TObject
+            Result := '';
+            Exit;
+          end;
           // We could instead recurse the treeview backwards to get
           // this information if we are in "tree" mode.
           if FStayInPackage then
@@ -1846,6 +1855,7 @@ begin
   FCodeText.Align := alClient;
   FCodeText.ReadOnly := True;
   FCodeText.Highlighter := gxpPas;
+  FCodeText.ActiveLineColor := $D0FFFF;
 end;
 
 procedure TfmClassBrowser.ViewBrowserDetails;

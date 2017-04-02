@@ -14,7 +14,7 @@ interface
 uses
   Classes,
   GX_EditReader,
-  mwPasParser;
+  mwPasParser, mwLongIntList, mwEPTokenList;
 
 type
   TOnParseFile = procedure(Sender: TObject; const FileName: string;
@@ -65,6 +65,8 @@ type
     property cOverload: Boolean read FcOverload;
   end;
 
+  TClassInterfaceEnum = (cieClass, cieInterface);
+
   TBrowseClassInfoCollection = class(TCollection)
   private
     FClassList: TClassList;
@@ -75,14 +77,14 @@ type
     FFileName: string;
     FIsLoaded: Boolean;
     FName: string;
+    FObjectType: TClassInterfaceEnum;
     procedure GetMethods(Parser: TmPasParser);
     function GetItem(Index: Integer): TBrowseMethodInfoItem;
-    function GetText: string;
     procedure SetText(const New: string);
     procedure SetClassList(AClassList: TClassList);
     function GetObjectDerivedFrom: string;
   public
-    constructor Create;
+    constructor Create(ObjectType: TClassInterfaceEnum);
     procedure LoadMethods;
     function Add: TBrowseMethodInfoItem;
     function SetParser(Parser: TmPasParser): Boolean; // Sets parser on interface line
@@ -96,7 +98,7 @@ type
     property LineNo: Integer read FLineNo;
     property IsLoaded: Boolean read FIsLoaded;
     property Name: string read FName;
-    property AsText: string read GetText;
+    property ObjectType: TClassInterfaceEnum read FObjectType;
   end;
 
   TClassItem = class(TCollectionItem)
@@ -111,7 +113,9 @@ type
     procedure LoadFromProject;
     function GetClassCount: Integer;
     function GetClassItem(Index: Integer): TBrowseClassInfoCollection;
-    procedure LoadClass(const FileName: string);
+    procedure LoadClasses(const FileName: string);
+    procedure AddClassesFromList(const FileName: string; Parser: TmEPTokenList; List: TLongintList);
+    procedure AddInterfacesFromList(const FileName: string; Parser: TmEPTokenList; List: TLongintList);
   public
     constructor Create(ACollection: TCollection); override;
     destructor Destroy; override;
@@ -155,7 +159,7 @@ type
 implementation
 
 uses
-  SysUtils, Dialogs, Controls, IniFiles, mwEPTokenList,
+  SysUtils, Dialogs, Controls, IniFiles,
   ToolsAPI,
   GX_GenericUtils, GX_OtaUtils, GX_dzFileUtils;
 
@@ -323,6 +327,10 @@ var
   InfoCollection: TBrowseClassInfoCollection;
 begin
   Result := nil;
+  if SameText(ObjectName, 'TObject') or SameText(ObjectName, 'IInterface') then begin
+    // The two root objects for classes and interfaces
+    Exit;
+  end;
   for i := 0 to FOList.Count-1 do
   begin
     InfoCollection := TBrowseClassInfoCollection(FOList.Items[i]);
@@ -371,7 +379,7 @@ begin
     if IsPascalSourceFile(ModuleFileName) then
     begin
       try
-        LoadClass(ModuleFileName);
+        LoadClasses(ModuleFileName);
       except
         on E: Exception do
         begin
@@ -441,7 +449,7 @@ begin
     for i := 0 to FileList.Count-1 do
     begin
       try
-        LoadClass(FileList[i]);
+        LoadClasses(FileList[i]);
       except
         on E: Exception do
         begin
@@ -458,12 +466,10 @@ begin
   end;
 end;
 
-procedure TClassItem.LoadClass(const FileName: string);
+procedure TClassItem.LoadClasses(const FileName: string);
 var
   FileContent: string;
   Parser: TmEPTokenList;
-  p1, i, j: Integer;
-  ObjectInfo: TBrowseClassInfoCollection;
   LocalEditReader: TEditReader;
 begin
   if not IsPascalSourceFile(FileName) then
@@ -478,42 +484,94 @@ begin
   Parser := TmEPTokenList.Create;
   try
     Parser.SetOrigin(@FileContent[1], Length(FileContent));
-    for j := 0 to Parser.Searcher.ClassList.Count - 1 do
-    begin
-      Parser.RunIndex := Parser.Searcher.ClassList[j];
-      case Parser.GetClassKind of
-        ikClass,
-        ikClEmpty:
-          begin
-            ObjectInfo := TBrowseClassInfoCollection.Create;
-            FOList.Add(ObjectInfo);
-            ObjectInfo.ClassList := TClassList(Collection);
-            p1 := 0;
-            for i := 1 to Length(Parser.Info.Data) do
-            begin
-              case Parser.Info.Data[i] of
-                '=': ObjectInfo.FName := Trim(Copy(Parser.Info.Data, 1, i - 1));
-                '(': p1 := i;
-                ')': begin
-                       ObjectInfo.FDerivedFrom := Trim(Copy(Parser.Info.Data, p1 + 1, i - p1 - 1));
-                       // Handle the shortcut implied TObject
-                       if Trim(ObjectInfo.FDerivedFrom) = '' then
-                         ObjectInfo.FDerivedFrom := 'TObject';
-                       Break;
-                     end;
-              end;
-            end;
-            // ObjectInfo.LineNo:=Parser.Info.LineNumber;
-            ObjectInfo.FFileName := LocalEditReader.FileName;
-            if Parser.Info.AI <> nil then
-              ObjectInfo.FSourceName := Parser.Info.AI.aiUnit
-            else
-              ObjectInfo.FSourceName := ExtractPureFileName(ObjectInfo.FileName);
-          end;
-      end; // case
-    end;
+    AddClassesFromList(FileName, Parser, Parser.Searcher.ClassList);
+    Parser.Searcher.FillInterfaceList;
+    AddInterfacesFromList(FileName, Parser, Parser.Searcher.InterfaceList);
   finally
     FreeAndNil(Parser);
+  end;
+end;
+
+procedure TClassItem.AddClassesFromList(const FileName: string; Parser: TmEPTokenList; List: TLongintList);
+var
+  j: Integer;
+  ObjectInfo: TBrowseClassInfoCollection;
+  p1: Integer;
+  i: Integer;
+begin
+  for j := 0 to List.Count - 1 do
+  begin
+    Parser.RunIndex := List[j];
+    case Parser.GetClassKind of
+      ikClass,
+      ikClEmpty:
+        begin
+          ObjectInfo := TBrowseClassInfoCollection.Create(cieClass);
+          FOList.Add(ObjectInfo);
+          ObjectInfo.ClassList := TClassList(Collection);
+          p1 := 0;
+          for i := 1 to Length(Parser.Info.Data) do
+          begin
+            case Parser.Info.Data[i] of
+              '=': ObjectInfo.FName := Trim(Copy(Parser.Info.Data, 1, i - 1));
+              '(': p1 := i;
+              ')': ObjectInfo.FDerivedFrom := Trim(Copy(Parser.Info.Data, p1 + 1, i - p1 - 1));
+            end;
+          end;
+          // Handle implied TObject
+          if ObjectInfo.FDerivedFrom = '' then
+            ObjectInfo.FDerivedFrom := 'TObject';
+          // ObjectInfo.LineNo:=Parser.Info.LineNumber;
+          ObjectInfo.FFileName := FileName;
+          if Parser.Info.AI <> nil then
+            ObjectInfo.FSourceName := Parser.Info.AI.aiUnit
+          else
+            ObjectInfo.FSourceName := ExtractPureFileName(ObjectInfo.FileName);
+        end;
+    end; // case
+  end;
+end;
+
+procedure TClassItem.AddInterfacesFromList(const FileName: string; Parser: TmEPTokenList; List: TLongintList);
+var
+  j: Integer;
+  ObjectInfo: TBrowseClassInfoCollection;
+  p1: Integer;
+  i: Integer;
+  InterfaceKind: TmInfoKind;
+begin
+  for j := 0 to List.Count - 1 do
+  begin
+    Parser.RunIndex := List[j];
+    InterfaceKind := Parser.GetInterfaceKind;
+    case InterfaceKind of
+      ikUnknown,
+      ikInterface,
+      ikIntEmpty:
+        begin
+          ObjectInfo := TBrowseClassInfoCollection.Create(cieInterface);
+          FOList.Add(ObjectInfo);
+          ObjectInfo.ClassList := TClassList(Collection);
+          p1 := 0;
+          for i := 1 to Length(Parser.Info.Data) do
+          begin
+            case Parser.Info.Data[i] of
+              '=': ObjectInfo.FName := Trim(Copy(Parser.Info.Data, 1, i - 1));
+              '(': p1 := i;
+              ')': ObjectInfo.FDerivedFrom := Trim(Copy(Parser.Info.Data, p1 + 1, i - p1 - 1));
+            end;
+          end;
+          // Handle implied IInterface
+          if ObjectInfo.FDerivedFrom = '' then
+            ObjectInfo.FDerivedFrom := 'IInterface';
+          // ObjectInfo.LineNo:=Parser.Info.LineNumber;
+          ObjectInfo.FFileName := FileName;
+          if Parser.Info.AI <> nil then
+            ObjectInfo.FSourceName := Parser.Info.AI.aiUnit
+          else
+            ObjectInfo.FSourceName := ExtractPureFileName(ObjectInfo.FileName);
+        end;
+    end; // case
   end;
 end;
 
@@ -524,87 +582,41 @@ var
   FileName: string;
   i: Integer;
   sl: TStringList;
-//  Cnt1: Int64;
-//  Cnt2: Int64;
-//  PFreq: Int64;
+  ci: TBrowseClassInfoCollection;
+  s: string;
 begin
   FileName := GenerateFilename(ADirectory);
 
-//  QueryPerformanceFrequency(PFreq);
-
-//  QueryPerformanceCounter(Cnt1);
-  // Using TStringlist.SaveToFile is much(!) faster than TIniFile and still 50 times faster
-  // than TMemIniFile.
-  // I left the timing code commented out, so you can see for yourself, if you want.
   sl := TStringList.Create;
   try
     sl.Add('[General]');
     sl.Add('Name=' + Name);
     sl.Add('BaseDir=' + Directory);
     sl.Add('Project=' + BoolValues[IsProject]);
+    // Version=1 (or empty) means class entries are saved as a single line as Class<n>=Class.AsText
+    // Version=2 means, the class entries are saved in dotted notation as below.
+    sl.Add('Version=2');
     sl.Add('[Classes]');
     sl.Add('Count=' + IntToStr(ClassCount));
-    for i := 0 to ClassCount - 1 do // do not localize
-      sl.Add('Class' + IntToStr(i) + '=' + ClassItem[i].AsText);
+    for i := 0 to ClassCount - 1 do begin
+     ci := ClassItem[i];
+     s := 'Class' + IntToStr(i) + '.';
+     sl.Add(s + 'Name=' + ci.Name);
+     case ci.ObjectType of
+        cieClass:
+          sl.Add(s + 'ObjectType=Class');
+        cieInterface:
+          sl.Add(s + 'ObjectType=Interface');
+     end;
+     sl.Add(s + 'DerivedFrom=' + ci.DerivedFrom);
+     sl.Add(s + 'SourceName=' + ci.SourceName);
+     sl.Add(s + 'LineNo=' + IntToStr(ci.LineNo));
+     sl.Add(s + 'Filename=' + ci.Filename);
+    end;
     sl.SaveToFile(FileName);
   finally
     FreeAndNil(sl);
   end;
-//  QueryPerformanceCounter(Cnt2);
-//{$IFOPT D+}SendDebugFmt('Writing with TStringList.SaveToFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
-
-//  QueryPerformanceCounter(Cnt1);
-//  sl := TStringList.Create;
-//  try
-//    sl.Add('[General]');
-//    sl.Add('Name=' + Name);
-//    sl.Add('Project=' + BoolValues[IsProject]);
-//    sl.Add('[Classes]');
-//    sl.Add('Count=' + IntToStr(ClassCount));
-//    for i := 0 to ClassCount-1 do // do not localize
-//      sl.Add('Class' + IntToStr(i) + '=' + ClassItem[i].AsText);
-//    with TMemIniFile.Create(FileName) do
-//    try
-//      SetStrings(sl);
-//      UpdateFile;
-//    finally
-//      Free;
-//    end;
-//  finally
-//    FreeAndNil(sl);
-//  end;
-//  QueryPerformanceCounter(Cnt2);
-//{$IFOPT D+}SendDebugFmt('Writing with TMemIniFile.SetStrings took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
-
-//  QueryPerformanceCounter(Cnt1);
-//  with TMemIniFile.Create(FileName) do
-//  try
-//    WriteString('General', 'Name', Name); // do not localize
-//    WriteBool('General', 'Project', IsProject); // do not localize
-//    WriteInteger('Classes', 'Count', ClassCount); // do not localize
-//    for i := 0 to ClassCount-1 do // do not localize
-//      WriteString('Classes', 'Class' + IntToStr(i), ClassItem[i].AsText); // do not localize
-//    UpdateFile;
-//  finally
-//    Free;
-//  end;
-//  QueryPerformanceCounter(Cnt2);
-//{$IFOPT D+}SendDebugFmt('Writing with TMemIniFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
-
-//  QueryPerformanceCounter(Cnt1);
-  with TIniFile.Create(FileName) do
-//  try
-//    WriteString('General', 'Name', Name); // do not localize
-//    WriteBool('General', 'Project', IsProject); // do not localize
-//    WriteInteger('Classes', 'Count', ClassCount); // do not localize
-//    for i := 0 to ClassCount-1 do // do not localize
-//      WriteString('Classes', 'Class' + IntToStr(i), ClassItem[i].AsText); // do not localize
-//    UpdateFile;
-//  finally
-//    Free;
-//  end;
-//  QueryPerformanceCounter(Cnt2);
-//{$IFOPT D+}SendDebugFmt('Writing with TIniFile took %.3f s', [(Cnt2 - Cnt1) / PFreq]);{$ENDIF}
 end;
 
 procedure TClassItem.LoadFromFile(const ADirectory: string);
@@ -615,6 +627,10 @@ var
   TempClassName: string;
   i: Integer;
   OInfo: TBrowseClassInfoCollection;
+  IsVersion2: Boolean;
+  s: string;
+  ClsName: string;
+  ClsObjType: TClassInterfaceEnum;
 begin
   FileName := GenerateFilename(ADirectory);
   if not FileExists(FileName) then
@@ -623,20 +639,42 @@ begin
   try
     FName := IniFile.ReadString('General', 'Name', Name); // do not localize
     FIsProject := IniFile.ReadBool('General', 'Project', IsProject); // do not localize
+    IsVersion2 := (IniFile.ReadInteger('General', 'Version', 1) = 2); // do not localize
     IniClassCount := IniFile.ReadInteger('Classes', 'Count', 0); // do not localize
-    with FOList do
-      Capacity := Capacity + IniClassCount;
-    for i := 0 to IniClassCount-1 do
-    begin
-      OInfo := TBrowseClassInfoCollection.Create;
-      FOList.Add(OInfo);
-      OInfo.FClassList := TClassList(Collection);
-      TempClassName := IniFile.ReadString('Classes', 'Class' + IntToStr(i), '');// do not localize
-      if TempClassName = '' then
-        raise Exception.Create('Invalid class file format');
-      if TempClassName[1] <> '"' then TempClassName := '"' + TempClassName;
-      if TempClassName[Length(TempClassName)] <> '"' then TempClassName := TempClassName + '"';
-      OInfo.SetText(TempClassName);
+    FOList.Capacity := FOList.Capacity + IniClassCount;
+    if IsVersion2 then begin
+      for i := 0 to IniClassCount-1 do begin
+        s := 'Class' + IntToStr(i) + '.'; // do not localize
+        ClsName := IniFile.ReadString('Classes', s + 'Name', ''); // do not localize
+        if ClsName <> '' then begin
+          if SameText(IniFile.ReadString('Classes', s + 'ObjectType', 'Class'), 'Interface') then // do not localize
+            ClsObjType := cieInterface
+          else
+            ClsObjType := cieClass;
+          OInfo := TBrowseClassInfoCollection.Create(ClsObjType);
+          FOList.Add(OInfo);
+          OInfo.FClassList := TClassList(Collection);
+          OInfo.FName := ClsName;
+          OInfo.FDerivedFrom := IniFile.ReadString('Classes', s + 'DerivedFrom', ''); // do not localize
+          OInfo.FSourceName := IniFile.ReadString('Classes', s + 'SourceName', ''); // do not localize
+          OInfo.FLineNo := StrToIntDef(IniFile.ReadString('Classes', s + 'LineNo', ''), 0); // do not localize
+          OInfo.FFilename:= IniFile.ReadString('Classes', s + 'Filename', ''); // do not localize
+        end;
+      end;
+    end else begin
+      // Version 1 stored each class as a CSV and suppored only classes, not interfaces
+      for i := 0 to IniClassCount-1 do
+      begin
+        OInfo := TBrowseClassInfoCollection.Create(cieClass);
+        FOList.Add(OInfo);
+        OInfo.FClassList := TClassList(Collection);
+        TempClassName := IniFile.ReadString('Classes', 'Class' + IntToStr(i), '');// do not localize
+        if TempClassName = '' then
+          raise Exception.Create('Invalid class file format');
+        if TempClassName[1] <> '"' then TempClassName := '"' + TempClassName;
+        if TempClassName[Length(TempClassName)] <> '"' then TempClassName := TempClassName + '"';
+        OInfo.SetText(TempClassName);
+      end;
     end;
   finally
     FreeAndNil(IniFile);
@@ -645,9 +683,10 @@ end;
 
 { TBrowseClassInfoCollection }
 
-constructor TBrowseClassInfoCollection.Create;
+constructor TBrowseClassInfoCollection.Create(ObjectType: TClassInterfaceEnum);
 begin
   inherited Create(TBrowseMethodInfoItem);
+  FObjectType := ObjectType;
 end;
 
 function TBrowseClassInfoCollection.Add: TBrowseMethodInfoItem;
@@ -658,12 +697,6 @@ end;
 function TBrowseClassInfoCollection.GetItem(Index: Integer): TBrowseMethodInfoItem;
 begin
   Result := TBrowseMethodInfoItem(inherited GetItem(Index));
-end;
-
-function TBrowseClassInfoCollection.GetText: string;
-begin
-  Result := #34 + Name + #34 + ',' + #34 + DerivedFrom + #34 + ',' +
-    #34 + SourceName + #34 + ',' + #34 + IntToStr(LineNo) + #34 + ',' + #34 + FileName + #34;
 end;
 
 procedure TBrowseClassInfoCollection.SetText(const New: string);
@@ -741,7 +774,7 @@ begin
   Result := False;
   while Parser.Token.ID <> tkNull do
   begin
-    Parser.NextClassLine;
+    Parser.NextObjectLine;
     if GetInfo = ikClass then
     begin
       Parser.RunPos := Parser.LastIdentPos;
@@ -805,12 +838,12 @@ begin
     Parser.Origin := @FileContent[1];
     if SetParser(Parser) then
     begin
-      while (Parser.Token.ID <> tkNull) and (Parser.Token.ID <> tkClass) do
+      while not (Parser.Token.ID in [tkNull, tkClass, tkInterface]) do
         Parser.NextNonJunk;
-      if Parser.Token.ID = tkClass then
+      if Parser.Token.ID in [tkClass, tkInterface] then
         Parser.NextNonJunk;
       if Parser.Token.ID = tkRoundOpen then
-        while (Parser.Token.ID <> tkNull) and (Parser.Token.ID <> tkRoundClose) do
+        while not (Parser.Token.ID in [tkNull, tkRoundClose]) do
           Parser.NextNonJunk;
       if Parser.Token.ID = tkRoundClose then
         Parser.NextNonJunk;
