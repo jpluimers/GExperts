@@ -290,7 +290,9 @@ end; { Next }
 
 function TmSearcher.GetItems(Index: Integer): Integer;
 begin
-  if (Index >= FFoundList.Count) or (Index < 0) then Result := -1 else
+  if (Index >= FFoundList.Count) or (Index < 0) then
+    Result := -1
+  else
     Result := FFoundList[Index];
 end; { GetItems }
 
@@ -326,7 +328,8 @@ begin
           if 'CLASS' = UpperCase(FPasTokenList[RIndex]) then
           begin
             RIndex := FPasTokenList.RunIndex - 1;
-            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do Dec(RIndex);
+            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do
+              Dec(RIndex);
             ClassList.Add(RIndex);
           end;
         end;
@@ -357,7 +360,8 @@ begin
           if 'INTERFACE' = UpperCase(FPasTokenList[RIndex]) then
           begin
             RIndex := FPasTokenList.RunIndex - 1;
-            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do Dec(RIndex);
+            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do
+              Dec(RIndex);
             InterfaceList.Add(RIndex);
           end;
         end;
@@ -380,7 +384,8 @@ begin
           if 'DISPINTERFACE' = UpperCase(FPasTokenList[RIndex]) then
           begin
             RIndex := FPasTokenList.RunIndex - 1;
-            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do Dec(RIndex);
+            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do
+              Dec(RIndex);
             InterfaceList.Add(RIndex);
           end;
         end;
@@ -406,7 +411,8 @@ begin
       if (RPos = FPasTokenList.FTokenPositionsList[RIndex]) then
         if 'CONSTRUCTOR' = UpperCase(FPasTokenList[RIndex]) then
         begin
-          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do Dec(RIndex);
+          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do
+            Dec(RIndex);
           MethodList.Add(RIndex);
         end;
     end;
@@ -421,7 +427,8 @@ begin
       if (RPos = FPasTokenList.FTokenPositionsList[RIndex]) then
         if 'DESTRUCTOR' = UpperCase(FPasTokenList[RIndex]) then
         begin
-          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do Dec(RIndex);
+          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do
+            Dec(RIndex);
           MethodList.Add(RIndex);
         end;
     end;
@@ -436,7 +443,8 @@ begin
       if (RPos = FPasTokenList.FTokenPositionsList[RIndex]) then
         if 'FUNCTION' = UpperCase(FPasTokenList[RIndex]) then
         begin
-          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do Dec(RIndex);
+          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do
+            Dec(RIndex);
           MethodList.Add(RIndex);
         end;
     end;
@@ -451,7 +459,8 @@ begin
       if (RPos = FPasTokenList.FTokenPositionsList[RIndex]) then
         if 'PROCEDURE' = UpperCase(FPasTokenList[RIndex]) then
         begin
-          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do Dec(RIndex);
+          while FPasTokenList.TokenID[RIndex - 1] <> tkCRLF do
+            Dec(RIndex);
           MethodList.Add(RIndex);
         end;
     end;
@@ -473,7 +482,8 @@ begin
     begin
       RIndex := FPasTokenList.PositionToIndex(RPos);
       if (RPos = FPasTokenList.FTokenPositionsList[RIndex]) then
-        if aToken = UpperCase(FPasTokenList[RIndex]) then Add(RIndex);
+        if aToken = UpperCase(FPasTokenList[RIndex]) then
+          Add(RIndex);
     end;
   end;
 end; { Retrive }
