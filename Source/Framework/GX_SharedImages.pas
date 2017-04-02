@@ -39,6 +39,8 @@ const
   ImageIndexOverride = 84;
   ImageIndexMessage = 85;
 
+  ImageIndexInterface = 86;
+
 function GetSharedImageList: TImageList;
 
 implementation
