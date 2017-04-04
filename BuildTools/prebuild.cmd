@@ -1,6 +1,6 @@
 @echo off
 @rem prebuild.cmd should be called as pre-build event like this:
-@rem ..\buildtools\prebuild.cmd $(OUTPUTDIR)$(OUTPUTNAME)
+@rem Path\to\buildtools\prebuild.cmd $(OUTPUTDIR)$(OUTPUTNAME)
 @echo %0
 @echo running in %CD%
 
@@ -13,8 +13,8 @@ set OUTPUTDIR=%~dp1
 
 pushd %OUTPUTDIR%
 
-%~dp0\prepbuild.exe --readini=%PROJECTPATH% --WriteRc=%PROJECTPATH%
-brcc32 %PROJECTNAMEONLY%_Version.rc
+"%~dp0\prepbuild.exe" --readini=%PROJECTPATH% --WriteRc=%PROJECTPATH%
+brcc32 "%PROJECTNAMEONLY%_Version.rc"
 
 popd
 

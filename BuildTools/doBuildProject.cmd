@@ -8,9 +8,9 @@ echo %1
 set delphiver=%1
 goto continue
 :detectver
-call %buildtools%doGetDelphiVer.cmd
+call "%buildtools%doGetDelphiVer.cmd"
 :continue
-call %buildtools%\doGetDelphiPath.cmd %delphiver%
+call "%buildtools%\doGetDelphiPath.cmd" %delphiver%
 
 if "%delphiver%" == "6" goto dcc32
 if "%delphiver%" == "7" goto dcc32
