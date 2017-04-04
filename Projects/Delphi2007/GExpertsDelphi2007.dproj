@@ -137,8 +137,8 @@
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
   <PropertyGroup>
-    <PreBuildEvent>call ..\..\buildtools\prebuild.cmd $(PROJECTPATH)
-call ..\..\buildtools\movedll.cmd $(OUTPUTPATH)</PreBuildEvent>
+    <PreBuildEvent>call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
+call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <DelphiCompile Include="GExpertsDelphi2007.dpr">
