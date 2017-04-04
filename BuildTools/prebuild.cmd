@@ -5,6 +5,9 @@
 @echo running in %CD%
 
 set PROJECTPATH=%1
+rem remove quotes
+set PROJECTPATH=%PROJECTPATH:"=%
+
 if "%PROJECTPATH%"=="" goto NeedPara
 rem echo PROJECTPATH=%PROJECTPATH%
 set PROJECTNAMEONLY=%~dpn1
@@ -13,7 +16,7 @@ set OUTPUTDIR=%~dp1
 
 pushd %OUTPUTDIR%
 
-"%~dp0\prepbuild.exe" --readini=%PROJECTPATH% --WriteRc=%PROJECTPATH%
+"%~dp0\prepbuild.exe" --readini="%PROJECTPATH%" --WriteRc="%PROJECTPATH%"
 brcc32 "%PROJECTNAMEONLY%_Version.rc"
 
 popd
