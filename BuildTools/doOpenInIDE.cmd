@@ -7,9 +7,9 @@ echo %1
 set delphiver=%1
 goto continue
 :detectver
-call %buildtools%doGetDelphiVer.cmd
+call "%buildtools%doGetDelphiVer.cmd"
 :continue
-call %buildtools%\doGetDelphiPath.cmd %delphiver%
+call "%buildtools%\doGetDelphiPath.cmd" %delphiver%
 if %delphiver% LSS 8 goto delphi32
 set delphiexe=bds.exe
 goto :bds

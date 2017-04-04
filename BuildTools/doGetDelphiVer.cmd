@@ -2,7 +2,7 @@
 @rem assuming that it is of the form \Delphi%delphiver%\
 @echo off
 setlocal
-call :GetLastDir %CD%
+call :GetLastDir "%CD%"
 set thisdir=%result%
 set prefix=%thisdir:~0,6%
 if /I "%prefix%"=="Delphi" goto ok
