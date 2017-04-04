@@ -7,26 +7,15 @@ compilation steps.
 Compiling the Source Code
 ------------------------------------------------------------------------------
 
-- Open one of the the following projects from the Source directory:
-    GExpertsRSXE3.dproj       RAD Studio XE3
-    GExpertsRSXE2.dproj       RAD Studio XE2
-    GExpertsRSXE1.dproj       RAD Studio XE1
-    GExpertsRS2010.dproj      RAD Studio 2010
-    GExpertsRS2009.dproj      RAD Studio 2009
-    GExpertsDelphi2007.dproj  Delphi 2007
-    GExpertsBDS2006.dpr       BDS 2006
-    GExpertsDelphi2005.dpr    Delphi 2005
-    GExpertsD8.dpr            Delphi 8 (See: http://cc.codegear.com/Item/21448)
-    GExpertsD7.dpr            Delphi 7
-    GExpertsD6.dpr            Delphi 6
+- Open one of the the projects in the subdirectory of .\Projects for your Delphi version.
 
-  Prior IDE versions are not supported.  In most cases, you can build
-  the dll now and install it into the registry, but please continue reading
+  IDE versions prior to Delphi 6 are not supported, also Delphi 8 is no longer supported.
+  In most cases, you can build the dll now and install it into the registry, but please continue reading
   below if you experience problems or want to customize your build.
 
 - Ensure the following directories exist on the projects search path:
   in the Project Options dialog:
-  - Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit
+  - ..\source\Framework;..\ExternalSource;..\ExternalSource\Abbrevia;..\ExternalSource\UniSynEdit
 
 - Open Project | Options
   - On the Packages page, check the "Build with runtime packages"
@@ -51,7 +40,7 @@ Compiling the Source Code
   Readme.txt file (remove any older versions of GExperts first)
 
 - To build the GExperts Debug Window, compile the project
-     Source\StandAlone\DebugWindow\GExpertsDebugWindow.dpr
+     .\projects\StandAlone\DebugWindow\GExpertsDebugWindow.dpr
   Do the same for ExpertManager.dpr, GExpertsGrep.dpr, CodeLibrarian.dpr if
   you want stand-alone versions of these experts.
 
