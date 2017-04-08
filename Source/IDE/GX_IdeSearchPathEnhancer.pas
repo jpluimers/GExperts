@@ -32,7 +32,7 @@ uses
   GX_dzClassUtils,
   GX_dzFileUtils,
   GX_OtaUtils,
-  GX_dzSelectDirectoryFix,
+  GX_GenericUtils,
   GX_IdeFavoritesList,
   GX_ConfigurationInfo,
   GX_IdeSearchPathFavoriteEdit,
@@ -390,8 +390,8 @@ begin
         // Assign shortcuts to the Up/Down buttons via actions
       AssignActionToButton('UpButton', 'Move Up', UpBtnClick, ShortCut(VK_UP, [ssCtrl]), FUpBtn, FUpClick);
       AssignActionToButton('DownButton', 'Move Down', DownBtnClick, ShortCut(VK_DOWN, [ssCtrl]), FDownBtn, FDownClick);
-{$IFNDEF GX_VER300_up}
-        // Delphi 10 and later no longer uses SelectDirectory, so we don't need to fix it.
+{$IFNDEF GX_VER300_up} // RAD Studio 10 Seattle (24; BDS 17)
+      // Delphi 10 and later no longer uses SelectDirectory, so we don't need to fix it.
       AssignActionToButton('BrowseButton', 'Browse', BrowseBtnClick, ShortCut(VK_DOWN, [ssAlt]), FBrowseBtn, FBrowseClick);
 {$ENDIF GX_VER300_up}
 
@@ -755,7 +755,7 @@ begin
     ProjectDir := ExtractFilePath(ProjectFile);
     Dir := TFileSystem.ExpandFileNameRelBaseDir(Dir, ProjectDir);
   end;
-  if dzSelectDirectory(FBrowseBtn.Hint, '', Dir, FBrowseBtn) then
+  if GetDirectory(FBrowseBtn.Hint, Dir, FBrowseBtn) then
     FEdit.Text := Dir;
 end;
 {$ENDIF GX_VER300_up}

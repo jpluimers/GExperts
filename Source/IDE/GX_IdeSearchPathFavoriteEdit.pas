@@ -39,7 +39,7 @@ implementation
 uses
   StrUtils,
   GX_dzVclUtils,
-  GX_dzSelectDirectoryFix;
+  GX_GenericUtils;
 
 {$R *.dfm}
 
@@ -65,7 +65,7 @@ var
   Dir: string;
 begin
   Dir := '';
-  if not dzSelectDirectory('Select directory to add', '', Dir, Self) then
+  if not GetDirectory('Select directory to add', Dir, Self) then
     Exit;
   m_Path.Lines.Add(Dir);
 end;

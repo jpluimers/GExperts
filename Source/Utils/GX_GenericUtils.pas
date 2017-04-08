@@ -596,7 +596,8 @@ function CanCreateFile(const FileName: string): Boolean;
 // Returns True if the user selected a directory; Dir then
 // contains the selected directory.
 // Returns False if the user did not select a directory.
-function GetDirectory(var Dir: string; Owner: TCustomForm = nil): Boolean;
+function GetDirectory(var Dir: string; Owner: TCustomForm = nil): Boolean; overload;
+function GetDirectory(const Caption: string; var Dir: string; Parent: TWinControl = nil): Boolean; overload;
 
 // Displays the file selection box passed as Dialog.
 // Returns True if the user selected a file
@@ -3646,21 +3647,26 @@ end;
 function GetDirectory(var Dir: string; Owner: TCustomForm): Boolean;
 resourcestring
   SSelDir = 'Select a Directory';
+begin
+  Result := GetDirectory(SSelDir,  Dir, Owner);
+end;
+
+function GetDirectory(const Caption: string; var Dir: string; Parent: TWinControl = nil): Boolean;
 var
   OldErrorMode: UINT;
   BrowseRoot: WideString;
-{$IFDEF GX_VER185_up}
+{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
   fo: TFileOpenDialog;
 {$ENDIF}
 begin
-  if Owner = nil then
-    Owner := Screen.ActiveCustomForm;
-{$IFDEF GX_VER185_up}
+  if Parent = nil then
+    Parent := Screen.ActiveCustomForm;
+{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
   if IsWindowsVistaOrLater then begin
-    fo := TFileOpenDialog.Create(Owner);
+    fo := TFileOpenDialog.Create(Parent);
     try
       fo.Options := [fdoPickFolders];
-      fo.Title := SSelDir;
+      fo.Title := Caption;
       fo.DefaultFolder := Dir;
       fo.FileName := '';
       Result := fo.Execute;
@@ -3675,7 +3681,7 @@ begin
     OldErrorMode := SetErrorMode(SEM_FAILCRITICALERRORS);
     try
       BrowseRoot := '';
-      Result := dzSelectDirectory(SSelDir, BrowseRoot, Dir, Owner);
+      Result := dzSelectDirectory(Caption, BrowseRoot, Dir, Parent);
     finally
       SetErrorMode(OldErrorMode);
     end;

@@ -300,20 +300,24 @@ begin
 end;
 
 procedure TfmConfiguration.sbVCLDirClick(Sender: TObject);
+resourcestring
+  SSelVclDir = 'Select VCL Directory';
 var
   TempString: string;
 begin
   TempString := edVCLPath.Text;
-  if GetDirectory(TempString) then
+  if GetDirectory(SSelVclDir, TempString, self) then
     edVCLPath.Text := TempString;
 end;
 
 procedure TfmConfiguration.sbConfigDirClick(Sender: TObject);
+resourcestring
+  SSelConfigDir = 'Select Configuration Directory';
 var
   TempString: string;
 begin
   TempString := edConfigPath.Text;
-  if GetDirectory(TempString) then
+  if GetDirectory(SSelConfigDir, TempString, Self) then
     edConfigPath.Text := TempString;
 end;
 
