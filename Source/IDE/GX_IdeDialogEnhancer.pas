@@ -6,7 +6,7 @@ uses
   Classes,
   Controls,
   Forms,
-  GX_IdeFormEnhancer;
+  GX_IdeFormChangeManager;
 
 type
   TComponentClass = class of TComponent;
@@ -38,12 +38,12 @@ uses
 constructor TIdeDialogEnhancer.Create;
 begin
   inherited Create;
-  FFormCallbackHandle := TIDEFormEnhancements.RegisterFormChangeCallback(HandleFormChanged)
+  FFormCallbackHandle := TIDEFormChangeManager.RegisterFormChangeCallback(HandleFormChanged)
 end;
 
 destructor TIdeDialogEnhancer.Destroy;
 begin
-  TIDEFormEnhancements.UnregisterFormChangeCallback(FFormCallbackHandle);
+  TIDEFormChangeManager.UnregisterFormChangeCallback(FFormCallbackHandle);
   inherited;
 end;
 
