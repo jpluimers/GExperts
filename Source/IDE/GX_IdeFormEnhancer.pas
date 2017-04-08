@@ -89,7 +89,7 @@ type
   end;
 
 const
-  FormsToChange: array[0..10] of TFormChanges = (
+  FormsToChange: array[0..12] of TFormChanges = (
     (
       FormClassNames: 'TSrchDialog';
       FormEnhancer: TManagedFormSrchDialog;
@@ -213,6 +213,28 @@ const
       RememberSplitterPosition: False;
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
+    ),
+    (
+      FormClassNames: 'TGalleryBrowseDlg;TProjectResourcesDlg';
+      FormEnhancer: TManagedFormFixFormPositioningOnly;
+      MakeResizable: False;
+      RememberSize: false;
+      RememberWidth: false;
+      RememberPosition: false;
+      RememberSplitterPosition: False;
+      ResizePictureDialogs: False;
+      ComboDropDownCount: 0;
+    ),
+    (
+      FormClassNames: 'TAboutBox';
+      FormEnhancer: TManagedFormAboutBox;
+      MakeResizable: False;
+      RememberSize: false;
+      RememberWidth: false;
+      RememberPosition: false;
+      RememberSplitterPosition: False;
+      ResizePictureDialogs: False;
+      ComboDropDownCount: 0;
     )
   );
 
@@ -365,51 +387,10 @@ begin
       ProcessActivatedForm(Screen.ActiveCustomForm);
 end;
 
-// fix for RSP-13229: File -> New -> Other opens on different monitor
-//     and RSP-13230: on dual monitor Project -> Resources and images gets shown on primary monitor
-// which occur in Delphi 2009 to 10.0 Berlin
-{$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
-{$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
-procedure FixFormPositioning1(_frm: TForm);
-begin
-  if (_frm.ClassName = 'TGalleryBrowseDlg') or (_frm.ClassName = 'TProjectResourcesDlg') then begin
-    try
-      // this results in an EInvalidOperation exception the first time it is called ...
-      _frm.Position := poDesigned;
-    except
-      on EInvalidOperation do
-        ; // ... which we ignore
-    end;
-  end;
-end;
-{$ENDIF}
-{$ENDIF}
-
-{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
-{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
-// Replace Dialog is placed on the primary monitor, occurs in Delphi 2005 to 2007
-procedure FixFormPositioning2(_frm: TForm);
-var
-  AppBuilder: TCustomForm;
-  Monitor: tmonitor;
-begin
-  if (_frm.ClassName = 'TRplcDialog') then begin
-    AppBuilder := GetIdeMainForm;
-    Assert(Assigned(AppBuilder));
-    Monitor := AppBuilder.Monitor;
-    _frm.Left := Monitor.Left + (Monitor.Width - _frm.Width) div 2;
-    _frm.Top := Monitor.Top + (Monitor.Height - _frm.Height) div 2;
-  end;
-end;
-{$ENDIF}
-{$ENDIF}
-
-
 function TFormChangeManager.ShouldManageForm(Form: TCustomForm;
   var Changes: TFormChanges): Boolean;
 var
   i: Integer;
-  Control: TControl;
   ClsName: string;
   cmp: TComponent;
 begin
@@ -419,30 +400,6 @@ begin
   if (csDesigning in Form.ComponentState)
     or StringInArray(ClsName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) then
     Exit;
-  if (ClsName = 'TAboutBox') then  // Or TAboutBoxHiColor in D7-
-  begin
-    if RunningDelphi8OrGreater then
-    begin
-      Control := Form.FindChildControl('InstalledProducts');
-      if Assigned(Control) then
-      begin // Remove the horizontal scrollbar
-        Control.Left := Control.Left - 1;
-        Control.Width := Control.Width + 4;
-      end;
-    end;
-  end;
-
-{$IFDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
-{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
-  FixFormPositioning2(TForm(Form));
-{$ENDIF}
-{$ENDIF}
-
-{$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
-{$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
-  FixFormPositioning1(TForm(Form));
-{$ENDIF}
-{$ENDIF}
 
   if not TComponent_FindComponent(Form, TManagedForm.GenerateName(Form.Name), False, cmp, TManagedForm) then begin
     for i := Low(FormsToChange) to High(FormsToChange) do begin

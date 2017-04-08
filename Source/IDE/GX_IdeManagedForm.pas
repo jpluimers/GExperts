@@ -38,18 +38,19 @@ type
     function GetRegistryKey: string;
     function FindSplitPanel: TCustomPanel;
     procedure SetComboDropDownCount(Control: TControl);
-    procedure DoMakeResizable;
-    procedure DoCollapseTreeNodes; virtual;
-    procedure DoSaveFormState;
-    procedure DoLoadFormState;
-    procedure DoResizePictureDialogs;
-    procedure DoComboDropDownCount;
     procedure FormCanResize(Sender: TObject; var NewWidth,
       NewHeight: Integer; var Resize: Boolean);
     procedure ForceVisibleToBeSizable(WndHandle: HWND);
     procedure FormDestroy(Sender: TObject);
   protected
+    procedure DoFixFormErrors; virtual;
+    procedure DoMakeResizable; virtual;
+    procedure DoLoadFormState;
+    procedure DoSaveFormState;
+    procedure DoResizePictureDialogs;
+    procedure DoComboDropDownCount;
     procedure MakeComponentsResizable; virtual;
+    procedure DoCollapseTreeNodes; virtual;
   public
     FFormChanges: TFormChanges;
     class function GenerateName(const _FormName: string): string;
@@ -60,7 +61,9 @@ type
 type
   TManagedFormImageListEditor = class(TManagedForm)
   protected
+{$IFNDEF GX_VER150_up} // Delphi 7
     procedure MakeComponentsResizable; override;
+{$ENDIF}
   end;
 
 type
@@ -72,13 +75,22 @@ type
 type
   TManagedFormSrchDialog = class(TManagedForm)
   protected
+{$IFNDEF GX_VER150_up} // Delphi 7
     procedure MakeComponentsResizable; override;
+{$ENDIF}
   end;
 
 type
   TManagedFormRplcDialog = class(TManagedForm)
   protected
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
+    procedure DoFixFormErrors; override;
+{$ENDIF}
+{$ENDIF}
+{$IFNDEF GX_VER150_up} // Delphi 7
     procedure MakeComponentsResizable; override;
+{$ENDIF}
   end;
 
 type
@@ -111,6 +123,29 @@ type
     destructor Destroy; override;
   end;
 
+type
+  TManagedFormFixFormPositioningOnly = class(TManagedForm)
+  protected
+// fix for RSP-13229: File -> New -> Other opens on different monitor
+//     and RSP-13230: on dual monitor Project -> Resources and images gets shown on primary monitor
+// which occur in Delphi 2009 to 10.0 Berlin
+{$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
+{$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
+    procedure DoFixFormErrors; override;
+{$ENDIF}
+{$ENDIF}
+  end;
+
+type
+  TManagedFormAboutBox = class(TManagedForm)
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+  protected
+    procedure DoFixFormErrors; override;
+{$ENDIF}
+{$ENDIF}
+  end;
+
 implementation
 
 uses
@@ -121,7 +156,8 @@ uses
   StdCtrls,
   GX_ConfigurationInfo,
   GX_GenericUtils,
-  GX_dzClassUtils;
+  GX_dzClassUtils,
+  GX_IdeUtils;
 
 const
   WidthIdent = 'Width';
@@ -212,6 +248,11 @@ begin
     IterateOverControls(FForm, SetComboDropDownCount);
 end;
 
+procedure TManagedForm.DoFixFormErrors;
+begin
+  // nothing to do in base class
+end;
+
 procedure TManagedForm.DoLoadFormState;
 var
   Settings: TGExpertsSettings;
@@ -260,8 +301,9 @@ end;
 
 { TManagedFormImageListEditor }
 
-procedure TManagedFormImageListEditor.MakeComponentsResizable;
 {$IFNDEF GX_VER150_up} // Delphi 7
+
+procedure TManagedFormImageListEditor.MakeComponentsResizable;
 var
   ImageGroup: TGroupBox;
   TransparentColor: TComboBox;
@@ -277,9 +319,8 @@ var
   CancelBtn: TButton;
   ApplyBtn: TButton;
   HelpBtn: TButton;
-{$ENDIF}
 begin
-{$IFNDEF GX_VER150_up} // Delphi 7
+  // necessary only in Delphi 6
   if not TComponent_FindComponent(FForm, 'ImageGroup', False, TComponent(ImageGroup), TGroupBox)
     or not TComponent_FindComponent(FForm, 'TransparentColor', False, TComponent(TransparentColor), TComboBox)
     or not TComponent_FindComponent(FForm, 'FillColor', False, TComponent(FillColor), TComboBox)
@@ -317,8 +358,8 @@ begin
   CancelBtn.Anchors := [akRight, akTop];
   ApplyBtn.Anchors := [akRight, akTop];
   HelpBtn.Anchors := [akRight, akTop];
-{$ENDIF}
 end;
+{$ENDIF}
 
 { TManagedFormPictureEditDlg }
 
@@ -353,8 +394,9 @@ begin
   HelpBtn.Anchors := [akRight, akTop];
 end;
 
-procedure TManagedFormSrchDialog.MakeComponentsResizable;
 {$IFNDEF GX_VER150_up} // Delphi 7
+
+procedure TManagedFormSrchDialog.MakeComponentsResizable;
 var
   PageControl: TPageControl;
   SearchText: TComboBox;
@@ -365,9 +407,7 @@ var
   OKButton: TButton;
   CancelButton: TButton;
   HelpButton: TButton;
-{$ENDIF}
 begin
-{$IFNDEF GX_VER150_up} // Delphi 7
   // This is only ever called in Delphi6 because the Search form of later
   // versions is already resizable.
   if not TComponent_FindComponent(FForm, 'PageControl', False, TComponent(PageControl), TPageControl)
@@ -392,11 +432,34 @@ begin
   OKButton.Anchors := [akRight, akBottom];
   CancelButton.Anchors := [akRight, akBottom];
   HelpButton.Anchors := [akRight, akBottom];
-{$ENDIF}
 end;
+{$ENDIF}
+
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+{$IFNDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
+
+procedure TManagedFormRplcDialog.DoFixFormErrors;
+var
+  AppBuilder: TCustomForm;
+  Monitor: tmonitor;
+begin
+  // Replace Dialog is placed on the primary monitor, occurs in Delphi 2005 to 2007
+  AppBuilder := GetIdeMainForm;
+  if Assigned(AppBuilder) then begin
+    Monitor := AppBuilder.Monitor;
+    if Assigned(Monitor) then begin
+      FForm.Left := Monitor.Left + (Monitor.Width - FForm.Width) div 2;
+      FForm.Top := Monitor.Top + (Monitor.Height - FForm.Height) div 2;
+    end;
+  end;
+  inherited;
+end;
+{$ENDIF}
+{$ENDIF}
+
+{$IFNDEF GX_VER150_up} // Delphi 7
 
 procedure TManagedFormRplcDialog.MakeComponentsResizable;
-{$IFNDEF GX_VER150_up} // Delphi 7
 var
   SearchText: TComboBox;
   ReplaceText: TComboBox;
@@ -404,9 +467,7 @@ var
   ChangeAll: TButton;
   CancelButton: TButton;
   HelpButton: TButton;
-{$ENDIF}
 begin
-{$IFNDEF GX_VER150_up} // Delphi 7
   // This is only ever called in Delphi6 because the Replace form of later
   // versions is already resizable.
   if not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomComboBox)
@@ -425,8 +486,8 @@ begin
   ChangeAll.Anchors := [akRight, akBottom];
   CancelButton.Anchors := [akRight, akBottom];
   HelpButton.Anchors := [akRight, akBottom];
-{$ENDIF}
 end;
+{$ENDIF}
 
 { TManagedFormDefaultEnvironmentDialog }
 
@@ -620,6 +681,42 @@ begin
 {$ENDIF}
 end;
 
+{$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
+{$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
+
+procedure TManagedFormFixFormPositioningOnly.DoFixFormErrors;
+begin
+  // fix for RSP-13229: File -> New -> Other opens on different monitor
+  //     and RSP-13230: on dual monitor Project -> Resources and images gets shown on primary monitor
+  // which occur in Delphi 2009 to 10.0 Berlin
+  try
+    // this results in an EInvalidOperation exception the first time it is called ...
+    FForm.Position := poDesigned;
+  except
+    on EInvalidOperation do
+      ; // ... which we ignore
+  end;
+end;
+{$ENDIF}
+{$ENDIF}
+
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+
+procedure TManagedFormAboutBox.DoFixFormErrors;
+var
+  Control: TControl;
+begin
+  // Remove the horizontal scrollbar, Delphi 2005 and 2006 only
+  Control := FForm.FindChildControl('InstalledProducts');
+  if Assigned(Control) then begin
+    Control.Left := Control.Left - 1;
+    Control.Width := Control.Width + 4;
+  end;
+end;
+{$ENDIF}
+{$ENDIF}
+
 procedure TManagedForm.ForceVisibleToBeSizable(WndHandle: HWND);
 begin
   // this is taken from http://stackoverflow.com/a/34255563/49925
@@ -722,6 +819,7 @@ begin
   FForm.OnDestroy := FormDestroy;
 
   DoMakeResizable;
+  DoFixFormErrors;
   DoLoadFormState;
   DoCollapseTreeNodes;
   DoResizePictureDialogs;
