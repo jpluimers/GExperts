@@ -53,19 +53,21 @@ var
 { TIdeAppSettingsEnhancer }
 
 procedure TIdeAppSettingsEnhancer.EnhanceForm(_Form: TForm);
+const
+  SuffixBtnName = 'GXSOSuffixBtn';
 var
   Cmp: TComponent;
   btn: TButton;
   s: string;
 begin
-  if TComponent_FindComponent(_Form, 'GXSOSuffixBtn', True, Cmp) then
+  if TComponent_FindComponent(_Form, SuffixBtnName, True, Cmp) then
     Exit;
   if not TComponent_FindComponent(_Form, 'ecSOSuffix', True, Cmp) or not (Cmp is TEdit) then
     Exit;
   FSuffixEdit := TEdit(Cmp);
   btn := TButton.Create(_Form);
   btn.Parent := FSuffixEdit.Parent;
-  btn.Name := '';
+  btn.Name := SuffixBtnName;
   btn.Top := FSuffixEdit.Top;
   btn.Height := FSuffixEdit.Height;
   s := MajorVersionNumberChar + '0';
