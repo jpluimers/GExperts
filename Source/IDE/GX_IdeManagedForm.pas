@@ -25,7 +25,6 @@ type
     RememberWidth: Boolean;
     RememberPosition: Boolean;
     RememberSplitterPosition: Boolean;
-    CollapseTreeNodes: string;
     ResizePictureDialogs: Boolean;
     ComboDropDownCount: Integer;
   end;
@@ -40,7 +39,7 @@ type
     function FindSplitPanel: TCustomPanel;
     procedure SetComboDropDownCount(Control: TControl);
     procedure DoMakeResizable;
-    procedure DoCollapseTreeNodes;
+    procedure DoCollapseTreeNodes; virtual;
     procedure DoSaveFormState;
     procedure DoLoadFormState;
     procedure DoResizePictureDialogs;
@@ -80,6 +79,11 @@ type
   TManagedFormRplcDialog = class(TManagedForm)
   protected
     procedure MakeComponentsResizable; override;
+  end;
+
+type
+  TManagedFormDefaultEnvironmentDialog = class(TManagedForm)
+    procedure DoCollapseTreeNodes; override;
   end;
 
 type
@@ -167,29 +171,8 @@ begin
 end;
 
 procedure TManagedForm.DoCollapseTreeNodes;
-var
-  LeftPanel: TCustomPanel;
-  Node: TTreeNode;
-  Nodes: TStringList;
-  i: Integer;
 begin
-  if IsEmpty(FFormChanges.CollapseTreeNodes) then
-    Exit;
-  Nodes := TStringList.Create;
-  try
-    AnsiStrTok(FFormChanges.CollapseTreeNodes, ';', Nodes);
-    for i := 0 to Nodes.Count - 1 do begin
-      Node := nil;
-      LeftPanel := FindSplitPanel;
-      if LeftPanel.ControlCount > 0 then
-        if LeftPanel.Controls[0] is TTreeView then
-          Node := FindTreeNode(LeftPanel.Controls[0] as TTreeView, Nodes[i]);
-      if Assigned(Node) then
-        Node.Collapse(False);
-    end;
-  finally
-    FreeAndNil(Nodes);
-  end;
+  // does nothing, is overridden in decendant forms if necessary
 end;
 
 procedure TManagedForm.SetComboDropDownCount(Control: TControl);
@@ -388,10 +371,10 @@ begin
   // This is only ever called in Delphi6 because the Search form of later
   // versions is already resizable.
   if not TComponent_FindComponent(FForm, 'PageControl', False, TComponent(PageControl), TPageControl)
-    or not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomCombobox)
-    or not TComponent_FindComponent(FForm, 'FileSearchText', False, TComponent(FileSearchText), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomComboBox)
+    or not TComponent_FindComponent(FForm, 'FileSearchText', False, TComponent(FileSearchText), TCustomComboBox)
     or not TComponent_FindComponent(FForm, 'GroupBox4', False, TComponent(GroupBox4), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'DirSpec', False, TComponent(DirSpec), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'DirSpec', False, TComponent(DirSpec), TCustomComboBox)
     or not TComponent_FindComponent(FForm, 'BrowseButton', False, TComponent(BrowseButton), TButton)
     or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
     or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
@@ -426,8 +409,8 @@ begin
 {$IFNDEF GX_VER150_up} // Delphi 7
   // This is only ever called in Delphi6 because the Replace form of later
   // versions is already resizable.
-  if not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomCombobox)
-    or not TComponent_FindComponent(FForm, 'ReplaceText', False, TComponent(ReplaceText), TCustomCombobox)
+  if not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomComboBox)
+    or not TComponent_FindComponent(FForm, 'ReplaceText', False, TComponent(ReplaceText), TCustomComboBox)
     or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
     or not TComponent_FindComponent(FForm, 'ChangeAll', False, TComponent(ChangeAll), TButton)
     or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
@@ -445,6 +428,41 @@ begin
 {$ENDIF}
 end;
 
+{ TManagedFormDefaultEnvironmentDialog }
+
+procedure TManagedFormDefaultEnvironmentDialog.DoCollapseTreeNodes;
+
+  function TryFindTreeView(out _tv: TTreeView): Boolean;
+  var
+    LeftPanel: TCustomPanel;
+  begin
+    Result := False;
+    LeftPanel := FindSplitPanel;
+    if LeftPanel.ControlCount > 0 then
+      if LeftPanel.Controls[0] is TTreeView then begin
+        _tv := TTreeView(LeftPanel.Controls[0]);
+        Result := True;
+      end;
+  end;
+
+  procedure CollapseNode(_TreeView: TTreeView; const _NodeName: string);
+  var
+    Node: TTreeNode;
+  begin
+    Node := FindTreeNode(_TreeView, _NodeName);
+    if Assigned(Node) then
+      Node.Collapse(False);
+  end;
+
+var
+  TreeView: TTreeView;
+begin
+  if not TryFindTreeView(TreeView) then
+    Exit;
+  CollapseNode(TreeView, 'Together');
+  CollapseNode(TreeView, 'Modeling');
+end;
+
 procedure TManagedFormConnEditForm.MakeComponentsResizable;
 var
   SourceOfConnection: TGroupBox;
@@ -458,7 +476,7 @@ var
 begin
   // There are two forms with that name. The one shown for TAdoConnection is not resizable
   if not TComponent_FindComponent(FForm, 'SourceOfConnection', False, TComponent(SourceOfConnection), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'DataLinkFile', False, TComponent(DataLinkFile), TCustomCombobox)
+    or not TComponent_FindComponent(FForm, 'DataLinkFile', False, TComponent(DataLinkFile), TCustomComboBox)
     or not TComponent_FindComponent(FForm, 'Browse', False, TComponent(Browse), TButton)
     or not TComponent_FindComponent(FForm, 'ConnectionString', False, TComponent(ConnectionString), TEdit)
     or not TComponent_FindComponent(FForm, 'Build', False, TComponent(Build), TButton)
@@ -550,7 +568,7 @@ var
     end else if _cmp is TColorBox then begin
       if SameText(_cmp.Name, 'cbColorPicker') then
         TColorBox(_cmp).Anchors := [akLeft, akBottom];
-    end else if _cmp is TCustomCombobox then begin
+    end else if _cmp is TCustomComboBox then begin
       if SameText(_cmp.Name, 'ecLibraryPath') or SameText(_cmp.Name, 'ecDLLOutput')
         or SameText(_cmp.Name, 'ecDCPOutput') or SameText(_cmp.Name, 'ecBrowsing') then begin
         TComboBox(_cmp).Anchors := [akLeft, akRight, akTop];

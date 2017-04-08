@@ -98,7 +98,6 @@ const
       RememberWidth: True;
       RememberPosition: False;
       RememberSplitterPosition: False;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
@@ -110,19 +109,17 @@ const
       RememberWidth: True;
       RememberPosition: False;
       RememberSplitterPosition: False;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
     (
       FormClassNames: 'TDefaultEnvironmentDialog';
-      FormEnhancer: TManagedForm;
+      FormEnhancer: TManagedFormDefaultEnvironmentDialog;
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: 'Together;Modeling';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
@@ -134,7 +131,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: False;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: True;
       ComboDropDownCount: 15;
     ),
@@ -146,7 +142,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: False;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: True;
       ComboDropDownCount: 15;
     ),
@@ -161,7 +156,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
@@ -173,7 +167,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 0; // changing the dropdown count seems to result in intermittent invalid pointer operations in Delphi 10.1
     ),
@@ -185,7 +178,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
@@ -197,7 +189,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
@@ -209,7 +200,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: True;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     ),
@@ -221,7 +211,6 @@ const
       RememberWidth: False;
       RememberPosition: True;
       RememberSplitterPosition: False;
-      CollapseTreeNodes: '';
       ResizePictureDialogs: False;
       ComboDropDownCount: 15;
     )
@@ -330,7 +319,6 @@ begin
     Changes.RememberPosition := Changes.RememberPosition and RememberPosition;
     Changes.RememberSplitterPosition := Changes.RememberSplitterPosition;
     Changes.RememberWidth := Changes.RememberWidth and AllowResize;
-    Changes.CollapseTreeNodes := Changes.CollapseTreeNodes;
     Changes.ResizePictureDialogs := Changes.ResizePictureDialogs;
     Changes.ComboDropDownCount := Changes.ComboDropDownCount;
     Enhancer := Changes.FormEnhancer.Create(Form);
