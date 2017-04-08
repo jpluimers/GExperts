@@ -456,11 +456,19 @@ procedure TManagedFormDefaultEnvironmentDialog.DoCollapseTreeNodes;
 
 var
   TreeView: TTreeView;
+  SelectedNode: TTreeNode;
 begin
   if not TryFindTreeView(TreeView) then
     Exit;
+  SelectedNode := TreeView.Selected;
   CollapseNode(TreeView, 'Together');
   CollapseNode(TreeView, 'Modeling');
+  CollapseNode(TreeView, 'Version Control');
+  CollapseNode(TreeView, 'Formatter');
+  CollapseNode(TreeView, 'Translation Tools Options');
+  CollapseNode(TreeView, 'HTML Options');
+  if Assigned(SelectedNode) then
+    SelectedNode.MakeVisible;
 end;
 
 procedure TManagedFormConnEditForm.MakeComponentsResizable;
