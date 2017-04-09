@@ -88,14 +88,14 @@ end;
 function TIdeAppSettingsEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 const
 {$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
-  TheClassName = 'TProjectOptionsDialog';
-  TheName = 'ProjectOptionsDialog');
+  DIALOG_CLASS = 'TProjectOptionsDialog';
+  DIALOG_NAME = 'ProjectOptionsDialog');
 {$ELSE}
-  TheClassName = 'TDelphiProjectOptionsDialog';
-  TheName = 'DelphiProjectOptionsDialog';
+DIALOG_CLASS = 'TDelphiProjectOptionsDialog';
+  DIALOG_NAME = 'DelphiProjectOptionsDialog';
 {$ENDIF}
 begin
-  Result := (_Form.ClassName = TheClassName) and (_Form.Name = TheName);
+  Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
 end;
 
 { TGxIdeApplicationSettingsEnhancer }
