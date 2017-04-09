@@ -74,10 +74,10 @@ end;
 
 function TGotoEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 const
-  GOTO_DIALOG_CLASS = 'TGotoLineDialog';
-  GOTO_DIALOG_NAME = 'GotoLineDialog';
+  DIALOG_CLASS = 'TGotoLineDialog';
+  DIALOG_NAME = 'GotoLineDialog';
 begin
-  Result := (_Form.ClassName = GOTO_DIALOG_CLASS) and (_Form.Name = GOTO_DIALOG_NAME);
+  Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
 end;
 
 procedure TGotoEnhancer.EnhanceForm(_Form: TForm);
