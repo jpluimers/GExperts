@@ -37,7 +37,20 @@ function TComponent_FindComponent(_Owner: TComponent; const _Name: string; _Recu
 /// Checks both, the code and data pointer of a Method and returns true, if both are equal </summary>
 function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
 
+procedure TList_FreeWithObjects(_List: TList);
+
 implementation
+
+procedure TList_FreeWithObjects(_List: TList);
+var
+  i: Integer;
+begin
+  if Assigned(_List) then begin
+    for i := 0 to _List.Count - 1 do
+      TObject(_List[i]).Free;
+    FreeAndNil(_List);
+  end;
+end;
 
 function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
 begin
