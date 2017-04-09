@@ -107,6 +107,7 @@ type
     chkOIHideDescPane: TCheckBox;
     chkEnhanceBuildEventsDialog: TCheckBox;
     chkEnhanceApplicationSettingsDialog: TCheckBox;
+    lblHideNavBar: TLabel;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -588,14 +589,16 @@ end;
 
 procedure TfmConfiguration.HideUnsupportedIdeItems;
 begin
-  if not MultilineTabDockHostPossible then begin
-    gbxIDEMenu.Width := gbxTabDockHost.Left + gbxTabDockHost.Width - gbxIDEMenu.Left;
-    gbxTabDockHost.Visible := False;
-  end;
+{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  // Only for the old IDEs
+  gbxIDEMenu.Width := gbxTabDockHost.Left + gbxTabDockHost.Width - gbxIDEMenu.Left;
+  gbxTabDockHost.Visible := False;
+{$ENDIF}
 
 {$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
   chkEnhanceBuildEventsDialog.Visible := False;
 {$ENDIF}
+
 {$IFNDEF GX_VER210_up} // RAD Studio 2010 (15; BDS 7)
   // These controls were introduced in Delphi 2010
   chkOIHideHotCmds.Visible := False;
@@ -607,24 +610,27 @@ begin
   chkOIHideDescPane.Visible := False;
 {$ENDIF}
 
-  if not ComponentPaletteAvailable then begin
-    gbxCompPalette.Visible := False;
-    // these are on the debug tab and normally not visible
-    btnCPFont.Visible := False;
-    chkCPFontEnabled.Visible := False;
-    gbxObjectInspector.Width := gbxCompPalette.Left + gbxCompPalette.Width - gbxObjectInspector.Left;
-  end;
+{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  // Only the old IDEs had a component palette
+  gbxCompPalette.Visible := False;
+  gbxObjectInspector.Width := gbxCompPalette.Left + gbxCompPalette.Width - gbxObjectInspector.Left;
+
+  // these are on the debug tab and normally not visible
+  btnCPFont.Visible := False;
+  chkCPFontEnabled.Visible := False;
+{$ENDIF}
 end;
 
 procedure TfmConfiguration.HideUnsupportedEditorItems;
 begin
   tshEditor.TabVisible := EditorEnhancementsPossible;
   gbxEditorTabs.Visible := RunningDelphi7OrLess;
-{$ifndef GX_VER300_up}
+{$IFNDEF GX_VER300_up} // RAD Studio 10 Seattle (24; BDS 17)
   chkHideNavbar.Visible := False;
 {$endif}
-{$ifdef GX_VER310_up}
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
   chkHideNavbar.Visible := False;
+  lblHideNavBar.Visible := true;
 {$endif}
 end;
 

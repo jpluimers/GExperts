@@ -231,7 +231,7 @@ object fmConfiguration: TfmConfiguration
           Top = 8
           Width = 249
           Height = 105
-          Caption = 'Tab Dock &Hosts'
+          Caption = 'Tab Dock &Hosts (Delphi 6 and 7)'
           TabOrder = 1
           object chkMultiLineTabDockHost: TCheckBox
             Left = 8
@@ -256,7 +256,7 @@ object fmConfiguration: TfmConfiguration
           Top = 296
           Width = 273
           Height = 159
-          Caption = 'Component &Palette'
+          Caption = 'Component &Palette (Delphi 6 and 7)'
           TabOrder = 4
           object chkCPMultiLine: TCheckBox
             Left = 8
@@ -441,12 +441,24 @@ object fmConfiguration: TfmConfiguration
       end
       object tshEditor: TTabSheet
         Caption = 'Code Editor'
+        object lblHideNavBar: TLabel
+          Left = 8
+          Top = 320
+          Width = 297
+          Height = 49
+          AutoSize = False
+          Caption = 
+            'You can hide the navigation bar in the Tools -> Options dialog. ' +
+            'See Editor Options -> Display -> Show Navigation Toolbar'
+          Visible = False
+          WordWrap = True
+        end
         object gbxEditorTabs: TGroupBox
           Left = 8
           Top = 192
           Width = 225
           Height = 121
-          Caption = 'Editor T&abs'
+          Caption = 'Editor T&abs (Delphi 6 and 7)'
           TabOrder = 1
           object chkMultiLine: TCheckBox
             Left = 8
@@ -544,7 +556,7 @@ object fmConfiguration: TfmConfiguration
           Top = 320
           Width = 305
           Height = 17
-          Caption = 'Hide Navigation Bar (Delphi 10 and up)'
+          Caption = 'Hide Navigation Bar (Delphi 10 and 10.1)'
           TabOrder = 2
         end
       end
