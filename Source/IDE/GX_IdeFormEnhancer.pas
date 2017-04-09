@@ -46,7 +46,7 @@ type
   end;
 
 const
-  FormsToChange: array[0..12] of TFormChanges = (
+  FormsToChange: array[0..13] of TFormChanges = (
     (
       FormClassNames: 'TSrchDialog';
       FormEnhancer: TManagedFormSrchDialog;
@@ -103,11 +103,21 @@ const
       ComboDropDownCount: 15;
     ),
     (
-      FormClassNames: 'TProjectOptionsDialog;TDelphiProjectOptionsDialog;'
-        + 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
+      FormClassNames: 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
         + 'TCppProjOptsDlg;TReopenMenuPropertiesDialog;'
         + 'TActionListDesigner;TFieldsEditor;TDBGridColumnsEditor;TDriverSettingsForm';
       FormEnhancer: TManagedForm;
+      MakeResizable: True;
+      RememberSize: True;
+      RememberWidth: False;
+      RememberPosition: True;
+      RememberSplitterPosition: True;
+      ResizePictureDialogs: False;
+      ComboDropDownCount: 15;
+    ),
+    (
+      FormClassNames: 'TProjectOptionsDialog';
+      FormEnhancer: TManagedFormProjectOptionsDialog;
       MakeResizable: True;
       RememberSize: True;
       RememberWidth: False;

@@ -124,6 +124,14 @@ type
   end;
 
 type
+  TManagedFormProjectOptionsDialog = class(TManagedForm)
+  protected
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+    procedure MakeComponentsResizable; override;
+{$ENDIF}
+  end;
+
+type
   TManagedFormFixFormPositioningOnly = class(TManagedForm)
   protected
 // fix for RSP-13229: File -> New -> Other opens on different monitor
@@ -154,6 +162,8 @@ uses
   ExtDlgs,
   Dialogs,
   StdCtrls,
+  Grids,
+  CheckLst,
   GX_ConfigurationInfo,
   GX_GenericUtils,
   GX_dzClassUtils,
@@ -680,6 +690,185 @@ begin
   HandleComponent(FForm);
 {$ENDIF}
 end;
+
+{ TManagedFormProjectOptionsDialog }
+
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+
+procedure TManagedFormProjectOptionsDialog.MakeComponentsResizable;
+
+  procedure MakeCompilerMessagesResizable;
+  var
+    WarningsList: TCheckListBox;
+    gbGeneral: TGroupBox;
+    gbWarnings: TGroupBox;
+  begin
+    if not TComponent_FindComponent(FForm, 'WarningsList', True, TComponent(WarningsList), TCheckListBox) then
+      Exit;
+    if not (WarningsList.Parent is TGroupBox) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'gbGeneral', True, TComponent(gbGeneral), TGroupBox) then
+      Exit;
+    gbGeneral.Anchors := [akLeft, akTop, akRight];
+    gbWarnings := TGroupBox(WarningsList.Parent);
+    gbWarnings.Anchors := [akLeft, akTop, akRight, akBottom];
+    WarningsList.Anchors := [akLeft, akTop, akRight, akBottom];
+  end;
+
+  procedure MakeDirectoriesResizable;
+
+    function FindCmbAndButton(const _CmbName, _BtnName: string; out _Cmb: TCustomComboBox; out _Btn: TButton): Boolean;
+    begin
+      Result := TComponent_FindComponent(FForm, _CmbName, True, TComponent(_Cmb), TCustomComboBox)
+        and TComponent_FindComponent(FForm, _BtnName, True, TComponent(_Btn), TButton);
+    end;
+
+    procedure SetCmbAndButtonAnchors(_Cmb: TCustomComboBox; _Btn: TButton);
+    begin
+      _Cmb.Anchors := [akLeft, akTop, akRight];
+      _Btn.Anchors := [akTop, akRight];
+    end;
+
+  var
+    ddOutputDir: TCustomComboBox;
+    bOutputDir: TButton;
+    ddUnitOutput: TCustomComboBox;
+    bUnitOutputDir: TButton;
+    ddSearchPath: TCustomComboBox;
+    bDirSearch: TButton;
+    ddDebugSourcePath: TCustomComboBox;
+    bDirDebugSource: TButton;
+    ddDPLOutputDir: TCustomComboBox;
+    bDplOutputDir: TButton;
+    ddDCPOutputDir: TCustomComboBox;
+    bDCPOutputDir: TButton;
+    ddConditionals: TCustomComboBox;
+    bConditionals: TButton;
+    ddUnitAliases: TCustomComboBox;
+    bUnitAliases: TButton;
+    GroupBox10: TGroupBox;
+    GroupBox11: TGroupBox;
+    GroupBox12: TGroupBox;
+  begin
+    if not FindCmbAndButton('ddOutputDir', 'bOutputDir', ddOutputDir, bOutputDir) then
+      Exit;
+    if not (ddOutputDir.Parent is TGroupBox) then
+      Exit;
+    if not FindCmbAndButton('ddUnitOutput', 'bUnitOutputDir', ddUnitOutput, bUnitOutputDir) then
+      Exit;
+    if not FindCmbAndButton('ddSearchPath', 'bDirSearch', ddSearchPath, bDirSearch) then
+      Exit;
+    if not FindCmbAndButton('ddDebugSourcePath', 'bDirDebugSource', ddDebugSourcePath, bDirDebugSource) then
+      Exit;
+    if not FindCmbAndButton('ddDPLOutputDir', 'bDplOutputDir', ddDPLOutputDir, bDplOutputDir) then
+      Exit;
+    if not FindCmbAndButton('ddDCPOutputDir', 'bDCPOutputDir', ddDCPOutputDir, bDCPOutputDir) then
+      Exit;
+    if not FindCmbAndButton('ddConditionals', 'bConditionals', ddConditionals, bConditionals) then
+      Exit;
+    if not (ddConditionals.Parent is TGroupBox) then
+      Exit;
+    if not FindCmbAndButton('ddUnitAliases', 'bUnitAliases', ddUnitAliases, bUnitAliases) then
+      Exit;
+    if not (ddUnitAliases.Parent is TGroupBox) then
+      Exit;
+
+    GroupBox10 := TGroupBox(ddOutputDir.Parent);
+    GroupBox11 := TGroupBox(ddConditionals.Parent);
+    GroupBox12 := TGroupBox(ddUnitAliases.Parent);
+
+    GroupBox10.Anchors := [akLeft, akTop, akRight];
+    SetCmbAndButtonAnchors(ddOutputDir, bOutputDir);
+    SetCmbAndButtonAnchors(ddUnitOutput, bUnitOutputDir);
+    SetCmbAndButtonAnchors(ddSearchPath, bDirSearch);
+    SetCmbAndButtonAnchors(ddDebugSourcePath, bDirDebugSource);
+    SetCmbAndButtonAnchors(ddDPLOutputDir, bDplOutputDir);
+    SetCmbAndButtonAnchors(ddDCPOutputDir, bDCPOutputDir);
+
+    GroupBox11.Anchors := [akLeft, akTop, akRight];
+    SetCmbAndButtonAnchors(ddConditionals, bConditionals);
+
+    GroupBox12.Anchors := [akLeft, akTop, akRight];
+    SetCmbAndButtonAnchors(ddUnitAliases, bUnitAliases);
+  end;
+
+  procedure MakeVersionInfoResizable;
+  var
+    ValueGrid: TStringGrid;
+    Panel1: TPanel;
+  begin
+    if not TComponent_FindComponent(FForm, 'ValueGrid', True, TComponent(ValueGrid), TStringGrid) then
+      Exit;
+    if not (ValueGrid.Parent is TPanel) then
+      Exit;
+    Panel1 := TPanel(ValueGrid.Parent);
+    Panel1.Anchors := [akLeft, akTop, akRight, akBottom];
+    ValueGrid.Anchors := [akLeft, akTop, akRight, akBottom];
+  end;
+
+  procedure MakePackagesResizable;
+  var
+    DesignPackageList: TCheckListBox;
+    LabelPackageFile: TLabel;
+    AddButton: TButton;
+    RemoveButton: TButton;
+    EditButton: TButton;
+    ButtonComponents: TButton;
+    EditPackages: TEdit;
+    ModifyRuntimeButton: TButton;
+    GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    Panel1: TPanel;
+  begin
+    if not TComponent_FindComponent(FForm, 'DesignPackageList', True, TComponent(DesignPackageList), TCheckListBox) then
+      Exit;
+    if not (DesignPackageList.Parent is TGroupBox) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'LabelPackageFile', True, TComponent(LabelPackageFile), TLabel) then
+      Exit;
+    if not (LabelPackageFile.Parent is TPanel) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'AddButton', True, TComponent(AddButton), TButton) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'RemoveButton', True, TComponent(RemoveButton), TButton) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'EditButton', True, TComponent(EditButton), TButton) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'ButtonComponents', True, TComponent(ButtonComponents), TButton) then
+      Exit;
+
+    if not TComponent_FindComponent(FForm, 'EditPackages', True, TComponent(EditPackages), TEdit) then
+      Exit;
+    if not (EditPackages.Parent is TGroupBox) then
+      Exit;
+    if not TComponent_FindComponent(FForm, 'ModifyRuntimeButton', True, TComponent(ModifyRuntimeButton), TButton) then
+      Exit;
+
+    GroupBox1 := TGroupBox(DesignPackageList.Parent);
+    Panel1 := TPanel(LabelPackageFile.Parent);
+    GroupBox2 := TGroupBox(EditPackages.Parent);
+
+    GroupBox1.Anchors := [akLeft, akTop, akRight, akBottom];
+    DesignPackageList.Anchors := [akLeft, akTop, akRight, akBottom];
+    Panel1.Anchors := [akLeft, akRight, akBottom];
+    Panel1.Caption := ''; // normally that caption is behind the label, but if we resize it, it becomes visible
+    AddButton.Anchors := [akRight, akBottom];
+    RemoveButton.Anchors := [akRight, akBottom];
+    EditButton.Anchors := [akRight, akBottom];
+    ButtonComponents.Anchors := [akRight, akBottom];
+
+    GroupBox2.Anchors := [akLeft, akRight, akBottom];
+    EditPackages.Anchors := [akLeft, akTop, akRight];
+    ModifyRuntimeButton.Anchors := [akTop, akRight];
+  end;
+
+begin
+  MakeCompilerMessagesResizable;
+  MakeDirectoriesResizable;
+  MakeVersionInfoResizable;
+  MakePackagesResizable;
+end;
+{$ENDIF}
 
 {$IFDEF GX_VER200_up} // RAD Studio 2009 (14; BDS 6)
 {$IFNDEF GX_VER310_up} // RAD Studio 10.1 Berlin (25; BDS 18)
