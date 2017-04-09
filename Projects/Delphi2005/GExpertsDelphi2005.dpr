@@ -223,7 +223,8 @@ uses
   GX_ReadMapFileThread in '..\..\Source\Utils\GX_ReadMapFileThread.pas',
   GX_IdeApplicationSettingsEnhancer in '..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas',
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
-  GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas';
+  GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
+  GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res} // if you get an error here, run the __build_project.cmd script first

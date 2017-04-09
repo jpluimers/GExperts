@@ -224,7 +224,8 @@ uses
   GX_IdeApplicationSettingsEnhancer in '..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas',
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
-  GX_PerfectLayout in '..\..\Source\Legacy\GX_PerfectLayout.pas' {fmPerfectLayout};
+  GX_PerfectLayout in '..\..\Source\Legacy\GX_PerfectLayout.pas' {fmPerfectLayout},
+  GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res}
