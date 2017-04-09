@@ -5,12 +5,15 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
+{$IFOPT D+}GX_DbugIntf,
+{$ENDIF}
   SysUtils,
   Classes,
   Controls,
   Forms,
   ExtCtrls,
-  Windows;
+  Windows,
+  StdCtrls;
 
 type
   TManagedForm = class;
@@ -51,6 +54,7 @@ type
     procedure DoComboDropDownCount;
     procedure MakeComponentsResizable; virtual;
     procedure DoCollapseTreeNodes; virtual;
+    function AddMadeSizeablePanel: TPanel;
   public
     FFormChanges: TFormChanges;
     class function GenerateName(const _FormName: string): string;
@@ -100,6 +104,10 @@ type
 
 type
   TManagedFormConnEditForm = class(TManagedForm)
+  private
+    FConnectionStringEdit: TEdit;
+    function EditConnectionString(_ParentHandle: THandle; var _ConnectionString: string): Boolean;
+    procedure BuildButtonClick(_Sender: TObject);
   protected
     procedure MakeComponentsResizable; override;
   end;
@@ -115,12 +123,12 @@ type
   private
 {$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
     FItems: TStringList;
-{$ENDIF}
   protected
     procedure MakeComponentsResizable; override;
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
+{$ENDIF}
   end;
 
 type
@@ -161,9 +169,11 @@ uses
   TypInfo,
   ExtDlgs,
   Dialogs,
-  StdCtrls,
   Grids,
   CheckLst,
+  OleDB,
+  ComObj,
+  ActiveX,
   GX_ConfigurationInfo,
   GX_GenericUtils,
   GX_dzClassUtils,
@@ -180,6 +190,87 @@ type
   TCustomFormHack = class(TCustomForm)
   end;
 
+type
+  TAnchorInfo = class
+  private
+    FCtrl: TControl;
+    FAnchors: TAnchors;
+  public
+    constructor Create(_Ctrl: TControl; _Anchors: TAnchors);
+    procedure Apply;
+  end;
+
+constructor TAnchorInfo.Create(_Ctrl: TControl; _Anchors: TAnchors);
+begin
+  inherited Create;
+  FCtrl := _Ctrl;
+  FAnchors := _Anchors;
+end;
+
+procedure TAnchorInfo.Apply;
+begin
+  FCtrl.Anchors := FAnchors;
+end;
+
+type
+  EMakeResizableError = class(Exception)
+  end;
+
+  ECtrlNotFound = class(EMakeResizableError)
+  end;
+
+  EParentIsWrongType = class(EMakeResizableError)
+  end;
+
+type
+  TAnchorInfoList = class
+  private
+    FList: TList;
+    FForm: TForm;
+  public
+    constructor Create(_Form: TForm);
+    destructor Destroy; override;
+    function AddControl(const _Name: string; _Anchors: TAnchors; _CmpClass: TComponentClass): TControl; overload;
+    procedure AddControl(_Ctrl: TControl; _Anchors: TAnchors; _CmpClass: TComponentClass = nil); overload;
+    procedure ApplyAnchors;
+  end;
+
+constructor TAnchorInfoList.Create(_Form: TForm);
+begin
+  inherited Create;
+  FForm := _Form;
+  FList := TList.Create;
+end;
+
+destructor TAnchorInfoList.Destroy;
+begin
+  TList_FreeWithObjects(FList);
+  inherited;
+end;
+
+function TAnchorInfoList.AddControl(const _Name: string; _Anchors: TAnchors;
+  _CmpClass: TComponentClass): TControl;
+begin
+  if not TComponent_FindComponent(FForm, _Name, True, TComponent(Result), _CmpClass) then
+    raise ECtrlNotFound.CreateFmt('Control %s not found in form', [_Name]);
+  FList.Add(TAnchorInfo.Create(Result, _Anchors));
+end;
+
+procedure TAnchorInfoList.AddControl(_Ctrl: TControl; _Anchors: TAnchors; _CmpClass: TComponentClass = nil);
+begin
+  if (_CmpClass <> nil) and not (_Ctrl is _CmpClass) then
+    raise EParentIsWrongType.CreateFmt('%s is not %s', [_Ctrl.Name, _CmpClass.ClassName]);
+  FList.Add(TAnchorInfo.Create(_Ctrl, _Anchors));
+end;
+
+procedure TAnchorInfoList.ApplyAnchors;
+var
+  i: Integer;
+begin
+  for i := 0 to FList.Count - 1 do
+    TAnchorInfo(FList[i]).Apply;
+end;
+
 { TGxIdeFormEnhancerBase }
 
 class function TManagedForm.GenerateName(const _FormName: string): string;
@@ -192,6 +283,24 @@ begin
   inherited Create(_Owner);
   FForm := _Owner as TForm;
   Name := GenerateName(FForm.Name)
+end;
+
+function TManagedForm.AddMadeSizeablePanel: TPanel;
+var
+  Size: TSize;
+begin
+  Result := TPanel.Create(FForm);
+  Result.Parent := FForm;
+  Result.Caption := 'Form made sizeable by GExperts';
+  Result.Hint := 'You can turn this off in the GExperts configuration on the IDE tab.';
+  Result.showhint := True;
+  Size := FForm.Canvas.TextExtent(Result.Caption);
+  Result.Height := Size.cy + 4;
+  Result.Width := Size.cx + 4;
+  Result.Left := 0;
+  Result.Top := FForm.ClientHeight - Result.Height;
+  Result.BevelOuter := bvNone;
+  Result.Anchors := [akLeft, akBottom];
 end;
 
 function TManagedForm.FindSplitPanel: TCustomPanel;
@@ -312,62 +421,40 @@ end;
 { TManagedFormImageListEditor }
 
 {$IFNDEF GX_VER150_up} // Delphi 7
+// necessary only in Delphi 6
 
 procedure TManagedFormImageListEditor.MakeComponentsResizable;
 var
-  ImageGroup: TGroupBox;
-  TransparentColor: TComboBox;
-  FillColor: TComboBox;
-  OptionsGroup: TRadioGroup;
-  GroupBox1: TGroupBox;
-  ImageView: TListView;
-  AddBtn: TButton;
-  DeleteBtn: TButton;
-  ClearBtn: TButton;
-  ExportBtn: TButton;
-  OkBtn: TButton;
-  CancelBtn: TButton;
-  ApplyBtn: TButton;
-  HelpBtn: TButton;
+  List: TAnchorInfoList;
 begin
-  // necessary only in Delphi 6
-  if not TComponent_FindComponent(FForm, 'ImageGroup', False, TComponent(ImageGroup), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'TransparentColor', False, TComponent(TransparentColor), TComboBox)
-    or not TComponent_FindComponent(FForm, 'FillColor', False, TComponent(FillColor), TComboBox)
-    or not TComponent_FindComponent(FForm, 'OptionsGroup', False, TComponent(OptionsGroup), TRadioGroup)
-    or not TComponent_FindComponent(FForm, 'GroupBox1', False, TComponent(GroupBox1), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'ImageView', False, TComponent(ImageView), TListView)
-    or not TComponent_FindComponent(FForm, 'Add', False, TComponent(AddBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Delete', False, TComponent(DeleteBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Clear', False, TComponent(ClearBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'ExportBtn', False, TComponent(ExportBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'OK', False, TComponent(OkBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Cancel', False, TComponent(CancelBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Apply', False, TComponent(ApplyBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Help', False, TComponent(HelpBtn), TButton) then
-    Exit; //==>
-
+  List := TAnchorInfoList.Create(FForm);
+  try
+    List.AddControl('ImageGroup', [akLeft, akTop, akRight], TGroupBox);
+    List.AddControl('TransparentColor', [akLeft, akTop, akRight], TComboBox);
+    List.AddControl('FillColor', [akLeft, akTop, akRight], TComboBox);
+    List.AddControl('OptionsGroup', [akRight, akTop], TRadioGroup);
+    List.AddControl('GroupBox1', [akLeft, akTop, akRight, akBottom], TGroupBox);
+    List.AddControl('ImageView', [akLeft, akTop, akRight, akBottom], TListView);
+    List.AddControl('Add', [akRight, akBottom], TButton);
+    List.AddControl('Delete', [akRight, akBottom], TButton);
+    List.AddControl('Clear', [akRight, akBottom], TButton);
+    List.AddControl('ExportBtn', [akRight, akBottom], TButton);
+    List.AddControl('OK', [akRight, akTop], TButton);
+    List.AddControl('Cancel', [akRight, akTop], TButton);
+    List.AddControl('Apply', [akRight, akTop], TButton);
+    List.AddControl('Help', [akRight, akTop], TButton);
+    List.ApplyAnchors;
+  finally
+    FreeAndNil(List);
+  end;
   // unfortunately we must restrict the height, otherwise the sort order of the icons gets
   // messed up. It's probably possible to fix that, but that's quite a lot of work for
   // the oldest supported IDE Delphi 6
   FMinHeight := -FMinHeight;
-
-  ImageGroup.Anchors := [akLeft, akTop, akRight];
-  TransparentColor.Anchors := [akLeft, akTop, akRight];
-  FillColor.Anchors := [akLeft, akTop, akRight];
-  OptionsGroup.Anchors := [akRight, akTop];
-  GroupBox1.Anchors := [akLeft, akTop, akRight, akBottom];
-  ImageView.Anchors := [akLeft, akTop, akRight, akBottom];
 // if set, the icon order gets messed up
 //  ImageView.IconOptions.Arrangement := iaTop;
-  AddBtn.Anchors := [akRight, akBottom];
-  DeleteBtn.Anchors := [akRight, akBottom];
-  ClearBtn.Anchors := [akRight, akBottom];
-  ExportBtn.Anchors := [akRight, akBottom];
-  OkBtn.Anchors := [akRight, akTop];
-  CancelBtn.Anchors := [akRight, akTop];
-  ApplyBtn.Anchors := [akRight, akTop];
-  HelpBtn.Anchors := [akRight, akTop];
+
+  AddMadeSizeablePanel;
 end;
 {$ENDIF}
 
@@ -375,73 +462,52 @@ end;
 
 procedure TManagedFormPictureEditDlg.MakeComponentsResizable;
 var
-  GroupBox1: TGroupBox;
-  ImagePanel: TPanel;
-  LoadBtn: TButton;
-  SaveBtn: TButton;
-  ClearBtn: TButton;
-  OkBtn: TButton;
-  CancelBtn: TButton;
-  HelpBtn: TButton;
+  List: TAnchorInfoList;
 begin
-  if not TComponent_FindComponent(FForm, 'GroupBox1', False, TComponent(GroupBox1), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'ImagePanel', False, TComponent(ImagePanel), TPanel)
-    or not TComponent_FindComponent(FForm, 'Load', False, TComponent(LoadBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Save', False, TComponent(SaveBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'Clear', False, TComponent(ClearBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OkBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelBtn), TButton)
-    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpBtn), TButton) then
-    Exit; //==>
+  List := TAnchorInfoList.Create(FForm);
+  try
+    List.AddControl('GroupBox1', [akLeft, akTop, akRight, akBottom], TGroupBox);
+    List.AddControl('ImagePanel', [akLeft, akTop, akRight, akBottom], TPanel);
+    List.AddControl('Load', [akRight, akBottom], TButton);
+    List.AddControl('Save', [akRight, akBottom], TButton);
+    List.AddControl('Clear', [akRight, akBottom], TButton);
+    List.AddControl('OKButton', [akRight, akTop], TButton);
+    List.AddControl('CancelButton', [akRight, akTop], TButton);
+    List.AddControl('HelpButton', [akRight, akTop], TButton);
+    List.ApplyAnchors;
+  finally
+    FreeAndNil(List);
+  end;
 
-  GroupBox1.Anchors := [akLeft, akTop, akRight, akBottom];
-  ImagePanel.Anchors := [akLeft, akTop, akRight, akBottom];
-  LoadBtn.Anchors := [akRight, akBottom];
-  SaveBtn.Anchors := [akRight, akBottom];
-  ClearBtn.Anchors := [akRight, akBottom];
-  OkBtn.Anchors := [akRight, akTop];
-  CancelBtn.Anchors := [akRight, akTop];
-  HelpBtn.Anchors := [akRight, akTop];
+  AddMadeSizeablePanel;
 end;
 
 {$IFNDEF GX_VER150_up} // Delphi 7
+// This is only ever called in Delphi6 because the Search form of later
+// versions is already resizable.
 
 procedure TManagedFormSrchDialog.MakeComponentsResizable;
 var
-  PageControl: TPageControl;
-  SearchText: TComboBox;
-  FileSearchText: TComboBox;
-  GroupBox4: TGroupBox; // stupid developer forgot to give it a meaningful name :-(
-  DirSpec: TComboBox;
-  BrowseButton: TButton;
-  OKButton: TButton;
-  CancelButton: TButton;
-  HelpButton: TButton;
+  List: TAnchorInfoList;
 begin
-  // This is only ever called in Delphi6 because the Search form of later
-  // versions is already resizable.
-  if not TComponent_FindComponent(FForm, 'PageControl', False, TComponent(PageControl), TPageControl)
-    or not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomComboBox)
-    or not TComponent_FindComponent(FForm, 'FileSearchText', False, TComponent(FileSearchText), TCustomComboBox)
-    or not TComponent_FindComponent(FForm, 'GroupBox4', False, TComponent(GroupBox4), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'DirSpec', False, TComponent(DirSpec), TCustomComboBox)
-    or not TComponent_FindComponent(FForm, 'BrowseButton', False, TComponent(BrowseButton), TButton)
-    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
-    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
-    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpButton), TButton) then
-    Exit;
-
+  List := TAnchorInfoList.Create(FForm);
+  try
+    List.AddControl('PageControl', [akLeft, akTop, akRight, akBottom], TPageControl);
+    List.AddControl('SearchText', [akLeft, akRight, akTop], TCustomComboBox);
+    List.AddControl('FileSearchText', [akLeft, akRight, akTop], TCustomComboBox);
+    List.AddControl('GroupBox4', [akLeft, akRight, akTop], TGroupBox);
+    List.AddControl('DirSpec', [akLeft, akRight, akTop], TCustomComboBox);
+    List.AddControl('BrowseButton', [akRight, akBottom], TButton);
+    List.AddControl('OKButton', [akRight, akBottom], TButton);
+    List.AddControl('CancelButton', [akRight, akBottom], TButton);
+    List.AddControl('HelpButton', [akRight, akBottom], TButton);
+    List.ApplyAnchors;
+  finally
+    FreeAndNil(List);
+  end;
   FMinHeight := -FMinHeight;
 
-  PageControl.Anchors := [akLeft, akTop, akRight, akBottom];
-  SearchText.Anchors := [akLeft, akRight, akTop];
-  FileSearchText.Anchors := [akLeft, akRight, akTop];
-  GroupBox4.Anchors := [akLeft, akRight, akTop];
-  DirSpec.Anchors := [akLeft, akRight, akTop];
-  BrowseButton.Anchors := [akRight, akBottom];
-  OKButton.Anchors := [akRight, akBottom];
-  CancelButton.Anchors := [akRight, akBottom];
-  HelpButton.Anchors := [akRight, akBottom];
+  AddMadeSizeablePanel;
 end;
 {$ENDIF}
 
@@ -468,34 +534,28 @@ end;
 {$ENDIF}
 
 {$IFNDEF GX_VER150_up} // Delphi 7
+// This is only ever called in Delphi6 because the Replace form of later
+// versions is already resizable.
 
 procedure TManagedFormRplcDialog.MakeComponentsResizable;
 var
-  SearchText: TComboBox;
-  ReplaceText: TComboBox;
-  OKButton: TButton;
-  ChangeAll: TButton;
-  CancelButton: TButton;
-  HelpButton: TButton;
+  List: TAnchorInfoList;
 begin
-  // This is only ever called in Delphi6 because the Replace form of later
-  // versions is already resizable.
-  if not TComponent_FindComponent(FForm, 'SearchText', False, TComponent(SearchText), TCustomComboBox)
-    or not TComponent_FindComponent(FForm, 'ReplaceText', False, TComponent(ReplaceText), TCustomComboBox)
-    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
-    or not TComponent_FindComponent(FForm, 'ChangeAll', False, TComponent(ChangeAll), TButton)
-    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
-    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpButton), TButton) then
-    Exit;
-
+  List := TAnchorInfoList.Create(FForm);
+  try
+    List.AddControl('SearchText', [akLeft, akRight, akTop], TCustomComboBox);
+    List.AddControl('ReplaceText', [akLeft, akRight, akTop], TCustomComboBox);
+    List.AddControl('OKButton', [akRight, akBottom], TButton);
+    List.AddControl('ChangeAll', [akRight, akBottom], TButton);
+    List.AddControl('CancelButton', [akRight, akBottom], TButton);
+    List.AddControl('HelpButton', [akRight, akBottom], TButton);
+    List.ApplyAnchors;
+  finally
+    FreeAndNil(List);
+  end;
   FMinHeight := -FMinHeight;
 
-  SearchText.Anchors := [akLeft, akRight, akTop];
-  ReplaceText.Anchors := [akLeft, akRight, akTop];
-  OKButton.Anchors := [akRight, akBottom];
-  ChangeAll.Anchors := [akRight, akBottom];
-  CancelButton.Anchors := [akRight, akBottom];
-  HelpButton.Anchors := [akRight, akBottom];
+  AddMadeSizeablePanel;
 end;
 {$ENDIF}
 
@@ -542,82 +602,112 @@ begin
     SelectedNode.MakeVisible;
 end;
 
+function TManagedFormConnEditForm.EditConnectionString(_ParentHandle: THandle;
+  var _ConnectionString: string): Boolean;
+var
+  DataInit: IDataInitialize;
+  DBPrompt: IDBPromptInitialize;
+  DataSource: IUnknown;
+  InitStr: PWideChar;
+  s: WideString;
+begin
+  DataInit := CreateComObject(CLSID_DataLinks) as IDataInitialize;
+  if _ConnectionString <> '' then begin
+    s := _ConnectionString;
+    DataInit.GetDataSource(nil, CLSCTX_INPROC_SERVER,
+      PWideChar(s), IUnknown, DataSource);
+  end;
+  DBPrompt := CreateComObject(CLSID_DataLinks) as IDBPromptInitialize;
+  Result := Succeeded(DBPrompt.PromptDataSource(nil, _ParentHandle,
+    DBPROMPTOPTIONS_PROPERTYSHEET, 0, nil, nil, IUnknown, DataSource));
+  if Result then begin
+    InitStr := nil;
+    DataInit.GetInitializationString(DataSource, True, InitStr);
+    _ConnectionString := InitStr;
+  end;
+end;
+
+procedure TManagedFormConnEditForm.BuildButtonClick(_Sender: TObject);
+var
+  ConnectionString: string;
+begin
+  ConnectionString := FConnectionStringEdit.Text;
+  if EditConnectionString(FForm.Handle, ConnectionString) then
+    FConnectionStringEdit.Text := ConnectionString;
+end;
+
 procedure TManagedFormConnEditForm.MakeComponentsResizable;
 var
-  SourceOfConnection: TGroupBox;
-  DataLinkFile: TComboBox;
-  Browse: TButton;
-  ConnectionString: TEdit;
-  Build: TButton;
-  OKButton: TButton;
-  CancelButton: TButton;
-  HelpButton: TButton;
+  List: TAnchorInfoList;
+  BuildBtn: TControl;
 begin
   // There are two forms with that name. The one shown for TAdoConnection is not resizable
-  if not TComponent_FindComponent(FForm, 'SourceOfConnection', False, TComponent(SourceOfConnection), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'DataLinkFile', False, TComponent(DataLinkFile), TCustomComboBox)
-    or not TComponent_FindComponent(FForm, 'Browse', False, TComponent(Browse), TButton)
-    or not TComponent_FindComponent(FForm, 'ConnectionString', False, TComponent(ConnectionString), TEdit)
-    or not TComponent_FindComponent(FForm, 'Build', False, TComponent(Build), TButton)
-    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
-    or not TComponent_FindComponent(FForm, 'CancelButton', False, TComponent(CancelButton), TButton)
-    or not TComponent_FindComponent(FForm, 'HelpButton', False, TComponent(HelpButton), TButton) then
-    Exit; // it's not the TAdoConnection one, we don't need to do anything
+  // If it's not the TAdoConnection one, a silent exception will be raised and no
+  // chages will be made.
+  List := TAnchorInfoList.Create(FForm);
+  try
+    List.AddControl('SourceOfConnection', [akLeft, akTop, akRight], TGroupBox);
+    List.AddControl('DataLinkFile', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl('Browse', [akTop, akRight], TButton);
+    FConnectionStringEdit := List.AddControl('ConnectionString', [akLeft, akTop, akRight], TEdit) as TEdit;
+    BuildBtn := List.AddControl('Build', [akTop, akRight], TButton);
+    List.AddControl('OKButton', [akBottom, akRight], TButton);
+    List.AddControl('CancelButton', [akBottom, akRight], TButton);
+    List.AddControl('HelpButton', [akBottom, akRight], TButton);
+    List.ApplyAnchors;
 
+// Unfortunately this does not fix the problem that the build connection dialog is shown
+// on the primary monitor while the form is on a secondary monitor.
+//    TButton(BuildBtn).OnClick := BuildButtonClick;
+// it might be a bug in the IDBPromptInitialize::PromptDataSource API
+  finally
+    FreeAndNil(List);
+  end;
   FMinHeight := -FMinHeight;
 
-  SourceOfConnection.Anchors := [akLeft, akTop, akRight];
-  DataLinkFile.Anchors := [akLeft, akTop, akRight];
-  Browse.Anchors := [akTop, akRight];
-  ConnectionString.Anchors := [akLeft, akTop, akRight];
-  Build.Anchors := [akTop, akRight];
-  OKButton.Anchors := [akBottom, akRight];
-  CancelButton.Anchors := [akBottom, akRight];
-  HelpButton.Anchors := [akBottom, akRight];
+  AddMadeSizeablePanel;
 end;
 
 procedure TManagedFormPakComponentsDlg.MakeComponentsResizable;
 var
-  InstalledGroupBox: TGroupBox;
-  ComponentsListBox: TListBox;
-  OKButton: TButton;
-  Button1: TButton; // Help button
+  List: TAnchorInfoList;
   Cancel: TButton;
 begin
-  if not TComponent_FindComponent(FForm, 'InstalledGroupBox', False, TComponent(InstalledGroupBox), TGroupBox)
-    or not TComponent_FindComponent(FForm, 'ComponentsListBox', False, TComponent(ComponentsListBox), TListBox)
-    or not TComponent_FindComponent(FForm, 'OKButton', False, TComponent(OKButton), TButton)
-    or not TComponent_FindComponent(FForm, 'Button1', False, TComponent(Button1), TButton)
-    or not TComponent_FindComponent(FForm, 'Cancel', False, TComponent(Cancel), TButton) then
-    Exit;
+  List := TAnchorInfoList.Create(FForm);
+  try
+    List.AddControl('InstalledGroupBox', [akTop, akLeft, akRight, akBottom], TGroupBox);
+    List.AddControl('ComponentsListBox', [akTop, akLeft, akRight, akBottom], TListBox);
+    List.AddControl('OKButton', [akRight, akBottom], TButton);
+    List.AddControl('Button1', [akRight, akBottom], TButton);
+    List.ApplyAnchors;
+  finally
+    FreeAndNil(List);
+  end;
+  if TComponent_FindComponent(FForm, 'Cancel', True, TComponent(Cancel), TButton) then begin
+    // they forgot to remove or hide that unused button ...
+    Cancel.Visible := False;
+  end;
 
-  InstalledGroupBox.Anchors := [akTop, akLeft, akRight, akBottom];
-  ComponentsListBox.Anchors := [akTop, akLeft, akRight, akBottom];
-  OKButton.Anchors := [akRight, akBottom];
-  Button1.Anchors := [akRight, akBottom];
-  Cancel.Visible := False;
+  AddMadeSizeablePanel;
 end;
+
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+// This is called in Delphi6 and Delphi 7 because the Environment form of later
+// versions is already resizable.
 
 constructor TManagedFormPasEnvironmentDialog.Create(_Owner: TComponent);
 begin
   inherited;
-{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
   FItems := TStringList.Create;
-{$ENDIF}
 end;
 
 destructor TManagedFormPasEnvironmentDialog.Destroy;
 begin
-{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
   FreeAndNil(FItems);
-{$ENDIF}
   inherited;
 end;
 
 procedure TManagedFormPasEnvironmentDialog.MakeComponentsResizable;
-// This is called in Delphi6 and Delphi 7 because the Environment form of later
-// versions is already resizable.
-{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
 var
   VariableOptionsFrame: TWinControl;
 
@@ -684,189 +774,112 @@ var
       HandleComponent(_cmp.Components[i]);
     end;
   end;
-{$ENDIF}
 begin
-{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
   HandleComponent(FForm);
-{$ENDIF}
+  AddMadeSizeablePanel;
 end;
+{$ENDIF}
 
 { TManagedFormProjectOptionsDialog }
 
 {$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
 
 procedure TManagedFormProjectOptionsDialog.MakeComponentsResizable;
+var
+  List: TAnchorInfoList;
+
+{$IFDEF GX_VER150_up} // Delphi 7
+// Delphi 6 does not have that page
 
   procedure MakeCompilerMessagesResizable;
   var
-    WarningsList: TCheckListBox;
-    gbGeneral: TGroupBox;
-    gbWarnings: TGroupBox;
+    ctrl: TControl;
   begin
-    if not TComponent_FindComponent(FForm, 'WarningsList', True, TComponent(WarningsList), TCheckListBox) then
-      Exit;
-    if not (WarningsList.Parent is TGroupBox) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'gbGeneral', True, TComponent(gbGeneral), TGroupBox) then
-      Exit;
-    gbGeneral.Anchors := [akLeft, akTop, akRight];
-    gbWarnings := TGroupBox(WarningsList.Parent);
-    gbWarnings.Anchors := [akLeft, akTop, akRight, akBottom];
-    WarningsList.Anchors := [akLeft, akTop, akRight, akBottom];
+    ctrl := List.AddControl('WarningsList', [akLeft, akTop, akRight, akBottom], TCheckListBox);
+    List.AddControl(ctrl.Parent, [akLeft, akTop, akRight, akBottom], TGroupBox);
+    List.AddControl('gbGeneral', [akLeft, akTop, akRight], TGroupBox);
   end;
+{$ENDIF}
 
   procedure MakeDirectoriesResizable;
-
-    function FindCmbAndButton(const _CmbName, _BtnName: string; out _Cmb: TCustomComboBox; out _Btn: TButton): Boolean;
-    begin
-      Result := TComponent_FindComponent(FForm, _CmbName, True, TComponent(_Cmb), TCustomComboBox)
-        and TComponent_FindComponent(FForm, _BtnName, True, TComponent(_Btn), TButton);
-    end;
-
-    procedure SetCmbAndButtonAnchors(_Cmb: TCustomComboBox; _Btn: TButton);
-    begin
-      _Cmb.Anchors := [akLeft, akTop, akRight];
-      _Btn.Anchors := [akTop, akRight];
-    end;
-
   var
-    ddOutputDir: TCustomComboBox;
-    bOutputDir: TButton;
-    ddUnitOutput: TCustomComboBox;
-    bUnitOutputDir: TButton;
-    ddSearchPath: TCustomComboBox;
-    bDirSearch: TButton;
-    ddDebugSourcePath: TCustomComboBox;
-    bDirDebugSource: TButton;
-    ddDPLOutputDir: TCustomComboBox;
-    bDplOutputDir: TButton;
-    ddDCPOutputDir: TCustomComboBox;
-    bDCPOutputDir: TButton;
-    ddConditionals: TCustomComboBox;
-    bConditionals: TButton;
-    ddUnitAliases: TCustomComboBox;
-    bUnitAliases: TButton;
-    GroupBox10: TGroupBox;
-    GroupBox11: TGroupBox;
-    GroupBox12: TGroupBox;
+    ctrl: TControl;
   begin
-    if not FindCmbAndButton('ddOutputDir', 'bOutputDir', ddOutputDir, bOutputDir) then
-      Exit;
-    if not (ddOutputDir.Parent is TGroupBox) then
-      Exit;
-    if not FindCmbAndButton('ddUnitOutput', 'bUnitOutputDir', ddUnitOutput, bUnitOutputDir) then
-      Exit;
-    if not FindCmbAndButton('ddSearchPath', 'bDirSearch', ddSearchPath, bDirSearch) then
-      Exit;
-    if not FindCmbAndButton('ddDebugSourcePath', 'bDirDebugSource', ddDebugSourcePath, bDirDebugSource) then
-      Exit;
-    if not FindCmbAndButton('ddDPLOutputDir', 'bDplOutputDir', ddDPLOutputDir, bDplOutputDir) then
-      Exit;
-    if not FindCmbAndButton('ddDCPOutputDir', 'bDCPOutputDir', ddDCPOutputDir, bDCPOutputDir) then
-      Exit;
-    if not FindCmbAndButton('ddConditionals', 'bConditionals', ddConditionals, bConditionals) then
-      Exit;
-    if not (ddConditionals.Parent is TGroupBox) then
-      Exit;
-    if not FindCmbAndButton('ddUnitAliases', 'bUnitAliases', ddUnitAliases, bUnitAliases) then
-      Exit;
-    if not (ddUnitAliases.Parent is TGroupBox) then
-      Exit;
+    ctrl := List.AddControl('ddOutputDir', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl(ctrl.Parent, [akLeft, akTop, akRight], TGroupBox);
+    List.AddControl('bOutputDir', [akTop, akRight], TButton);
+    List.AddControl('ddUnitOutput', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl('bUnitOutputDir', [akTop, akRight], TButton);
+    List.AddControl('ddSearchPath', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl('bDirSearch', [akTop, akRight], TButton);
+    List.AddControl('ddDebugSourcePath', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl('bDirDebugSource', [akTop, akRight], TButton);
+    List.AddControl('ddDPLOutputDir', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl('bDplOutputDir', [akTop, akRight], TButton);
+    List.AddControl('ddDCPOutputDir', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl('bDCPOutputDir', [akTop, akRight], TButton);
 
-    GroupBox10 := TGroupBox(ddOutputDir.Parent);
-    GroupBox11 := TGroupBox(ddConditionals.Parent);
-    GroupBox12 := TGroupBox(ddUnitAliases.Parent);
+    ctrl := List.AddControl('ddConditionals', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl(ctrl.Parent, [akLeft, akTop, akRight], TGroupBox);
+    List.AddControl('bConditionals', [akTop, akRight], TButton);
 
-    GroupBox10.Anchors := [akLeft, akTop, akRight];
-    SetCmbAndButtonAnchors(ddOutputDir, bOutputDir);
-    SetCmbAndButtonAnchors(ddUnitOutput, bUnitOutputDir);
-    SetCmbAndButtonAnchors(ddSearchPath, bDirSearch);
-    SetCmbAndButtonAnchors(ddDebugSourcePath, bDirDebugSource);
-    SetCmbAndButtonAnchors(ddDPLOutputDir, bDplOutputDir);
-    SetCmbAndButtonAnchors(ddDCPOutputDir, bDCPOutputDir);
-
-    GroupBox11.Anchors := [akLeft, akTop, akRight];
-    SetCmbAndButtonAnchors(ddConditionals, bConditionals);
-
-    GroupBox12.Anchors := [akLeft, akTop, akRight];
-    SetCmbAndButtonAnchors(ddUnitAliases, bUnitAliases);
+    ctrl := List.AddControl('ddUnitAliases', [akLeft, akTop, akRight], TCustomComboBox);
+    List.AddControl(ctrl.Parent, [akLeft, akTop, akRight], TGroupBox);
+    List.AddControl('bUnitAliases', [akTop, akRight], TButton);
   end;
 
   procedure MakeVersionInfoResizable;
   var
-    ValueGrid: TStringGrid;
-    Panel1: TPanel;
+    ctrl: TControl;
   begin
-    if not TComponent_FindComponent(FForm, 'ValueGrid', True, TComponent(ValueGrid), TStringGrid) then
-      Exit;
-    if not (ValueGrid.Parent is TPanel) then
-      Exit;
-    Panel1 := TPanel(ValueGrid.Parent);
-    Panel1.Anchors := [akLeft, akTop, akRight, akBottom];
-    ValueGrid.Anchors := [akLeft, akTop, akRight, akBottom];
+    ctrl := List.AddControl('ValueGrid', [akLeft, akTop, akRight, akBottom], TStringGrid);
+    List.AddControl(ctrl.Parent, [akLeft, akTop, akRight, akBottom], TPanel);
+    List.ApplyAnchors;
   end;
 
   procedure MakePackagesResizable;
   var
-    DesignPackageList: TCheckListBox;
-    LabelPackageFile: TLabel;
-    AddButton: TButton;
-    RemoveButton: TButton;
-    EditButton: TButton;
-    ButtonComponents: TButton;
-    EditPackages: TEdit;
-    ModifyRuntimeButton: TButton;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
     Panel1: TPanel;
+    ctrl: TControl;
   begin
-    if not TComponent_FindComponent(FForm, 'DesignPackageList', True, TComponent(DesignPackageList), TCheckListBox) then
-      Exit;
-    if not (DesignPackageList.Parent is TGroupBox) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'LabelPackageFile', True, TComponent(LabelPackageFile), TLabel) then
-      Exit;
-    if not (LabelPackageFile.Parent is TPanel) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'AddButton', True, TComponent(AddButton), TButton) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'RemoveButton', True, TComponent(RemoveButton), TButton) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'EditButton', True, TComponent(EditButton), TButton) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'ButtonComponents', True, TComponent(ButtonComponents), TButton) then
-      Exit;
+    ctrl := List.AddControl('DesignPackageList', [akLeft, akTop, akRight, akBottom], TCheckListBox);
+    List.AddControl(ctrl.Parent, [akLeft, akTop, akRight, akBottom], TGroupBox);
+    if not TComponent_FindComponent(FForm, 'LabelPackageFile', True, TComponent(ctrl), TLabel) then
+      raise ECtrlNotFound.CreateFmt('Control %s not found in form', ['LabelPackageFile']);
+    List.AddControl(ctrl.Parent, [akLeft, akRight, akBottom], TPanel);
+    Panel1 := TPanel(ctrl.Parent);
 
-    if not TComponent_FindComponent(FForm, 'EditPackages', True, TComponent(EditPackages), TEdit) then
-      Exit;
-    if not (EditPackages.Parent is TGroupBox) then
-      Exit;
-    if not TComponent_FindComponent(FForm, 'ModifyRuntimeButton', True, TComponent(ModifyRuntimeButton), TButton) then
-      Exit;
+    List.AddControl('AddButton', [akRight, akBottom], TButton);
+    List.AddControl('RemoveButton', [akRight, akBottom], TButton);
+    List.AddControl('EditButton', [akRight, akBottom], TButton);
+    List.AddControl('ButtonComponents', [akRight, akBottom], TButton);
 
-    GroupBox1 := TGroupBox(DesignPackageList.Parent);
-    Panel1 := TPanel(LabelPackageFile.Parent);
-    GroupBox2 := TGroupBox(EditPackages.Parent);
+    ctrl := List.AddControl('EditPackages', [akLeft, akTop, akRight], TEdit);
+    List.AddControl(ctrl.Parent, [akLeft, akRight, akBottom], TGroupBox);
+    List.AddControl('ModifyRuntimeButton', [akTop, akRight], TButton);
 
-    GroupBox1.Anchors := [akLeft, akTop, akRight, akBottom];
-    DesignPackageList.Anchors := [akLeft, akTop, akRight, akBottom];
-    Panel1.Anchors := [akLeft, akRight, akBottom];
     Panel1.Caption := ''; // normally that caption is behind the label, but if we resize it, it becomes visible
-    AddButton.Anchors := [akRight, akBottom];
-    RemoveButton.Anchors := [akRight, akBottom];
-    EditButton.Anchors := [akRight, akBottom];
-    ButtonComponents.Anchors := [akRight, akBottom];
-
-    GroupBox2.Anchors := [akLeft, akRight, akBottom];
-    EditPackages.Anchors := [akLeft, akTop, akRight];
-    ModifyRuntimeButton.Anchors := [akTop, akRight];
   end;
 
 begin
-  MakeCompilerMessagesResizable;
-  MakeDirectoriesResizable;
-  MakeVersionInfoResizable;
-  MakePackagesResizable;
+  List := TAnchorInfoList.Create(FForm);
+  try
+{$IFDEF GX_VER150_up} // Delphi 7
+    MakeCompilerMessagesResizable;
+{$ENDIF}
+    MakeDirectoriesResizable;
+    MakeVersionInfoResizable;
+    MakePackagesResizable;
+
+    List.AddControl('OkButton', [akRight, akBottom], TButton);
+    List.AddControl('CancelButton', [akRight, akBottom], TButton);
+    List.AddControl('HelpButton', [akRight, akBottom], TButton);
+
+    List.ApplyAnchors;
+  finally
+    FreeAndNil(List);
+  end;
+  AddMadeSizeablePanel;
 end;
 {$ENDIF}
 
@@ -927,6 +940,16 @@ begin
   Assert(Assigned(FForm));
 
   if FFormChanges.MakeResizable and (FForm.BorderStyle <> bsSizeable) then begin
+    FMinHeight := FForm.Height;
+    FMinWidth := FForm.Width;
+    try
+      MakeComponentsResizable;
+    except
+      on e: EMakeResizableError do begin
+{$IFOPT D+}SendDebugError(e.Message);
+{$ENDIF}
+      end;
+    end;
     ClsName := FForm.ClassName;
     WasShowing := (fsShowing in TCustomFormHack(FForm).FFormState);
     if WasShowing then
@@ -937,10 +960,7 @@ begin
       FForm.BorderStyle := bsSizeable;
       FForm.HandleNeeded;
     end;
-    FMinHeight := FForm.Height;
-    FMinWidth := FForm.Width;
     FForm.OnCanResize := FormCanResize;
-    MakeComponentsResizable;
     if WasShowing then begin
       SendMessage(FForm.Handle, CM_SHOWINGCHANGED, 0, 0);
     end;
@@ -1027,7 +1047,8 @@ end;
 
 procedure TManagedForm.MakeComponentsResizable;
 begin
-  // does nothing, is overridden in decendant forms if necessary
+  // does nothing, is overridden in descendant forms if necessary
 end;
 
 end.
+
