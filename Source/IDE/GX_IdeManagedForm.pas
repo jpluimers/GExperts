@@ -602,6 +602,70 @@ begin
     SelectedNode.MakeVisible;
 end;
 
+type
+  TMoveWindowThread = class(TThread)
+  private
+    FParentHandle: HWND;
+    FProcessId: DWORD;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(_ParentHandle: HWND);
+  end;
+
+{ TMoveWindowThread }
+
+constructor TMoveWindowThread.Create(_ParentHandle: HWND);
+begin
+  FreeOnTerminate := True;
+  FParentHandle := _ParentHandle;
+  FProcessId := GetCurrentProcessId;
+  inherited Create(False);
+end;
+
+procedure TMoveWindowThread.Execute;
+var
+  WindowHandle: HWND;
+  ProcessId: DWORD;
+  Rect: TRect;
+  WindowCenterX: Integer;
+  WindowCenterY: Integer;
+  ParentCenterX: Integer;
+  ParentCenterY: Integer;
+  MoveByX: Integer;
+  MoveByY: Integer;
+  MaxTickCount: DWORD;
+begin
+  inherited;
+  GetWindowRect(FParentHandle, Rect);
+  ParentCenterX := Round(Rect.left / 2 + Rect.Right / 2);
+  ParentCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
+  MaxTickCount := GetTickCount + 10000; // 10 Seconds should be plenty
+  while MaxTickCount > GetTickCount do begin
+    Sleep(50);
+    // It would have been so much easier if GetActiveWindow returned that dialog, but it doesn't.
+    // So, instead we get the foreground window and check to make sure it belongs to the same
+    // thread as the parent window.
+    WindowHandle := GetForegroundWindow;
+    if WindowHandle <> FParentHandle then begin
+      GetWindowThreadProcessId(WindowHandle, ProcessId);
+      if ProcessId = FProcessId then begin
+        // We found a window that belongs to the same process as the parent window and
+        // is not the parent window. Let's assume it is the build connection dialog and
+        // move it to the correct position.
+        GetWindowRect(WindowHandle, Rect);
+        WindowCenterX := Round(Rect.left / 2 + Rect.Right / 2);
+        WindowCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
+        MoveByX := WindowCenterX - ParentCenterX;
+        MoveByY := WindowCenterY - ParentCenterY;
+        MoveWindow(WindowHandle, Rect.left - MoveByX, Rect.Top - MoveByY,
+          Rect.Right - Rect.left, Rect.Bottom - Rect.Top, False);
+        Exit;
+      end;
+    end;
+  end;
+end;
+
 function TManagedFormConnEditForm.EditConnectionString(_ParentHandle: THandle;
   var _ConnectionString: string): Boolean;
 var
@@ -618,6 +682,15 @@ begin
       PWideChar(s), IUnknown, DataSource);
   end;
   DBPrompt := CreateComObject(CLSID_DataLinks) as IDBPromptInitialize;
+  if _ParentHandle <> 0 then begin
+    // This is a hack to make the dialog appear centered on the parent window
+    // According to https://msdn.microsoft.com/en-us/library/ms725392(v=vs.85).aspx
+    // the dialog should automatically be centered on the passed parent handle,
+    // but if the parent window is not on the primary monitor this does not work.
+    // So, we start a background thread that waits for the dialog to appear and then
+    // moves it to the correct position.
+    TMoveWindowThread.Create(_ParentHandle);
+  end;
   Result := Succeeded(DBPrompt.PromptDataSource(nil, _ParentHandle,
     DBPROMPTOPTIONS_PROPERTYSHEET, 0, nil, nil, IUnknown, DataSource));
   if Result then begin
@@ -656,10 +729,9 @@ begin
     List.AddControl('HelpButton', [akBottom, akRight], TButton);
     List.ApplyAnchors;
 
-// Unfortunately this does not fix the problem that the build connection dialog is shown
-// on the primary monitor while the form is on a secondary monitor.
-//    TButton(BuildBtn).OnClick := BuildButtonClick;
-// it might be a bug in the IDBPromptInitialize::PromptDataSource API
+    // Workaround for the bug that the build connection string dialog isn't automatically centered on the parent window
+    // (which the WinAPI documentation claims it should be)
+    TButton(BuildBtn).OnClick := BuildButtonClick;
   finally
     FreeAndNil(List);
   end;
