@@ -88,7 +88,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Clipbrd, ComCtrls, ToolsAPI, TypInfo,
+  SysUtils, Clipbrd, ComCtrls, ToolsAPI, TypInfo, Menus,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_MessageBox, GX_IdeUtils;
 
 type
@@ -534,6 +534,18 @@ begin
   ccIsDirty := True;
 end; { TComponentCreate.Dump }
 
+function FindMenuItem(Menu: TMenu; const cName: string): TMenuItem;
+var
+  i: integer;
+begin
+  for i := 0 to Menu.Items.Count-1 do begin
+    Result := Menu.Items[i];
+    if SameText(Result.Name, cName) then
+      Exit;
+  end;
+  Result := nil;
+end;
+
 procedure TComponentCreate.DumpComponent(Comp: TComponent;
   const Obj, Decl, Crea, Dele, Impl: TStrings);
 
@@ -954,6 +966,12 @@ begin
             if Comp is TWinControl then
             begin
               childComp := FindChild(Comp as TWinControl, cName);
+              if not Assigned(childComp) then
+                childComp := Comp;
+            end
+            else if Comp is TMenu then
+            begin
+              childComp := FindMenuItem(TMenu(Comp), cName);
               if not Assigned(childComp) then
                 childComp := Comp;
             end;
