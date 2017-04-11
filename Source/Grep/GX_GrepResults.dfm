@@ -44,7 +44,6 @@ inherited fmGrepResults: TfmGrepResults
       AutoSnap = False
       Beveled = True
       MinSize = 20
-      Visible = False
       OnMoved = SplitterHistoryListMoved
     end
     object lbResults: TListBox
