@@ -607,6 +607,9 @@ type
   private
     FParentHandle: HWND;
     FProcessId: DWORD;
+    FParentCenterX: Integer;
+    FParentCenterY: Integer;
+    procedure CenterWindow(wHandle: HWND);
   protected
     procedure Execute; override;
   public
@@ -619,47 +622,44 @@ constructor TMoveWindowThread.Create(_ParentHandle: HWND);
 begin
   FreeOnTerminate := True;
   FParentHandle := _ParentHandle;
-  FProcessId := GetCurrentProcessId;
   inherited Create(False);
+end;
+
+procedure TMoveWindowThread.CenterWindow(wHandle: HWND);
+var
+  Rect: TRect;
+  WindowCenterX: Integer;
+  WindowCenterY: Integer;
+  MoveByX: Integer;
+  MoveByY: Integer;
+begin
+  GetWindowRect(wHandle, Rect);
+  WindowCenterX := Round(Rect.Left / 2 + Rect.Right / 2);
+  WindowCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
+  MoveByX := WindowCenterX - FParentCenterX;
+  MoveByY := WindowCenterY - FParentCenterY;
+  MoveWindow(wHandle, Rect.Left - MoveByX, Rect.Top - MoveByY,
+    Rect.Right - Rect.Left, Rect.Bottom - Rect.Top, False);
 end;
 
 procedure TMoveWindowThread.Execute;
 var
-  WindowHandle: HWND;
-  ProcessId: DWORD;
   Rect: TRect;
-  WindowCenterX: Integer;
-  WindowCenterY: Integer;
-  ParentCenterX: Integer;
-  ParentCenterY: Integer;
-  MoveByX: Integer;
-  MoveByY: Integer;
   MaxTickCount: DWORD;
+  ThreadInfo: TGUIThreadinfo;
 begin
   inherited;
   GetWindowRect(FParentHandle, Rect);
-  ParentCenterX := Round(Rect.left / 2 + Rect.Right / 2);
-  ParentCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
+  FParentCenterX := Round(Rect.Left / 2 + Rect.Right / 2);
+  FParentCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
+
+  ThreadInfo.cbSize := SizeOf(ThreadInfo);
   MaxTickCount := GetTickCount + 10000; // 10 Seconds should be plenty
   while MaxTickCount > GetTickCount do begin
     Sleep(50);
-    // It would have been so much easier if GetActiveWindow returned that dialog, but it doesn't.
-    // So, instead we get the foreground window and check to make sure it belongs to the same
-    // thread as the parent window.
-    WindowHandle := GetForegroundWindow;
-    if WindowHandle <> FParentHandle then begin
-      GetWindowThreadProcessId(WindowHandle, ProcessId);
-      if ProcessId = FProcessId then begin
-        // We found a window that belongs to the same process as the parent window and
-        // is not the parent window. Let's assume it is the build connection dialog and
-        // move it to the correct position.
-        GetWindowRect(WindowHandle, Rect);
-        WindowCenterX := Round(Rect.left / 2 + Rect.Right / 2);
-        WindowCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
-        MoveByX := WindowCenterX - ParentCenterX;
-        MoveByY := WindowCenterY - ParentCenterY;
-        MoveWindow(WindowHandle, Rect.left - MoveByX, Rect.Top - MoveByY,
-          Rect.Right - Rect.left, Rect.Bottom - Rect.Top, False);
+    if GetGUIThreadInfo(MainThreadID, ThreadInfo) then begin
+      if ThreadInfo.hwndActive <> FParentHandle then begin
+        CenterWindow(ThreadInfo.hwndActive);
         Exit;
       end;
     end;
@@ -1123,4 +1123,3 @@ begin
 end;
 
 end.
-
