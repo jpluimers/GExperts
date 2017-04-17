@@ -126,6 +126,7 @@ var
   Module: IOTAModule;
   SourceEditor: IOTASourceEditor;
 
+  MessageToken: string;
   TextToken: string;
   EditorLine: string;
   FileName: string;
@@ -320,13 +321,17 @@ var
           else
             if i = 0 then begin
               TextToken := Parser.RunToken;
-              if TextToken = CRLF then
-                TextToken := '<cr><lf>'
-              else
-                TextToken := HackBadEditorStringToNativeString(TextToken)
+              if TextToken = CRLF then begin
+                TextToken := '<cr><lf>';
+                MessageToken := TextToken;
+              end
+              else begin
+                MessageToken := Copy(TextToken, 1, 20);
+                TextToken := HackBadEditorStringToNativeString(TextToken);
+              end;
             end else if i = 2 then
             begin
-              MessageDlg(Format(SNotValidIdentifier, [TextToken]), mtError, [mbOK], 0);
+              MessageDlg(Format(SNotValidIdentifier, [MessageToken]), mtError, [mbOK], 0);
               Exit;
             end;
         end; // case
