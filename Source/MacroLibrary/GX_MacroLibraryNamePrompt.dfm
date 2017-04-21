@@ -103,36 +103,40 @@ object fmMacroLibraryNamePrompt: TfmMacroLibraryNamePrompt
     Top = 224
     Width = 75
     Height = 25
-    Action = actDelete
     Anchors = [akTop, akRight]
+    Caption = 'Delete'
     TabOrder = 5
+    OnClick = actDeleteExecute
   end
   object btnEdit: TButton
     Left = 344
     Top = 160
     Width = 75
     Height = 25
-    Action = actEdit
     Anchors = [akTop, akRight]
+    Caption = 'Edit'
     TabOrder = 3
+    OnClick = actEditExecute
   end
   object btnInsert: TButton
     Left = 344
     Top = 192
     Width = 75
     Height = 25
-    Action = actInsert
     Anchors = [akTop, akRight]
+    Caption = 'Insert'
     TabOrder = 4
+    OnClick = actInsertExecute
   end
   object btnAppend: TButton
     Left = 344
     Top = 256
     Width = 75
     Height = 25
-    Action = actAppend
     Anchors = [akTop, akRight]
+    Caption = 'Append'
     TabOrder = 6
+    OnClick = actAppendExecute
   end
   object TheActionList: TActionList
     State = asSuspended
