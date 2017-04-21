@@ -665,7 +665,7 @@ begin
     Exit
   else
   begin
-    // Figure out how to make this work without messing up offsets with multi-line selections
+    // todo: Figure out how to make this work without messing up offsets with multi-line selections
     //if not StrContains('%SELECTION%', TemplateText) then
     //  GxOtaDeleteSelection;
 
