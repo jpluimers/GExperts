@@ -55,7 +55,7 @@ begin
   try
     LoadTemplates(MacroFile);
     tbEnter.Text := ATemplateName;
-    tbEnter.SelStart := Length(ATemplateName);
+    tbEnter.SelectAll;
     if ShowModal = mrOk then
       Result := GetSelectedMacroCode
     else
@@ -143,8 +143,7 @@ end;
 procedure TfmMacroSelect.tbEnterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (Key = VK_DOWN) or (Key = VK_UP) or
-    (Key = VK_NEXT) or (Key = VK_PRIOR) or
-    (Key = VK_HOME) or (Key = VK_END) then
+    (Key = VK_NEXT) or (Key = VK_PRIOR) then
   begin
     SendMessage(lvMacros.Handle, WM_KEYDOWN, Key, 0);
     Key := 0;
