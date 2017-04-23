@@ -606,7 +606,6 @@ type
   TMoveWindowThread = class(TThread)
   private
     FParentHandle: HWND;
-    FProcessId: DWORD;
     FParentCenterX: Integer;
     FParentCenterY: Integer;
     procedure CenterWindow(wHandle: HWND);
