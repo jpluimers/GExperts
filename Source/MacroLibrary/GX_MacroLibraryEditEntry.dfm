@@ -21,7 +21,7 @@ inherited fmEditMacroItem: TfmEditMacroItem
     Top = 144
     Width = 75
     Height = 25
-    Caption = 'OK'
+    Caption = '&OK'
     Default = True
     ModalResult = 1
     TabOrder = 7

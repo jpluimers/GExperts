@@ -48,6 +48,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Width = 75
         Height = 25
         Action = acOK
+        Caption = '&OK'
         Default = True
         TabOrder = 0
       end
