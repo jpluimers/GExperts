@@ -83,6 +83,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure ShowModal;
+    procedure ShowStandAlone(const _Directory: string);
     function GetDefaultShortCut: TShortCut; override;
     function GetActionCaption: string; override;
     class function ConfigurationKey: string; override;
@@ -168,6 +169,8 @@ var
   GrepStandAlone: TGrepExpert = nil;
 
 procedure ShowGrep; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+procedure ShowGrepExW(const _Directory: PWideChar); {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+procedure ShowGrepExA(const _Directory: PAnsiChar); {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 
 implementation
 
@@ -283,6 +286,12 @@ end;
 procedure TGrepExpert.ShowModal;
 begin
   fmGrepResults.ShowModal;
+end;
+
+procedure TGrepExpert.ShowStandAlone(const _Directory: string);
+begin
+  AddMRUString(_Directory, FDirList, True);
+  fmGrepResults.Execute(gssNormal);
 end;
 
 procedure TGrepExpert.Configure;
@@ -865,6 +874,43 @@ begin
     FreeSharedResources;
   end;
 end;
+
+procedure doShowGrepEx(const _Directory: string);
+begin
+{$IFOPT D+}SendDebug('Showing grep expert for directory ' + _Directory);{$ENDIF}
+  InitSharedResources;
+  try
+    GrepStandAlone := TGrepExpert.Create;
+    try
+      {$IFOPT D+} SendDebug('Created grep window'); {$ENDIF}
+      GrepStandAlone.LoadSettings;
+      GrepStandAlone.ShowStandAlone(_Directory);
+      GrepStandAlone.HistoryListSaveSettings;
+      GrepStandAlone.SaveSettings;
+    finally
+      FreeAndNil(GrepStandAlone);
+    end;
+  finally
+    FreeSharedResources;
+  end;
+end;
+
+procedure ShowGrepExW(const _Directory: PWideChar);
+var
+  Dir: string;
+begin
+  Dir := _Directory;
+  doShowGrepEx(Dir);
+end;
+
+procedure ShowGrepExA(const _Directory: PAnsiChar);
+var
+  Dir: string;
+begin
+  Dir := _Directory;
+  doShowGrepEx(Dir);
+end;
+
 
 function TGrepExpert.GetSaveOption: TGrepSaveOption;
 begin

@@ -88,7 +88,9 @@ exports
   ShowPeInfo,
   InstallGExperts,
   ShowCodeLib,
-  ShowGrep;
+  ShowGrep,
+  ShowGrepExW,
+  ShowGrepExA;
 {$ENDIF GX_BCB}
 
 // ---------------------------------------------
