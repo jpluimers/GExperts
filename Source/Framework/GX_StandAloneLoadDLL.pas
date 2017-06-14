@@ -18,7 +18,7 @@ type
 
 type
   IGExpertsDll = interface
-    function GetProcAddress(const _EntryPoint: AnsiString): pointer;
+    function GetProcAddress(const _EntryPoint: AnsiString): Pointer;
     function DllName: string;
   end;
 
@@ -35,7 +35,7 @@ type
   private
     FDllHandle: HMODULE;
     FDllName: string;
-    function GetProcAddress(const _EntryPoint: AnsiString): pointer;
+    function GetProcAddress(const _EntryPoint: AnsiString): Pointer;
     function DllName: string;
   public
     constructor Create(const _DllName: string);
@@ -59,7 +59,8 @@ end;
 
 function LoadAnyGExpertsDLL: IGExpertsDll;
 begin
-  if TryLoad('GExpertsRS101.dll', Result)
+  if TryLoad('GExpertsRS102.dll', Result)
+    or TryLoad('GExpertsRS101.dll', Result)
     or TryLoad('GExpertsRS10.dll', Result)
     or TryLoad('GExpertsRSXE8.dll', Result)
     or TryLoad('GExpertsRSXE7.dll', Result)
@@ -74,7 +75,6 @@ begin
     or TryLoad('GExpertsDelphi2007.dll', Result)
     or TryLoad('GExpertsBDS2006.dll', Result)
     or TryLoad('GExpertsDelphi2005.dll', Result)
-//    or TryLoad('GExpertsD8.dll', Result)
     or TryLoad('GExpertsD7.dll', Result)
     or TryLoad('GExpertsD6.dll', Result) then
     Exit; //==>
@@ -82,6 +82,23 @@ begin
 end;
 
 { TGExpertsDll }
+
+function GxSafeLoadLibrary(const Filename: string): HMODULE;
+var
+  FPUControlWord: Word;
+begin
+  asm
+    FNSTCW  FPUControlWord
+  end;
+  try
+    Result := LoadLibrary(PChar(Filename));
+  finally
+    asm
+      FNCLEX
+      FLDCW FPUControlWord
+    end;
+  end;
+end;
 
 constructor TGExpertsDll.Create(const _DllName: string);
 var
@@ -91,7 +108,7 @@ begin
   Path := ExtractFilePath(Application.ExeName);
   Path := IncludeTrailingPathDelimiter(Path);
   FDllName := Path + _DllName;
-  FDllHandle := SysUtils.SafeLoadLibrary(_DllName);
+  FDllHandle := GxSafeLoadLibrary(_DllName);
   if FDllHandle = 0 then
     raise ELoadFailed.CreateFmt('Could not load library %s.', [FDllName]);
 end;
@@ -107,7 +124,7 @@ begin
   Result := FDllName;
 end;
 
-function TGExpertsDll.GetProcAddress(const _EntryPoint: AnsiString): pointer;
+function TGExpertsDll.GetProcAddress(const _EntryPoint: AnsiString): Pointer;
 begin
   Result := Windows.GetProcAddress(FDllHandle, PAnsiChar(_EntryPoint));
   if not Assigned(Result) then
