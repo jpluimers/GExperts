@@ -26,7 +26,8 @@ implementation
 uses Windows, Dialogs, ExtCtrls,
   ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
   GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils, GX_EventHook,
-  GX_dzVclUtils, GX_dzClassUtils, GX_IdeFormChangeManager, GX_IdeManagedForm;
+  GX_dzVclUtils, GX_dzClassUtils, GX_IdeFormChangeManager, GX_IdeManagedFormHandler,
+  GX_IdeManagedForm;
 
 type
   TIDEFormEnhancer = class(TObject)
@@ -40,170 +41,169 @@ type
   protected
     constructor Create;
     destructor Destroy; override;
-    function ShouldManageForm(Form: TCustomForm; var Changes: TFormChanges): Boolean;
     property AllowResize: Boolean read FAllowResize write FAllowResize;
     property RememberPosition: Boolean read FRememberPosition write FRememberPosition;
   end;
 
-const
-  FormsToChange: array[0..13] of TFormChanges = (
-    (
-      FormClassNames: 'TSrchDialog';
-      FormEnhancer: TManagedFormSrchDialog;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: True;
-      RememberPosition: False;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TRplcDialog';
-      FormEnhancer: TManagedFormRplcDialog;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: True;
-      RememberPosition: False;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TDefaultEnvironmentDialog';
-      FormEnhancer: TManagedFormDefaultEnvironmentDialog;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TImageListEditor';
-      FormEnhancer: TManagedFormImageListEditor;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: True;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TPictureEditorDlg';
-      FormEnhancer: TManagedFormPictureEditDlg;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: True;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
-        + 'TCppProjOptsDlg;TReopenMenuPropertiesDialog;'
-        + 'TActionListDesigner;TFieldsEditor;TDBGridColumnsEditor;TDriverSettingsForm';
-      FormEnhancer: TManagedForm;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TProjectOptionsDialog';
-      FormEnhancer: TManagedFormProjectOptionsDialog;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TDelphiProjectOptionsDialog';
-      FormEnhancer: TManagedForm;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 0; // changing the dropdown count seems to result in intermittent invalid pointer operations in Delphi 10.1
-    ),
-    (
-      FormClassNames: 'TPasEnvironmentDialog';
-      FormEnhancer: TManagedFormPasEnvironmentDialog;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TConnEditForm';
-      FormEnhancer: TManagedFormConnEditForm;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TPakComponentsDlg';
-      FormEnhancer: TManagedFormPakComponentsDlg;
-      MakeResizable: True;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: True;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TOrderedListEditDlg;TInheritedListEditDlg;TBufferListFrm;TMenuBuilder';
-      FormEnhancer: TManagedForm;
-      MakeResizable: False;
-      RememberSize: True;
-      RememberWidth: False;
-      RememberPosition: True;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 15;
-    ),
-    (
-      FormClassNames: 'TGalleryBrowseDlg;TProjectResourcesDlg';
-      FormEnhancer: TManagedFormFixFormPositioningOnly;
-      MakeResizable: False;
-      RememberSize: false;
-      RememberWidth: false;
-      RememberPosition: false;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 0;
-    ),
-    (
-      FormClassNames: 'TAboutBox';
-      FormEnhancer: TManagedFormAboutBox;
-      MakeResizable: False;
-      RememberSize: false;
-      RememberWidth: false;
-      RememberPosition: false;
-      RememberSplitterPosition: False;
-      ResizePictureDialogs: False;
-      ComboDropDownCount: 0;
-    )
-  );
+//const
+//  FormsToChange: array[0..13] of TFormChanges = (
+//    (
+//      FormClassNames: 'TSrchDialog';
+//      FormEnhancer: TManagedFormSrchDialog;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: True;
+//      RememberPosition: False;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TRplcDialog';
+//      FormEnhancer: TManagedFormRplcDialog;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: True;
+//      RememberPosition: False;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TDefaultEnvironmentDialog';
+//      FormEnhancer: TManagedFormDefaultEnvironmentDialog;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TImageListEditor';
+//      FormEnhancer: TManagedFormImageListEditor;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: True;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TPictureEditorDlg';
+//      FormEnhancer: TManagedFormPictureEditDlg;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: True;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TLoadProcessDialog;TDotNetOptionForm;TPasEditorPropertyDialog;'
+//        + 'TCppProjOptsDlg;TReopenMenuPropertiesDialog;'
+//        + 'TActionListDesigner;TFieldsEditor;TDBGridColumnsEditor;TDriverSettingsForm';
+//      FormEnhancer: TManagedForm;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TProjectOptionsDialog';
+//      FormEnhancer: TManagedFormProjectOptionsDialog;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TDelphiProjectOptionsDialog';
+//      FormEnhancer: TManagedForm;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 0; // changing the dropdown count seems to result in intermittent invalid pointer operations in Delphi 10.1
+//    ),
+//    (
+//      FormClassNames: 'TPasEnvironmentDialog';
+//      FormEnhancer: TManagedFormPasEnvironmentDialog;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TConnEditForm';
+//      FormEnhancer: TManagedFormConnEditForm;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TPakComponentsDlg';
+//      FormEnhancer: TManagedFormPakComponentsDlg;
+//      MakeResizable: True;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: True;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TOrderedListEditDlg;TInheritedListEditDlg;TBufferListFrm;TMenuBuilder';
+//      FormEnhancer: TManagedForm;
+//      MakeResizable: False;
+//      RememberSize: True;
+//      RememberWidth: False;
+//      RememberPosition: True;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 15;
+//    ),
+//    (
+//      FormClassNames: 'TGalleryBrowseDlg;TProjectResourcesDlg';
+//      FormEnhancer: TManagedFormFixFormPositioningOnly;
+//      MakeResizable: False;
+//      RememberSize: false;
+//      RememberWidth: false;
+//      RememberPosition: false;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 0;
+//    ),
+//    (
+//      FormClassNames: 'TAboutBox';
+//      FormEnhancer: TManagedFormAboutBox;
+//      MakeResizable: False;
+//      RememberSize: false;
+//      RememberWidth: false;
+//      RememberPosition: false;
+//      RememberSplitterPosition: False;
+//      ResizePictureDialogs: False;
+//      ComboDropDownCount: 0;
+//    )
+//  );
 
 var
   PrivateIdeFormEnhancer: TIDEFormEnhancer = nil;
@@ -224,10 +224,32 @@ end;
 
 procedure TIDEFormEnhancer.HandleFormChanged(_Sender: TObject; _Form: TCustomForm);
 var
+  i: Integer;
   Changes: TFormChanges;
   Enhancer: TManagedForm;
+  Handlers: TList;
+  ClsName: string;
+  Handler: TManagedFormHandler;
 begin
-  if Assigned(_Form) and ShouldManageForm(_Form, Changes) then
+  if not Assigned(_Form) then
+    Exit;
+  ClsName := _Form.ClassName;
+  if (csDesigning in _Form.ComponentState)
+    or StringInArray(ClsName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) then
+    Exit;
+
+  Handlers := TList.Create;
+  try
+    TManagedFormHandlerFactory.GetHandlers(_Form, Handlers);
+    for i := 0 to Handlers.Count - 1 do begin
+      Handler := TManagedFormHandler(Handlers[i]);
+      Handler.Execute(_Form);
+    end;
+  finally
+    FreeAndNil(Handlers);
+  end;
+  Exit;
+
   begin
     Changes.MakeResizable := Changes.MakeResizable and AllowResize;
     Changes.RememberSize := Changes.RememberSize and AllowResize;
@@ -238,31 +260,6 @@ begin
     Changes.ComboDropDownCount := Changes.ComboDropDownCount;
     Enhancer := Changes.FormEnhancer.Create(_Form);
     Enhancer.Init(Changes);
-  end;
-end;
-
-function TIDEFormEnhancer.ShouldManageForm(Form: TCustomForm;
-  var Changes: TFormChanges): Boolean;
-var
-  i: Integer;
-  ClsName: string;
-  cmp: TComponent;
-begin
-  Assert(Assigned(Form));
-  Result := False;
-  ClsName := Form.ClassName;
-  if (csDesigning in Form.ComponentState)
-    or StringInArray(ClsName, ['TAppBuilder', 'TMessageForm', 'TPropertyInspector', 'TObjectTreeView', 'TEditWindow']) then
-    Exit;
-
-  if not TComponent_FindComponent(Form, TManagedForm.GenerateName(Form.Name), False, cmp, TManagedForm) then begin
-    for i := Low(FormsToChange) to High(FormsToChange) do begin
-      if StrContains(ClsName + ';', FormsToChange[i].FormClassNames + ';') then begin
-        Result := True;
-        Changes := FormsToChange[i];
-        Break;
-      end;
-    end;
   end;
 end;
 
