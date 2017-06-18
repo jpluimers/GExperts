@@ -316,6 +316,9 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibrary.pas">
 				<Form>fmMacroLibrary</Form>
 			</DCCReference>
+			<DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
+				<Form>fmEditMacroItem</Form>
+			</DCCReference>
 			<DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas">
 				<Form>fmMacroLibraryNamePrompt</Form>
 			</DCCReference>
@@ -532,9 +535,8 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
-			<DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
-				<Form>fmEditMacroItem</Form>
-			</DCCReference>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
+			<DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
 			<RcCompile Include="..\..\images\GXIcons.rc">
 				<Form>GXIcons.res</Form>
 			</RcCompile>

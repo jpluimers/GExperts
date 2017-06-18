@@ -225,7 +225,8 @@ uses
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
   GX_PerfectLayout in '..\..\Source\Legacy\GX_PerfectLayout.pas' {fmPerfectLayout},
-  GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas';
+  GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas',
+  GX_IdeManagedFormHandler in '..\..\Source\IDE\GX_IdeManagedFormHandler.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res}

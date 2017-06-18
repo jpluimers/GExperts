@@ -526,6 +526,8 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
@@ -560,6 +562,12 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <ModelSupport>False</ModelSupport>
             <Deployment Version="3">
                 <DeployFile LocalName="..\..\Binaries\GExpertsRS102.dll" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>GExpertsRS102.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\Binaries\GExpertsRS102.dll" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>GExpertsRS102.dll</RemoteName>
                         <Overwrite>true</Overwrite>
