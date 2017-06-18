@@ -907,7 +907,7 @@ procedure ShowGrepExA(const _Directory: PAnsiChar);
 var
   Dir: string;
 begin
-  Dir := _Directory;
+  Dir := String(_Directory);
   doShowGrepEx(Dir);
 end;
 
