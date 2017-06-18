@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, Graphics,
-  GX_Experts, GX_ConfigurationInfo, GX_GrepBackend, IniFiles;
+  GX_Experts, GX_ConfigurationInfo, GX_GrepBackend, IniFiles, Windows;
 
 type
   TGrepExpert = class(TGX_Expert)
@@ -169,8 +169,11 @@ var
   GrepStandAlone: TGrepExpert = nil;
 
 procedure ShowGrep; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
-procedure ShowGrepExW(const _Directory: PWideChar); {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
-procedure ShowGrepExA(const _Directory: PAnsiChar); {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+///<summary>
+/// These parameters are necessary to have this entry point called using rundll32.exe
+/// https://support.microsoft.com/en-us/help/164787/info-windows-rundll-and-rundll32-interface
+/// We only need the directory name. </summary>
+procedure ShowGrepEx(_HWnd: HWND; _HInst: HINST; _CmdLine: PAnsiChar; nCmdShow: Integer); stdcall; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 
 implementation
 
@@ -895,22 +898,13 @@ begin
   end;
 end;
 
-procedure ShowGrepExW(const _Directory: PWideChar);
+procedure ShowGrepEx(_HWnd: HWND; _HInst: HINST; _CmdLine: PAnsiChar; nCmdShow: Integer);
 var
   Dir: string;
 begin
-  Dir := _Directory;
+  Dir := String(_CmdLine);
   doShowGrepEx(Dir);
 end;
-
-procedure ShowGrepExA(const _Directory: PAnsiChar);
-var
-  Dir: string;
-begin
-  Dir := String(_Directory);
-  doShowGrepEx(Dir);
-end;
-
 
 function TGrepExpert.GetSaveOption: TGrepSaveOption;
 begin

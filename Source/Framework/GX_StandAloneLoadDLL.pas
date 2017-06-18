@@ -20,6 +20,7 @@ type
   IGExpertsDll = interface
     function GetProcAddress(const _EntryPoint: AnsiString): Pointer;
     function DllName: string;
+    function ModuleHandle: HINST;
   end;
 
 function LoadGExpertsDll(const _DllName: string): IGExpertsDll;
@@ -37,6 +38,7 @@ type
     FDllName: string;
     function GetProcAddress(const _EntryPoint: AnsiString): Pointer;
     function DllName: string;
+    function ModuleHandle: HMODULE;
   public
     constructor Create(const _DllName: string);
     destructor Destroy; override;
@@ -129,6 +131,11 @@ begin
   Result := Windows.GetProcAddress(FDllHandle, PAnsiChar(_EntryPoint));
   if not Assigned(Result) then
     raise EEntryPointMissing.CreateFmt('Could not find entry point "%s" in dll %s', [_EntryPoint, FDllName]);
+end;
+
+function TGExpertsDll.ModuleHandle: HMODULE;
+begin
+  Result := FDllHandle;
 end;
 
 end.

@@ -14,30 +14,22 @@ uses
   GX_StandAloneLoadDLL;
 
 procedure Main;
-const
-{$IFDEF unicode}
-  ShowGrepExName = 'ShowGrepExW';
-{$ELSE}
-  ShowGrepExName = 'ShowGrepExA';
-{$ENDIF}
 type
   TShowGrep = procedure;
-{$IFDEF unicode}
-  TShowGrepEx = procedure(const _Directory: PWideChar);
-{$ELSE}
-  TShowGrepEx = procedure(const _Directory: PAnsiChar);
-{$ENDIF}
+  TShowGrepEx = procedure(_HWnd: HWND; _HInst: HINST; _CmdLine: PAnsiChar; nCmdShow: Integer); stdcall;
 var
   ShowGrep: TShowGrep;
   ShowGrepEx: TShowGrepEx;
   Dll: IGExpertsDll;
+  Dir: AnsiString;
 begin
   try
     SetErrorMode(SEM_FAILCRITICALERRORS);
     Dll := LoadAnyGExpertsDLL;
     if ParamCount > 0 then begin
-      ShowGrepEx := Dll.GetProcAddress(ShowGrepExName);
-      ShowGrepEx(PChar(ParamStr(1)));
+      ShowGrepEx := Dll.GetProcAddress('ShowGrepEx');
+      Dir := ParamStr(1);
+      ShowGrepEx(0, Dll.ModuleHandle, PAnsiChar(Dir), SW_SHOWNORMAL);
     end else begin
       ShowGrep := Dll.GetProcAddress('ShowGrep');
       ShowGrep;
