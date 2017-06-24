@@ -93,6 +93,119 @@ begin
   Result := gblFormHandlers;
 end;
 
+type
+  TManagedFormHandlerSrchDialog = class(TManagedFormHandler)
+  protected
+{.$IFNDEF GX_VER150_up} // Delphi 7
+    // only for Delphi 6 do we need to make the form components sizeable
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+{.$ENDIF}
+  end;
+
+type
+  TManagedFormHandlerRplcDialog = class(TManagedFormHandler)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  end;
+
+type
+  TManagedFormGotoDialog = class(TManagedFormHandler)
+  public
+    function FormEnhancements: string; override;
+    // todo: call / add the code from GX_IdeGotoEnhancer
+  end;
+
+type
+  TManagedFormHandlerDefaultEnvironmentDialog = class(TManagedFormHandler)
+    // Tools -> Options (Delphi 2007)
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  end;
+
+type
+  TManagedFormHandlerSearchPath = class(TManagedFormHandler)
+  public
+    function FormEnhancements: string; override;
+    // todo: call / add the code from GX_IdeSearchPathEnhancer
+  end;
+
+type
+  TManagedFormHandlerImageListEditor = class(TManagedFormHandler)
+{.$IFNDEF GX_VER150_up} // Delphi 7
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+{.$ENDIF}
+  end;
+
+type
+  TManagedFormHandlerPictureEditDlg = class(TManagedFormHandler)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  end;
+
+{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+type
+  TManagedFormHandlerProjectOptionsDialog = class(TManagedFormHandler)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  end;
+{$ENDIF}
+
+type
+  TManagedFormBuildEventPropEditor = class(TManagedFormHandler)
+  public
+    function FormEnhancements: string; override;
+    // todo: call / add the code from GX_IdeBuildEventsEnhancer
+  end;
+
+type
+  TManagedFormHandlerPasEnvironmentDialog = class(TManagedFormHandler)
+{.$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+{.$ENDIF}
+  end;
+
+type
+  TManagedFormHandlerConnEditForm = class(TManagedFormHandler)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  public
+    function FormFixes: string; override;
+  end;
+
+type
+  TManagedFormHandlerPakComponentsDlg = class(TManagedFormHandler)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  end;
+
+type
+  TManagedFormFixFormPositioningOnly = class(TManagedFormHandler)
+  public
+    function FormFixes: string; override;
+  end;
+
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+type
+  TManagedFormHandlerAboutBox = class(TManagedFormHandler)
+  protected
+    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
+  public
+    function FormFixes: string; override;
+    // remove scroll bar
+  end;
+{$ENDIF}
+{$ENDIF}
+
+{$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
+  // Delphi 6/7: Tools -> Editor Options
+type
+  TManagedFormHandlerEditorProperties = class(TManagedFormHandler)
+    // todo: make the controls sizeable (no code for that exists yet)
+  end;
+{$ENDIF}
+
 { TManagedFormHandlerFactory }
 
 class function TManagedFormHandlerFactory.Count: Integer;
@@ -197,111 +310,6 @@ function TManagedFormHandler.SupportedChanges: TStandardFormChangesSet;
 begin
   Result := FSupportedChanges;
 end;
-
-type
-  TManagedFormHandlerSrchDialog = class(TManagedFormHandler)
-  protected
-{.$IFNDEF GX_VER150_up} // Delphi 7
-    // only for Delphi 6 do we need to make the form components sizeable
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-{.$ENDIF}
-  end;
-
-type
-  TManagedFormHandlerRplcDialog = class(TManagedFormHandler)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  end;
-
-type
-  TManagedFormGotoDialog = class(TManagedFormHandler)
-  public
-    function FormEnhancements: string; override;
-  end;
-
-type
-  TManagedFormHandlerDefaultEnvironmentDialog = class(TManagedFormHandler)
-    // Tools -> Options (Delphi 2007)
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  end;
-
-type
-  TManagedFormHandlerSearchPath = class(TManagedFormHandler)
-  public
-    function FormEnhancements: string; override;
-  end;
-
-type
-  TManagedFormHandlerImageListEditor = class(TManagedFormHandler)
-{.$IFNDEF GX_VER150_up} // Delphi 7
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-{.$ENDIF}
-  end;
-
-type
-  TManagedFormHandlerPictureEditDlg = class(TManagedFormHandler)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  end;
-
-type
-  TManagedFormHandlerProjectOptionsDialog = class(TManagedFormHandler)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  end;
-
-type
-  TManagedFormBuildEventPropEditor = class(TManagedFormHandler)
-  public
-    function FormEnhancements: string; override;
-  end;
-
-type
-  TManagedFormHandlerPasEnvironmentDialog = class(TManagedFormHandler)
-{.$IFNDEF GX_VER160_up} // Delphi 8 (BDS 1)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-{.$ENDIF}
-  end;
-
-type
-  TManagedFormHandlerConnEditForm = class(TManagedFormHandler)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  public
-    function FormFixes: string; override;
-  end;
-
-type
-  TManagedFormHandlerPakComponentsDlg = class(TManagedFormHandler)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  end;
-
-type
-  TManagedFormFixFormPositioningOnly = class(TManagedFormHandler)
-  public
-    function FormFixes: string; override;
-  end;
-
-{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
-{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
-type
-  TManagedFormHandlerAboutBox = class(TManagedFormHandler)
-  protected
-    function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
-  public
-    function FormFixes: string; override;
-    // remove scroll bar
-  end;
-{$ENDIF}
-{$ENDIF}
-
-type
-  TManagedFormHandlerEditorProperties = class(TManagedFormHandler)
-    // todo: make the controls sizeable
-  end;
 
 { TManagedFormHandlerSrchDialog }
 
@@ -656,11 +664,13 @@ end;
 
 { TManagedFormHandlerProjectOptionsDialog }
 
+{$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
 function TManagedFormHandlerProjectOptionsDialog.CreateManagedForm(
   _Form: TCustomForm): TManagedForm;
 begin
   Result := TManagedFormProjectOptionsDialog.Create(_Form);
 end;
+{$ENDIF}
 
 { TManagedFormHandlerAboutBox }
 
