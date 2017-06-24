@@ -83,7 +83,7 @@ object fmCompRename: TfmCompRename
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Caption = '&OK'
     Default = True
     ModalResult = 1
     TabOrder = 2
