@@ -49,6 +49,7 @@ begin
   Result.IndentTryElse := False;
   Result.NoFeedBeforeThen := False;
   Result.NoIndentElseIf := False;
+  Result.NoIndentUsesComma := False;
   Result.RemoveDoubleBlank := False;
   Result.ReservedCase := rfLowerCase;
   Result.SpaceColon := [spAfter];
@@ -100,6 +101,7 @@ begin
   Result.IndentTryElse := False;
   Result.NoFeedBeforeThen := True;
   Result.NoIndentElseIf := False;
+  Result.NoIndentUsesComma := False;
   Result.RemoveDoubleBlank := True;
   Result.ReservedCase := rfLowerCase;
   Result.SpaceColon := [spAfter];

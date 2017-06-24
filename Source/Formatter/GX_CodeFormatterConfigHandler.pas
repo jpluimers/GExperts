@@ -195,6 +195,7 @@ begin
   ES.IdentifiersCase := TCase(_Reader.ReadInteger('IdentifiersCase', Ord(ES.IdentifiersCase))); // TCase
   ES.ChangeIndent := _Reader.ReadBool('ChangeIndent', ES.ChangeIndent); //: Boolean;
   ES.NoIndentElseIf := _Reader.ReadBool('NoIndentElseIf', ES.NoIndentElseIf); //: Boolean;
+  ES.NoIndentUsesComma := _Reader.ReadBool('NoIndentUsesComma', ES.NoIndentUsesComma); //: Boolean;
   ES.IndentBegin := _Reader.ReadBool('IndentBegin', ES.IndentBegin); //: Boolean;
   ES.IndentTry := _Reader.ReadBool('IndentTry', ES.IndentTry); //: Boolean;
   ES.IndentTryElse := _Reader.ReadBool('IndentTryElse', ES.IndentTryElse); //: Boolean;
@@ -253,6 +254,7 @@ begin
   _Writer.WriteInteger('IdentifiersCase', Ord(_Settings.IdentifiersCase));
   _Writer.WriteBool('ChangeIndent', _Settings.ChangeIndent); //: Boolean;
   _Writer.WriteBool('NoIndentElseIf', _Settings.NoIndentElseIf); //: Boolean;
+  _Writer.WriteBool('NoIndentUsesComma', _Settings.NoIndentUsesComma); //: Boolean;
   _Writer.WriteBool('IndentBegin', _Settings.IndentBegin); //: Boolean;
   _Writer.WriteBool('IndentTry', _Settings.IndentTry); //: Boolean;
   _Writer.WriteBool('IndentTryElse', _Settings.IndentTryElse); //: Boolean;

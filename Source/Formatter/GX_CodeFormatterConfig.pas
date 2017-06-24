@@ -134,6 +134,7 @@ type
     lb_Precedence: TListBox;
     b_PrecedenceUp: TButton;
     b_PrecedenceDown: TButton;
+    chk_NoIndentUsesComma: TCheckBox;
     procedure b_HelpClick(Sender: TObject);
     procedure b_EditCapitalizationClick(Sender: TObject);
     procedure ts_PreviewShow(Sender: TObject);
@@ -397,6 +398,7 @@ begin
   _Settings.FeedAfterVar := chk_FeedAfterVar.Checked;
   _Settings.FeedElseIf := chk_FeedElseIf.Checked;
   _Settings.NoIndentElseIf := chk_NoIndentElseIf.Checked;
+  _Settings.NoIndentUsesComma := chk_NoIndentUsesComma.Checked;
   _Settings.FeedBeforeEnd := chk_FeedBeforeEnd.Checked;
   _Settings.FeedAfterSemiColon := chk_FeedAfterSemiColon.Checked;
   _Settings.FillNewWords := IntToCapfileMode(rg_Capitalization.ItemIndex);
@@ -480,6 +482,7 @@ begin
   chk_FeedAfterVar.Checked := _EngineSettings.FeedAfterVar;
   chk_FeedElseIf.Checked := _EngineSettings.FeedElseIf;
   chk_NoIndentElseIf.Checked := _EngineSettings.NoIndentElseIf;
+  chk_NoIndentUsesComma.Checked := _EngineSettings.NoIndentUsesComma;
   chk_FeedBeforeEnd.Checked := _EngineSettings.FeedBeforeEnd;
   chk_WrapLines.Checked := _EngineSettings.WrapLines;
   ud_WrapPosition.Position := _EngineSettings.WrapPosition;

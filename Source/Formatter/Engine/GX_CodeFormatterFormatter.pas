@@ -950,11 +950,18 @@ var
           Exit;
         end;
 
-      rtComma:
-        if Settings.FeedEachUnit and (FStack.GetTopType = rtUses) then begin
-          Next := GetNextNoComment(FTokenIdx, RemoveMe);
-          if Next.ReservedType <> rtLineFeed then
-            AssertLineFeedAfter(FTokenIdx);
+      rtComma: begin
+          if FStack.GetTopType = rtUses then begin
+            if (Settings.NoIndentUsesComma) and (FPrevToken is TLineFeed) then
+              SetPrevLineIndent(-1)
+              { TODO -cfixme : The options NoIndentUsesComma and FeedEachUnit don't work well
+                with each other so for now we ignore FeedEachUnit if NoIndentUsesComma is true. }
+            else if Settings.FeedEachUnit then begin
+              Next := GetNextNoComment(FTokenIdx, RemoveMe);
+              if Next.ReservedType <> rtLineFeed then
+                AssertLineFeedAfter(FTokenIdx);
+            end;
+          end;
         end;
 
       rtProgram, rtUses, rtInitialization:
@@ -1290,6 +1297,9 @@ var
 
       rtSemiColon:
         if not (FStack.GetTopType in [rtLeftBr, rtLeftHook]) then begin
+          if (FStack.GetTopType = rtUses) and (Settings.NoIndentUsesComma) and (FPrevToken is TLineFeed) then
+              SetPrevLineIndent(-1);
+
           while not FStack.IsEmpty and (FStack.GetTopType in [rtDo, rtWhile,
             rtProcDeclare, rtThen, rtProgram, rtUses, rtColon, rtClassDecl])
             or (FStack.GetTopType = rtIfElse) do

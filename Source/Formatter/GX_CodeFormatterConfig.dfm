@@ -1,8 +1,8 @@
 object fmCodeFormatterConfig: TfmCodeFormatterConfig
   Left = 339
   Top = 175
-  Width = 494
-  Height = 463
+  Width = 478
+  Height = 375
   HelpContext = 100
   Caption = 'Delphi Code Formatter Configuration'
   Color = clBtnFace
@@ -18,8 +18,8 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
   object pc_Main: TPageControl
     Left = 0
     Top = 0
-    Width = 478
-    Height = 384
+    Width = 462
+    Height = 295
     ActivePage = ts_Indent
     Align = alClient
     TabIndex = 0
@@ -56,7 +56,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       object chk_IndentComments: TCheckBox
         Left = 240
         Top = 104
-        Width = 170
+        Width = 209
         Height = 17
         Caption = 'Indent comments'
         TabOrder = 4
@@ -64,7 +64,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       object chk_IndentCompDirectives: TCheckBox
         Left = 240
         Top = 128
-        Width = 170
+        Width = 209
         Height = 17
         Caption = 'Indent compiler directives'
         TabOrder = 5
@@ -72,10 +72,24 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       object chk_NoIndentElseIf: TCheckBox
         Left = 240
         Top = 80
-        Width = 170
+        Width = 209
         Height = 17
         Caption = 'Never indent else if'
         TabOrder = 3
+      end
+      object chk_NoIndentUsesComma: TCheckBox
+        Left = 240
+        Top = 152
+        Width = 209
+        Height = 17
+        Hint = 
+          'Do not ident units in the uses block if the line starts with a c' +
+          'omma.'#13#10'Note: This disables Line Breaks after each unit uses list' +
+          '.'
+        Caption = 'Do not indent uses starting with ,'
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 6
       end
       object grp_ExtraIndentBefore: TGroupBox
         Left = 8
@@ -121,13 +135,13 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
     object ts_Spacing: TTabSheet
       Caption = 'Spacing'
       DesignSize = (
-        470
-        356)
+        454
+        267)
       object grid_Spacing: TStringGrid
         Left = 8
         Top = 8
-        Width = 453
-        Height = 338
+        Width = 437
+        Height = 250
         Anchors = [akLeft, akTop, akRight, akBottom]
         ColCount = 3
         DefaultColWidth = 100
@@ -328,8 +342,8 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
     object ts_Capitalization: TTabSheet
       Caption = 'Capitalization'
       DesignSize = (
-        470
-        356)
+        454
+        267)
       object l_Capitalize: TLabel
         Left = 16
         Top = 8
@@ -403,7 +417,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
           'Unchanged')
       end
       object b_EditCapitalization: TButton
-        Left = 392
+        Left = 376
         Top = 276
         Width = 75
         Height = 25
@@ -435,14 +449,14 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       object ed_CapitalizationFile: TEdit
         Left = 32
         Top = 326
-        Width = 354
+        Width = 338
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         Enabled = False
         TabOrder = 9
       end
       object b_CapitalizationSelect: TButton
-        Left = 392
+        Left = 376
         Top = 324
         Width = 75
         Height = 25
@@ -635,9 +649,6 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       ImageIndex = 6
       OnResize = ts_PreviewResize
       OnShow = ts_PreviewShow
-      DesignSize = (
-        470
-        356)
       object l_Before: TLabel
         Left = 0
         Top = 0
@@ -664,13 +675,13 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
   end
   object p_Botton: TPanel
     Left = 0
-    Top = 384
-    Width = 478
+    Top = 295
+    Width = 462
     Height = 41
     Align = alBottom
     TabOrder = 1
     DesignSize = (
-      478
+      462
       41)
     object b_Help: TButton
       Left = 8
@@ -682,7 +693,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       OnClick = b_HelpClick
     end
     object b_Ok: TButton
-      Left = 316
+      Left = 300
       Top = 8
       Width = 75
       Height = 25
@@ -693,7 +704,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       TabOrder = 2
     end
     object b_Cancel: TButton
-      Left = 396
+      Left = 380
       Top = 8
       Width = 75
       Height = 25
@@ -724,8 +735,8 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
     Top = 7
   end
   object pm_Extra: TPopupMenu
-    Left = 400
-    Top = 64
+    Left = 264
+    Top = 32
     object mi_ResetTo: TMenuItem
       Caption = 'Reset to'
       object mi_ResetToDefault: TMenuItem
@@ -745,21 +756,21 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
   object od_Import: TOpenDialog
     Filter = 'INI-Files (*.ini)|*.ini|all files (*.*)|*.*'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
-    Left = 176
-    Top = 376
+    Left = 168
+    Top = 248
   end
   object sd_Export: TSaveDialog
     Filter = 'INI-Files (*.ini)|*.ini|all files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofNoReadOnlyReturn, ofEnableSizing, ofDontAddToRecent]
-    Left = 256
-    Top = 376
+    Left = 248
+    Top = 248
   end
   object od_CapitalizationFile: TOpenDialog
     DefaultExt = 'txt'
     Filter = 'text files (*.txt)|*.txt|all files (*.*)|*.*'
     FilterIndex = 0
     Options = [ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Left = 352
-    Top = 320
+    Left = 344
+    Top = 200
   end
 end
