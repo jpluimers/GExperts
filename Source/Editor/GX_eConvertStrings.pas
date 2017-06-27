@@ -38,6 +38,9 @@ type
     b_PasteFromClipboard: TButton;
     b_ToSQL: TButton;
     b_ToTStrings: TButton;
+    chk_TrimLeft: TCheckBox;
+    chk_TrimRight: TCheckBox;
+    chk_Indent: TCheckBox;
     procedure chk_ExtractRawClick(Sender: TObject);
     procedure rg_ConvertTypeClick(Sender: TObject);
     procedure b_CopyToClipboardClick(Sender: TObject);
@@ -50,16 +53,20 @@ type
     procedure FormResize(Sender: TObject);
     procedure b_ToSQLClick(Sender: TObject);
     procedure b_ToTStringsClick(Sender: TObject);
+    procedure chk_TrimLeftClick(Sender: TObject);
+    procedure chk_TrimRightClick(Sender: TObject);
+    procedure chk_IndentClick(Sender: TObject);
   private
     FUpdating: Boolean;
     procedure SetData(_sl: TStrings);
     procedure ConvertStrings;
-    procedure ExtractRawStrings(_sl: TStrings; _AddBaseIndent: Boolean);
+    procedure ExtractRawStrings(_sl: TStrings; _AddBaseIndent, _TrimLeft, _TrimRight: Boolean);
     function DetermineIndent(_sl: TStrings): Integer;
-    procedure ConvertToCode(_sl: TStrings; _PasteAsType: TPasteAsType; _QuoteStrings: Boolean;
-      _AppendSpace: Boolean; const _Prefix: string);
+    procedure ConvertToCode(_sl: TStrings; _Indent: Boolean; _PasteAsType: TPasteAsType;
+      _QuoteStrings: Boolean; _AppendSpace: Boolean; const _Prefix: string);
     procedure LoadSettings;
     procedure SaveSettings;
+    procedure TrimStrings(_sl: TStrings; _TrimLeft, _TrimRight: Boolean);
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -140,6 +147,8 @@ begin
   cw := ClientWidth;
   x := (cw - rg_ConvertType.Width) div 2;
   chk_ExtractRaw.Left := x;
+  chk_TrimLeft.Left := x;
+  chk_TrimRight.Left := x;
   rg_ConvertType.Left := x;
   chk_QuoteStrings.Left := x;
   chk_AppendSpace.Left := x;
@@ -169,6 +178,8 @@ begin
     Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
     Settings.SaveForm('Window', Self);
     Settings.WriteBool('ExtractRaw', chk_ExtractRaw.Checked);
+    Settings.WriteBool('TrimLeft', chk_TrimLeft.Checked);
+    Settings.WriteBool('TrimRight', chk_TrimRight.Checked);
     Settings.WriteInteger('ConvertType', rg_ConvertType.ItemIndex);
     Settings.WriteBool('QuoteStrings', chk_QuoteStrings.Checked);
     Settings.WriteBool('AppendSpace', chk_AppendSpace.Checked);
@@ -231,6 +242,8 @@ begin
     Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
     Settings.LoadForm('Window', Self);
     chk_ExtractRaw.Checked := Settings.ReadBool('ExtractRaw', True);
+    chk_TrimLeft.Checked := Settings.ReadBool('TrimLeft', True);
+    chk_TrimRight.Checked := Settings.ReadBool('TrimRight', True);
     rg_ConvertType.ItemIndex := Settings.ReadInteger('ConvertType', Ord(paAdd));
     chk_QuoteStrings.Checked := Settings.ReadBool('QuoteStrings', True);
     chk_AppendSpace.Checked := Settings.ReadBool('AppendSpace', True);
@@ -255,7 +268,7 @@ begin
   end;
 end;
 
-procedure TfmEConvertStrings.ExtractRawStrings(_sl: TStrings; _AddBaseIndent: Boolean);
+procedure TfmEConvertStrings.ExtractRawStrings(_sl: TStrings; _AddBaseIndent, _TrimLeft, _TrimRight: Boolean);
 var
   i, FirstCharPos, FirstQuotePos, LastQuotePos: Integer;
   Line, BaseIndent: string;
@@ -268,7 +281,11 @@ begin
   BaseIndent := LeftStr(_sl[0], FirstCharPos - 1);
 
   for i := 0 to _sl.Count - 1 do begin
-    Line := Trim(Copy(_sl[i], FirstCharPos, MaxInt));
+    Line := Copy(_sl[i], FirstCharPos, MaxInt);
+    if _TrimLeft then
+      Line := TrimLeft(Line);
+    if _TrimRight then
+      Line := TrimRight(Line);
 
     FirstQuotePos := GetFirstCharPos(Line, [SINGLE_QUOTE], True);
     LastQuotePos := GetLastCharPos(Line, [SINGLE_QUOTE], True);
@@ -283,13 +300,16 @@ begin
   end;
 end;
 
-procedure TfmEConvertStrings.ConvertToCode(_sl: TStrings; _PasteAsType: TPasteAsType; _QuoteStrings: Boolean;
-  _AppendSpace: Boolean; const _Prefix: string);
+procedure TfmEConvertStrings.ConvertToCode(_sl: TStrings; _Indent: Boolean; _PasteAsType: TPasteAsType;
+  _QuoteStrings: Boolean; _AppendSpace: Boolean; const _Prefix: string);
 var
   i, FirstCharPos: Integer;
   ALine, BaseIndent, ALineStart, ALineEnd, ALineStartBase, AAddDot: string;
 begin
-  FirstCharPos := DetermineIndent(_sl);
+  if _Indent then
+    FirstCharPos := DetermineIndent(_sl)
+  else
+    FirstCharPos := 1;
   // this works, because FirstCharPos is the smallest Indent for all lines
   BaseIndent := LeftStr(_sl[0], FirstCharPos - 1);
 
@@ -328,6 +348,29 @@ begin
   end;
 end;
 
+procedure TfmEConvertStrings.TrimStrings(_sl: TStrings; _TrimLeft, _TrimRight: Boolean);
+var
+  i: Integer;
+  s: string;
+begin
+  if not _TrimLeft and not _TrimRight then
+    Exit; //==>
+
+  for i := 0 to _sl.Count - 1 do begin
+    s := _sl[i];
+    if _TrimLeft then begin
+      if _TrimRight then
+        s := Trim(s)
+      else
+        s := TrimLeft(s);
+    end else begin
+      if _TrimRight then
+        s := TrimRight(s);
+    end;
+    _sl[i] := s;
+  end;
+end;
+
 procedure TfmEConvertStrings.ConvertStrings;
 var
   sl: TStrings;
@@ -346,9 +389,11 @@ begin
 
     sl.Assign(m_Input.Lines);
     if chk_ExtractRaw.Checked then
-      ExtractRawStrings(sl, True);
+      ExtractRawStrings(sl, chk_Indent.Checked, chk_TrimLeft.Checked, chk_TrimRight.Checked)
+    else
+      TrimStrings(sl, chk_TrimLeft.Checked, chk_TrimRight.Checked);
     if sl.Count > 0 then begin
-      ConvertToCode(sl, PasteAsType, QuoteStrings, AppendSpace, ed_Prefix.Text);
+      ConvertToCode(sl, chk_Indent.Checked, PasteAsType, QuoteStrings, AppendSpace, ed_Prefix.Text);
     end;
     m_Output.Lines.Assign(sl);
   finally
@@ -381,7 +426,22 @@ begin
   ConvertStrings;
 end;
 
+procedure TfmEConvertStrings.chk_IndentClick(Sender: TObject);
+begin
+  ConvertStrings;
+end;
+
 procedure TfmEConvertStrings.chk_QuoteStringsClick(Sender: TObject);
+begin
+  ConvertStrings;
+end;
+
+procedure TfmEConvertStrings.chk_TrimLeftClick(Sender: TObject);
+begin
+  ConvertStrings;
+end;
+
+procedure TfmEConvertStrings.chk_TrimRightClick(Sender: TObject);
 begin
   ConvertStrings;
 end;
