@@ -295,6 +295,8 @@ procedure TGrepExpert.ShowStandAlone(const _Directory: string);
 begin
   AddMRUString(_Directory, FDirList, True);
   fmGrepResults.Execute(gssNormal);
+  fmGrepResults.Hide;
+  fmGrepResults.ShowModal;
 end;
 
 procedure TGrepExpert.Configure;
