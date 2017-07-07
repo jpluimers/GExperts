@@ -250,14 +250,18 @@ begin
 end;
 
 procedure TBuildEventsEnhancer.InitProjectOptions(_Form: TForm);
-{$IFDEF INCREASE_MEMO_HEIGHT}
 var
   Cmp: TComponent;
+{$IFDEF INCREASE_MEMO_HEIGHT}
   pPreBuild: TPanel;
   pPostBuild: TPanel;
   pPreLink: TPanel;
 {$ENDIF INCREASE_MEMO_HEIGHT}
 begin
+  if TComponent_FindComponent(_Form, 'GX' + 'bEditPreBuild', True, Cmp) then begin
+    // do it only once
+    Exit;
+  end;
   InitBuildEvent(_Form, 'bEditPreBuild', 'mPreBuildCommands');
   InitBuildEvent(_Form, 'bEditPostBuild', 'mPostBuildCommands');
   InitBuildEvent(_Form, 'bEditPreLink', 'mPreLinkCommands');
