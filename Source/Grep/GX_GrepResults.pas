@@ -451,7 +451,7 @@ begin
   CurrentGetTickCount := GetTickCount;
   if CurrentGetTickCount <> FLastRepaintTick then
   begin
-    Application.ProcessMessages;
+    Application.ProcessMessages; // not exactly multi-threading, but fine enough on most systems
     FLastRepaintTick := CurrentGetTickCount;
   end;
 end;
@@ -1971,6 +1971,9 @@ procedure TfmGrepResults.ViewHistoryListItems(AIndex: Integer; AUsedExpandState:
 var
   AHistoryItem: TGrepHistoryListItem;
 begin
+  if FSearchInProgress then
+    Exit; // prevent race condition where painting and search both write to `lbResults.Items`
+
   ClearResultsData;
   SetSavedHistoryIndexes(AIndex);
   if AIndex <> -1 then

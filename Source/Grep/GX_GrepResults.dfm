@@ -217,7 +217,7 @@ inherited fmGrepResults: TfmGrepResults
       Width = 623
       Height = 88
       Align = alBottom
-      Font.Charset = EASTEUROPE_CHARSET
+      Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
       Font.Name = 'Tahoma'
