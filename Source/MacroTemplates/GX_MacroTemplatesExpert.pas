@@ -308,7 +308,7 @@ begin
     InsertOff := AInsertOffset;
     if CodeLen > 0 then
       GxOtaDeleteTextFromPos(ATemplateOffset, CodeLen);
-    GxOtaInsertTextIntoEditorAtCharPos(ATemplateCode, InsertOff);
+    GxOtaInsertTextIntoEditorAtBufferPos(ATemplateCode, InsertOff);
   end;
 end;
 
@@ -639,8 +639,8 @@ var
   CursorPos: TOTAEditPos;
   TemplateContainsPipe: Boolean;
 begin
-  // Retrieve the template from the editor window
-  GxOtaGetCurrentIdentEx(TemplateName, CodeOffset, InsertPos, CurrentPos, AfterLen);
+  // Retrieve the template name from the editor window
+  GxOtaGetCurrentIdentEx(TemplateName, CodeOffset, InsertPos, CurrentPos, AfterLen, True);
 
   // CodeOffset: Offset of the identifier in the character stream (Integer)
   // InsertPos:  Position where the identifier starts (line/col, 1-based)
