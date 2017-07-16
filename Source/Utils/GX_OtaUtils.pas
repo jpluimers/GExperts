@@ -370,6 +370,9 @@ function GxOtaCompareEditPos(AEditPos1, AEditPos2: TOTAEditPos): Integer;
 // Select a range of text in the source editor
 procedure GxOtaSelectBlock(const Editor: IOTASourceEditor; const Start, After: TOTACharPos); overload;
 procedure GxOtaSelectBlock(const Editor: IOTASourceEditor; Start, After: TOTAEditPos); overload;
+///<summary>
+/// Gets the currently selected block
+/// @param SelStart and SelLength are byte offsets (not character offsets) </summary>
 function GxOtaGetSelection(const EditView: IOTAEditView;
   var BlockStart, BlockEnd: TOTAEditPos; var SelStart, SelLength: Integer): Boolean;
 
@@ -1709,10 +1712,12 @@ begin
   P:= PAnsiChar(S);
   while (Result < Length(S)) and (Index > 0) do begin
     Inc(Result);
-    if Ord(P^) and $C0 <> $80 then Dec(Index);
+    if Ord(P^) and $C0 <> $80 then
+      Dec(Index);
     Inc(P);
   end;
-  if Index <> 0 then Result:= 0;  // char index not found
+  if Index <> 0 then
+    Result:= 0;  // char index not found
 end;
 
 function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; ByteBased: Boolean): string;
@@ -1743,8 +1748,10 @@ function GxOtaGetCurrentLineData(var StartOffset, ColumnNo, LineNo: Integer; Byt
       EditView.ConvertPos(True, EditPos, CharPos);
       CursorLine := CharPos.Line;
       CursorPosition := EditView.CharPosToPos(CharPos);
-      IdeString := ConvertToIDEEditorString(Result);
-      CursorPosition := UTF8PosToCharIndex(IdeString, CursorPosition);
+      if not ByteBased then begin
+        IdeString := ConvertToIDEEditorString(Result);
+        CursorPosition := UTF8PosToCharIndex(IdeString, CursorPosition);
+      end;
     end;
   end;
 
