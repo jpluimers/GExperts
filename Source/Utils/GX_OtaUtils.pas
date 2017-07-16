@@ -1646,6 +1646,7 @@ var
   IEditView: IOTAEditView;
   IEditReader: IOTAEditReader;
   BlockSelText: string;
+  HasSelection: Boolean;
 begin
   Assert(Stream <> nil);
 
@@ -1659,17 +1660,28 @@ begin
     IEditView := GxOtaGetTopMostEditView(ISourceEditor);
     Assert(IEditView <> nil);
 
-    if (IEditView.Block.Size > 0) and UseSelection then
-    begin
-      BlockSelText := IDEEditorStringToString(IEditView.Block.Text);
-      Stream.WriteBuffer(PAnsiChar(ConvertToIDEEditorString(BlockSelText))^, Length(BlockSelText) + SizeOf(Byte(0)));
-      Result := True;
-    end
-    else
-    begin
+    HasSelection := (IEditView.Block.Size > 0);
+    if HasSelection then begin
+      if UseSelection then begin
+        BlockSelText := IDEEditorStringToString(IEditView.Block.Text);
+        Stream.WriteBuffer(PAnsiChar(ConvertToIDEEditorString(BlockSelText))^, Length(BlockSelText) + SizeOf(Byte(0)));
+        Result := True;
+      end else begin
+        // this is a workaround for an apparent bug in Delphi 7:
+        // If a selection is active, IEditReader.GetText generates an Access Violation,
+        // so we save the block, reset it and restore it after reading the text
+        // This shouldn't cause problems for any other Delphi versions.
+        IEditView.Block.Save;
+        IEditView.Block.Reset;
+      end;
+    end;
+    if not UseSelection or not HasSelection then begin
       IEditReader := ISourceEditor.CreateReader;
       GxOtaSaveReaderToStream(IEditReader, Stream);
       Result := False;
+    end;
+    if HasSelection then begin
+      IEditView.Block.Restore;
     end;
   end;
 end;
@@ -3921,12 +3933,12 @@ var
   EditReaderPos: Integer;
   ReadDataSize: Integer;
   Buffer: array[0..EditReaderBufferSize] of AnsiChar; // Array of bytes, might be UTF-8
-begin
+  begin
   Assert(EditReader <> nil);
   Assert(Stream <> nil);
 
   EditReaderPos := 0;
-  ReadDataSize := EditReader.GetText(EditReaderPos, Buffer, EditReaderBufferSize);
+  ReadDataSize := EditReader.GetText(EditReaderPos, @Buffer[0], EditReaderBufferSize);
   Inc(EditReaderPos, ReadDataSize);
   while ReadDataSize = EditReaderBufferSize do
   begin
