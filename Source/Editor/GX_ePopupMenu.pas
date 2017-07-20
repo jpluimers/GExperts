@@ -72,7 +72,8 @@ uses
   GX_EditorExpertManager,
   GX_Experts,
   GX_MessageBox,
-  GX_OtaUtils;
+  GX_OtaUtils,
+  GX_MenusForEditorExpert;
 
 type
   TGxEditorPopupMenuExpert = class(TEditorExpert)
@@ -109,7 +110,7 @@ begin
   try
     frm.SetData(FShortcuts, FForceEditorActive);
     frm.Height := FFormHeight;
-    if frm.ShowModal <> mrok then
+    if frm.ShowModal <> mrOk then
       Exit;
     frm.GetData(FShortcuts, FForceEditorActive);
     FFormHeight := frm.Height;
@@ -177,8 +178,13 @@ begin
           Expert.Execute);
       end else if GExpertsInst.FindExpert(ExpName, idx) then begin
         Expert := GExpertsInst.ExpertList[idx];
-        TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
-          Expert.Execute);
+        if Expert is TGxMenusForEditorExperts then begin
+          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
+            TGxMenusForEditorExperts(Expert).ShowPopup);
+        end else begin
+          TPopupMenu_AppendMenuItem(FGExpertsShortcutMenu, '&' + Key + ' ' + Expert.GetDisplayName,
+            Expert.Execute);
+        end;
       end;
     end;
   end;
@@ -410,7 +416,7 @@ begin
     for i := 1 to sl.Count - 1 do
       if sl.Names[i] = sl.Names[i - 1] then begin
         DupeFound := True;
-        break;
+        Break;
       end;
     l_DuplicateShortcuts.Visible := DupeFound;
   finally
@@ -433,7 +439,7 @@ begin
   for i := 0 to _ListView.Items.Count - 1 do begin
     if _ListView.Items[i].Data = _Expert then begin
       Result := i;
-      break;
+      Break;
     end;
   end;
 end;

@@ -20,6 +20,7 @@ type
     function HasSubmenuItems: Boolean; override;
     procedure CreateSubMenuItems(MenuItem: TMenuItem); override;
     procedure Execute(Sender: TObject); override;
+    procedure ShowPopup(Sender: TObject);
   end;
 
 implementation
@@ -54,8 +55,6 @@ end;
 
 procedure TGxMenusForEditorExperts.Execute(Sender: TObject);
 var
-  MousePosition: TPoint;
-  APopupMenu: TPopupMenu;
   IsToolButton: Boolean;
 begin
   IsToolButton := Assigned(Sender) and (Sender is TCustomAction) and ((Sender as TCustomAction).ActionComponent is TToolButton);
@@ -64,13 +63,22 @@ begin
     // The submenu items perform all actions
   end
   else begin
-    MousePosition := Mouse.CursorPos;
-    APopupMenu := GetInternalPopupMenu;
-    Assert(Assigned(APopupMenu));
-    PopulatePopupMenu(APopupMenu);
-    APopupMenu.Popup(MousePosition.x, MousePosition.y);
+    ShowPopup(Sender);
   end;
 end;
+
+procedure TGxMenusForEditorExperts.ShowPopup(Sender: TObject);
+var
+  MousePosition: TPoint;
+  APopupMenu: TPopupMenu;
+begin
+  MousePosition := Mouse.CursorPos;
+  APopupMenu := GetInternalPopupMenu;
+  Assert(Assigned(APopupMenu));
+  PopulatePopupMenu(APopupMenu);
+  APopupMenu.Popup(MousePosition.x, MousePosition.y);
+end;
+
 
 // Note: Partially duplicated below
 procedure TGxMenusForEditorExperts.CreateSubMenuItems(MenuItem: TMenuItem);
