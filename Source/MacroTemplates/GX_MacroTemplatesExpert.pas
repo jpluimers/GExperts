@@ -628,9 +628,9 @@ var
   TemplateText: string;
   TemplateIdx: Integer;
   InsertOffset: Integer;
-  CodeOffset: Integer;
+  IdentOffset: Integer;
   AfterLen: Integer;
-  InsertPos, CurrentPos: TOTAEditPos; // In characters
+  InsertPos, IdentPos, CaretPos: TOTAEditPos; // In characters
   NewCursorPos: TOTAEditPos; // Standard cursor position
   CharPos: TOTACharPos;
   TemplateObject: TMacroObject;
@@ -638,13 +638,17 @@ var
   CodeForced, CodeInEditor: Boolean;
   CursorPos: TOTAEditPos;
   TemplateContainsPipe: Boolean;
+  BlockStart: TOTAEditPos;
+  BlockEnd: TOTAEditPos;
+  SelStart: Integer;
+  SelLength: Integer;
 begin
   // Retrieve the template name from the editor window
-  GxOtaGetCurrentIdentEx(TemplateName, CodeOffset, InsertPos, CurrentPos, AfterLen, True);
+  GxOtaGetCurrentIdentEx(TemplateName, IdentOffset, IdentPos, CaretPos, AfterLen, True);
 
-  // CodeOffset: Offset of the identifier in the character stream (Integer)
-  // InsertPos:  Position where the identifier starts (line/col, 1-based)
-  // CurrentPos: Current caret position (line/col)
+  // IdentOffset: Offset of the identifier in the character stream (Integer)
+  // IdentPos:  Position where the identifier starts (line/col, 1-based)
+  // CaretPos: Current caret position (line/col)
   // AfterLen:   Length of the part of the identifier that is after cursor
 
   // AForcedCode is set when a macro's shortcut is pressed or when the space expand
@@ -659,12 +663,20 @@ begin
     CodeForced := False;
   // TODO 3 -oAnyone -cBug: Fix when pressing Shift+Alt+T or the template's shortcut with a non-template identifier under the cursor, but choosing another template to insert inserts the text before the identifier
 
+// If cond. define ForceTestTemplate is set, the template with the name "test" is automatically selected
+// so debugging is more convenient.
+{.$DEFINE ForceTestTemplate}
+{$IFDEF ForceTestTemplate}
+  TemplateIdx := GetTemplate('test', false);
+{$ELSE}
   // Locate the named template, or prompt for one if it does not exist
   TemplateIdx := GetTemplate(TemplateName, not CodeForced);
+{$ENDIF}
   if TemplateIdx < 0 then
     Exit
   else
   begin
+
     // todo: Figure out how to make this work without messing up offsets with multi-line selections
     //if not StrContains('%SELECTION%', TemplateText) then
     //  GxOtaDeleteSelection;
@@ -679,7 +691,7 @@ begin
     // Insert the macro into the editor
     if TemplateText <> '' then
     begin
-      CodeInEditor := (CurrentPos.Col + 1 <> InsertPos.Col) and (not CodeForced);
+      CodeInEditor := (CaretPos.Col + 1 <> IdentPos.Col) and (not CodeForced);
 
       if CodeForced and (TemplateObject.InsertPos = tipCursorPos) then
       begin
@@ -690,17 +702,24 @@ begin
         //InsertPos.Col := InsertPos.Col + 1;
       end;
 
-      InsertOffset := CodeOffset;
+      if GxOtaGetSelection(nil, BlockStart, BlockEnd, SelStart, SelLength) and (SelLength > 0) then begin
+        InsertOffset := SelStart;
+        InsertPos := BlockStart;
+      end else begin
+        InsertOffset := IdentOffset;
+        InsertPos := IdentPos;
+      end;
       // This does nothing for tipCursorPos:
       CalculateInsertPos(TemplateObject.InsertPos, InsertOffset, InsertPos);
       // Expand the macros in the template text, embed/delete selection, etc.
-      PrepareTemplateText(TemplateText, CurrentPos, AfterLen, InsertOffset, InsertPos);
+      PrepareTemplateText(TemplateText, CaretPos, AfterLen, InsertOffset, InsertPos);
 
       if TemplateObject.InsertPos = tipCursorPos then
       begin
         InsertWhiteCnt := InsertPos.Col - 1; // insert pos is one-based
-        if InsertWhiteCnt > 0 then
-          TemplateText := AddLeadingSpaces(TemplateText, InsertWhiteCnt, InsertPos.Col)
+        if InsertWhiteCnt > 0 then begin
+          TemplateText := AddLeadingSpaces(TemplateText, InsertWhiteCnt, InsertPos.Col);
+        end
         else
         begin
           if CodeInEditor then
@@ -716,15 +735,15 @@ begin
       PrepareNewCursorPos(TemplateText, InsertPos, NewCursorPos, TemplateContainsPipe);
 
       if CodeForced or (not SameText(TemplateName, TemplateObject.Name)) then
-        InsertTemplateIntoEditor('', TemplateText, CodeOffset, InsertOffset)
+        InsertTemplateIntoEditor('', TemplateText, IdentOffset, InsertOffset)
       else
-        InsertTemplateIntoEditor(TemplateName, TemplateText, CodeOffset, InsertOffset);
+        InsertTemplateIntoEditor(TemplateName, TemplateText, IdentOffset, InsertOffset);
 
       CharPos.CharIndex := NewCursorPos.Col - 1;
       CharPos.Line := NewCursorPos.Line;
 
-      CurrentPos := CharPosToEditPos(CharPos);
-      SetNewCursorPos(CurrentPos);
+      CaretPos := CharPosToEditPos(CharPos);
+      SetNewCursorPos(CaretPos);
       AddUsesToUnit(TemplateObject);
     end;
   end;
