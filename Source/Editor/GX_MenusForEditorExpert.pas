@@ -27,7 +27,7 @@ implementation
 uses
   SysUtils, Windows, Controls,
   GX_GExperts, GX_OtaUtils, GX_ActionBroker, GX_IdeUtils,
-  GX_EditorExpert, GX_EditorExpertManager, ComCtrls;
+  GX_EditorExpert, GX_EditorExpertManager, ComCtrls, Forms;
 
 var
   InternalPopupMenu: TPopupMenu;
@@ -186,6 +186,11 @@ function TGxMenusForEditorExperts.SupportsSubmenu: Boolean;
 begin
   // The Delphi 7- IDEs seem to clear out the submenu item shortcuts
   Result := RunningDelphi8OrGreater;
+  if Result then begin
+    // on small screens the sub menu cannot be displayed properly
+    Result := Assigned(Screen.ActiveForm)  and Assigned(Screen.ActiveForm.Monitor)
+      and (Screen.ActiveForm.Monitor.Height >= 1024);
+  end;
 end;
 
 procedure TGxMenusForEditorExperts.UpdateAction(Action: TCustomAction);
