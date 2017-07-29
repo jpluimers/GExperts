@@ -644,7 +644,15 @@ var
   SelLength: Integer;
 begin
   // Retrieve the template name from the editor window
-  GxOtaGetCurrentIdentEx(TemplateName, IdentOffset, IdentPos, CaretPos, AfterLen, True);
+  if GxOtaGetSelection(nil, BlockStart, BlockEnd, SelStart, SelLength) and (SelLength > 0) then begin
+    IdentOffset := SelStart;
+    IdentPos := BlockStart;
+    AfterLen := 0;
+    GxOtaGetActiveEditorTextAsString(TemplateName, True);
+    CursorPos := GxOtaGetCurrentEditPos();
+  end else begin
+    GxOtaGetCurrentIdentEx(TemplateName, IdentOffset, IdentPos, CaretPos, AfterLen, True);
+  end;
 
   // IdentOffset: Offset of the identifier in the character stream (Integer)
   // IdentPos:  Position where the identifier starts (line/col, 1-based)
