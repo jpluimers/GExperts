@@ -298,7 +298,7 @@ begin
   if ATemplateOffset = AInsertOffset then
   begin
     InsertOff := AInsertOffset + CodeLen;
-    GxOtaInsertTextIntoEditorAtCharPos(ATemplateCode, InsertOff);
+    GxOtaInsertTextIntoEditorAtBufferPos(ATemplateCode, InsertOff);
     // Delete template code (done after the insert to avoid problems)
     if CodeLen > 0 then
       GxOtaDeleteTextFromPos(ATemplateOffset, CodeLen);
@@ -667,7 +667,7 @@ begin
 // so debugging is more convenient.
 {.$DEFINE ForceTestTemplate}
 {$IFDEF ForceTestTemplate}
-  TemplateIdx := GetTemplate('test', false);
+  TemplateIdx := GetTemplate('testmacro', false);
 {$ELSE}
   // Locate the named template, or prompt for one if it does not exist
   TemplateIdx := GetTemplate(TemplateName, not CodeForced);
