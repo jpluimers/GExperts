@@ -4196,8 +4196,8 @@ begin
   Buffer := GxOtaReadEditorTextToString(GxOtaGetEditReaderForSourceEditor(SourceEditor));
   IdeString := ConvertToIDEEditorString(Buffer);
   UTF8Pos := CharIndexToUTF8Pos(IdeString, Position);
-  EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
   IdeString :=  ConvertToIDEEditorString(Text);
+  EditWriter := GxOtaGetEditWriterForSourceEditor(SourceEditor);
   EditWriter.CopyTo(UTF8Pos);
   EditWriter.Insert(PAnsiChar(IdeString));
 end;
