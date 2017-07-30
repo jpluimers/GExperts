@@ -7,7 +7,7 @@ interface
 uses
   Windows, Classes, Graphics, Controls, Forms, Dialogs, Menus,
   StdCtrls, ComCtrls, ExtCtrls, GX_EditorExpert, GX_BaseForm, 
-  GX_ConfigureExperts;
+  GX_ConfigureExperts, GX_ConfigureFormEnhancements;
 
 type
   TfmConfiguration = class(TfmBaseForm)
@@ -108,6 +108,7 @@ type
     chkEnhanceBuildEventsDialog: TCheckBox;
     chkEnhanceApplicationSettingsDialog: TCheckBox;
     lblHideNavBar: TLabel;
+    tshFormEnhancements: TTabSheet;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -142,6 +143,7 @@ type
     FCPFont: TFont;
     FConfigEditorExpertsFrame: TfrConfigureExperts;
     FConfigExpertsFrame: TfrConfigureExperts;
+    FConfigFormEnhancementsFrame: TfrConfigureFormEnhancements;
     procedure HideUnsupportedIdeItems;
     procedure HideUnsupportedEditorItems;
 
@@ -199,11 +201,10 @@ constructor TfmConfiguration.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  Width := 629;
+  Width := 640;
   Height := 569;
 
-  Constraints.MinWidth := Self.Width;
-  Constraints.MinHeight := Self.Height;
+  TControl_SetMinConstraints(Self);
 
   FOIFont := TFont.Create;
   FCPFont := TFont.Create;
@@ -234,6 +235,11 @@ begin
   FConfigExpertsFrame.Parent := tshExperts;
   FConfigExpertsFrame.Align := alClient;
   FConfigExpertsFrame.Init(GExpertsInst.GetExpertList);
+
+  FConfigFormEnhancementsFrame := TfrConfigureFormEnhancements.Create(Self);
+  FConfigFormEnhancementsFrame.Parent := tshFormEnhancements;
+  FConfigFormEnhancementsFrame.Align := alClient;
+  FConfigFormEnhancementsFrame.InitGrid;
 
   ActiveControl := FConfigExpertsFrame.edtFilter;
 
@@ -339,6 +345,7 @@ begin
     FConfigExpertsFrame.SaveExperts;
     FConfigEditorExpertsFrame.SaveExperts;
     SaveIdeEnhancements;
+    FConfigFormEnhancementsFrame.ApplyGrid;
     SaveEditorEnhancements;
     ConfigInfo.SaveSettings;
     GXMenuActionManager.ArrangeMenuItems;

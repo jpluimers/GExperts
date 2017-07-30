@@ -1,7 +1,7 @@
 object fmConfiguration: TfmConfiguration
   Left = 411
   Top = 164
-  Width = 629
+  Width = 640
   Height = 569
   BorderIcons = [biSystemMenu]
   Caption = 'GExperts Configuration'
@@ -51,8 +51,8 @@ object fmConfiguration: TfmConfiguration
         object pnlGeneral: TPanel
           Left = 0
           Top = 0
-          Width = 599
-          Height = 461
+          Width = 591
+          Height = 453
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 8
@@ -60,13 +60,13 @@ object fmConfiguration: TfmConfiguration
           object gbxLocations: TGroupBox
             Left = 8
             Top = 8
-            Width = 583
+            Width = 575
             Height = 169
             Align = alTop
             Caption = 'File Locations'
             TabOrder = 0
             DesignSize = (
-              583
+              575
               169)
             object lblVCL: TLabel
               Left = 12
@@ -93,7 +93,7 @@ object fmConfiguration: TfmConfiguration
               FocusControl = edHelpFile
             end
             object sbVCLDir: TButton
-              Left = 550
+              Left = 542
               Top = 40
               Width = 21
               Height = 21
@@ -103,7 +103,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbVCLDirClick
             end
             object sbConfigDir: TButton
-              Left = 550
+              Left = 542
               Top = 88
               Width = 21
               Height = 21
@@ -113,7 +113,7 @@ object fmConfiguration: TfmConfiguration
               OnClick = sbConfigDirClick
             end
             object sbHelpFile: TButton
-              Left = 550
+              Left = 542
               Top = 136
               Width = 21
               Height = 21
@@ -125,7 +125,7 @@ object fmConfiguration: TfmConfiguration
             object edVCLPath: TEdit
               Left = 12
               Top = 40
-              Width = 533
+              Width = 525
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 0
@@ -133,7 +133,7 @@ object fmConfiguration: TfmConfiguration
             object edConfigPath: TEdit
               Left = 12
               Top = 88
-              Width = 533
+              Width = 525
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 2
@@ -141,7 +141,7 @@ object fmConfiguration: TfmConfiguration
             object edHelpFile: TEdit
               Left = 12
               Top = 136
-              Width = 525
+              Width = 517
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 4
@@ -150,7 +150,7 @@ object fmConfiguration: TfmConfiguration
           object gbxCustomFont: TGroupBox
             Left = 8
             Top = 183
-            Width = 583
+            Width = 575
             Height = 65
             Align = alTop
             Caption = 'User Interface'
@@ -176,7 +176,7 @@ object fmConfiguration: TfmConfiguration
           object pnlGeneralSpacer: TPanel
             Left = 8
             Top = 177
-            Width = 583
+            Width = 575
             Height = 6
             Align = alTop
             BevelOuter = bvNone
@@ -560,12 +560,15 @@ object fmConfiguration: TfmConfiguration
           TabOrder = 2
         end
       end
+      object tshFormEnhancements: TTabSheet
+        Caption = 'Forms'
+      end
       object tshSuppressedMessages: TTabSheet
         Caption = 'Suppressed Messages'
         ImageIndex = 6
         DesignSize = (
-          599
-          461)
+          591
+          453)
         object gbSuppressedMessages: TGroupBox
           Left = 8
           Top = 8
@@ -749,7 +752,6 @@ object fmConfiguration: TfmConfiguration
             Max = 1000
             Position = 1
             TabOrder = 2
-            Wrap = False
           end
         end
         object btnEditView: TButton
@@ -766,15 +768,15 @@ object fmConfiguration: TfmConfiguration
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 504
-    Width = 621
+    Top = 496
+    Width = 613
     Height = 34
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 334
+      Left = 326
       Top = 0
       Width = 287
       Height = 34
