@@ -41,7 +41,7 @@ type
     function FormFixes: string; virtual;
     ///<summary>
     /// @returns A string describing the enhancements (in addition to the default position and
-    ///          sizing enhancements) this class applis to the managed form. May be multi line. </summary>
+    ///          sizing enhancements) this class applies to the managed form. May be multi line. </summary>
     function FormEnhancements: string; virtual;
     ///<summary>
     /// @returns a set of TStandardFormChanges supported by this class </summary>
@@ -54,7 +54,7 @@ type
     function HasBeenHandled(_Form: TCustomForm): Boolean;
     ///<summary>
     /// Called when the form for which IsDesiredForm returned true becomes the current form.
-    /// Note: It's possible that the form has already been changed, so check this first! </summary>
+    /// Note: It is possible that the form has already been changed, so check this first! </summary>
     procedure Execute(_Form: TCustomForm);
     ///<summary>
     /// The subset of SupportedChanges that are enabled </summary>
