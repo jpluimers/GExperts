@@ -225,7 +225,8 @@ uses
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
   GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas',
-  GX_IdeManagedFormHandler in '..\..\Source\IDE\GX_IdeManagedFormHandler.pas';
+  GX_IdeManagedFormHandler in '..\..\Source\IDE\GX_IdeManagedFormHandler.pas',
+  GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame};
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res}
