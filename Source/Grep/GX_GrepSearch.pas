@@ -716,9 +716,7 @@ end;
 
 procedure TfmGrepSearch.FormShow(Sender: TObject);
 begin
-  Constraints.MaxHeight := Height;
-  Constraints.MinHeight := Height;
-  Constraints.MinWidth := Width;
+  TControl_SetMinConstraints(Self, True);
 end;
 
 procedure TfmGrepSearch.ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

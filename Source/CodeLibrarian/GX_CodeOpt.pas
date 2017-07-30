@@ -68,9 +68,7 @@ constructor TfmCodeOptions.Create(_Owner: TComponent);
 begin
   inherited;
 
-  TControl_SetMinConstraints(Self);
-  Constraints.MaxHeight := Height;
-
+  TControl_SetMinConstraints(Self, True);
   TWinControl_ActivateDropFiles(edPath, edPathOnFilesDropped);
   TEdit_ActivateAutoComplete(edPath, [acsFileSystem], [actSuggest]);
 end;

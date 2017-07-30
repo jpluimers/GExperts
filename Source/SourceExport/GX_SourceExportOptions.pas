@@ -49,7 +49,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, SynEditHighlighter, SynUnicode, GX_SynMemoUtils, GX_VerDepConst, GX_GenericUtils,
-  GX_IdeUtils;
+  GX_IdeUtils, GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -95,8 +95,7 @@ begin
     btnLoadIde.Enabled := False;
 
   BorderStyle := bsSizeable;
-  Constraints.MinHeight := Height;
-  Constraints.MinWidth := Width;
+  TControl_SetMinConstraints(Self);
 
   btnLoadIdeClick(Sender);
   for i := 0 to FSampleEditor.Highlighter.AttrCount - 1 do
