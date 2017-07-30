@@ -1,8 +1,8 @@
 Windows Registry Editor Version 5.00
 
-[HKEY_CLASSES_ROOT\Folder\shell\WindowsDefender]
-"Icon"="D:\\source\\_SourceForge\\GExperts\\Binaries\\GExpertsGrep.exe"
+[HKEY_CLASSES_ROOT\Folder\shell\GExpertsGrep]
+"Icon"="c:\\source\\_SourceForge\\GExperts\\Binaries\\GExpertsGrep.exe"
 "MUIVerb"="GExperts Grep"
 
-[HKEY_CLASSES_ROOT\Folder\shell\WindowsDefender\Command]
-@="\"D:\\source\\_SourceForge\\GExperts\\Binaries\\GExpertsGrep.exe\" %1"
+[HKEY_CLASSES_ROOT\Folder\shell\GExpertsGrep\Command]
+@="\"c:\\source\\_SourceForge\\GExperts\\Binaries\\GExpertsGrep.exe\" %1"
