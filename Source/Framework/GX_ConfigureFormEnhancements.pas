@@ -170,6 +170,7 @@ constructor TfrConfigureFormEnhancements.Create(_Owner: TComponent);
 begin
   inherited;
   sg_IdeEnhancements.OnGetCellHint := sg_IdeEnhancementsGetCellHint;
+  TControl_SetMinConstraints(Self);
 end;
 
 procedure TfrConfigureFormEnhancements.FrameResize(Sender: TObject);

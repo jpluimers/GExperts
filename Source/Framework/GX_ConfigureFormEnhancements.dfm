@@ -1,14 +1,14 @@
 object frConfigureFormEnhancements: TfrConfigureFormEnhancements
   Left = 0
   Top = 0
-  Width = 654
+  Width = 808
   Height = 467
   TabOrder = 0
   OnResize = FrameResize
   object sg_IdeEnhancements: TStringGrid
     Left = 0
     Top = 0
-    Width = 654
+    Width = 808
     Height = 467
     Align = alClient
     DefaultColWidth = 50

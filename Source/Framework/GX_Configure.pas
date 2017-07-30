@@ -198,13 +198,26 @@ end;
 // **************************************************************
 
 constructor TfmConfiguration.Create(AOwner: TComponent);
+var
+  MinWidth: Integer;
+  MinHeight: Integer;
+
+  procedure AdjustMinSize(_ctrl: TControl);
+  begin
+    if _ctrl.Constraints.MinWidth > MinWidth then
+      MinWidth := _ctrl.Constraints.MinWidth;
+    if _ctrl.Constraints.MinHeight > MinHeight then
+      MinHeight := _ctrl.Constraints.MinHeight;
+  end;
+
 begin
   inherited Create(AOwner);
 
   Width := 640;
   Height := 569;
 
-  TControl_SetMinConstraints(Self);
+  MinWidth := pcConfig.ClientWidth;
+  MinHeight := pcConfig.ClientHeight;
 
   FOIFont := TFont.Create;
   FCPFont := TFont.Create;
@@ -227,6 +240,7 @@ begin
   FConfigEditorExpertsFrame.Name := '';
   FConfigEditorExpertsFrame.Parent := tshEditorExperts;
   FConfigEditorExpertsFrame.Align := alClient;
+  AdjustMinSize(FConfigEditorExpertsFrame);
   { TODO : Sort expert and editor expert lists by caption }
   FConfigEditorExpertsFrame.Init(GExpertsInst.EditorExpertManager.GetExpertList);
 
@@ -234,14 +248,20 @@ begin
   FConfigExpertsFrame.Name := '';
   FConfigExpertsFrame.Parent := tshExperts;
   FConfigExpertsFrame.Align := alClient;
+  AdjustMinSize(FConfigExpertsFrame);
   FConfigExpertsFrame.Init(GExpertsInst.GetExpertList);
 
   FConfigFormEnhancementsFrame := TfrConfigureFormEnhancements.Create(Self);
   FConfigFormEnhancementsFrame.Parent := tshFormEnhancements;
   FConfigFormEnhancementsFrame.Align := alClient;
+  AdjustMinSize(FConfigFormEnhancementsFrame);
   FConfigFormEnhancementsFrame.InitGrid;
 
   ActiveControl := FConfigExpertsFrame.edtFilter;
+
+  Width := MinWidth + (Width - pcConfig.ClientWidth);
+  Height := MinHeight+ (Height - pcConfig.ClientHeight);
+  TControl_SetMinConstraints(Self);
 
   LoadGeneral;
 
