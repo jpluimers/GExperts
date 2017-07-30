@@ -198,7 +198,10 @@ type
     function IndexOfObject(AObject: TObject): Integer;
     procedure Insert(Index: Integer; const S: UnicodeString); virtual; abstract;
     procedure InsertObject(Index: Integer; const S: UnicodeString; AObject: TObject);
-    procedure LoadFromFile(const FileName: TFileName); virtual;
+    procedure LoadFromFile(const FileName: TFileName); overload; virtual;
+{$IFNDEF UNICODE}
+    procedure LoadFromFile(const FileName: WideString); overload; virtual;
+{$ENDIF UNICODE}
     procedure LoadFromStream(Stream: TStream); virtual;
     procedure Move(CurIndex, NewIndex: Integer); virtual;
     procedure SaveToFile(const FileName: TFileName); virtual;
@@ -870,6 +873,20 @@ begin
     Stream.Free;
   end;
 end;
+
+{$IFNDEF UNICODE}
+procedure TUnicodeStrings.LoadFromFile(const FileName: WideString);
+var
+  Stream: TWideFileStream;
+begin
+  Stream := TWideFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
+  try
+    LoadFromStream(Stream);
+  finally
+    FreeAndNil(Stream);
+  end;
+end;
+{$ENDIF UNICODE}
 
 procedure TUnicodeStrings.LoadFromStream(Stream: TStream);
 // usual loader routine, but enhanced to handle byte order marks in stream
