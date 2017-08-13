@@ -2,7 +2,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
   Left = 339
   Top = 175
   Width = 478
-  Height = 375
+  Height = 463
   HelpContext = 100
   Caption = 'Delphi Code Formatter Configuration'
   Color = clBtnFace
@@ -19,7 +19,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
     Left = 0
     Top = 0
     Width = 462
-    Height = 295
+    Height = 383
     ActivePage = ts_Indent
     Align = alClient
     TabIndex = 0
@@ -136,12 +136,12 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       Caption = 'Spacing'
       DesignSize = (
         454
-        267)
+        355)
       object grid_Spacing: TStringGrid
         Left = 8
         Top = 8
         Width = 437
-        Height = 250
+        Height = 338
         Anchors = [akLeft, akTop, akRight, akBottom]
         ColCount = 3
         DefaultColWidth = 100
@@ -343,7 +343,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
       Caption = 'Capitalization'
       DesignSize = (
         454
-        267)
+        355)
       object l_Capitalize: TLabel
         Left = 16
         Top = 8
@@ -675,7 +675,7 @@ object fmCodeFormatterConfig: TfmCodeFormatterConfig
   end
   object p_Botton: TPanel
     Left = 0
-    Top = 295
+    Top = 383
     Width = 462
     Height = 41
     Align = alBottom
