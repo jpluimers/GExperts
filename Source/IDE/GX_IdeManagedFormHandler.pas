@@ -50,11 +50,9 @@ type
     /// @returns true, if this object wants to manage the given form. </summary>
     function IsDesiredForm(_Form: TCustomForm): Boolean; virtual;
     ///<summary>
-    /// @returns true, if the given Form has already been handled </summary>
-    function HasBeenHandled(_Form: TCustomForm): Boolean;
-    ///<summary>
     /// Called when the form for which IsDesiredForm returned true becomes the current form.
-    /// Note: It is possible that the form has already been changed, so check this first! </summary>
+    /// Note: It is possible that the form has already been changed, so check this first by
+    ///       calling TManagedForm.AlreadyExists! </summary>
     procedure Execute(_Form: TCustomForm);
     ///<summary>
     /// The subset of SupportedChanges that are enabled </summary>
@@ -112,12 +110,11 @@ type
   TManagedFormGotoDialog = class(TManagedFormHandler)
   public
     function FormEnhancements: string; override;
-    // todo: call / add the code from GX_IdeGotoEnhancer
   end;
 
 type
   TManagedFormHandlerDefaultEnvironmentDialog = class(TManagedFormHandler)
-    // Tools -> Options (Delphi 2007)
+    // Tools -> Options (Delphi 2005 and later)
     function CreateManagedForm(_Form: TCustomForm): TManagedForm; override;
   end;
 
@@ -262,7 +259,7 @@ var
   frm: TManagedForm;
   Changes: TFormChanges;
 begin
-  if HasBeenHandled(_Form) then
+  if TManagedForm.AlreadyExists(_Form) then
     Exit;
 
   frm := CreateManagedForm(_Form);
@@ -292,13 +289,6 @@ end;
 function TManagedFormHandler.FormFixes: string;
 begin
   Result := '';
-end;
-
-function TManagedFormHandler.HasBeenHandled(_Form: TCustomForm): Boolean;
-var
-  cmp: TComponent;
-begin
-  Result := TComponent_FindComponent(_Form, TManagedForm.GenerateName(_Form.Name), False, cmp, TManagedForm);
 end;
 
 function TManagedFormHandler.IsDesiredForm(_Form: TCustomForm): Boolean;
@@ -665,6 +655,7 @@ end;
 { TManagedFormHandlerProjectOptionsDialog }
 
 {$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
+
 function TManagedFormHandlerProjectOptionsDialog.CreateManagedForm(
   _Form: TCustomForm): TManagedForm;
 begin

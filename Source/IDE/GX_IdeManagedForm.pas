@@ -45,7 +45,11 @@ type
       NewHeight: Integer; var Resize: Boolean);
     procedure ForceVisibleToBeSizable(WndHandle: HWND);
     procedure FormDestroy(Sender: TObject);
+    ///</summary>
+    /// Creates a unique comonent name based on the form name  </summary>
+    class function GenerateName(const _FormName: string): string;
   protected
+    procedure DoHookOnFormDestroy; virtual;
     procedure DoFixFormErrors; virtual;
     procedure DoMakeResizable; virtual;
     procedure DoLoadFormState;
@@ -57,7 +61,10 @@ type
     function AddMadeSizeablePanel: TPanel;
   public
     FFormChanges: TFormChanges;
-    class function GenerateName(const _FormName: string): string;
+    ///<summary>
+    /// Checks whether the given form already contains a component with this GenerateName
+    /// @returns true, if it does, false otherwise </summary>
+    class function AlreadyExists(const _Form: TCustomForm): Boolean;
     constructor Create(_Owner: TComponent); override;
     procedure Init(const _FormChanges: TFormChanges);
   end;
@@ -99,7 +106,11 @@ type
 
 type
   TManagedFormDefaultEnvironmentDialog = class(TManagedForm)
+  // Options dialog in Delphi 2005 and later:
+  // Collapse some tree branches.
+{$IFNDEF GX_VER170_up} // Delphi 2005
     procedure DoCollapseTreeNodes; override;
+{$ENDIF}
   end;
 
 type
@@ -276,6 +287,13 @@ end;
 class function TManagedForm.GenerateName(const _FormName: string): string;
 begin
   Result := 'GXManagedForm_' + _FormName;
+end;
+
+class function TManagedForm.AlreadyExists(const _Form: TCustomForm): Boolean;
+var
+  cmp: TComponent;
+begin
+  Result := TComponent_FindComponent(_Form, GenerateName(_Form.Name), False, cmp, TManagedForm);
 end;
 
 constructor TManagedForm.Create(_Owner: TComponent);
@@ -561,6 +579,8 @@ end;
 
 { TManagedFormDefaultEnvironmentDialog }
 
+{$IFNDEF GX_VER170_up} // Delphi 2005
+
 procedure TManagedFormDefaultEnvironmentDialog.DoCollapseTreeNodes;
 
   function TryFindTreeView(out _tv: TTreeView): Boolean;
@@ -601,6 +621,7 @@ begin
   if Assigned(SelectedNode) then
     SelectedNode.MakeVisible;
 end;
+{$ENDIF GX_VER170_up}
 
 type
   TMoveWindowThread = class(TThread)
@@ -905,7 +926,6 @@ var
   begin
     ctrl := List.AddControl('ValueGrid', [akLeft, akTop, akRight, akBottom], TStringGrid);
     List.AddControl(ctrl.Parent, [akLeft, akTop, akRight, akBottom], TPanel);
-    List.ApplyAnchors;
   end;
 
   procedure MakePackagesResizable;
@@ -1090,14 +1110,19 @@ begin
   end;
 end;
 
+procedure TManagedForm.DoHookOnFormDestroy;
+begin
+  FOrigOnDestroy := FForm.OnDestroy;
+  FForm.OnDestroy := FormDestroy;
+end;
+
 procedure TManagedForm.Init(const _FormChanges: TFormChanges);
 begin
   Assert(Assigned(FForm));
 
   FFormChanges := _FormChanges;
-  FOrigOnDestroy := FForm.OnDestroy;
-  FForm.OnDestroy := FormDestroy;
 
+  DoHookOnFormDestroy;
   DoMakeResizable;
   DoFixFormErrors;
   DoLoadFormState;
@@ -1114,6 +1139,7 @@ begin
   FForm.OnDestroy := FOrigOnDestroy;
   FOrigOnDestroy := nil;
   DoSaveFormState;
+  // todo: Shouldn't this call the original OnDestroy event?
 end;
 
 procedure TManagedForm.MakeComponentsResizable;
