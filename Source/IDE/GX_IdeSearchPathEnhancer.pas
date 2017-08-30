@@ -19,6 +19,7 @@ implementation
 
 uses
   Windows,
+  Messages,
   Controls,
   StdCtrls,
   Forms,
@@ -76,6 +77,8 @@ type
     FFavoritesBtn: TButton;
     FFavorites: TStringList;
     FEnabled: Boolean;
+    FAddDotsBtn: TButton;
+    FDelDotsBtn: TButton;
 {$IFNDEF GX_VER300_up}
     FBrowseBtn: TCustomButton;
     FBrowseClick: TNotifyEvent;
@@ -101,6 +104,10 @@ type
     function ConfigurationKey: string;
     procedure PageControlChange(_Sender: TObject);
     procedure EditEntry(_Sender: TWinControl; var _Name, _Value: string; var _OK: Boolean);
+    procedure AddDotsBtnClick(_Sender: TObject);
+    procedure DelDotsBtnClick(_Sender: TObject);
+    procedure GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer);
+    procedure SelectMemoLines(out _StartIdx, _EndIdx: Integer);
   protected
     function IsDesiredForm(_Form: TCustomForm): Boolean; override;
     procedure EnhanceForm(_Form: TForm); override;
@@ -422,6 +429,7 @@ begin
       FMemo := TMemo.Create(_Form);
       FMemo.Parent := FTabSheetMemo;
       FMemo.Align := alClient;
+      FMemo.HideSelection := False;
       FMemo.Lines.Text := FListbox.Items.Text;
       FMemo.OnChange := Self.HandleMemoChange;
       FMemo.ScrollBars := ssBoth;
@@ -429,6 +437,24 @@ begin
 
       FListbox.Parent := FTabSheetList;
       FListbox.Align := alClient;
+
+      FDelDotsBtn := TButton.Create(_Form);
+      FDelDotsBtn.Name := 'DelDotsBtn';
+      FDelDotsBtn.Parent := _Form;
+      FDelDotsBtn.Left := FPageControl.Left + FPageControl.Width - FDelDotsBtn.Width;
+      FDelDotsBtn.Top := FPageControl.Top + FPageControl.Height;
+      FDelDotsBtn.Anchors := [akRight, akBottom];
+      FDelDotsBtn.Caption := 'Del ..\';
+      FDelDotsBtn.OnClick := DelDotsBtnClick;
+
+      FAddDotsBtn := TButton.Create(_Form);
+      FAddDotsBtn.Name := 'AddDotsBtn';
+      FAddDotsBtn.Parent := _Form;
+      FAddDotsBtn.Left := FDelDotsBtn.Left - FAddDotsBtn.Width - 8;
+      FAddDotsBtn.Top := FPageControl.Top + FPageControl.Height;
+      FAddDotsBtn.Anchors := [akRight, akBottom];
+      FAddDotsBtn.Caption := 'Add ..\';
+      FAddDotsBtn.OnClick := AddDotsBtnClick;
 
       if Assigned(FUpBtn) then begin
         FFavoritesBtn := TButton.Create(_Form);
@@ -489,6 +515,76 @@ begin
       if cmp is TLabel then
         TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
     end;
+  end;
+end;
+
+procedure TSearchPathEnhancer.GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer);
+var
+  SelStart: Integer;
+  SelEnd: Integer;
+begin
+  SendMessage(FMemo.Handle, EM_GETSEL, LongInt(@SelStart), LongInt(@SelEnd));
+  _StartIdx := SendMessage(FMemo.Handle, EM_LINEFROMCHAR, SelStart, 0);
+  _EndIdx := SendMessage(FMemo.Handle, EM_LINEFROMCHAR, SelEnd - 1, 0);
+end;
+
+procedure TSearchPathEnhancer.SelectMemoLines(out _StartIdx, _EndIdx: Integer);
+var
+  SelStart: Integer;
+  SelEnd: Integer;
+begin
+  SelStart := SendMessage(FMemo.Handle, EM_LINEINDEX, _StartIdx, 0);
+  SelEnd := SendMessage(FMemo.Handle, EM_LINEINDEX, _EndIdx + 1, 0);
+  SendMessage(FMemo.Handle, EM_SETSEL, SelStart, SelEnd);
+end;
+
+procedure TSearchPathEnhancer.AddDotsBtnClick(_Sender: TObject);
+var
+  i: Integer;
+  s: string;
+  sl: TStringList;
+  StartIdx: Integer;
+  EndIdx: Integer;
+begin
+  sl := TStringList.Create;
+  try
+    GetSelectedMemoLines(StartIdx, EndIdx);
+    sl.Assign(FMemo.Lines);
+    for i := StartIdx to EndIdx do begin
+      s := sl[i];
+      s := '..\' + s;
+      sl[i] := s;
+    end;
+    FMemo.Lines.Assign(sl);
+    SelectMemoLines(StartIdx, EndIdx);
+  finally
+    FreeAndNil(sl);
+  end;
+end;
+
+procedure TSearchPathEnhancer.DelDotsBtnClick(_Sender: TObject);
+var
+  i: Integer;
+  s: string;
+  sl: TStringList;
+  StartIdx: Integer;
+  EndIdx: Integer;
+begin
+  sl := TStringList.Create;
+  try
+    GetSelectedMemoLines(StartIdx, EndIdx);
+    sl.Assign(FMemo.Lines);
+    for i := StartIdx to EndIdx do begin
+      s := sl[i];
+      if LeftStr(s, 3) = '..\' then begin
+        s := Copy(s, 4);
+        sl[i] := s;
+      end;
+    end;
+    FMemo.Lines.Assign(sl);
+    SelectMemoLines(StartIdx, EndIdx);
+  finally
+    FreeAndNil(sl);
   end;
 end;
 
