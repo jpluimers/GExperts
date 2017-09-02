@@ -118,6 +118,7 @@ type
 
 procedure ShowExpertManager; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 procedure InstallGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: Integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
+procedure RemoveGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: Integer); cdecl; {$IFNDEF GX_BCB} export; {$ENDIF GX_BCB}
 
 implementation
 
@@ -623,6 +624,25 @@ begin
   else begin
     ShowMessage(Format('GExperts could not be registered for use in %s.'#13#10
       + 'Starting the GExperts Expert Manager.', [IDEEnglishName]));
+    ShowExpertManager;
+  end;
+end;
+
+procedure RemoveGExperts(Handle: HWND; InstHandle: HINST; CmdLine: PAnsiChar; CmdShow: Integer);
+var
+  Succeeded: Boolean;
+begin
+  try
+    TExpertManagerExpert.RemoveExpertFromRegistry('GExperts', true);
+    Succeeded := True;
+  except
+    Succeeded := False;
+  end;
+  if Succeeded then
+    ShowMessage('GExperts has been removed')
+  else begin
+    ShowMessage('GExperts could not be removed.'#13#10
+      + 'Starting the GExperts Expert Manager.');
     ShowExpertManager;
   end;
 end;
