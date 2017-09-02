@@ -52,6 +52,7 @@ type
     IdentifiersCase: TCase; {: case for identifiers }
     ChangeIndent: Boolean;
     NoIndentElseIf: Boolean;
+    NoIndentVarDecl: Boolean;
     IndentBegin: Boolean;
     IndentTry: Boolean;
     IndentTryElse: Boolean;
@@ -66,6 +67,7 @@ type
     SpacePerIndent: Integer; {: number of spaces per indent }
     FeedRoundBegin: TFeedBegin; {: how to handle linefeeds around begin }
     FeedRoundTry: TFeedBegin; {: how to handle linefeeds around try }
+    FeedBeforeElse: Boolean;
     FeedBeforeEnd: Boolean;
     FeedAfterThen: Boolean;
     ExceptSingle: Boolean;
@@ -134,6 +136,7 @@ type
     property IdentifiersCase: TCase read FSettings.IdentifiersCase;
     property ChangeIndent: Boolean read FSettings.ChangeIndent;
     property NoIndentElseIf: Boolean read FSettings.NoIndentElseIf;
+    property NoIndentVarDecl: Boolean read FSettings.NoIndentVarDecl;
     property IndentBegin: Boolean read FSettings.IndentBegin;
     property IndentTry: Boolean read FSettings.IndentTry;
     property IndentTryElse: Boolean read FSettings.IndentTryElse;
@@ -147,6 +150,7 @@ type
     property SpacePerIndent: Integer read FSettings.SpacePerIndent;
     property FeedRoundBegin: TFeedBegin read FSettings.FeedRoundBegin;
     property FeedRoundTry: TFeedBegin read FSettings.FeedRoundTry;
+    property FeedBeforeElse: Boolean read FSettings.FeedBeforeElse;
     property FeedBeforeEnd: Boolean read FSettings.FeedBeforeEnd;
     property FeedAfterThen: Boolean read FSettings.FeedAfterThen;
     property ExceptSingle: Boolean read FSettings.ExceptSingle;

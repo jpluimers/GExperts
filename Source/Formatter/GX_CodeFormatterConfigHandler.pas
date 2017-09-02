@@ -195,6 +195,7 @@ begin
   ES.IdentifiersCase := TCase(_Reader.ReadInteger('IdentifiersCase', Ord(ES.IdentifiersCase))); // TCase
   ES.ChangeIndent := _Reader.ReadBool('ChangeIndent', ES.ChangeIndent); //: Boolean;
   ES.NoIndentElseIf := _Reader.ReadBool('NoIndentElseIf', ES.NoIndentElseIf); //: Boolean;
+  ES.NoIndentVarDecl := _Reader.ReadBool('NoIndentVarDecl', ES.NoIndentVarDecl); //: Boolean;
   ES.NoIndentUsesComma := _Reader.ReadBool('NoIndentUsesComma', ES.NoIndentUsesComma); //: Boolean;
   ES.IndentBegin := _Reader.ReadBool('IndentBegin', ES.IndentBegin); //: Boolean;
   ES.IndentTry := _Reader.ReadBool('IndentTry', ES.IndentTry); //: Boolean;
@@ -208,6 +209,7 @@ begin
   ES.SpacePerIndent := _Reader.ReadInteger('SpacePerIndent', ES.SpacePerIndent); //: Integer;
   ES.FeedRoundBegin := TFeedBegin(_Reader.ReadInteger('FeedRoundBegin', Ord(ES.FeedRoundBegin)));
   ES.FeedRoundTry := TFeedBegin(_Reader.ReadInteger('FeedRoundTry', Ord(ES.FeedRoundTry)));
+  ES.FeedBeforeElse := _Reader.ReadBool('FeedBeforeElse', ES.FeedBeforeElse); //: Boolean;
   ES.FeedBeforeEnd := _Reader.ReadBool('FeedBeforeEnd', ES.FeedBeforeEnd); //: Boolean;
   ES.FeedAfterThen := _Reader.ReadBool('FeedAfterThen', ES.FeedAfterThen); //: Boolean;
   ES.ExceptSingle := _Reader.ReadBool('ExceptSingle', ES.ExceptSingle); //: Boolean;
@@ -254,6 +256,7 @@ begin
   _Writer.WriteInteger('IdentifiersCase', Ord(_Settings.IdentifiersCase));
   _Writer.WriteBool('ChangeIndent', _Settings.ChangeIndent); //: Boolean;
   _Writer.WriteBool('NoIndentElseIf', _Settings.NoIndentElseIf); //: Boolean;
+  _Writer.WriteBool('NoIndentVarDecl', _Settings.NoIndentVarDecl); //: Boolean;
   _Writer.WriteBool('NoIndentUsesComma', _Settings.NoIndentUsesComma); //: Boolean;
   _Writer.WriteBool('IndentBegin', _Settings.IndentBegin); //: Boolean;
   _Writer.WriteBool('IndentTry', _Settings.IndentTry); //: Boolean;
@@ -267,6 +270,7 @@ begin
   _Writer.WriteInteger('SpacePerIndent', _Settings.SpacePerIndent); //: Integer;
   _Writer.WriteInteger('FeedRoundBegin', Ord(_Settings.FeedRoundBegin)); //: TFeedBegin;
   _Writer.WriteInteger('FeedRoundTry', Ord(_Settings.FeedRoundTry)); //: TFeedBegin;
+  _Writer.WriteBool('FeedBeforeElse', _Settings.FeedBeforeElse); //: Boolean;
   _Writer.WriteBool('FeedBeforeEnd', _Settings.FeedBeforeEnd); //: Boolean;
   _Writer.WriteBool('FeedAfterThen', _Settings.FeedAfterThen); //: Boolean;
   _Writer.WriteBool('ExceptSingle', _Settings.ExceptSingle); //: Boolean;

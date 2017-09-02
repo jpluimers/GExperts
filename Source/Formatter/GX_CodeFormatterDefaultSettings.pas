@@ -34,6 +34,7 @@ begin
   Result.FeedAfterSemiColon := False;
   Result.FeedAfterThen := False;
   Result.FeedAfterVar := False;
+  Result.FeedBeforeElse := False;
   Result.FeedBeforeEnd := False;
   Result.FeedEachUnit := False;
   Result.FeedElseIf := False;
@@ -49,6 +50,7 @@ begin
   Result.IndentTryElse := False;
   Result.NoFeedBeforeThen := False;
   Result.NoIndentElseIf := False;
+  Result.NoIndentVarDecl := False;
   Result.NoIndentUsesComma := False;
   Result.RemoveDoubleBlank := False;
   Result.ReservedCase := rfLowerCase;
@@ -86,6 +88,7 @@ begin
   Result.FeedAfterSemiColon := True;
   Result.FeedAfterThen := True;
   Result.FeedAfterVar := True;
+  Result.FeedBeforeElse := False;
   Result.FeedBeforeEnd := True;
   Result.FeedEachUnit := False;
   Result.FeedElseIf := False;
@@ -101,6 +104,7 @@ begin
   Result.IndentTryElse := False;
   Result.NoFeedBeforeThen := True;
   Result.NoIndentElseIf := False;
+  Result.NoIndentVarDecl := False;
   Result.NoIndentUsesComma := False;
   Result.RemoveDoubleBlank := True;
   Result.ReservedCase := rfLowerCase;

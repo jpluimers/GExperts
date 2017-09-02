@@ -747,6 +747,13 @@ begin
   if FPrevToken = FPrevLine then
     SetPrevLineIndent(_NTmp);
 
+  if Settings.FeedBeforeElse then begin
+    if not TokenAtIs(FTokenIdx - 1, rtLineFeed) then begin
+      FPrevLine := AssertLineFeedAfter(FTokenIdx - 1);
+      FPrevToken := FPrevLine;
+    end;
+  end;
+
   if Settings.IndentTryElse and (FStack.GetTopType = rtTry) then begin
     FStack.nIndent := FStack.nIndent + 1;
     SetPrevLineIndent(_NTmp);
@@ -928,7 +935,7 @@ var
             if Next.ReservedType in [rtElse, rtIfElse, rtBegin, rtEnd, rtUntil, rtExcept] then
               FWrapIndent := False;
 
-            if FWrapIndent then
+            if FWrapIndent and not Settings.NoIndentVarDecl then
               NTmp := 1
             else
               NTmp := 0;

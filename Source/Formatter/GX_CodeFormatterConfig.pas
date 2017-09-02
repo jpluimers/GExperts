@@ -135,6 +135,8 @@ type
     b_PrecedenceUp: TButton;
     b_PrecedenceDown: TButton;
     chk_NoIndentUsesComma: TCheckBox;
+    chk_FeedBeforeElse: TCheckBox;
+    chk_NoIndentVarDecl: TCheckBox;
     procedure b_HelpClick(Sender: TObject);
     procedure b_EditCapitalizationClick(Sender: TObject);
     procedure ts_PreviewShow(Sender: TObject);
@@ -202,6 +204,9 @@ var
   mi: TMenuItem;
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
   FCapitalization := TGXUnicodeStringList.Create;
   st := TStringList.Create;
   try
@@ -398,7 +403,9 @@ begin
   _Settings.FeedAfterVar := chk_FeedAfterVar.Checked;
   _Settings.FeedElseIf := chk_FeedElseIf.Checked;
   _Settings.NoIndentElseIf := chk_NoIndentElseIf.Checked;
+  _Settings.NoIndentVarDecl := chk_NoIndentVarDecl.Checked;
   _Settings.NoIndentUsesComma := chk_NoIndentUsesComma.Checked;
+  _Settings.FeedBeforeElse :=  chk_FeedBeforeElse.Checked;
   _Settings.FeedBeforeEnd := chk_FeedBeforeEnd.Checked;
   _Settings.FeedAfterSemiColon := chk_FeedAfterSemiColon.Checked;
   _Settings.FillNewWords := IntToCapfileMode(rg_Capitalization.ItemIndex);
@@ -482,7 +489,9 @@ begin
   chk_FeedAfterVar.Checked := _EngineSettings.FeedAfterVar;
   chk_FeedElseIf.Checked := _EngineSettings.FeedElseIf;
   chk_NoIndentElseIf.Checked := _EngineSettings.NoIndentElseIf;
+  chk_NoIndentVarDecl.Checked := _EngineSettings.NoIndentVarDecl;
   chk_NoIndentUsesComma.Checked := _EngineSettings.NoIndentUsesComma;
+  chk_FeedBeforeElse.Checked := _EngineSettings.FeedBeforeElse;
   chk_FeedBeforeEnd.Checked := _EngineSettings.FeedBeforeEnd;
   chk_WrapLines.Checked := _EngineSettings.WrapLines;
   ud_WrapPosition.Position := _EngineSettings.WrapPosition;
