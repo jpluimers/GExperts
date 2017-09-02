@@ -87,6 +87,7 @@ exports
   ShowExpertManager,
   ShowPeInfo,
   InstallGExperts,
+  RemoveGExperts,
   ShowCodeLib,
   ShowGrep,
   ShowGrepEx;
