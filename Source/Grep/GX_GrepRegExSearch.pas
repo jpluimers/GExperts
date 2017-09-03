@@ -124,14 +124,26 @@ var
   CodeFragmentsToSkip: TCodeFragments;
   ActiveSection: TUnitSection;
   ActiveCodeFragment: TCodeFragment;
-  s: TGXUnicodeString;
+  Line: TGXUnicodeString;
+  PrevLine: TGXUnicodeString;
+//  s: TGXUnicodeString;
+//  Len: Integer;
+  IsAForm: Boolean;
+
+  procedure doSearchLine(_Line: TGXUnicodeString; _LineIdx: Integer);
+  begin
+    if RegularExpression then
+      SearchLineRegEx(_Line, _LineIdx)
+    else
+      SearchLineRaw(_Line, _LineIdx);
+  end;
 
   function _TrySwitchToSection(const aNextSection: TUnitSection): Boolean;
   begin
     if ActiveSection < aNextSection then
-      if Length(s) >= index + Length(CSections[aNextSection]) then
-        if StrLIComp(@(s[index]), CSections[aNextSection], Length(CSections[aNextSection])) = 0 then
-          if (aNextSection = usEnd) or (not IsCharIdentifier(s[index + Length(CSections[aNextSection])])) then
+      if Length(Line) >= index + Length(CSections[aNextSection]) then
+        if StrLIComp(@(Line[index]), CSections[aNextSection], Length(CSections[aNextSection])) = 0 then
+          if (aNextSection = usEnd) or (not IsCharIdentifier(Line[index + Length(CSections[aNextSection])])) then
           begin
             ActiveSection := aNextSection;
             Result := True;
@@ -171,101 +183,139 @@ begin // Execute
     if NoComments then CodeFragmentsToSkip := CodeFragmentsToSkip + CommentFragments;
   end;
 
-
+  IsAForm := IsForm(FileName);
   ActiveSection := usStart;
   ActiveCodeFragment := cfCode;
+  PrevLine := '';
+  Index := 0;
   for i := 0 to FData.Count - 1 do
   begin
     // Read the input line, skip if empty.
-    s := FData[i];
-    if s = EmptyString then
+    Line := FData[i];
+    if Line = EmptyString then begin
+      PrevLine := '';
       Continue;
-
-    if (UnitSectionsToSkip <> []) or (CodeFragmentsToSkip <> []) then
-    begin
-      Assert(Length(s) > 0);
-      // On each new line, switch line comment mode back to code :
-      if ActiveCodeFragment = cfLineComment then
-        ActiveCodeFragment := cfCode;
-
-      s := s + CReplacementChar; // Extend the input line to avoid out of bounds errors.
-      index := 1;
-      // This (and prior) code scans Delphi syntax. TODO : Handle IsC and IsDFM syntax too.
-      repeat
-        Assert(s[index] <> #10, 'unexpected linefeed');
-        Assert(s[index] <> #13, 'unexpected carriage return');
-
-        index2 := index + 1;
-        case ActiveCodeFragment of
-          cfLineComment: ; // skip everything, active fragment switches back to code on the next line
-          cfCurlyComment: if s[index] = '}' then ActiveCodeFragment := cfEndOfComment;
-          cfBlockComment:
-            if s[index] = '*' then
-              if s[index2] = ')' then
-              begin
-                Inc(index2); // skip both closing characters
-                ActiveCodeFragment := cfEndOfComment;
-              end;
-          cfString: // already seen one '
-            if s[index] = #39 then
-              // Is this single quote followed by another?
-              if s[index2] = #39 then
-                Inc(index2) // skip double-escaped single quote character
-              else
-                ActiveCodeFragment := cfEndOfString;
-        else // cfCode, cfEndOfString, cfEndOfComment:
-          ActiveCodeFragment := cfCode;
-          case s[index] of
-            #39: ActiveCodeFragment := cfString;
-            '{': ActiveCodeFragment := cfCurlyComment;
-            '/': if s[index2] = '/' then ActiveCodeFragment := cfLineComment;
-            '(': if s[index2] = '*' then ActiveCodeFragment := cfBlockComment;
-          end; // case s[index]
-        end; // case ActiveCodeFragment
-
-        // Do we need to detect unit section-changes?
-        if UnitSectionsToSkip <> [] then
-          if ActiveCodeFragment = cfCode then
-            if ActiveSection < usEnd then
-              // Is this the start of an identifier (looking back in the UNALTERED line)?
-              if (index = 1)
-              or ((not IsCharIdentifier(FData[i][index - 1])) and (FData[i][index - 1] <> '&')) then
-                if _TrySwitchToSection(usInterface)
-                or _TrySwitchToSection(usImplementation)
-                or _TrySwitchToSection(usInitialization)
-                or _TrySwitchToSection(usFinalization)
-                or _TrySwitchToSection(usEnd) then
-                  // When detected, step over the activated section keyword :
-                  Inc(index2, Length(CSections[ActiveSection]) - 1);
-
-        // Lastly, put a CReplacementChar over fragments and sections that must not be searched :
-        if (ActiveSection in UnitSectionsToSkip)
-        or (ActiveCodeFragment in CodeFragmentsToSkip) then
-          repeat
-            s[index] := CReplacementChar;
-            Inc(index);
-          until index = index2
-        else
-          index := index2;
-      until index >= Length(s); // Stop at the extra character we added
-
-      // To here, s has had all content removed that must not be searched.
-      // For the search, we trim all trailing CReplacementChar's out of s.
-      while (index > 0) and (s[index] = CReplacementChar) do
-        Dec(index);
-
-      // If s is empty we skip the search.
-      if index = 0 then
-        Continue;
-
-      SetLength(s, index);
     end;
 
-    if RegularExpression then
-      SearchLineRegEx(s, i)
-    else
-      SearchLineRaw(s, i);
+    if IsPascalSourceFile then begin
+      if (UnitSectionsToSkip <> []) or (CodeFragmentsToSkip <> []) then
+      begin
+        Assert(Length(Line) > 0);
+        // On each new line, switch line comment mode back to code :
+        if ActiveCodeFragment = cfLineComment then
+          ActiveCodeFragment := cfCode;
+
+        Line := Line + CReplacementChar; // Extend the input line to avoid out of bounds errors.
+        index := 1;
+        // This (and prior) code scans Delphi syntax. TODO : Handle IsC and IsDFM syntax too.
+        repeat
+          Assert(Line[index] <> #10, 'unexpected linefeed');
+          Assert(Line[index] <> #13, 'unexpected carriage return');
+
+          index2 := index + 1;
+          case ActiveCodeFragment of
+            cfLineComment: ; // skip everything, active fragment switches back to code on the next line
+            cfCurlyComment: if Line[index] = '}' then ActiveCodeFragment := cfEndOfComment;
+            cfBlockComment:
+              if Line[index] = '*' then
+                if Line[index2] = ')' then
+                begin
+                  Inc(index2); // skip both closing characters
+                  ActiveCodeFragment := cfEndOfComment;
+                end;
+            cfString: // already seen one '
+              if Line[index] = #39 then
+                // Is this single quote followed by another?
+                if Line[index2] = #39 then
+                  Inc(index2) // skip double-escaped single quote character
+                else
+                  ActiveCodeFragment := cfEndOfString;
+          else // cfCode, cfEndOfString, cfEndOfComment:
+            ActiveCodeFragment := cfCode;
+            case Line[index] of
+              #39: ActiveCodeFragment := cfString;
+              '{': ActiveCodeFragment := cfCurlyComment;
+              '/': if Line[index2] = '/' then ActiveCodeFragment := cfLineComment;
+              '(': if Line[index2] = '*' then ActiveCodeFragment := cfBlockComment;
+            end; // case s[index]
+          end; // case ActiveCodeFragment
+
+          // Do we need to detect unit section-changes?
+          if UnitSectionsToSkip <> [] then
+            if ActiveCodeFragment = cfCode then
+              if ActiveSection < usEnd then
+                // Is this the start of an identifier (looking back in the UNALTERED line)?
+                if (index = 1)
+                or ((not IsCharIdentifier(FData[i][index - 1])) and (FData[i][index - 1] <> '&')) then
+                  if _TrySwitchToSection(usInterface)
+                  or _TrySwitchToSection(usImplementation)
+                  or _TrySwitchToSection(usInitialization)
+                  or _TrySwitchToSection(usFinalization)
+                  or _TrySwitchToSection(usEnd) then
+                    // When detected, step over the activated section keyword :
+                    Inc(index2, Length(CSections[ActiveSection]) - 1);
+
+          // Lastly, put a CReplacementChar over fragments and sections that must not be searched :
+          if (ActiveSection in UnitSectionsToSkip)
+          or (ActiveCodeFragment in CodeFragmentsToSkip) then
+            repeat
+              Line[index] := CReplacementChar;
+              Inc(index);
+            until index = index2
+          else
+            index := index2;
+        until index >= Length(Line); // Stop at the extra character we added
+
+        // To here, s has had all content removed that must not be searched.
+        // For the search, we trim all trailing CReplacementChar's out of s.
+        while (index > 0) and (Line[index] = CReplacementChar) do
+          Dec(index);
+
+        // If s is empty we skip the search.
+        if index = 0 then
+          Continue;
+
+        SetLength(Line, index);
+      end;
+    end else if IsAForm then begin
+      // todo:
+      // handle the case where long strings are split into multiple lines by the IDE, e.g.:
+      // Caption = 'abcde bcdef cdefg defgh efghi fghij ghijk hijkl ijklm jklmn klmno lmnop mnopq'
+      // split into
+      // Caption =
+      //   'abcde bcdef cdefg defgh efghi fghij ghijk hijkl ijklm jklmn klmn' +
+      //   'o lmnop mnopq'
+      // grep won't find 'bsdf' because it was split
+
+      // unfortunately this is more complex than my first take at it:
+//      Len := Length(Line);
+//      Assert(Len > 0);
+//      s := Trim(Line);
+//      if (PrevLine <> '') then begin
+//        if (Copy(s, 1, 1) = '''') then begin
+//          PrevLine := PrevLine + Copy(s, 2, Length(s) - 1);
+//        end;
+//      end;
+//      if Len > 3 then begin
+//        if Copy(Line, Len - 2, 3) = ''' +' then begin
+//          if PrevLine = '' then begin
+//            PrevLine := Copy(Line, 1, Len - 3);
+//            Index := i;
+//          end else begin
+//            PrevLine := PrevLine + Copy(s, 2, Length(s) - 4);
+//          end;
+//        end else begin
+//          if PrevLine <> '' then
+//            doSearchLine(PrevLine, index);
+//            PrevLine := '';
+//          end;
+//      end;
+      // so I commented it out again
+    end;
+    doSearchLine(Line, i);
   end; // for i FData
+  if PrevLine <> '' then
+    doSearchLine(PrevLine + '''', FData.Count - 1);
 end; // Execute
 
 procedure TSearcher.SearchLineRaw(const LineStr: string; LineNo: Integer);
