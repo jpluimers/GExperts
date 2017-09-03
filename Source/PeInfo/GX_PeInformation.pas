@@ -273,47 +273,52 @@ var
   s: string;
   p: Integer;
 begin
-  Info := TPackageInfo.Create(AFilename);
+  pitItems := lbPackageInfoType.Items;
+  pitItems.BeginUpdate;
   try
-    pitItems := lbPackageInfoType.Items;
-    pitItems.BeginUpdate;
+    TListbox_ClearWithObjects(lbPackageInfoType);
     try
-      TListbox_ClearWithObjects(lbPackageInfoType);
+      Info := TPackageInfo.Create(AFileName);
+      try
+        sl := TStringList.Create;
+        sl.Add(Info.Description);
+        pitItems.AddObject('Description', sl);
 
-      sl := TStringList.Create;
-      sl.Add(Info.Description);
-      pitItems.AddObject('Description', sl);
+        sl := TStringList.Create;
+        sl.Assign(Info.Units);
+        pitItems.AddObject('Units', sl);
 
-      sl := TStringList.Create;
-      sl.Assign(Info.Units);
-      pitItems.AddObject('Units', sl);
+        sl := TStringList.Create;
+        sl.Assign(Info.Required);
+        pitItems.AddObject('Required Packages', sl);
 
-      sl := TStringList.Create;
-      sl.Assign(Info.Required);
-      pitItems.AddObject('Required Packages', sl);
-
-      sl := TStringList.Create;
-      for i := 0 to PEInfo.ExportList.Count - 1 do begin
-        s := PEInfo.ExportList[i];
-        if StartsText('@$xp$', s) then begin
-          s := Copy(s, 2, 255);
-          p := Pos('@', s);
-          if p > 0 then begin
-            s := Copy(s, p + 1, 255);
-            p := Pos('$', s);
-            if p > 0 then
-              s := Copy(s, 1, p - 1);
-            sl.Add(s);
+        sl := TStringList.Create;
+        for i := 0 to PEInfo.ExportList.Count - 1 do begin
+          s := PEInfo.ExportList[i];
+          if StartsText('@$xp$', s) then begin
+            s := Copy(s, 2, 255);
+            p := Pos('@', s);
+            if p > 0 then begin
+              s := Copy(s, p + 1, 255);
+              p := Pos('$', s);
+              if p > 0 then
+                s := Copy(s, 1, p - 1);
+              sl.Add(s);
+            end;
           end;
         end;
+        pitItems.AddObject('Exported Classes', sl);
+      finally
+        FreeAndNil(Info);
       end;
-      pitItems.AddObject('Exported Classes', sl);
-    finally
-      pitItems.EndUpdate;
+    except
+      pitItems.Add('not available');
     end;
   finally
-    FreeAndNil(Info);
+    pitItems.EndUpdate;
   end;
+  lbPackageInfoType.ItemIndex := 0;
+  lbPackageInfoType.OnClick(lbPackageInfoType);
 end;
 
 procedure TfmPeInformation.lvImportsChange(Sender: TObject; Item: TListItem; Change: TItemChange);
