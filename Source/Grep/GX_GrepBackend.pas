@@ -354,7 +354,7 @@ type
 type
   TOnHitMatch = procedure(Sender: TObject; LineNo: Integer; const Line: string;
       SPos, EPos: Integer) of object;
-  TOnSearchFile = procedure(Sender: TObject; const FileName: string) of object;
+  TOnSearchPath = procedure(Sender: TObject; const FileName: string) of object;
 
   TGrepSearchContext = class(TObject)
   public
@@ -365,7 +365,8 @@ type
   TGrepSearchRunner = class(TObject)
   private
     FOnHitMatch: TOnHitMatch;
-    FOnSearchFile: TOnSearchFile;
+    FOnSearchDirectory: TOnSearchPath;
+    FOnSearchFile: TOnSearchPath;
     FStorageTarget: TStrings;
     FDupeFileList: TStringList;
     FExceptionList: TStrings;
@@ -378,6 +379,7 @@ type
     FSearchRoot: string;
     FFilesInResults: TStrings;
     procedure FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
+    procedure StartDirectorySearch(const DirectoryName: string);
     procedure StartFileSearch(const FileName: string);
     procedure ExecuteSearchOnFile(const FileName: string; Context: TGrepSearchContext; FromProject: Boolean = False);
     procedure SearchFormForFile(const FileName: string; Context: TGrepSearchContext);
@@ -396,7 +398,8 @@ type
   public
     constructor Create(const Settings: TGrepSettings; StorageTarget, FilesInResults: TStrings);
     procedure Execute;
-    property OnSearchFile: TOnSearchFile read FOnSearchFile write FOnSearchFile;
+    property OnSearchDirectory: TOnSearchPath read FOnSearchDirectory write FOnSearchDirectory;
+    property OnSearchFile: TOnSearchPath read FOnSearchFile write FOnSearchFile;
     property FileSearchCount: Integer read FFileSearchCount;
     property MatchCount: Integer read FMatchCount;
     property AbortSignalled: Boolean read FAbortSignalled write FAbortSignalled;
@@ -585,6 +588,7 @@ begin
     if FGrepSettings.IncludeSubdirs then
     begin
       Result := FindFirst(Dir + AllFilesWildCard, faAnyFile, Search);
+      StartDirectorySearch(Dir);
       try
         while Result = 0 do
         begin
@@ -612,6 +616,7 @@ begin
 
       Result := FindFirst(Dir + Trim(Masks.Strings[i]), faAnyFile, Search);
       try
+        StartDirectorySearch(Dir);
         Context := TGrepSearchContext.Create;
         try
           while Result = 0 do
@@ -889,6 +894,12 @@ begin
   AMatchResult.SPos := StartCol;
   AMatchResult.EPos := EndCol;
   FFileResult.TotalMatches := FFileResult.TotalMatches + 1;
+end;
+
+procedure TGrepSearchRunner.StartDirectorySearch(const DirectoryName: string);
+begin
+  if Assigned(FOnSearchDirectory) then
+    FOnSearchDirectory(Self, DirectoryName);
 end;
 
 procedure TGrepSearchRunner.StartFileSearch(const FileName: string);

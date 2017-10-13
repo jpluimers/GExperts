@@ -275,6 +275,8 @@ type
     procedure RefreshContextLines;
     procedure SetShowContext(Value: Boolean);
     procedure HighlightMemo(FileMatches: TFileResult; StartLine, MatchLineNo: Integer);
+    procedure ReportProgress(const PathName: string);
+    procedure StartDirectorySearch(Sender: TObject; const DirectoryName: string);
     procedure StartFileSearch(Sender: TObject; const FileName: string);
     procedure SaveSettings;
     procedure LoadSettings;
@@ -439,14 +441,14 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.StartFileSearch(Sender: TObject; const FileName: string);
+procedure TfmGrepResults.ReportProgress(const PathName: string);
 resourcestring
   SProcessing = 'Processing %s';
 var
   Dummy: Boolean;
   CurrentGetTickCount: DWORD;
 begin
-  SetStatusString(Format(SProcessing, [FileName]));
+  SetStatusString(Format(SProcessing, [PathName]));
   ActionsUpdate(nil, Dummy);
   CurrentGetTickCount := GetTickCount;
   if CurrentGetTickCount <> FLastRepaintTick then
@@ -454,6 +456,16 @@ begin
     Application.ProcessMessages;
     FLastRepaintTick := CurrentGetTickCount;
   end;
+end;
+
+procedure TfmGrepResults.StartDirectorySearch(Sender: TObject; const DirectoryName: string);
+begin
+  ReportProgress(DirectoryName);
+end;
+
+procedure TfmGrepResults.StartFileSearch(Sender: TObject; const FileName: string);
+begin
+  ReportProgress(FileName);
 end;
 
 function TfmGrepResults.Execute(AState: TGrepSearchState): Boolean;
@@ -508,6 +520,7 @@ begin
 
     try
       FSearcher.OnSearchFile := StartFileSearch;
+      FSearcher.OnSearchDirectory := StartDirectorySearch;
       FSearchInProgress := True;
       FSearcher.Execute;
       FilesSearched := FSearcher.FileSearchCount;
