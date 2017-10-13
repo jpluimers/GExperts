@@ -652,6 +652,7 @@ inherited fmGrepResults: TfmGrepResults
       Category = 'History'
       Caption = 'Delete'
       ImageIndex = 11
+      ShortCut = 46
       OnExecute = actHistoryDeleteExecute
       OnUpdate = actHistoryUpdate
     end

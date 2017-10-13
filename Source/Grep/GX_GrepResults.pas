@@ -271,6 +271,7 @@ type
     FSaveItemEmptyCaption: string;
     FSaveSortCaption: string;
     FSavedFormCaption: string;
+    FlbHistoryListIndexForHistoryMenuActions: Integer;
     procedure SetStayOnTop(Value: Boolean);
     procedure RefreshContextLines;
     procedure SetShowContext(Value: Boolean);
@@ -310,6 +311,7 @@ type
     procedure ClearResultsData;
     procedure DoEmbeddedSearch(Sender: TObject);
     procedure UpdateHistoryPagesOptions;
+    property lbHistoryListIndexForHistoryMenuActions: Integer read FlbHistoryListIndexForHistoryMenuActions write FlbHistoryListIndexForHistoryMenuActions;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure AssignSettingsToForm;
@@ -2082,6 +2084,7 @@ begin
     AIndex := lbHistoryList.Count-1;
 
   lbHistoryList.ItemIndex := AIndex;
+  lbHistoryListIndexForHistoryMenuActions := AIndex; // in case actHistroy... actions get fired without pmHistoryMenu being visible
   ViewHistoryListItems(AIndex, True);
 
   AItem := GrepExpert.HistoryList.Items[AIndex];
@@ -2126,7 +2129,7 @@ begin
           gossaShowSearchWindow:
           begin
             ViewHistoryListItems(ClickedEntry, False);
-            pmHistoryMenu.Tag := ClickedEntry;
+            lbHistoryListIndexForHistoryMenuActions := ClickedEntry;
             actHistorySearch.Execute;
           end ;
           gossaShowEmbeddedSearch:
@@ -2137,7 +2140,7 @@ begin
           end;
           gossaAutoRefresh:
           begin
-            pmHistoryMenu.Tag := ClickedEntry;
+            lbHistoryListIndexForHistoryMenuActions := ClickedEntry;
             actHistoryRefresh.Execute;
           end;
           //Auto refresh when double click
@@ -2165,7 +2168,7 @@ begin
         //Auto refresh when double click
         gossaAutoRefreshDouble:
         begin
-          pmHistoryMenu.Tag := ClickedEntry;
+          lbHistoryListIndexForHistoryMenuActions := ClickedEntry;
           actHistoryRefresh.Execute;
         end;
       end;
@@ -2192,7 +2195,7 @@ begin
   if AIndex = -1 then
     AIndex := lbHistoryList.ItemIndex;
 
-  pmHistoryMenu.Tag := AIndex;
+  lbHistoryListIndexForHistoryMenuActions := AIndex;
 
   if AIndex = -1 then
   begin
@@ -2268,14 +2271,14 @@ procedure TfmGrepResults.miHistoryItemNameClick(Sender: TObject);
 var
   AItem: TGrepHistoryListItem;
 begin
-  AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
+  AItem := GrepExpert.HistoryList.Items[lbHistoryListIndexForHistoryMenuActions];
   if Assigned(AItem) then
     Clipboard.AsText := AItem.SearchText;
 end;
 
 procedure TfmGrepResults.actHistoryViewExecute(Sender: TObject);
 begin
-  lbHistoryList.ItemIndex := pmHistoryMenu.Tag;
+  lbHistoryList.ItemIndex := lbHistoryListIndexForHistoryMenuActions;
   ViewHistoryListItems(lbHistoryList.ItemIndex, True);
 end;
 
@@ -2300,7 +2303,7 @@ var
   AItem: TGrepHistoryListItem;
   ASaveSettings: TGrepSettings;
 begin
-  AItem := GrepExpert.HistoryList.Items[pmHistoryMenu.Tag];
+  AItem := GrepExpert.HistoryList.Items[lbHistoryListIndexForHistoryMenuActions];
   if not Assigned(AItem) then
     Exit;
 
@@ -2394,7 +2397,7 @@ var
   AIndex, ATopIndex: Integer;
   IsCurrent: Boolean;
 begin
-  AIndex := pmHistoryMenu.Tag;
+  AIndex := lbHistoryListIndexForHistoryMenuActions;
   if AIndex = -1 then
    Exit;
 
