@@ -54,7 +54,7 @@ type
   TSearchPathEnhancer = class(TIdeDialogEnhancer)
   private
     FForm: TCustomForm;
-    FListbox: TListbox;
+    FListbox: TListBox;
     FMemo: TMemo;
 
     FPageControl: TPageControl;
@@ -208,8 +208,8 @@ begin
     TEdit(_Sender).Text := _Files[0]
   else if _Sender is TMemo then
     TMemo(_Sender).Lines.AddStrings(_Files)
-  else if _Sender is TListbox then
-    TListbox(_Sender).Items.AddStrings(_Files);
+  else if _Sender is TListBox then
+    TListBox(_Sender).Items.AddStrings(_Files);
 end;
 
 function TSearchPathEnhancer.TryGetElementEdit(_Form: TCustomForm; out _ed: TEdit): Boolean;
@@ -388,8 +388,8 @@ begin
     TWinControl_ActivateDropFiles(FEdit, HandleFilesDropped);
 
     cmp := _Form.FindComponent('CreationList');
-    if Assigned(cmp) and (cmp is TListbox) then begin
-      FListbox := TListbox(cmp);
+    if Assigned(cmp) and (cmp is TListBox) then begin
+      FListbox := TListBox(cmp);
 
       TheActionList := TActionList.Create(_Form);
       TheActionList.Name := 'GXTheActionList';
@@ -523,7 +523,7 @@ var
   SelStart: Integer;
   SelEnd: Integer;
 begin
-  SendMessage(FMemo.Handle, EM_GETSEL, LongInt(@SelStart), LongInt(@SelEnd));
+  SendMessage(FMemo.Handle, EM_GETSEL, Longint(@SelStart), Longint(@SelEnd));
   _StartIdx := SendMessage(FMemo.Handle, EM_LINEFROMCHAR, SelStart, 0);
   _EndIdx := SendMessage(FMemo.Handle, EM_LINEFROMCHAR, SelEnd - 1, 0);
 end;
@@ -577,7 +577,7 @@ begin
     for i := StartIdx to EndIdx do begin
       s := sl[i];
       if LeftStr(s, 3) = '..\' then begin
-        s := Copy(s, 4);
+        s := Copy(s, 4, MaxInt);
         sl[i] := s;
       end;
     end;
