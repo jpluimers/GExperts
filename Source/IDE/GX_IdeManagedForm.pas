@@ -1132,14 +1132,26 @@ begin
 end;
 
 procedure TManagedForm.FormDestroy(Sender: TObject);
+var
+  OrigOnDestroy: TNotifyEvent;
 begin
   Assert(Assigned(FForm));
   Assert(FForm = Sender);
 
+  // restore the original OnDestroy event
+  // It's not being called, but there might be code in other plugins
+  // (e.g. IdeFixpack or cnpack) that checks for it.
   FForm.OnDestroy := FOrigOnDestroy;
+  // save it for later (see below)
+  OrigOnDestroy := FOrigOnDestroy;
+  // just in case, set FOrigOnDestroy to nil
   FOrigOnDestroy := nil;
+
   DoSaveFormState;
-  // todo: Shouldn't this call the original OnDestroy event?
+
+  // if it was assigned, call the original OnDestroy event
+  if Assigned(OrigOnDestroy) then
+    OrigOnDestroy(Sender);
 end;
 
 procedure TManagedForm.MakeComponentsResizable;
