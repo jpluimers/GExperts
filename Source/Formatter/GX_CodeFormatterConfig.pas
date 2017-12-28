@@ -137,6 +137,7 @@ type
     chk_NoIndentUsesComma: TCheckBox;
     chk_FeedBeforeElse: TCheckBox;
     chk_NoIndentVarDecl: TCheckBox;
+    p_Main: TPanel;
     procedure b_HelpClick(Sender: TObject);
     procedure b_EditCapitalizationClick(Sender: TObject);
     procedure ts_PreviewShow(Sender: TObject);
@@ -183,6 +184,7 @@ implementation
 uses
   Messages,
   GX_dzVclUtils,
+  GX_GxUtils,
   GX_CodeFormatterConfigHandler,
   GX_CodeFormatterEditCapitalization,
   GX_CodeFormatterDefaultSettings;
@@ -255,6 +257,8 @@ begin
   lb_Precedence.Items.AddObject(str_PrecedenceDirective, Pointer(cpDirective));
   lb_Precedence.Items.AddObject(str_PrecedenceIniFile, Pointer(cpIniFile));
   lb_Precedence.Items.AddObject(str_PrecedenceMySettings, Pointer(cpMyConfig));
+
+  SetDefaultFont(Self);
 end;
 
 destructor TfmCodeFormatterConfig.Destroy;
@@ -405,7 +409,7 @@ begin
   _Settings.NoIndentElseIf := chk_NoIndentElseIf.Checked;
   _Settings.NoIndentVarDecl := chk_NoIndentVarDecl.Checked;
   _Settings.NoIndentUsesComma := chk_NoIndentUsesComma.Checked;
-  _Settings.FeedBeforeElse :=  chk_FeedBeforeElse.Checked;
+  _Settings.FeedBeforeElse := chk_FeedBeforeElse.Checked;
   _Settings.FeedBeforeEnd := chk_FeedBeforeEnd.Checked;
   _Settings.FeedAfterSemiColon := chk_FeedAfterSemiColon.Checked;
   _Settings.FillNewWords := IntToCapfileMode(rg_Capitalization.ItemIndex);
