@@ -90,7 +90,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = 'OK'
+    Caption = '&OK'
     Default = True
     ModalResult = 1
     TabOrder = 7
@@ -111,7 +111,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Top = 88
     Width = 75
     Height = 25
-    Caption = '>> Add >>'
+    Caption = '>> &Add >>'
     TabOrder = 1
     OnClick = b_AddClick
   end
@@ -120,7 +120,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Top = 128
     Width = 75
     Height = 25
-    Caption = 'Remove <<'
+    Caption = '&Remove <<'
     TabOrder = 2
     OnClick = b_RemoveClick
   end
@@ -130,7 +130,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = 'Default >>'
+    Caption = '&Default >>'
     TabOrder = 3
     OnClick = b_DefaultClick
   end

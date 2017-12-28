@@ -313,6 +313,7 @@ begin
     if not (Expert is TGxEditorPopupMenuExpert) then
       lb_EditorExperts.Items.AddObject(Expert.GetDisplayName, Expert);
   end;
+  lb_EditorExperts.Sorted := True;
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.EnableOKCancel;
