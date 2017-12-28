@@ -277,6 +277,7 @@ var
   SettingsControl: TWinControl;
   al: TActionList;
   lbl: TLabel;
+  act: TCustomAction;
 begin
   if _Form.FindComponent(GX_ACTION_LIST) = nil then begin
     al := TActionList.Create(_Form);
@@ -284,20 +285,22 @@ begin
 
     FOkBtn := _Form.FindComponent('OKButton') as TButton;
     if Assigned(FOkBtn) then begin
-      TActionlist_Append(al, 'OK', ShiftCtrlO, ShortCut(Ord('O'), [ssShift, ssCtrl]));
-      FOkBtn.Caption := 'OK (s+c+O)';
+      act := TActionlist_Append(al, 'OK', ShiftCtrlO, ShortCut(VK_RETURN, [ssCtrl]));
+      act.SecondaryShortCuts.Add(ShortCutToText(ShortCut(Ord('O'), [ssShift, ssCtrl])));
+      FOkBtn.Hint := ShortCutToText(act.ShortCut);
+      FOkBtn.ShowHint := True;
     end;
+
     FConfigCombo := _Form.FindComponent('cbConfig') as TCustomCombo;
     if Assigned(FConfigCombo) then begin
-      TActionlist_Append(al, 'Target', ShiftCtrlT, ShortCut(Ord('T'), [ssShift, ssCtrl]));
+      act := TActionlist_Append(al, 'Target', ShiftCtrlT, ShortCut(Ord('T'), [ssShift, ssCtrl]));
       lbl := _Form.FindComponent('Label1') as TLabel; // sic!
       if Assigned(lbl) then begin
         lbl.AutoSize := False;
-        lbl.Top := FConfigCombo.Top;
-        lbl.Height := lbl.Height * 2;
+
         lbl.Width := FConfigCombo.Left - lbl.Left;
-        lbl.WordWrap := True;
-        lbl.Caption := '&Target: (s+c+T)';
+        lbl.Hint := ShortCutToText(act.ShortCut);
+        lbl.ShowHint := True;
       end;
     end;
   end;
