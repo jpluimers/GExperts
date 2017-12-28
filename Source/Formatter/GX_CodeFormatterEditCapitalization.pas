@@ -76,7 +76,8 @@ implementation
 
 uses
   GX_dzVclUtils,
-  GX_dzClassUtils;
+  GX_dzClassUtils,
+  GX_GxUtils;
 
 { TfmCodeFormatterCapitalization }
 
@@ -99,6 +100,8 @@ begin
   FWords.OnExit := HandleOnExitList;
   FWords.ActiveLineColor := clYellow;
   FWords.WantTabs := False;
+
+  SetDefaultFont(Self);
 end;
 
 procedure TfmCodeFormatterEditCapitalization.ListToForm(_Words: TGXUnicodeStringList);
@@ -199,6 +202,8 @@ begin
     FWords.GetLines(sl);
     TGXUnicodeStringList_MakeIndex(sl);
     sl.Find(s, Idx);
+    if Idx >= sl.Count then
+      Idx := sl.Count - 1;
     FWords.CaretXY := Point(0, NativeInt(sl.Objects[Idx]) - 1);
   finally
     FreeAndNil(sl);
