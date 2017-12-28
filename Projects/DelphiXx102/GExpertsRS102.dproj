@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -76,7 +76,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_HostApplication>C:\Delphi\Delphi_10_1\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>C:\delphi\Delphi_10.2\bin\bds.exe</Debugger_HostApplication>
         <Debugger_RunParams>-ns</Debugger_RunParams>
         <VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
     </PropertyGroup>
@@ -528,6 +528,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_ConfigureFormEnhancements.pas">
+            <Form>frConfigureFormEnhancements</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
