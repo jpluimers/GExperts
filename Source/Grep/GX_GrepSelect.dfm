@@ -56,7 +56,6 @@ inherited fmGrepSelect: TfmGrepSelect
     ReadOnly = True
     RowSelect = True
     ParentFont = False
-    SortType = stData
     TabOrder = 0
     ViewStyle = vsReport
     OnAdvancedCustomDrawItem = lvHistoryListAdvancedCustomDrawItem
