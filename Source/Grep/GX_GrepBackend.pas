@@ -1921,7 +1921,9 @@ begin
 
         if FListMode = hlmResults then
           Result := RI;
-      end;
+      end
+      else
+        Inc(FromI);
     end
     else
       Inc(FromI);
@@ -1969,6 +1971,7 @@ var
         AItem := TGrepHistoryListItem.Create(ADefGrepSettings);
         AItem.GrepSettingsSaveOption := gsoSaveSettingsAndResults;
         AItem.LoadFromIni(AIni, AIniVersion, ifmSingle, Key + PathDelim + Format('%s%d', [AItemSubKeyName, I]));
+        AItem.FKeyIndex := GetNextIndex;
         AItem.GrepSettingsSaveOption := ASaveOption;
 
         SearchHistoryItem(AItem.GrepSettings, AHistoryItem);
