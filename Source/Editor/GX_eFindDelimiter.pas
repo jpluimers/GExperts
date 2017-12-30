@@ -53,7 +53,7 @@ implementation
 uses
   SysUtils, Windows, Dialogs,
   mwPasTokenList, mwBCBTokenList,
-  GX_EditReader, GX_GenericUtils, GX_OtaUtils;
+  GX_GenericUtils, GX_OtaUtils;
 
 resourcestring
   SDelimiterHelpPrefix =
@@ -85,23 +85,15 @@ resourcestring
 
 { TBaseDelimiterExpert }
 
-function GetFileContent(out FileContent: string; const FileName: string;
-  var EditorLine: string): Integer;
+function GetFileContent(out FileContent: string; SourceEditor: IOTASourceEditor): Integer;
 var
-  EditRead: TEditReader;
-  CharPos: TOTACharPos;
+  StartOffset: Integer;
+  ColumnNo: Integer;
+  LineNo: Integer;
 begin
-  // Since this edit reader is destroyed almost
-  // immediately, do not call FreeFileData.
-  EditRead := TEditReader.Create(FileName);
-  try
-    FileContent := EditRead.GetText;
-    FileContent := AdjustLineBreaks(FileContent, tlbsCRLF);
-    CharPos :=EditRead.GetCurrentCharPos;
-    Result := LinePosToCharPos(Point(CharPos.CharIndex + 1, CharPos.Line), FileContent);
-  finally
-    FreeAndNil(EditRead);
-  end;
+  FileContent := GxOtaReadEditorTextToString(GxOtaGetEditReaderForSourceEditor(SourceEditor));
+  GxOtaGetCurrentLineData(StartOffset, ColumnNo, LineNo);
+  Result := LinePosToCharPos(Point(ColumnNo + 1, LineNo), FileContent);
 end;
 
 { TODO 4 -oAnyone -cCleanup:
@@ -128,7 +120,6 @@ var
 
   MessageToken: string;
   TextToken: string;
-  EditorLine: string;
   FileName: string;
 
   Language: TSourceLanguage;
@@ -610,9 +601,9 @@ begin
 
   Module := GxOtaGetCurrentModule;
   if (not Assigned(Module)) or not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
-    Exit;
+    Exit; //==>
 
-  SPos := GetFileContent(FileContent, SourceEditor.FileName, EditorLine);
+  SPos := GetFileContent(FileContent, SourceEditor);
 
   if Language = ltPas then
   begin
