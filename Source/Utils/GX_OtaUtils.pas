@@ -67,6 +67,9 @@ const
   sDesignPersonality = 'Design.Personality';
   {$ENDIF}
 
+// returns an IOTAEditReader for the given or the current IOTASourceEditor if none is specified
+function GxOtaGetEditReaderForSourceEditor(SourceEditor: IOTASourceEditor = nil): IOTAEditReader;
+
 // Save an edit reader to a stream
 procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream; TrailingNull: Boolean = True);
 
@@ -3933,7 +3936,7 @@ var
   EditReaderPos: Integer;
   ReadDataSize: Integer;
   Buffer: array[0..EditReaderBufferSize] of AnsiChar; // Array of bytes, might be UTF-8
-  begin
+begin
   Assert(EditReader <> nil);
   Assert(Stream <> nil);
 
