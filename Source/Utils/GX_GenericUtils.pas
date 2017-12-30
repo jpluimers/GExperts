@@ -771,7 +771,7 @@ uses
   {$IFDEF UNICODE} Character, {$ENDIF}
   {$IFDEF HAS_SHLWAPI} ShLwApi, {$ENDIF}
   ShellAPI, ShlObj, ActiveX, StrUtils, Math,
-  GX_dzSelectDirectoryFix;
+  GX_OtaUtils, GX_dzSelectDirectoryFix;
 
 const
   shlwapi32 = 'shlwapi.dll';
@@ -4159,6 +4159,8 @@ var
   LineIdx: Integer;
   Offset: Integer;
   LineLen: Integer;
+  LeftLinePart: string;
+  ColumnError: Integer;
 begin
   Assert(CharPos > 0);
 
@@ -4172,7 +4174,10 @@ begin
       if Offset + LineLen > CharPos then begin
         Result.Y := LineIdx + 1;
         Result.X := CharPos - Offset;
-        Exit;
+        LeftLinePart := Copy(sl[LineIdx], 1, Result.X - 1);
+        ColumnError := Length(ConvertToIDEEditorString(LeftLinePart)) - Length(LeftLinePart);
+        Result.X := Result.X + ColumnError;
+        Exit; //==>
       end else begin
         Inc(LineIdx);
         Offset := Offset + LineLen;
