@@ -1198,6 +1198,7 @@ resourcestring
     Match: TMatchResult;
     NextMatchStart: Integer;
     PrevMatchEnd: Integer;
+    LineMatches: TLineMatches;
   begin
     // Paint a search match line number and highlighted match
     ALineResult := lbResults.Items.Objects[Index] as TLineResult;
@@ -1249,13 +1250,14 @@ resourcestring
 
     if not FShowLineIndent then
     begin
-      if ALineResult.Matches.Count > 0 then
+      LineMatches := ALineResult.Matches;
+      if Assigned(LineMatches) and (LineMatches.Count > 0) then
       begin
         // Avoid trimming inside the first match :
         Trimmed := 0;
         while (Length(LineText) > Trimmed)
           and CharInSet(LineText[Trimmed + 1], [#9, #32])
-          and (Trimmed < ALineResult.Matches[0].SPos - 1) do
+          and (Trimmed < LineMatches[0].SPos - 1) do
             Inc(Trimmed);
 
         if Trimmed > 0 then
@@ -2395,15 +2397,19 @@ end;
 procedure TfmGrepResults.actHistoryDeleteExecute(Sender: TObject);
 var
   AIndex, ATopIndex: Integer;
-  IsCurrent: Boolean;
+  NewItemIndex: Integer;
 begin
   AIndex := lbHistoryListIndexForHistoryMenuActions;
   if AIndex = -1 then
-   Exit;
+   Exit; //==>
 
-  IsCurrent := AIndex = lbHistoryList.ItemIndex;
-  if IsCurrent then
+  if AIndex = lbHistoryList.ItemIndex then begin
     ClearResultsData;
+  end;
+
+  NewItemIndex := lbHistoryList.ItemIndex;
+  if NewItemIndex > AIndex then
+    Dec(NewItemIndex);  
 
   GrepExpert.HistoryListDeleteFromSettings(delOneItem, AIndex);
 
@@ -2413,14 +2419,12 @@ begin
   lbHistoryList.Count := GrepExpert.HistoryList.Count;
   if AIndex >= lbHistoryList.Count then
     Dec(AIndex);
-  if (ATopIndex < lbHistoryList.Count) and (AIndex < lbHistoryList.Count-1) then
+  if (ATopIndex < lbHistoryList.Count) and (AIndex < lbHistoryList.Count - 1) then
     lbHistoryList.TopIndex := ATopIndex;
 
-  if IsCurrent and (AIndex > -1) then
-  begin
-    lbHistoryList.ItemIndex := AIndex;
-    ViewHistoryListItems(lbHistoryList.ItemIndex, True);
-  end ;
+  if lbHistoryList.ItemIndex <> NewItemIndex then
+    lbHistoryList.ItemIndex := NewItemIndex;
+  ViewHistoryListItems(NewItemIndex, True);
 end;
 
 procedure TfmGrepResults.actHistoryDeleteSelectedExecute(Sender: TObject);
