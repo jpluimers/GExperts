@@ -1024,7 +1024,7 @@ end;
 
 procedure TfmMacroLibrary.InstallKeyboardBindings;
 begin
-  Assert(not Assigned(FShortCut));
+  Assert(not Assigned(FShortCut), 'FShortCut is already assigend');
   FShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(RecordShortcutCallback, ShortCut(Ord('R'), [ssCtrl, ssShift]));
 end;
 
