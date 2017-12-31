@@ -55,8 +55,8 @@ begin
         _SortOrder := esoReverse;
       else
         Result := False;
-      _Ignore := frm.chkIgnoreFunction.Checked;
     end;
+    _Ignore := frm.chkIgnoreFunction.Checked;
   finally
     FreeAndNil(frm);
   end;
@@ -102,12 +102,22 @@ begin
 end;
 
 function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
+const
+  PrefixArray: array[1..8] of string = (
+    'procedure',
+    'function',
+    'class procedure',
+    'class function',
+    'property',
+    'constructor',
+    'destructor',
+    'class operator');
 
-  function StripPrefix(const _Prefix: string; var _Line: string): boolean;
+  function StripPrefix(const _Prefix: string; var _Line: string): Boolean;
   begin
-    Result := AnsiStartsText(_Prefix, _Line);
+    Result := AnsiStartsText(_Prefix + ' ', _Line);
     if Result then
-      _Line := Copy(_Line, Length(_Prefix), 255);
+      _Line := Trim(Copy(_Line, Length(_Prefix) + 1, 255));
   end;
 
 var
@@ -117,54 +127,58 @@ var
   Direction: integer;
   IgnoreFunction: Boolean;
   s: string;
+  PrefixIdx: Integer;
 begin
   Result := False;
 
-  if Lines.Count > 1 then
-  begin
-    if not  TfmeSortConfig.Execute(SortOrder, IgnoreFunction) then
-      exit;
+  if Lines.Count < 1 then
+    Exit; //==>
 
-    // The trim mess here is so we can ignore whitespace when sorting
-    SortedList := nil;
-    TrimList := TGXUnicodeStringList.Create;
-    try
-      SortedList := TGXUnicodeStringList.Create;
-      for i := 0 to Lines.Count - 1 do begin
-        s := TrimLeft(Lines[i]);
-        if IgnoreFunction then
-          if not StripPrefix('procedure ', s) then
-            StripPrefix('function ', s);
-        TrimList.AddObject(s, TObject(i));
-      end;
-      case SortOrder of
-        esoAscending: begin
-          i := 0;
-          Direction := 1;
-          TrimList.SortLogical;
+  if not TfmeSortConfig.Execute(SortOrder, IgnoreFunction) then
+    exit;
+
+  // The trim mess here is so we can ignore whitespace when sorting
+  SortedList := nil;
+  TrimList := TGXUnicodeStringList.Create;
+  try
+    SortedList := TGXUnicodeStringList.Create;
+    for i := 0 to Lines.Count - 1 do begin
+      s := TrimLeft(Lines[i]);
+      if IgnoreFunction then begin
+        for PrefixIdx := Low(PrefixArray) to HIgh(PrefixArray) do begin
+          if StripPrefix(PrefixArray[PrefixIdx], s) then
+            Break; //==>
         end;
-        esoDescending: begin
-          i := TrimList.Count - 1;
-          Direction := -1;
-          TrimList.SortLogical;
-        end
-      else // esoReverse:
+      end;
+      TrimList.AddObject(s, TObject(i));
+    end;
+    case SortOrder of
+      esoAscending: begin
+        i := 0;
+        Direction := 1;
+        TrimList.SortLogical;
+      end;
+      esoDescending: begin
         i := TrimList.Count - 1;
         Direction := -1;
-      end;
-      while (i >= 0) and (i < TrimList.Count) do begin
-        SortedList.Add(Lines[NativeInt(TrimList.Objects[i])]);
-        i := i + Direction;
-      end;
-      Lines.Clear;
-      for i := 0 to SortedList.Count - 1 do
-        Lines.add(SortedList[i]);
-    finally
-      FreeAndNil(SortedList);
-      FreeAndNil(TrimList);
+        TrimList.SortLogical;
+      end
+    else // esoReverse:
+      i := TrimList.Count - 1;
+      Direction := -1;
     end;
-    Result := True;
+    while (i >= 0) and (i < TrimList.Count) do begin
+      SortedList.Add(Lines[NativeInt(TrimList.Objects[i])]);
+      i := i + Direction;
+    end;
+    Lines.Clear;
+    for i := 0 to SortedList.Count - 1 do
+      Lines.add(SortedList[i]);
+  finally
+    FreeAndNil(SortedList);
+    FreeAndNil(TrimList);
   end;
+  Result := True;
 end;
 
 initialization
