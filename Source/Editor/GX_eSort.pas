@@ -13,10 +13,11 @@ uses
   Forms,
   Dialogs,
   StdCtrls,
-  GX_BaseForm;
+  GX_BaseForm,
+  GX_GenericUtils;
 
 type
-  TeSortOrder = (esoAscending, esoDescending, esoReverse);
+  TeSortOrder = (esoAscending, esoDescending, esoReverse, esoCustom);
 
 type
   TfmeSortConfig = class(TfmBaseForm)
@@ -24,10 +25,15 @@ type
     btnDescending: TButton;
     btnReverse: TButton;
     btnCancel: TButton;
+    grpSort: TGroupBox;
     chkIgnoreFunction: TCheckBox;
+    btnCustom: TButton;
+    btnConfigCustom: TButton;
+    procedure btnConfigCustomClick(Sender: TObject);
   private
+    FCustomPrefixOrder: TGXUnicodeStringList;
   public
-    class function Execute(out _SortOrder: TeSortOrder; out _Ignore: Boolean): Boolean;
+    class function Execute(_CustomPrefixOrder: TGXUnicodeStringList; out _SortOrder: TeSortOrder; out _Ignore: Boolean): Boolean;
   end;
 
 implementation
@@ -35,16 +41,26 @@ implementation
 {$R *.dfm}
 
 uses
-  GX_EditorExpert, GX_eSelectionEditorExpert, GX_GenericUtils, StrUtils;
+  StrUtils,
+  {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE}
+  GX_EditorExpert, GX_eSelectionEditorExpert,
+  GX_eSortOptions, GX_dzQuicksort, Math;
 
 { TfmeSortConfig }
 
-class function TfmeSortConfig.Execute(out _SortOrder: TeSortOrder; out _Ignore: Boolean): Boolean;
+procedure TfmeSortConfig.btnConfigCustomClick(Sender: TObject);
+begin
+  TfrmSortOptions.Execute(Self, FCustomPrefixOrder);
+end;
+
+class function TfmeSortConfig.Execute(_CustomPrefixOrder: TGXUnicodeStringList; out _SortOrder: TeSortOrder;
+  out _Ignore: Boolean): Boolean;
 var
   frm: TfmeSortConfig;
 begin
   frm := TfmeSortConfig.Create(nil);
   try
+    frm.FCustomPrefixOrder := _CustomPrefixOrder;
     Result := True;
     case frm.ShowModal of
       mrYes:
@@ -53,8 +69,10 @@ begin
         _SortOrder := esoDescending;
       mrRetry:
         _SortOrder := esoReverse;
-      else
-        Result := False;
+      mrAll:
+        _SortOrder := esoCustom;
+    else
+      Result := False;
     end;
     _Ignore := frm.chkIgnoreFunction.Checked;
   finally
@@ -62,18 +80,48 @@ begin
   end;
 end;
 
+const
+  PREFIX_NONE = '<none>';
+
 type
   TSortExpert = class(TSelectionEditorExpert)
+  private
+    FCustomPrefixOrder: TGXUnicodeStringList;
   protected
     function ProcessSelected(Lines: TStrings): Boolean; override;
   public
     class function GetName: string; override;
+    constructor Create; override;
+    destructor Destroy; override;
     function GetDisplayName: string; override;
     function GetHelpString: string; override;
     function HasConfigOptions: boolean; override;
   end;
 
 { TSortExpert }
+
+constructor TSortExpert.Create;
+begin
+  inherited;
+  
+  FCustomPrefixOrder:= TGXUnicodeStringList.Create;
+  // default sort order for custom sort
+  FCustomPrefixOrder.Add(PREFIX_NONE);
+  FCustomPrefixOrder.Add('class function');
+  FCustomPrefixOrder.Add('class procedure');
+  FCustomPrefixOrder.Add('constructor');
+  FCustomPrefixOrder.Add('destructor');
+  FCustomPrefixOrder.Add('class operator');
+  FCustomPrefixOrder.Add('function');
+  FCustomPrefixOrder.Add('procedure');
+  FCustomPrefixOrder.Add('property');
+end;
+
+destructor TSortExpert.Destroy;
+begin
+  FreeAndNil(FCustomPrefixOrder);
+  inherited;
+end;
 
 function TSortExpert.GetDisplayName: string;
 resourcestring
@@ -101,14 +149,35 @@ begin
   Result := False;
 end;
 
+type
+  TStringListSorter = class
+  private
+    FStringList: TGXUnicodeStringList;
+  protected
+    function CompareItems(_Idx1, _Idx2: Integer): Integer; virtual; abstract;
+  public
+    constructor Create(_StringList: TGXUnicodeStringList);
+    procedure Sort;
+  end;
+
+  TStringListCustomSorter = class(TStringListSorter)
+  private
+    FCustomPrefixOrder: TGXUnicodeStringList;
+  protected
+    function CompareItems(_Idx1, _Idx2: Integer): Integer; override;
+  public
+    constructor Create(_StringList: TGXUnicodeStringList; _CustomPrefixOrder: TGXUnicodeStringList);
+  end;
+
 function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
 const
   PrefixArray: array[1..8] of string = (
+    // ordered by probablility, not that it matters much
     'procedure',
     'function',
+    'property',
     'class procedure',
     'class function',
-    'property',
     'constructor',
     'destructor',
     'class operator');
@@ -128,16 +197,20 @@ var
   IgnoreFunction: Boolean;
   s: string;
   PrefixIdx: Integer;
+  Sorter: TStringListCustomSorter;
 begin
   Result := False;
 
   if Lines.Count < 1 then
     Exit; //==>
 
-  if not TfmeSortConfig.Execute(SortOrder, IgnoreFunction) then
+  if not TfmeSortConfig.Execute(FCustomPrefixOrder, SortOrder, IgnoreFunction) then
     exit;
 
-  // The trim mess here is so we can ignore whitespace when sorting
+  if not (SortOrder in [esoAscending, esoDescending]) then
+    IgnoreFunction := False;
+
+  // we use a special SortedList in order to ignore leading white space and prefixes 
   SortedList := nil;
   TrimList := TGXUnicodeStringList.Create;
   try
@@ -145,7 +218,7 @@ begin
     for i := 0 to Lines.Count - 1 do begin
       s := TrimLeft(Lines[i]);
       if IgnoreFunction then begin
-        for PrefixIdx := Low(PrefixArray) to HIgh(PrefixArray) do begin
+        for PrefixIdx := Low(PrefixArray) to High(PrefixArray) do begin
           if StripPrefix(PrefixArray[PrefixIdx], s) then
             Break; //==>
         end;
@@ -162,7 +235,17 @@ begin
         i := TrimList.Count - 1;
         Direction := -1;
         TrimList.SortLogical;
-      end
+      end;
+      esoCustom: begin
+        i := 0;
+        Direction := 1;
+        Sorter := TStringListCustomSorter.Create(TrimList, FCustomPrefixOrder);
+        try
+          Sorter.Sort;
+        finally
+                    FreeAndNil(Sorter);
+        end;
+      end;
     else // esoReverse:
       i := TrimList.Count - 1;
       Direction := -1;
@@ -179,6 +262,74 @@ begin
     FreeAndNil(TrimList);
   end;
   Result := True;
+end;
+
+{ TStringListSorter }
+
+constructor TStringListSorter.Create(_StringList: TGXUnicodeStringList);
+begin
+  inherited Create;
+  FStringList := _StringList;
+end;
+
+procedure TStringListSorter.Sort;
+begin
+  QuickSort(0, FStringList.Count-1, CompareItems, FStringList.Exchange);
+end;
+
+{ TStringListCustomSorter }
+
+constructor TStringListCustomSorter.Create(_StringList, _CustomPrefixOrder: TGXUnicodeStringList);
+begin
+  inherited Create(_StringList);
+  FCustomPrefixOrder := _CustomPrefixOrder;
+end;
+
+function TStringListCustomSorter.CompareItems(_Idx1, _Idx2: Integer): Integer;
+var
+  s1: TGXUnicodeString;
+  s2: TGXUnicodeString;
+  Prefix: TGXUnicodeString;
+  NoneIdx: Integer;
+  PrefixIdx1: Integer;
+  PrefixIdx2: Integer;
+  i: Integer;
+begin
+  s1 := FStringList[_Idx1];
+  s2 := FStringList[_Idx2];
+
+  // Determine the PrefixIdx for the given strings
+  NoneIdx := -1;
+  PrefixIdx1 := -1;
+  PrefixIdx2 := -1;
+  for i := 0 to FCustomPrefixOrder.Count - 1 do begin
+    Prefix := FCustomPrefixOrder[i];
+    if Prefix = PREFIX_NONE then
+      NoneIdx := i
+    else begin
+      Prefix := Prefix + ' ';
+      if (PrefixIdx1 = -1) and StartsText(Prefix, s1) then begin
+        PrefixIdx1 := i;
+        s1 := Copy(s1, Length(Prefix) + 1, 255);
+      end;
+      if (PrefixIdx2 = -1) and StartsText(Prefix, s2) then begin
+        PrefixIdx2 := i;
+        s2 := Copy(s2, Length(Prefix) + 1, 255);
+      end;
+    end;
+  end;
+
+  // Set the PrefixIdx to NoneIdx, if they are still -1
+  if PrefixIdx1 = -1 then
+    PrefixIdx1 := NoneIdx;
+  if PrefixIdx2 = -1 then
+    PrefixIdx2 := NoneIdx;
+
+  // Compare by PrefixIdx first and then alphabetically
+  Result := CompareValue(PrefixIdx1, PrefixIdx2);
+  if Result = 0 then begin
+    Result := CompareText(s1, s2);
+  end;
 end;
 
 initialization
