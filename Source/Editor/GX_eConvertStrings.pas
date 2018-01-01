@@ -149,6 +149,7 @@ begin
   chk_ExtractRaw.Left := x;
   chk_TrimLeft.Left := x;
   chk_TrimRight.Left := x;
+  chk_Indent.Left := X;
   rg_ConvertType.Left := x;
   chk_QuoteStrings.Left := x;
   chk_AppendSpace.Left := x;
