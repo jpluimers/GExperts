@@ -532,6 +532,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <Form>frConfigureFormEnhancements</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eSortOptions.pas">
+            <Form>frmSortOptions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
