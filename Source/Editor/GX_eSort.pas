@@ -202,7 +202,7 @@ begin
   sl := TStringList.Create;
   try
     for i := 0 to FCustomPrefixOrder.Count - 1 do begin
-      sl.Add(AnsiString(FCustomPrefixOrder[i]));
+      sl.Add(String(FCustomPrefixOrder[i]));
     end;
     Settings.WriteStrings('CustomSortOrder', sl);
   finally
