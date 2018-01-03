@@ -252,6 +252,9 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
     <DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
       <Form>fmeSortConfig</Form>
     </DCCReference>
+    <DCCReference Include="..\..\Source\Editor\GX_eSortOptions.pas">
+      <Form>frmSortOptions</Form>
+    </DCCReference>
     <DCCReference Include="..\..\Source\Editor\GX_eWarn.pas">
       <Form>fmConfigureWarning</Form>
     </DCCReference>
@@ -343,6 +346,10 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
       <Form>frConfigureExperts</Form>
       <DesignClass>TFrame</DesignClass>
     </DCCReference>
+    <DCCReference Include="..\..\Source\Framework\GX_ConfigureFormEnhancements.pas">
+      <Form>frConfigureFormEnhancements</Form>
+      <DesignClass>TFrame</DesignClass>
+    </DCCReference>
     <DCCReference Include="..\..\source\Framework\GX_Consts.pas" />
     <DCCReference Include="..\..\source\Framework\GX_DbugIntf.pas" />
     <DCCReference Include="..\..\source\Framework\GX_DesignerMenu.pas" />
@@ -426,6 +433,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
     <DCCReference Include="..\..\Source\IDE\GX_IdeGotoEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas" />
+    <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdePackageRenameDlg.pas">
       <Form>fmIdxPackageRenameDlg</Form>
