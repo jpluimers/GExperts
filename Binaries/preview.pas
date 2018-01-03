@@ -12,35 +12,43 @@ uses Windows, SysUtils, Classes,
 type
   TClass = class(TObject)
   private
-    procedure M1(S: Integer); virtual;
+    FField1,
+    FField2: integer;
+    procedure M1(S: integer); virtual;
   public
-    function Foo: Integer;
+    function Foo: integer;
   end;
 
 implementation
 
-function Foo: Integer;
+function Foo: integer;
 begin
   Result := 0;
+  case Result of
+    1: Result := 2;
+    else Result := 3;
+  end;
 end;
 
-procedure TClass.M1(S: Integer);
+procedure TClass.M1(S, K: integer;
+  S2, K2: Single);
   procedure SubProc;
   begin
     S := 9;
   end;
 const
   J = 10;
+  V = 12.5;
 var
-  J: Double;
+  J,
+  I: Double;
 begin
-  if S > J then
-  begin
+  if S > J then begin
     SubProc;
   end
-  else
-  begin
+  else begin
     S := Foo;
   end;
 end;
 end.
+
