@@ -26,6 +26,7 @@ type
     // script located in that directory.
     // It is possible to return an empty string. This
     // signals that no icon file is available.
+    // Defaults to GetName.
     function GetBitmapFileName: string; virtual;
     // Overrride to load any configuration settings
     procedure InternalLoadSettings(Settings: TExpertSettings); virtual;
