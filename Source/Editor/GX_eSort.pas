@@ -41,9 +41,10 @@ implementation
 {$R *.dfm}
 
 uses
+  {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   StrUtils,
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE}
-  GX_EditorExpert, GX_eSelectionEditorExpert,
+  GX_EditorExpert, GX_eSelectionEditorExpert, GX_ConfigurationInfo,
   GX_eSortOptions, GX_dzQuicksort, Math;
 
 { TfmeSortConfig }
@@ -96,25 +97,39 @@ type
     function GetDisplayName: string; override;
     function GetHelpString: string; override;
     function HasConfigOptions: boolean; override;
+    procedure Configure; override;
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   end;
 
 { TSortExpert }
 
+const
+  PrefixArray: array[1..9] of string = (
+    // default sort order for custom sort
+    // do not translate!
+    'class function',
+    'class procedure',
+    'class operator',
+    'class property',
+    'constructor',
+    'destructor',
+    'function',
+    'procedure',
+    'property');
+
+
 constructor TSortExpert.Create;
+var
+  i: integer;
 begin
   inherited;
-  
+
   FCustomPrefixOrder:= TGXUnicodeStringList.Create;
-  // default sort order for custom sort
+
   FCustomPrefixOrder.Add(PREFIX_NONE);
-  FCustomPrefixOrder.Add('class function');
-  FCustomPrefixOrder.Add('class procedure');
-  FCustomPrefixOrder.Add('constructor');
-  FCustomPrefixOrder.Add('destructor');
-  FCustomPrefixOrder.Add('class operator');
-  FCustomPrefixOrder.Add('function');
-  FCustomPrefixOrder.Add('procedure');
-  FCustomPrefixOrder.Add('property');
+  for i := Low(PrefixArray) to High(PrefixArray) do
+    FCustomPrefixOrder.Add(PrefixArray[i]);
 end;
 
 destructor TSortExpert.Destroy;
@@ -146,7 +161,53 @@ end;
 
 function TSortExpert.HasConfigOptions: boolean;
 begin
-  Result := False;
+  Result := True;
+end;
+
+
+procedure TSortExpert.Configure;
+begin
+  TfrmSortOptions.Execute(nil, FCustomPrefixOrder);
+end;
+
+procedure TSortExpert.InternalLoadSettings(Settings: TExpertSettings);
+var
+  sl: TStringList;
+  i: Integer;
+begin
+  inherited;
+  sl := TStringList.Create;
+  try
+    Settings.ReadStrings('CustomSortOrder', sl);
+    if sl.Count <> Length(PrefixArray) + 1 then begin
+      {$IFOPT D+}SendDebug('Number of CustomSortOrder items is wrong, ignoring them.'); {$ENDIF}
+      Exit; //==>
+    end;
+
+    FCustomPrefixOrder.Clear;
+    for i := 0 to sl.Count - 1 do begin
+      FCustomPrefixOrder.Add(sl[i]);
+    end;
+  finally
+    FreeAndNil(sl);
+  end;
+end;
+
+procedure TSortExpert.InternalSaveSettings(Settings: TExpertSettings);
+var
+  sl: TStringList;
+  i: Integer;
+begin
+  inherited;
+  sl := TStringList.Create;
+  try
+    for i := 0 to FCustomPrefixOrder.Count - 1 do begin
+      sl.Add(AnsiString(FCustomPrefixOrder[i]));
+    end;
+    Settings.WriteStrings('CustomSortOrder', sl);
+  finally
+    FreeAndNil(sl);
+  end;
 end;
 
 type
@@ -170,17 +231,6 @@ type
   end;
 
 function TSortExpert.ProcessSelected(Lines: TStrings): Boolean;
-const
-  PrefixArray: array[1..8] of string = (
-    // ordered by probablility, not that it matters much
-    'procedure',
-    'function',
-    'property',
-    'class procedure',
-    'class function',
-    'constructor',
-    'destructor',
-    'class operator');
 
   function StripPrefix(const _Prefix: string; var _Line: string): Boolean;
   begin

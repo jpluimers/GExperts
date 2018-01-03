@@ -1,28 +1,28 @@
 inherited frmSortOptions: TfrmSortOptions
   BorderStyle = bsDialog
   Caption = 'Sort Options'
-  ClientHeight = 224
-  ClientWidth = 193
+  ClientHeight = 249
+  ClientWidth = 217
   PixelsPerInch = 96
   TextHeight = 13
   object grpSortOrder: TGroupBox
     Left = 8
     Top = 8
-    Width = 177
-    Height = 169
+    Width = 201
+    Height = 201
     Caption = 'Sort order for prefixes'
     TabOrder = 0
     object lbxGroupOrder: TListBox
       Left = 8
       Top = 24
-      Width = 129
-      Height = 137
+      Width = 153
+      Height = 169
       ItemHeight = 13
       TabOrder = 0
       OnClick = lbxGroupOrderClick
     end
     object btnUp: TBitBtn
-      Left = 144
+      Left = 168
       Top = 64
       Width = 25
       Height = 25
@@ -105,7 +105,7 @@ inherited frmSortOptions: TfrmSortOptions
       NumGlyphs = 2
     end
     object btnDown: TBitBtn
-      Left = 144
+      Left = 168
       Top = 96
       Width = 25
       Height = 25
@@ -188,8 +188,8 @@ inherited frmSortOptions: TfrmSortOptions
     end
   end
   object btnOK: TButton
-    Left = 16
-    Top = 192
+    Left = 40
+    Top = 216
     Width = 81
     Height = 26
     Caption = '&OK'
@@ -198,8 +198,8 @@ inherited frmSortOptions: TfrmSortOptions
     TabOrder = 1
   end
   object btnCancel: TButton
-    Left = 104
-    Top = 192
+    Left = 128
+    Top = 216
     Width = 81
     Height = 26
     Cancel = True
