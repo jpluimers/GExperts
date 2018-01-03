@@ -256,14 +256,6 @@ begin
   end;
 end;
 
-{$IFNDEF GX_VER170_up}
-
-function StartsText(const ASubText, AText: string): Boolean;
-begin
-  Result := AnsiStartsText(ASubText, AText);
-end;
-{$ENDIF}
-
 procedure TfmPeInformation.SetPackageInfo(const AFilename: string);
 var
   sl: TStringList;
@@ -295,7 +287,7 @@ begin
         sl := TStringList.Create;
         for i := 0 to PEInfo.ExportList.Count - 1 do begin
           s := PEInfo.ExportList[i];
-          if StartsText('@$xp$', s) then begin
+          if StrBeginsWith('@$xp$', s, False) then begin
             s := Copy(s, 2, 255);
             p := Pos('@', s);
             if p > 0 then begin

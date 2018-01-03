@@ -330,7 +330,8 @@ uses
   ShellApi,
   Types,
   FileCtrl,
-  StrUtils;
+  StrUtils,
+  GX_GenericUtils;
 
 type
   TWindowProcHook = class(TComponent)
@@ -806,11 +807,11 @@ end;
 
 function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): Boolean;
 var
-  idx: Integer;
+  Idx: Integer;
 begin
-  Result := TListView_TryGetSelected(_lv, idx);
+  Result := TListView_TryGetSelected(_lv, Idx);
   if Result then
-    _li := _lv.Items[idx];
+    _li := _lv.Items[Idx];
 end;
 
 procedure TListItems_ClearWithObjects(_li: TListItems);
@@ -848,14 +849,6 @@ begin
   _cmb.Items.AddObject(_Item, Pointer(_Value));
 end;
 
-{$IFNDEF GX_VER170_up}
-
-function StartsText(const ASubText, AText: string): Boolean;
-begin
-  Result := AnsiStartsText(ASubText, AText);
-end;
-{$ENDIF}
-
 function TComboBox_Select(_cmb: TCustomComboBox; const _Item: string; _DefaultIdx: Integer = -1;
   _AllowPartialMatch: Boolean = False): Integer;
 var
@@ -868,7 +861,7 @@ begin
       sl.Assign(_cmb.Items);
       Result := _DefaultIdx;
       for i := 0 to sl.Count - 1 do
-        if StartsText(_Item, sl[i]) then begin
+        if StrBeginsWith(_Item, sl[i], False) then begin
           Result := i;
           Break;
         end;
@@ -918,16 +911,15 @@ end;
 
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
 var
-  idx: Integer;
+  Idx: Integer;
 begin
-  Result := TComboBox_GetSelectedObject(_cmb, idx, _Obj, _FocusControl);
+  Result := TComboBox_GetSelectedObject(_cmb, Idx, _Obj, _FocusControl);
 end;
 
 {$IFNDEF GX_VER160_up}
 type
-  NativeInt = integer;
+  NativeInt = Integer;
 {$ENDIF ~GX_VER160_up}
-
 
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean;
 var
@@ -952,13 +944,13 @@ end;
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
   out _Item: string; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
 var
-  idx: Integer;
+  Idx: Integer;
 begin
-  idx := _cmb.ItemIndex;
-  Result := (idx <> -1);
+  Idx := _cmb.ItemIndex;
+  Result := (Idx <> -1);
   if Result then begin
-    _Item := _cmb.Items[idx];
-    _Obj := _cmb.Items.Objects[idx];
+    _Item := _cmb.Items[Idx];
+    _Obj := _cmb.Items.Objects[Idx];
   end else if _FocusControl then
     _cmb.SetFocus;
 end;
@@ -993,11 +985,11 @@ end;
 function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Item: string;
   _FocusControl: Boolean = False): Boolean;
 var
-  idx: Integer;
+  Idx: Integer;
 begin
-  Result := TComboBox_GetSelected(_cmb, idx, _FocusControl);
+  Result := TComboBox_GetSelected(_cmb, Idx, _FocusControl);
   if Result then
-    _Item := _cmb.Items[idx];
+    _Item := _cmb.Items[Idx];
 end;
 
 /// <summary>
@@ -1032,12 +1024,12 @@ end;
 function TListBox_GetSelected(_lb: TCustomListbox; out _Item: string;
   _FocusControl: Boolean = False): Boolean;
 var
-  idx: Integer;
+  Idx: Integer;
 begin
-  idx := _lb.ItemIndex;
-  Result := idx <> -1;
+  Idx := _lb.ItemIndex;
+  Result := Idx <> -1;
   if Result then
-    _Item := _lb.Items[idx]
+    _Item := _lb.Items[Idx]
   else if _FocusControl then
     _lb.SetFocus;
 end;
@@ -1052,12 +1044,12 @@ end;
 
 function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Obj: Pointer): Boolean;
 var
-  idx: Integer;
+  Idx: Integer;
 begin
-  idx := _lst.ItemIndex;
-  Result := idx <> -1;
+  Idx := _lst.ItemIndex;
+  Result := Idx <> -1;
   if Result then
-    _Obj := _lst.Items.Objects[idx];
+    _Obj := _lst.Items.Objects[Idx];
 end;
 
 type

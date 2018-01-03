@@ -358,11 +358,11 @@ begin
       NoneIdx := i
     else begin
       Prefix := Prefix + ' ';
-      if (PrefixIdx1 = -1) and StartsText(Prefix, s1) then begin
+      if (PrefixIdx1 = -1) and StrBeginsWith(Prefix, s1, False) then begin
         PrefixIdx1 := i;
         s1 := Copy(s1, Length(Prefix) + 1, 255);
       end;
-      if (PrefixIdx2 = -1) and StartsText(Prefix, s2) then begin
+      if (PrefixIdx2 = -1) and StrBeginsWith(Prefix, s2, False) then begin
         PrefixIdx2 := i;
         s2 := Copy(s2, Length(Prefix) + 1, 255);
       end;
