@@ -1414,8 +1414,16 @@ begin
     try
       // BCB 5.01 AVs here on the LibDir setting every time
       if AOption = 'Keys' then begin
-        if GxOtaGetVersionInfoKeysStrings(VersionKeys) then
-          VersionKeys.Text := AValue;
+        VersionKeys := TStringList.Create;
+        try
+          if GxOtaGetVersionInfoKeysStrings(VersionKeys) then
+            // todo: This no longer works because VersionKeys is only a local copy
+            //       (IMHO it was a nasty hack anyway.)
+            // -- 2018-01-21 twm
+            VersionKeys.Text := AValue;
+        finally
+          FreeAndNil(VersionKeys);
+        end;
       end else
         FPrjOptions.Values[AOption] := AValue;
     except on E: Exception do

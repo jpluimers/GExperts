@@ -359,7 +359,7 @@ function GxOtaGetVersionInfoKeysOption(const Option: string; var Value: Variant)
 // Get the first value of a list of version info keys strings
 function GxOtaGetVersionInfoKeysOptions(const Options: array of string; var Value: Variant): Boolean;
 // Get all of the version info keys (do not free the string list)
-function GxOtaGetVersionInfoKeysStrings(out Strings: TStrings): Boolean;
+function GxOtaGetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 function GxOtaGetVersionInfoKeysString: string;
 
 // Get the selected text in the top edit view, if any
@@ -1554,14 +1554,19 @@ var
 begin
   Result := False;
   Value := Null;
-  if GxOtaGetVersionInfoKeysStrings(KeysStrings) then
-  begin
-    OptionValue := KeysStrings.Values[Option];
-    if OptionValue <> '' then
+  KeysStrings := TStringList.Create;
+  try
+    if GxOtaGetVersionInfoKeysStrings(KeysStrings) then
     begin
-      Result := True;
-      Value := OptionValue;
+      OptionValue := KeysStrings.Values[Option];
+      if OptionValue <> '' then
+      begin
+        Result := True;
+        Value := OptionValue;
+      end;
     end;
+  finally
+    FreeAndNil(KeysStrings);
   end;
 end;
 
@@ -1578,13 +1583,47 @@ begin
   end;
 end;
 
-function GxOtaGetVersionInfoKeysStrings(out Strings: TStrings): Boolean;
+function GxOtaGetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 var
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions : IOTAProjectOptions;
+  Configurations : IOTAProjectOptionsConfigurations;
+  Configuration  : IOTABuildConfiguration;
+  PropValue      : string;
+{$ELSE}
   KeysValue: Variant;
   KeysInteger: Integer;
+  VerStrings: TStrings;
+{$ENDIF}
 begin
+  // This has been changed to support Delphi XE2 and up which stores
+  // version information in the configuration sets. Strings can no longer
+  // be simply assigned but needs to be passed into this function to be
+  // set.
+  Assert(Assigned(Strings));
+
   Result := False;
-  Strings := nil;
+
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions := GxOtaGetActiveProjectOptions;
+  if Assigned(ProjectOptions) then
+  begin
+    if ProjectOptions.QueryInterface(IOTAProjectOptionsConfigurations, Configurations) = S_OK then
+    begin
+      Configuration := Configurations.ActiveConfiguration;
+      if Assigned(Configuration) then
+      begin
+        if Configuration.PropertyExists('VerInfo_Keys') then
+        begin
+          PropValue := Configuration.GetValue('VerInfo_Keys', True);
+          Strings.Delimiter := ';';
+          Strings.DelimitedText := PropValue;
+          Result := True;
+        end;
+      end;
+    end;
+  end;
+{$ELSE}
   if GxOtaGetActiveProjectOption('Keys', KeysValue) then
   begin
     if (not VarIsNull(KeysValue)) and (VarType(KeysValue) = varInteger) then
@@ -1592,11 +1631,13 @@ begin
       KeysInteger := KeysValue;
       if TObject(KeysInteger) is TStrings then
       begin
-        Strings := TStrings(KeysInteger);
+        VerStrings := TStrings(KeysInteger);
+        Strings.Assign(VerStrings);
         Result := True;
       end;
     end;
   end;
+{$ENDIF}
 end;
 
 function GxOtaGetVersionInfoKeysString: string;
@@ -1604,8 +1645,13 @@ var
   Strings: TStrings;
 begin
   Result := '';
-  if GxOtaGetVersionInfoKeysStrings(Strings) then
-    Result := Strings.Text;
+  Strings := TStringList.Create;
+  try
+    if GxOtaGetVersionInfoKeysStrings(Strings) then
+      Result := Strings.Text;
+  finally
+    FreeAndNil(Strings);
+  end;
 end;
 
 function GxOtaGetCurrentSelection(IncludeTrailingCRLF: Boolean): string;
