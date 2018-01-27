@@ -4161,11 +4161,11 @@ begin
   EditReader := View.Buffer.CreateReader;
   // If there are embedded tabs in the line, our offsets are off and we must
   // be sure to not request nagative indexes or return more than one line
-  LineStartPos := Position - (EditPos.Col - 1);
+  LineStartPos := Position - (CharPos.CharIndex);
   Offset := 0;
   if LineStartPos < 0 then // This happens with tabs at the beginning of the file
     Offset := Abs(LineStartPos);
-  LineLength := EditPos.Col - 1 - Offset;
+  LineLength := CharPos.CharIndex - Offset;
   Assert(LineLength >= 0);
   if LineLength = 0 then
     Exit;
