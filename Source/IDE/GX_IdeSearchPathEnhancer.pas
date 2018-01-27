@@ -106,7 +106,7 @@ type
     procedure EditEntry(_Sender: TWinControl; var _Name, _Value: string; var _OK: Boolean);
     procedure AddDotsBtnClick(_Sender: TObject);
     procedure DelDotsBtnClick(_Sender: TObject);
-    procedure GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer);
+    procedure GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer; _Lines: TStrings);
     procedure SelectMemoLines(out _StartIdx, _EndIdx: Integer);
   protected
     function IsDesiredForm(_Form: TCustomForm): Boolean; override;
@@ -378,6 +378,10 @@ var
 var
   cmp: TComponent;
   btn: TCustomButton;
+  h: Integer;
+  w: Integer;
+  t: Integer;
+  l: Integer;
 begin
   if not TryGetElementEdit(_Form, FEdit) then
     Exit;
@@ -439,22 +443,35 @@ begin
       FListbox.Align := alClient;
 
       FDelDotsBtn := TButton.Create(_Form);
+      h := FDelDotsBtn.Height - 4;
+      w := FDelDotsBtn.Width;
+      t := FPageControl.Top - h;
+      l := FPageControl.Left + FPageControl.Width - 2 * w - 8;
       FDelDotsBtn.Name := 'DelDotsBtn';
       FDelDotsBtn.Parent := _Form;
-      FDelDotsBtn.Left := FPageControl.Left + FPageControl.Width - FDelDotsBtn.Width;
-      FDelDotsBtn.Top := FPageControl.Top + FPageControl.Height;
-      FDelDotsBtn.Anchors := [akRight, akBottom];
+      FDelDotsBtn.Height := h;
+      FDelDotsBtn.Top := t;
+      FDelDotsBtn.Left := l;
+      FDelDotsBtn.Anchors := [akRight, akTop];
       FDelDotsBtn.Caption := 'Del ..\';
       FDelDotsBtn.OnClick := DelDotsBtnClick;
+      FDelDotsBtn.TabOrder := FPageControl.TabOrder + 1;
+      FDelDotsBtn.Visible := False;
+
+      l := l + 8 + w;
 
       FAddDotsBtn := TButton.Create(_Form);
       FAddDotsBtn.Name := 'AddDotsBtn';
       FAddDotsBtn.Parent := _Form;
-      FAddDotsBtn.Left := FDelDotsBtn.Left - FAddDotsBtn.Width - 8;
-      FAddDotsBtn.Top := FPageControl.Top + FPageControl.Height;
-      FAddDotsBtn.Anchors := [akRight, akBottom];
+      FAddDotsBtn.Height := h;
+      FAddDotsBtn.Top := t;
+      FAddDotsBtn.Left := l;
+      FAddDotsBtn.Height := h;
+      FAddDotsBtn.Anchors := [akRight, akTop];
       FAddDotsBtn.Caption := 'Add ..\';
       FAddDotsBtn.OnClick := AddDotsBtnClick;
+      FAddDotsBtn.TabOrder := FDelDotsBtn.TabOrder + 1;
+      FAddDotsBtn.Visible := False;
 
       if Assigned(FUpBtn) then begin
         FFavoritesBtn := TButton.Create(_Form);
@@ -466,7 +483,7 @@ begin
         FFavoritesBtn.Anchors := [akRight, akTop];
         FFavoritesBtn.Caption := '&Fav';
         FFavoritesBtn.OnClick := FavoritesBtnClick;
-        FFavoritesBtn.TabOrder := FPageControl.TabOrder + 1;
+        FFavoritesBtn.TabOrder := FAddDotsBtn.TabOrder + 1;
         FFavoritesBtn.Visible := False;
         FFavoritesPm := TPopupMenu.Create(_Form);
         InitFavoritesMenu;
@@ -486,6 +503,7 @@ begin
         FMakeRelativeBtn.Caption := 'Make Relative';
         FMakeRelativeBtn.Visible := False;
         FMakeRelativeBtn.OnClick := MakeRelativeBtnClick;
+        FMakeRelativeBtn.TabOrder := FReplaceBtn.TabOrder + 1;
       end;
       if TryFindButton('DeleteButton', FDeleteBtn) then begin
         FMakeAbsoluteBtn := TButton.Create(_Form);
@@ -496,6 +514,7 @@ begin
         FMakeAbsoluteBtn.Caption := 'Make Absolute';
         FMakeAbsoluteBtn.Visible := False;
         FMakeAbsoluteBtn.OnClick := MakeAbsoluteBtnClick;
+        FMakeAbsoluteBtn.TabOrder := FDeleteBtn.TabOrder + 1;
       end;
       if TryFindButton('DeleteInvalidBtn', FDeleteInvalidBtn) then begin
         FAddRecursiveBtn := TButton.Create(_Form);
@@ -506,6 +525,7 @@ begin
         FAddRecursiveBtn.Caption := 'Add Recursive';
         FAddRecursiveBtn.Visible := False;
         FAddRecursiveBtn.OnClick := AddRecursiveBtnClick;
+        FAddRecursiveBtn.TabOrder := FDeleteInvalidBtn.TabOrder + 1;
       end;
 
       if TryFindButton('OkButton', btn) then
@@ -518,7 +538,7 @@ begin
   end;
 end;
 
-procedure TSearchPathEnhancer.GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer);
+procedure TSearchPathEnhancer.GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer; _Lines: TStrings);
 var
   SelStart: Integer;
   SelEnd: Integer;
@@ -526,6 +546,11 @@ begin
   SendMessage(FMemo.Handle, EM_GETSEL, Longint(@SelStart), Longint(@SelEnd));
   _StartIdx := SendMessage(FMemo.Handle, EM_LINEFROMCHAR, SelStart, 0);
   _EndIdx := SendMessage(FMemo.Handle, EM_LINEFROMCHAR, SelEnd - 1, 0);
+  _Lines.Assign(FMemo.Lines);
+  if _StartIdx < 0 then
+    _StartIdx := 0;
+  if _EndIdx >= _Lines.Count then
+    _EndIdx := _Lines.Count - 1;
 end;
 
 procedure TSearchPathEnhancer.SelectMemoLines(out _StartIdx, _EndIdx: Integer);
@@ -548,8 +573,7 @@ var
 begin
   sl := TStringList.Create;
   try
-    GetSelectedMemoLines(StartIdx, EndIdx);
-    sl.Assign(FMemo.Lines);
+    GetSelectedMemoLines(StartIdx, EndIdx, sl);
     for i := StartIdx to EndIdx do begin
       s := sl[i];
       s := '..\' + s;
@@ -572,8 +596,7 @@ var
 begin
   sl := TStringList.Create;
   try
-    GetSelectedMemoLines(StartIdx, EndIdx);
-    sl.Assign(FMemo.Lines);
+    GetSelectedMemoLines(StartIdx, EndIdx, sl);
     for i := StartIdx to EndIdx do begin
       s := sl[i];
       if LeftStr(s, 3) = '..\' then begin
@@ -772,6 +795,13 @@ begin
   TrySetButtonVisibility(FAddRecursiveBtn, SwitchedToMemo);
   TrySetButtonVisibility(FReplaceBtn, not SwitchedToMemo);
   TrySetButtonVisibility(FMakeRelativeBtn, SwitchedToMemo);
+  TrySetButtonVisibility(FDelDotsBtn, SwitchedToMemo);
+  TrySetButtonVisibility(FAddDotsBtn, SwitchedToMemo);
+
+  if SwitchedToMemo then
+    TWinControl_SetFocus(FMemo)
+  else
+    TWinControl_SetFocus(FListbox);
 end;
 
 procedure TSearchPathEnhancer.UpBtnClick(_Sender: TObject);
