@@ -1407,6 +1407,9 @@ end;
 procedure TfmProjOptionSets.SetPrjOptionValue(const AOption, AValue: string);
 var
   VersionKeys: TStrings;
+  i: integer;
+  s: string;
+  c: char;
 begin
   if Assigned(FPrjOptions) then
   begin
@@ -1414,13 +1417,17 @@ begin
     try
       // BCB 5.01 AVs here on the LibDir setting every time
       if AOption = 'Keys' then begin
+        s := '';
+        for i := 1 to Length(AValue) do begin
+          c := AValue[i];
+          if c = #$0A then
+            s := s + #$0D;
+          s := s + c;
+        end;
         VersionKeys := TStringList.Create;
         try
-          if GxOtaGetVersionInfoKeysStrings(VersionKeys) then
-            // todo: This no longer works because VersionKeys is only a local copy
-            //       (IMHO it was a nasty hack anyway.)
-            // -- 2018-01-21 twm
-            VersionKeys.Text := AValue;
+          VersionKeys.Text := s;
+          GxOtaSetVersionInfoKeysStrings(VersionKeys);
         finally
           FreeAndNil(VersionKeys);
         end;

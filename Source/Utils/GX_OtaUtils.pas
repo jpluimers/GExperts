@@ -358,9 +358,12 @@ function GxOtaGetActiveProjectOption(const Option: string; var Value: Variant): 
 function GxOtaGetVersionInfoKeysOption(const Option: string; var Value: Variant): Boolean;
 // Get the first value of a list of version info keys strings
 function GxOtaGetVersionInfoKeysOptions(const Options: array of string; var Value: Variant): Boolean;
-// Get all of the version info keys (do not free the string list)
+// Get all of the version info keys
 function GxOtaGetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 function GxOtaGetVersionInfoKeysString: string;
+
+// Set all the version info keys
+function GxOtaSetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 
 // Get the selected text in the top edit view, if any
 function GxOtaGetCurrentSelection(IncludeTrailingCRLF: Boolean = True): string;
@@ -1585,6 +1588,7 @@ end;
 
 function GxOtaGetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 var
+  VerStrings: TStrings;
 {$IFDEF GX_VER230_up} // Delphi XE2 and up.
   ProjectOptions : IOTAProjectOptions;
   Configurations : IOTAProjectOptionsConfigurations;
@@ -1593,7 +1597,6 @@ var
 {$ELSE}
   KeysValue: Variant;
   KeysInteger: Integer;
-  VerStrings: TStrings;
 {$ENDIF}
 begin
   // This has been changed to support Delphi XE2 and up which stores
@@ -1616,9 +1619,17 @@ begin
         if Configuration.PropertyExists('VerInfo_Keys') then
         begin
           PropValue := Configuration.GetValue('VerInfo_Keys', True);
-          Strings.Delimiter := ';';
-          Strings.DelimitedText := PropValue;
-          Result := True;
+          VerStrings := TStringList.Create;
+          try
+            VerStrings.Delimiter := ';';
+            VerStrings.StrictDelimiter := True;
+            VerStrings.DelimitedText := PropValue;
+            Result := True;
+          finally
+            Strings.Clear;
+            Strings.AddStrings(VerStrings);
+            FreeAndNil(VerStrings);
+          end;
         end;
       end;
     end;
@@ -1652,6 +1663,63 @@ begin
   finally
     FreeAndNil(Strings);
   end;
+end;
+
+function GxOtaSetVersionInfoKeysStrings(Strings: TStrings): Boolean;
+var
+  VerStrings: TStrings;
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions : IOTAProjectOptions;
+  Configurations : IOTAProjectOptionsConfigurations;
+  Configuration  : IOTABuildConfiguration;
+  PropValue      : string;
+{$ELSE}
+  KeysValue: Variant;
+  KeysInteger: Integer;
+{$ENDIF}
+begin
+  Assert(Assigned(Strings));
+
+  Result := False;
+
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions := GxOtaGetActiveProjectOptions;
+  if Assigned(ProjectOptions) then
+  begin
+    if ProjectOptions.QueryInterface(IOTAProjectOptionsConfigurations, Configurations) = S_OK then
+    begin
+      Configuration := Configurations.ActiveConfiguration;
+      if Assigned(Configuration) then
+      begin
+        VerStrings := TStringList.Create;
+        try
+          VerStrings.Assign(Strings);
+          VerStrings.Delimiter := ';';
+          VerStrings.StrictDelimiter := True;
+          PropValue := VerStrings.DelimitedText;
+          Configuration.SetValue('VerInfo_Keys', PropValue);
+          Result := True;
+        finally
+          FreeAndNil(VerStrings);
+        end;
+      end;
+    end;
+  end;
+{$ELSE}
+  if GxOtaGetActiveProjectOption('Keys', KeysValue) then
+  begin
+    if (not VarIsNull(KeysValue)) and (VarType(KeysValue) = varInteger) then
+    begin
+      KeysInteger := KeysValue;
+      if TObject(KeysInteger) is TStrings then
+      begin
+        VerStrings := TStrings(KeysInteger);
+        VerStrings.Assign(Strings);
+        Result := True;
+      end;
+    end;
+  end;
+{$ENDIF}
 end;
 
 function GxOtaGetCurrentSelection(IncludeTrailingCRLF: Boolean): string;
