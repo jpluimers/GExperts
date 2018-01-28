@@ -567,6 +567,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
     <DCCReference Include="..\..\Source\Utils\GX_dzPackageInfo.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzQuicksort.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzSelectDirectoryFix.pas" />
+    <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas" />
     <DCCReference Include="..\..\source\Utils\GX_dzVclUtils.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_dzVersionInfo.pas" />
     <DCCReference Include="..\..\source\Utils\GX_GenericClasses.pas" />
