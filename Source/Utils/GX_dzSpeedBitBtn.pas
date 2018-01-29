@@ -44,18 +44,41 @@ implementation
 { TdzSpeedBitBtn }
 
 constructor TdzSpeedBitBtn.Create(_btn: TComponent);
+
+  procedure PrepareBmp(w, h: Integer; _Color: TColor; _Edge: UINT; out _bmp: TBitmap);
+  var
+    cnv: TCanvas;
+    qrc: TRect;
+    TextSize: TSize;
+  begin
+    _bmp := TBitmap.Create;
+    _bmp.Width := w;
+    _bmp.Height := h;
+    _bmp.TransparentColor := clFuchsia;
+
+    cnv := _bmp.Canvas;
+
+    cnv.Brush.Color := _Color;
+    cnv.Brush.Style := bsSolid;
+    cnv.FillRect(Rect(0, 0, w, h));
+
+    qrc := Rect(0, 0, w - 1, h - 2);
+    DrawEdge(cnv.Handle, qrc, _Edge, BF_RECT);
+
+    if FCaption <> '' then begin
+      TextSize := cnv.TextExtent(FCaption);
+      cnv.TextOut((w - TextSize.cx) div 2, (h - TextSize.cy) div 2, FCaption);
+    end else begin
+      cnv.Draw((w - FOrigBmp.Width) div 2, (h - FOrigBmp.Height) div 2, FOrigBmp);
+    end;
+
+  end;
+
 var
   w: Integer;
   h: Integer;
-  cnv: TCanvas;
   ColBack1: TColor;
-  ColWhite: TColor;
-  ColGray1: TColor;
-  ColGray2: TColor;
-  ColGray3: TColor;
   ColBack2: TColor;
-  TextSize: TSize;
-  qrc: TRect;
 begin
   inherited Create(_btn);
   FBtn := _btn as TBitBtn;
@@ -73,52 +96,9 @@ begin
 
   ColBack1 := rgb(240, 240, 240); // clBtnFace;
   ColBack2 := rgb(245, 245, 245); // a bit lighter than clBtnFace;
-  ColWhite := clWhite;
-  ColGray1 := rgb(227, 227, 227);
-  ColGray2 := rgb(160, 160, 160);
-  ColGray3 := rgb(105, 105, 105);
 
-  // generate and draw the Up bitmap
-  FUpBmp := TBitmap.Create;
-  FUpBmp.Width := w;
-  FUpBmp.Height := h;
-  FUpBmp.TransparentColor := clFuchsia;
-  cnv := FUpBmp.Canvas;
-
-  cnv.Brush.Color := ColBack1;
-  cnv.Brush.Style := bsSolid;
-  cnv.FillRect(Rect(0, 0, w, h));
-
-  qrc := Rect(0, 0, w - 1, h - 2);
-  DrawEdge(cnv.Handle, qrc, EDGE_RAISED, BF_RECT);
-
-  if FCaption <> '' then begin
-    TextSize := cnv.TextExtent(FCaption);
-    cnv.TextOut((w - TextSize.cx) div 2, (h - TextSize.cy) div 2, FCaption);
-  end else begin
-    cnv.Draw((w - FOrigBmp.Width) div 2, (h - FOrigBmp.Height) div 2, FOrigBmp);
-  end;
-
-  // generate and draw the Down bitmap
-  FDownBmp := TBitmap.Create;
-  FDownBmp.Width := w;
-  FDownBmp.Height := h;
-  FDownBmp.TransparentColor := clFuchsia;
-  cnv := FDownBmp.Canvas;
-
-  cnv.Brush.Color := ColBack2;
-  cnv.Brush.Style := bsSolid;
-  cnv.FillRect(Rect(0, 0, w, h));
-
-  qrc := Rect(0, 0, w - 1, h - 2);
-  DrawEdge(cnv.Handle, qrc, EDGE_SUNKEN, BF_RECT);
-
-  if FCaption <> '' then begin
-    TextSize := cnv.TextExtent(FCaption);
-    cnv.TextOut((w - TextSize.cx) div 2, (h - TextSize.cy) div 2, FCaption);
-  end else begin
-    cnv.Draw((w - FOrigBmp.Width) div 2, (h - FOrigBmp.Height) div 2, FOrigBmp);
-  end;
+  PrepareBmp(w, h, ColBack1, EDGE_RAISED, FUpBmp);
+  PrepareBmp(w, h, ColBack2, EDGE_SUNKEN, FDownBmp);
 
   FBtn.OnClick := HandleOnClick;
 
