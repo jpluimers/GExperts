@@ -124,7 +124,7 @@ type
     procedure RefreshTodoList;
     procedure ClearDataListAndListView;
     procedure ParseComment(const FileName: string; const SComment, EComment: string;
-      const TokenString: string; LineNumber: Integer);
+      const CommentStr: string; LineNumber: Integer);
     procedure LoadFile(const FileName: string);
     procedure EnumerateFilesByDirectory;
     procedure EnumerateProjectFiles(Project: IOTAProject);
@@ -401,7 +401,7 @@ end;
 // be passed in, clearly saying so.
 
 procedure TfmToDo.ParseComment(const FileName: string; const SComment, EComment: string;
-  const TokenString: string; LineNumber: Integer);
+  const CommentStr: string; LineNumber: Integer);
 var
   i, j, k, n, m, TokenPos, NextCharPos: Integer;
   Info: TToDoInfo;
@@ -411,7 +411,7 @@ var
 begin
   for i := 0 to ToDoExpert.FTokenList.Count - 1 do
   begin
-    n := AnsiCaseInsensitivePos(ToDoExpert.FTokenList[i], TokenString);
+    n := AnsiCaseInsensitivePos(ToDoExpert.FTokenList[i], CommentStr);
     if n > 1 then
     begin
       // We found a token that looks like a TODO comment. Now
@@ -419,7 +419,7 @@ begin
       // comment token need to be right in front of the TODO item
 
       // Remove comment characters
-      ParsingString := TokenString;
+      ParsingString := CommentStr;
       Delete(ParsingString, 1, Length(SComment));
       // Remove white-space left and right
       ParsingString := Trim(ParsingString);
@@ -509,24 +509,21 @@ begin
         Delete(ParsingString, 1, j);
       end;
 
-      Info.Raw := TokenString;
+      Info.Raw := CommentStr;
+
+      // Handle multi-line to do comments
+      ParsingString := StringReplace(CommentStr, CRLF, ' ', [rfReplaceAll]);
 
       if not ToDoExpert.FShowTokens then
         n := n + Length(ToDoExpert.FTokenList[i]);
       if EComment <> '' then // Trim end-comment token.
-        m := AnsiCaseInsensitivePos(EComment, TokenString) - 1
+        m := AnsiCaseInsensitivePos(EComment, ParsingString) - 1
       else
-        m := Length(TokenString);
+        m := Length(ParsingString);
       if m < 1 then
-        m := Length(TokenString);
-      // Prevent multi-line to do notes
-      j := Pos(#13, TokenString);
-      k := Pos(#10, TokenString);
-      if j = 0 then j := 999999;
-      if k = 0 then k := 999999;
-      m := Min(m, Min(j, k));
+        m := Length(ParsingString);
       // The +1 is necessary to match IDE's line numbering
-      Info.Display := Copy(TokenString, n, (m - n) + 1);
+      Info.Display := Copy(ParsingString, n, (m - n) + 1);
       // Delete -C and -O options from ToDo text
       if Pos(' -C', UpperCase(Info.Display)) > 0 then
         Delete(Info.Display, Pos(' -C', UpperCase(Info.Display)), Length(Info.ToDoClass) + 3);
@@ -579,6 +576,8 @@ var
   IsCPPModule: Boolean;
   InternalEditReader: TEditReader;
   HeaderFile: string;
+  CommentText: string;
+  CommentLineNo: Integer;
 begin
   if FScannedFiles.IndexOf(FileName) >= 0 then
     Exit;
@@ -609,7 +608,13 @@ begin
         while CParser.RunID <> ctknull do
         begin
           case CParser.RunID of
-            ctkansicomment: ParseComment(FileName, '/*', '*/', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
+            ctkansicomment: begin
+              { TODO -oanyone -ccheck :
+                Maybe we can also easily support multi line todos here?
+                If the C parser handles them as the Pascal parser does,
+                that shouldn't be too difficult }
+              ParseComment(FileName, '/*', '*/', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
+            end;
             ctkslashesComment: ParseComment(FileName, '//', '', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
           end;
           if CParser.RunIndex = CParser.Count - 1 then
@@ -634,16 +639,34 @@ begin
         Parser.Origin := @FileContent[1];
         while Parser.TokenID <> tkNull do
         begin
-          { TODO 4 -oAnyone -cIssue: This needs to be fixed for multiline comments;
-            the strategy ought to be to read the complete comment and only then
-            start parsing. Also it would be better to move deleting of the comment
+          { TODO 4 -oAnyone -cIssue: move deleting of the comment
             tokens out of the parser }
           case Parser.TokenID of
-            // These only get the first line of multi-line comments.  We could concatenate multiple
-            // lines, but the go to "search" using the raw text match would need some changes.
-            tkBorComment: ParseComment(FileName, '{', '}', Parser.Token, Parser.LineNumber + 1);
-            tkAnsiComment: ParseComment(FileName, '(*', '*)', Parser.Token, Parser.LineNumber + 1);
-            tkSlashesComment: ParseComment(FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
+            tkBorComment: begin
+              CommentLineNo := Parser.LineNumber + 1;
+              CommentText := '';
+              while Parser.TokenID in [tkCRLFCo, tkBorComment] do begin
+                CommentText := CommentText + Parser.Token;
+                Parser.Next;
+              end;
+              ParseComment(FileName, '{', '}', CommentText, CommentLineNo);
+            end;
+            tkAnsiComment: begin
+              CommentLineNo := Parser.LineNumber + 1;
+              CommentText := '';
+              while Parser.TokenID in [tkCRLFCo, tkAnsiComment] do begin
+                CommentText := CommentText + Parser.Token;
+                Parser.Next;
+              end;
+              ParseComment(FileName, '(*', '*)', CommentText, CommentLineNo);
+            end;
+            tkSlashesComment: begin
+              { TODO -oanyone -ccheck :
+                Do we also want to support multi line todos that start with // ?
+                The parser does not support that very well in contrast to the multi line
+                borland and ansi comments }
+              ParseComment(FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
+            end;
           end;
           Parser.Next;
         end;
@@ -778,8 +801,6 @@ begin
           Application.ProcessMessages;
         end;
       finally
-        if LineMatchDifference > -1 then
-          InternalEditReader.GotoLine(ClosestLineMatch + 1);
         FreeAndNil(CParser);
       end;
     end
@@ -805,10 +826,16 @@ begin
           Application.ProcessMessages;
         end;
       finally
-        if LineMatchDifference > -1 then
-          InternalEditReader.GotoLine(ClosestLineMatch + 1);
         FreeAndNil(Parser);
       end;
+    end;
+    if ClosestLineMatch > -1 then begin
+      // we found a match, goto that line
+      InternalEditReader.GotoOffsetLine(ClosestLineMatch + 1);
+    end else begin
+      // no match found (matching does not work with multi line comments (yet))
+      // so we goto the line we stored originally
+      InternalEditReader.GotoOffsetLine(SelectedItem.LineNo);
     end;
   finally
     FreeAndNil(InternalEditReader);
