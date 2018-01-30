@@ -83,6 +83,13 @@
                                       {$DEFINE GX_VER310_up}  // RAD Studio 10.1 Berlin (25; BDS 18)
                                       {$IF CompilerVersion >= 32}
                                         {$DEFINE GX_VER320_up}  // RAD Studio 10.2 Tokyo (26; BDS 19)
+                                        {$IF CompilerVersion >= 33}
+unsupported Delphi version
+If you get here, you are probably trying to compile GExperts with a new Delphi release.
+In addition to define a new GX_VERxxx_UP symbol, you should also have a look at
+* GX_VerDepConst.pas
+todo: List the other units that might need to be adapted.
+                                        {$IFEND}
                                       {$IFEND}
                                     {$IFEND}
                                   {$IFEND}
