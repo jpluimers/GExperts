@@ -17,11 +17,19 @@ interface
 
 {$I GX_CondDefine.inc}
 
+{$IFDEF GX_VER320_up}
+{$IFNDEF GX_VER330_up}
+// only for Delphi 10.2 (lets hope Embarcadero fixes the problem in later versions)
+{$DEFINE STARTUP_LAYOUT_FIX_ENABLED}
+{$ENDIF GX_VER330_up}
+{$ENDIF GX_VER320_up}
+
 {$UNDEF UseInternalTestClient}
 {.$DEFINE UseInternalTestClient}
 
 uses
-  ToolsAPI;
+  ToolsAPI,
+  GX_ConfigurationInfo; // needed only for STARTUP_LAYOUT_FIX_ENABLED
 
 type
   { Implement the IGxEditorNotification interface to learn of
@@ -63,6 +71,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, TypInfo, {$ENDIF}
   SysUtils, Windows, Classes, Messages, Controls, Forms,
+  StdCtrls, // needed only for STARTUP_LAYOUT_FIX_ENABLED
   GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils;
 
 type
@@ -113,6 +122,11 @@ type
     function HasNotifierBeenInstalled(const FileName: string): Boolean;
     procedure NotifyClientNewModule(const Module: IOTAModule);
     function ValidModuleFileName(const FileName: string): Boolean;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    // Fix for the IDE always switching to the Startup Layout
+    procedure SaveUserDesktop;
+    procedure RestoreUserDesktop;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
   protected
     // IOTAIdeNotifier
     procedure FileNotification(NotifyCode: TOTAFileNotification;
@@ -531,6 +545,13 @@ begin
   case NotifyCode of
     ofnFileOpened:
       InstallModuleNotifier(FileName);
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    ofnProjectDesktopSave:
+      SaveUserDesktop;
+
+    ofnActiveProjectChanged:
+      RestoreUserDesktop;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
   else // case  // FI:W506
     // Do nothing
   end;
@@ -640,6 +661,82 @@ begin
     // FInstalledEditorNotifiers.Count down to zero.
   end;
 end;
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+type
+  TComboBoxHack = class(TComboBox);
+
+procedure TGxIdeNotifier.RestoreUserDesktop;
+var
+  Settings     : TGExpertsSettings;
+  LDesktopName : string;
+  AppBuilder   : TForm;
+  cbDesktop    : TComboBoxHack;
+  ndx          : Integer;
+begin
+  LDesktopName := '';
+  Settings := TGExpertsSettings.Create;
+  try
+    LDesktopName := Settings.ReadString('Desktop', 'Layout', '');
+  finally
+    FreeAndNil(Settings);
+  end;
+
+  if Length(LDesktopName) > 0 then
+  begin
+    AppBuilder := TForm(Application.FindComponent('AppBuilder'));
+    if not Assigned(AppBuilder) then
+      Exit;
+    cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
+    if not Assigned(cbDesktop) then
+      Exit;
+
+    ndx := cbDesktop.Items.IndexOf(LDesktopName);
+    if (ndx >= 0) and (cbDesktop.ItemIndex <> ndx) then
+    begin
+      cbDesktop.ItemIndex := ndx;
+      cbDesktop.Click;
+    end;
+  end;
+end;
+
+procedure TGxIdeNotifier.SaveUserDesktop;
+var
+  AppBuilder  : TForm;
+  cbDesktop   : TComboBoxHack;
+  ndx         : Integer;
+  LDesktopName: string;
+  LIgnoreName : string;
+  Settings    : TGExpertsSettings;
+begin
+  AppBuilder := TForm(Application.FindComponent('AppBuilder'));
+  if not Assigned(AppBuilder) then
+    Exit;
+  cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
+  if not Assigned(cbDesktop) then
+    Exit;
+
+  ndx := cbDesktop.ItemIndex;
+  if ndx > 0 then
+  begin
+    LDesktopName := cbDesktop.Items.Strings[ndx];
+
+    // do not store layouts with this names:
+    LIgnoreName := AnsiUpperCase(LDesktopName);
+    if (AnsiPos('DEFAULT', LIgnoreName)=1)
+    or (AnsiPos('STARTUP', LIgnoreName)=1)
+    or (AnsiPos('DEBUG', LIgnoreName) > 0)
+    then Exit;
+
+    Settings := TGExpertsSettings.Create;
+    try
+      Settings.WriteString('Desktop', 'Layout', LDesktopName);
+    finally
+      FreeAndNil(Settings);
+    end;
+  end;
+end;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
 
 function TGxIdeNotifier.ValidModuleFileName(const FileName: string): Boolean;
 begin
