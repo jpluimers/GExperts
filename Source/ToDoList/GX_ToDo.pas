@@ -455,8 +455,11 @@ begin
         Inc(j);
       end;
       if j > 0 then begin
-        if not (Info.Priority in [tpInfo, tpDone]) then
+        if not (Info.Priority in [tpInfo, tpDone]) then begin
+          // tpInfo and tpDone priority is fixed
+          // todo: shouldn't this check for tpNormal only?
           Info.Priority := NumericPriorityToGXPriority(Copy(ParsingString, 1, j));
+        end;
         Delete(ParsingString, 1, j);
         ParsingString := TrimLeft(ParsingString);
       end;
@@ -478,6 +481,22 @@ begin
       { zTODO -oTestCase -cTest -z-z-z-z -------------- -c switch: <-- try to break it }
       { zTODO -oTestCase -cTe-st : <-- hyphen test }
       //zTOdo
+
+      //zTOdo 0 <-- test case for priority 0 (maps to 5)
+      //zTOdo 1 <-- test case for priority 1 (critical)
+      //zTOdo 2 <-- test case for priority 2 (high)
+      //zTOdo 3 <-- test case for priority 3 (normal)
+      //zTOdo 4 <-- test case for priority 4 (low)
+      //zTOdo 5 <-- test case for priority 5 (lowest)
+      //zTOdo 6 <-- test case for priority 6 (maps to 5)
+      //zTOdo 7 <-- test case for priority 7 (maps to 5)
+      //zTOdo 8 <-- test case for priority 8 (maps to 5)
+      //zTOdo 9 <-- test case for priority 9 (maps to 5)
+
+      // info <-- test case for INFO
+      // done <-- test case for DONE
+      // todo <-- test case for normal todo
+
       { zTODO -oTestCase
           -cMultiline
           <-- Multiline test }
@@ -851,7 +870,7 @@ begin
 
   if lvToDo.Items.Count = 0 then
     Exit;
-  //#TODO2 make this a nicely formatted page
+  //TODO make this a nicely formatted page
   RichEdit := TRichEdit.Create(Self);
   try
     RichEdit.Visible := False;
@@ -1138,13 +1157,43 @@ end;
 
 procedure TfmToDo.lvTodoCustomDrawItem(Sender: TCustomListView; Item: TListItem;
   State: TCustomDrawState; var DefaultDraw: Boolean);
+var
+  cnv: TCanvas;
 begin
+  cnv := lvToDo.Canvas;
   if Odd(Item.Index) then
-    lvToDo.Canvas.Brush.Color := clWindow
+    cnv.Brush.Color := clWindow
   else
-    lvToDo.Canvas.Brush.Color := clWindow or ($0A0A0A);
-  if TToDoInfo(Item.Data).Priority = tpDone then
-    lvToDo.Canvas.Font.Color := clGrayText;
+    cnv.Brush.Color := clWindow or ($0A0A0A);
+
+  // todo: check for current file against TToDoInfo(Item.data).FileName and draw the filename in bold
+  // TODO: make coloring the text an option, maybe even let the user select the colours
+  // TODO: maybe only the text should be colored, not the other columns?
+  // todo: can we check the owner and draw matching entries in bold?
+
+  case TToDoInfo(Item.Data).Priority of
+    tpCritical: begin
+        cnv.Font.Color := clRed;
+      end;
+    tpHigh: begin
+        cnv.Font.Color := $0045FF; // clWebOrangeRed (Delphi 6 and 7 don't know this) 
+      end;
+    tpNormal: begin
+        cnv.Font.Color := clBlue;
+    end;
+    tpLow: begin
+        cnv.Font.Color := clBlack;
+      end;
+    tpLowest: begin
+        cnv.Font.Color := clGrayText;
+      end;
+    tpInfo: begin
+        cnv.Font.Color := clBlack;
+      end;
+    tpDone: begin
+        lvToDo.Canvas.Font.Color := clGrayText;
+      end;
+  end;
 end;
 
 procedure TfmToDo.SaveSettings;
@@ -1446,11 +1495,13 @@ begin
   Result := tpNormal;
   if TryStrToInt(PriorityStr, IntPriority) then begin
     case IntPriority of
+      0: Result := tpNormal;
       1: Result := tpCritical;
       2: Result := tpHigh;
       3: Result := tpNormal;
       4: Result := tpLow;
-      5: Result := tpLowest;
+    else
+      Result := tpLowest;
     end;
   end;
 end;
