@@ -587,12 +587,10 @@ begin
     'TBufferListFrm', 'Buffer List', [sfcStoreSize, sfcStorePosition]));
 {$ENDIF}
 
-  // todo:
-  // Delphi 6: TDebuggerOptDialog Tools -> Debugger Options
-
-  // Delphi 6: TPalettePropertyDialog Component -> Configure Palette
-
-  // Delphi 6: Project -> Import Type Library
+  { todo:
+    Delphi 6: TDebuggerOptDialog Tools -> Debugger Options
+    Delphi 6: TPalettePropertyDialog Component -> Configure Palette
+    Delphi 6: Project -> Import Type Library }
 end;
 
 procedure FinalizeFormHandlers;
