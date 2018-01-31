@@ -65,6 +65,8 @@ type
   end;
 
   TToDoScanType = (tstProject, tstOpenFiles, tstDirectory, tstProjectGroup);
+  TParsePasFileCallback = procedure(const FileName: string; const SComment, EComment: string;
+    const CommentStr: string; LineNumber: Integer) of object;
 
   TfmToDo = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
@@ -134,6 +136,7 @@ type
     function ConfigurationKey: string;
     function PriorityToImageIndex(Priority: TToDoPriority): Integer;
     function NumericPriorityToGXPriority(const PriorityStr: string): TToDoPriority;
+    procedure ParsePasFile(const _Filename: string; const _Content: string; _Callback: TParsePasFileCallback);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -570,14 +573,11 @@ end;
 
 procedure TfmToDo.LoadFile(const FileName: string);
 var
-  Parser: TmwPasLex;
   CParser: TBCBTokenList;
   FileContent: String;
   IsCPPModule: Boolean;
   InternalEditReader: TEditReader;
   HeaderFile: string;
-  CommentText: string;
-  CommentLineNo: Integer;
 begin
   if FScannedFiles.IndexOf(FileName) >= 0 then
     Exit;
@@ -634,48 +634,57 @@ begin
     end
     else
     begin
-      Parser := TmwPasLex.Create;
-      try
-        Parser.Origin := @FileContent[1];
-        while Parser.TokenID <> tkNull do
-        begin
+      ParsePasFile(FileName, FileContent, ParseComment);
+    end;
+  finally
+    Self.Update;
+  end;
+end;
+
+procedure TfmToDo.ParsePasFile(const _Filename: string; const _Content: string;
+  _Callback: TParsePasFileCallback);
+var
+  Parser: TmwPasLex;
+  CommentLineNo: Integer;
+  CommentText: string;
+begin
+  Parser := TmwPasLex.Create;
+  try
+    Parser.Origin := @_Content[1];
+    while Parser.TokenID <> tkNull do begin
           { TODO 4 -oAnyone -cIssue: move deleting of the comment
             tokens out of the parser }
-          case Parser.TokenID of
-            tkBorComment: begin
-              CommentLineNo := Parser.LineNumber + 1;
-              CommentText := '';
-              while Parser.TokenID in [tkCRLFCo, tkBorComment] do begin
-                CommentText := CommentText + Parser.Token;
-                Parser.Next;
-              end;
-              ParseComment(FileName, '{', '}', CommentText, CommentLineNo);
+      case Parser.TokenID of
+        tkBorComment: begin
+            CommentLineNo := Parser.LineNumber + 1;
+            CommentText := '';
+            while Parser.TokenID in [tkCRLFCo, tkBorComment] do begin
+              CommentText := CommentText + Parser.Token;
+              Parser.Next;
             end;
-            tkAnsiComment: begin
-              CommentLineNo := Parser.LineNumber + 1;
-              CommentText := '';
-              while Parser.TokenID in [tkCRLFCo, tkAnsiComment] do begin
-                CommentText := CommentText + Parser.Token;
-                Parser.Next;
-              end;
-              ParseComment(FileName, '(*', '*)', CommentText, CommentLineNo);
+            _Callback(_FileName, '{', '}', CommentText, CommentLineNo);
+          end;
+        tkAnsiComment: begin
+            CommentLineNo := Parser.LineNumber + 1;
+            CommentText := '';
+            while Parser.TokenID in [tkCRLFCo, tkAnsiComment] do begin
+              CommentText := CommentText + Parser.Token;
+              Parser.Next;
             end;
-            tkSlashesComment: begin
+            _Callback(_FileName, '(*', '*)', CommentText, CommentLineNo);
+          end;
+        tkSlashesComment: begin
               { TODO -oanyone -ccheck :
                 Do we also want to support multi line todos that start with // ?
                 The parser does not support that very well in contrast to the multi line
                 borland and ansi comments }
-              ParseComment(FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
-            end;
+            _Callback(_FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
           end;
-          Parser.Next;
-        end;
-      finally
-        FreeAndNil(Parser);
       end;
+      Parser.Next;
     end;
   finally
-    Self.Update;
+    FreeAndNil(Parser);
   end;
 end;
 
@@ -746,9 +755,45 @@ begin
   (Sender as TAction).Enabled := (lvToDo.Items.Count > 0);
 end;
 
+type
+  TMatchChecker = class
+  private
+    FSelectedItem: TToDoInfo;
+    FClosestLineMatch: Integer;
+    FLineMatchDifference: integer;
+  public
+    constructor Create(_SelectedItem: TToDoInfo);
+    procedure CheckComment(const FileName: string; const SComment, EComment: string;
+      const CommentStr: string; LineNumber: Integer);
+      property ClosestLineMatch: Integer read FClosestLineMatch;
+  end;
+
+{ TMatchChecker }
+
+constructor TMatchChecker.Create(_SelectedItem: TToDoInfo);
+begin
+  inherited Create;
+  FSelectedItem := _SelectedItem;
+  FClosestLineMatch := -1;
+  FLineMatchDifference := MaxInt;
+end;
+
+procedure TMatchChecker.CheckComment(const FileName, SComment, EComment, CommentStr: string;
+  LineNumber: Integer);
+begin
+  if SameText(CommentStr, FSelectedItem.Raw) then begin
+    // Look for a matching todo comment with the smallest absolute distance
+    // from the line where we found the original comment when last scanning
+    if (FClosestLineMatch = -1) or (Abs(FSelectedItem.LineNo - LineNumber + 1) <= FLineMatchDifference) then
+    begin
+      FClosestLineMatch := LineNumber;
+      FLineMatchDifference := Abs(FSelectedItem.LineNo - FClosestLineMatch);
+    end;
+  end;
+end;
+
 procedure TfmToDo.actEditGotoExecute(Sender: TObject);
 var
-  Parser: TmwPasLex;
   CParser: TBCBTokenList;
   FileContent: string;
   SelectedItem: TToDoInfo;
@@ -757,6 +802,7 @@ var
   LineMatchDifference: Integer;
   IsCPPModule: Boolean;
   Cursor: IInterface;
+  MatchChecker: TMatchChecker;
 begin
   inherited;
 
@@ -806,32 +852,17 @@ begin
     end
     else
     begin
-      Parser := TmwPasLex.Create;
+      MatchChecker := TMatchChecker.Create(SelectedItem);
       try
-        Parser.Origin := @FileContent[1];
-        while Parser.TokenID <> tkNull do
-        begin
-          if Parser.TokenID in [tkBorComment, tkAnsiComment, tkSlashesComment] then
-            if SameText(Parser.Token, SelectedItem.Raw) then
-            begin
-              // Look for a matching todo comment with the smallest absolute distance
-              // from the line where we found the original comment when last scanning
-              if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - Parser.LineNumber + 1) <= LineMatchDifference) then
-              begin
-                ClosestLineMatch := Parser.LineNumber;
-                LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
-              end;
-            end;
-          Parser.Next;
-          Application.ProcessMessages;
-        end;
+        ParsePasFile('EditBuffer', FileContent, MatchChecker.CheckComment);
+        ClosestLineMatch := MatchChecker.ClosestLineMatch;
       finally
-        FreeAndNil(Parser);
+        FreeAndNil(MatchChecker);
       end;
     end;
     if ClosestLineMatch > -1 then begin
       // we found a match, goto that line
-      InternalEditReader.GotoOffsetLine(ClosestLineMatch + 1);
+      InternalEditReader.GotoOffsetLine(ClosestLineMatch);
     end else begin
       // no match found (matching does not work with multi line comments (yet))
       // so we goto the line we stored originally
