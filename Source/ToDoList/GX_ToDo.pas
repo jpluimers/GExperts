@@ -137,6 +137,7 @@ type
     function PriorityToImageIndex(Priority: TToDoPriority): Integer;
     function NumericPriorityToGXPriority(const PriorityStr: string): TToDoPriority;
     procedure ParsePasFile(const _Filename: string; const _Content: string; _Callback: TParsePasFileCallback);
+    procedure ParseCFile(const _Filename, _Content: string; _Callback: TParsePasFileCallback);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -573,7 +574,6 @@ end;
 
 procedure TfmToDo.LoadFile(const FileName: string);
 var
-  CParser: TBCBTokenList;
   FileContent: String;
   IsCPPModule: Boolean;
   InternalEditReader: TEditReader;
@@ -600,44 +600,45 @@ begin
       FreeAndNil(InternalEditReader);
     end;
 
-    if IsCPPModule then
-    begin
-      CParser := TBCBTokenList.Create;
-      try
-        CParser.SetOrigin(@FileContent[1], Length(FileContent));
-        while CParser.RunID <> ctknull do
-        begin
-          case CParser.RunID of
-            ctkansicomment: begin
-              { TODO -oanyone -ccheck :
-                Maybe we can also easily support multi line todos here?
-                If the C parser handles them as the Pascal parser does,
-                that shouldn't be too difficult }
-              ParseComment(FileName, '/*', '*/', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
-            end;
-            ctkslashesComment: ParseComment(FileName, '//', '', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
-          end;
-          if CParser.RunIndex = CParser.Count - 1 then
-            Break;
-          CParser.Next;
-        end;
-      finally
-        FreeAndNil(CParser);
-      end;
+    if IsCPPModule then begin
+      ParseCFile(FileName, FileContent, ParseComment);
 
-      if (ExtractUpperFileExt(FileName) = '.CPP') then
+      if IsCpp(FileName) or IsC(FileName) then
       begin
         HeaderFile := ChangeFileExt(FileName, '.h');
         if GxOtaFileOrModuleExists(HeaderFile) then
           LoadFile(HeaderFile);
       end;
-    end
-    else
-    begin
+    end else begin
       ParsePasFile(FileName, FileContent, ParseComment);
     end;
   finally
     Self.Update;
+  end;
+end;
+
+procedure TfmToDo.ParseCFile(const _Filename: string; const _Content: string;
+  _Callback: TParsePasFileCallback);
+var
+  CParser: TBCBTokenList;
+begin
+  CParser := TBCBTokenList.Create;
+  try
+    CParser.SetOrigin(@_Content[1], Length(_Content));
+    while CParser.RunID <> ctknull do begin
+      case CParser.RunID of
+        ctkansicomment: begin
+            // This also supports multi line comments since the parser handles them
+            _Callback(_Filename, '/*', '*/', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
+          end;
+        ctkslashesComment: _Callback(_Filename, '//', '', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
+      end;
+      if CParser.RunIndex = CParser.Count - 1 then
+        Break;
+      CParser.Next;
+    end;
+  finally
+    FreeAndNil(CParser);
   end;
 end;
 
@@ -652,8 +653,6 @@ begin
   try
     Parser.Origin := @_Content[1];
     while Parser.TokenID <> tkNull do begin
-          { TODO 4 -oAnyone -cIssue: move deleting of the comment
-            tokens out of the parser }
       case Parser.TokenID of
         tkBorComment: begin
             CommentLineNo := Parser.LineNumber + 1;
@@ -674,10 +673,10 @@ begin
             _Callback(_FileName, '(*', '*)', CommentText, CommentLineNo);
           end;
         tkSlashesComment: begin
-              { TODO -oanyone -ccheck :
-                Do we also want to support multi line todos that start with // ?
-                The parser does not support that very well in contrast to the multi line
-                borland and ansi comments }
+            { TODO -oanyone -ccheck :
+              Do we also want to support multi line todos that start with // ?
+              The parser does not support that very well in contrast to the multi line
+              borland and ansi comments }
             _Callback(_FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
           end;
       end;
@@ -794,20 +793,15 @@ end;
 
 procedure TfmToDo.actEditGotoExecute(Sender: TObject);
 var
-  CParser: TBCBTokenList;
   FileContent: string;
   SelectedItem: TToDoInfo;
   InternalEditReader: TEditReader;
   ClosestLineMatch: Integer;
-  LineMatchDifference: Integer;
   IsCPPModule: Boolean;
   Cursor: IInterface;
   MatchChecker: TMatchChecker;
 begin
   inherited;
-
-  ClosestLineMatch := -1;
-  LineMatchDifference := MaxInt;
 
   SelectedItem := GetSelectedItem;
   if SelectedItem = nil then Exit;
@@ -818,57 +812,26 @@ begin
     GxOtaOpenFile(SelectedItem.FileName);
 
   Cursor := TempHourGlassCursor;
-  // Since this edit reader is destroyed almost
-  // immediately, do not call FreeFileData
-  InternalEditReader := TEditReader.Create(SelectedItem.FileName);
+  InternalEditReader := nil;
+  MatchChecker := TMatchChecker.Create(SelectedItem);
   try
+    // Since this edit reader is destroyed almost
+    // immediately, do not call FreeFileData
+    InternalEditReader := TEditReader.Create(SelectedItem.FileName);
     FileContent := InternalEditReader.GetText;
-    if IsCppModule then
-    begin
-      CParser := TBCBTokenList.Create;
-      try
-        CParser.SetOrigin(@FileContent[1], Length(FileContent));
-        while CParser.RunID <> ctknull do
-        begin
-          if CParser.RunID in [ctkansicomment, ctkslashescomment] then
-            if SameText(CParser.RunToken, SelectedItem.Raw) then
-            begin
-              // Look for a matching todo comment with the smallest absolute distance
-              // from the line where we found the original comment when last scanning
-              if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - CParser.PositionAtLine(CParser.RunPosition)) <= LineMatchDifference) then
-              begin
-                ClosestLineMatch := CParser.PositionAtLine(CParser.RunPosition) - 1;
-                LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
-              end;
-            end;
-          if CParser.RunIndex = CParser.Count - 1 then
-            Break;
-          CParser.Next;
-          Application.ProcessMessages;
-        end;
-      finally
-        FreeAndNil(CParser);
-      end;
-    end
-    else
-    begin
-      MatchChecker := TMatchChecker.Create(SelectedItem);
-      try
-        ParsePasFile('EditBuffer', FileContent, MatchChecker.CheckComment);
-        ClosestLineMatch := MatchChecker.ClosestLineMatch;
-      finally
-        FreeAndNil(MatchChecker);
-      end;
-    end;
-    if ClosestLineMatch > -1 then begin
-      // we found a match, goto that line
-      InternalEditReader.GotoOffsetLine(ClosestLineMatch);
+    if IsCppModule then begin
+      ParseCFile(SelectedItem.FileName, FileContent, MatchChecker.CheckComment);
     end else begin
-      // no match found (matching does not work with multi line comments (yet))
-      // so we goto the line we stored originally
-      InternalEditReader.GotoOffsetLine(SelectedItem.LineNo);
+      ParsePasFile(SelectedItem.FileName, FileContent, MatchChecker.CheckComment);
     end;
+    ClosestLineMatch := MatchChecker.ClosestLineMatch;
+    if ClosestLineMatch = -1 then begin
+      // no match found, so we goto the line we stored originally
+      ClosestLineMatch := SelectedItem.LineNo;
+    end;
+    InternalEditReader.GotoOffsetLine(ClosestLineMatch);
   finally
+    FreeAndNil(MatchChecker);
     FreeAndNil(InternalEditReader);
   end;
   if ToDoExpert.FHideOnGoto then
