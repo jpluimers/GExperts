@@ -774,6 +774,12 @@ begin
   Result := False;
   while Parser.Token.ID <> tkNull do
   begin
+    // todo: This will only find lines of the form
+    //       identifier = class | interface | DispInterface
+    //       it will not find Generics like this
+    //       identifier<T:bla> = class | interface | DispInterface
+    //       because the identifier is not directly in front of the equal sign.
+    //       That's why the LineNo is always 0 for Generics.
     Parser.NextObjectLine;
     if GetInfo = ikClass then
     begin
