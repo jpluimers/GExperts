@@ -1645,8 +1645,21 @@ begin
   if TokenID in MethodMarkers then
     NextNoJunk;
 
-  while TokenID in PossibleIdentifiers + [tkPoint] do
+  while TokenID in PossibleIdentifiers + [tkPoint, tkLower] do
   begin
+    if TokenID = tkLower then begin
+      // It's a Generic, so we need to read until the closing '>'
+      CurrentIdentifier := CurrentIdentifier + Token;
+      NextNoJunk;
+      while TokenID in [tkComma, tkIdentifier] do begin
+        CurrentIdentifier := CurrentIdentifier + Token;
+        NextNoJunk;
+      end;
+      if TokenID = tkGreater then begin
+        CurrentIdentifier := CurrentIdentifier + Token;
+        NextNoJunk;
+      end;
+    end;
     if TokenID in PossibleIdentifiers then
     begin
       if PrevIdentifiers <> '' then
