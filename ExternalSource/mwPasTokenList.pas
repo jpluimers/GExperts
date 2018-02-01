@@ -328,8 +328,15 @@ begin
           if 'CLASS' = UpperCase(FPasTokenList[RIndex]) then
           begin
             RIndex := FPasTokenList.RunIndex - 1;
-            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do
+            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do begin
+              if FPasTokenList.TokenID[RIndex] = tkGreater then begin
+                // It's a Generic, find the matching '<'
+                while (RIndex > 1) and (FPasTokenList.TokenID[RIndex] <> tkLower) do begin
+                  Dec(RIndex);
+                end;
+              end;
               Dec(RIndex);
+            end;
             ClassList.Add(RIndex);
           end;
         end;
@@ -360,8 +367,15 @@ begin
           if 'INTERFACE' = UpperCase(FPasTokenList[RIndex]) then
           begin
             RIndex := FPasTokenList.RunIndex - 1;
-            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do
+            while not (FPasTokenList.TokenID[RIndex] in BigIdentDirect) do begin
+              if FPasTokenList.TokenID[RIndex] = tkGreater then begin
+                // It's a Generic, find the matching '<'
+                while (RIndex > 1) and (FPasTokenList.TokenID[RIndex] <> tkLower) do begin
+                  Dec(RIndex);
+                end;
+              end;
               Dec(RIndex);
+            end;
             InterfaceList.Add(RIndex);
           end;
         end;
