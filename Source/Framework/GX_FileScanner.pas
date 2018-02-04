@@ -509,7 +509,7 @@ begin
 
           while not ((FCParser.RunID in [ctkSemiColon, ctkbraceclose,
             ctkbraceopen, ctkbracepair]) or
-              (FCParser.RunID in IdentDirect) or
+              (FCParser.RunID in IdentDirectC) or
             (FCParser.RunIndex = 0)) do
           begin
             FCParser.PreviousNonJunk;

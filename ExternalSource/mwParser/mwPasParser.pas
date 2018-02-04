@@ -81,22 +81,6 @@ type
     property Visibility: TTokenKind read FVisibility write FVisibility;
   end;
 
-Const
-  IdentDirect: TIdentDirect = [tkAbsolute, tkAbstract, tkAssembler, tkCdecl,
-    tkDefault, tkDispid, tkDynamic, tkExport, tkExternal, tkFar, tkForward,
-    tkIdentifier, tkIndex, tkMessage, tkName, tkNear, tkNodefault, tkOverride,
-    tkPascal, tkRead, tkReadonly, tkRegister, tkResident, tksafecall, tkstdcall,
-    tkStored, tkVirtual, tkWrite, tkWriteonly, tkReintroduce, tkOverload, tkImplements];
-
-  BigIdentDirect: TIdentDirect = [tkAbsolute, tkAbstract, tkAssembler,
-    tkAutomated, tkCdecl, tkDefault, tkDispid, tkDynamic, tkExport, tkExternal,
-    tkFar, tkForward, tkIdentifier, tkIndex, tkMessage, tkName, tkNear,
-    tkNodefault, tkOverride, tkPascal, tkPrivate, tkProtected, tkPublic,
-    tkPublished, tkRead, tkReadonly, tkRegister, tkResident, tksafecall,
-    tkstdcall, tkStored, tkVirtual, tkWrite, tkWriteOnly, tkReintroduce, tkOverload, tkImplements];
-
-  MethodMarkers = [tkFunction, tkProcedure, tkConstructor, tkDestructor, tkOperator];
-
 implementation
 
 uses

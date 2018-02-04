@@ -306,9 +306,25 @@ type
     tkWriteonly,
     tkXor);
 
-  TIdentDirect = set of TTokenKind;
-
+  TTokenKindSet = set of TTokenKind;
   TCommentState = (csAnsi, csBor, csNo, csSlashes);
+
+const
+  IdentDirect: TTokenKindSet = [tkAbsolute, tkAbstract, tkAssembler, tkCdecl,
+    tkDefault, tkDispid, tkDynamic, tkExport, tkExternal, tkFar, tkForward,
+    tkIdentifier, tkIndex, tkMessage, tkName, tkNear, tkNodefault, tkOverride,
+    tkPascal, tkRead, tkReadonly, tkRegister, tkResident, tkSafecall, tkStdcall,
+    tkStored, tkVirtual, tkWrite, tkWriteonly, tkReintroduce, tkOverload, tkImplements];
+
+Const
+  BigIdentDirect: TTokenKindSet = [tkAbsolute, tkAbstract, tkAssembler,
+    tkAutomated, tkCdecl, tkDefault, tkDispid, tkDynamic, tkExport, tkExternal,
+    tkFar, tkForward, tkIdentifier, tkIndex, tkMessage, tkName, tkNear,
+    tkNodefault, tkOverride, tkPascal, tkPrivate, tkProtected, tkPublic,
+    tkPublished, tkRead, tkReadonly, tkRegister, tkResident, tksafecall,
+    tkstdcall, tkStored, tkVirtual, tkWrite, tkWriteonly];
+
+  MethodMarkers = [tkFunction, tkProcedure, tkConstructor, tkDestructor, tkOperator];
 
 implementation
 

@@ -162,20 +162,6 @@ type
     property RunLine: Longint read GetRunLine;
   end; { TPasTokenList }
 
-Const
-  IdentDirect: TIdentDirect = [tkAbsolute, tkAbstract, tkAssembler, tkCdecl,
-    tkDefault, tkDispid, tkDynamic, tkExport, tkExternal, tkFar, tkForward,
-    tkIdentifier, tkIndex, tkMessage, tkName, tkNear, tkNodefault, tkOverride,
-    tkPascal, tkRead, tkReadonly, tkRegister, tkResident, tksafecall, tkstdcall,
-    tkStored, tkVirtual, tkWrite, tkWriteonly];
-
-  BigIdentDirect: TIdentDirect = [tkAbsolute, tkAbstract, tkAssembler,
-    tkAutomated, tkCdecl, tkDefault, tkDispid, tkDynamic, tkExport, tkExternal,
-    tkFar, tkForward, tkIdentifier, tkIndex, tkMessage, tkName, tkNear,
-    tkNodefault, tkOverride, tkPascal, tkPrivate, tkProtected, tkPublic,
-    tkPublished, tkRead, tkReadonly, tkRegister, tkResident, tksafecall,
-    tkstdcall, tkStored, tkVirtual, tkWrite, tkWriteonly];
-
 implementation
 
 uses

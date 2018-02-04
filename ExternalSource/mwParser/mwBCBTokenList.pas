@@ -61,7 +61,7 @@ type
     ctktypename, ctkunion, ctkUnknown, ctkunsigned, ctkusing, ctkvirtual,
     ctkvoid, ctkvolatile, ctkwchar_t, ctkwhile, ctknextline);
 
-  TIdentDirect = set of TCTokenKind;
+  TCTokenKindSet = set of TCTokenKind;
 
   TCommentState = (csAnsi, csNo, csSlashes);
 
@@ -197,7 +197,7 @@ type
   end; { TBCBTokenList }
 
 const
-  IdentDirect: TIdentDirect = [ctkdirdefine, ctkdirelif, ctkdirelse,
+  IdentDirectC: TCTokenKindSet = [ctkdirdefine, ctkdirelif, ctkdirelse,
     ctkdirendif, ctkdirerror, ctkdirif, ctkdirifdef, ctkdirifndef,
     ctkdirinclude, ctkdirline, ctkdirnull, ctkdirpragma, ctkdirundef];
 
