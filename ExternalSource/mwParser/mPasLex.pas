@@ -277,9 +277,6 @@ type
 const
   PossibleIdentifiers = [tkIdentifier, tkRegister];
 
-var // May include tkOperator after initialization
-  MethodMarkers: set of TTokenKind = [tkProcedure, tkFunction, tkConstructor, tkDestructor];
-
 implementation
 
 uses
@@ -294,7 +291,7 @@ procedure MakeIdentTable;
 var
   i, J: Char;
 begin
-  for I := #0 to #127 do
+  for i := #0 to #127 do
   begin
     case i of
       '_', '0'..'9', 'a'..'z', 'A'..'Z': Identifiers[i] := True;
@@ -1761,11 +1758,6 @@ end;
 procedure Initialize;
 begin
   MakeIdentTable;
-  {$IFDEF CONDITIONALEXPRESSIONS}
-    {$IF CompilerVersion >= 16}
-    Include(MethodMarkers, tkOperator);
-    {$IFEND}
-  {$ENDIF}
 end;
 
 { TLexArgList }

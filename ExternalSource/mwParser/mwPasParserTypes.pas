@@ -324,8 +324,23 @@ Const
     tkPublished, tkRead, tkReadonly, tkRegister, tkResident, tksafecall,
     tkstdcall, tkStored, tkVirtual, tkWrite, tkWriteonly];
 
-  MethodMarkers = [tkFunction, tkProcedure, tkConstructor, tkDestructor, tkOperator];
+var
+  // todo: Do we really want to change this set depending on the current compiler version?
+  //       It shouldn't hurt to simply support tkOperator for older Delphis too.
+  // May include tkOperator after initialization
+  MethodMarkers: set of TTokenKind = [tkProcedure, tkFunction, tkConstructor, tkDestructor];
 
 implementation
 
+procedure Initialize;
+begin
+  {$IFDEF CONDITIONALEXPRESSIONS}
+    {$IF CompilerVersion >= 16}
+    Include(MethodMarkers, tkOperator);
+    {$IFEND}
+  {$ENDIF}
+end;
+
+initialization
+  Initialize;
 end.
