@@ -94,7 +94,7 @@ type
     fComment: TCommentState;
     fOrigin: PChar;
     fProcTable: array[#0..#255] of procedure of object;
-    Run: Longint;
+    Run: Integer;
     Temp: PChar;
     FRoundCount: Integer;
     FSquareCount: Integer;
