@@ -38,7 +38,7 @@ implementation
 
 uses
   Classes, SysUtils, Dialogs, Windows, Clipbrd,
-  mPasLex, GX_GenericUtils, GX_OtaUtils, GX_EditReader;
+  mwPasParserTypes, mPasLex, GX_GenericUtils, GX_OtaUtils, GX_EditReader;
 
 resourcestring
   SUnknownNameResult = 'Not available';

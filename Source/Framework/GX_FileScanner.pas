@@ -11,7 +11,7 @@ unit GX_FileScanner;
 interface
 
 uses
-  Classes, mPasLex, mwBCBTokenList;
+  Classes, mPasLex, mwBCBTokenList, mwPasParserTypes;
 
 type
   TSourceLanguage = (ltPas, ltCpp);

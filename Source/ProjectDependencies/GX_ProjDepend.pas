@@ -147,7 +147,7 @@ implementation
 
 uses
   SysUtils, Windows, ToolsAPI,
-  mPasLex,
+  mPasLex, mwPasParserTypes,
   GX_EditReader, GX_ProjDependProp, GX_GExperts, GX_ProjDependFilter,
   GX_GenericUtils, GX_GxUtils, GX_SharedImages, GX_IdeUtils, Math;
 

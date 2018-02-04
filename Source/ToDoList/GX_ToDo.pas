@@ -178,7 +178,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Dialogs, Clipbrd, Windows,
-  mPasLex, mwBCBTokenList,
+  mPasLex, mwBCBTokenList, mwPasParserTypes,
   GX_GxUtils, GX_GenericUtils, GX_EditReader,
   GX_ToDoOptions, GX_SharedImages, Math;
 

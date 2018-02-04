@@ -89,7 +89,7 @@ procedure ReplaceUnitInInterface(const AOldUnitName, ANewUnitName: string);
 
 implementation
 
-uses SysUtils, GX_OtaUtils, GX_GenericUtils;
+uses SysUtils, GX_OtaUtils, GX_GenericUtils, mwPasParserTypes;
 
 function UseUnitInImplementation(const AUnitName: string): Boolean;
 begin

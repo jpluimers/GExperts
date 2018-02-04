@@ -198,7 +198,7 @@ type
 
 const
   IdentDirect: TIdentDirect = [ctkdirdefine, ctkdirelif, ctkdirelse,
-  ctkdirendif, ctkdirerror, ctkdirif, ctkdirifdef, ctkdirifndef,
+    ctkdirendif, ctkdirerror, ctkdirif, ctkdirifdef, ctkdirifndef,
     ctkdirinclude, ctkdirline, ctkdirnull, ctkdirpragma, ctkdirundef];
 
 implementation

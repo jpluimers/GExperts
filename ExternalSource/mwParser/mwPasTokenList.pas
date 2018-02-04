@@ -18,34 +18,11 @@ unit mwPasTokenList;
 
 interface
 
-uses mwLongIntList;
+uses
+  mwPasParserTypes,
+  mwLongIntList;
 
 type
-  TTokenKind = (tkAbsolute, tkAbstract, tkAnd, tkAnsiComment, tkArray, tkAs,
-    tkAsciiChar, tkAsm, tkAssembler, tkAssign, tkAutomated, tkBegin, tkBadString,
-    tkBorComment, tkCase, tkCdecl, tkClass, tkColon, tkComma, tkCompDirect,
-    tkConst, tkConstructor, tkCRLF, tkCRLFCo, tkDefault, tkDestructor, tkDispid,
-    tkDispinterface, tkDiv, tkDo, tkDotDot, tkDownto, tkDynamic, tkElse, tkEnd,
-    tkEqual, tkError, tkExcept, tkExport, tkExports, tkExternal, tkFar, tkFile,
-    tkFinalization, tkFinally, tkFloat, tkFor, tkForward, tkFunction, tkGoto,
-    tkGreater, tkGreaterEqual, tkIdentifier, tkIf, tkImplementation, tkIn,
-    tkIndex, tkInherited, tkInitialization, tkInline, tkInteger, tkInterface,
-    tkIs, tkKeyString, tkLabel, tkLibrary, tkLower, tkLowerEqual, tkMessage,
-    tkMinus, tkMod, tkName, tkNear, tkNil, tkNodefault, tkNone, tkNot,
-    tkNotEqual, tkNull, tkNumber, tkObject, tkOf, tkOr, tkOut, tkOverride,
-    tkPacked, tkPascal, tkPlus, tkPoint, tkPrivate, tkProcedure, tkProgram,
-    tkProperty, tkProtected, tkPublic, tkPublished, tkRaise, tkRead, tkReadonly,
-    tkRecord, tkRegister, tkRepeat, tkResident, tkResourcestring, tkRoundClose,
-    tkRoundOpen, tkSafecall, tkSemiColon, tkSet, tkShl, tkShr, tkSlash,
-    tkSlashesComment, tkSquareClose, tkSquareOpen, tkSpace, tkStar, tkStdcall,
-    tkStored, tkString, tkStringresource, tkSymbol, tkThen, tkThreadvar, tkTo,
-    tkTry, tkType, tkUnit, tkUnknown, tkUntil, tkUses, tkVar, tkVirtual, tkWhile,
-    tkWith, tkWrite, tkWriteonly, tkXor);
-
-  TIdentDirect = Set of TTokenKind;
-
-  TCommentState = (csAnsi, csBor, csNo, csSlashes);
-
   TPasTokenList = class;
 
   TmSearcher = class(TObject)

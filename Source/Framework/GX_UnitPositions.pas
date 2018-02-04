@@ -29,7 +29,7 @@ type
 implementation
 
 uses
-  SysUtils, GX_OtaUtils, GX_GenericUtils;
+  SysUtils, GX_OtaUtils, GX_GenericUtils, mwPasParserTypes;
 
 resourcestring
   SUnitName = 'unit';

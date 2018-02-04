@@ -57,6 +57,9 @@ type
 
 implementation
 
+uses
+  mwPasParserTypes;
+
 constructor TmAdditionalInfo.Create;
 begin
   inherited Create;
