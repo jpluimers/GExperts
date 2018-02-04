@@ -43,7 +43,7 @@
     <PropertyGroup Condition="'$(Base)'!=''">
         <UsePackages>true</UsePackages>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
-        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Release>8</VerInfo_Release>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Manifest_File>None</Manifest_File>
@@ -208,6 +208,9 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas"/>
         <DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
             <Form>fmeSortConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eSortOptions.pas">
+            <Form>frmSortOptions</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
             <Form>fmUsesManager</Form>
@@ -526,6 +529,12 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_ConfigureFormEnhancements.pas">
+            <Form>frConfigureFormEnhancements</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>

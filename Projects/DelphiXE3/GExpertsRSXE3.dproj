@@ -58,7 +58,7 @@
         <DCC_UsePackage>rtl;vcl;designide;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_S>false</DCC_S>
-        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_E>false</DCC_E>
         <DCC_K>false</DCC_K>
@@ -73,7 +73,6 @@
         <DCC_N>false</DCC_N>
         <DCC_F>false</DCC_F>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
-        <VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_OSX32)'!=''">
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
@@ -226,6 +225,9 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas"/>
         <DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
             <Form>fmeSortConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eSortOptions.pas">
+            <Form>frmSortOptions</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
             <Form>fmUsesManager</Form>
@@ -539,6 +541,13 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_ConfigureFormEnhancements.pas">
+            <Form>frConfigureFormEnhancements</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>GXIcons.res</Form>
         </RcCompile>

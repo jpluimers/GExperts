@@ -42,12 +42,11 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_UnitAlias>Actions=Actnlist;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_UnitAlias>ImageList=ImgList;Actions=Actnlist;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<Manifest_File>None</Manifest_File>
 			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Winapi;System.Win;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE2;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE2;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE2.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
 			<VerInfo_Locale>1033</VerInfo_Locale>
-			<VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
 			<VerInfo_MinorVer>3</VerInfo_MinorVer>
 			<VerInfo_DLL>true</VerInfo_DLL>
 			<VerInfo_Release>8</VerInfo_Release>
@@ -55,7 +54,7 @@
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
 			<DCC_DcuOutput>dcu</DCC_DcuOutput>
-			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE2.dll</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<UsePackages>true</UsePackages>
@@ -86,7 +85,8 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCC_IncludePath>..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_IncludePath)</DCC_IncludePath>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-			<DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<Debugger_RunParams>-ns</Debugger_RunParams>
+			<Debugger_HostApplication>C:\Delphi\DelphiXE2\bin\bds.exe</Debugger_HostApplication>
 			<VerInfo_Build>8</VerInfo_Build>
 			<VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE2;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE2;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE2.dll;ProductName=GExperts for RAD Studio XE2;ProductVersion=1.38;Comments=Open Source;CompileDate=</VerInfo_Keys>
 		</PropertyGroup>
@@ -103,7 +103,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-			<Debugger_RunParams>-ns</Debugger_RunParams>
+			<Debugger_RunParams>-ns -np</Debugger_RunParams>
 			<Debugger_HostApplication>C:\Delphi\DelphiXE2\bin\bds.exe</Debugger_HostApplication>
 		</PropertyGroup>
 		<ItemGroup>
@@ -222,6 +222,9 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas"/>
 			<DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
 				<Form>fmeSortConfig</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\Editor\GX_eSortOptions.pas">
+				<Form>frmSortOptions</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
 				<Form>fmUsesManager</Form>
@@ -537,6 +540,11 @@ $(PreBuildEvent)]]></PreBuildEvent>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
 			<DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
+			<DCCReference Include="..\..\Source\Framework\GX_ConfigureFormEnhancements.pas">
+				<Form>frConfigureFormEnhancements</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
 			<RcCompile Include="..\..\images\GXIcons.rc">
 				<Form>GXIcons.res</Form>
 			</RcCompile>
