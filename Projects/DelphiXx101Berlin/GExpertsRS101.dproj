@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -47,7 +47,7 @@
         <VerInfo_Release>8</VerInfo_Release>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Manifest_File>None</Manifest_File>
-        <DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;fmx;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_DLL>true</VerInfo_DLL>
         <DCC_K>false</DCC_K>
         <DCC_S>false</DCC_S>
@@ -535,6 +535,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
+        <DCCReference Include="..\..\Source\FMX\GXFmxUtils.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>

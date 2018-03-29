@@ -228,7 +228,8 @@ uses
   GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas',
   GX_IdeManagedFormHandler in '..\..\Source\IDE\GX_IdeManagedFormHandler.pas',
   GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame},
-  GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas';
+  GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas',
+  GXFmxUtils in '..\..\Source\FMX\GXFmxUtils.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res} // if you get an error here, run the __build_project.cmd script first
