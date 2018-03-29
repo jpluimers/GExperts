@@ -165,6 +165,32 @@ type
     property HistoryList: TGrepHistoryList read FHistoryList;
   end;
 
+  TGrepNextItemExpert = class(TGX_Expert)
+  protected
+    procedure SetShortCut(Value: TShortCut); override;
+  public
+    procedure Execute(Sender: TObject); override;
+    procedure Configure; override;
+    function GetDefaultShortCut: TShortCut; override;
+    function GetActionCaption: string; override;
+    class function ConfigurationKey: string; override;
+    class function GetName: string; override;
+    function GetHelpString: string; override;
+  end;
+
+  TGrepPrevItemExpert = class(TGX_Expert)
+  protected
+    procedure SetShortCut(Value: TShortCut); override;
+  public
+    procedure Execute(Sender: TObject); override;
+    procedure Configure; override;
+    function GetDefaultShortCut: TShortCut; override;
+    function GetActionCaption: string; override;
+    class function ConfigurationKey: string; override;
+    class function GetName: string; override;
+    function GetHelpString: string; override;
+  end;
+
 var
   GrepStandAlone: TGrepExpert = nil;
 
@@ -924,6 +950,113 @@ begin
     Result := SaveOption;
 end;
 
+{ TGrepNextItemExpert }
+
+class function TGrepNextItemExpert.ConfigurationKey: string;
+begin
+  result := TGrepExpert.ConfigurationKey;
+end;
+
+procedure TGrepNextItemExpert.Configure;
+begin
+  inherited;
+end;
+
+procedure TGrepNextItemExpert.Execute(Sender: TObject);
+begin
+  if not Assigned(fmGrepResults) then Exit;
+  if fmGrepResults.actListSelectNext.Enabled then
+    fmGrepResults.actListSelectNext.Execute;
+end;
+
+function TGrepNextItemExpert.GetActionCaption: string;
+resourcestring
+  SMenuCaption = 'Grep Result &Next Item';
+begin
+  Result := SMenuCaption;
+end;
+
+function TGrepNextItemExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(VK_F8, [ssAlt]);
+end;
+
+function TGrepNextItemExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  Select next item in grep search results.';
+begin
+  Result := SHelpString;
+end;
+
+class function TGrepNextItemExpert.GetName: string;
+begin
+  Result := 'GrepNextItem';
+end;
+
+procedure TGrepNextItemExpert.SetShortCut(Value: TShortCut);
+begin
+  inherited;
+  if not Assigned(fmGrepResults) then
+    Exit; //==>
+  fmGrepResults.actListSelectNext.ShortCut := Value;
+end;
+
+{ TGrepPrevItemExpert }
+
+class function TGrepPrevItemExpert.ConfigurationKey: string;
+begin
+  result := TGrepExpert.ConfigurationKey;
+end;
+
+procedure TGrepPrevItemExpert.Configure;
+begin
+  inherited;
+end;
+
+procedure TGrepPrevItemExpert.Execute(Sender: TObject);
+begin
+  if not Assigned(fmGrepResults) then
+    Exit; //==>
+  if fmGrepResults.actListSelectPrevious.Enabled then
+    fmGrepResults.actListSelectPrevious.Execute;
+end;
+
+function TGrepPrevItemExpert.GetActionCaption: string;
+resourcestring
+  SMenuCaption = 'Grep Result &Previous Item';
+begin
+  Result := SMenuCaption;
+end;
+
+function TGrepPrevItemExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(VK_F7, [ssAlt]);
+end;
+
+function TGrepPrevItemExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  Select previous item in grep search results.';
+begin
+  Result := SHelpString;
+end;
+
+class function TGrepPrevItemExpert.GetName: string;
+begin
+  Result := 'GrepPrevItem';
+end;
+
+procedure TGrepPrevItemExpert.SetShortCut(Value: TShortCut);
+begin
+  inherited;
+  if not Assigned(fmGrepResults) then
+    Exit; //==>
+  fmGrepResults.actListSelectPrevious.ShortCut := Value;
+end;
+
 initialization
   RegisterGX_Expert(TGrepExpert);
+  RegisterGX_Expert(TGrepNextItemExpert);
+  RegisterGX_Expert(TGrepPrevItemExpert);
 end.

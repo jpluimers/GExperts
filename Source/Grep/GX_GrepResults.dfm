@@ -377,6 +377,12 @@ inherited fmGrepResults: TfmGrepResults
       object GotoSelectedandClose1: TMenuItem
         Action = actListGotoSelectedAndClose
       end
+      object mitListSelectNext: TMenuItem
+        Action = actListSelectNext
+      end
+      object mitListSelectPrevious: TMenuItem
+        Action = actListSelectPrevious
+      end
       object mitListSep1: TMenuItem
         Caption = '-'
       end
@@ -747,6 +753,22 @@ inherited fmGrepResults: TfmGrepResults
       ImageIndex = 81
       OnExecute = actHistorySearchInHistoryExecute
     end
+    object actListSelectNext: TAction
+      Category = 'List'
+      Caption = 'Select Next'
+      ImageIndex = 87
+      SecondaryShortCuts.Strings = (
+        'SHIFT+ALT+F8')
+      OnExecute = actListSelectNextExecute
+    end
+    object actListSelectPrevious: TAction
+      Category = 'List'
+      Caption = 'Select Previous'
+      ImageIndex = 88
+      SecondaryShortCuts.Strings = (
+        'SHIFT+ALT+F7')
+      OnExecute = actListSelectPreviousExecute
+    end
   end
   object pmHistoryMenu: TPopupMenu
     Images = dmSharedImages.Images
@@ -855,6 +877,7 @@ inherited fmGrepResults: TfmGrepResults
     end
     object miHistoryRefresh: TMenuItem
       Action = actHistoryRefresh
+      Default = True
     end
     object miHistorySearch: TMenuItem
       Action = actHistorySearch

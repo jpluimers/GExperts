@@ -15,6 +15,7 @@ type
   TPageIndexType = (pitClickedEntryKeyIndex, pitTopKeyIndex, pitClickedEntryItemIndex, pitTopItemIndex);
   TPageSavedIndexType = Low(TPageIndexType)..pitTopKeyIndex;
   TPageIndexes = array[TPageIndexType] of Integer;
+  TExpandMode = (emExpand, emContract, emToggle);
 
   TfmGrepResults = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
@@ -180,6 +181,10 @@ type
     miSettingsSepDir: TMenuItem;
     tbnSearchInHistory: TToolButton;
     tbnSep9: TToolButton;
+    actListSelectNext: TAction;
+    actListSelectPrevious: TAction;
+    mitListSelectNext: TMenuItem;
+    mitListSelectPrevious: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);
@@ -237,6 +242,8 @@ type
     procedure actHistorySearchInHistoryExecute(Sender: TObject);
     procedure SplitterHistoryListMoved(Sender: TObject);
     procedure reContextContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure actListSelectNextExecute(Sender: TObject);
+    procedure actListSelectPreviousExecute(Sender: TObject);
   private
     FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
@@ -281,7 +288,8 @@ type
     procedure StartFileSearch(Sender: TObject; const FileName: string);
     procedure SaveSettings;
     procedure LoadSettings;
-    procedure ToggleFileResultExpanded(ListBoxIndex: Integer);
+    function ResultListItemIsFileResult(ListBoxIndex: Integer): boolean;
+    procedure ToggleFileResultExpanded(ListBoxIndex: Integer; const AExpandMode: TExpandMode = emToggle);
     procedure ExpandList(AUsedState, ASetState: Boolean; AExpandFewLines: Integer);
     procedure ContractList(ASetState: Boolean);
     procedure ResizeListBox;
@@ -299,6 +307,8 @@ type
     procedure ResizeStatusBar;
     procedure RefreshInformation(AMatchesFound: Integer; ADoExpand, AUSedExpandState, ASetExpandState: Boolean);
     procedure ViewHistoryListItems(AIndex: Integer; AUsedExpandState: Boolean);
+    function SelectNextListItem: boolean;
+    function SelectPrevListItem: boolean;
     procedure SetShowHistoryList(const Value: Boolean);
     procedure SetShowFullFilename(const Value: Boolean);
     procedure SetShowLineIndent(const Value: Boolean);
@@ -574,6 +584,37 @@ begin
   finally
     lbHistoryList.Items.EndUpdate;
   end;
+end;
+
+function TfmGrepResults.SelectNextListItem: boolean;
+var
+  liIx: integer;
+begin
+  result := false;
+  liIx := lbResults.ItemIndex + 1;
+  if ResultListItemIsFileResult(liIx) then
+  begin
+    ToggleFileResultExpanded(liIx, emExpand);
+    Inc(liIx);
+  end;
+  if liIx >= lbResults.Items.Count then Exit;
+  lbResults.ItemIndex := liIx;
+  result := true;
+end;
+
+function TfmGrepResults.SelectPrevListItem: boolean;
+var
+  liIx, liOrgListCnt: integer;
+begin
+  liIx := lbResults.ItemIndex - 1;
+  if ResultListItemIsFileResult(liIx) then
+  begin
+    liOrgListCnt := lbResults.Items.Count;
+    ToggleFileResultExpanded(liIx, emExpand);
+    Inc(liIx, lbResults.Items.Count - liOrgListCnt);
+  end;
+  lbResults.ItemIndex := Max(liIx, -1);
+  result := lbResults.ItemIndex >= 0;
 end;
 
 procedure TfmGrepResults.SetHistoryListMode(ANewMode: TGrepHistoryListMode;
@@ -1045,7 +1086,7 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.ToggleFileResultExpanded(ListBoxIndex: Integer);
+procedure TfmGrepResults.ToggleFileResultExpanded(ListBoxIndex: Integer; const AExpandMode: TExpandMode);
 var
   AFileResult: TFileResult;
   i: Integer;
@@ -1062,7 +1103,7 @@ begin
 
     lbResults.Items.BeginUpdate;
     try
-      if AFileResult.Expanded then
+      if AFileResult.Expanded and (AExpandMode in [emToggle, emContract]) then
       begin
         while (ListBoxIndex + 1 <= lbResults.Items.Count - 1) and
               (not (lbResults.Items.Objects[ListBoxIndex + 1] is TFileResult)) do
@@ -1072,7 +1113,7 @@ begin
         AFileResult.Expanded := False;
         AFileResult.ExpandState := False;
       end
-      else
+      else if not AFileResult.Expanded and (AExpandMode in [emToggle, emExpand]) then
       begin
         for i := AFileResult.Count - 1 downto 0 do
           lbResults.Items.InsertObject(ListBoxIndex + 1, AFileResult.Items[i].Line, AFileResult.Items[i]);
@@ -1477,6 +1518,18 @@ end;
 procedure TfmGrepResults.actListGotoSelectedExecute(Sender: TObject);
 begin
   GotoHighlightedListEntry;
+end;
+
+procedure TfmGrepResults.actListSelectNextExecute(Sender: TObject);
+begin
+  if SelectNextListItem then
+    GotoHighlightedListEntry;
+end;
+
+procedure TfmGrepResults.actListSelectPreviousExecute(Sender: TObject);
+begin
+  if SelectPrevListItem then
+    GotoHighlightedListEntry;
 end;
 
 procedure TfmGrepResults.actListContractExecute(Sender: TObject);
@@ -1924,6 +1977,11 @@ end;
 procedure TfmGrepResults.ResizeStatusBar;
 begin
   StatusBar.Panels.Items[0].Width := StatusBar.ClientWidth - StatusBar.Panels.Items[1].Width;
+end;
+
+function TfmGrepResults.ResultListItemIsFileResult(ListBoxIndex: Integer): boolean;
+begin
+  result := (ListBoxIndex >= 0) and (ListBoxIndex < lbResults.Items.Count) and (lbResults.Items.Objects[ListBoxIndex] is TFileResult);
 end;
 
 procedure TfmGrepResults.SetShowHistoryList(const Value: Boolean);
