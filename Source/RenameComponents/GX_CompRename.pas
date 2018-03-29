@@ -13,7 +13,7 @@ interface
 uses
   Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI, ComCtrls, Buttons,
   GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs,
-  GX_BaseForm, GX_dzSpeedBitBtn, GXFmxUtils;
+  GX_BaseForm, GX_dzSpeedBitBtn;
 
 type
   TCompRenameExpert = class;
@@ -77,7 +77,7 @@ type
     FIsValidComponentName: TIsValidComponentName;
     FProperties: TObjectList;
     FAnchorButtons: array[TAnchorKind] of TdzSpeedBitBtn;
-    FAlignButtons: array[TGxAlign] of TdzSpeedBitBtn;
+    FAlignButtons: array[TAlign] of TdzSpeedBitBtn;
     function GetNewName: WideString;
     function GetOldName: WideString;
     procedure SetNewName(const Value: WideString);
@@ -88,7 +88,7 @@ type
     procedure GetAlign(const _Component: IOTAComponent);
     procedure SetAnchors(const _Component: IOTAComponent);
     procedure GetAnchors(const _Component: IOTAComponent);
-    procedure HandleAlignButtons(_Align: TGxAlign);
+    procedure HandleAlignButtons(_Align: TAlign);
     procedure SetMargins(_Value: integer);
   public
     constructor Create(Owner: TComponent); override;
@@ -207,7 +207,7 @@ procedure TfmCompRename.GetAlign(const _Component: IOTAComponent);
 var
   BoolValue: LongBool;
   CompMargins: TObject;
-  al: TGxAlign;
+  al: TAlign;
   IntValue: Integer;
 begin
   if not GxOtaActiveDesignerIsVCL then begin
@@ -218,13 +218,13 @@ begin
   if not ts_Align.TabVisible then
     Exit; //==>
 
-  al := Low(TGxAlign);
-  while al < High(TGxAlign) do begin
+  al := Low(TAlign);
+  while al < High(TAlign) do begin
     if FAlignButtons[al].Down then
       Break;
     Inc(al);
   end;
-  IntValue := GxAlignToInt(al);
+  IntValue := Ord(al);
   _Component.SetPropByName('Align', IntValue);
 
   if not grp_Margins.Visible then
@@ -252,8 +252,8 @@ var
   BoolValue: LongBool;
   CompMargins: TObject;
   IntValue: Integer;
-  AlignValue: TGxAlign;
-  al: TGxAlign;
+  AlignValue: TAlign;
+  al: TAlign;
 begin
   if not GxOtaActiveDesignerIsVCL then begin
     ts_Align.TabVisible := False;
@@ -267,12 +267,13 @@ begin
     Exit; //==>
   end;
 
-  if not TryIntToGxAlign(IntValue, AlignValue) then begin
+  if (IntValue < Ord(Low(TAlign))) or (Ord(High(TAlign)) < IntValue) then begin
     ts_Align.TabVisible := False;
     Exit; //==>
   end;
+  AlignValue := TAlign(IntValue);
 
-  for al := Low(TGxAlign) to High(TGxAlign) do
+  for al := Low(TAlign) to High(TAlign) do
     FAlignButtons[al].Down := (al = AlignValue);
 
   if _Component.GetPropTypeByName('Margins') <> tkClass then begin
@@ -429,13 +430,13 @@ begin
   inherited;
   FProperties := TObjectList.Create(False);
 
-  FAlignButtons[galTop] := TdzSpeedBitBtn.Create(b_AlignTop);
-  FAlignButtons[galLeft] := TdzSpeedBitBtn.Create(b_AlignLeft);
-  FAlignButtons[galClient] := TdzSpeedBitBtn.Create(b_AlignClient);
-  FAlignButtons[galRight] := TdzSpeedBitBtn.Create(b_AlignRight);
-  FAlignButtons[galBottom] := TdzSpeedBitBtn.Create(b_AlignBottom);
-  FAlignButtons[galNone] := TdzSpeedBitBtn.Create(b_AlignNone);
-  FAlignButtons[galCustom] := TdzSpeedBitBtn.Create(b_AlignCustom);
+  FAlignButtons[alTop] := TdzSpeedBitBtn.Create(b_AlignTop);
+  FAlignButtons[alLeft] := TdzSpeedBitBtn.Create(b_AlignLeft);
+  FAlignButtons[alClient] := TdzSpeedBitBtn.Create(b_AlignClient);
+  FAlignButtons[alRight] := TdzSpeedBitBtn.Create(b_AlignRight);
+  FAlignButtons[alBottom] := TdzSpeedBitBtn.Create(b_AlignBottom);
+  FAlignButtons[alNone] := TdzSpeedBitBtn.Create(b_AlignNone);
+  FAlignButtons[alCustom] := TdzSpeedBitBtn.Create(b_AlignCustom);
 
   FAnchorButtons[akTop] := TdzSpeedBitBtn.Create(b_AnchorTop);
   FAnchorButtons[akLeft] := TdzSpeedBitBtn.Create(b_AnchorLeft);
@@ -1071,9 +1072,9 @@ begin
   PrivateCompRenameExpert.Configure;
 end;
 
-procedure TfmCompRename.HandleAlignButtons(_Align: TGxAlign);
+procedure TfmCompRename.HandleAlignButtons(_Align: TAlign);
 var
-  al: TGxAlign;
+  al: TAlign;
 begin
   if FAlignButtons[_Align].Down then begin
     for al := Low(FAlignButtons) to High(FAlignButtons) do
@@ -1085,37 +1086,37 @@ end;
 
 procedure TfmCompRename.b_AlignBottomClick(Sender: TObject);
 begin
-  HandleAlignButtons(galBottom);
+  HandleAlignButtons(alBottom);
 end;
 
 procedure TfmCompRename.b_AlignClientClick(Sender: TObject);
 begin
-  HandleAlignButtons(galClient);
+  HandleAlignButtons(alClient);
 end;
 
 procedure TfmCompRename.b_AlignCustomClick(Sender: TObject);
 begin
-  HandleAlignButtons(galCustom);
+  HandleAlignButtons(alCustom);
 end;
 
 procedure TfmCompRename.b_AlignLeftClick(Sender: TObject);
 begin
-  HandleAlignButtons(galLeft);
+  HandleAlignButtons(alLeft);
 end;
 
 procedure TfmCompRename.b_AlignNoneClick(Sender: TObject);
 begin
-  HandleAlignButtons(galNone);
+  HandleAlignButtons(alNone);
 end;
 
 procedure TfmCompRename.b_AlignRightClick(Sender: TObject);
 begin
-  HandleAlignButtons(galRight);
+  HandleAlignButtons(alRight);
 end;
 
 procedure TfmCompRename.b_AlignTopClick(Sender: TObject);
 begin
-  HandleAlignButtons(galTop);
+  HandleAlignButtons(alTop);
 end;
 
 procedure TfmCompRename.SetMargins(_Value: integer);
