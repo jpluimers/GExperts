@@ -300,6 +300,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
       <Form>fmFavOptions</Form>
     </DCCReference>
     <DCCReference Include="..\..\source\FavoriteFiles\GX_FavUtil.pas" />
+    <DCCReference Include="..\..\Source\FMX\GXFmxUtils.pas" />
     <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterEngine.pas" />
     <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterFormatter.pas" />
     <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterParser.pas" />

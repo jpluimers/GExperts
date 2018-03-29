@@ -110,7 +110,7 @@ object fmCompRename: TfmCompRename
         Height = 145
         TabOrder = 8
         object l_MarginTop: TLabel
-          Left = 40
+          Left = 24
           Top = 16
           Width = 22
           Height = 14
@@ -124,46 +124,82 @@ object fmCompRename: TfmCompRename
           Caption = 'Left'
         end
         object l_MarginRight: TLabel
-          Left = 72
+          Left = 48
           Top = 56
           Width = 28
           Height = 14
           Caption = 'Right'
         end
         object l_MarginBottom: TLabel
-          Left = 40
+          Left = 24
           Top = 96
           Width = 41
           Height = 14
           Caption = 'Bottom'
         end
         object ed_MarginTop: TEdit
-          Left = 40
+          Left = 24
           Top = 32
-          Width = 57
+          Width = 33
           Height = 22
           TabOrder = 0
         end
         object ed_MarginLeft: TEdit
           Left = 8
           Top = 72
-          Width = 57
+          Width = 33
           Height = 22
           TabOrder = 1
         end
         object ed_MarginRight: TEdit
-          Left = 72
+          Left = 48
           Top = 72
-          Width = 57
+          Width = 33
           Height = 22
           TabOrder = 2
         end
         object ed_MarginBottom: TEdit
-          Left = 40
+          Left = 24
           Top = 112
-          Width = 57
+          Width = 33
           Height = 22
           TabOrder = 3
+        end
+        object b_Margins0: TButton
+          Left = 96
+          Top = 16
+          Width = 33
+          Height = 25
+          Caption = '0'
+          TabOrder = 4
+          OnClick = b_Margins0Click
+        end
+        object b_Margins3: TButton
+          Left = 96
+          Top = 48
+          Width = 33
+          Height = 25
+          Caption = '3'
+          TabOrder = 5
+          OnClick = b_Margins3Click
+        end
+        object b_Margins6: TButton
+          Left = 96
+          Top = 80
+          Width = 33
+          Height = 25
+          Caption = '6'
+          TabOrder = 6
+          OnClick = b_Margins6Click
+        end
+        object b_Margins8: TButton
+          Left = 96
+          Top = 112
+          Width = 33
+          Height = 25
+          Caption = '8'
+          TabOrder = 7
+          OnClick = b_Margins8Click
         end
       end
       object chk_WithMargins: TCheckBox

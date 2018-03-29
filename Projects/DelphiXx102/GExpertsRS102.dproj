@@ -537,6 +537,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
+        <DCCReference Include="..\..\Source\FMX\GXFmxUtils.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>

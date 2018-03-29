@@ -13,7 +13,7 @@ interface
 uses
   Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI, ComCtrls, Buttons,
   GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs,
-  GX_BaseForm, GX_dzSpeedBitBtn;
+  GX_BaseForm, GX_dzSpeedBitBtn, GXFmxUtils;
 
 type
   TCompRenameExpert = class;
@@ -54,6 +54,10 @@ type
     b_AlignBottom: TBitBtn;
     b_AlignNone: TBitBtn;
     b_AlignCustom: TBitBtn;
+    b_Margins0: TButton;
+    b_Margins3: TButton;
+    b_Margins6: TButton;
+    b_Margins8: TButton;
     procedure FormCreate(Sender: TObject);
     procedure edtNewNameChange(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
@@ -65,11 +69,15 @@ type
     procedure b_AlignBottomClick(Sender: TObject);
     procedure b_AlignNoneClick(Sender: TObject);
     procedure b_AlignCustomClick(Sender: TObject);
+    procedure b_Margins0Click(Sender: TObject);
+    procedure b_Margins3Click(Sender: TObject);
+    procedure b_Margins6Click(Sender: TObject);
+    procedure b_Margins8Click(Sender: TObject);
   private
     FIsValidComponentName: TIsValidComponentName;
     FProperties: TObjectList;
     FAnchorButtons: array[TAnchorKind] of TdzSpeedBitBtn;
-    FAlignButtons: array[TAlign] of TdzSpeedBitBtn;
+    FAlignButtons: array[TGxAlign] of TdzSpeedBitBtn;
     function GetNewName: WideString;
     function GetOldName: WideString;
     procedure SetNewName(const Value: WideString);
@@ -80,7 +88,8 @@ type
     procedure GetAlign(const _Component: IOTAComponent);
     procedure SetAnchors(const _Component: IOTAComponent);
     procedure GetAnchors(const _Component: IOTAComponent);
-    procedure HandleAlignButtons(_Align: TAlign);
+    procedure HandleAlignButtons(_Align: TGxAlign);
+    procedure SetMargins(_Value: integer);
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
@@ -198,34 +207,43 @@ procedure TfmCompRename.GetAlign(const _Component: IOTAComponent);
 var
   BoolValue: LongBool;
   CompMargins: TObject;
-  al: TAlign;
+  al: TGxAlign;
   IntValue: Integer;
 begin
-  if ts_Align.TabVisible then begin
-    al := Low(TAlign);
-    while al < High(TAlign) do begin
-      if FAlignButtons[al].Down then
-        break;
-      Inc(al);
-    end;
-    IntValue := 0;
-    Move(al, IntValue, SizeOf(al));
-    _Component.SetPropByName('Align', Intvalue);
-    if grp_Margins.Visible then begin
-      BoolValue := chk_WithMargins.Checked;
-      _Component.SetPropByName('AlignWithMargins', BoolValue);
-      if _Component.GetPropTypeByName('Margins') = tkClass then begin
-        CompMargins := GetObjectProp((_Component as INTAComponent).GetComponent, 'Margins');
-        if TryStrToInt(ed_MarginTop.Text, IntValue) then
-          SetOrdProp(CompMargins, 'Top', IntValue);
-        if TryStrToInt(ed_MarginLeft.Text, IntValue) then
-          SetOrdProp(CompMargins, 'Left', IntValue);
-        if TryStrToInt(ed_MarginRight.Text, IntValue) then
-          SetOrdProp(CompMargins, 'Right', IntValue);
-        if TryStrToInt(ed_MarginBottom.Text, IntValue) then
-          SetOrdProp(CompMargins, 'Bottom', IntValue);
-      end;
-    end;
+  if not GxOtaActiveDesignerIsVCL then begin
+    // for whatever reason this currently does not work for FMX
+    Exit; //==>
+  end;
+
+  if not ts_Align.TabVisible then
+    Exit; //==>
+
+  al := Low(TGxAlign);
+  while al < High(TGxAlign) do begin
+    if FAlignButtons[al].Down then
+      Break;
+    Inc(al);
+  end;
+  IntValue := GxAlignToInt(al);
+  _Component.SetPropByName('Align', IntValue);
+
+  if not grp_Margins.Visible then
+    Exit; //==>
+
+  if chk_WithMargins.Visible then begin
+    BoolValue := chk_WithMargins.Checked;
+    _Component.SetPropByName('AlignWithMargins', BoolValue);
+  end;
+  if _Component.GetPropTypeByName('Margins') = tkClass then begin
+    CompMargins := GetObjectProp((_Component as INTAComponent).GetComponent, 'Margins');
+    if TryStrToInt(ed_MarginTop.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Top', IntValue);
+    if TryStrToInt(ed_MarginLeft.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Left', IntValue);
+    if TryStrToInt(ed_MarginRight.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Right', IntValue);
+    if TryStrToInt(ed_MarginBottom.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Bottom', IntValue);
   end;
 end;
 
@@ -234,36 +252,49 @@ var
   BoolValue: LongBool;
   CompMargins: TObject;
   IntValue: Integer;
-  AlignValue: TAlign;
-  al: TAlign;
+  AlignValue: TGxAlign;
+  al: TGxAlign;
 begin
+  if not GxOtaActiveDesignerIsVCL then begin
+    ts_Align.TabVisible := False;
+    // for whatever reason this currently does not work for FMX
+    Exit; //==>
+  end;
+
   // GetPropValueByName expects 4 byte values for enums
   if not _Component.GetPropValueByName('Align', IntValue) then begin
     ts_Align.TabVisible := False;
-  end else begin
-    Move(IntValue, AlignValue, SizeOf(AlignValue));
-    for al := Low(TAlign) to High(TAlign) do
-      FAlignButtons[al].Down := (al = AlignValue);
-
-    // GetPropValueByName expects 4 byte values for booleans too
-    if not _Component.GetPropValueByName('AlignWithMargins', BoolValue) then begin
-      chk_WithMargins.Visible := False;
-      grp_Margins.Visible := False;
-    end else begin
-      chk_WithMargins.Checked := BoolValue;
-      if _Component.GetPropTypeByName('Margins') = tkClass then begin
-        CompMargins := GetObjectProp((_Component as INTAComponent).GetComponent, 'Margins');
-        IntValue := GetOrdProp(CompMargins, 'Top');
-        ed_MarginTop.Text := IntToStr(IntValue);
-        IntValue := GetOrdProp(CompMargins, 'Left');
-        ed_MarginLeft.Text := IntToStr(IntValue);
-        IntValue := GetOrdProp(CompMargins, 'Right');
-        ed_MarginRight.Text := IntToStr(IntValue);
-        IntValue := GetOrdProp(CompMargins, 'Bottom');
-        ed_MarginBottom.Text := IntToStr(IntValue);
-      end;
-    end;
+    Exit; //==>
   end;
+
+  if not TryIntToGxAlign(IntValue, AlignValue) then begin
+    ts_Align.TabVisible := False;
+    Exit; //==>
+  end;
+
+  for al := Low(TGxAlign) to High(TGxAlign) do
+    FAlignButtons[al].Down := (al = AlignValue);
+
+  if _Component.GetPropTypeByName('Margins') <> tkClass then begin
+    grp_Margins.Visible := False;
+    chk_WithMargins.Visible := False;
+    Exit; //==>
+  end;
+
+  // GetPropValueByName expects 4 byte values for booleans too
+  if not _Component.GetPropValueByName('AlignWithMargins', BoolValue) then begin
+    chk_WithMargins.Visible := False;
+  end;
+  chk_WithMargins.Checked := BoolValue;
+  CompMargins := GetObjectProp((_Component as INTAComponent).GetComponent, 'Margins');
+  IntValue := GetOrdProp(CompMargins, 'Top');
+  ed_MarginTop.Text := IntToStr(IntValue);
+  IntValue := GetOrdProp(CompMargins, 'Left');
+  ed_MarginLeft.Text := IntToStr(IntValue);
+  IntValue := GetOrdProp(CompMargins, 'Right');
+  ed_MarginRight.Text := IntToStr(IntValue);
+  IntValue := GetOrdProp(CompMargins, 'Bottom');
+  ed_MarginBottom.Text := IntToStr(IntValue);
 end;
 
 procedure TfmCompRename.GetAnchors(const _Component: IOTAComponent);
@@ -398,13 +429,13 @@ begin
   inherited;
   FProperties := TObjectList.Create(False);
 
-  FAlignButtons[alTop] := TdzSpeedBitBtn.Create(b_AlignTop);
-  FAlignButtons[alLeft] := TdzSpeedBitBtn.Create(b_AlignLeft);
-  FAlignButtons[alClient] := TdzSpeedBitBtn.Create(b_AlignClient);
-  FAlignButtons[alRight] := TdzSpeedBitBtn.Create(b_AlignRight);
-  FAlignButtons[alBottom] := TdzSpeedBitBtn.Create(b_AlignBottom);
-  FAlignButtons[alNone] := TdzSpeedBitBtn.Create(b_AlignNone);
-  FAlignButtons[alCustom] := TdzSpeedBitBtn.Create(b_AlignCustom);
+  FAlignButtons[galTop] := TdzSpeedBitBtn.Create(b_AlignTop);
+  FAlignButtons[galLeft] := TdzSpeedBitBtn.Create(b_AlignLeft);
+  FAlignButtons[galClient] := TdzSpeedBitBtn.Create(b_AlignClient);
+  FAlignButtons[galRight] := TdzSpeedBitBtn.Create(b_AlignRight);
+  FAlignButtons[galBottom] := TdzSpeedBitBtn.Create(b_AlignBottom);
+  FAlignButtons[galNone] := TdzSpeedBitBtn.Create(b_AlignNone);
+  FAlignButtons[galCustom] := TdzSpeedBitBtn.Create(b_AlignCustom);
 
   FAnchorButtons[akTop] := TdzSpeedBitBtn.Create(b_AnchorTop);
   FAnchorButtons[akLeft] := TdzSpeedBitBtn.Create(b_AnchorLeft);
@@ -1040,9 +1071,9 @@ begin
   PrivateCompRenameExpert.Configure;
 end;
 
-procedure TfmCompRename.HandleAlignButtons(_Align: TAlign);
+procedure TfmCompRename.HandleAlignButtons(_Align: TGxAlign);
 var
-  al: TAlign;
+  al: TGxAlign;
 begin
   if FAlignButtons[_Align].Down then begin
     for al := Low(FAlignButtons) to High(FAlignButtons) do
@@ -1054,37 +1085,68 @@ end;
 
 procedure TfmCompRename.b_AlignBottomClick(Sender: TObject);
 begin
-  HandleAlignButtons(alBottom);
+  HandleAlignButtons(galBottom);
 end;
 
 procedure TfmCompRename.b_AlignClientClick(Sender: TObject);
 begin
-  HandleAlignButtons(alClient);
+  HandleAlignButtons(galClient);
 end;
 
 procedure TfmCompRename.b_AlignCustomClick(Sender: TObject);
 begin
-  HandleAlignButtons(alCustom);
+  HandleAlignButtons(galCustom);
 end;
 
 procedure TfmCompRename.b_AlignLeftClick(Sender: TObject);
 begin
-  HandleAlignButtons(alLeft);
+  HandleAlignButtons(galLeft);
 end;
 
 procedure TfmCompRename.b_AlignNoneClick(Sender: TObject);
 begin
-  HandleAlignButtons(alNone);
+  HandleAlignButtons(galNone);
 end;
 
 procedure TfmCompRename.b_AlignRightClick(Sender: TObject);
 begin
-  HandleAlignButtons(alRight);
+  HandleAlignButtons(galRight);
 end;
 
 procedure TfmCompRename.b_AlignTopClick(Sender: TObject);
 begin
-  HandleAlignButtons(alTop);
+  HandleAlignButtons(galTop);
+end;
+
+procedure TfmCompRename.SetMargins(_Value: integer);
+var
+  s: string;
+begin
+  s := IntToStr(_Value);
+  ed_MarginTop.Text := s;
+  ed_MarginLeft.Text := s;
+  ed_MarginRight.Text := s;
+  ed_MarginBottom.Text := s;
+end;
+
+procedure TfmCompRename.b_Margins0Click(Sender: TObject);
+begin
+  SetMargins(0);
+end;
+
+procedure TfmCompRename.b_Margins3Click(Sender: TObject);
+begin
+  SetMargins(3);
+end;
+
+procedure TfmCompRename.b_Margins6Click(Sender: TObject);
+begin
+  SetMargins(6);
+end;
+
+procedure TfmCompRename.b_Margins8Click(Sender: TObject);
+begin
+  SetMargins(8);
 end;
 
 initialization
