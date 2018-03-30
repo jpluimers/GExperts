@@ -857,7 +857,7 @@ begin
   if ToDoExpert.FHideOnGoto then
     Self.Hide;
 
-  // todo: somehow call IncCallCount
+  ToDoExpert.IncCallCount;
 end;
 
 procedure TfmToDo.actFilePrintExecute(Sender: TObject);
@@ -923,7 +923,7 @@ begin
     FreeAndNil(RichEdit);
   end;
 
-  // todo: Call IncCallCount
+  ToDoExpert.IncCallCount;
 end;
 
 procedure TfmToDo.actFileRefreshExecute(Sender: TObject);

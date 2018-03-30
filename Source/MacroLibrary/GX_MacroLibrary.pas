@@ -82,8 +82,6 @@ type
     property Stream: TStream read GetStream write SetStream;
   end;
 
-  TMacroLibExpert = class;
-
   TfmMacroLibrary = class(TfmIdeDockForm)
     lvMacros: TListView;
     Toolbar: TToolBar;
@@ -103,16 +101,6 @@ type
     mitShowToolbar: TMenuItem;
     actViewDescription: TAction;
     mitShowDescription: TMenuItem;
-    actViewStyleLargeIcon: TAction;
-    actViewStyleSmallIcon: TAction;
-    actViewStyleList: TAction;
-    actViewStyleDetails: TAction;
-    mitViewStyle: TMenuItem;
-    mitLargeIcons: TMenuItem;
-    mitSmallIcons: TMenuItem;
-    mitList: TMenuItem;
-    mitDetails: TMenuItem;
-    mitSep4: TMenuItem;
     ilLarge: TImageList;
     ilSmall: TImageList;
     actFileSave: TAction;
@@ -166,7 +154,6 @@ type
     procedure lvMacrosChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure actViewDescriptionExecute(Sender: TObject);
     procedure FormResize(Sender: TObject);
-    procedure actViewStyleExecute(Sender: TObject);
     procedure actFileSaveExecute(Sender: TObject);
     procedure actFileLoadExecute(Sender: TObject);
     procedure actEditSuspendExecute(Sender: TObject);
@@ -822,10 +809,6 @@ begin
   actRecord.Checked      := GxOtaEditorIsRecordingMacro;
   actViewToolbar.Checked := Toolbar.Visible;
   actViewDescription.Checked    := DescriptionVisible;
-  actViewStyleLargeIcon.Checked := lvMacros.ViewStyle = vsIcon;
-  actViewStyleSmallIcon.Checked := lvMacros.ViewStyle = vsSmallIcon;
-  actViewStyleList.Checked      := lvMacros.ViewStyle = vsList;
-  actViewStyleDetails.Checked   := lvMacros.ViewStyle = vsReport;
   actPromptForName.Checked := FPromptForName;
 end;
 
@@ -950,19 +933,6 @@ begin
   inherited;
   ResizeColumns;
   lvMacros.Invalidate;
-end;
-
-procedure TfmMacroLibrary.actViewStyleExecute(Sender: TObject);
-begin
-  if Sender is TComponent then
-  begin
-    case TComponent(Sender).Tag of
-      1: lvMacros.ViewStyle := vsIcon;
-      2: lvMacros.ViewStyle := vsSmallIcon;
-      3: lvMacros.ViewStyle := vsList;
-    else lvMacros.ViewStyle := vsReport;
-    end;
-  end;
 end;
 
 procedure TfmMacroLibrary.actFileSaveExecute(Sender: TObject);
@@ -1108,7 +1078,8 @@ begin
   actEditCopy.Execute;
   GxOtaFocusCurrentIDEEditControl;
   GxOtaGetKeyboardServices.ResumePlayback;
-  // todo: Call IncCallCount somehow
+
+  MacroLibExpert.IncCallCount;
 end;
 
 procedure TfmMacroLibrary.actPromptForNameExecute(Sender: TObject);
@@ -1137,7 +1108,7 @@ begin
       sl.Clear;
     if FPromptForName then begin
       if not TfmMacroLibraryNamePrompt.Execute(Self, True, MacroName, MacroDesc, sl, FPromptForName) then
-        Exit;
+        Exit; //==>
     end;
 
     Info := TMacroInfo.Create;
@@ -1146,7 +1117,6 @@ begin
     Info.Description := MacroDesc;
     Info.TimeStamp := Now;
     Info.Stream := MemStream;
-
     InsertMacro(0, Info);
     SelectFirstMacro;
 
@@ -1155,6 +1125,8 @@ begin
     FreeAndNil(sl);
     FreeAndNil(MemStream)
   end;
+
+  MacroLibExpert.IncCallCount;
 end;
 
 procedure TfmMacroLibrary.FormCreate(Sender: TObject);

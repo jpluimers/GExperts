@@ -242,34 +242,6 @@ object fmMacroLibrary: TfmMacroLibrary
       Hint = 'Show description'
       OnExecute = actViewDescriptionExecute
     end
-    object actViewStyleLargeIcon: TAction
-      Tag = 1
-      Category = 'ViewStyle'
-      Caption = 'Large Icons'
-      Hint = 'View as large icons'
-      OnExecute = actViewStyleExecute
-    end
-    object actViewStyleSmallIcon: TAction
-      Tag = 2
-      Category = 'ViewStyle'
-      Caption = 'Small Icons'
-      Hint = 'View as small icons'
-      OnExecute = actViewStyleExecute
-    end
-    object actViewStyleList: TAction
-      Tag = 3
-      Category = 'ViewStyle'
-      Caption = 'List'
-      Hint = 'View as list'
-      OnExecute = actViewStyleExecute
-    end
-    object actViewStyleDetails: TAction
-      Tag = 4
-      Category = 'ViewStyle'
-      Caption = 'Details'
-      Hint = 'View as details'
-      OnExecute = actViewStyleExecute
-    end
     object actFileSave: TAction
       Category = 'File'
       Caption = 'Save Macro...'
@@ -377,33 +349,6 @@ object fmMacroLibrary: TfmMacroLibrary
       RadioItem = True
     end
     object mitSep3: TMenuItem
-      Caption = '-'
-    end
-    object mitViewStyle: TMenuItem
-      Caption = 'View Style'
-      Visible = False
-      object mitLargeIcons: TMenuItem
-        Tag = 1
-        Action = actViewStyleLargeIcon
-        RadioItem = True
-      end
-      object mitSmallIcons: TMenuItem
-        Tag = 2
-        Action = actViewStyleSmallIcon
-        RadioItem = True
-      end
-      object mitList: TMenuItem
-        Tag = 3
-        Action = actViewStyleList
-        RadioItem = True
-      end
-      object mitDetails: TMenuItem
-        Tag = 4
-        Action = actViewStyleDetails
-        RadioItem = True
-      end
-    end
-    object mitSep4: TMenuItem
       Caption = '-'
     end
     object mitShowToolbar: TMenuItem
