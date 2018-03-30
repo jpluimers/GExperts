@@ -788,8 +788,8 @@ object fmConfiguration: TfmConfiguration
         287
         34)
       object btnOK: TButton
-        Left = 30
-        Top = 1
+        Left = 48
+        Top = 0
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -799,8 +799,8 @@ object fmConfiguration: TfmConfiguration
         OnClick = btnOKClick
       end
       object btnCancel: TButton
-        Left = 117
-        Top = 1
+        Left = 128
+        Top = 0
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -810,8 +810,8 @@ object fmConfiguration: TfmConfiguration
         TabOrder = 1
       end
       object btnHelp: TButton
-        Left = 204
-        Top = 1
+        Left = 208
+        Top = 0
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -821,23 +821,32 @@ object fmConfiguration: TfmConfiguration
       end
     end
     object btnImport: TButton
-      Left = 88
+      Left = 216
       Top = 1
       Width = 75
       Height = 25
       Caption = 'Import ...'
-      TabOrder = 2
+      TabOrder = 3
       Visible = False
     end
     object btnExport: TButton
-      Left = 8
+      Left = 136
       Top = 1
       Width = 75
       Height = 25
       Caption = 'Export ...'
-      TabOrder = 1
+      TabOrder = 2
       Visible = False
       OnClick = btnExportClick
+    end
+    object btnUsage: TButton
+      Left = 8
+      Top = 0
+      Width = 121
+      Height = 25
+      Caption = 'Usage (%d) ...'
+      TabOrder = 1
+      OnClick = btnUsageClick
     end
   end
   object dlgUIFont: TFontDialog

@@ -362,6 +362,8 @@ begin
       FFavoriteUnits.Assign(Form.FFavoriteUnits);
       FSingleActionMode := Form.chkSingleActionMode.Checked;
       FAvailTabIndex := Form.pcUnits.ActivePageIndex;
+
+      IncCallCount;
     end;
   finally
     FreeAndNil(Form);

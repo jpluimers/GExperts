@@ -153,7 +153,8 @@ var
 begin
   if not IsEditorActive(ctl) then begin
     if not FForceEditorActive then
-      Exit;
+      Exit; //==>
+
     EditorForm := GxOtaGetTopMostEditView.GetEditWindow.Form;
     if Assigned(EditorForm) then begin
       EditorControl := EditorForm.FindComponent('Editor');
@@ -192,6 +193,8 @@ begin
     ShowConfigForm);
   pnt := ctl.ClientToScreen(Point(0, 0));
   FGExpertsShortcutMenu.Popup(pnt.X, pnt.Y);
+
+  IncCallCount;
 end;
 
 procedure TGxEditorPopupMenuExpert.ShowConfigForm(_Sender: TObject);

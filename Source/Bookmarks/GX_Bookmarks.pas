@@ -166,6 +166,7 @@ begin
   fmBookmarks.Init;
   IdeDockManager.ShowForm(fmBookmarks);
   EnsureFormVisible(fmBookmarks);
+  IncCallCount;
 end;
 
 {$IFDEF GX_VER170_up}

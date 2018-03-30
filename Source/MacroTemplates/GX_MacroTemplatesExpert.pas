@@ -681,80 +681,79 @@ begin
   TemplateIdx := GetTemplate(TemplateName, not CodeForced);
 {$ENDIF}
   if TemplateIdx < 0 then
-    Exit
-  else
+    Exit; //==>
+
+  // todo: Figure out how to make this work without messing up offsets with multi-line selections
+  //if not StrContains('%SELECTION%', TemplateText) then
+  //  GxOtaDeleteSelection;
+
+  TemplateObject := FMacroFile.MacroItems[TemplateIdx];
+  TemplateText := TemplateObject.Text;
+  TemplateContainsPipe := StrContains('|', TemplateText);
+  // Convert to CRLF on Windows
+  if sLineBreak = #13#10 then
+    TemplateText := AdjustLineBreaks(TemplateText);
+
+  // Insert the macro into the editor
+  if TemplateText = '' then
+    Exit; //==>
+
+  CodeInEditor := (CaretPos.Col + 1 <> IdentPos.Col) and (not CodeForced);
+
+  if CodeForced and (TemplateObject.InsertPos = tipCursorPos) then
   begin
+    // For when the template is to be inserted directly at the end of a non-template-name identifier via a shortcut
+    // This was causing problems with templates like raise and is disabled
+    //CodeOffset := CodeOffset + Length(TemplateName);
+    //InsertPos := CurrentPos;
+    //InsertPos.Col := InsertPos.Col + 1;
+  end;
 
-    // todo: Figure out how to make this work without messing up offsets with multi-line selections
-    //if not StrContains('%SELECTION%', TemplateText) then
-    //  GxOtaDeleteSelection;
+  if GxOtaGetSelection(nil, BlockStart, BlockEnd, SelStart, SelLength) and (SelLength > 0) then begin
+    InsertOffset := SelStart;
+    InsertPos := BlockStart;
+  end else begin
+    InsertOffset := IdentOffset;
+    InsertPos := IdentPos;
+  end;
+  // This does nothing for tipCursorPos:
+  CalculateInsertPos(TemplateObject.InsertPos, InsertOffset, InsertPos);
+  // Expand the macros in the template text, embed/delete selection, etc.
+  PrepareTemplateText(TemplateText, CaretPos, AfterLen, InsertOffset, InsertPos);
 
-    TemplateObject := FMacroFile.MacroItems[TemplateIdx];
-    TemplateText := TemplateObject.Text;
-    TemplateContainsPipe := StrContains('|', TemplateText);
-    // Convert to CRLF on Windows
-    if sLineBreak = #13#10 then
-      TemplateText := AdjustLineBreaks(TemplateText);
-
-    // Insert the macro into the editor
-    if TemplateText <> '' then
+  if TemplateObject.InsertPos = tipCursorPos then
+  begin
+    InsertWhiteCnt := InsertPos.Col - 1; // insert pos is one-based
+    if InsertWhiteCnt > 0 then begin
+      TemplateText := AddLeadingSpaces(TemplateText, InsertWhiteCnt, InsertPos.Col);
+    end
+    else
     begin
-      CodeInEditor := (CaretPos.Col + 1 <> IdentPos.Col) and (not CodeForced);
-
-      if CodeForced and (TemplateObject.InsertPos = tipCursorPos) then
-      begin
-        // For when the template is to be inserted directly at the end of a non-template-name identifier via a shortcut
-        // This was causing problems with templates like raise and is disabled
-        //CodeOffset := CodeOffset + Length(TemplateName);
-        //InsertPos := CurrentPos;
-        //InsertPos.Col := InsertPos.Col + 1;
-      end;
-
-      if GxOtaGetSelection(nil, BlockStart, BlockEnd, SelStart, SelLength) and (SelLength > 0) then begin
-        InsertOffset := SelStart;
-        InsertPos := BlockStart;
-      end else begin
-        InsertOffset := IdentOffset;
-        InsertPos := IdentPos;
-      end;
-      // This does nothing for tipCursorPos:
-      CalculateInsertPos(TemplateObject.InsertPos, InsertOffset, InsertPos);
-      // Expand the macros in the template text, embed/delete selection, etc.
-      PrepareTemplateText(TemplateText, CaretPos, AfterLen, InsertOffset, InsertPos);
-
-      if TemplateObject.InsertPos = tipCursorPos then
-      begin
-        InsertWhiteCnt := InsertPos.Col - 1; // insert pos is one-based
-        if InsertWhiteCnt > 0 then begin
-          TemplateText := AddLeadingSpaces(TemplateText, InsertWhiteCnt, InsertPos.Col);
-        end
-        else
-        begin
-          if CodeInEditor then
-            CursorPos := InsertPos // start of code in editor
-          else
-            CursorPos := GxOtaGetCurrentEditPos;
-
-          if CursorPos.Col > 1 then // Trim trailing blanks is on, and the user is not in the first column
-            TemplateText := PrefixLines(TemplateText, StringOfChar(' ', CursorPos.Col - 1), 0);
-        end;
-      end;
-
-      PrepareNewCursorPos(TemplateText, InsertPos, NewCursorPos, TemplateContainsPipe);
-
-      if CodeForced or (not SameText(TemplateName, TemplateObject.Name)) then
-        InsertTemplateIntoEditor('', TemplateText, IdentOffset, InsertOffset)
+      if CodeInEditor then
+        CursorPos := InsertPos // start of code in editor
       else
-        InsertTemplateIntoEditor(TemplateName, TemplateText, IdentOffset, InsertOffset);
+        CursorPos := GxOtaGetCurrentEditPos;
 
-      CharPos.CharIndex := NewCursorPos.Col - 1;
-      CharPos.Line := NewCursorPos.Line;
-
-      CaretPos := CharPosToEditPos(CharPos);
-      SetNewCursorPos(CaretPos);
-      AddUsesToUnit(TemplateObject);
+      if CursorPos.Col > 1 then // Trim trailing blanks is on, and the user is not in the first column
+        TemplateText := PrefixLines(TemplateText, StringOfChar(' ', CursorPos.Col - 1), 0);
     end;
   end;
+
+  PrepareNewCursorPos(TemplateText, InsertPos, NewCursorPos, TemplateContainsPipe);
+
+  if CodeForced or (not SameText(TemplateName, TemplateObject.Name)) then
+    InsertTemplateIntoEditor('', TemplateText, IdentOffset, InsertOffset)
+  else
+    InsertTemplateIntoEditor(TemplateName, TemplateText, IdentOffset, InsertOffset);
+
+  CharPos.CharIndex := NewCursorPos.Col - 1;
+  CharPos.Line := NewCursorPos.Line;
+
+  CaretPos := CharPosToEditPos(CharPos);
+  SetNewCursorPos(CaretPos);
+  AddUsesToUnit(TemplateObject);
+
+  IncCallCount;
 end;
 
 procedure TMacroTemplatesExpert.AddUsesToUnit(ATemplateObject: TMacroObject);

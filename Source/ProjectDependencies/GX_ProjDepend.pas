@@ -1055,6 +1055,8 @@ begin
   if fmProjDepend.WindowState = wsMinimized then
     fmProjDepend.WindowState := wsNormal;
   fmProjDepend.Show;
+
+  IncCallCount;
 end;
 
 function TDependExpert.IsDefaultActive: Boolean;

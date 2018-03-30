@@ -163,6 +163,7 @@ begin
       if Source = '' then
         exit;
 
+      IncCallCount;
       TextLength := Length(Source);
 
       Patches := TStringList.Create;

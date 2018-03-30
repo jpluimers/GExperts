@@ -937,6 +937,8 @@ begin
       if Dlg.chkDefaults.Checked then
         Dlg.SaveSettings;
       GxOtaFocusCurrentIDEEditControl;
+
+      IncCallCount;
     end;
   finally
     FreeAndNil(Dlg);

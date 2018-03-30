@@ -552,6 +552,8 @@ begin
         Break;
     end;
   end;
+
+  IncCallCount;
 end;
 
 procedure TCompRenameExpert.Configure;

@@ -1108,6 +1108,7 @@ begin
   actEditCopy.Execute;
   GxOtaFocusCurrentIDEEditControl;
   GxOtaGetKeyboardServices.ResumePlayback;
+  // todo: Call IncCallCount somehow
 end;
 
 procedure TfmMacroLibrary.actPromptForNameExecute(Sender: TObject);

@@ -603,6 +603,8 @@ begin
   if (not Assigned(Module)) or not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     Exit; //==>
 
+  IncCallCount;
+
   SPos := GetFileContent(FileContent, SourceEditor);
 
   if Language = ltPas then

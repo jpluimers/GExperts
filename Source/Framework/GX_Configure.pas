@@ -109,6 +109,7 @@ type
     chkEnhanceApplicationSettingsDialog: TCheckBox;
     lblHideNavBar: TLabel;
     tshFormEnhancements: TTabSheet;
+    btnUsage: TButton;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -138,6 +139,7 @@ type
     procedure btnDeleteSuppressedMessageClick(Sender: TObject);
     procedure btnClearSuppressedMessagesClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
+    procedure btnUsageClick(Sender: TObject);
   private
     FOIFont: TFont;
     FCPFont: TFont;
@@ -201,6 +203,9 @@ constructor TfmConfiguration.Create(AOwner: TComponent);
 var
   MinWidth: Integer;
   MinHeight: Integer;
+  GExperts: TGExperts;
+  i: Integer;
+  UsageCount: Integer;
 
   procedure AdjustMinSize(_ctrl: TControl);
   begin
@@ -282,6 +287,16 @@ begin
   LoadSuppressedMessages;
 
   tshDebug.TabVisible := False;
+
+  GExperts := GExpertsInst(True);
+  UsageCount := 0;
+  for i := 0 to GExperts.ExpertCount - 1 do begin
+    Inc(UsageCount, GExperts.ExpertList[i].CallCount);
+  end;
+  for i := 0 to GExperts.EditorExpertManager.EditorExpertCount - 1 do begin
+    Inc(UsageCount, GExperts.EditorExpertManager.EditorExpertList[i].CallCount);
+  end;
+  btnUsage.Caption := Format('Usage (%d) ...', [UsageCount]);
 end;
 
 destructor TfmConfiguration.Destroy;
@@ -379,6 +394,11 @@ begin
   SaveAllSettings;
 
   ModalResult := mrOk;
+end;
+
+procedure TfmConfiguration.btnUsageClick(Sender: TObject);
+begin
+  // todo: show detailed usage
 end;
 
 procedure TfmConfiguration.btnHelpClick(Sender: TObject);

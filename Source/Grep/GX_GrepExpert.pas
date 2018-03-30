@@ -310,6 +310,8 @@ begin
   SetFormIcon(fmGrepResults);
   IdeDockManager.ShowForm(fmGrepResults);
   EnsureFormVisible(fmGrepResults);
+
+  IncCallCount;
 end;
 
 procedure TGrepExpert.ShowModal;
@@ -964,9 +966,13 @@ end;
 
 procedure TGrepNextItemExpert.Execute(Sender: TObject);
 begin
-  if not Assigned(fmGrepResults) then Exit;
-  if fmGrepResults.actListSelectNext.Enabled then
+  if not Assigned(fmGrepResults) then
+    Exit; //==>
+
+  if fmGrepResults.actListSelectNext.Enabled then begin
     fmGrepResults.actListSelectNext.Execute;
+    IncCallCount;
+  end;
 end;
 
 function TGrepNextItemExpert.GetActionCaption: string;
@@ -1018,8 +1024,11 @@ procedure TGrepPrevItemExpert.Execute(Sender: TObject);
 begin
   if not Assigned(fmGrepResults) then
     Exit; //==>
-  if fmGrepResults.actListSelectPrevious.Enabled then
+
+  if fmGrepResults.actListSelectPrevious.Enabled then begin
     fmGrepResults.actListSelectPrevious.Execute;
+    IncCallCount;
+  end;
 end;
 
 function TGrepPrevItemExpert.GetActionCaption: string;

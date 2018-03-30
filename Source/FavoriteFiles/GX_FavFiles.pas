@@ -1615,6 +1615,8 @@ begin
   if FFavoriteFiles.WindowState = wsMinimized then
     FFavoriteFiles.WindowState := wsNormal;
   FFavoriteFiles.Show;
+
+  IncCallCount;
 end;
 
 function TFilesExpert.HasConfigOptions: Boolean;

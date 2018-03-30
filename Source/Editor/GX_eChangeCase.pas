@@ -265,8 +265,10 @@ begin
   // If you have got any better idea, please feel free to change this code.
   // -- 2016-10-01 twm
   Application.ProcessMessages;
-  if EnterWasPressed then
+  if EnterWasPressed then begin
+    IncCallCount;
     FPopup.Items[FLastSelection].Click;
+  end;
 end;
 
 initialization

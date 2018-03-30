@@ -372,10 +372,13 @@ begin
   // No way to get a "native" component for VCL.NET components
   if GxOtaActiveDesignerIsNFM then
     raise Exception.Create('Components to Code does not support VCL.NET forms.');
+
   Comps := GetDesignerComps;
   if Length(Comps) > 0 then begin
     Clipboard.AsText := DoGetCreationCode(FSettings, Comps);
     ShowGxMessageBox(TShowCodeOnClipboardMessage);
+
+    IncCallCount;
   end;
 end;
 

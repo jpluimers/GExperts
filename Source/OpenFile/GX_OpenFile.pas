@@ -276,6 +276,8 @@ begin
     if (Form.ShowModal = mrOk) or (Form.chkDefault.Checked) then begin
       SaveSettings;
       Form.SaveSettings;
+
+      IncCallCount;
     end;
   finally
     FreeAndNil(Form);

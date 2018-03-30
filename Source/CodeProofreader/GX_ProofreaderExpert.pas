@@ -50,6 +50,7 @@ end;
 procedure TCodeProofreaderExpert.Execute(Sender: TObject);
 begin
   Configure;
+  // todo: Measure usage of this expert by calling IncCallCount whenever it does something
 end;
 
 procedure TCodeProofreaderExpert.Configure;

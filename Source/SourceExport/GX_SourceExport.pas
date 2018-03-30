@@ -69,11 +69,13 @@ type
     procedure actCopyTextRtfHtmlExecute(Sender: TObject);
   private
     FEditor: TSynEdit;
+    FHasBeenUsed: Boolean;
     procedure LoadSettings;
     procedure CopyToClipboard(CopyFormat: TGXCopyFormat);
     function FillEditControlWithIdeData: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
+    property HasBeenUsed: Boolean read FHasBeenUsed;
   end;
 
   TSourceExportExpert = class(TGX_Expert)
@@ -210,6 +212,7 @@ begin
     finally
       FreeAndNil(Exporter);
     end;
+    FHasBeenUsed := True;
   end;
 end;
 
@@ -282,6 +285,7 @@ procedure TfmSourceExport.actCopyExecute(Sender: TObject);
 begin
   Assert(Assigned(SourceExportExpert));
   CopyToClipboard(SourceExportExpert.FDefaultCopyFormat);
+  FHasBeenUsed := True;
 end;
 
 procedure TfmSourceExport.actPrintExecute(Sender: TObject);
@@ -304,6 +308,7 @@ begin
   finally
     FreeAndNil(SynPrint);
   end;
+  FHasBeenUsed := True;
 end;
 
 procedure TfmSourceExport.actConfigureExecute(Sender: TObject);
@@ -373,6 +378,8 @@ begin
   try
     SetFormIcon(Dlg);
     Dlg.ShowModal;
+    if Dlg.HasBeenUsed then
+      IncCallCount;
   finally
     FreeAndNil(Dlg);
   end;

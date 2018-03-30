@@ -512,6 +512,7 @@ begin
   finally
     FreeAndNil(sl);
   end;
+  IncCallCount;
 end;
 
 function TConvertStringsExpert.GetDisplayName: string;

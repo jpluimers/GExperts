@@ -402,6 +402,7 @@ begin
         end;
         TreeNode := TreeNode.GetNext;
       end;
+      IncCallCount;
     end;
   finally
     FreeAndNil(TabOrderForm);

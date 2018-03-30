@@ -419,6 +419,7 @@ begin
     begin
       // Apply new shortcut settings.  The form writes to the registry itself.
       ReadFromRegistryIDE;
+      IncCallCount;
     end;
   finally
     FreeAndNil(Dlg);

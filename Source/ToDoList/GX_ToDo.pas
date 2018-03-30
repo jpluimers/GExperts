@@ -823,7 +823,8 @@ begin
   inherited;
 
   SelectedItem := GetSelectedItem;
-  if SelectedItem = nil then Exit;
+  if SelectedItem = nil then
+    Exit; //==>
 
   IsCPPModule := IsCppSourceModule(SelectedItem.FileName);
 
@@ -855,6 +856,8 @@ begin
   end;
   if ToDoExpert.FHideOnGoto then
     Self.Hide;
+
+  // todo: somehow call IncCallCount
 end;
 
 procedure TfmToDo.actFilePrintExecute(Sender: TObject);
@@ -919,6 +922,8 @@ begin
   finally
     FreeAndNil(RichEdit);
   end;
+
+  // todo: Call IncCallCount
 end;
 
 procedure TfmToDo.actFileRefreshExecute(Sender: TObject);
@@ -1274,6 +1279,8 @@ begin
     fmToDo.lvToDo.Font.Assign(FFont);
   end;
   IdeDockManager.ShowForm(fmToDo);
+
+  IncCallCount;
 end;
 
 { TODO 3 -cIssue -oAnyone: This process needs to be cleaned up.  Why store the configuration

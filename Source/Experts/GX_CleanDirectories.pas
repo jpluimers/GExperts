@@ -667,7 +667,8 @@ begin
   try
     SetFormIcon(Dlg);
     Dlg.chkReportErrors.Checked := FReportErrors;
-    Dlg.ShowModal;
+    if Dlg.ShowModal = mrOk then
+      IncCallCount;
     FReportErrors := Dlg.chkReportErrors.Checked;
   finally
     FreeAndNil(Dlg);

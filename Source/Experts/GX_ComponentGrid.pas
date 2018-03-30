@@ -191,6 +191,7 @@ begin
   finally
     FreeAndNil(Dlg);
   end;
+  IncCallCount;
 end;
 
 constructor TGridExpert.Create;

@@ -1712,6 +1712,7 @@ begin
   if fmClassBrowser.WindowState = wsMinimized then
     fmClassBrowser.WindowState := wsNormal;
   fmClassBrowser.Show;
+  IncCallCount;
 end;
 
 function TClassExpert.HasConfigOptions: Boolean;

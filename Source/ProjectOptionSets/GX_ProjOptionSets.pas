@@ -426,6 +426,8 @@ begin
     fmProjOptionSets := TfmProjOptionSets.Create(nil);
   SetFormIcon(fmProjOptionSets);
   IdeDockManager.ShowForm(fmProjOptionSets);
+
+  IncCallCount;
 end;
 
 constructor TProjOptionSetsExpert.Create;

@@ -115,6 +115,7 @@ begin
         else
           GxOtaReplaceSelection(SourceEditor, 0, CodeList.Text);
       end;
+      IncCallCount;
     end;
   finally
     FreeAndNil(CodeList);

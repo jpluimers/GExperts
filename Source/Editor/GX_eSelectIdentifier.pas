@@ -29,6 +29,7 @@ end;
 procedure TSelectIdentifierExpert.Execute(Sender: TObject);
 begin
   GxOtaSelectCurrentIdent(GxOtaGetCurrentSourceEditor);
+  IncCallCount;
 end;
 
 function TSelectIdentifierExpert.GetDefaultShortCut: TShortCut;

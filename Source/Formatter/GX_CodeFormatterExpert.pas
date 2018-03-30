@@ -26,7 +26,9 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Configure;
-    procedure Execute;
+    ///<summary>
+    /// @returns true if formatting was actually done </summary>
+    function Execute: Boolean;
     procedure InternalLoadSettings(Settings: TExpertSettings);
     procedure InternalSaveSettings(Settings: TExpertSettings);
     function FormatFile(const _FileName: string): Boolean;
@@ -199,7 +201,7 @@ begin
   Result := str_FileHasBeenFormatted;
 end;
 
-procedure TCodeFormatterExpert.Execute;
+function TCodeFormatterExpert.Execute: Boolean;
 resourcestring
   str_NoEditor = 'No source editor';
   str_UnsupportedFileTypeS = 'Unsupported file type: %s';
@@ -227,6 +229,8 @@ var
   FormattedBlockStart: string;
   FormattedBlockEnd: string;
 begin
+  Result := False;
+  
   if not GxOtaTryGetCurrentSourceEditor(SourceEditor) then
     raise ECodeFormatter.Create(str_NoEditor);
   FileName := SourceEditor.FileName;
@@ -305,6 +309,7 @@ begin
           for i := 0 to SourceEditor.EditViewCount - 1 do
             SourceEditor.EditViews[i].Paint;
           ShowGxMessageBox(TCodeFormatterDone);
+          Result := True;
         end;
       end else
         XSendDebug('Ignoring request, no settings name available');

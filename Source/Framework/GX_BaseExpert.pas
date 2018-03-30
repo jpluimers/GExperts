@@ -9,6 +9,7 @@ type
   TGX_BaseExpert = class(TObject)
   private
     FBitmap: TBitmap;
+    FCallCount: Integer;
   protected
     FActive: Boolean;
     function GetShortCut: TShortCut; virtual; abstract;
@@ -46,6 +47,7 @@ type
     // displays a dialog saying there are no configuration options
     // see also HasConfigOptions
     procedure Configure; virtual;
+    procedure IncCallCount;
     procedure Execute(Sender: TObject); virtual; abstract;
     // Get a reference to the bitmap for menu items, buttons, etc.
     // Note that this bitmap is loaded and unloaded on demand;
@@ -81,6 +83,7 @@ type
     function IsDefaultActive: Boolean; virtual;
     property Active: Boolean read FActive write SetActive;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
+    property CallCount: Integer read FCallCount;
   end;
 
 implementation
@@ -169,6 +172,11 @@ end;
 function TGX_BaseExpert.HasConfigOptions: Boolean;
 begin
   Result := True;
+end;
+
+procedure TGX_BaseExpert.IncCallCount;
+begin
+  Inc(FCallCount);
 end;
 
 procedure TGX_BaseExpert.InternalLoadSettings(Settings: TExpertSettings);

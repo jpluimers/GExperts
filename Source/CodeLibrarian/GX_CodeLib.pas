@@ -1368,6 +1368,7 @@ begin
     FCodeLibForm.WindowState := wsNormal;
   {$IFOPT D+}SendDebug('Showing CodeLib form');{$ENDIF}
   FCodeLibForm.Show;
+  IncCallCount;
 end;
 
 function TCodeLibExpert.HasConfigOptions: Boolean;

@@ -127,9 +127,13 @@ var
 begin
   if not TfmConfigureIfDef.Execute(GetBitmap, FAppendComment, InsertString, IncFile) then
     Exit; //==>
+
+  IncCallCount;
+
   GxOtaInsertLineIntoEditor(InsertString);
 
   if IncFile <> '' then begin
+    // if an include file is necessary for the ifdef, add the include file at the beginning
     CurPos := GxOtaGetCurrentEditPos();
     Lines := TGXUnicodeStringList.Create;
     try

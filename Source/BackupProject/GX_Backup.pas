@@ -1217,6 +1217,7 @@ begin
     Dlg.FBackupExpert := Self;
     Dlg.FCurrentBackupScope := BackupScope;
     Dlg.ShowModal;
+    IncCallCount;
   finally
     FreeAndNil(Dlg);
   end;

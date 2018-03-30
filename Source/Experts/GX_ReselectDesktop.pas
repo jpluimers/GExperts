@@ -43,6 +43,8 @@ begin
   if not Assigned(cbDesktop) then
     Exit;
   cbDesktop.Click;
+
+  IncCallCount;
 end;
 
 function TReselectDesktopExpert.GetActionCaption: string;

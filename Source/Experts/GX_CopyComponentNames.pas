@@ -86,7 +86,8 @@ begin
     Clipboard.AsText := Trim(Names.Text);
   finally
     FreeAndNil(Names);
-  end
+  end;
+  IncCallCount;
 end;
 
 constructor TCopyComponentNamesExpert.Create;

@@ -538,6 +538,7 @@ begin
   if fmAsciiChart.WindowState = wsMinimized then
     fmAsciiChart.WindowState := wsNormal;
   fmAsciiChart.Show;
+  IncCallCount;
 end;
 
 destructor TASCIIExpert.Destroy;

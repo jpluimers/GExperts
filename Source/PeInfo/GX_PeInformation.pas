@@ -922,6 +922,8 @@ begin
     fmPeInformation := TfmPeInformation.Create(nil);
   IdeDockManager.ShowForm(fmPeInformation);
   EnsureFormVisible(fmPeInformation);
+
+  IncCallCount;
 end;
 
 function TPEExpert.HasConfigOptions: Boolean;

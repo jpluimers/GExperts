@@ -99,6 +99,7 @@ end;
 // When the menu item is clicked, open the configuration dialog
 procedure TSetComponentPropsExpert.Execute(Sender: TObject);
 begin
+  // todo: figure out how to count usage by calling IncCallCount
   Configure;
 end;
 

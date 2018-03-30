@@ -126,8 +126,10 @@ begin
   ALines := TStringList.Create;
   try
     ALines.Text := Clipboard.AsText;
-    if PasteAsHandler.ExecuteConfig(Self, False) then
+    if PasteAsHandler.ExecuteConfig(Self, False) then begin
       PasteAsHandler.ConvertToCode(ALines, False);
+      IncCallCount;
+    end;
   finally
     ALines.Free;
   end;

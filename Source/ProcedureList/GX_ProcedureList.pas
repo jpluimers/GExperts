@@ -481,20 +481,22 @@ begin
   end;
 
   if not (IsDprOrPas(FileName) or IsTypeLibrary(FileName) or IsInc(FileName) or
-    IsCpp(FileName) or IsC(FileName) or IsH(FileName)) then
-    MessageDlg(SPasOrDprOrCPPOnly, mtError, [mbOK], 0)
-  else
-  begin
-    {$IFOPT D+} SendDebug('Procedure List: Expert activated'); {$ENDIF}
-    Dlg := TfmProcedureList.CreateWithFileName(nil, FileName);
-    try
-      SetFormIcon(Dlg);
-      if Dlg.ShowModal <> mrCancel then
-        GxOtaMakeSourceVisible(FileName);
-    finally
-      FreeAndNil(Dlg);
-    end;
+    IsCpp(FileName) or IsC(FileName) or IsH(FileName)) then begin
+    MessageDlg(SPasOrDprOrCPPOnly, mtError, [mbOK], 0);
+    Exit; //==>
   end;
+
+  {$IFOPT D+} SendDebug('Procedure List: Expert activated'); {$ENDIF}
+  Dlg := TfmProcedureList.CreateWithFileName(nil, FileName);
+  try
+    SetFormIcon(Dlg);
+    if Dlg.ShowModal <> mrCancel then
+      GxOtaMakeSourceVisible(FileName);
+  finally
+    FreeAndNil(Dlg);
+  end;
+
+  IncCallCount;
 end;
 
 function TProcedureExpert.HasConfigOptions: Boolean;

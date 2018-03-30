@@ -912,6 +912,7 @@ begin
   end;
   IdeDockManager.ShowForm(fmClipboardHistory);
   fmClipboardHistory.lvClip.SetFocus;
+  IncCallCount;
 end;
 
 procedure TClipExpert.InternalLoadSettings(Settings: TExpertSettings);
