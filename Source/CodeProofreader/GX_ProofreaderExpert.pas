@@ -15,12 +15,16 @@ type
     procedure SetActive(New: Boolean); override;
     procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
+    constructor Create; override;
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
   end;
+
+var
+  CodeProofreaderExpert: TCodeProofreaderExpert = nil;
 
 implementation
 
@@ -50,7 +54,6 @@ end;
 procedure TCodeProofreaderExpert.Execute(Sender: TObject);
 begin
   Configure;
-  // todo: Measure usage of this expert by calling IncCallCount whenever it does something
 end;
 
 procedure TCodeProofreaderExpert.Configure;
@@ -92,9 +95,18 @@ begin
   end;
 end;
 
+constructor TCodeProofreaderExpert.Create;
+begin
+  inherited;
+
+  FreeAndNil(CodeProofreaderExpert);
+  CodeProofreaderExpert := Self;
+end;
+
 destructor TCodeProofreaderExpert.Destroy;
 begin
   FreeAndNil(FProofreaderData);
+  CodeProofreaderExpert := nil;
 
   inherited Destroy;
 end;

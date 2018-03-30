@@ -5,7 +5,7 @@ unit GX_ProofreaderCorrection;
 interface
 
 uses
-  GX_ProofreaderData, GX_EditorChangeServices;
+  GX_ProofreaderData, GX_EditorChangeServices, GX_ProofreaderExpert;
 
 type
   IAutoTypeWriterNotifier = interface(IGxEditorNotification)
@@ -761,6 +761,7 @@ begin
           ReplacementSourceTable, TrailingChars, SourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
+          CodeProofreaderExpert.IncCallCount;
           Exit;
         end;
       end;
@@ -800,6 +801,7 @@ begin
           ReplacementSourceTable, TrailingChars, SourceString, OriginalSourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
+          CodeProofreaderExpert.IncCallCount;
           Exit;
         end;
       end;
@@ -810,6 +812,7 @@ begin
           ReplacementSourceTable, TrailingChars, SourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
+          CodeProofreaderExpert.IncCallCount;
           // Exit;
         end;
       end;

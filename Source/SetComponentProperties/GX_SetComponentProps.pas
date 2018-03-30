@@ -78,6 +78,7 @@ type
 
 var
   GxSetComponentPropsSettings: TSetComponentPropsSettings = nil;
+  SetComponentPropsExpert: TSetComponentPropsExpert = nil;
 
 {TSetComponentPropsExpert}
 
@@ -86,12 +87,16 @@ constructor TSetComponentPropsExpert.Create;
 begin
   inherited;
   TSetComponentPropsSettings.GetInstance; // Get an instance of the settings container
+
+  FreeAndNil(SetComponentPropsExpert);
+  SetComponentPropsExpert := Self;
 end;
 
 // Be sure to free the settings conatiner (TSetComponentPropsSettings)
 destructor TSetComponentPropsExpert.Destroy;
 begin
   Active := False; // Prevent re-creating TSetComponentPropsSettings later when setting Active=False
+  SetComponentPropsExpert := nil;
   TSetComponentPropsSettings.FreeMe;
   inherited;
 end;
@@ -99,7 +104,6 @@ end;
 // When the menu item is clicked, open the configuration dialog
 procedure TSetComponentPropsExpert.Execute(Sender: TObject);
 begin
-  // todo: figure out how to count usage by calling IncCallCount
   Configure;
 end;
 
@@ -421,8 +425,11 @@ begin
                 AddMessageToList(ModuleFileName, '%s %s: Setting %s to %s', [cClass, cName, cProperty, cValue]);
 
               if not Settings.Simulate then
-                if (not GxOtaSetComponentPropertyAsString(Component, cProperty, cValue)) then
+                if GxOtaSetComponentPropertyAsString(Component, cProperty, cValue) then begin
+                  SetComponentPropsExpert.IncCallCount;
+                end else begin
                   AddMessageToList(ModuleFileName, '%s %s: Setting %s to %s failed', [cClass, cName, cProperty, cValue]);
+                end;
             end;
           except
             on E: Exception do
