@@ -10,6 +10,9 @@ type
   private
     FBitmap: TBitmap;
     FCallCount: Integer;
+    FTotalCallCount: Integer;
+    procedure SaveUsageStats;
+    procedure LoadUsageStats;
   protected
     FActive: Boolean;
     function GetShortCut: TShortCut; virtual; abstract;
@@ -42,6 +45,7 @@ type
   public
     // Internal name of expert for expert identification.
     class function GetName: string; virtual;
+    constructor Create;
     destructor Destroy; override;
     function CanHaveShortCut: boolean; virtual; abstract;
     // displays a dialog saying there are no configuration options
@@ -81,9 +85,11 @@ type
     function GetOptionsBaseRegistryKey: string; virtual;
     // Defaults to True
     function IsDefaultActive: Boolean; virtual;
+    procedure ClearCallCounts;
     property Active: Boolean read FActive write SetActive;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
     property CallCount: Integer read FCallCount;
+    property TotalCallCount: Integer read FTotalCallCount;
   end;
 
 implementation
@@ -94,10 +100,23 @@ uses
 
 { TGX_BaseExpert }
 
+constructor TGX_BaseExpert.Create;
+begin
+  inherited Create;
+  LoadUsageStats;
+end;
+
 destructor TGX_BaseExpert.Destroy;
 begin
   FreeAndNil(FBitmap);
+  SaveUsageStats;
   inherited;
+end;
+
+procedure TGX_BaseExpert.ClearCallCounts;
+begin
+  FTotalCallCount := 0;
+  FCallCount := 0;
 end;
 
 class function TGX_BaseExpert.ConfigurationKey: string;
@@ -219,6 +238,24 @@ begin
   end;
 end;
 
+procedure TGX_BaseExpert.LoadUsageStats;
+var
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
+begin
+  Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
+  try
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+    try
+      FTotalCallCount := ExpSettings.ReadInteger('TotalCallCount', 0);
+    finally
+      FreeAndNil(ExpSettings);
+    end;
+  finally
+    FreeAndNil(Settings);
+  end;
+end;
+
 procedure TGX_BaseExpert.SaveActiveAndShortCut(Settings: TGExpertsSettings);
 begin
   // do nothing here, overridden by TGX_Expert and TEditorExpert because
@@ -241,6 +278,28 @@ begin
     end;
   finally
     FreeAndNil(Settings);
+  end;
+end;
+
+procedure TGX_BaseExpert.SaveUsageStats;
+var
+  Settings: TGExpertsSettings;
+  ExpSettings: TExpertSettings;
+begin
+  try
+  Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
+    try
+      ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
+      try
+        ExpSettings.WriteInteger('TotalCallCount', FTotalCallCount + FCallCount);
+      finally
+        FreeAndNil(ExpSettings);
+      end;
+    finally
+      FreeAndNil(Settings);
+    end;
+  except
+    // ignore exceptions, because we are being called in the destructor
   end;
 end;
 
