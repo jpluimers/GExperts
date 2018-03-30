@@ -31,7 +31,7 @@ type
   private
     procedure FillStats;
   public
-    class procedure Execute(_Owner: TWinControl); static;
+    class procedure Execute(_Owner: TWinControl);
     constructor Create(_Owner: TComponent); override;
   end;
 

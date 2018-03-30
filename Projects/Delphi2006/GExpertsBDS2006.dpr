@@ -230,7 +230,9 @@ uses
   GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas',
   GX_IdeManagedFormHandler in '..\..\Source\IDE\GX_IdeManagedFormHandler.pas',
   GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame},
-  GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas';
+  GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas',
+  GX_UsageStatistics in '..\..\Source\Framework\GX_UsageStatistics.pas' {fmUsageStatistics},
+  GX_dzDateUtils in '..\..\Source\Utils\GX_dzDateUtils.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R *_version.res}
