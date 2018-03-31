@@ -185,6 +185,8 @@ begin
   end;
 
   InternalExecute;
+
+  IncCallCount;
 end;
 
 function TBaseIdentExpert.HasConfigOptions: Boolean;
