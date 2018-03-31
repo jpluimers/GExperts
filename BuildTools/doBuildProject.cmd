@@ -37,7 +37,9 @@ SET PATH=%FrameworkDir%%FrameworkVersion%;%FrameworkSDKDir%;%OldPath%
 @rem determine the .dproj file
 for %%a in (GExperts*.dproj) do set dprname=%%a
 @rem build it
-msbuild /target:Build /p:config=Release %dprname%
+@rem note that for Delphi 2007 the target is rebuild and the configuration must be specified with
+@rem /p:Configuration= instead of /p:Config= as in later versions.
+msbuild %dprname% /target:rebuild /p:Configuration=Release
 goto :done
 
 :dcc32
