@@ -256,11 +256,15 @@ begin
   AdjustMinSize(FConfigExpertsFrame);
   FConfigExpertsFrame.Init(GExpertsInst.GetExpertList);
 
+{$IFOPT D+} // DebugInfo
   FConfigFormEnhancementsFrame := TfrConfigureFormEnhancements.Create(Self);
   FConfigFormEnhancementsFrame.Parent := tshFormEnhancements;
   FConfigFormEnhancementsFrame.Align := alClient;
   AdjustMinSize(FConfigFormEnhancementsFrame);
   FConfigFormEnhancementsFrame.InitGrid;
+{$ELSE}
+  tshFormEnhancements.TabVisible := False;
+{$ENDIF}
 
   ActiveControl := FConfigExpertsFrame.edtFilter;
 
@@ -380,7 +384,8 @@ begin
     FConfigExpertsFrame.SaveExperts;
     FConfigEditorExpertsFrame.SaveExperts;
     SaveIdeEnhancements;
-    FConfigFormEnhancementsFrame.ApplyGrid;
+    if Assigned(FConfigFormEnhancementsFrame) then
+      FConfigFormEnhancementsFrame.ApplyGrid;
     SaveEditorEnhancements;
     ConfigInfo.SaveSettings;
     GXMenuActionManager.ArrangeMenuItems;
