@@ -135,7 +135,6 @@ uses
   GX_ProofreaderConfig in '..\..\source\CodeProofreader\GX_ProofreaderConfig.pas' {fmProofreaderConfig},
   GX_ProofreaderCorrection in '..\..\source\CodeProofreader\GX_ProofreaderCorrection.pas',
   GX_ProofreaderData in '..\..\source\CodeProofreader\GX_ProofreaderData.pas',
-  GX_ProofreaderDefaults in '..\..\source\CodeProofreader\GX_ProofreaderDefaults.pas',
   GX_ProofreaderExpert in '..\..\source\CodeProofreader\GX_ProofreaderExpert.pas',
   GX_ProofreaderKeyboard in '..\..\source\CodeProofreader\GX_ProofreaderKeyboard.pas',
   GX_ProofreaderUtils in '..\..\source\CodeProofreader\GX_ProofreaderUtils.pas',
@@ -233,6 +232,7 @@ uses
   GX_dzDateUtils in '..\..\Source\Utils\GX_dzDateUtils.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
+{$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}
 {$R *_version.res} // if you get an error here, run the __build_project.cmd script first
 
 begin
