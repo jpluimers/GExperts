@@ -25,7 +25,7 @@ call "%DelphiPath%\bin\rsvars.bat"
 @rem determine the .dproj file
 for %%a in (GExperts*.dproj) do set dprname=%%a
 @rem build it
-msbuild /target:Build /p:config=Release %dprname%
+msbuild /target:rebuild /p:config=Release %dprname%
 goto :done
 
 :is2007
@@ -39,7 +39,7 @@ for %%a in (GExperts*.dproj) do set dprname=%%a
 @rem build it
 @rem note that for Delphi 2007 the target is rebuild and the configuration must be specified with
 @rem /p:Configuration= instead of /p:Config= as in later versions.
-msbuild %dprname% /target:rebuild /p:Configuration=Release
+msbuild /target:rebuild /p:Configuration=Release -p:DCC_Quiet=true %dprname% 
 goto :done
 
 :dcc32
