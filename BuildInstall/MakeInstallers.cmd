@@ -1,7 +1,7 @@
 @echo off
 set iscc="C:\Program Files (x86)\Inno Setup 5\ISCC.exe"
-set version=1.38
-set instver=138
+set version=1.39
+set instver=139
 call :getdate
 set special=-experimental-twm-%dateYYYYMMDD%
 
