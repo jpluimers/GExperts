@@ -186,7 +186,6 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
     </DCCReference>
     <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderCorrection.pas" />
     <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderData.pas" />
-    <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderDefaults.pas" />
     <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderExpert.pas" />
     <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderKeyboard.pas" />
     <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderUtils.pas" />
@@ -561,6 +560,9 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
     <DCCReference Include="..\..\Source\Utils\GX_ReadMapFileThread.pas" />
     <DCCReference Include="..\..\Source\Utils\GX_VCLFixPack.pas" />
     <DCCReference Include="..\..\source\Utils\GX_XmlUtils.pas" />
+    <RcCompile Include="..\..\Binaries\CodeProofreaderDefault.rc">
+      <Form>..\..\Binaries\CodeProofreaderDefault.res</Form>
+    </RcCompile>
     <RcCompile Include="..\..\images\GXIcons.rc">
       <Form>..\..\images\GXIcons.res</Form>
     </RcCompile>

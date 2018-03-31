@@ -5,12 +5,13 @@ unit GX_ProofreaderExpert;
 interface
 
 uses
-  GX_ProofreaderData, GX_ConfigurationInfo, GX_Experts;
+  GX_ProofreaderData, GX_ConfigurationInfo, GX_Experts, Classes, Types;
 
 type
   TCodeProofreaderExpert = class(TGX_Expert)
   private
     FProofreaderData: TProofreaderData;
+    procedure CopyDefaultsFromResource(const _FileName: string);
   protected
     procedure SetActive(New: Boolean); override;
     procedure InternalSaveSettings(Settings: TExpertSettings); override;
@@ -30,7 +31,7 @@ implementation
 
 uses
   SysUtils, Dialogs, Controls,
-  GX_ProofreaderConfig, GX_ProofreaderDefaults, GX_MessageBox;
+  GX_ProofreaderConfig, GX_MessageBox;
 
 type
   TCreateDefaultTablesMessage = class(TGxQuestionBoxAdaptor)
@@ -75,9 +76,8 @@ begin
     if (not FileExists(FileName)) and
       (ShowGxMessageBox(TCreateDefaultTablesMessage, FileName) = mrYes) then
     begin
-      AddDefaultReplacementEntries(FProofreaderData);
-      AddDefaultDictionaryEntries(FProofreaderData);
-      FProofreaderData.SaveData;
+      CopyDefaultsFromResource(FileName);
+      FProofreaderData.ReloadData;
     end;
 
     Dlg := TfmProofreaderConfig.Create(nil, Self, FProofreaderData);
@@ -92,6 +92,22 @@ begin
   finally
     if CreatedDataToConfigure then
       FreeAndNil(FProofreaderData);
+  end;
+end;
+
+procedure TCodeProofreaderExpert.CopyDefaultsFromResource(const _FileName: string);
+var
+  ResStream: TResourceStream;
+  FileStream: TFileStream;
+begin
+  FileStream := nil;
+  ResStream := TResourceStream.Create(hInstance, 'CodeProofreaderDefault', RT_RCDATA);
+  try
+    FileStream := TFileStream.Create(_FileName, fmOpenReadWrite or fmCreate);
+    FileStream.CopyFrom(ResStream, ResStream.Size);
+  finally
+    FreeAndNil(FileStream);
+    FreeAndNil(ResStream);
   end;
 end;
 
