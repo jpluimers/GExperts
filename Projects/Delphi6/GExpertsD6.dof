@@ -30,7 +30,7 @@ Y=1
 Z=1
 ShowHints=1
 ShowWarnings=1
-UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=actnlist;Themes=Controls;ImageList=Controls
+UnitAliases=Actions=actnlist;Themes=Controls;ImageList=Controls;ShLwApi=GX_ShLwApi;UITypes=Types
 
 [Linker]
 MapFile=0

@@ -7,9 +7,7 @@ interface
 uses
   Classes, ActnList,
   Menus, ImgList,
-  {$IFDEF GX_VER240_up}
-  System.UITypes,
-  {$ENDIF GX_VER240_up}
+  UITypes,
   GX_KbdShortCutBroker;
 
 type

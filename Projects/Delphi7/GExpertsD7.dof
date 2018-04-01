@@ -30,7 +30,7 @@ Y=1
 Z=1
 ShowHints=1
 ShowWarnings=1
-UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;ImageList=Controls
+UnitAliases=Actions=Actnlist;ImageList=Controls;ShLwApi=GX_ShLwApi;UiTypes=Types
 NamespacePrefix=
 SymbolDeprecated=1
 SymbolLibrary=1
@@ -80,7 +80,6 @@ PrivatePropAccessor=1
 UnsafeType=0
 UnsafeCode=0
 UnsafeCast=0
-
 [Linker]
 MapFile=0
 OutputObjs=0
@@ -91,7 +90,6 @@ MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=5242880
 ExeDescription=
-
 [Directories]
 OutputDir=..\..\Binaries
 UnitOutputDir=dcu
@@ -102,14 +100,12 @@ Packages=rtl;vcl;vclx;vclsmp;designide;vcljpg
 Conditionals=
 DebugSourceDirs=
 UsePackages=1
-
 [Parameters]
 RunParams=-ns -np
 HostApplication=C:\Delphi\Delphi7\Bin\delphi32.exe
 Launcher=
 UseLauncher=0
 DebugCWD=
-
 [Version Info]
 IncludeVerInfo=0
 AutoIncBuild=0
@@ -124,7 +120,6 @@ Private=0
 DLL=1
 Locale=1033
 CodePage=1252
-
 [Version Info Keys]
 CompanyName=Erik Berry and the GExperts Development Team
 FileDescription=GExperts for Delphi 7
@@ -136,3 +131,16 @@ OriginalFilename=GExpertsD7.dll
 ProductName=GExperts for Delphi
 ProductVersion=1.38
 Comments=Open Source
+[HistoryLists\hlUnitAliases]
+Count=2
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;ImageList=Controls;ShLwApi=GX_ShLwApi;UiTypes=Types
+Item1=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;Actions=Actnlist;ImageList=Controls;ShLwApi=GX_ShLwApi
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=..\..\source\Framework;..\..\ExternalSource;..\..\ExternalSource\mwParser;..\..\ExternalSource\Abbrevia;..\..\ExternalSource\UniSynEdit;..\..\source\Include
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=dcu
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..\..\Binaries

@@ -9,7 +9,7 @@ interface
 uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
-  {$IFDEF GX_VER290_up} System.UITypes, {$ENDIF GX_VER290_up}
+  UITypes,
   Types, CheckLst, TypInfo, ExtCtrls, ComCtrls;
 
 const
@@ -785,33 +785,17 @@ type
 
 implementation
 
-{$IFDEF GX_VER160_up}
-  {$DEFINE HAS_SHLWAPI}
-{$ELSE}
-  {$UNDEF HAS_SHLWAPI}
-{$ENDIF}
-
 uses
   Windows, Messages,
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  {$IFDEF GX_DEBUGLOG} GX_Debug, {$ENDIF}
+  GX_Debug,
   {$IFDEF UNICODE} Character, {$ENDIF}
-  {$IFDEF HAS_SHLWAPI} ShLwApi, {$ENDIF}
+  ShLwApi,
   ShellAPI, ShlObj, ActiveX, StrUtils, Math,
   GX_dzSelectDirectoryFix;
 
 const
   shlwapi32 = 'shlwapi.dll';
-
-{$IFNDEF HAS_SHLWAPI}
-// Manually import ShLwApi routines in Delphi 7 and earlier (supported in W2K or later)
-function PathCombine(szDest: PChar; lpszDir, lpszFile: PChar): PChar; stdcall;
-  external shlwapi32 name 'PathCombineA';
-
-function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
-  pszTo: PChar; dwAttrTo: DWORD): BOOL; stdcall;
-  external shlwapi32 name 'PathRelativePathToA';
-{$ENDIF}
 
 function StrCmpLogicalW(psz1, psz2: PWideChar): Integer; stdcall;
   external shlwapi32 name 'StrCmpLogicalW';

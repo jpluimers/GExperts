@@ -25,11 +25,11 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_UnitAlias>Actions=Actnlist;ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_UnitAlias>Actions=Actnlist;ImageList=ImgList;UITypes=Types;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
-			<DCC_DcuOutput>dcu</DCC_DcuOutput>
+			<DCC_DcuOutput>.\dcu</DCC_DcuOutput>
 			<DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>GExpertsRSXE1.dll</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
@@ -354,7 +354,6 @@
 			</DCCReference>
 			<DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderCorrection.pas"/>
 			<DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderData.pas"/>
-			<DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderDefaults.pas"/>
 			<DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderExpert.pas"/>
 			<DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderKeyboard.pas"/>
 			<DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderUtils.pas"/>
@@ -506,6 +505,10 @@
 				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
 			<DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
+			<DCCReference Include="..\..\Source\Framework\GX_UsageStatistics.pas">
+				<Form>fmUsageStatistics</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\Source\Utils\GX_dzDateUtils.pas"/>
 			<RcCompile Include="..\..\images\GXIcons.rc">
 				<Form>GXIcons.res</Form>
 			</RcCompile>

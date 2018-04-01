@@ -230,7 +230,8 @@ uses
   GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame},
   GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas',
   GX_UsageStatistics in '..\..\Source\Framework\GX_UsageStatistics.pas' {fmUsageStatistics},
-  GX_dzDateUtils in '..\..\Source\Utils\GX_dzDateUtils.pas';
+  GX_dzDateUtils in '..\..\Source\Utils\GX_dzDateUtils.pas',
+  GX_ShLwApi in '..\..\Source\Utils\GX_ShLwApi.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}
