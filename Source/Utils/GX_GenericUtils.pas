@@ -28,6 +28,13 @@ type
 {$ENDIF ~GX_VER160_up}
 
 type
+  {$IFDEF GX_VER160_up}
+  IDEEditBufferString = UTF8String;
+  {$ELSE}
+  IDEEditBufferString = AnsiString;
+  {$ENDIF}
+
+type
   {$IFDEF UNICODE}
   TGXStringList = class(TStringList)
   private
@@ -721,6 +728,26 @@ function IsoStringToDateTimeDef(const DateTime: string; Default: TDateTime): TDa
 function GetFirstCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 function GetLastCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 
+{$IFNDEF GX_VER160_up}
+// Delphi 6/7: IDE is non-unicode, string is ansistring
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: IDEEditBufferString): string;
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+{$ELSE GX_VER160_up}
+// Delphi 8+
+{$IFNDEF GX_VER200_up}
+// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: IDEEditBufferString): string;
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+{$ELSE GX_VER200_up}
+// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: string): string; overload;
+function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
+{$ENDIF GX_VER200_up}
+{$ENDIF GX_VER160_up}
+
 type
   TFileFindThread = class(TThread)
   private
@@ -771,7 +798,7 @@ uses
   {$IFDEF UNICODE} Character, {$ENDIF}
   {$IFDEF HAS_SHLWAPI} ShLwApi, {$ENDIF}
   ShellAPI, ShlObj, ActiveX, StrUtils, Math,
-  GX_OtaUtils, GX_dzSelectDirectoryFix;
+  GX_dzSelectDirectoryFix;
 
 const
   shlwapi32 = 'shlwapi.dll';
@@ -4464,6 +4491,72 @@ begin
       Exit;
   Result := 0;
 end;
+
+{$IFNDEF GX_VER160_up}
+// Delphi 6/7: IDE is non-unicode, string is ansistring
+
+// no conversion necessary
+function ConvertToIDEEditorString(const S: string): string;
+begin
+  Result := S;
+end;
+
+// no conversion necessary
+function IDEEditorStringToString(const S: string): string;
+begin
+  Result := S;
+end;
+
+// converting AnsiString to WideString is done automatically on assignment
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
+{$ELSE GX_VER160_up}
+// Delphi 8+
+{$IFNDEF GX_VER200_up}
+// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
+
+function ConvertToIDEEditorString(const S: string): UTF8String;
+begin
+  Result := AnsiToUtf8(S);
+end;
+
+function IDEEditorStringToString(const S: UTF8String): string;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := UTF8Decode(S);
+end;
+
+{$ELSE GX_VER200_up}
+// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
+
+function ConvertToIDEEditorString(const S: string): UTF8String;
+begin
+  Result := UTF8Encode(s);
+end;
+
+function IDEEditorStringToString(const S: string): string;
+begin
+  Result := S;
+end;
+
+function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+{$ENDIF GX_VER200_up}
+{$ENDIF GX_VER160_up}
 
 { TFileFindThread }
 
