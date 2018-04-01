@@ -82,6 +82,7 @@ object fmProcedureList: TfmProcedureList
         OnColumnClick = lvProcsColumnClick
         OnCompare = lvProcsCompare
         OnDblClick = actViewGotoExecute
+        OnResize = lvProcsResize
       end
     end
     object pnlHeader: TPanel
