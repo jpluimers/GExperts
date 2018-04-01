@@ -95,8 +95,8 @@ object fmConfiguration: TfmConfiguration
             object sbVCLDir: TButton
               Left = 542
               Top = 40
-              Width = 21
-              Height = 21
+              Width = 22
+              Height = 22
               Anchors = [akTop, akRight]
               Caption = '...'
               TabOrder = 1
@@ -105,8 +105,8 @@ object fmConfiguration: TfmConfiguration
             object sbConfigDir: TButton
               Left = 542
               Top = 88
-              Width = 21
-              Height = 21
+              Width = 22
+              Height = 22
               Anchors = [akTop, akRight]
               Caption = '...'
               TabOrder = 3
@@ -115,8 +115,8 @@ object fmConfiguration: TfmConfiguration
             object sbHelpFile: TButton
               Left = 542
               Top = 136
-              Width = 21
-              Height = 21
+              Width = 22
+              Height = 22
               Anchors = [akTop, akRight]
               Caption = '...'
               TabOrder = 5
@@ -141,7 +141,7 @@ object fmConfiguration: TfmConfiguration
             object edHelpFile: TEdit
               Left = 12
               Top = 136
-              Width = 517
+              Width = 525
               Height = 22
               Anchors = [akLeft, akTop, akRight]
               TabOrder = 4
