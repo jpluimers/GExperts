@@ -1,6 +1,8 @@
 // Editor expert for expanding a macro template
 unit GX_MacroTemplatesExpert;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
@@ -123,6 +125,8 @@ const
   ExpandWithCharIdent = 'ExpandWithChar';
   ExpandDelayIdent = 'ExpandDelay';
 
+// I have no idea whether GExperts still compiles with any of the old C++Builder versions
+// but you never now -- 2018-03-31 twm
 {$IFDEF GX_BCB}
   CommentBegin = '/*';
   CommentEnd = '*/';
