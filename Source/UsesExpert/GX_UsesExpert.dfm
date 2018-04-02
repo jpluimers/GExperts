@@ -47,7 +47,6 @@ object fmUsesManager: TfmUsesManager
       Height = 388
       ActivePage = tabSearchPath
       Align = alClient
-      TabIndex = 0
       TabOrder = 1
       object tabSearchPath: TTabSheet
         Caption = '&Search Path'
@@ -297,7 +296,7 @@ object fmUsesManager: TfmUsesManager
           Left = 0
           Top = 0
           Width = 306
-          Height = 359
+          Height = 325
           Align = alClient
           Columns = <
             item
@@ -309,8 +308,34 @@ object fmUsesManager: TfmUsesManager
               Width = 150
             end>
           ReadOnly = True
+          RowSelect = True
           TabOrder = 0
           ViewStyle = vsReport
+        end
+        object pnlIdentifiersFooter: TPanel
+          Left = 0
+          Top = 325
+          Width = 306
+          Height = 34
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 1
+          object btnIdentifiersAddToIntf: TButton
+            Left = 4
+            Top = 4
+            Width = 140
+            Height = 25
+            Action = actAvailAddToIntf
+            TabOrder = 0
+          end
+          object btnIdentifiersAddToImpl: TButton
+            Left = 152
+            Top = 4
+            Width = 150
+            Height = 25
+            Action = actAvailAddToImpl
+            TabOrder = 1
+          end
         end
       end
     end
@@ -375,7 +400,6 @@ object fmUsesManager: TfmUsesManager
       Height = 379
       ActivePage = tabInterface
       Align = alClient
-      TabIndex = 0
       TabOrder = 1
       object tabInterface: TTabSheet
         Caption = 'I&nterface'

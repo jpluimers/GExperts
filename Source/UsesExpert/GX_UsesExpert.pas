@@ -127,6 +127,9 @@ type
     mitUsesUnalias: TMenuItem;
     tabIdentifiers: TTabSheet;
     lvIdentifiers: TListView;
+    pnlIdentifiersFooter: TPanel;
+    btnIdentifiersAddToIntf: TButton;
+    btnIdentifiersAddToImpl: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -749,10 +752,16 @@ begin
   actFavAdd.Enabled := ActiveLBHasSelection or (pcUnits.ActivePage = tabFavorite);
   actFavDelete.Enabled := HaveSelectedItem(lbxFavorite);
   actFavDelete.Visible := AvailableSourceListBox = lbxFavorite;
+
   if (ActiveControl = lbxInterface) or (ActiveControl = lbxImplementation) then
     actUsesDelete.ShortCut := VK_DELETE
   else
     actUsesDelete.ShortCut := 0;
+
+  if ActiveControl = lbxFavorite then
+    actFavDelete.ShortCut := VK_DELETE
+  else
+    actFavDelete.ShortCut := 0;
 
   actOpenUnit.Enabled := HaveSelectedItem(GetLbxForOpen);
 end;
@@ -877,21 +886,34 @@ var
   Src: TListBox;
   i: Integer;
 begin
-  if not TryGetAvailableSourceListBox(src) then
-    Exit; //==>
-  for i := Src.Items.Count - 1 downto 0 do
-    if Src.Selected[i] then
-      AddToIntfSection(Src.Items[i]);
+  if TryGetAvailableSourceListBox(src) then begin
+    for i := Src.Items.Count - 1 downto 0 do
+      if Src.Selected[i] then
+        AddToIntfSection(Src.Items[i]);
+  end else begin
+    // no listbox, so it must be the Identifiers ListView
+    for i := 0 to lvIdentifiers.Items.Count - 1 do
+      if lvIdentifiers.Items[i].Selected then begin
+        AddToIntfSection(lvIdentifiers.Items[i].SubItems[0]);
+      end;
+  end;
   CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actAvailAddToImplExecute(Sender: TObject);
 var
+  i: Integer;
   Src: TListBox;
 begin
-  if not TryGetAvailableSourceListBox(Src) then
-    Exit; //==>
-  AddListToImplSection(Src, False);
+  if TryGetAvailableSourceListBox(Src) then begin
+    AddListToImplSection(Src, False);
+  end else begin
+    // no listbox, so it must be the Identifiers ListView
+    for i := 0 to lvIdentifiers.Items.Count - 1 do
+      if lvIdentifiers.Items[i].Selected then begin
+        AddToImplSection(lvIdentifiers.Items[i].SubItems[0], False);
+      end;
+  end;
   CloseIfInSingleActionMode;
 end;
 
@@ -1142,13 +1164,20 @@ begin
   end else begin
     if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
     begin
-      if not TryGetAvailableSourceListBox(ListBox) then
-        Exit; //==>
-      if ListBox.Items.Count > 1 then
-        ListBox.Perform(WM_KEYDOWN, Key, 0)
-      else if ListBox.Items.Count = 1 then
-        ListBox.Selected[0] := True;
-      Key := 0;
+      if TryGetAvailableSourceListBox(ListBox) then begin
+        if ListBox.Items.Count > 1 then
+          ListBox.Perform(WM_KEYDOWN, Key, 0)
+        else if ListBox.Items.Count = 1 then
+          ListBox.Selected[0] := True;
+        Key := 0;
+      end else begin
+        // no listbox, so ist must be the identifiers ListView
+        if lvIdentifiers.Items.Count > 1 then
+          lvIdentifiers.Perform(WM_KEYDOWN, Key, 0)
+        else if lvIdentifiers.Items.Count = 1 then
+          lvIdentifiers.ItemIndex := 0;
+        Key := 0;
+      end;
     end;
   end;
 end;
