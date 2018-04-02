@@ -10,9 +10,8 @@ type
   private
     FBitmap: TBitmap;
     FCallCount: Integer;
-    FTotalCallCount: Integer;
-    procedure SaveUsageStats;
-    procedure LoadUsageStats;
+    function GetTotalCallCount: Integer;
+    procedure SetTotalCallCount(Value: Integer);
   protected
     FActive: Boolean;
     function GetShortCut: TShortCut; virtual; abstract;
@@ -89,7 +88,7 @@ type
     property Active: Boolean read FActive write SetActive;
     property ShortCut: TShortCut read GetShortCut write SetShortCut;
     property CallCount: Integer read FCallCount;
-    property TotalCallCount: Integer read FTotalCallCount;
+    property TotalCallCount: Integer read GetTotalCallCount;
   end;
 
 implementation
@@ -103,19 +102,23 @@ uses
 constructor TGX_BaseExpert.Create;
 begin
   inherited Create;
-  LoadUsageStats;
+  FCallCount := 0;
 end;
 
 destructor TGX_BaseExpert.Destroy;
 begin
   FreeAndNil(FBitmap);
-  SaveUsageStats;
+  try
+    SetTotalCallCount(GetTotalCallCount + FCallCount);
+  except
+    // ignore exceptions in the destructor
+  end;
   inherited;
 end;
 
 procedure TGX_BaseExpert.ClearCallCounts;
 begin
-  FTotalCallCount := 0;
+  SetTotalCallCount(0);
   FCallCount := 0;
 end;
 
@@ -238,7 +241,7 @@ begin
   end;
 end;
 
-procedure TGX_BaseExpert.LoadUsageStats;
+function TGX_BaseExpert.GetTotalCallCount: Integer;
 var
   Settings: TGExpertsSettings;
   ExpSettings: TExpertSettings;
@@ -247,7 +250,7 @@ begin
   try
     ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
     try
-      FTotalCallCount := ExpSettings.ReadInteger('TotalCallCount', 0);
+      Result := ExpSettings.ReadInteger('TotalCallCount', 0);
     finally
       FreeAndNil(ExpSettings);
     end;
@@ -281,25 +284,21 @@ begin
   end;
 end;
 
-procedure TGX_BaseExpert.SaveUsageStats;
+procedure TGX_BaseExpert.SetTotalCallCount(Value: Integer);
 var
   Settings: TGExpertsSettings;
   ExpSettings: TExpertSettings;
 begin
-  try
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
+  try
+    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
     try
-      ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
-      try
-        ExpSettings.WriteInteger('TotalCallCount', FTotalCallCount + FCallCount);
-      finally
-        FreeAndNil(ExpSettings);
-      end;
+      ExpSettings.WriteInteger('TotalCallCount', Value);
     finally
-      FreeAndNil(Settings);
+      FreeAndNil(ExpSettings);
     end;
-  except
-    // ignore exceptions, because we are being called in the destructor
+  finally
+    FreeAndNil(Settings);
   end;
 end;
 
