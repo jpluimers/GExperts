@@ -203,7 +203,7 @@ const
 
 implementation
 
-uses SysUtils, GX_GenericUtils, GX_OtaUtils; //TODO: Remove dependency
+uses SysUtils, GX_GenericUtils;
 
 constructor TmsSearcher.Create(Value: TBCBTokenList);
 begin
