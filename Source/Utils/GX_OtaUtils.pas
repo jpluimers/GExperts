@@ -464,7 +464,8 @@ procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
 // Retrieve a guess at all possible paths where files in the current project
 // might be located by the compiler
 procedure GxOtaGetAllPossiblePaths(Paths: TStrings);
-// Locate a base file name on a list of paths
+// Locate a base file name on a list of paths, if Paths is nil, call GxOtaGetAllPossiblePaths
+// to fill it.
 function GxOtaFindPathToFile(const FileName: string; Paths: TStrings = nil): string;
 // Try to open a file located anywhere in GxOtaGetAllPossiblePaths
 function GxOtaOpenFileFromPath(const FileName: string): Boolean;
