@@ -290,6 +290,29 @@ object fmUsesManager: TfmUsesManager
           end
         end
       end
+      object tabIdentifiers: TTabSheet
+        Caption = 'Identifiers'
+        ImageIndex = 4
+        object lvIdentifiers: TListView
+          Left = 0
+          Top = 0
+          Width = 306
+          Height = 359
+          Align = alClient
+          Columns = <
+            item
+              Caption = 'Identifiers'
+              Width = 150
+            end
+            item
+              Caption = 'Unit'
+              Width = 150
+            end>
+          ReadOnly = True
+          TabOrder = 0
+          ViewStyle = vsReport
+        end
+      end
     end
     object pnlAvailableHeader: TPanel
       Left = 6

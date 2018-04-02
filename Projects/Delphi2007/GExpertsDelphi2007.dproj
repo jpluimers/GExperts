@@ -363,6 +363,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
       <DesignClass>TDataModule</DesignClass>
     </DCCReference>
     <DCCReference Include="..\..\source\Framework\GX_SynMemoUtils.pas" />
+    <DCCReference Include="..\..\Source\Framework\GX_UnitExportsParser.pas" />
     <DCCReference Include="..\..\source\Framework\GX_UnitPositions.pas" />
     <DCCReference Include="..\..\Source\Framework\GX_UsageStatistics.pas">
       <Form>fmUsageStatistics</Form>

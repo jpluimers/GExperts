@@ -8,7 +8,7 @@ uses
   Classes, Controls, Forms, Menus, ComCtrls,
   ExtCtrls, ActnList, Actions, Dialogs, StdCtrls,
   GX_ConfigurationInfo, GX_Experts, GX_GenericUtils, GX_BaseForm,
-  GX_KbdShortCutBroker;
+  GX_KbdShortCutBroker, GX_UnitExportsParser;
 
 type
   TUsesExpert = class(TGX_Expert)
@@ -125,6 +125,8 @@ type
     btnRemoveDots: TButton;
     actUsesUnAlias: TAction;
     mitUsesUnalias: TMenuItem;
+    tabIdentifiers: TTabSheet;
+    lvIdentifiers: TListView;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -155,6 +157,7 @@ type
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
+    FUnitExportParserThread: TUnitExportParserThread;
     FCurrentIdentIdx: Integer;
     // maintains a list unit name mappings from "originally used" to "currently used"
     // this is necessary to put units which have been switched between using prefixes and
@@ -178,7 +181,7 @@ type
     procedure DeleteItemIndex(ListBox: TListBox; FromInterface: Boolean);
     procedure DeleteSelected(ListBox: TListBox; FromInterface: Boolean);
     procedure MoveSelected(Src, Dest: TListBox; ToInterface: Boolean);
-    function GetAvailableSourceListBox: TListBox;
+    function TryGetAvailableSourceListBox(out lbx: TListBox): Boolean;
     function GetUsesSourceListBox: TListBox;
     procedure SearchPathReady;
     procedure DeleteFromFavorites(const Item: string);
@@ -194,6 +197,8 @@ type
     procedure lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure actUsesMoveToImplExecute(Sender: TObject);
     procedure actUsesMoveToIntExecute(Sender: TObject);
+    procedure SetFavoriteUnits(_Favorites: TStrings);
+    procedure OnExportParserFinished(_Sender: TObject);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -342,17 +347,11 @@ end;
 procedure TUsesExpert.InternalExecute;
 var
   Form: TfmUsesManager;
-  Bitmap: TBitmap;
 begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
   Form := TfmUsesManager.Create(Application, Self);
   try
-    Bitmap := GetBitmap;
-    if Assigned(Bitmap) then
-      ConvertBitmapToIcon(Bitmap, Form.Icon);
-
-    Form.FFavoriteUnits.Assign(FFavoriteUnits);
-    Form.FUsesExpert := Self;
+    Form.SetFavoriteUnits(FFavoriteUnits);
     Form.chkSingleActionMode.Checked := FSingleActionMode;
     if (FAvailTabIndex >= 0) and (FAvailTabIndex < Form.pcUnits.PageCount) then
       Form.pcUnits.ActivePageIndex := FAvailTabIndex;
@@ -393,9 +392,15 @@ end;
 { TfmUsesManager }
 
 constructor TfmUsesManager.Create(_Owner: TComponent; _UsesExpert: TUsesExpert);
+var
+  Bitmap: TBitmap;
 begin
   FUsesExpert := _UsesExpert;
   inherited Create(_Owner);
+
+  Bitmap := FUsesExpert.GetBitmap;
+  if Assigned(Bitmap) then
+    ConvertBitmapToIcon(Bitmap, Icon);
 end;
 
 procedure TfmUsesManager.GetProjectFiles;
@@ -710,7 +715,8 @@ var
   UsesSourceListBox: TListBox;
   UsesIsInterface: Boolean;
 begin
-  AvailableSourceListBox := GetAvailableSourceListBox;
+  if not TryGetAvailableSourceListBox(AvailableSourceListBox) then
+    Exit; //==>
   UsesSourceListBox := GetUsesSourceListBox;
   ActiveLBHasSelection := HaveSelectedItem(AvailableSourceListBox);
   UsesIsInterface := (pcUses.ActivePage = tabInterface);
@@ -747,8 +753,10 @@ function TfmUsesManager.HaveSelectedItem(ListBox: TListBox): Boolean;
 var
   i: Integer;
 begin
-  Assert(Assigned(ListBox));
   Result := False;
+  if not Assigned(ListBox) then
+    Exit; //==>
+
   for i := 0 to ListBox.Items.Count - 1 do
     if ListBox.Selected[i] then
     begin
@@ -841,7 +849,8 @@ begin
   end
   else begin
     FileName := '';
-    Src := GetAvailableSourceListBox;
+    if not TryGetAvailableSourceListBox(src) then
+      Exit; //==>
     for i := Src.Items.Count - 1 downto 0 do
     begin
       if Src.Selected[i] then
@@ -860,7 +869,8 @@ var
   Src: TListBox;
   i: Integer;
 begin
-  Src := GetAvailableSourceListBox;
+  if not TryGetAvailableSourceListBox(src) then
+    Exit; //==>
   for i := Src.Items.Count - 1 downto 0 do
     if Src.Selected[i] then
       AddToIntfSection(Src.Items[i]);
@@ -868,23 +878,27 @@ begin
 end;
 
 procedure TfmUsesManager.actAvailAddToImplExecute(Sender: TObject);
+var
+  Src: TListBox;
 begin
-  AddListToImplSection(GetAvailableSourceListBox, False);
+  if not TryGetAvailableSourceListBox(Src) then
+    Exit; //==>
+  AddListToImplSection(Src, False);
   CloseIfInSingleActionMode;
 end;
 
-function TfmUsesManager.GetAvailableSourceListBox: TListBox;
+function TfmUsesManager.TryGetAvailableSourceListBox(out lbx: TListBox): Boolean;
 begin
-  Result := nil;
+  lbx := nil;
   if pcUnits.ActivePage = tabProject then
-    Result := lbxProject
+    lbx := lbxProject
   else if pcUnits.ActivePage = tabCommon then
-    Result := lbxCommon
+    lbx := lbxCommon
   else if pcUnits.ActivePage = tabFavorite then
-    Result := lbxFavorite
+    lbx := lbxFavorite
   else if pcUnits.ActivePage = tabSearchPath then
-    Result := lbxSearchPath;
-  Assert(Assigned(Result));
+    lbx := lbxSearchPath;
+  Result := Assigned(lbx);
 end;
 
 procedure TfmUsesManager.lbxInterfaceDblClick(Sender: TObject);
@@ -937,14 +951,19 @@ begin
     Result := lbxImplementation
   else if ActiveControl = lbxInterface then
     Result := lbxInterface
-  else
-    Result := GetAvailableSourceListBox;
+  else begin
+    if not TryGetAvailableSourceListBox(Result) then begin
+      Result := nil;
+    end;
+  end;
 end;
 
 procedure TfmUsesManager.OpenSelectedUnit(ListBox: TListBox);
 var
   UnitName: string;
 begin
+  if not Assigned(ListBox) then
+    Exit; //==>
   if TListBox_GetSelected(ListBox, UnitName) then begin
     OpenUnit(UnitName);
     ModalResult := mrCancel;
@@ -971,7 +990,8 @@ var
   Src: TListBox;
   UnitName: string;
 begin
-  Src := GetAvailableSourceListBox;
+  if not TryGetAvailableSourceListBox(Src) then
+    Exit; //==>
   if TListBox_GetSelected(Src, UnitName) then begin
     if IsCtrlDown then begin
       OpenUnit(UnitName);
@@ -1007,6 +1027,11 @@ var
   end;
 
 begin
+  if not Assigned(FFindThread) then begin
+    // If it is not assigned, something went wrong in the form's constructor
+    // which freed the thread but a synchronise call was still waiting to be executed.
+    Exit; //==>
+  end;
   IsDotNet := GxOtaCurrentProjectIsDotNet;
   PathFiles := nil;
   PathUnits := TStringList.Create;
@@ -1076,13 +1101,19 @@ begin
   if (Key = VK_TAB) and (Shift = [ssCtrl]) then
   begin
     i := pcUnits.ActivePageIndex + 1;
-    if i = pcUnits.PageCount then i := 0;
-      pcUnits.ActivePageIndex := i;
-  end
-  else begin
+    if i = pcUnits.PageCount then
+      i := 0;
+    pcUnits.ActivePageIndex := i;
+  end else if (Key = VK_TAB) and (Shift = [ssCtrl, ssShift]) then begin
+    i := pcUnits.ActivePageIndex - 1;
+    if i < 0 then
+      i := pcUnits.PageCount - 1;
+    pcUnits.ActivePageIndex := i;
+  end else begin
     if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
     begin
-      ListBox := GetAvailableSourceListBox;
+      if not TryGetAvailableSourceListBox(ListBox) then
+        Exit; //==>
       if ListBox.Items.Count > 1 then
         ListBox.Perform(WM_KEYDOWN, Key, 0)
       else if ListBox.Items.Count = 1 then
@@ -1115,6 +1146,58 @@ begin
   SelectBestItem(lbxFavorite);
   SelectBestItem(lbxSearchPath);
   SelectBestItem(lbxProject);
+end;
+
+procedure TfmUsesManager.SetFavoriteUnits(_Favorites: TStrings);
+var
+  Paths: TStringList;
+  sl: TStringList;
+  i: Integer;
+  fn: string;
+begin
+  FFavoriteUnits.Assign(_Favorites);
+  Paths := nil;
+  sl := TStringList.Create;
+  try
+    Paths := TStringList.Create;
+    GxOtaGetAllPossiblePaths(Paths);
+    for i := 0 to FFavoriteUnits.Count - 1 do begin
+      fn := GxOtaFindPathToFile(FFavoriteUnits[i] + '.pas', Paths);
+      sl.Add(fn);
+    end;
+    FUnitExportParserThread := TUnitExportParserThread.Create(sl, OnExportParserFinished);
+  finally
+    FreeAndNil(Paths);
+    FreeAndNil(sl);
+  end;
+end;
+
+procedure TfmUsesManager.OnExportParserFinished(_Sender: TObject);
+var
+  IdentIdx: Integer;
+  li: TListItem;
+  UnitName: string;
+  Identifier: string;
+  sl: TStrings;
+begin
+  if not Assigned(FUnitExportParserThread) then
+    Exit; //==>
+
+  lvIdentifiers.Items.BeginUpdate;
+  try
+    sl := FUnitExportParserThread.Identifiers;
+    for IdentIdx := 0 to sl.Count - 1 do begin
+      Identifier := sl[IdentIdx];
+      UniqueString(Identifier);
+      UnitName := PChar(sl.Objects[IdentIdx]);
+      UniqueString(UnitName);
+      li := lvIdentifiers.Items.Add;
+      li.Caption := Identifier;
+      li.SubItems.Add(UnitName);
+    end;
+  finally
+    lvIdentifiers.Items.EndUpdate;
+  end;
 end;
 
 type
@@ -1206,7 +1289,8 @@ var
 begin
   if chkSingleActionMode.Checked then
   begin
-    ListBox := GetAvailableSourceListBox;
+    if not TryGetAvailableSourceListBox(ListBox) then
+      Exit; //==>
     if pcUses.ActivePage = tabInterface then
       AddListToIntfSection(ListBox)
     else
