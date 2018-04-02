@@ -204,6 +204,7 @@ type
     FCommonUnits: TStringList;
     FFavoriteUnits: TStringList;
     FSearchPathUnits: TStringList;
+    FFavUnitsExports: TStringList;
     FUsesExpert: TUsesExpert;
   public
     constructor Create(_Owner: TComponent; _UsesExpert: TUsesExpert); reintroduce;
@@ -214,7 +215,7 @@ implementation
 uses
   SysUtils, Messages, Windows, Graphics, ToolsAPI,
   GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils,
-  GX_UsesExpertOptions, GX_MessageBox;
+  GX_UsesExpertOptions, GX_MessageBox, StrUtils;
 
 {$R *.dfm}
 
@@ -481,6 +482,7 @@ begin
   FCommonUnits := TStringList.Create;
   FFavoriteUnits := TStringList.Create;
   FSearchPathUnits := TStringList.Create;
+  FFavUnitsExports := TStringList.Create;
   FAliases := TStringList.Create;
   FOldToNewUnitNameMap := TStringList.Create;
   FCurrentIdentIdx := -1;
@@ -510,13 +512,19 @@ begin
     FFindThread.OnFindComplete := nil;
     FFindThread.Terminate;
   end;
+  if Assigned(FUnitExportParserThread) then begin
+    FUnitExportParserThread.OnTerminate := nil;
+    FUnitExportParserThread.Terminate;
+  end;
   FreeAndNil(FOldToNewUnitNameMap);
   FreeAndNil(FAliases);
   FreeAndNil(FFindThread);
+  FreeAndNil(FUnitExportParserThread);
   FreeAndNil(FProjectUnits);
   FreeAndNil(FCommonUnits);
   FreeAndNil(FFavoriteUnits);
   FreeAndNil(FSearchPathUnits);
+  FreeAndNil(FFavUnitsExports);
 end;
 
 procedure TfmUsesManager.lbxInterfaceFilesDropped(_Sender: TObject; _Files: TStrings);
@@ -1083,7 +1091,11 @@ end;
 
 procedure TfmUsesManager.FilterVisibleUnits;
 var
+  i: Integer;
+  Identifier: string;
+  UnitName: string;
   Filter: string;
+  li: TListItem;
 begin
   Filter := Trim(edtFilter.Text);
   FilterStringList(FFavoriteUnits, lbxFavorite.Items, Filter, False);
@@ -1091,6 +1103,24 @@ begin
   FilterStringList(FCommonUnits, lbxCommon.Items, Filter, False);
   FilterStringList(FSearchPathUnits, lbxSearchPath.Items, Filter, False);
   SelectFirstItemInLists;
+
+  lvIdentifiers.Items.BeginUpdate;
+  try
+    lvIdentifiers.Items.Clear;
+    for i := 0 to FFavUnitsExports.Count - 1 do begin
+      Identifier := FFavUnitsExports[i];
+      if StartsText(Filter, Identifier) then begin
+        li := lvIdentifiers.Items.Add;
+        li.Caption := Identifier;
+        UnitName := PChar(FFavUnitsExports.Objects[i]);
+        li.SubItems.Add(UnitName);
+      end;
+    end;
+    if lvIdentifiers.Items.Count > 0 then
+      lvIdentifiers.ItemIndex := 0;
+  finally
+    lvIdentifiers.Items.EndUpdate;
+  end;
 end;
 
 procedure TfmUsesManager.edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1179,6 +1209,7 @@ var
   UnitName: string;
   Identifier: string;
   sl: TStrings;
+  Idx: Integer;
 begin
   if not Assigned(FUnitExportParserThread) then
     Exit; //==>
@@ -1190,10 +1221,14 @@ begin
       Identifier := sl[IdentIdx];
       UniqueString(Identifier);
       UnitName := PChar(sl.Objects[IdentIdx]);
-      UniqueString(UnitName);
-      li := lvIdentifiers.Items.Add;
-      li.Caption := Identifier;
-      li.SubItems.Add(UnitName);
+      // make sure the string is valid and not freed in the thread
+      if FFavoriteUnits.Find(UnitName, Idx) then begin
+        UnitName := FFavoriteUnits[Idx];
+        FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
+        li := lvIdentifiers.Items.Add;
+        li.Caption := Identifier;
+        li.SubItems.Add(UnitName);
+      end;
     end;
   finally
     lvIdentifiers.Items.EndUpdate;
