@@ -1221,10 +1221,11 @@ begin
     Paths := TStringList.Create;
     GxOtaGetAllPossiblePaths(Paths);
     for i := 0 to FFavoriteUnits.Count - 1 do begin
-      fn := GxOtaFindPathToFile(FFavoriteUnits[i] + '.pas', Paths);
-      sl.Add(fn);
+      if GxOtaTryFindPathToFile(FFavoriteUnits[i] + '.pas', fn, Paths) then
+        sl.Add(fn);
     end;
-    FUnitExportParserThread := TUnitExportParserThread.Create(sl, OnExportParserFinished);
+    if sl.Count > 0 then
+      FUnitExportParserThread := TUnitExportParserThread.Create(sl, OnExportParserFinished);
   finally
     FreeAndNil(Paths);
     FreeAndNil(sl);
