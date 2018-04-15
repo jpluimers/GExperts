@@ -175,7 +175,7 @@ end;
 
 procedure TfrConfigureFormEnhancements.FrameResize(Sender: TObject);
 begin
-  TGrid_Resize(sg_IdeEnhancements, [roUseGridWidth, roReduceMinWidth, roUseAllRows]);
+  TGrid_Resize(sg_IdeEnhancements, [roUseGridWidth, roUseAllRows]);
 end;
 
 procedure TfrConfigureFormEnhancements.sg_IdeEnhancementsGetCellHint(_Sender: TObject;
@@ -249,7 +249,7 @@ begin
       sg_IdeEnhancements.Cells[Ord(sfc) + sfcOffset, Row] := s;
     end;
   end;
-  TGrid_Resize(sg_IdeEnhancements, [roUseGridWidth, roReduceMinWidth, roUseAllRows]);
+  TGrid_Resize(sg_IdeEnhancements, [roUseGridWidth, roUseAllRows]);
 end;
 
 procedure TfrConfigureFormEnhancements.ApplyGrid;

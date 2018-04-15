@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, Controls, Forms, Menus, ComCtrls,
-  ExtCtrls, ActnList, Actions, Dialogs, StdCtrls,
+  ExtCtrls, ActnList, Actions, Dialogs, StdCtrls, Grids,
   GX_ConfigurationInfo, GX_Experts, GX_GenericUtils, GX_BaseForm,
   GX_KbdShortCutBroker, GX_UnitExportsParser;
 
@@ -126,7 +126,7 @@ type
     actUsesUnAlias: TAction;
     mitUsesUnalias: TMenuItem;
     tabIdentifiers: TTabSheet;
-    lvIdentifiers: TListView;
+    sgIdentifiers: TStringGrid;
     pnlIdentifiersFooter: TPanel;
     btnIdentifiersAddToIntf: TButton;
     btnIdentifiersAddToImpl: TButton;
@@ -405,6 +405,9 @@ begin
   Bitmap := FUsesExpert.GetBitmap;
   if Assigned(Bitmap) then
     ConvertBitmapToIcon(Bitmap, Icon);
+
+  sgIdentifiers.Cells[0, 0] := 'Identifier';
+  sgIdentifiers.Cells[1, 0] := 'Unit';
 end;
 
 procedure TfmUsesManager.GetProjectFiles;
@@ -891,11 +894,11 @@ begin
       if Src.Selected[i] then
         AddToIntfSection(Src.Items[i]);
   end else begin
-    // no listbox, so it must be the Identifiers ListView
-    for i := 0 to lvIdentifiers.Items.Count - 1 do
-      if lvIdentifiers.Items[i].Selected then begin
-        AddToIntfSection(lvIdentifiers.Items[i].SubItems[0]);
-      end;
+    // no listbox, so it must be the Identifiers StringGrid
+    i := sgIdentifiers.Row;
+    if (i < sgIdentifiers.FixedRows) or (i >= sgIdentifiers.RowCount) then
+      Exit; //==>
+    AddToIntfSection(sgIdentifiers.Cells[1, i]);
   end;
   CloseIfInSingleActionMode;
 end;
@@ -908,11 +911,11 @@ begin
   if TryGetAvailableSourceListBox(Src) then begin
     AddListToImplSection(Src, False);
   end else begin
-    // no listbox, so it must be the Identifiers ListView
-    for i := 0 to lvIdentifiers.Items.Count - 1 do
-      if lvIdentifiers.Items[i].Selected then begin
-        AddToImplSection(lvIdentifiers.Items[i].SubItems[0], False);
-      end;
+    // no listbox, so it must be the Identifiers StringGrid
+    i := sgIdentifiers.Row;
+    if (i < sgIdentifiers.FixedRows) or (i >= sgIdentifiers.RowCount) then
+      Exit; //==>
+    AddToImplSection(sgIdentifiers.Cells[1, i], False);
   end;
   CloseIfInSingleActionMode;
 end;
@@ -1117,7 +1120,8 @@ var
   Identifier: string;
   UnitName: string;
   Filter: string;
-  li: TListItem;
+  FixedRows: Integer;
+  cnt: Integer;
 begin
   Filter := Trim(edtFilter.Text);
   FilterStringList(FFavoriteUnits, lbxFavorite.Items, Filter, False);
@@ -1126,23 +1130,20 @@ begin
   FilterStringList(FSearchPathUnits, lbxSearchPath.Items, Filter, False);
   SelectFirstItemInLists;
 
-  lvIdentifiers.Items.BeginUpdate;
-  try
-    lvIdentifiers.Items.Clear;
-    for i := 0 to FFavUnitsExports.Count - 1 do begin
-      Identifier := FFavUnitsExports[i];
-      if StartsText(Filter, Identifier) then begin
-        li := lvIdentifiers.Items.Add;
-        li.Caption := Identifier;
-        UnitName := PChar(FFavUnitsExports.Objects[i]);
-        li.SubItems.Add(UnitName);
-      end;
+  FixedRows := sgIdentifiers.FixedRows;
+  sgIdentifiers.RowCount := FixedRows + 1;
+  cnt := 0;
+  for i := 0 to FFavUnitsExports.Count - 1 do begin
+    Identifier := FFavUnitsExports[i];
+    if StartsText(Filter, Identifier) then begin
+      Inc(cnt);
+      sgIdentifiers.RowCount := FixedRows + cnt;
+      sgIdentifiers.Cells[0, FixedRows + cnt - 1] := Identifier;
+      UnitName := PChar(FFavUnitsExports.Objects[i]);
+      sgIdentifiers.Cells[1, FixedRows + cnt - 1] := UnitName;
     end;
-    if lvIdentifiers.Items.Count > 0 then
-      lvIdentifiers.ItemIndex := 0;
-  finally
-    lvIdentifiers.Items.EndUpdate;
   end;
+  TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
 end;
 
 procedure TfmUsesManager.edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1171,11 +1172,8 @@ begin
           ListBox.Selected[0] := True;
         Key := 0;
       end else begin
-        // no listbox, so ist must be the identifiers ListView
-        if lvIdentifiers.Items.Count > 1 then
-          lvIdentifiers.Perform(WM_KEYDOWN, Key, 0)
-        else if lvIdentifiers.Items.Count = 1 then
-          lvIdentifiers.ItemIndex := 0;
+        // no listbox, so ist must be the identifiers StringGrid
+        sgIdentifiers.Perform(WM_KEYDOWN, Key, 0);
         Key := 0;
       end;
     end;
@@ -1235,7 +1233,8 @@ end;
 procedure TfmUsesManager.OnExportParserFinished(_Sender: TObject);
 var
   IdentIdx: Integer;
-  li: TListItem;
+  cnt: Integer;
+  FixedRows: Integer;
   UnitName: string;
   Identifier: string;
   sl: TStrings;
@@ -1244,25 +1243,26 @@ begin
   if not Assigned(FUnitExportParserThread) then
     Exit; //==>
 
-  lvIdentifiers.Items.BeginUpdate;
-  try
-    sl := FUnitExportParserThread.Identifiers;
-    for IdentIdx := 0 to sl.Count - 1 do begin
-      Identifier := sl[IdentIdx];
-      UniqueString(Identifier);
-      UnitName := PChar(sl.Objects[IdentIdx]);
+  FixedRows := sgIdentifiers.FixedRows;
+  cnt := 0;
+  sgIdentifiers.RowCount := FixedRows + 1;
+
+  sl := FUnitExportParserThread.Identifiers;
+  for IdentIdx := 0 to sl.Count - 1 do begin
+    Identifier := sl[IdentIdx];
+    UniqueString(Identifier);
+    UnitName := PChar(sl.Objects[IdentIdx]);
       // make sure the string is valid and not freed in the thread
-      if FFavoriteUnits.Find(UnitName, Idx) then begin
-        UnitName := FFavoriteUnits[Idx];
-        FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
-        li := lvIdentifiers.Items.Add;
-        li.Caption := Identifier;
-        li.SubItems.Add(UnitName);
-      end;
+    if FFavoriteUnits.Find(UnitName, Idx) then begin
+      UnitName := FFavoriteUnits[Idx];
+      FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
+      Inc(cnt);
+      sgIdentifiers.RowCount := FixedRows + cnt;
+      sgIdentifiers.Cells[0, FixedRows + cnt - 1] := Identifier;
+      sgIdentifiers.Cells[1, FixedRows + cnt - 1] := UnitName;
     end;
-  finally
-    lvIdentifiers.Items.EndUpdate;
   end;
+  TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
 end;
 
 type

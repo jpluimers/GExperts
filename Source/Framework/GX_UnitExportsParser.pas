@@ -6,7 +6,8 @@ uses
   SysUtils,
   Classes,
   mwPasParserTypes,
-  mPasLex;
+  mPasLex,
+  GX_dzNamedThread;
 
 type
   // itUnknown is only there so Delphi 6 does not bomb out because of NIL objects in FIdentifiers
@@ -83,7 +84,7 @@ type
   end;
 
 type
-  TUnitExportParserThread = class(TThread)
+  TUnitExportParserThread = class(TNamedThread)
   private
     FUnits: TStringList;
     FFiles: TStringList;
@@ -442,12 +443,18 @@ var
   sl: TStrings;
   UnitName: string;
 begin
+  inherited;
+
   for FileIdx := 0 to FFiles.Count - 1 do begin
+    if Terminated then
+      Exit; //==>
     fn := FFiles[FileIdx];
     if FileExists(fn) then begin
       Parser := TUnitExportsParser.Create(fn);
       try
         Parser.Execute;
+        if Terminated then
+          Exit; //==>
         UnitName := ExtractFileName(fn);
         UnitName := ChangeFileExt(UnitName, '');
         FUnits.Add(UnitName);
@@ -460,6 +467,8 @@ begin
       end;
     end;
   end;
+  if Terminated then
+    Exit; //==>
   TStringList(FIdentifiers).Sort;
 end;
 

@@ -8,10 +8,11 @@ uses
   Windows,
   SysUtils,
   Classes,
-  SyncObjs;
+  SyncObjs,
+  GX_dzNamedThread;
 
 type
-  TReadMapFileThread = class(TThread)
+  TReadMapFileThread = class(TNamedThread)
   private
     FSearchPath: TStringList;
     FMapFile: string;
@@ -72,6 +73,8 @@ var
   PathIdx: Integer;
   ExtensionIndex: Integer;
 begin
+  inherited;
+
   FComplete := False;
   try
     LockResults;

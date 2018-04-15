@@ -292,25 +292,19 @@ object fmUsesManager: TfmUsesManager
       object tabIdentifiers: TTabSheet
         Caption = 'Identifiers'
         ImageIndex = 4
-        object lvIdentifiers: TListView
+        object sgIdentifiers: TStringGrid
           Left = 0
           Top = 0
           Width = 306
           Height = 325
           Align = alClient
-          Columns = <
-            item
-              Caption = 'Identifiers'
-              Width = 150
-            end
-            item
-              Caption = 'Unit'
-              Width = 150
-            end>
-          ReadOnly = True
-          RowSelect = True
+          ColCount = 2
+          DefaultColWidth = 80
+          DefaultRowHeight = 18
+          FixedCols = 0
+          RowCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing]
           TabOrder = 0
-          ViewStyle = vsReport
         end
         object pnlIdentifiersFooter: TPanel
           Left = 0

@@ -188,7 +188,7 @@ uses
   GX_ConfigurationInfo,
   GX_GenericUtils,
   GX_dzClassUtils,
-  GX_IdeUtils;
+  GX_IdeUtils, GX_dzNamedThread;
 
 const
   WidthIdent = 'Width';
@@ -624,7 +624,7 @@ end;
 {$ENDIF GX_VER170_up}
 
 type
-  TMoveWindowThread = class(TThread)
+  TMoveWindowThread = class(TNamedThread)
   private
     FParentHandle: HWND;
     FParentCenterX: Integer;
@@ -669,6 +669,7 @@ var
   ThreadInfo: TGUIThreadinfo;
 begin
   inherited;
+
   GetWindowRect(FParentHandle, Rect);
   FParentCenterX := Round(Rect.Left / 2 + Rect.Right / 2);
   FParentCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);

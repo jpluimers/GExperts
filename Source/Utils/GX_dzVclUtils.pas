@@ -211,7 +211,7 @@ type
   TListViewResizeOptions = (lvrCaptions, lvrContent);
   TLIstViewResizeOptionSet = set of TListViewResizeOptions;
 ///<summary>
-/// Resize all columns of a TListView in vsReport ViewStyle
+/// Resize a column of a TListView in vsReport ViewStyle
 /// @param lc is the TListColumn to resize
 /// @param Options is a set of tListViewResizeOptions
 ///                lvrCaptions means resize so the captions fit
@@ -306,7 +306,7 @@ type
   ///    <li>roUseAllRows -> use all Grid rows to calculate the minimum width, not
   ///                        just the first 10</li>
   ///  </ul> </summary>
-  TResizeOptions = (roUseGridWidth, roIgnoreHeader, roUseLastRows, roUseAllRows, roReduceMinWidth);
+  TResizeOptions = (roUseGridWidth, roIgnoreHeader, roUseFirstRows, roUseLastRows, roUseAllRows);
   TResizeOptionSet = set of TResizeOptions;
 
 ///<summary> Resizes the columns of a TCustomGrid to fit their contents

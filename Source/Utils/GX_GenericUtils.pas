@@ -10,7 +10,7 @@ uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
   UITypes,
-  Types, CheckLst, TypInfo, ExtCtrls, ComCtrls;
+  Types, CheckLst, TypInfo, ExtCtrls, ComCtrls, GX_dzNamedThread;
 
 const
   AllFilesWildCard = '*.*';
@@ -749,7 +749,7 @@ function IDEEditorStringToString(const S: IDEEditBufferString): string; overload
 {$ENDIF GX_VER160_up}
 
 type
-  TFileFindThread = class(TThread)
+  TFileFindThread = class(TNamedThread)
   private
     FFileMasks: TStringList;
     FResults: TStringList;
@@ -4599,6 +4599,8 @@ procedure TFileFindThread.Execute;
 var
   i: Integer;
 begin
+  inherited;
+
   FComplete := False;
   try
     LockResults;
