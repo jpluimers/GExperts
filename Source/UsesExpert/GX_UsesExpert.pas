@@ -1432,8 +1432,6 @@ var
   Units: TStringList;
   NewToOldUnitNameMap: TStringList;
 begin
-  FFavoriteUnits.Assign(lbxFavorite.Items);
-
   UnAlias(lbxInterface.Items);
   UnAlias(lbxImplementation.Items);
 
