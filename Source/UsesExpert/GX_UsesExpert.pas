@@ -13,7 +13,6 @@ uses
 type
   TUsesExpert = class(TGX_Expert)
   private
-    FFavoriteUnits: TStringList;
     FSingleActionMode: Boolean;
     FAvailTabIndex: Integer;
     FReplaceFileUseUnit: Boolean;
@@ -200,7 +199,8 @@ type
     procedure lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure actUsesMoveToImplExecute(Sender: TObject);
     procedure actUsesMoveToIntExecute(Sender: TObject);
-    procedure SetFavoriteUnits(_Favorites: TStrings);
+    procedure LoadSettings;
+    procedure SaveSettings;
     procedure OnExportParserFinished(_Sender: TObject);
   protected
     FProjectUnits: TStringList;
@@ -227,7 +227,6 @@ uses
 constructor TUsesExpert.Create;
 begin
   inherited;
-  FFavoriteUnits := TStringList.Create;
   LoadSettings;
 end;
 
@@ -241,7 +240,6 @@ begin
     if FindAction(act) then
       act.OnExecute := FOrigFileAddUnitExecute;
 
-  FreeAndNil(FFavoriteUnits);
   inherited;
 end;
 
@@ -355,14 +353,14 @@ begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
   Form := TfmUsesManager.Create(Application, Self);
   try
-    Form.SetFavoriteUnits(FFavoriteUnits);
+    Form.LoadSettings;
     Form.chkSingleActionMode.Checked := FSingleActionMode;
     if (FAvailTabIndex >= 0) and (FAvailTabIndex < Form.pcUnits.PageCount) then
       Form.pcUnits.ActivePageIndex := FAvailTabIndex;
 
     if Form.ShowModal = mrOk then
     begin
-      FFavoriteUnits.Assign(Form.FFavoriteUnits);
+      Form.SaveSettings;
       FSingleActionMode := Form.chkSingleActionMode.Checked;
       FAvailTabIndex := Form.pcUnits.ActivePageIndex;
 
@@ -376,7 +374,6 @@ end;
 procedure TUsesExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FFavoriteUnits.CommaText := Settings.ReadString('Favorites', '');
   FSingleActionMode := Settings.ReadBool('SingleActionMode', False);
   FReplaceFileUseUnit := Settings.ReadBool('ReplaceFileUseUnit', False);
   FReadMap := Settings.ReadBool('ReadMap', True);
@@ -386,7 +383,6 @@ end;
 procedure TUsesExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited;
-  Settings.WriteString('Favorites', FFavoriteUnits.CommaText);
   Settings.WriteBool('SingleActionMode', FSingleActionMode);
   Settings.WriteBool('ReplaceFileUseUnit', FReplaceFileUseUnit);
   Settings.WriteBool('ReadMap', FReadMap);
@@ -1205,14 +1201,22 @@ begin
   SelectBestItem(lbxProject);
 end;
 
-procedure TfmUsesManager.SetFavoriteUnits(_Favorites: TStrings);
+procedure TfmUsesManager.LoadSettings;
 var
+  Settings: TGExpertsSettings;
   Paths: TStringList;
   sl: TStringList;
   i: Integer;
   fn: string;
 begin
-  FFavoriteUnits.Assign(_Favorites);
+  // Do not localize.
+  Settings := TGExpertsSettings.Create;
+  try
+    FFavoriteUnits.CommaText := Settings.ReadString(TUsesExpert.ConfigurationKey, 'Favorites', '');
+  finally
+    FreeAndNil(Settings);
+  end;
+
   Paths := nil;
   sl := TStringList.Create;
   try
@@ -1571,6 +1575,19 @@ begin
   finally
     FreeAndNil(NewToOldUnitNameMap);
     FreeAndNil(Units);
+  end;
+end;
+
+procedure TfmUsesManager.SaveSettings;
+var
+  Settings: TGExpertsSettings;
+begin
+  // Do not localize.
+  Settings := TGExpertsSettings.Create;
+  try
+    Settings.WriteString(TUsesExpert.ConfigurationKey,  'Favorites', FFavoriteUnits.CommaText);
+  finally
+    FreeAndNil(Settings);
   end;
 end;
 
