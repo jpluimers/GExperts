@@ -102,9 +102,9 @@ implementation
 {$R *.dfm}
 
 uses
-  Windows, SysUtils,
+  Windows, SysUtils, Math,
   GX_GenericUtils, GX_OtaUtils, GX_SharedImages, GX_GxUtils, GX_CompRenameAdvanced,
-  Math;
+  GX_MessageBox;
 
 function CompareClassFunc(List: TStringList; Index1, Index2: Integer): Integer;
 var
@@ -428,8 +428,31 @@ begin
   end;
 end;
 
+{ TDefaultRenameComponentsMessage }
+
+type
+  TDefaultRenameComponentsMessage = class(TGxQuestionBoxAdaptor)
+  protected
+    function GetMessage: string; override;
+  end;
+
+function TDefaultRenameComponentsMessage.GetMessage: string;
+resourcestring
+  SClearIndividualShortcut =
+    'This will reset this expert to the default settings. ' +
+    'In particular it will replace existing rename rules with the defaults. ' +
+    'Do you really want to do that?';
+begin
+  Result := SClearIndividualShortcut;
+end;
+
+
 procedure TfmCompRenameConfig.btnDefaultsClick(Sender: TObject);
 begin
+  if FValueList.Count > 0 then
+    if ShowGxMessageBox(TDefaultRenameComponentsMessage) <> mrYes then
+      Exit; //==>
+
   with FValueList do begin
     Clear;
     Values['TAction']      := 'act';
