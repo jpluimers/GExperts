@@ -1138,7 +1138,7 @@ begin
   cnt := 0;
   for i := 0 to FFavUnitsExports.Count - 1 do begin
     Identifier := FFavUnitsExports[i];
-    if StartsText(Filter, Identifier) then begin
+    if StrBeginsWith(Filter, Identifier, False) then begin
       Inc(cnt);
       sgIdentifiers.RowCount := FixedRows + cnt;
       sgIdentifiers.Cells[0, FixedRows + cnt - 1] := Identifier;
