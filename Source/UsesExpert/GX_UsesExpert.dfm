@@ -300,7 +300,7 @@ object fmUsesManager: TfmUsesManager
           Align = alClient
           ColCount = 2
           DefaultColWidth = 80
-          DefaultRowHeight = 18
+          DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 2
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing]

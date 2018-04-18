@@ -990,13 +990,20 @@ end;
 procedure TfmUsesManager.OpenSelectedUnit(ListBox: TListBox);
 var
   UnitName: string;
+  r: Integer;
 begin
-  if not Assigned(ListBox) then
-    Exit; //==>
-  if TListBox_GetSelected(ListBox, UnitName) then begin
-    OpenUnit(UnitName);
-    ModalResult := mrCancel;
+  if not Assigned(ListBox) then begin
+    // no listbox -> identifier string grid
+    r := sgIdentifiers.Row;
+    if (r < sgIdentifiers.FixedRows) or (r >= sgIdentifiers.RowCount) then
+      Exit; //==>
+    UnitName := sgIdentifiers.Cells[1, r];
+  end else begin
+    if not TListBox_GetSelected(ListBox, UnitName) then
+      Exit; //==>
   end;
+  OpenUnit(UnitName);
+  ModalResult := mrCancel;
 end;
 
 procedure TfmUsesManager.actOpenUnitExecute(Sender: TObject);
@@ -1583,7 +1590,7 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
-    Settings.WriteString(TUsesExpert.ConfigurationKey,  'Favorites', FFavoriteUnits.CommaText);
+    Settings.WriteString(TUsesExpert.ConfigurationKey, 'Favorites', FFavoriteUnits.CommaText);
   finally
     FreeAndNil(Settings);
   end;
