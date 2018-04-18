@@ -6,6 +6,8 @@
 /// your thread's execute procedure. </summary>
 unit GX_dzNamedThread;
 
+{$I 'GX_CondDefine.inc'}
+
 interface
 
 uses
@@ -49,7 +51,9 @@ type
 
 implementation
 
+{$IFDEF GX_VER150_up}
 {$WARN UNSAFE_CODE OFF}
+{$ENDIF}
 
 procedure SetThreadName(const _Name: AnsiString);
 var
@@ -60,7 +64,7 @@ begin
   ThreadNameInfo.FThreadID := $FFFFFFFF;
   ThreadNameInfo.FFlags := 0;
   try
-    RaiseException($406D1388, 0, SizeOf(ThreadNameInfo) div SizeOf(LongWord), @ThreadNameInfo);
+    RaiseException($406D1388, 0, SizeOf(ThreadNameInfo) div SizeOf(LongWord), Pointer(@ThreadNameInfo));
   except
     // ignore
   end;
