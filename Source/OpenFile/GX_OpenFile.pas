@@ -456,6 +456,10 @@ var
   PathsToUse: TStringList;
   SearchPath: TStringList;
 begin
+  FreeAndNil(FSearchPathThread);
+  FreeAndNil(FMapFileThread);
+  FreeAndNil(FCommonThread);
+
   FCommonFiles.Clear;
   FCommonDCUFiles.Clear;
   FProjectFiles.Clear;
@@ -469,7 +473,6 @@ begin
   try
     GetSearchPath(SearchPath);
 
-    FreeAndNil(FSearchPathThread);
     FSearchPathThread := TFileFindThread.Create;
 
     // This will allow semi-colon separated lists at the user GUI level
@@ -486,7 +489,6 @@ begin
     FSearchPathThread.OnFindComplete := PathSearchComplete;
     FSearchPathThread.StartFind;
 
-    FreeAndNil(FMapFileThread);
     if MapFileSearch then begin
       FMapFileThread := TReadMapFileThread.Create;
       FMapFileThread.SearchPath.Assign(SearchPath);
@@ -498,7 +500,6 @@ begin
     end else
       FMapSearchDone := True;
 
-    FreeAndNil(FCommonThread);
     FCommonThread := TFileFindThread.Create;
     FCommonThread.RecursiveSearchDirs.Add(ExtractFilePath(GetIdeRootDirectory) + AddSlash('Source'));
     FCommonThread.FileMasks.CommaText := '*.pas,*.cpp,*.cs,*.inc,*.dfm';
@@ -520,6 +521,9 @@ var
   PathUnits: TStringList;
   i: Integer;
 begin
+  if not Assigned(FSearchPathThread) then
+    Exit; //==>
+
   PathUnits := nil;
   PathFiles := TStringList.Create;
   try
@@ -547,6 +551,9 @@ end;
 
 procedure TAvailableFiles.CommonSearchComplete;
 begin
+  if not Assigned(FCommonThread) then
+    Exit; //==>
+
   FCommonThread.LockResults;
   try
     CommonFiles.Assign(FCommonThread.Results);
@@ -559,6 +566,9 @@ end;
 
 procedure TAvailableFiles.MapSearchComplete;
 begin
+  if not Assigned(FMapFileThread) then
+    Exit; //==>
+
   FMapFileThread.LockResults;
   try
      MapFiles.Assign(FMapFileThread.Results);

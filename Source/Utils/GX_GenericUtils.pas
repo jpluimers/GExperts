@@ -4586,13 +4586,13 @@ end;
 
 destructor TFileFindThread.Destroy;
 begin
+  inherited;
   FreeAndNil(FDirsToIgnore);
   FreeAndNil(FFileMasks);
   FreeAndNil(FResults);
   FreeAndNil(FResultsLock);
   FreeAndNil(FSearchDirs);
   FreeAndNil(FRecursiveSearchDirs);
-  inherited;
 end;
 
 procedure TFileFindThread.Execute;

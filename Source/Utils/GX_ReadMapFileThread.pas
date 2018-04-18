@@ -56,11 +56,11 @@ end;
 
 destructor TReadMapFileThread.Destroy;
 begin
+  inherited;
   FreeAndNil(FFileExtensions);
   FreeAndNil(FResults);
   FreeAndNil(FSearchPath);
   FreeAndNil(FResultsLock);
-  inherited;
 end;
 
 procedure TReadMapFileThread.Execute;
@@ -83,7 +83,7 @@ begin
     finally
       ReleaseResults;
     end;
-    inherited;
+
     Reader := TMapFileReader.Create(FMapFile);
     try
       if Terminated then
