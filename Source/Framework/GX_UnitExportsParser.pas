@@ -331,6 +331,16 @@ begin
               // simple declaration: type Tbla = class(Tblub); as used for e.g. exceptions or forward declarations
               Exit; //==>
             end;
+          end else if FParser.TokenId = tkOf then begin
+            // TBla = class of Tblub;
+            FParser.NextNoJunk;
+            while FParser.TokenID <> tkNull do begin
+              if FParser.TokenID = tkSemiColon then
+                Exit; //==>
+              FParser.NextNoJunk;
+            end;
+            // should never happen
+            Exit; //==>
           end;
           SkipClassOrRecord;
           Exit; //==>
