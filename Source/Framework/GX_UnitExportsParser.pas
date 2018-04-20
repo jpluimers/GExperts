@@ -349,15 +349,21 @@ begin
           SkipClassOrRecord;
         end;
       tkSemiColon: begin
-        // we have reached the end of the type declaration
+          // we have reached the end of the type declaration
           Exit; //==>
         end;
       tkProcedure: begin
-        // type bla = procedure(...);
-        // type bla = procedure(...) of object;
+          // type bla = procedure(...);
+          // type bla = procedure(...) of object;
           SkipProcedureDeclaration;
           Exit; //==>
         end;
+      tkFunction: begin
+          // type bla = function(...): Sometype;
+          // type bla = function(...): Sometype of object;
+          SkipFunctionDeclaration;
+          Exit; //==>
+      end;
     end;
 
     FParser.NextNoJunk;
