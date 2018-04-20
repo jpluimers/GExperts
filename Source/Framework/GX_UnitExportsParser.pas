@@ -322,10 +322,27 @@ begin
     FParser.NextNoJunk;
   while FParser.TokenID <> tkNull do begin
     case FParser.TokenID of
-      tkInterface, tkClass: begin
+      tkInterface, tkDispinterface, tkClass: begin
           FParser.NextNoJunk;
-          if FParser.TokenID = tkRoundOpen then begin
+          if FParser.TokenID = tkSemiColon then begin
+            // forward declaration: type Tbla = class;
+            //                  or: type Tbla = interface;
+            Exit; //==>
+          end else if FParser.TokenID = tkRoundOpen then begin
             SkipToClosingDelimiter(tkRoundOpen, tkRoundClose);
+            FParser.NextNoJunk;
+            if FParser.TokenID = tkSquareOpen then begin
+              // interface(bla)[guid]
+              SkipToClosingDelimiter(tkSquareOpen, tkSquareClose);
+              FParser.NextNoJunk;
+            end;
+            if FParser.TokenID = tkSemiColon then begin
+              // simple declaration: type Tbla = class(Tblub); as used for e.g. exceptions or forward declarations
+              Exit; //==>
+            end;
+          end else if FParser.TokenID = tkSquareOpen then begin
+            // interface[guid]
+            SkipToClosingDelimiter(tkSquareOpen, tkSquareClose);
             FParser.NextNoJunk;
             if FParser.TokenID = tkSemiColon then begin
               // simple declaration: type Tbla = class(Tblub); as used for e.g. exceptions or forward declarations
@@ -363,7 +380,7 @@ begin
           // type bla = function(...): Sometype of object;
           SkipFunctionDeclaration;
           Exit; //==>
-      end;
+        end;
     end;
 
     FParser.NextNoJunk;
