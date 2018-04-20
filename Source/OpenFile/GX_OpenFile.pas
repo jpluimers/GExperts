@@ -59,7 +59,7 @@ type
     property SearchPaths: TStrings read FSearchPaths write FSearchPaths;
     property RecursiveDirSearch: Boolean read FRecursiveDirSearch write FRecursiveDirSearch;
     property MapFileSearch: boolean read FMapFileSearch write FMapFileSearch;
-    procedure HaltThreads;
+    procedure FreeThreads;
   end;
 
   TfmOpenFile = class(TfmBaseForm)
@@ -438,16 +438,13 @@ end;
 destructor TAvailableFiles.Destroy;
 begin
   OnFindComplete := nil;
-  HaltThreads;
+  FreeThreads;
   FreeAndNil(FMapFiles);
   FreeAndNil(FFileMasks);
   FreeAndNil(FCommonFiles);
   FreeAndNil(FCommonDCUFiles);
   FreeAndNil(FProjectFiles);
   FreeAndNil(FSearchPathFiles);
-  FreeAndNil(FSearchPathThread);
-  FreeAndNil(FCommonThread);
-  FreeAndNil(FMapFileThread);
   inherited;
 end;
 
@@ -456,9 +453,7 @@ var
   PathsToUse: TStringList;
   SearchPath: TStringList;
 begin
-  FreeAndNil(FSearchPathThread);
-  FreeAndNil(FMapFileThread);
-  FreeAndNil(FCommonThread);
+  FreeThreads;
 
   FCommonFiles.Clear;
   FCommonDCUFiles.Clear;
@@ -644,29 +639,30 @@ begin
   GxOtaGetEffectiveLibraryPath(Paths);
 end;
 
-procedure TAvailableFiles.HaltThreads;
-
-  procedure StopThread(Thread: TFileFindThread);
-  begin
-    if Assigned(Thread) then
-    begin
-      Thread.OnFindComplete := nil;
-      Thread.Terminate;
-      Thread.WaitFor;
-    end;
-  end;
-
+procedure TAvailableFiles.FreeThreads;
 var
   Cursor: IInterface;
 begin
   Cursor := TempHourGlassCursor;
-  StopThread(FSearchPathThread);
-  StopThread(FCommonThread);
+
+  if Assigned(FSearchPathThread) then begin
+    FSearchPathThread.OnFindComplete := nil;
+    FSearchPathThread.Terminate;
+  end;
+
+  if Assigned(FCommonThread) then begin
+    FCommonThread.OnFindComplete := nil;
+    FCommonThread.Terminate;
+  end;
+
   if Assigned(FMapFileThread) then begin
     FMapFileThread.OnFindComplete := nil;
     FMapFileThread.Terminate;
-    FMapFileThread.WaitFor;
   end;
+
+  FreeAndNil(FSearchPathThread);
+  FreeAndNil(FCommonThread);
+  FreeAndNil(FMapFileThread);
 end;
 
 { TOpenFileNotifier }
