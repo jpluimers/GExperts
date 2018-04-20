@@ -1219,10 +1219,12 @@ begin
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
+    FFavoriteUnits.Sorted := False;
     FFavoriteUnits.CommaText := Settings.ReadString(TUsesExpert.ConfigurationKey, 'Favorites', '');
   finally
     FreeAndNil(Settings);
   end;
+  FFavoriteUnits.Sorted := True;
 
   Paths := nil;
   sl := TStringList.Create;
