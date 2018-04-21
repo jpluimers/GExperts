@@ -218,7 +218,7 @@ implementation
 uses
   SysUtils, Messages, Windows, Graphics, ToolsAPI,
   GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils,
-  GX_UsesExpertOptions, GX_MessageBox, StrUtils;
+  GX_UsesExpertOptions, GX_MessageBox, StrUtils, Math;
 
 {$R *.dfm}
 
@@ -1134,18 +1134,18 @@ begin
   SelectFirstItemInLists;
 
   FixedRows := sgIdentifiers.FixedRows;
-  sgIdentifiers.RowCount := FixedRows + 1;
+  sgIdentifiers.RowCount := FixedRows + Max(1, FFavUnitsExports.Count);
   cnt := 0;
   for i := 0 to FFavUnitsExports.Count - 1 do begin
     Identifier := FFavUnitsExports[i];
     if StrBeginsWith(Filter, Identifier, False) then begin
-      Inc(cnt);
-      sgIdentifiers.RowCount := FixedRows + cnt;
-      sgIdentifiers.Cells[0, FixedRows + cnt - 1] := Identifier;
+      sgIdentifiers.Cells[0, FixedRows + cnt] := Identifier;
       UnitName := PChar(FFavUnitsExports.Objects[i]);
-      sgIdentifiers.Cells[1, FixedRows + cnt - 1] := UnitName;
+      sgIdentifiers.Cells[1, FixedRows + cnt] := UnitName;
+      Inc(cnt);
     end;
   end;
+  sgIdentifiers.RowCount := FixedRows + Max(1, cnt);
   TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
 end;
 
@@ -1258,9 +1258,8 @@ begin
 
   FixedRows := sgIdentifiers.FixedRows;
   cnt := 0;
-  sgIdentifiers.RowCount := FixedRows + 1;
-
   sl := FUnitExportParserThread.Identifiers;
+  sgIdentifiers.RowCount := FixedRows + max(1, sl.Count);
   for IdentIdx := 0 to sl.Count - 1 do begin
     Identifier := sl[IdentIdx];
     UniqueString(Identifier);
@@ -1269,12 +1268,12 @@ begin
     if FFavoriteUnits.Find(UnitName, Idx) then begin
       UnitName := FFavoriteUnits[Idx];
       FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
+      sgIdentifiers.Cells[0, FixedRows + cnt] := Identifier;
+      sgIdentifiers.Cells[1, FixedRows + cnt] := UnitName;
       Inc(cnt);
-      sgIdentifiers.RowCount := FixedRows + cnt;
-      sgIdentifiers.Cells[0, FixedRows + cnt - 1] := Identifier;
-      sgIdentifiers.Cells[1, FixedRows + cnt - 1] := UnitName;
     end;
   end;
+  sgIdentifiers.RowCount := FixedRows + Max(1, cnt);
   TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
 end;
 

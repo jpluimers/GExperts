@@ -3,7 +3,7 @@ object fmUsesManager: TfmUsesManager
   Top = 202
   ActiveControl = edtFilter
   AutoScroll = False
-  BorderIcons = [biSystemMenu]
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Uses Clause Manager'
   ClientHeight = 478
   ClientWidth = 595
