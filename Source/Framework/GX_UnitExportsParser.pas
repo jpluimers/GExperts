@@ -161,7 +161,7 @@ type
 procedure TUnitExportsParser.Execute;
 var
   sl: TStringList;
-  s: AnsiString;
+  s: string;
   DeclarationType: TDeclarationType;
 begin
   sl := nil;
@@ -303,8 +303,23 @@ end;
 procedure TUnitExportsParser.SkipClassOrRecord;
 begin
   while FParser.TokenID <> tkNull do begin
-    if FParser.TokenID = tkEnd then
-      Exit; //==>
+    case FParser.TokenID of
+      tkEnd:
+        Exit; //==>
+      tkClass: begin
+          FParser.NextNoJunk;
+          if not (FParser.TokenID in [tkFunction, tkProcedure, tkOperator, tkVar, tkProperty]) then begin
+            // nested class declaration
+            SkipClassOrRecord;
+          end;
+        end;
+      tkRecord,
+        tkInterface: begin
+          FParser.NextNoJunk;
+          // nested record/interface declaration
+          SkipClassOrRecord;
+        end;
+    end;
     // todo: handle more complex declarations
     FParser.NextNoJunk;
   end;
@@ -322,6 +337,10 @@ begin
     FParser.NextNoJunk;
   while FParser.TokenID <> tkNull do begin
     case FParser.TokenID of
+      tkSemiColon: begin
+          // we have reached the end of the type declaration
+          Exit; //==>
+        end;
       tkInterface, tkDispinterface, tkClass: begin
           FParser.NextNoJunk;
           if FParser.TokenID = tkSemiColon then begin
@@ -363,10 +382,12 @@ begin
           Exit; //==>
         end;
       tkRecord: begin
+          FParser.NextNoJunk;
+          if FParser.TokenID = tkSemiColon then begin
+            // forward declaration: type Tbla = record;
+            Exit; //==>
+          end;
           SkipClassOrRecord;
-        end;
-      tkSemiColon: begin
-          // we have reached the end of the type declaration
           Exit; //==>
         end;
       tkProcedure: begin
