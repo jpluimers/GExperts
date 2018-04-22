@@ -725,6 +725,10 @@ var
   UsesSourceListBox: TListBox;
   UsesIsInterface: Boolean;
 begin
+  // todo: This no longer works correctly: If the Identifiers grid is active
+  //       TryGetAvailableSourceListBox returns false and the actions don't
+  //       get enabled / disabled as they should, e.g. the Delete action stays
+  //       disabled even when switching from an empty to a non empty uses list.
   if not TryGetAvailableSourceListBox(AvailableSourceListBox) then
     Exit; //==>
   UsesSourceListBox := GetUsesSourceListBox;
