@@ -1,13 +1,15 @@
 unit GX_UnitExportsParser;
 
+{$I 'GX_CondDefine.inc'}
+
 interface
 
 uses
   SysUtils,
   Classes,
+  GX_dzNamedThread,
   mwPasParserTypes,
-  mPasLex,
-  GX_dzNamedThread;
+  mPasLex;
 
 type
   // itUnknown is only there so Delphi 6 does not bomb out because of NIL objects in FIdentifiers
@@ -18,18 +20,43 @@ type
   end;
 
 type
+  TSkipToElseOrEndifResult = (seeElse, seeEndif, seeNull);
+
+type
+  TPasLexEx = class(TmwPasLex)
+  private
+    FSymbols: TStringList;
+    FIfdefStack: TStringList;
+    function GetSymbols: TStrings;
+    procedure SetSymbols(const _Value: TStrings);
+    function SkipToElseOrEndif: TSkipToElseOrEndifResult;
+    function TokenIsElse: Boolean;
+    function TokenIsEndif: Boolean;
+    function TokenIsIfdef(out _Symbol: string): Boolean;
+    ///<summary>
+    /// @returns true, if last token is <> tkNull </summary>
+    function SkipToEndif: Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function NextNoJunkEx: Boolean;
+    property Symbols: TStrings read GetSymbols write SetSymbols;
+  end;
+
+type
   ///<summary>
   /// Simple parser that collects all identifiers declared in the interface of a unit.
   TUnitExportsParser = class
   private
     FFilename: string;
-    FParser: TmwPasLex;
+    FParser: TPasLexEx;
     FProcedures: TStrings;
     FFunctions: TStrings;
     FConstants: TStrings;
     FTypes: TStrings;
     FVariables: TStrings;
     FIdentifiers: TStrings;
+    FSymbols: TStrings;
     procedure AddToIdentifiers(const _Identifier: string; _IdType: TIdentifierTypes);
     procedure AddToConsts(const _Token: string);
     procedure AddToFunctions(const _Token: string);
@@ -81,6 +108,9 @@ type
     ///<summary>
     /// Count of exported identifiers </summary>
     function IdentifierCount: Integer;
+    ///<summary>
+    /// Add any conditional symbols here </summary>
+    property Symbols: TStrings read FSymbols;
   end;
 
 type
@@ -89,6 +119,7 @@ type
     FUnits: TStringList;
     FFiles: TStringList;
     FIdentifiers: TStrings;
+    procedure AddSymbols(_Parser: TUnitExportsParser);
   protected
     procedure Execute; override;
   public
@@ -105,6 +136,150 @@ type
   end;
 
 implementation
+
+uses
+  StrUtils;
+
+{ TPasLexEx }
+
+constructor TPasLexEx.Create;
+begin
+  inherited Create;
+  FSymbols := TStringList.Create;
+  FSymbols.Sorted := True;
+  FSymbols.Duplicates := dupIgnore;
+  FSymbols.CaseSensitive := False;
+  FIfdefStack := TStringList.Create;
+end;
+
+destructor TPasLexEx.Destroy;
+begin
+  FreeAndNil(FIfdefStack);
+  FreeAndNil(FSymbols);
+  inherited;
+end;
+
+function TPasLexEx.GetSymbols: TStrings;
+begin
+  Result := FSymbols;
+end;
+
+procedure TPasLexEx.SetSymbols(const _Value: TStrings);
+begin
+  FSymbols.Assign(_Value);
+end;
+
+function TPasLexEx.TokenIsElse: Boolean;
+var
+  TheToken: string;
+begin
+  TheToken := Token;
+  Result := SameText('{$else}', TheToken) or StartsText('{$else ', TheToken);
+end;
+
+function TPasLexEx.TokenIsEndif: Boolean;
+var
+  TheToken: string;
+begin
+  TheToken := Token;
+  Result := SameText('{$endif}', TheToken) or StartsText('{$endif ', TheToken);
+end;
+
+function TPasLexEx.TokenIsIfdef(out _Symbol: string): Boolean;
+var
+  TheToken: string;
+  p: Integer;
+begin
+  TheToken := Token;
+  Result := StartsText('{$ifdef ', TheToken);
+  if Result then begin
+    _Symbol := Trim(Copy(TheToken, 9, Length(TheToken) - 9));
+    p := Pos(' ', _Symbol);
+    if p > 0 then
+      _Symbol := Copy(_Symbol, 1, p - 1);
+  end;
+end;
+
+function TPasLexEx.NextNoJunkEx: Boolean;
+var
+  Symbol: string;
+  Idx: Integer;
+begin
+  Result := NextNoJunk;
+  if not Result or (Tokenid <> tkCompDirect) then
+    Exit; //==>
+
+  if TokenIsIfdef(Symbol) then begin
+    if FSymbols.Find(Symbol, Idx) then begin
+      FIfdefStack.Add(Symbol);
+      // it's possible that the next token again is a compiler directive, so recurse
+      Result := NextNoJunkEx;
+    end else begin
+      case SkipToElseOrEndif of
+        seeElse: begin
+            FIfdefStack.Add(Symbol);
+            // it's possible that the next token again is a compiler directive, so recurse
+            Result := NextNoJunkEx;
+          end;
+        seeEndif: begin
+            // it's possible that the next token again is a compiler directive, so recurse
+            Result := NextNoJunkEx;
+          end;
+      else // seeNull
+        Result := False;
+      end;
+    end;
+    Exit; //==>
+  end;
+
+  if TokenIsElse then begin
+    // we have already parsed the if branch, so skip  to endif
+    Result := SkipToEndif;
+    if Result then begin
+      // it's possible that the next token again is a compiler directive, so recurse
+      Result := NextNoJunkEx;
+    end;
+    Exit; //==>
+  end;
+
+  if TokenIsEndif then begin
+    // we have parsed the else branch, so we remove the symbol from the stack and continue
+    Idx := FIfdefStack.Count;
+    if Idx > 0 then
+      FIfdefStack.Delete(Idx - 1);
+    // it's possible that the next token again is a compiler directive, so recurse
+    Result := NextNoJunkEx;
+    Exit; //==>
+  end;
+end;
+
+function TPasLexEx.SkipToEndif: Boolean;
+begin
+  Result := True;
+  while NextNoJunk do begin
+    if Tokenid = tkCompDirect then
+      if TokenIsEndif then
+        Exit; //==>
+  end;
+  Result := False;
+end;
+
+function TPasLexEx.SkipToElseOrEndif: TSkipToElseOrEndifResult;
+begin
+  while NextNoJunk do begin
+    if Tokenid = tkCompDirect then begin
+      if TokenIsElse then begin
+        Result := seeElse;
+        Exit //==>
+      end;
+      if TokenIsEndif then begin
+        Result := seeEndif;
+        Exit //==>
+      end;
+    end;
+  end;
+  Result := seeNull;
+end;
 
 { TUnitExportsParser }
 
@@ -142,10 +317,12 @@ begin
   CreateStrings(FVariables);
   CreateStrings(FTypes);
   CreateStrings(FIdentifiers);
+  CreateStrings(FSymbols);
 end;
 
 destructor TUnitExportsParser.Destroy;
 begin
+  FreeAndNil(FSymbols);
   FreeAndNil(FProcedures);
   FreeAndNil(FFunctions);
   FreeAndNil(FConstants);
@@ -165,17 +342,18 @@ var
   DeclarationType: TDeclarationType;
 begin
   sl := nil;
-  FParser := TmwPasLex.Create;
+  FParser := TPasLexEx.Create;
   try
+    FParser.Symbols := FSymbols;
     sl := TStringList.Create;
     sl.LoadFromFile(FFilename);
     s := sl.Text;
     FParser.Origin := @s[1];
     DeclarationType := dtNone;
-    while FParser.TokenID <> tkNull do begin
-      if FParser.TokenID = tkImplementation then
+    while FParser.Tokenid <> tkNull do begin
+      if FParser.Tokenid = tkImplementation then
         Exit;
-      case FParser.TokenID of
+      case FParser.Tokenid of
         tkConst: begin
             DeclarationType := dtConst;
           end;
@@ -217,7 +395,7 @@ begin
             DeclarationType := dtFunction;
           end;
       end;
-      FParser.NextNoJunk;
+      FParser.NextNoJunkEx;
     end;
   finally
     FreeAndNil(sl);
@@ -273,107 +451,107 @@ end;
 
 procedure TUnitExportsParser.SkipToClosingDelimiter(_OpeningDel, _ClosingDel: TTokenKind);
 begin
-  FParser.NextNoJunk;
-  while FParser.TokenID <> tkNull do begin
-    if FParser.TokenID = _ClosingDel then begin
+  FParser.NextNoJunkEx;
+  while FParser.Tokenid <> tkNull do begin
+    if FParser.Tokenid = _ClosingDel then begin
       // we have found the closing delimiter
       Exit; //==>
     end;
-    if FParser.TokenID = _OpeningDel then
+    if FParser.Tokenid = _OpeningDel then
       // we found another opening delimiter
       SkipToClosingDelimiter(_OpeningDel, _ClosingDel);
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
 procedure TUnitExportsParser.SkipProcedureDeclaration;
 begin
-  FParser.NextNoJunk;
-  if FParser.TokenID = tkRoundOpen then begin
+  FParser.NextNoJunkEx;
+  if FParser.Tokenid = tkRoundOpen then begin
     SkipToClosingDelimiter(tkRoundOpen, tkRoundClose);
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
-  while FParser.TokenID <> tkNull do begin
-    if FParser.TokenID = tkSemiColon then
+  while FParser.Tokenid <> tkNull do begin
+    if FParser.Tokenid = tkSemiColon then
       Exit; //==>
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
 procedure TUnitExportsParser.SkipClassOrRecord;
 begin
-  while FParser.TokenID <> tkNull do begin
-    case FParser.TokenID of
+  while FParser.Tokenid <> tkNull do begin
+    case FParser.Tokenid of
       tkEnd:
         Exit; //==>
       tkClass: begin
-          FParser.NextNoJunk;
-          if not (FParser.TokenID in [tkFunction, tkProcedure, tkOperator, tkVar, tkProperty]) then begin
+          FParser.NextNoJunkEx;
+          if not (FParser.Tokenid in [tkFunction, tkProcedure, tkOperator, tkVar, tkProperty]) then begin
             // nested class declaration
             SkipClassOrRecord;
           end;
         end;
       tkRecord,
         tkInterface: begin
-          FParser.NextNoJunk;
+          FParser.NextNoJunkEx;
           // nested record/interface declaration
           SkipClassOrRecord;
         end;
     end;
     // todo: handle more complex declarations
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
 procedure TUnitExportsParser.SkipTypeDeclaration;
 begin
-  FParser.NextNoJunk;
-  if FParser.TokenID <> tkEqual then begin
+  FParser.NextNoJunkEx;
+  if FParser.Tokenid <> tkEqual then begin
     // todo: this is an error -> handle it gracefully somehow
     Exit; //==>
   end;
-  FParser.NextNoJunk;
-  if FParser.TokenID = tkPacked then
-    FParser.NextNoJunk;
-  while FParser.TokenID <> tkNull do begin
-    case FParser.TokenID of
+  FParser.NextNoJunkEx;
+  if FParser.Tokenid = tkPacked then
+    FParser.NextNoJunkEx;
+  while FParser.Tokenid <> tkNull do begin
+    case FParser.Tokenid of
       tkSemiColon: begin
           // we have reached the end of the type declaration
           Exit; //==>
         end;
       tkInterface, tkDispinterface, tkClass: begin
-          FParser.NextNoJunk;
-          if FParser.TokenID = tkSemiColon then begin
+          FParser.NextNoJunkEx;
+          if FParser.Tokenid = tkSemiColon then begin
             // forward declaration: type Tbla = class;
             //                  or: type Tbla = interface;
             Exit; //==>
-          end else if FParser.TokenID = tkRoundOpen then begin
+          end else if FParser.Tokenid = tkRoundOpen then begin
             SkipToClosingDelimiter(tkRoundOpen, tkRoundClose);
-            FParser.NextNoJunk;
-            if FParser.TokenID = tkSquareOpen then begin
+            FParser.NextNoJunkEx;
+            if FParser.Tokenid = tkSquareOpen then begin
               // interface(bla)[guid]
               SkipToClosingDelimiter(tkSquareOpen, tkSquareClose);
-              FParser.NextNoJunk;
+              FParser.NextNoJunkEx;
             end;
-            if FParser.TokenID = tkSemiColon then begin
+            if FParser.Tokenid = tkSemiColon then begin
               // simple declaration: type Tbla = class(Tblub); as used for e.g. exceptions or forward declarations
               Exit; //==>
             end;
-          end else if FParser.TokenID = tkSquareOpen then begin
+          end else if FParser.Tokenid = tkSquareOpen then begin
             // interface[guid]
             SkipToClosingDelimiter(tkSquareOpen, tkSquareClose);
-            FParser.NextNoJunk;
-            if FParser.TokenID = tkSemiColon then begin
+            FParser.NextNoJunkEx;
+            if FParser.Tokenid = tkSemiColon then begin
               // simple declaration: type Tbla = class(Tblub); as used for e.g. exceptions or forward declarations
               Exit; //==>
             end;
-          end else if FParser.TokenId = tkOf then begin
+          end else if FParser.Tokenid = tkOf then begin
             // TBla = class of Tblub;
-            FParser.NextNoJunk;
-            while FParser.TokenID <> tkNull do begin
-              if FParser.TokenID = tkSemiColon then
+            FParser.NextNoJunkEx;
+            while FParser.Tokenid <> tkNull do begin
+              if FParser.Tokenid = tkSemiColon then
                 Exit; //==>
-              FParser.NextNoJunk;
+              FParser.NextNoJunkEx;
             end;
             // should never happen
             Exit; //==>
@@ -382,8 +560,8 @@ begin
           Exit; //==>
         end;
       tkRecord: begin
-          FParser.NextNoJunk;
-          if FParser.TokenID = tkSemiColon then begin
+          FParser.NextNoJunkEx;
+          if FParser.Tokenid = tkSemiColon then begin
             // forward declaration: type Tbla = record;
             Exit; //==>
           end;
@@ -404,15 +582,15 @@ begin
         end;
     end;
 
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
 procedure TUnitExportsParser.SkipConstDeclaration;
 begin
-  FParser.NextNoJunk;
-  while FParser.TokenID <> tkNull do begin
-    case FParser.TokenID of
+  FParser.NextNoJunkEx;
+  while FParser.Tokenid <> tkNull do begin
+    case FParser.Tokenid of
       tkSquareOpen: begin
           SkipToClosingDelimiter(tkSquareOpen, tkSquareClose);
         end;
@@ -424,39 +602,39 @@ begin
           Exit; //==>
         end;
     end;
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
 procedure TUnitExportsParser.SkipVarDeclaration;
 begin
-  FParser.NextNoJunk;
-  if FParser.TokenID = tkComma then begin
+  FParser.NextNoJunkEx;
+  if FParser.Tokenid = tkComma then begin
     // multiple variables in one declaration
     Exit; //==>
   end;
-  while FParser.TokenID <> tkNull do begin
-    if FParser.TokenID = tkSemiColon then
+  while FParser.Tokenid <> tkNull do begin
+    if FParser.Tokenid = tkSemiColon then
       Exit; //==>
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
 procedure TUnitExportsParser.SkipFunctionDeclaration;
 begin
-  FParser.NextNoJunk;
-  if FParser.TokenID = tkRoundOpen then begin
+  FParser.NextNoJunkEx;
+  if FParser.Tokenid = tkRoundOpen then begin
     SkipToClosingDelimiter(tkRoundOpen, tkRoundClose);
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
-  if FParser.TokenID <> tkColon then begin
+  if FParser.Tokenid <> tkColon then begin
     // todo: this is an error -> handle it gracefully somehow
     Exit; //==>
   end;
-  while FParser.TokenID <> tkNull do begin
-    if FParser.TokenID = tkSemiColon then
+  while FParser.Tokenid <> tkNull do begin
+    if FParser.Tokenid = tkSemiColon then
       Exit; //==>
-    FParser.NextNoJunk;
+    FParser.NextNoJunkEx;
   end;
 end;
 
@@ -488,6 +666,72 @@ begin
   inherited;
 end;
 
+procedure TUnitExportParserThread.AddSymbols(_Parser: TUnitExportsParser);
+begin
+{$IFDEF VER140} // Delphi 6
+  _Parser.Symbols.Add('VER140');
+{$ENDIF}
+{$IFDEF VER150} // Delphi 7
+  _Parser.Symbols.Add('VER150');
+{$ENDIF}
+{$IFDEF VER170} // Delphi 2005 / BDS 2
+  _Parser.Symbols.Add('VER170');
+{$ENDIF}
+{$IFDEF VER180} // Delphi 2006/2007 / BDS 3
+  _Parser.Symbols.Add('VER180');
+{$ENDIF}
+{$IFDEF VER185} // Delphi 2007 / BDS 4
+  _Parser.Symbols.Add('VER185');
+{$ENDIF}
+{$IFDEF VER200} // Delphi 2009 / BDS 6
+  _Parser.Symbols.Add('VER200');
+{$ENDIF}
+{$IFDEF VER210} // Delphi 2010 / BDS 7
+  _Parser.Symbols.Add('VER210');
+{$ENDIF}
+{$IFDEF VER220} // Delphi XE1 / BDS 8
+  _Parser.Symbols.Add('VER220');
+{$ENDIF}
+{$IFDEF VER230} // Delphi XE2 / BDS 9
+  _Parser.Symbols.Add('VER230');
+{$ENDIF}
+{$IFDEF VER240} // Delphi XE3 / BDS 10
+  _Parser.Symbols.Add('VER240');
+{$ENDIF}
+{$IFDEF VER250} // Delphi XE4 / BDS 11
+  _Parser.Symbols.Add('VER250');
+{$ENDIF}
+{$IFDEF VER260} // Delphi XE5 / BDS 12
+  _Parser.Symbols.Add('VER260');
+{$ENDIF}
+{$IFDEF VER270} // Delphi XE6 / BDS 14
+  _Parser.Symbols.Add('VER270');
+{$ENDIF}
+{$IFDEF VER280} // Delphi XE7 / BDS 15
+  _Parser.Symbols.Add('VER280');
+{$ENDIF}
+{$IFDEF VER290} // Delphi XE8 / BDS 16
+  _Parser.Symbols.Add('VER290');
+{$ENDIF}
+{$IFDEF VER300} // Delphi 10.0 Seattle / BDS 17
+  _Parser.Symbols.Add('VER300');
+{$ENDIF}
+{$IFDEF VER310} // Delphi 10.1 Berlin / BDS 18
+  _Parser.Symbols.Add('VER310');
+{$ENDIF}
+{$IFDEF VER320} // Delphi 10.2 Tokyo / BDS 19
+  _Parser.Symbols.Add('VER320');
+{$ENDIF}
+// todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
+{$ifdef UNICODE}
+  _Parser.Symbols.Add('UNICODE');
+{$ENDIF}
+// todo: Handle the symbols defined by the target somehow
+// {$ifdef WINDOWS}
+//  _Parser.Symbols.Add('WINDOWS');
+// {$ENDIF}
+end;
+
 procedure TUnitExportParserThread.Execute;
 var
   FileIdx: Integer;
@@ -506,6 +750,7 @@ begin
     if FileExists(fn) then begin
       Parser := TUnitExportsParser.Create(fn);
       try
+        AddSymbols(Parser);
         Parser.Execute;
         if Terminated then
           Exit; //==>
