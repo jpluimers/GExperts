@@ -1135,10 +1135,12 @@ begin
 
   FixedRows := sgIdentifiers.FixedRows;
   sgIdentifiers.RowCount := FixedRows + Max(1, FFavUnitsExports.Count);
+  sgIdentifiers.Cells[0, FixedRows] := '';
+  sgIdentifiers.Cells[1, FixedRows] := '';
   cnt := 0;
   for i := 0 to FFavUnitsExports.Count - 1 do begin
     Identifier := FFavUnitsExports[i];
-    if StrBeginsWith(Filter, Identifier, False) then begin
+    if (Filter = '') or StrBeginsWith(Filter, Identifier, False) then begin
       sgIdentifiers.Cells[0, FixedRows + cnt] := Identifier;
       UnitName := PChar(FFavUnitsExports.Objects[i]);
       sgIdentifiers.Cells[1, FixedRows + cnt] := UnitName;
@@ -1260,6 +1262,8 @@ begin
   cnt := 0;
   sl := FUnitExportParserThread.Identifiers;
   sgIdentifiers.RowCount := FixedRows + max(1, sl.Count);
+  sgIdentifiers.Cells[0, FixedRows] := '';
+  sgIdentifiers.Cells[1, FixedRows] := '';
   for IdentIdx := 0 to sl.Count - 1 do begin
     Identifier := sl[IdentIdx];
     UniqueString(Identifier);
