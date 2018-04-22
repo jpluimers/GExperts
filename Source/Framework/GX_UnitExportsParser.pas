@@ -705,8 +705,7 @@ end;
 procedure TUnitExportsParser.SkipTypeDeclaration;
 begin
   FParser.NextNoJunkEx;
-  if FParser.TokenID = tkLower then
-  begin
+  if FParser.Tokenid = tkLower then begin
     // type bla<tresult>
     SkipToClosingDelimiter(tkLower, tkGreater);
     FParser.NextNoJunkEx;
@@ -819,7 +818,9 @@ begin
     Exit; //==>
   end;
   while FParser.Tokenid <> tkNull do begin
-    if FParser.Tokenid = tkSemiColon then
+    if FParser.Tokenid = tkRoundOpen then begin
+      SkipToClosingDelimiter(tkRoundOpen, tkRoundClose);
+    end else if FParser.Tokenid = tkSemiColon then
       Exit; //==>
     FParser.NextNoJunkEx;
   end;
