@@ -20,22 +20,42 @@ type
   end;
 
 type
-  TSkipToElseOrEndifResult = (seeElse, seeEndif, seeNull);
+  TSkipToElseOrEndifResult = (seeElse, seeEndif, seeElseIf, seeNull);
 
 type
   TPasLexEx = class(TmwPasLex)
   private
     FSymbols: TStringList;
     FIfdefStack: TStringList;
+    procedure Push(const _Condition: string);
+    procedure Pop(out _Condition: string); overload;
+    procedure Pop; overload;
+    function TopOfStack: string;
     function GetSymbols: TStrings;
     procedure SetSymbols(const _Value: TStrings);
-    function SkipToElseOrEndif: TSkipToElseOrEndifResult;
+    function SkipToElseOrEndif(out _Expression: string): TSkipToElseOrEndifResult;
+    ///<summary>
+    /// @returns true, if the current token is {$ELSE}
+    /// (allows additional text in the comment, so {$ENDIF bla} is also detected) </summary>
     function TokenIsElse: Boolean;
+    ///<summary>
+    /// @returns true, if the current token is either {$ENDIF} or {$IFEND}
+    /// (allows additional text in the comment, so {$ENDIF bla} is also detected) </summary>
     function TokenIsEndif: Boolean;
-    function TokenIsIfdef(out _Symbol: string): Boolean;
+    ///<summary>
+    /// Checks for {$IFDEF <symbol>} or {$IF <expression>}
+    /// @param Expression will return either be the defined(<symbol>) (for {$IFDEF <symbol>}
+    ///        or the whole expression if the expression is more conplex
+    /// @returns true, if the current tooken is {$IFDEF <symbol>} or {$IF <expression>}
+    /// </summary>
+    function TokenIsIfdef(out _Expression: string): Boolean;
+    function TokenIsIfndef(out _Expression: string): Boolean;
+    function TokenIsElseIf(out _Expression: string): Boolean;
     ///<summary>
     /// @returns true, if last token is <> tkNull </summary>
     function SkipToEndif: Boolean;
+    function CheckExpression(const _Expression: string): Boolean;
+    function Content: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -150,6 +170,10 @@ begin
   FSymbols.Duplicates := dupIgnore;
   FSymbols.CaseSensitive := False;
   FIfdefStack := TStringList.Create;
+
+   // call the following functions so they don't get elimiated by the linker
+  TopOfStack;
+  Content;
 end;
 
 destructor TPasLexEx.Destroy;
@@ -169,6 +193,26 @@ begin
   FSymbols.Assign(_Value);
 end;
 
+function TPasLexEx.CheckExpression(const _Expression: string): Boolean;
+var
+  s: string;
+  Idx: Integer;
+begin
+  if StartsText('defined(', _Expression) then begin
+    s := Trim(Copy(_Expression, 9, Length(_Expression) - 9));
+    if (Pos('(', s) > 0) or (Pos(' ', s) > 0) then begin
+      // we don't handle more complex expressions (yet)
+      Result := False;
+    end else begin
+      // it's a simple defined(<symbol>), we can handle that
+      Result := FSymbols.Find(s, Idx);
+    end;
+  end else begin
+    // we don't handle more complex expressions (yet)
+    Result := False;
+  end;
+end;
+
 function TPasLexEx.TokenIsElse: Boolean;
 var
   TheToken: string;
@@ -177,15 +221,28 @@ begin
   Result := SameText('{$else}', TheToken) or StartsText('{$else ', TheToken);
 end;
 
+function TPasLexEx.TokenIsElseIf(out _Expression: string): Boolean;
+var
+  TheToken: string;
+begin
+  TheToken := Token;
+  Result := StartsText('{$elseif ', TheToken);
+  if not Result then
+    Exit; //==>
+
+  _Expression := Trim(Copy(TheToken, 9, Length(TheToken) - 9));
+end;
+
 function TPasLexEx.TokenIsEndif: Boolean;
 var
   TheToken: string;
 begin
   TheToken := Token;
-  Result := SameText('{$endif}', TheToken) or StartsText('{$endif ', TheToken);
+  Result := SameText('{$endif}', TheToken) or StartsText('{$endif ', TheToken)
+    or SameText('{$ifend}', TheToken) or StartsText('{$ifend ', TheToken);
 end;
 
-function TPasLexEx.TokenIsIfdef(out _Symbol: string): Boolean;
+function TPasLexEx.TokenIsIfdef(out _Expression: string): Boolean;
 var
   TheToken: string;
   p: Integer;
@@ -193,31 +250,120 @@ begin
   TheToken := Token;
   Result := StartsText('{$ifdef ', TheToken);
   if Result then begin
-    _Symbol := Trim(Copy(TheToken, 9, Length(TheToken) - 9));
-    p := Pos(' ', _Symbol);
+    _Expression := Trim(Copy(TheToken, 9, Length(TheToken) - 9));
+    p := Pos(' ', _Expression);
     if p > 0 then
-      _Symbol := Copy(_Symbol, 1, p - 1);
+      _Expression := Copy(_Expression, 1, p - 1);
+    _Expression := 'defined(' + _Expression + ')';
+    Exit; //==>
   end;
+
+  if StartsText('{$if ', TheToken) then begin
+    _Expression := Trim(Copy(TheToken, 5, Length(TheToken) - 5));
+    Result := True;
+  end;
+end;
+
+function TPasLexEx.TokenIsIfndef(out _Expression: string): Boolean;
+var
+  TheToken: string;
+  p: Integer;
+begin
+  TheToken := Token;
+  Result := StartsText('{$ifndef ', TheToken);
+  if Result then begin
+    _Expression := Trim(Copy(TheToken, 10, Length(TheToken) - 10));
+    p := Pos(' ', _Expression);
+    if p > 0 then
+      _Expression := Copy(_Expression, 1, p - 1);
+    _Expression := 'defined(' + _Expression + ')';
+  end;
+end;
+
+function TPasLexEx.TopOfStack: string;
+var
+  cnt: Integer;
+begin
+  cnt := FIfdefStack.Count;
+  if cnt > 0 then
+    Result := FIfdefStack[cnt - 1]
+  else
+    Result := '<empty>';
+end;
+
+function TPasLexEx.Content: string;
+begin
+  if Assigned(Origin) then
+    Result := Origin + RunPos
+  else
+    Result := '';
 end;
 
 function TPasLexEx.NextNoJunkEx: Boolean;
 var
-  Symbol: string;
-  Idx: Integer;
+  Expression: string;
+  ElseifExp: string;
+  Res: TSkipToElseOrEndifResult;
 begin
   Result := NextNoJunk;
   if not Result or (Tokenid <> tkCompDirect) then
     Exit; //==>
 
-  if TokenIsIfdef(Symbol) then begin
-    if FSymbols.Find(Symbol, Idx) then begin
-      FIfdefStack.Add(Symbol);
+  if TokenIsIfdef(Expression) then begin
+    if CheckExpression(Expression) then begin
+      Push(Expression);
       // it's possible that the next token again is a compiler directive, so recurse
       Result := NextNoJunkEx;
     end else begin
-      case SkipToElseOrEndif of
+      Res := SkipToElseOrEndif(ElseifExp);
+      while Res = seeElseIf do begin
+        Pop;
+        Push(ElseifExp);
+        if CheckExpression(ElseifExp) then begin
+          // it's possible that the next token again is a compiler directive, so recurse
+          Result := NextNoJunkEx;
+          Exit; //==>
+        end;
+        Res := SkipToElseOrEndif(ElseifExp);
+      end;
+      case Res of
         seeElse: begin
-            FIfdefStack.Add(Symbol);
+            Push('not ' + Expression);
+            // it's possible that the next token again is a compiler directive, so recurse
+            Result := NextNoJunkEx;
+          end;
+        seeEndif: begin
+            Pop;
+            // it's possible that the next token again is a compiler directive, so recurse
+            Result := NextNoJunkEx;
+          end;
+      else // seeNull
+        Result := False;
+      end;
+    end;
+    Exit; //==>
+  end;
+
+  if TokenIsIfndef(Expression) then begin
+    if not CheckExpression(Expression) then begin
+      Push('not ' + Expression);
+      // it's possible that the next token again is a compiler directive, so recurse
+      Result := NextNoJunkEx;
+    end else begin
+      Res := SkipToElseOrEndif(ElseifExp);
+      while Res = seeElseIf do begin
+        Pop;
+        Push(ElseifExp);
+        if CheckExpression(ElseifExp) then begin
+          // it's possible that the next token again is a compiler directive, so recurse
+          Result := NextNoJunkEx;
+          Exit; //==>
+        end;
+        Res := SkipToElseOrEndif(ElseifExp);
+      end;
+      case Res of
+        seeElse: begin
+            Push(Expression);
             // it's possible that the next token again is a compiler directive, so recurse
             Result := NextNoJunkEx;
           end;
@@ -242,39 +388,93 @@ begin
     Exit; //==>
   end;
 
+  if TokenIsElseIf(Expression) then begin
+    // if we get here, we have already parsed the if branch, so skip to endif
+    Pop;
+    Push(Expression);
+    // we have already parsed the if branch, so skip  to endif
+    Result := SkipToEndif;
+    if Result then begin
+      // it's possible that the next token again is a compiler directive, so recurse
+      Result := NextNoJunkEx;
+    end;
+    Exit; //==>
+  end;
+
   if TokenIsEndif then begin
     // we have parsed the else branch, so we remove the symbol from the stack and continue
-    Idx := FIfdefStack.Count;
-    if Idx > 0 then
-      FIfdefStack.Delete(Idx - 1);
+    Pop;
     // it's possible that the next token again is a compiler directive, so recurse
     Result := NextNoJunkEx;
     Exit; //==>
   end;
 end;
 
+procedure TPasLexEx.Pop(out _Condition: string);
+var
+  cnt: Integer;
+begin
+  cnt := FIfdefStack.Count;
+  if cnt > 0 then begin
+    _Condition := FIfdefStack[cnt - 1];
+    FIfdefStack.Delete(cnt - 1);
+  end;
+end;
+
+procedure TPasLexEx.Pop;
+var
+  cnt: Integer;
+begin
+  cnt := FIfdefStack.Count;
+  if cnt > 0 then
+    FIfdefStack.Delete(cnt - 1);
+end;
+
+procedure TPasLexEx.Push(const _Condition: string);
+begin
+  FIfdefStack.Add(_Condition);
+end;
+
 function TPasLexEx.SkipToEndif: Boolean;
+var
+  Expression: string;
 begin
   Result := True;
   while NextNoJunk do begin
-    if Tokenid = tkCompDirect then
+    if Tokenid = tkCompDirect then begin
       if TokenIsEndif then
         Exit; //==>
+      if TokenIsIfdef(Expression) then begin
+        // nested $if
+        SkipToEndif;
+      end;
+    end;
   end;
   Result := False;
 end;
 
-function TPasLexEx.SkipToElseOrEndif: TSkipToElseOrEndifResult;
+function TPasLexEx.SkipToElseOrEndif(out _Expression: string): TSkipToElseOrEndifResult;
+var
+  Expression: string;
 begin
   while NextNoJunk do begin
     if Tokenid = tkCompDirect then begin
       if TokenIsElse then begin
         Result := seeElse;
-        Exit //==>
+        Exit; //==>
       end;
       if TokenIsEndif then begin
         Result := seeEndif;
-        Exit //==>
+        Exit; //==>
+      end;
+      if TokenIsElseIf(_Expression) then begin
+        Result := seeElseIf;
+        Exit; //==>
+      end;
+
+      if TokenIsIfdef(Expression) then begin
+        // nested $if
+        SkipToEndif;
       end;
     end;
   end;
@@ -317,6 +517,7 @@ begin
   CreateStrings(FVariables);
   CreateStrings(FTypes);
   CreateStrings(FIdentifiers);
+//  TStringList(FIdentifiers).Sorted := False;
   CreateStrings(FSymbols);
 end;
 
@@ -486,7 +687,8 @@ begin
         Exit; //==>
       tkClass: begin
           FParser.NextNoJunkEx;
-          if not (FParser.Tokenid in [tkFunction, tkProcedure, tkOperator, tkVar, tkProperty]) then begin
+          if not (FParser.Tokenid in [tkFunction, tkProcedure, tkConstructor, tkDestructor, tkOperator,
+            tkVar, tkThreadvar, tkProperty]) then begin
             // nested class declaration
             SkipClassOrRecord;
           end;
@@ -723,7 +925,7 @@ begin
   _Parser.Symbols.Add('VER320');
 {$ENDIF}
 // todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
-{$ifdef UNICODE}
+{$IFDEF UNICODE}
   _Parser.Symbols.Add('UNICODE');
 {$ENDIF}
 // todo: Handle the symbols defined by the target somehow
