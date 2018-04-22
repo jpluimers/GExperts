@@ -517,7 +517,6 @@ begin
   CreateStrings(FVariables);
   CreateStrings(FTypes);
   CreateStrings(FIdentifiers);
-//  TStringList(FIdentifiers).Sorted := False;
   CreateStrings(FSymbols);
 end;
 
@@ -652,8 +651,7 @@ end;
 
 procedure TUnitExportsParser.SkipToClosingDelimiter(_OpeningDel, _ClosingDel: TTokenKind);
 begin
-  FParser.NextNoJunkEx;
-  while FParser.Tokenid <> tkNull do begin
+  while FParser.NextNoJunkEx do begin
     if FParser.Tokenid = _ClosingDel then begin
       // we have found the closing delimiter
       Exit; //==>
@@ -661,7 +659,6 @@ begin
     if FParser.Tokenid = _OpeningDel then
       // we found another opening delimiter
       SkipToClosingDelimiter(_OpeningDel, _ClosingDel);
-    FParser.NextNoJunkEx;
   end;
 end;
 
@@ -708,6 +705,12 @@ end;
 procedure TUnitExportsParser.SkipTypeDeclaration;
 begin
   FParser.NextNoJunkEx;
+  if FParser.TokenID = tkLower then
+  begin
+    // type bla<tresult>
+    SkipToClosingDelimiter(tkLower, tkGreater);
+    FParser.NextNoJunkEx;
+  end;
   if FParser.Tokenid <> tkEqual then begin
     // todo: this is an error -> handle it gracefully somehow
     Exit; //==>
