@@ -231,9 +231,14 @@ type
     destructor Destroy; override;
     function CharAhead(Count: Integer): Char;
     function NextChar: Char;
-    procedure Next;
+    ///<summary>
+    /// @Returns true, if TokenId <> tkNull </summary>
+    function Next: Boolean;
     procedure NextID(ID: TTokenKind);
-    procedure NextNoJunk;
+    ///<summary>
+    /// Like Next, but skips whitespace and comments
+    /// @Returns true, if TokenId <> tkNull </summary>
+    function NextNoJunk: Boolean;
     procedure NextClass;
     property IsClass: Boolean read fIsClass;
     property IsInterface: Boolean read fIsInterface;
@@ -1450,7 +1455,7 @@ begin
   end;
 end;
 
-procedure TmwPasLex.Next;
+function TmwPasLex.Next: Boolean;
 begin
   case fTokenID of
     tkIdentifier:
@@ -1475,6 +1480,7 @@ begin
       csAnsi: AnsiProc;
     end;
   end;
+  Result := (FTokenID <> tkNull);
 end;
 
 function TmwPasLex.GetToken: string;
@@ -1495,10 +1501,10 @@ begin
   until fTokenID = ID;
 end;
 
-procedure TmwPasLex.NextNoJunk;
+function TmwPasLex.NextNoJunk: boolean;
 begin
   repeat
-    Next;
+    Result := Next;
   until not (fTokenID in [tkSlashesComment, tkAnsiComment, tkBorComment, tkCRLF, tkCRLFCo, tkSpace]);
 end;
 
