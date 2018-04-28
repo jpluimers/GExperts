@@ -1557,7 +1557,7 @@ end;
 {$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 function StartsText(const SubStr, Str: string): Boolean;
 begin
-Result := StrBeginsWith(SubStr, Str, False);
+  Result := CaseInsensitivePos(SubStr, Str) = 1;
 end;
 {$ENDIF}
 
