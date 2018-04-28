@@ -250,6 +250,10 @@ function LeftTrimChars(var Value: string; const TrimChars: TSysCharSet = [#9, #3
 function LeftTrimNChars(const AValue: string; const TrimChars: TSysCharSet = [#9, #32];
   AMaxCount: Integer = 0): string;
 
+{$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+function StartsText(const SubStr, Str: string): Boolean;
+{$ENDIF}
+
 // See if a string begins/ends with a specific substring
 function StrBeginsWith(const SubStr, Str: string; CaseSensitive: Boolean = True): Boolean;
 function StrEndsWith(const SubStr, Str: string; CaseSensitive: Boolean = True): Boolean;
@@ -1549,6 +1553,13 @@ begin
   if CharCnt > 0 then
     Delete(Result, 1, CharCnt);  
 end;
+
+{$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+function StartsText(const SubStr, Str: string): Boolean;
+begin
+Result := StrBeginsWith(SubStr, Str, False);
+end;
+{$ENDIF}
 
 function StrBeginsWith(const SubStr, Str: string; CaseSensitive: Boolean): Boolean;
 begin
