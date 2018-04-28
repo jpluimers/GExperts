@@ -204,7 +204,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Menus, Graphics, Windows, ToolsAPI,
+  SysUtils, Menus, Graphics, Windows, ToolsAPI, StrUtils,
   GX_IdeUtils, GX_SharedImages, GX_Experts, GX_ConfigurationInfo, GX_OtaUtils,
   GX_GxUtils, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils;
 
@@ -681,7 +681,7 @@ begin
         try
           FileExt := LowerCase(ExtractFileExt(FileName));
           FilePath := ExtractFilePath(FileName);
-          if StrBeginsWith('.', FileExt) then
+          if StartsStr('.', FileExt) then
             FileExt := Copy(FileExt, 2, Length(FileExt));
           if FileExt = '' then // Unknown files
             Exit;
@@ -798,7 +798,7 @@ begin
             AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex]);
         end
         else
-          if StrBeginsWith(edtFilter.Text, SearchValue, False) then
+          if StartsText(edtFilter.Text, SearchValue) then
             AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex]);
 
       Inc(FCurrentFilterIndex);
@@ -839,7 +839,7 @@ begin
     for i := 0 to CurrentListView.Items.Count - 1 do
     begin
       ListItem := CurrentListView.Items[i];
-      if StrBeginsWith(FilterText, ListItem.Caption, False) then
+      if StartsText(FilterText, ListItem.Caption) then
       begin
         SelIndex := i;
         Break;

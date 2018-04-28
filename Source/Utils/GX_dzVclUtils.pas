@@ -861,7 +861,7 @@ begin
       sl.Assign(_cmb.Items);
       Result := _DefaultIdx;
       for i := 0 to sl.Count - 1 do
-        if StrBeginsWith(_Item, sl[i], False) then begin
+        if StartsText(_Item, sl[i]) then begin
           Result := i;
           Break;
         end;

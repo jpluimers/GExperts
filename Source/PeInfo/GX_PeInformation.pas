@@ -287,7 +287,7 @@ begin
         sl := TStringList.Create;
         for i := 0 to PEInfo.ExportList.Count - 1 do begin
           s := PEInfo.ExportList[i];
-          if StrBeginsWith('@$xp$', s, False) then begin
+          if StartsText('@$xp$', s) then begin
             s := Copy(s, 2, 255);
             p := Pos('@', s);
             if p > 0 then begin

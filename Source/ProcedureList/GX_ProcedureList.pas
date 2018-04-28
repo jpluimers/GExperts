@@ -114,7 +114,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Windows, Clipbrd, Menus,
+  Windows, Clipbrd, Menus, StrUtils,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_IdeUtils,
   GX_SharedImages, GX_Experts, Math, GX_dzVclUtils;
 
@@ -185,7 +185,7 @@ begin
     Result := ImageIndexNew
   else if StrContains('destructor', ProcName, False) then // Do not localize.
     Result := ImageIndexTrash
-  else if StrBeginsWith('class proc', ProcName, False) or StrContains('class func', ProcName, False) or (ProcClass <> '') then // Do not localize
+  else if StartsText('class proc', ProcName) or StrContains('class func', ProcName, False) or (ProcClass <> '') then // Do not localize
     Result := ImageIndexGear
   else
     Result := ImageIndexFunction;
@@ -272,9 +272,9 @@ begin
 
       if Length(edtMethods.Text) = 0 then
         AddListItem(ProcInfo)
-      else if not FOptions.SearchAll and StrBeginsWith(edtMethods.Text, ProcInfo.ProcName, False) then
+      else if not FOptions.SearchAll and StartsText(edtMethods.Text, ProcInfo.ProcName) then
         AddListItem(ProcInfo)
-      else if not FOptions.SearchAll and FOptions.SearchClassName and StrBeginsWith(edtMethods.Text, ProcInfo.ProcClass, False) then
+      else if not FOptions.SearchAll and FOptions.SearchClassName and StartsText(edtMethods.Text, ProcInfo.ProcClass) then
         AddListItem(ProcInfo)
       else if FOptions.SearchAll and StrContains(edtMethods.Text, ProcInfo.ProcName, False) then
         AddListItem(ProcInfo)

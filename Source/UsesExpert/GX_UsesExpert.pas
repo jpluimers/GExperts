@@ -1144,7 +1144,7 @@ begin
   cnt := 0;
   for i := 0 to FFavUnitsExports.Count - 1 do begin
     Identifier := FFavUnitsExports[i];
-    if (Filter = '') or StrBeginsWith(Filter, Identifier, False) then begin
+    if (Filter = '') or StartsText(Filter, Identifier) then begin
       sgIdentifiers.Cells[0, FixedRows + cnt] := Identifier;
       UnitName := PChar(FFavUnitsExports.Objects[i]);
       sgIdentifiers.Cells[1, FixedRows + cnt] := UnitName;

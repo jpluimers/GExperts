@@ -117,7 +117,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Messages, Graphics, Menus, RegExpr, Math,
+  SysUtils, Windows, Messages, Graphics, StrUtils, Menus, RegExpr, Math,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions,
   GX_GrepRegExSearch, GX_dzVclUtils;
 
@@ -381,7 +381,7 @@ begin
       FreeAndNil(Dirs);
     end;
   end;
-  while StrBeginsWith(';', cbExcludedDirs.Text) do
+  while StartsStr(';', cbExcludedDirs.Text) do
     cbExcludedDirs.Text := Copy(cbExcludedDirs.Text, 2, MaxInt);
   cbExcludedDirs.Text := StringReplace(cbExcludedDirs.Text, ';;', ';', [rfReplaceAll]);
 

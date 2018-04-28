@@ -685,7 +685,7 @@ begin
   _Comment := '';
   Incl := '{' + _Directive + ' ';
   s := Trim(_Line);
-  Result := StrBeginsWith(Incl, s, False);
+  Result := StartsText(Incl, s);
   if Result then begin
     p := Pos('}', s);
     if p > Length(Incl) then begin

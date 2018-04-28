@@ -183,7 +183,7 @@ end;
 function IsIdeEditorForm(AForm: TCustomForm): Boolean;
 begin
   Result := (AForm <> nil) and
-            (StrBeginsWith('EditWindow_', AForm.Name)) and
+            (StartsStr('EditWindow_', AForm.Name)) and
             (AForm.ClassName = EditorFormClassName) and
             (not (csDesigning in AForm.ComponentState));
 end;

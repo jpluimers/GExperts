@@ -80,7 +80,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Graphics, Menus, Messages,
+  SysUtils, Graphics, Menus, Messages, StrUtils,
   GX_ActionBroker, GX_GenericUtils, GX_GxUtils, GX_Toolbar;
 
 procedure AddActionToListbox(Action: TContainedAction; Listbox: TCustomListbox; Select: Boolean);
@@ -230,7 +230,7 @@ begin
     begin
       ActionName := GxActionBroker.Actions[i].Name;
       // Close All causes AVs, so we don't allow it.  More/Editor Experts are not useful.
-      if StrBeginsWith('FileClose', ActionName) or StrContains('GExpertsMoreAction', ActionName, False) then
+      if StartsStr('FileClose', ActionName) or StrContains('GExpertsMoreAction', ActionName, False) then
         Continue;
       if Category = SAllButtonsCategory then
         AddActionToListbox(GxActionBroker.Actions[i], lbAvailable, False)

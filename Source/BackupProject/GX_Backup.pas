@@ -275,7 +275,7 @@ procedure ScanForIncludesAndAdd(const FileName: string;
       begin
         // This will break filenames with more than one consecutive space
         PragmaBackup := CompressWhiteSpace(Copy(ParsedLine, 2, MaxInt));
-        if StrBeginsWith('pragma backup ', PragmaBackup) then
+        if StartsStr('pragma backup ', PragmaBackup) then
         begin
           FileSpec := Trim(Copy(ParsedLine, Pos('backup', ParsedLine) + 6, MaxInt));
           if FileSpec = '' then

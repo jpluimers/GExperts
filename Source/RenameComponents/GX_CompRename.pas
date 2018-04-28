@@ -166,7 +166,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Menus, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
+  SysUtils, Windows, Menus, StrUtils, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
   GX_IdeUtils, Graphics, GX_GxUtils, TypInfo, GX_dzVclUtils;
 
 resourcestring
@@ -1049,7 +1049,7 @@ begin
   Prefix := Component.GetComponentType;
   if (Length(Prefix) > 1) and (Prefix[1] = 'T') then
     Prefix := Copy(Prefix, 2, 999);
-  if not StrBeginsWith(Prefix, NewName) then
+  if not StartsText(Prefix, NewName) then
     Exit;
   Suffix := Copy(NewName, Length(Prefix) + 1, 999);
   if StrToIntDef(Suffix, -999) <> -999 then

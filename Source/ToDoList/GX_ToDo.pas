@@ -177,7 +177,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Dialogs, Clipbrd, Windows,
+  SysUtils, Dialogs, Clipbrd, Windows, StrUtils,
   mPasLex, mwBCBTokenList, mwPasParserTypes,
   GX_GxUtils, GX_GenericUtils, GX_EditReader,
   GX_ToDoOptions, GX_SharedImages, Math;
@@ -564,7 +564,7 @@ begin
       end;
       Delete(Info.Display, 1, j);
       Info.Display := TrimLeft(Info.Display);
-      if StrBeginsWith(':', Info.Display) then
+      if StartsStr(':', Info.Display) then
       begin
         Delete(Info.Display, 1, 1);
         Info.Display := Trim(Info.Display);
