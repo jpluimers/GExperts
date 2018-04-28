@@ -63,6 +63,8 @@ constructor TfmUsageStatistics.Create(_Owner: TComponent);
 begin
   inherited;
 
+  TControl_SetMinConstraints(Self);
+
   p_Bottom.BevelOuter := bvNone;
   FillStats;
 end;

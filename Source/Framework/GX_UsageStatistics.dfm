@@ -1,25 +1,26 @@
 inherited fmUsageStatistics: TfmUsageStatistics
   Caption = 'GExperts Usage Statistics'
-  ClientHeight = 411
-  ClientWidth = 593
+  ClientHeight = 501
+  ClientWidth = 634
+  OldCreateOrder = True
   Position = poOwnerFormCenter
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
   object p_Bottom: TPanel
     Left = 0
-    Top = 370
-    Width = 593
+    Top = 460
+    Width = 634
     Height = 41
     Align = alBottom
     TabOrder = 0
     DesignSize = (
-      593
+      634
       41)
     object l_Blurb: TLabel
       Left = 112
-      Top = 4
-      Width = 393
+      Top = 2
+      Width = 434
       Height = 37
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
@@ -30,7 +31,7 @@ inherited fmUsageStatistics: TfmUsageStatistics
       WordWrap = True
     end
     object b_Close: TButton
-      Left = 512
+      Left = 553
       Top = 8
       Width = 75
       Height = 25
@@ -54,7 +55,7 @@ inherited fmUsageStatistics: TfmUsageStatistics
     Left = 0
     Top = 0
     Width = 289
-    Height = 370
+    Height = 460
     Align = alLeft
     Columns = <
       item
@@ -75,8 +76,8 @@ inherited fmUsageStatistics: TfmUsageStatistics
   object lv_EditorExperts: TListView
     Left = 289
     Top = 0
-    Width = 304
-    Height = 370
+    Width = 345
+    Height = 460
     Align = alClient
     Columns = <
       item
