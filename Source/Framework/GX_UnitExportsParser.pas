@@ -158,7 +158,7 @@ type
 implementation
 
 uses
-  StrUtils;
+  StrUtils, GX_GenericUtils;
 
 { TPasLexEx }
 
