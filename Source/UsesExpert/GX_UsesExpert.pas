@@ -189,6 +189,7 @@ type
     procedure DeleteFromFavorites(const Item: string);
     procedure AddToFavorites(const Item: string);
     procedure FilterVisibleUnits;
+    procedure FilterIdentifiers;
     procedure SelectFirstItemInLists;
     procedure SaveChanges;
     procedure CloseIfInSingleActionMode;
@@ -479,6 +480,26 @@ begin
 end;
 
 procedure TfmUsesManager.FormCreate(Sender: TObject);
+
+  function RetrieveEditorBlockSelection: string;
+  var
+    Temp: string;
+    i: Integer;
+  begin
+    Temp := GxOtaGetCurrentSelection;
+    // Only use the currently selected text if the length is between 1 and 80
+    if (Length(Trim(Temp)) >= 1) and (Length(Trim(Temp)) <= 80) then
+    begin
+      i := Min(Pos(#13, Temp), Pos(#10, Temp));
+      if i > 0 then
+        Temp := Copy(Temp, 1, i - 1);
+    end else
+      Temp := '';
+    Result := Temp;
+  end;
+
+var
+  Selection: string;
 begin
   FProjectUnits := TStringList.Create;
   FCommonUnits := TStringList.Create;
@@ -506,6 +527,18 @@ begin
   TWinControl_ActivateDropFiles(lbxInterface, lbxInterfaceFilesDropped);
   TWinControl_ActivateDropFiles(lbxImplementation, lbxImplementationFilesDropped);
   TWinControl_ActivateDropFiles(lbxFavorite, lbxFavoriteFilesDropped);
+
+  Selection := RetrieveEditorBlockSelection;
+  if Trim(Selection) = '' then begin
+    try
+      Selection := GxOtaGetCurrentIdent; //if access violation created
+    except
+      on E: Exception do
+        Selection := '';
+    end;
+  end;
+  edtFilter.Text := Selection;
+  edtFilter.SelectAll;
 end;
 
 procedure TfmUsesManager.FormDestroy(Sender: TObject);
@@ -1123,12 +1156,7 @@ end;
 
 procedure TfmUsesManager.FilterVisibleUnits;
 var
-  i: Integer;
-  Identifier: string;
-  UnitName: string;
   Filter: string;
-  FixedRows: Integer;
-  cnt: Integer;
 begin
   Filter := Trim(edtFilter.Text);
   FilterStringList(FFavoriteUnits, lbxFavorite.Items, Filter, False);
@@ -1137,6 +1165,19 @@ begin
   FilterStringList(FSearchPathUnits, lbxSearchPath.Items, Filter, False);
   SelectFirstItemInLists;
 
+  FilterIdentifiers;
+end;
+
+procedure TfmUsesManager.FilterIdentifiers;
+var
+  i: Integer;
+  Identifier: string;
+  UnitName: string;
+  Filter: string;
+  FixedRows: Integer;
+  cnt: Integer;
+begin
+  Filter := Trim(edtFilter.Text);
   FixedRows := sgIdentifiers.FixedRows;
   sgIdentifiers.RowCount := FixedRows + Max(1, FFavUnitsExports.Count);
   sgIdentifiers.Cells[0, FixedRows] := '';
@@ -1252,7 +1293,6 @@ end;
 procedure TfmUsesManager.OnExportParserFinished(_Sender: TObject);
 var
   IdentIdx: Integer;
-  cnt: Integer;
   FixedRows: Integer;
   UnitName: string;
   Identifier: string;
@@ -1263,9 +1303,8 @@ begin
     Exit; //==>
 
   FixedRows := sgIdentifiers.FixedRows;
-  cnt := 0;
   sl := FUnitExportParserThread.Identifiers;
-  sgIdentifiers.RowCount := FixedRows + max(1, sl.Count);
+  sgIdentifiers.RowCount := FixedRows + 1;
   sgIdentifiers.Cells[0, FixedRows] := '';
   sgIdentifiers.Cells[1, FixedRows] := '';
   for IdentIdx := 0 to sl.Count - 1 do begin
@@ -1276,13 +1315,9 @@ begin
     if FFavoriteUnits.Find(UnitName, Idx) then begin
       UnitName := FFavoriteUnits[Idx];
       FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
-      sgIdentifiers.Cells[0, FixedRows + cnt] := Identifier;
-      sgIdentifiers.Cells[1, FixedRows + cnt] := UnitName;
-      Inc(cnt);
     end;
   end;
-  sgIdentifiers.RowCount := FixedRows + Max(1, cnt);
-  TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
+  FilterIdentifiers;
 end;
 
 type
@@ -1290,7 +1325,6 @@ type
   protected
     function GetMessage: string; override;
   end;
-
 
 { TShowAddDotsMessage }
 
