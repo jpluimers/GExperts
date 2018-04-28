@@ -15,6 +15,8 @@ uses
 type
   TExpertManagerExpert = class;
 
+  TAddExpertToRegistryResult = (aerOK, aerDuplicate, aerNoExpert);
+
   TfmExpertManager = class(TfmBaseForm)
     lvExperts: TListView;
     pmItems: TPopupMenu;
@@ -98,7 +100,7 @@ type
     class procedure MoveExpertRegistryKey(const ExpertName, FromBase, FromSection: string;
       const ToBase, ToSection: string);
 
-    class function AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
+    class function AddExpertToRegistry(const ExpertName, FileName: string): TAddExpertToRegistryResult;
     class procedure EnableExpertInRegistry(const ExpertName: string);
     class procedure DisableExpertInRegistry(const ExpertName: string);
     class procedure RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
@@ -348,10 +350,12 @@ end;
 
 procedure TfmExpertManager.AddExperts(ExpertList: TStrings);
 resourcestring
-  SCouldNotAddExpert = '%s could not be added as an expert.' + sLineBreak +
-                       sLineBreak +
-                       'The module you chose probably is not a valid expert DLL or is '+
-                       'already loaded as an expert DLL.';
+  SCouldNotAddExpertDupe = '%s could not be added as an expert.' + sLineBreak
+                          + sLineBreak
+                          + 'The module you chose is already loaded as an expert DLL.';
+  SCouldNotAddExpertInvalid = '%s could not be added as an expert.' + sLineBreak
+                            + sLineBreak
+                            + 'The module you chose probably is not a valid expert DLL.';
 var
   i: Integer;
   ExpertName: string;
@@ -365,10 +369,14 @@ begin
     ExpertEntry := ExpertList[i];
 
     ExpertName := ChangeFileExt(ExtractFileName(ExpertEntry), '');
-    if FExpertManager.AddExpertToRegistry(ExpertName, ExpertEntry) then
-      UpdateControlsState
-    else
-      MessageDlg(Format(SCouldNotAddExpert, [ExpertEntry]), mtError, [mbOK], 0);
+    case FExpertManager.AddExpertToRegistry(ExpertName, ExpertEntry) of
+      aerOK:
+        UpdateControlsState;
+      aerDuplicate:
+        MessageDlg(Format(SCouldNotAddExpertDupe, [ExpertEntry]), mtError, [mbOK], 0);
+      aerNoExpert:
+        MessageDlg(Format(SCouldNotAddExpertInvalid, [ExpertEntry]), mtError, [mbOK], 0);
+    end;
   end;
 end;
 
@@ -485,14 +493,13 @@ begin
   end;
 end;
 
-class function TExpertManagerExpert.AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
+class function TExpertManagerExpert.AddExpertToRegistry(const ExpertName, FileName: string): TAddExpertToRegistryResult;
 var
   RegIni: TGExpertsSettings;
   ExpertList: TStringList;
   i: Integer;
 begin
   {$IFOPT D+} SendDebug('Adding Expert: '+FileName); {$ENDIF}
-  Result := True;
 
   // Make sure that this particular expert is not already loaded.
   ExpertList := TStringList.Create;
@@ -502,20 +509,18 @@ begin
     begin
       if ExpertList.Values[ExpertList.Names[i]] = FileName then
       begin
-        Result := False;
-        Break;
+        Result := aerDuplicate;
+        Exit;
       end;
     end;
   finally
     FreeAndNil(ExpertList);
   end;
 
-  if not Result then
+  if not IsValidExpertDll(FileName) then begin
+    Result := aerNoExpert;
     Exit;
-
-  Result := IsValidExpertDll(FileName);
-  if not Result then
-    Exit;
+  end;
 
   RegIni := TGExpertsSettings.Create(ConfigInfo.IdeRootRegistryKey);
   try
@@ -523,6 +528,8 @@ begin
   finally
     FreeAndNil(RegIni);
   end;
+
+  Result := aerOK;
 end;
 
 // Function to move a value from one registry key to another
@@ -615,7 +622,7 @@ var
   Succeeded: Boolean;
 begin
   try
-    Succeeded := TExpertManagerExpert.AddExpertToRegistry('GExperts', ThisDllName);
+    Succeeded := (TExpertManagerExpert.AddExpertToRegistry('GExperts', ThisDllName) = aerOK);
   except
     Succeeded := False;
   end;
