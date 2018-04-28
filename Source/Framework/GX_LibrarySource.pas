@@ -9,7 +9,12 @@ unit GX_LibrarySource;
 interface
 
 uses
+  Classes,
   ToolsAPI; // Errors here indicate that you didn't link to the DesignIde package
+
+var
+  // used to detect duplicat GExperts.dlls loaded into the same IDE instance
+  GExpertsDllMarker: TComponent = nil;
 
 // This function needs to be interface-visible, otherwise
 // C++Builder 5 complains about a missing EXTDEF symbol
@@ -21,9 +26,9 @@ function InitWizard(const BorlandIDEServices: IBorlandIDEServices;
 implementation
 
 uses
-  Windows, GX_GxUtils, GX_OtaUtils, GX_VerDepConst,
+  Windows, Forms, GX_GxUtils, GX_OtaUtils, GX_VerDepConst,
   GX_GExperts, GX_MessageBox, GX_CodeLib, GX_GrepExpert, GX_ExpertManager,
-  GX_PeInformation, GX_GenericUtils;
+  GX_PeInformation, GX_GenericUtils, GX_DummyWizard;
 
 const
   InvalidIndex = -1;
@@ -73,7 +78,12 @@ begin
     WizardServices := BorlandIDEServices as IOTAWizardServices;
     Assert(Assigned(WizardServices));
 
-    FExpertIndex := WizardServices.AddWizard(TGExperts.Create as IOTAWizard);
+    if (GExpertsDllMarker <> nil) then
+      FExpertIndex := WizardServices.AddWizard(TGExperts.Create as IOTAWizard)
+    else begin
+      // register a dummy wizard so we can fail gracefully
+      FExpertIndex := WizardServices.AddWizard(TDummyWizard.Create as IOTAWizard);
+    end;
 
     Result := (FExpertIndex >= 0);
   end;
@@ -120,6 +130,17 @@ var
 
 procedure CreateInstanceMutexes;
 begin
+  // First, check that the GExperts DLL is not loaded twice in the same IDE instance.
+  // This would play havoc with many of the functions.
+  if Application.FindComponent('GExpertsDllMarker') <> nil then begin
+    // Another instance of GExperts has already been loaded.
+    // -> Fail silently and do not create an instance of TGExperts in InitWizard.
+    Exit;
+  end;
+
+  GExpertsDllMarker := TComponent.Create(Application);
+  GExpertsDllMarker.Name := 'GExpertsDllMarker';
+
   // This mutex signals that at least one copy of GExperts is running
   // The installer uses this to determine if it should allow installation
   GXGeneralMutex := CreateMutex(nil, False, 'GExperts.Addin.For.Borland.IDEs');
