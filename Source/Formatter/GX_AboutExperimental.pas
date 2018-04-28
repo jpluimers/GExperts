@@ -24,7 +24,8 @@ type
     l_DummzeuchDe: TLabel;
     l_Formatter: TLabel;
   protected
-    class function DoAddToAboutDialog: integer; override;
+    class function GetVersionStr: string; override;
+    class function DoAddToAboutDialog: Integer; override;
   public
     constructor Create(_Owner: TComponent); override;
   end;
@@ -35,7 +36,8 @@ implementation
 
 uses
   ToolsAPI,
-  GX_GenericUtils;
+  GX_GenericUtils,
+  GX_LibrarySource;
 
 { TfmAboutExperimental }
 
@@ -49,25 +51,40 @@ begin
   SetFontColor(l_Formatter, clBlue);
 end;
 
-class function TfmAboutExperimental.DoAddToAboutDialog: integer;
+class function TfmAboutExperimental.GetVersionStr: string;
+begin
+  Result := inherited GetVersionStr + ' experimental';
+end;
+
+class function TfmAboutExperimental.DoAddToAboutDialog: Integer;
 {$IFDEF GX_VER170_up}
 // Only Delphi 2005 and up support the about box services
+const
+  Description = 'GExperts is a free set of tools built to increase the productivity of Delphi and C++Builder'
+    + ' programmers by adding several features to the IDE.'
+    + ' GExperts is developed as Open Source software and we encourage user contributions to the project.'#13#10
+    + '(c) Erik Berry and the GExperts Team';
 var
   AboutBoxServices: IOTAAboutBoxServices;
+  DupeString: string;
+  Desc: string;
 begin
+  if GExpertsDllMarker = nil then begin
+    DupeString := ' (duplicate, inactive)';
+    Desc := 'GExperts is listed twice in the IDE Experts list, so this instance is inactive.'#13#10
+      + 'Use the Expert Manager to remove the duplicate!';
+  end else
+    Desc := Description;
   Result := -1;
   if Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutBoxServices) then begin
     Result := AboutBoxServices.AddPluginInfo(
-      'GExperts Experimental',
-      'GExperts is a free set of tools built to increase the productivity of Delphi and C++Builder'
-      + ' programmers by adding several features to the IDE.'
-      + ' GExperts is developed as Open Source software and we encourage user contributions to the project.'#13#10
-      + '(c) Erik Berry and the GExperts Team'#13#10
-      + 'http://blog.dummzeuch.de',
+      'GExperts Experimental' + DupeString,
+      Desc + #13#10
+      + 'http://gexperts.dummzeuch.de/',
       GetAboutIcon,
       False,
       '', // leave this empty!
-      GetVersionStr + ' experimental');
+      GetVersionStr + DupeString);
   end;
 end;
 {$ELSE not GX_VER170_up}

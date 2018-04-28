@@ -13,9 +13,15 @@ type
     function GetName: string;
     function GetState: TWizardState;
     procedure Execute;
+  public
+    constructor Create;
+    destructor Destroy; override;
   end;
 
 implementation
+
+uses
+  GX_About;
 
 { TDummyWizard }
 
@@ -32,6 +38,18 @@ end;
 function TDummyWizard.GetState: TWizardState;
 begin
   Result := [];
+end;
+
+constructor TDummyWizard.Create;
+begin
+  inherited Create;
+  gblAboutFormClass.AddToAboutDialog;
+end;
+
+destructor TDummyWizard.Destroy;
+begin
+  gblAboutFormClass.RemoveFromAboutDialog;
+  inherited;
 end;
 
 procedure TDummyWizard.Execute;

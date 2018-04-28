@@ -31,7 +31,7 @@ type
   private
     procedure InitVersionInfoControls;
   protected
-    class function GetVersionStr: string;
+    class function GetVersionStr: string; virtual;
     class function DoAddToAboutDialog: Integer; virtual;
     class function GetAboutIcon: HBITMAP; virtual;
     class function GetSplashIcon: HBITMAP; virtual;
