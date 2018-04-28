@@ -252,6 +252,7 @@ function LeftTrimNChars(const AValue: string; const TrimChars: TSysCharSet = [#9
 
 {$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 function StartsText(const SubStr, Str: string): Boolean;
+function StartsStr(const SubStr, Str: string): Boolean;
 {$ENDIF}
 
 // See if a string begins/ends with a specific substring
@@ -1559,6 +1560,12 @@ function StartsText(const SubStr, Str: string): Boolean;
 begin
   Result := CaseInsensitivePos(SubStr, Str) = 1;
 end;
+
+function StartsStr(const SubStr, Str: string): Boolean;
+begin
+  Result := Pos(SubStr, Str) = 1;
+end;
+
 {$ENDIF}
 
 function StrBeginsWith(const SubStr, Str: string; CaseSensitive: Boolean): Boolean;
