@@ -47,6 +47,7 @@ object fmUsesManager: TfmUsesManager
       Align = alClient
       TabOrder = 1
       OnChange = pcUnitsChange
+      OnResize = pcUnitsResize
       object tabSearchPath: TTabSheet
         Caption = '&Search Path'
         ImageIndex = 3
@@ -85,23 +86,27 @@ object fmUsesManager: TfmUsesManager
           BorderWidth = 3
           FullRepaint = False
           TabOrder = 0
-          object lbxSearchPath: TListBox
+          object sg_SearchPath: TStringGrid
             Left = 3
             Top = 3
             Width = 309
             Height = 319
             Align = alClient
             Color = clBtnFace
-            DragMode = dmAutomatic
+            ColCount = 1
+            DefaultColWidth = 100
+            DefaultRowHeight = 16
             Enabled = False
-            ItemHeight = 14
-            MultiSelect = True
+            FixedCols = 0
+            RowCount = 1
+            FixedRows = 0
+            Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
             PopupMenu = pmuAvail
-            Sorted = True
             TabOrder = 0
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnMouseDown = sg_MouseDownForDragging
           end
         end
       end
@@ -117,21 +122,25 @@ object fmUsesManager: TfmUsesManager
           BorderWidth = 3
           FullRepaint = False
           TabOrder = 0
-          object lbxProject: TListBox
+          object sg_Project: TStringGrid
             Left = 3
             Top = 3
             Width = 309
             Height = 319
             Align = alClient
-            DragMode = dmAutomatic
-            ItemHeight = 14
-            MultiSelect = True
+            ColCount = 1
+            DefaultColWidth = 100
+            DefaultRowHeight = 16
+            FixedCols = 0
+            RowCount = 1
+            FixedRows = 0
+            Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
             PopupMenu = pmuAvail
-            Sorted = True
             TabOrder = 0
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnMouseDown = sg_MouseDownForDragging
           end
         end
         object pnlProjFooter: TPanel
@@ -173,21 +182,25 @@ object fmUsesManager: TfmUsesManager
           BorderWidth = 3
           FullRepaint = False
           TabOrder = 0
-          object lbxCommon: TListBox
+          object sg_Common: TStringGrid
             Left = 3
             Top = 3
             Width = 309
             Height = 319
             Align = alClient
-            DragMode = dmAutomatic
-            ItemHeight = 14
-            MultiSelect = True
+            ColCount = 1
+            DefaultColWidth = 100
+            DefaultRowHeight = 16
+            FixedCols = 0
+            RowCount = 1
+            FixedRows = 0
+            Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
             PopupMenu = pmuAvail
-            Sorted = True
             TabOrder = 0
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnMouseDown = sg_MouseDownForDragging
           end
         end
         object pnlCommonFooter: TPanel
@@ -229,21 +242,25 @@ object fmUsesManager: TfmUsesManager
           BorderWidth = 3
           FullRepaint = False
           TabOrder = 0
-          object lbxFavorite: TListBox
+          object sg_Favorite: TStringGrid
             Left = 3
             Top = 3
             Width = 309
             Height = 290
             Align = alClient
-            DragMode = dmAutomatic
-            ItemHeight = 14
-            MultiSelect = True
+            ColCount = 1
+            DefaultColWidth = 100
+            DefaultRowHeight = 16
+            FixedCols = 0
+            RowCount = 1
+            FixedRows = 0
+            Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
             PopupMenu = pmuAvail
-            Sorted = True
             TabOrder = 0
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnMouseDown = sg_MouseDownForDragging
           end
         end
         object pnlFavFooter: TPanel
@@ -291,8 +308,7 @@ object fmUsesManager: TfmUsesManager
       object tabIdentifiers: TTabSheet
         Caption = 'Identifiers'
         ImageIndex = 4
-        OnResize = tabIdentifiersResize
-        object sgIdentifiers: TStringGrid
+        object sg_Identifiers: TStringGrid
           Left = 0
           Top = 0
           Width = 315
@@ -303,8 +319,9 @@ object fmUsesManager: TfmUsesManager
           DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 2
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing]
           TabOrder = 0
+          OnMouseDown = sg_MouseDownForDragging
         end
         object pnlIdentifiersFooter: TPanel
           Left = 0
@@ -406,43 +423,52 @@ object fmUsesManager: TfmUsesManager
       ActivePage = tabInterface
       Align = alClient
       TabOrder = 1
+      OnResize = pcUsesResize
       object tabInterface: TTabSheet
         Caption = 'I&nterface'
-        object lbxInterface: TListBox
+        object sg_Interface: TStringGrid
           Left = 0
           Top = 0
           Width = 246
           Height = 318
           Align = alClient
-          DragMode = dmAutomatic
-          ItemHeight = 14
-          MultiSelect = True
+          ColCount = 1
+          DefaultColWidth = 100
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 1
+          FixedRows = 0
+          Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
           PopupMenu = pmuUses
-          Sorted = True
           TabOrder = 0
-          OnDblClick = lbxInterfaceDblClick
-          OnDragDrop = lbxInterfaceDragDrop
-          OnDragOver = lbxUsedDragOver
+          OnDblClick = sg_InterfaceDblClick
+          OnDragDrop = sg_InterfaceDragDrop
+          OnDragOver = sg_UsedDragOver
+          OnMouseDown = sg_MouseDownForDragging
         end
       end
       object tabImplementation: TTabSheet
         Caption = 'I&mplementation'
         ImageIndex = 1
-        object lbxImplementation: TListBox
+        object sg_Implementation: TStringGrid
           Left = 0
           Top = 0
           Width = 246
           Height = 318
           Align = alClient
-          DragMode = dmAutomatic
-          ItemHeight = 14
-          MultiSelect = True
+          ColCount = 1
+          DefaultColWidth = 100
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 1
+          FixedRows = 0
+          Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
           PopupMenu = pmuUses
-          Sorted = True
           TabOrder = 0
-          OnDblClick = lbxImplementationDblClick
-          OnDragDrop = lbxImplementationDragDrop
-          OnDragOver = lbxUsedDragOver
+          OnDblClick = sg_ImplementationDblClick
+          OnDragDrop = sg_ImplementationDragDrop
+          OnDragOver = sg_UsedDragOver
+          OnMouseDown = sg_MouseDownForDragging
         end
       end
     end
@@ -471,7 +497,7 @@ object fmUsesManager: TfmUsesManager
         Width = 105
         Height = 25
         Caption = 'Add Unit Prefixes'
-        TabOrder = 0
+        TabOrder = 2
         OnClick = btnAddDotsClick
       end
       object btnRemoveDots: TButton
@@ -480,28 +506,28 @@ object fmUsesManager: TfmUsesManager
         Width = 129
         Height = 25
         Caption = 'Remove Unit Prefixes'
-        TabOrder = 1
+        TabOrder = 3
         OnClick = btnRemoveDotsClick
       end
       object btnUsesDelete: TButton
         Left = 4
         Top = 4
-        Width = 93
+        Width = 85
         Height = 25
         Action = actUsesDelete
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 2
+        TabOrder = 0
       end
       object btnUsesMove: TButton
-        Left = 104
+        Left = 96
         Top = 4
-        Width = 144
+        Width = 152
         Height = 25
         Action = actUsesMove
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 3
+        TabOrder = 1
       end
     end
   end

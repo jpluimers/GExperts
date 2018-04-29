@@ -52,18 +52,18 @@ type
     pcUnits: TPageControl;
     tabProject: TTabSheet;
     pnlProject: TPanel;
-    lbxProject: TListBox;
+    sg_Project: TStringGrid;
     tabCommon: TTabSheet;
     pnlCommon: TPanel;
-    lbxCommon: TListBox;
+    sg_Common: TStringGrid;
     tabFavorite: TTabSheet;
     pnlFavorite: TPanel;
-    lbxFavorite: TListBox;
+    sg_Favorite: TStringGrid;
     pcUses: TPageControl;
     tabInterface: TTabSheet;
-    lbxInterface: TListBox;
+    sg_Interface: TStringGrid;
     tabImplementation: TTabSheet;
-    lbxImplementation: TListBox;
+    sg_Implementation: TStringGrid;
     mitUsesOpenUnit: TMenuItem;
     mitUsesSep1: TMenuItem;
     mitUsesSep2: TMenuItem;
@@ -95,7 +95,7 @@ type
     btnSearchPathAddToIntf: TButton;
     btnSearchPathAddToImpl: TButton;
     pnlSearchPath: TPanel;
-    lbxSearchPath: TListBox;
+    sg_SearchPath: TStringGrid;
     pnlAvailableHeader: TPanel;
     edtIdentifierFilter: TEdit;
     edtUnitFilter: TEdit;
@@ -121,27 +121,27 @@ type
     actUsesUnAlias: TAction;
     mitUsesUnalias: TMenuItem;
     tabIdentifiers: TTabSheet;
-    sgIdentifiers: TStringGrid;
+    sg_Identifiers: TStringGrid;
     pnlIdentifiersFooter: TPanel;
     btnIdentifiersAddToIntf: TButton;
     btnIdentifiersAddToImpl: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure lbxInterfaceDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure lbxUsedDragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);
+    procedure sg_ImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure sg_InterfaceDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure sg_UsedDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState;
+      var Accept: Boolean);
     procedure ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
     procedure acUsesDeleteExecute(Sender: TObject);
     procedure actFavDeleteExecute(Sender: TObject);
     procedure actFavAddExecute(Sender: TObject);
     procedure actAvailAddToIntfExecute(Sender: TObject);
     procedure actAvailAddToImplExecute(Sender: TObject);
-    procedure lbxInterfaceDblClick(Sender: TObject);
+    procedure sg_InterfaceDblClick(Sender: TObject);
     procedure lbxAvailDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure lbxAvailDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure lbxImplementationDblClick(Sender: TObject);
+    procedure sg_ImplementationDblClick(Sender: TObject);
     procedure actOpenUnitExecute(Sender: TObject);
     procedure lbxAvailDblClick(Sender: TObject);
     procedure edtIdentifierFilterChange(Sender: TObject);
@@ -156,6 +156,9 @@ type
     procedure actUsesUnAliasExecute(Sender: TObject);
     procedure tabIdentifiersResize(Sender: TObject);
     procedure pcUnitsChange(Sender: TObject);
+    procedure sg_MouseDownForDragging(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure pcUnitsResize(Sender: TObject);
+    procedure pcUsesResize(Sender: TObject);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -175,16 +178,16 @@ type
     procedure OpenUnit(const UnitName: string);
     procedure ReadUsesList;
     function ApplyAlias(const UnitName: string): string;
-    procedure UnAlias(AStrings: TStrings);
-    procedure AddListToIntfSection(ListBox: TObject);
-    procedure AddListToImplSection(ListBox: TObject; RemoveFromInterface: Boolean);
-    procedure AddListToFavorites(ListBox: TListBox);
-    function HaveSelectedItem(ListBox: TListBox): Boolean;
-    procedure DeleteItemIndex(ListBox: TListBox; FromInterface: Boolean);
-    procedure DeleteSelected(ListBox: TListBox; FromInterface: Boolean);
-    procedure MoveSelected(Src, Dest: TListBox; ToInterface: Boolean);
-    function TryGetAvailableSourceListBox(out lbx: TListBox): Boolean;
-    function GetUsesSourceListBox: TListBox;
+    procedure UnAlias(sg: TStringGrid);
+    procedure AddListToIntfSection(sg: TObject);
+    procedure AddListToImplSection(sg: TObject; RemoveFromInterface: Boolean);
+    procedure AddListToFavorites(sg: TStringGrid);
+    function HaveSelectedItem(sg: TStringGrid): Boolean;
+    procedure DeleteItemIndex(sg: TStringGrid; FromInterface: Boolean);
+    procedure DeleteSelected(sg: TStringGrid; FromInterface: Boolean);
+    procedure MoveSelected(Src, Dest: TStringGrid; ToInterface: Boolean);
+    function GetAvailableSourceList: TStringGrid;
+    function GetUsesSourceList: TStringGrid;
     procedure SearchPathReady;
     procedure DeleteFromFavorites(const Item: string);
     procedure AddToFavorites(const Item: string);
@@ -193,8 +196,8 @@ type
     procedure SelectFirstItemInLists;
     procedure SaveChanges;
     procedure CloseIfInSingleActionMode;
-    function GetLbxForOpen: TListBox;
-    procedure OpenSelectedUnit(ListBox: TListBox);
+    function GetListForOpen: TStringGrid;
+    procedure OpenSelectedUnit(List: TStringGrid);
     procedure lbxInterfaceFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure lbxImplementationFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
@@ -205,6 +208,10 @@ type
     procedure OnExportParserFinished(_Sender: TObject);
     procedure ResizeIdentiferGrid;
     procedure SwitchUnitsTab(_Direction: Integer);
+    procedure AddToStringGrid(sg: TStringGrid; const UnitName: string);
+    procedure DeleteFromStringGrid(sg: TStringGrid; const UnitName: string);
+    function IndexInStringGrid(sg: TStringGrid; const UnitName: string): integer;
+    procedure FilterStringGrid(Filter: string; List: TStrings; sg: TStringGrid);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -405,8 +412,8 @@ begin
   if Assigned(Bitmap) then
     ConvertBitmapToIcon(Bitmap, Icon);
 
-  sgIdentifiers.Cells[0, 0] := 'Identifier';
-  sgIdentifiers.Cells[1, 0] := 'Unit';
+  sg_Identifiers.Cells[0, 0] := 'Identifier';
+  sg_Identifiers.Cells[1, 0] := 'Unit';
 end;
 
 procedure TfmUsesManager.GetProjectFiles;
@@ -528,9 +535,9 @@ begin
   GetProjectFiles;
   ReadUsesList;
 
-  TWinControl_ActivateDropFiles(lbxInterface, lbxInterfaceFilesDropped);
-  TWinControl_ActivateDropFiles(lbxImplementation, lbxImplementationFilesDropped);
-  TWinControl_ActivateDropFiles(lbxFavorite, lbxFavoriteFilesDropped);
+  TWinControl_ActivateDropFiles(sg_Interface, lbxInterfaceFilesDropped);
+  TWinControl_ActivateDropFiles(sg_Implementation, lbxImplementationFilesDropped);
+  TWinControl_ActivateDropFiles(sg_Favorite, lbxFavoriteFilesDropped);
 
   edtUnitFilter.Left := pcUnits.Left;
   edtUnitFilter.Width := pcUnits.Width;
@@ -604,25 +611,66 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.AddListToIntfSection(ListBox: TObject);
+procedure TfmUsesManager.AddListToIntfSection(sg: TObject);
 var
   i: Integer;
+  grid: TStringGrid;
+  col: Integer;
 begin
-  if ListBox is TListBox then
-    for i := 0 to TListBox(ListBox).Items.Count - 1 do
-      if TListBox(ListBox).Selected[i] then
-        AddToIntfSection(TListBox(ListBox).Items[i]);
+  if sg is TStringGrid then begin
+    grid := TStringGrid(sg);
+    col := grid.ColCount - 1;
+    for i := grid.Selection.Top to grid.Selection.Bottom do
+      AddToIntfSection(grid.Cells[col, i]);
+  end;
+end;
+
+procedure TfmUsesManager.AddToStringGrid(sg: TStringGrid; const UnitName: string);
+var
+  i: Integer;
+  cnt: Integer;
+  Found: Boolean;
+begin
+  Found := False;
+  cnt := sg.RowCount;
+  for i := sg.FixedRows to cnt - 1 do begin
+    if SameText(sg.Cells[0, i], UnitName) then begin
+      Found := True;
+      Break;
+    end;
+  end;
+  if not found then begin
+    sg.RowCount := cnt + 1;
+    sg.Cells[0, cnt] := UnitName;
+  end;
+end;
+
+procedure TfmUsesManager.DeleteFromStringGrid(sg: TStringGrid; const UnitName: string);
+var
+  i: Integer;
+  cnt: Integer;
+  j: Integer;
+begin
+  cnt := sg.RowCount;
+  for i := sg.FixedRows to cnt - 1 do begin
+    if SameText(sg.Cells[0, i], UnitName) then begin
+      for j := i + 1 to cnt - 1 do
+        sg.Cells[0, j - 1] := sg.Cells[0, j];
+      sg.RowCount := cnt - 1;
+      Exit; //==>
+    end;
+  end;
 end;
 
 procedure TfmUsesManager.AddToIntfSection(const UnitName: string);
 begin
-  EnsureStringInList(lbxInterface.Items, UnitName);
-  DeleteStringFromList(lbxImplementation.Items, UnitName);
+  AddToStringGrid(sg_Interface, UnitName);
+  DeleteFromStringGrid(sg_Implementation, UnitName);
 end;
 
 procedure TfmUsesManager.DeleteFromIntfSection(const UnitName: string);
 begin
-  DeleteStringFromList(lbxInterface.Items, UnitName);
+  DeleteFromStringGrid(sg_Interface, UnitName);
 end;
 
 procedure TfmUsesManager.OpenUnit(const UnitName: string);
@@ -644,27 +692,44 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.AddListToImplSection(ListBox: TObject; RemoveFromInterface: Boolean);
+procedure TfmUsesManager.pcUnitsResize(Sender: TObject);
+begin
+  TGrid_Resize(sg_SearchPath, [roUseGridWidth, roUseAllRows]);
+  TGrid_Resize(sg_Project, [roUseGridWidth, roUseAllRows]);
+  TGrid_Resize(sg_Common, [roUseGridWidth, roUseAllRows]);
+  TGrid_Resize(sg_Favorite, [roUseGridWidth, roUseAllRows]);
+end;
+
+procedure TfmUsesManager.pcUsesResize(Sender: TObject);
+begin
+  TGrid_Resize(sg_Interface, [roUseGridWidth, roUseAllRows]);
+  TGrid_Resize(sg_Implementation, [roUseGridWidth, roUseAllRows]);
+end;
+
+procedure TfmUsesManager.AddListToImplSection(sg: TObject; RemoveFromInterface: Boolean);
 var
   i: Integer;
+  col: Integer;
+  grid: TStringGrid;
 begin
-  if ListBox is TListBox then
-    for i := 0 to TListBox(ListBox).Items.Count - 1 do
-      if TListBox(ListBox).Selected[i] then
-        AddToImplSection(TListBox(ListBox).Items[i], RemoveFromInterface);
+  if sg is TStringGrid then begin
+    grid := TStringGrid(sg);
+    col := grid.ColCount - 1;
+    for i := grid.Selection.Top to grid.Selection.Bottom do
+      AddToImplSection(grid.Cells[col, i], RemoveFromInterface);
+  end;
 end;
 
 procedure TfmUsesManager.AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean);
 begin
   if RemoveFromInterface then
-    DeleteStringFromList(lbxInterface.Items, UnitName);
-  if lbxInterface.Items.IndexOf(UnitName) = -1 then
-    EnsureStringInList(lbxImplementation.Items, UnitName);
+    DeleteFromStringGrid(sg_Interface, UnitName);
+  AddToStringGrid(sg_Implementation, UnitName);
 end;
 
 procedure TfmUsesManager.DeleteFromImplSection(const UnitName: string);
 begin
-  DeleteStringFromList(lbxImplementation.Items, UnitName);
+  DeleteFromStringGrid(sg_Implementation, UnitName);
 end;
 
 const
@@ -680,20 +745,35 @@ begin
     Result := UnitName + ALIAS_PREFIX + FAliases.Values[Result] + ')';
 end;
 
-procedure TfmUsesManager.UnAlias(AStrings: TStrings);
+procedure TfmUsesManager.UnAlias(sg: TStringGrid);
 var
   i: Integer;
   s: string;
   p: Integer;
 begin
-  for i := AStrings.Count - 1 downto 0 do begin
-    s := AStrings[i];
+  for i := sg.RowCount - 1 downto sg.FixedRows do begin
+    s := sg.cells[0, i];
     p := Pos(' ', s);
     if p > 0 then begin
       s := Copy(s, 1, p - 1);
-      AStrings[i] := s;
+      sg.cells[0, i] := s;
     end;
   end;
+end;
+
+function TfmUsesManager.IndexInStringGrid(sg: TStringGrid; const UnitName: string): integer;
+var
+  col: Integer;
+  i: Integer;
+begin
+  col := sg.ColCount - 1;
+  for i := sg.FixedRows to sg.RowCount - 1 do begin
+    if SameText(sg.Cells[col, i], UnitName) then begin
+      Result := i;
+      Exit;
+    end;
+  end;
+  Result := -1;
 end;
 
 procedure TfmUsesManager.ReadUsesList;
@@ -705,18 +785,30 @@ var
   StartPos: TOTAEditPos;
   CurrentPos: TOTAEditPos;
   AfterLen: Integer;
-  lbx: TListBox;
+  sg: TStringGrid;
   tab: TTabSheet;
+  sl: TStringList;
 begin
-  lbxInterface.Clear;
-  lbxImplementation.Clear;
+  TStringGrid_Clear(sg_Interface);
+  TStringGrid_Clear(sg_Implementation);
 
+  sl := nil;
   UsesManager := TUsesManager.Create(GxOtaGetCurrentSourceEditor);
   try
-    for i := 0 to UsesManager.InterfaceUses.Count - 1 do
-      lbxInterface.Items.Add(ApplyAlias(UsesManager.InterfaceUses.Items[i].Name));
-    for i := 0 to UsesManager.ImplementationUses.Count - 1 do
-      lbxImplementation.Items.Add(ApplyAlias(UsesManager.ImplementationUses.Items[i].Name));
+    sl := TStringList.Create;
+    UsesManager.InterfaceUses.AssignTo(sl);
+    sl.Sort;
+    for i := 0 to sl.Count - 1 do
+      sl[i] := ApplyAlias(sl[i]);
+    TStringGrid_AssignCol(sg_Interface, 0, sl);
+    TGrid_Resize(sg_Interface, [roUseGridWidth, roUseAllRows]);
+
+    UsesManager.ImplementationUses.AssignTo(sl);
+    sl.Sort;
+    for i := 0 to sl.Count - 1 do
+      sl[i] := ApplyAlias(sl[i]);
+    TStringGrid_AssignCol(sg_Implementation, 0, sl);
+    TGrid_Resize(sg_Implementation, [roUseGridWidth, roUseAllRows]);
 
     if not UsesManager.IsPositionBeforeImplementation(GxOtaGetCurrentEditBufferPos) then
       tab := tabImplementation
@@ -725,47 +817,65 @@ begin
 
     GxOtaGetCurrentIdentEx(Ident, IdentOffset, StartPos, CurrentPos, AfterLen);
     if Ident <> '' then begin
-      lbx := nil;
+      sg := nil;
       case UsesManager.isPositionInUsesList(IdentOffset) of
         puInterface: begin
             if UsesManager.GetUsesStatus(Ident) = usInterface then begin
               tab := tabInterface;
-              lbx := lbxInterface;
+              sg := sg_Interface;
             end;
           end;
         puImplementation: begin
             if UsesManager.GetUsesStatus(Ident) = usImplementation then begin
               tab := tabImplementation;
-              lbx := lbxImplementation;
+              sg := sg_Implementation;
             end;
           end;
       end;
       pcUses.ActivePage := tab;
-      if Assigned(lbx) then 
-        FCurrentIdentIdx := lbx.Items.IndexOf(Ident);
+      if Assigned(sg) then
+        FCurrentIdentIdx := IndexInStringGrid(sg, Ident);
     end;
   finally
+    FreeAndNil(sl);
     FreeAndNil(UsesManager);
   end;
 end;
 
-procedure TfmUsesManager.lbxImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TfmUsesManager.sg_ImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
 begin
   AddListToImplSection(Source, False);
   CloseIfInSingleActionMode;
 end;
 
-procedure TfmUsesManager.lbxInterfaceDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TfmUsesManager.sg_InterfaceDragDrop(Sender, Source: TObject; X, Y: Integer);
 begin
   AddListToIntfSection(Source);
   CloseIfInSingleActionMode;
 end;
 
-procedure TfmUsesManager.lbxUsedDragOver(Sender, Source: TObject;
-  X, Y: Integer; State: TDragState; var Accept: Boolean);
+procedure TfmUsesManager.sg_UsedDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState;
+  var Accept: Boolean);
 begin
-  Accept := (Source = lbxProject) or (Source = lbxCommon) or
-    (Source = lbxFavorite) or (Source = lbxSearchPath);
+  Accept := (Source = sg_Project) or (Source = sg_Common) or
+    (Source = sg_Favorite) or (Source = sg_SearchPath);
+end;
+
+procedure TfmUsesManager.sg_MouseDownForDragging(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  sg: TStringGrid;
+  SourceCol: Integer;
+  SourceRow: Integer;
+begin
+  sg := Sender as TStringGrid;
+  // Convert mouse coordinates X, Y to col and row indices
+  sg.MouseToCell(X, Y, SourceCol, SourceRow);
+  // Allow dragging only if a non fixed cell was clicked
+  if (SourceCol >= sg.FixedCols) and (SourceRow >= sg.FixedCols) then begin
+    // Begin dragging after mouse has moved 16 pixels
+    sg.BeginDrag(False, 16);
+  end;
 end;
 
 procedure TfmUsesManager.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
@@ -773,125 +883,114 @@ resourcestring
   SUsesMoveToInterface = '&Move to Interface';
   SUsesMoveToImplementation = '&Move to Implementation';
 var
-  AvailableSourceListBox: TListBox;
+  AvailableSourceList: TStringGrid;
   ActiveLBHasSelection: Boolean;
-  UsesSourceListBox: TListBox;
+  UsesSourceList: TStringGrid;
   UsesIsInterface: Boolean;
 begin
-  // todo: This no longer works correctly: If the Identifiers grid is active
-  //       TryGetAvailableSourceListBox returns false and the actions don't
-  //       get enabled / disabled as they should, e.g. the Delete action stays
-  //       disabled even when switching from an empty to a non empty uses list.
-  if not TryGetAvailableSourceListBox(AvailableSourceListBox) then
-    Exit; //==>
-  UsesSourceListBox := GetUsesSourceListBox;
-  ActiveLBHasSelection := HaveSelectedItem(AvailableSourceListBox);
+  AvailableSourceList := GetAvailableSourceList;
+  UsesSourceList := GetUsesSourceList;
+  ActiveLBHasSelection := HaveSelectedItem(AvailableSourceList);
   UsesIsInterface := (pcUses.ActivePage = tabInterface);
 
-  actUsesDelete.Enabled := HaveSelectedItem(UsesSourceListBox);
+  actUsesDelete.Enabled := HaveSelectedItem(UsesSourceList);
 
   actUsesAddToFavorites.Enabled := actUsesDelete.Enabled;
   if UsesIsInterface then begin
       actUsesMove.Caption := SUsesMoveToImplementation;
       actUsesMove.Hint := StripHotkey(SUsesMoveToImplementation);
       actUsesMove.OnExecute := actUsesMoveToImplExecute;
-      actUsesMove.Enabled := HaveSelectedItem(lbxInterface);
+      actUsesMove.Enabled := HaveSelectedItem(sg_Interface);
       mitAvailAddToUses.Action := actAvailAddToIntf;
   end else begin
       actUsesMove.Caption := SUsesMoveToInterface;
       actUsesMove.Hint := StripHotkey(SUsesMoveToInterface);
       actUsesMove.OnExecute := actUsesMoveToIntExecute;
-      actUsesMove.Enabled := HaveSelectedItem(lbxImplementation);
+      actUsesMove.Enabled := HaveSelectedItem(sg_Implementation);
       mitAvailAddToUses.Action := actAvailAddToImpl;
   end;
 
   actAvailAddToImpl.Enabled := ActiveLBHasSelection;
   actAvailAddToIntf.Enabled := ActiveLBHasSelection;
   actFavAdd.Enabled := ActiveLBHasSelection or (pcUnits.ActivePage = tabFavorite);
-  actFavDelete.Enabled := HaveSelectedItem(lbxFavorite);
-  actFavDelete.Visible := AvailableSourceListBox = lbxFavorite;
+  actFavDelete.Enabled := HaveSelectedItem(sg_Favorite);
+  actFavDelete.Visible := AvailableSourceList = sg_Favorite;
 
-  if (ActiveControl = lbxInterface) or (ActiveControl = lbxImplementation) then
+  if (ActiveControl = sg_Interface) or (ActiveControl = sg_Implementation) then
     actUsesDelete.ShortCut := VK_DELETE
   else
     actUsesDelete.ShortCut := 0;
 
-  if ActiveControl = lbxFavorite then
+  if ActiveControl = sg_Favorite then
     actFavDelete.ShortCut := VK_DELETE
   else
     actFavDelete.ShortCut := 0;
 
-  actOpenUnit.Enabled := HaveSelectedItem(GetLbxForOpen);
+  actOpenUnit.Enabled := HaveSelectedItem(GetListForOpen);
 end;
 
-function TfmUsesManager.HaveSelectedItem(ListBox: TListBox): Boolean;
-var
-  i: Integer;
+function TfmUsesManager.HaveSelectedItem(sg: TStringGrid): Boolean;
 begin
   Result := False;
-  if not Assigned(ListBox) then
+  if not Assigned(sg) then
     Exit; //==>
 
-  for i := 0 to ListBox.Items.Count - 1 do
-    if ListBox.Selected[i] then
-    begin
-      Result := True;
-      Break;
-    end;
+  Result := sg.Selection.Bottom - sg.Selection.Top >= 0;
 end;
 
-procedure TfmUsesManager.DeleteSelected(ListBox: TListBox; FromInterface: Boolean);
+procedure TfmUsesManager.DeleteSelected(sg: TStringGrid; FromInterface: Boolean);
 var
   i: Integer;
+  col: Integer;
 begin
-  Assert(Assigned(ListBox));
-  for i := ListBox.Items.Count - 1 downto 0 do
+  Assert(Assigned(sg));
+  col := sg.ColCount - 1;
+  for i := sg.Selection.Bottom downto sg.Selection.Top do
   begin
-    if ListBox.Selected[i] then
-    begin
-      if FromInterface then
-        DeleteFromIntfSection(ListBox.Items[i])
-      else
-        DeleteFromImplSection(ListBox.Items[i]);
-    end;
+    if FromInterface then
+      DeleteFromIntfSection(sg.Cells[col, i])
+    else
+      DeleteFromImplSection(sg.Cells[col, i]);
   end;
 end;
 
-procedure TfmUsesManager.MoveSelected(Src, Dest: TListBox; ToInterface: Boolean);
+procedure TfmUsesManager.MoveSelected(Src, Dest: TStringGrid; ToInterface: Boolean);
 var
   i: Integer;
+  col: Integer;
   UnitName: string;
 begin
   Assert(Assigned(Src) and Assigned(Dest));
-  for i := Src.Items.Count - 1 downto 0 do
+  col := Src.ColCount - 1;
+  for i := Src.Selection.Bottom downto Src.Selection.Top do
   begin
-    if Src.Selected[i] then
-    begin
-      UnitName := Src.Items[i];
+    UnitName := Src.Cells[col, i];
 
-      if ToInterface then
-        AddToIntfSection(UnitName)
-      else
-        AddToImplSection(UnitName, True);
+    if ToInterface then
+      AddToIntfSection(UnitName)
+    else
+      AddToImplSection(UnitName, True);
     end;
-  end;
 end;
 
 procedure TfmUsesManager.acUsesDeleteExecute(Sender: TObject);
+var
+  SourceList: TStringGrid;
 begin
-  DeleteSelected(GetUsesSourceListBox, GetUsesSourceListBox = lbxInterface);
+  SourceList := GetUsesSourceList;
+  DeleteSelected(SourceList, SourceList = sg_Interface);
   CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actUsesMoveToImplExecute(Sender: TObject);
 begin
-  MoveSelected(lbxInterface, lbxImplementation, False);
+  MoveSelected(sg_Interface, sg_Implementation, False);
   CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actUsesMoveToIntExecute(Sender: TObject);
 begin
-  MoveSelected(lbxImplementation, lbxInterface, True);
+  MoveSelected(sg_Implementation, sg_Interface, True);
   CloseIfInSingleActionMode;
 end;
 
@@ -899,16 +998,15 @@ procedure TfmUsesManager.actFavDeleteExecute(Sender: TObject);
 var
   i: Integer;
 begin
-  for i := lbxFavorite.Items.Count - 1 downto 0 do
-    if lbxFavorite.Selected[i] then
-      DeleteFromFavorites(lbxFavorite.Items[i]);
+  for i := sg_Favorite.Selection.Bottom downto sg_Favorite.Selection.Top do
+    DeleteFromFavorites(sg_Favorite.Cells[0, i]);
 end;
 
 procedure TfmUsesManager.actFavAddExecute(Sender: TObject);
 var
   i: Integer;
   FileName: string;
-  Src: TListBox;
+  Src: TStringGrid;
 begin
   if pcUnits.ActivePage = tabFavorite then
   begin
@@ -924,15 +1022,11 @@ begin
   end
   else begin
     FileName := '';
-    if not TryGetAvailableSourceListBox(src) then
-      Exit; //==>
-    for i := Src.Items.Count - 1 downto 0 do
+    src := GetAvailableSourceList;
+    for i := Src.Selection.Bottom downto Src.Selection.Top do
     begin
-      if Src.Selected[i] then
-      begin
-        FileName := Src.Items[i];
-        AddToFavorites(FileName);
-      end;
+      FileName := Src.Cells[0, i];
+      AddToFavorites(FileName);
     end;
     edtUnitFilter.Text := '';
     pcUnits.ActivePage := tabFavorite;
@@ -941,162 +1035,151 @@ end;
 
 procedure TfmUsesManager.actAvailAddToIntfExecute(Sender: TObject);
 var
-  Src: TListBox;
+  Src: TStringGrid;
   i: Integer;
+  Col: Integer;
 begin
-  if TryGetAvailableSourceListBox(src) then begin
-    for i := Src.Items.Count - 1 downto 0 do
-      if Src.Selected[i] then
-        AddToIntfSection(Src.Items[i]);
-  end else begin
-    // no listbox, so it must be the Identifiers StringGrid
-    i := sgIdentifiers.Row;
-    if (i < sgIdentifiers.FixedRows) or (i >= sgIdentifiers.RowCount) then
-      Exit; //==>
-    AddToIntfSection(sgIdentifiers.Cells[1, i]);
-  end;
+  src := GetAvailableSourceList;
+  Col := src.ColCount - 1;
+  for i := Src.Selection.Bottom downto Src.Selection.Top do
+    AddToIntfSection(Src.Cells[Col, i]);
   CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actAvailAddToImplExecute(Sender: TObject);
 var
   i: Integer;
-  Src: TListBox;
+  Src: TStringGrid;
+  Col: Integer;
 begin
-  if TryGetAvailableSourceListBox(Src) then begin
-    AddListToImplSection(Src, False);
-  end else begin
-    // no listbox, so it must be the Identifiers StringGrid
-    i := sgIdentifiers.Row;
-    if (i < sgIdentifiers.FixedRows) or (i >= sgIdentifiers.RowCount) then
-      Exit; //==>
-    AddToImplSection(sgIdentifiers.Cells[1, i], False);
-  end;
+  src := GetAvailableSourceList;
+  Col := src.ColCount - 1;
+  for i := Src.Selection.Bottom downto Src.Selection.Top do
+    AddToImplSection(Src.Cells[Col, i], False);
   CloseIfInSingleActionMode;
 end;
 
-function TfmUsesManager.TryGetAvailableSourceListBox(out lbx: TListBox): Boolean;
+function TfmUsesManager.GetAvailableSourceList: TStringGrid;
 begin
-  lbx := nil;
+  Result := nil;
   if pcUnits.ActivePage = tabProject then
-    lbx := lbxProject
+    Result := sg_Project
   else if pcUnits.ActivePage = tabCommon then
-    lbx := lbxCommon
+    Result := sg_Common
   else if pcUnits.ActivePage = tabFavorite then
-    lbx := lbxFavorite
+    Result := sg_Favorite
   else if pcUnits.ActivePage = tabSearchPath then
-    lbx := lbxSearchPath;
-  Result := Assigned(lbx);
+    Result := sg_SearchPath
+  else if pcUnits.ActivePage = tabIdentifiers then
+    Result := sg_Identifiers;
+  Assert(Assigned(Result));
 end;
 
-procedure TfmUsesManager.lbxInterfaceDblClick(Sender: TObject);
+procedure TfmUsesManager.sg_InterfaceDblClick(Sender: TObject);
 begin
   if IsCtrlDown then
-    OpenSelectedUnit(lbxInterface)
+    OpenSelectedUnit(sg_Interface)
   else
-    DeleteItemIndex(lbxInterface, True);
+    DeleteItemIndex(sg_Interface, True);
 end;
 
-procedure TfmUsesManager.lbxImplementationDblClick(Sender: TObject);
+procedure TfmUsesManager.sg_ImplementationDblClick(Sender: TObject);
 begin
   if IsCtrlDown then
-    OpenSelectedUnit(lbxImplementation)
+    OpenSelectedUnit(sg_Implementation)
   else
-    DeleteItemIndex(lbxImplementation, False);
+    DeleteItemIndex(sg_Implementation, False);
 end;
 
-procedure TfmUsesManager.DeleteItemIndex(ListBox: TListBox; FromInterface: Boolean);
+procedure TfmUsesManager.DeleteItemIndex(sg: TStringGrid; FromInterface: Boolean);
+var
+  col: Integer;
+  row: Integer;
 begin
-  if ListBox.ItemIndex > -1 then
-  begin
-    if FromInterface then
-      DeleteFromIntfSection(ListBox.Items[ListBox.ItemIndex])
-    else
-      DeleteFromImplSection(ListBox.Items[ListBox.ItemIndex])
-  end;
+  row := sg.row;
+  if (row >= sg.FixedRows) and (row < sg.RowCount) then
+    begin
+      col := sg.ColCount - 1;
+      if FromInterface then
+        DeleteFromIntfSection(sg.Cells[col, row])
+      else
+        DeleteFromImplSection(sg.Cells[col, row]);
+    end;
 end;
 
 procedure TfmUsesManager.lbxAvailDragOver(Sender, Source: TObject;
   X, Y: Integer; State: TDragState; var Accept: Boolean);
 begin
-  Accept := (Source = lbxInterface) or (Source = lbxImplementation);
+  Accept := (Source = sg_Interface) or (Source = sg_Implementation);
 end;
 
 procedure TfmUsesManager.lbxAvailDragDrop(Sender, Source: TObject; X, Y: Integer);
 begin
-  if (Source = lbxInterface) or (Source = lbxImplementation) then
+  if (Source = sg_Interface) or (Source = sg_Implementation) then
   begin
-    if Sender = lbxFavorite then
-      AddListToFavorites(Source as TListBox)
+    if Sender = sg_Favorite then
+      AddListToFavorites(Source as TStringGrid)
     else
       actUsesDelete.Execute;
   end;
 end;
 
-function TfmUsesManager.GetLbxForOpen: TListBox;
+function TfmUsesManager.GetListForOpen: TStringGrid;
 begin
-  if ActiveControl = lbxImplementation then
-    Result := lbxImplementation
-  else if ActiveControl = lbxInterface then
-    Result := lbxInterface
-  else begin
-    if not TryGetAvailableSourceListBox(Result) then begin
-      Result := nil;
-    end;
-  end;
+  if ActiveControl = sg_Implementation then
+    Result := sg_Implementation
+  else if ActiveControl = sg_Interface then
+    Result := sg_Interface
+  else
+    Result :=  GetAvailableSourceList;
 end;
 
-procedure TfmUsesManager.OpenSelectedUnit(ListBox: TListBox);
+procedure TfmUsesManager.OpenSelectedUnit(List: TStringGrid);
 var
   UnitName: string;
-  r: Integer;
+  col: Integer;
 begin
-  if not Assigned(ListBox) then begin
-    // no listbox -> identifier string grid
-    r := sgIdentifiers.Row;
-    if (r < sgIdentifiers.FixedRows) or (r >= sgIdentifiers.RowCount) then
-      Exit; //==>
-    UnitName := sgIdentifiers.Cells[1, r];
-  end else begin
-    if not TListBox_GetSelected(ListBox, UnitName) then
-      Exit; //==>
-  end;
+  Assert(Assigned(List));
+
+  col := List.ColCount-1;
+  UnitName := List.Cells[col, List.row];
   OpenUnit(UnitName);
   ModalResult := mrCancel;
 end;
 
 procedure TfmUsesManager.actOpenUnitExecute(Sender: TObject);
 begin
-  OpenSelectedUnit(GetLbxForOpen);
+  OpenSelectedUnit(GetListForOpen);
 end;
 
-function TfmUsesManager.GetUsesSourceListBox: TListBox;
+function TfmUsesManager.GetUsesSourceList: TStringGrid;
 begin
   Result := nil;
   if pcUses.ActivePage = tabImplementation then
-    Result := lbxImplementation
+    Result := sg_Implementation
   else if pcUses.ActivePage = tabInterface then
-    Result := lbxInterface;
+    Result := sg_Interface;
   Assert(Assigned(Result));
 end;
 
 procedure TfmUsesManager.lbxAvailDblClick(Sender: TObject);
 var
-  Src: TListBox;
+  Src: TStringGrid;
+  col: Integer;
   UnitName: string;
 begin
-  if not TryGetAvailableSourceListBox(Src) then
-    Exit; //==>
-  if TListBox_GetSelected(Src, UnitName) then begin
-    if IsCtrlDown then begin
-      OpenUnit(UnitName);
-      ModalResult := mrCancel;
-    end else begin
-      if GetUsesSourceListBox = lbxImplementation then
-        AddToImplSection(UnitName, False)
-      else
-        AddToIntfSection(UnitName);
-    end;
+  Src := GetAvailableSourceList;
+  Assert(Assigned(Src));
+  col := Src.ColCount - 1;
+  UnitName := Src.Cells[col, Src.row];
+  if IsCtrlDown then begin
+    OpenUnit(UnitName);
+    ModalResult := mrCancel;
+  end else begin
+    if GetUsesSourceList = sg_Implementation then
+      AddToImplSection(UnitName, False)
+    else
+      AddToIntfSection(UnitName);
   end;
 end;
 
@@ -1155,20 +1238,20 @@ begin
     FreeAndNil(PathFiles);
   end;
   FilterVisibleUnits;
-  lbxSearchPath.Color := clWindow;
-  lbxSearchPath.Enabled := True;
+  sg_SearchPath.Color := clWindow;
+  sg_SearchPath.Enabled := True;
 end;
 
 procedure TfmUsesManager.DeleteFromFavorites(const Item: string);
 begin
   DeleteStringFromList(FFavoriteUnits, Item);
-  DeleteStringFromList(lbxFavorite.Items, Item);
+  DeleteFromStringGrid(sg_Favorite, Item);
 end;
 
 procedure TfmUsesManager.AddToFavorites(const Item: string);
 begin
   EnsureStringInList(FFavoriteUnits, Item);
-  EnsureStringInList(lbxFavorite.Items, Item);
+  AddToStringGrid(sg_Favorite, Item);
 end;
 
 procedure TfmUsesManager.edtIdentifierFilterChange(Sender: TObject);
@@ -1190,8 +1273,6 @@ end;
 
 procedure TfmUsesManager.edtIdentifierFilterKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
-var
-  ListBox: TListBox;
 begin
   if (Key = VK_TAB) and (Shift = [ssCtrl]) then
   begin
@@ -1201,11 +1282,8 @@ begin
   end else begin
     if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
     begin
-      if not TryGetAvailableSourceListBox(ListBox) then begin
-        // no listbox, so ist must be the identifiers StringGrid
-        sgIdentifiers.Perform(WM_KEYDOWN, Key, 0);
-        Key := 0;
-      end;
+      sg_Identifiers.Perform(WM_KEYDOWN, Key, 0);
+      Key := 0;
     end;
   end;
 end;
@@ -1215,15 +1293,30 @@ begin
   FilterVisibleUnits;
 end;
 
+procedure TfmUsesManager.FilterStringGrid(Filter: string; List: TStrings; sg: TStringGrid);
+var
+  FilterList: TStrings;
+begin
+  FilterList := TStringList.Create;
+  try
+    FilterStringList(List, FilterList, Filter, False);
+    TStringGrid_AssignCol(sg, 0, FilterList);
+    TGrid_Resize(sg, [roUseGridWidth, roUseAllRows]);
+  finally
+    FreeAndNil(FilterList);
+  end;
+end;
+
 procedure TfmUsesManager.FilterVisibleUnits;
 var
   Filter: string;
 begin
   Filter := Trim(edtUnitFilter.Text);
-  FilterStringList(FFavoriteUnits, lbxFavorite.Items, Filter, False);
-  FilterStringList(FProjectUnits, lbxProject.Items, Filter, False);
-  FilterStringList(FCommonUnits, lbxCommon.Items, Filter, False);
-  FilterStringList(FSearchPathUnits, lbxSearchPath.Items, Filter, False);
+  FilterStringGrid(Filter, FFavoriteUnits, sg_Favorite);
+  FilterStringGrid(Filter, FProjectUnits, sg_Project);
+  FilterStringGrid(Filter, FCommonUnits, sg_Common);
+  FilterStringGrid(Filter, FSearchPathUnits, sg_SearchPath);
+
   SelectFirstItemInLists;
 end;
 
@@ -1237,33 +1330,32 @@ var
   cnt: Integer;
 begin
   Filter := Trim(edtIdentifierFilter.Text);
-  FixedRows := sgIdentifiers.FixedRows;
-  sgIdentifiers.RowCount := FixedRows + Max(1, FFavUnitsExports.Count);
-  sgIdentifiers.Cells[0, FixedRows] := '';
-  sgIdentifiers.Cells[1, FixedRows] := '';
+  FixedRows := sg_Identifiers.FixedRows;
+  TStringGrid_Clear(sg_Identifiers);
+  TGrid_SetNonfixedRowCount(sg_Identifiers, FFavUnitsExports.Count);
   cnt := 0;
   for i := 0 to FFavUnitsExports.Count - 1 do begin
     Identifier := FFavUnitsExports[i];
     if (Filter = '') or StartsText(Filter, Identifier) then begin
-      sgIdentifiers.Cells[0, FixedRows + cnt] := Identifier;
+      sg_Identifiers.Cells[0, FixedRows + cnt] := Identifier;
       UnitName := PChar(FFavUnitsExports.Objects[i]);
-      sgIdentifiers.Cells[1, FixedRows + cnt] := UnitName;
+      sg_Identifiers.Cells[1, FixedRows + cnt] := UnitName;
       Inc(cnt);
     end;
   end;
-  sgIdentifiers.RowCount := FixedRows + Max(1, cnt);
+  TGrid_SetNonfixedRowCount(sg_Identifiers, cnt);
   ResizeIdentiferGrid;
 end;
 
 procedure TfmUsesManager.ResizeIdentiferGrid;
 begin
-  TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
-  TGrid_RestrictToGridWdith(sgIdentifiers, [1]);
+  TGrid_Resize(sg_Identifiers, [roUseGridWidth, roUseAllRows]);
+  TGrid_RestrictToGridWdith(sg_Identifiers, [1]);
 end;
 
 procedure TfmUsesManager.edtUnitFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  ListBox: TListBox;
+  sg: TStringGrid;
 begin
   if (Key = VK_TAB) and (Shift = [ssCtrl]) then
   begin
@@ -1273,40 +1365,39 @@ begin
   end else begin
     if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
     begin
-      if TryGetAvailableSourceListBox(ListBox) then begin
-        if ListBox.Items.Count > 1 then
-          ListBox.Perform(WM_KEYDOWN, Key, 0)
-        else if ListBox.Items.Count = 1 then
-          ListBox.Selected[0] := True;
-        Key := 0;
-      end;
+      sg := GetAvailableSourceList;
+      Assert(Assigned(sg));
+      if sg.RowCount > sg.FixedRows then
+        sg.Perform(WM_KEYDOWN, Key, 0)
+      else
+        sg.Row := sg.FixedRows;
+      Key := 0;
     end;
   end;
 end;
 
 procedure TfmUsesManager.SelectFirstItemInLists;
 
-  procedure SelectBestItem(ListBox: TListBox);
+  procedure SelectBestItem(sg: TStringGrid);
   var
     Filter: string;
     MatchIndex: Integer;
   begin
-    if ListBox.Items.Count > 0 then
+    if sg.RowCount > sg.FixedRows then
     begin
       Filter := Trim(edtUnitFilter.Text);
-      MatchIndex := ListBox.Items.IndexOf(Filter);
+      MatchIndex := IndexInStringGrid(sg, Filter);
       if MatchIndex = -1 then
-        MatchIndex := 0;
-
-      ListBox.Selected[MatchIndex] := True;
+        MatchIndex := sg.FixedRows;
+      sg.Row := MatchIndex;
     end;
   end;
 
 begin
-  SelectBestItem(lbxCommon);
-  SelectBestItem(lbxFavorite);
-  SelectBestItem(lbxSearchPath);
-  SelectBestItem(lbxProject);
+  SelectBestItem(sg_Common);
+  SelectBestItem(sg_Favorite);
+  SelectBestItem(sg_SearchPath);
+  SelectBestItem(sg_Project);
 end;
 
 procedure TfmUsesManager.tabIdentifiersResize(Sender: TObject);
@@ -1361,11 +1452,11 @@ begin
   if not Assigned(FUnitExportParserThread) then
     Exit; //==>
 
-  FixedRows := sgIdentifiers.FixedRows;
+  FixedRows := sg_Identifiers.FixedRows;
   sl := FUnitExportParserThread.Identifiers;
-  sgIdentifiers.RowCount := FixedRows + 1;
-  sgIdentifiers.Cells[0, FixedRows] := '';
-  sgIdentifiers.Cells[1, FixedRows] := '';
+  sg_Identifiers.RowCount := FixedRows + 1;
+  sg_Identifiers.Cells[0, FixedRows] := '';
+  sg_Identifiers.Cells[1, FixedRows] := '';
   for IdentIdx := 0 to sl.Count - 1 do begin
     Identifier := sl[IdentIdx];
     UniqueString(Identifier);
@@ -1408,7 +1499,7 @@ var
   DefaultNamespace: string;
   NameSpaces: TStringList;
 
-  procedure AddDotsTo(lb: TListBox);
+  procedure AddDotsTo(sg: TStringGrid);
   var
     UnitIdx: Integer;
     OrigUnitName: string;
@@ -1417,8 +1508,8 @@ var
     NsIdx: Integer;
     SearchPathUnitsIndex: Integer;
   begin
-    for UnitIdx := 0 to lb.Count - 1 do begin
-      OrigUnitName := lb.Items[UnitIdx];
+    for UnitIdx := sg.FixedRows to sg.RowCount - 1 do begin
+      OrigUnitName := sg.Cells[0 ,UnitIdx];
       for NsIdx := 0 to NameSpaces.Count - 1 do begin
         s := NameSpaces[NsIdx] + '.' + OrigUnitName;
         SearchPathUnitsIndex := FSearchPathUnits.IndexOf(s);
@@ -1426,7 +1517,7 @@ var
           NewUnitName := FSearchPathUnits[SearchPathUnitsIndex];
           if OrigUnitName <> NewUnitName then begin
             FOldToNewUnitNameMap.Values[OrigUnitName] := NewUnitName;
-            lb.Items[UnitIdx] := NewUnitName;
+            sg.Cells[0, UnitIdx] := NewUnitName;
           end;
           Break;
         end;
@@ -1453,8 +1544,8 @@ begin
         CurrentUnitName := Copy(CurrentUnitName, 1, p - 1);
         NameSpaces.Insert(0, CurrentUnitName);
       end;
-      AddDotsTo(lbxInterface);
-      AddDotsTo(lbxImplementation);
+      AddDotsTo(sg_Interface);
+      AddDotsTo(sg_Implementation);
     end;
   finally
     FreeAndNil(NameSpaces);
@@ -1463,16 +1554,16 @@ end;
 
 procedure TfmUsesManager.actOKExecute(Sender: TObject);
 var
-  ListBox: TListBox;
+  sg: TStringGrid;
 begin
   if chkSingleActionMode.Checked then
   begin
-    if not TryGetAvailableSourceListBox(ListBox) then
-      Exit; //==>
+    sg := GetAvailableSourceList;
+    Assert(Assigned(sg));
     if pcUses.ActivePage = tabInterface then
-      AddListToIntfSection(ListBox)
+      AddListToIntfSection(sg)
     else
-      AddListToImplSection(ListBox, False);
+      AddListToImplSection(sg, False);
   end;
   SaveChanges;
   ModalResult := mrOk;
@@ -1504,15 +1595,15 @@ end;
 
 procedure TfmUsesManager.btnRemoveDotsClick(Sender: TObject);
 
-  procedure RemoveDotsfrom(lb: TListBox);
+  procedure RemoveDotsfrom(sg: TStringGrid);
   var
     i: Integer;
     OrigUnitName: string;
     NewUnitName: string;
     p: Integer;
   begin
-    for i := 0 to lb.Count - 1 do begin
-      OrigUnitName := lb.Items[i];
+    for i := sg.FixedRows to sg.RowCount - 1 do begin
+      OrigUnitName := sg.Cells[0, i];
       NewUnitName := OrigUnitName;
       p := Pos('.', NewUnitName);
       while p > 0 do begin
@@ -1521,7 +1612,7 @@ procedure TfmUsesManager.btnRemoveDotsClick(Sender: TObject);
       end;
       if NewUnitName <> OrigUnitName then begin
         FOldToNewUnitNameMap.Values[OrigUnitName] := NewUnitName;
-        lb.Items[i] := NewUnitName;
+        sg.Cells[0, i] := NewUnitName;
       end;
     end;
   end;
@@ -1530,8 +1621,8 @@ begin
   if ShowGxMessageBox(TShowRemoveDotsMessage) <> mrYes then
     Exit;
 
-  RemoveDotsfrom(lbxInterface);
-  RemoveDotsfrom(lbxImplementation);
+  RemoveDotsfrom(sg_Interface);
+  RemoveDotsfrom(sg_Implementation);
 end;
 
 procedure TfmUsesManager.SaveChanges;
@@ -1542,8 +1633,8 @@ var
   Units: TStringList;
   NewToOldUnitNameMap: TStringList;
 begin
-  UnAlias(lbxInterface.Items);
-  UnAlias(lbxImplementation.Items);
+  UnAlias(sg_Interface);
+  UnAlias(sg_Implementation);
 
   NewToOldUnitNameMap := nil;
   Units := TStringList.Create;
@@ -1551,9 +1642,9 @@ begin
     GetInterfaceUnits(Units);
     for i := 0 to Units.Count - 1 do begin
       OldUnitName := Units[i];
-      if lbxInterface.Items.IndexOf(OldUnitName) = -1 then begin
+      if IndexInStringGrid(sg_Interface, OldUnitName) = -1 then begin
         NewUnitName := FOldToNewUnitNameMap.Values[OldUnitName];
-        if (NewUnitName = '') or (lbxInterface.Items.IndexOf(NewUnitName) = -1) then
+        if (NewUnitName = '') or (IndexInStringGrid(sg_Interface, NewUnitName) = -1) then
           RemoveUnitFromInterface(OldUnitName);
       end;
     end;
@@ -1561,9 +1652,9 @@ begin
     GetImplementationUnits(Units);
     for i := 0 to Units.Count - 1 do begin
       OldUnitName := Units[i];
-      if lbxImplementation.Items.IndexOf(OldUnitName) = -1 then begin
+      if IndexInStringGrid(sg_Implementation, OldUnitName) = -1 then begin
         NewUnitName := FOldToNewUnitNameMap.Values[OldUnitName];
-        if (NewUnitName = '') or (lbxImplementation.Items.IndexOf(NewUnitName) = -1) then
+        if (NewUnitName = '') or (IndexInStringGrid(sg_Implementation, NewUnitName) = -1) then
           RemoveUnitFromImplementation(OldUnitName);
       end;
     end;
@@ -1575,8 +1666,8 @@ begin
       NewToOldUnitNameMap.Values[NewUnitName] := OldUnitName;
     end;
 
-    for i := 0 to lbxInterface.Items.Count - 1 do begin
-      NewUnitName := lbxInterface.Items[i];
+    for i := sg_Interface.FixedRows to sg_Interface.RowCount - 1 do begin
+      NewUnitName := sg_Interface.Cells[0, i];
       OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
       if OldUnitName = NewUnitName then
         OldUnitName := '';
@@ -1628,8 +1719,8 @@ begin
       end; // case New
     end; // end for interface
 
-    for i := 0 to lbxImplementation.Items.Count - 1 do begin
-      NewUnitName := lbxImplementation.Items[i];
+    for i := sg_Implementation.FixedRows to sg_Implementation.RowCount - 1 do begin
+      NewUnitName := sg_Implementation.Cells[0, i];
       OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
       if OldUnitName = NewUnitName then
         OldUnitName := '';
@@ -1710,21 +1801,20 @@ end;
 
 procedure TfmUsesManager.FormShow(Sender: TObject);
 var
-  lbx: TListBox;
+  sg: TStringGrid;
 begin
   FilterVisibleUnits;
-  lbx := GetUsesSourceListBox;
+  sg := GetUsesSourceList;
   if FCurrentIdentIdx <> -1 then
-    lbx.Selected[FCurrentIdentIdx] := True
+    sg.row := FCurrentIdentIdx
   else begin
-    lbx.ClearSelection;
-    lbx.ItemIndex := -1;
+    sg.Row := 0;
   end;
 end;
 
 procedure TfmUsesManager.actUsesAddToFavoritesExecute(Sender: TObject);
 begin
-  AddListToFavorites(GetUsesSourceListBox);
+  AddListToFavorites(GetUsesSourceList);
 end;
 
 type
@@ -1752,19 +1842,19 @@ end;
 
 procedure TfmUsesManager.actUsesUnAliasExecute(Sender: TObject);
 
-  procedure ReplaceByAlias(AStrings: TStrings);
+  procedure ReplaceByAlias(sg: TStringGrid);
   var
     i: Integer;
     s: string;
     p: Integer;
   begin
-    for i := AStrings.Count - 1 downto 0 do begin
-      s := AStrings[i];
+    for i := sg.RowCount - 1 downto sg.FixedRows do begin
+      s := sg.Cells[0, i];
       p := Pos(ALIAS_PREFIX, s);
       if p > 0 then begin
         p := p + Length(ALIAS_PREFIX);
         s := Copy(s, p, Length(s) - p);
-        AStrings[i] := s;
+        sg.Cells[0, i] := s;
       end;
     end;
   end;
@@ -1773,18 +1863,19 @@ begin
   if ShowGxMessageBox(TShowUnaliasMessage) <> mrYes then
     Exit;
 
-  ReplaceByAlias(lbxInterface.Items);
-  ReplaceByAlias(lbxImplementation.Items);
+  ReplaceByAlias(sg_Interface);
+  ReplaceByAlias(sg_Implementation);
 end;
 
-procedure TfmUsesManager.AddListToFavorites(ListBox: TListBox);
+procedure TfmUsesManager.AddListToFavorites(sg: TStringGrid);
 var
   i: Integer;
+  col: Integer;
 begin
-  Assert(Assigned(ListBox));
-  for i := 0 to ListBox.Items.Count - 1 do
-    if ListBox.Selected[i] then
-      AddToFavorites(ListBox.Items[i]);
+  Assert(Assigned(sg));
+  col := sg.ColCount - 1;
+  for i := sg.Selection.Top to sg.Selection.Bottom do
+    AddToFavorites(sg.Cells[col, i]);
 end;
 
 initialization
