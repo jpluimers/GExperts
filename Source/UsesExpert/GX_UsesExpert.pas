@@ -103,7 +103,8 @@ type
     pnlSearchPath: TPanel;
     lbxSearchPath: TListBox;
     pnlAvailableHeader: TPanel;
-    edtFilter: TEdit;
+    edtIdentifierFilter: TEdit;
+    edtUnitFilter: TEdit;
     lblFilter: TLabel;
     mitAvailAddToFav: TMenuItem;
     mitAvailDelFromFav: TMenuItem;
@@ -148,14 +149,18 @@ type
     procedure lbxImplementationDblClick(Sender: TObject);
     procedure actOpenUnitExecute(Sender: TObject);
     procedure lbxAvailDblClick(Sender: TObject);
-    procedure edtFilterChange(Sender: TObject);
-    procedure edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtIdentifierFilterChange(Sender: TObject);
+    procedure edtIdentifierFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtUnitFilterChange(Sender: TObject);
+    procedure edtUnitFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnOKClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure actUsesAddToFavoritesExecute(Sender: TObject);
     procedure btnRemoveDotsClick(Sender: TObject);
     procedure btnAddDotsClick(Sender: TObject);
     procedure actUsesUnAliasExecute(Sender: TObject);
+    procedure tabIdentifiersResize(Sender: TObject);
+    procedure pcUnitsChange(Sender: TObject);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -203,6 +208,8 @@ type
     procedure LoadSettings;
     procedure SaveSettings;
     procedure OnExportParserFinished(_Sender: TObject);
+    procedure ResizeIdentiferGrid;
+    procedure SwitchUnitsTab(_Direction: Integer);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -501,6 +508,8 @@ procedure TfmUsesManager.FormCreate(Sender: TObject);
 var
   Selection: string;
 begin
+  TControl_SetMinConstraints(Self);
+
   FProjectUnits := TStringList.Create;
   FCommonUnits := TStringList.Create;
   FFavoriteUnits := TStringList.Create;
@@ -528,6 +537,11 @@ begin
   TWinControl_ActivateDropFiles(lbxImplementation, lbxImplementationFilesDropped);
   TWinControl_ActivateDropFiles(lbxFavorite, lbxFavoriteFilesDropped);
 
+  edtUnitFilter.Left := pcUnits.Left;
+  edtUnitFilter.Width := pcUnits.Width;
+  edtIdentifierFilter.Left := pcUnits.Left;
+  edtIdentifierFilter.Width := pcUnits.Width;
+
   Selection := RetrieveEditorBlockSelection;
   if Trim(Selection) = '' then begin
     try
@@ -537,8 +551,8 @@ begin
         Selection := '';
     end;
   end;
-  edtFilter.Text := Selection;
-  edtFilter.SelectAll;
+  edtIdentifierFilter.Text := Selection;
+  edtIdentifierFilter.SelectAll;
 end;
 
 procedure TfmUsesManager.FormDestroy(Sender: TObject);
@@ -622,6 +636,17 @@ var
 begin
   FileName := UnitName + '.pas';
   GxOtaOpenFileFromPath(FileName);
+end;
+
+procedure TfmUsesManager.pcUnitsChange(Sender: TObject);
+begin
+  if pcUnits.ActivePage = tabIdentifiers then begin
+    edtIdentifierFilter.Visible := True;
+    edtUnitFilter.Visible := False;
+  end else begin
+    edtUnitFilter.Visible := True;
+    edtIdentifierFilter.Visible := False;
+  end;
 end;
 
 procedure TfmUsesManager.AddListToImplSection(ListBox: TObject; RemoveFromInterface: Boolean);
@@ -912,7 +937,7 @@ begin
         AddToFavorites(FileName);
       end;
     end;
-    edtFilter.Text := '';
+    edtUnitFilter.Text := '';
     pcUnits.ActivePage := tabFavorite;
   end;
 end;
@@ -1149,7 +1174,46 @@ begin
   EnsureStringInList(lbxFavorite.Items, Item);
 end;
 
-procedure TfmUsesManager.edtFilterChange(Sender: TObject);
+procedure TfmUsesManager.edtIdentifierFilterChange(Sender: TObject);
+begin
+  FilterIdentifiers;
+end;
+
+procedure TfmUsesManager.SwitchUnitsTab(_Direction: Integer);
+var
+  i: Integer;
+begin
+  i := pcUnits.ActivePageIndex + _Direction;
+  if i = pcUnits.PageCount then
+    i := 0
+  else if i < 0 then
+    i := pcUnits.PageCount - 1;
+  pcUnits.ActivePageIndex := i;
+end;
+
+procedure TfmUsesManager.edtIdentifierFilterKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  ListBox: TListBox;
+begin
+  if (Key = VK_TAB) and (Shift = [ssCtrl]) then
+  begin
+    SwitchUnitsTab(1);
+  end else if (Key = VK_TAB) and (Shift = [ssCtrl, ssShift]) then begin
+    SwitchUnitsTab(-1);
+  end else begin
+    if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
+    begin
+      if not TryGetAvailableSourceListBox(ListBox) then begin
+        // no listbox, so ist must be the identifiers StringGrid
+        sgIdentifiers.Perform(WM_KEYDOWN, Key, 0);
+        Key := 0;
+      end;
+    end;
+  end;
+end;
+
+procedure TfmUsesManager.edtUnitFilterChange(Sender: TObject);
 begin
   FilterVisibleUnits;
 end;
@@ -1158,14 +1222,12 @@ procedure TfmUsesManager.FilterVisibleUnits;
 var
   Filter: string;
 begin
-  Filter := Trim(edtFilter.Text);
+  Filter := Trim(edtUnitFilter.Text);
   FilterStringList(FFavoriteUnits, lbxFavorite.Items, Filter, False);
   FilterStringList(FProjectUnits, lbxProject.Items, Filter, False);
   FilterStringList(FCommonUnits, lbxCommon.Items, Filter, False);
   FilterStringList(FSearchPathUnits, lbxSearchPath.Items, Filter, False);
   SelectFirstItemInLists;
-
-  FilterIdentifiers;
 end;
 
 procedure TfmUsesManager.FilterIdentifiers;
@@ -1177,7 +1239,7 @@ var
   FixedRows: Integer;
   cnt: Integer;
 begin
-  Filter := Trim(edtFilter.Text);
+  Filter := Trim(edtIdentifierFilter.Text);
   FixedRows := sgIdentifiers.FixedRows;
   sgIdentifiers.RowCount := FixedRows + Max(1, FFavUnitsExports.Count);
   sgIdentifiers.Cells[0, FixedRows] := '';
@@ -1193,26 +1255,24 @@ begin
     end;
   end;
   sgIdentifiers.RowCount := FixedRows + Max(1, cnt);
+  ResizeIdentiferGrid;
+end;
+
+procedure TfmUsesManager.ResizeIdentiferGrid;
+begin
   TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
   TGrid_RestrictToGridWdith(sgIdentifiers, [1]);
 end;
 
-procedure TfmUsesManager.edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TfmUsesManager.edtUnitFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   ListBox: TListBox;
-  i: Integer;
 begin
   if (Key = VK_TAB) and (Shift = [ssCtrl]) then
   begin
-    i := pcUnits.ActivePageIndex + 1;
-    if i = pcUnits.PageCount then
-      i := 0;
-    pcUnits.ActivePageIndex := i;
+    SwitchUnitsTab(1);
   end else if (Key = VK_TAB) and (Shift = [ssCtrl, ssShift]) then begin
-    i := pcUnits.ActivePageIndex - 1;
-    if i < 0 then
-      i := pcUnits.PageCount - 1;
-    pcUnits.ActivePageIndex := i;
+    SwitchUnitsTab(-1);
   end else begin
     if (Key in [VK_DOWN, VK_UP, VK_NEXT, VK_PRIOR]) then
     begin
@@ -1221,10 +1281,6 @@ begin
           ListBox.Perform(WM_KEYDOWN, Key, 0)
         else if ListBox.Items.Count = 1 then
           ListBox.Selected[0] := True;
-        Key := 0;
-      end else begin
-        // no listbox, so ist must be the identifiers StringGrid
-        sgIdentifiers.Perform(WM_KEYDOWN, Key, 0);
         Key := 0;
       end;
     end;
@@ -1240,7 +1296,7 @@ procedure TfmUsesManager.SelectFirstItemInLists;
   begin
     if ListBox.Items.Count > 0 then
     begin
-      Filter := Trim(edtFilter.Text);
+      Filter := Trim(edtUnitFilter.Text);
       MatchIndex := ListBox.Items.IndexOf(Filter);
       if MatchIndex = -1 then
         MatchIndex := 0;
@@ -1254,6 +1310,11 @@ begin
   SelectBestItem(lbxFavorite);
   SelectBestItem(lbxSearchPath);
   SelectBestItem(lbxProject);
+end;
+
+procedure TfmUsesManager.tabIdentifiersResize(Sender: TObject);
+begin
+  ResizeIdentiferGrid;
 end;
 
 procedure TfmUsesManager.LoadSettings;

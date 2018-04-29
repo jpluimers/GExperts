@@ -1,15 +1,13 @@
 object fmUsesManager: TfmUsesManager
   Left = 311
   Top = 202
-  ActiveControl = edtFilter
+  ActiveControl = edtUnitFilter
   AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Uses Clause Manager'
   ClientHeight = 478
-  ClientWidth = 595
+  ClientWidth = 604
   Color = clBtnFace
-  Constraints.MinHeight = 240
-  Constraints.MinWidth = 560
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -33,7 +31,7 @@ object fmUsesManager: TfmUsesManager
   object pnlUnits: TPanel
     Left = 269
     Top = 0
-    Width = 326
+    Width = 335
     Height = 441
     Align = alClient
     BevelOuter = bvNone
@@ -43,18 +41,19 @@ object fmUsesManager: TfmUsesManager
     object pcUnits: TPageControl
       Left = 6
       Top = 47
-      Width = 314
+      Width = 323
       Height = 388
       ActivePage = tabSearchPath
       Align = alClient
       TabOrder = 1
+      OnChange = pcUnitsChange
       object tabSearchPath: TTabSheet
         Caption = '&Search Path'
         ImageIndex = 3
         object pnlSearchPathFooter: TPanel
           Left = 0
           Top = 325
-          Width = 306
+          Width = 315
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -79,7 +78,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 306
+          Width = 315
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -89,7 +88,7 @@ object fmUsesManager: TfmUsesManager
           object lbxSearchPath: TListBox
             Left = 3
             Top = 3
-            Width = 300
+            Width = 309
             Height = 319
             Align = alClient
             Color = clBtnFace
@@ -111,7 +110,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 306
+          Width = 315
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -121,7 +120,7 @@ object fmUsesManager: TfmUsesManager
           object lbxProject: TListBox
             Left = 3
             Top = 3
-            Width = 300
+            Width = 309
             Height = 319
             Align = alClient
             DragMode = dmAutomatic
@@ -138,7 +137,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProjFooter: TPanel
           Left = 0
           Top = 325
-          Width = 306
+          Width = 315
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -167,7 +166,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 306
+          Width = 315
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -177,7 +176,7 @@ object fmUsesManager: TfmUsesManager
           object lbxCommon: TListBox
             Left = 3
             Top = 3
-            Width = 300
+            Width = 309
             Height = 319
             Align = alClient
             DragMode = dmAutomatic
@@ -194,7 +193,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommonFooter: TPanel
           Left = 0
           Top = 325
-          Width = 306
+          Width = 315
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -223,7 +222,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 306
+          Width = 315
           Height = 296
           Align = alClient
           BevelOuter = bvNone
@@ -233,7 +232,7 @@ object fmUsesManager: TfmUsesManager
           object lbxFavorite: TListBox
             Left = 3
             Top = 3
-            Width = 300
+            Width = 309
             Height = 290
             Align = alClient
             DragMode = dmAutomatic
@@ -250,7 +249,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavFooter: TPanel
           Left = 0
           Top = 296
-          Width = 306
+          Width = 315
           Height = 63
           Align = alBottom
           BevelOuter = bvNone
@@ -292,10 +291,11 @@ object fmUsesManager: TfmUsesManager
       object tabIdentifiers: TTabSheet
         Caption = 'Identifiers'
         ImageIndex = 4
+        OnResize = tabIdentifiersResize
         object sgIdentifiers: TStringGrid
           Left = 0
           Top = 0
-          Width = 306
+          Width = 315
           Height = 325
           Align = alClient
           ColCount = 2
@@ -309,7 +309,7 @@ object fmUsesManager: TfmUsesManager
         object pnlIdentifiersFooter: TPanel
           Left = 0
           Top = 325
-          Width = 306
+          Width = 315
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -336,44 +336,55 @@ object fmUsesManager: TfmUsesManager
     object pnlAvailableHeader: TPanel
       Left = 6
       Top = 6
-      Width = 314
+      Width = 323
       Height = 41
       Align = alTop
       BevelOuter = bvNone
       FullRepaint = False
       TabOrder = 0
       DesignSize = (
-        314
+        323
         41)
-      object lblFilter: TLabel
-        Left = 17
-        Top = 20
-        Width = 26
-        Height = 14
-        Caption = 'Filte&r'
-        FocusControl = edtFilter
-      end
-      object edtFilter: TEdit
-        Left = 48
+      object edtUnitFilter: TEdit
+        Left = 160
         Top = 16
-        Width = 250
+        Width = 161
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 1
-        OnChange = edtFilterChange
-        OnKeyDown = edtFilterKeyDown
+        OnChange = edtUnitFilterChange
+        OnKeyDown = edtUnitFilterKeyDown
       end
       object lblUnits: TPanel
         Left = 0
         Top = 0
-        Width = 314
-        Height = 15
+        Width = 323
+        Height = 14
         Align = alTop
         AutoSize = True
         BevelOuter = bvNone
         Caption = 'Available Units'
         ParentColor = True
         TabOrder = 0
+        object lblFilter: TLabel
+          Left = 1
+          Top = 0
+          Width = 26
+          Height = 14
+          Caption = 'Filte&r'
+          FocusControl = edtUnitFilter
+        end
+      end
+      object edtIdentifierFilter: TEdit
+        Left = 0
+        Top = 16
+        Width = 153
+        Height = 22
+        Anchors = [akLeft, akTop, akRight]
+        TabOrder = 2
+        Visible = False
+        OnChange = edtIdentifierFilterChange
+        OnKeyDown = edtIdentifierFilterKeyDown
       end
     end
   end
@@ -553,19 +564,19 @@ object fmUsesManager: TfmUsesManager
   object pnlFooter: TPanel
     Left = 0
     Top = 441
-    Width = 595
+    Width = 604
     Height = 37
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 2
     DesignSize = (
-      595
+      604
       37)
     object chkSingleActionMode: TCheckBox
       Left = 8
       Top = 9
-      Width = 233
+      Width = 242
       Height = 17
       Hint = 
         'If enabled, OK will add the currently selected unit on the right' +
@@ -578,7 +589,7 @@ object fmUsesManager: TfmUsesManager
       TabOrder = 0
     end
     object pnlButtonsRight: TPanel
-      Left = 240
+      Left = 249
       Top = 0
       Width = 355
       Height = 37
