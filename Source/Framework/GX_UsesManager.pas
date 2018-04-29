@@ -29,6 +29,7 @@ type
     procedure SetItem(AIndex: Integer; const Value: TUsesItem);
   public
     function Add: TUsesItem;
+    procedure AssignTo(List: TStrings);
     function IndexOf(const AUnitName: string): Integer;
     property Items[AIndex: Integer]: TUsesItem read GetItem write SetItem;
   end;
@@ -123,19 +124,16 @@ end;
 
 procedure InternalGetUnits(Units: TStrings; FromIntf: Boolean);
 var
-  i: Integer;
   UsesList: TUsesList;
 begin
   Assert(Assigned(Units));
-  Units.Clear;
   with TUsesManager.Create(GxOtaGetCurrentSourceEditor) do
   try
     if FromIntf then
       UsesList := FInterfUses
     else
       UsesList := FImplemUses;
-    for i := 0 to UsesList.Count - 1 do
-      Units.Add(UsesList.Items[i].Name);
+    UsesList.AssignTo(Units);
   finally
     Free;
   end;
@@ -603,6 +601,15 @@ begin
       Break;
     Dec(Result);
   end;
+end;
+
+procedure TUsesList.AssignTo(List: TStrings);
+var
+  i: Integer;
+begin
+  List.Clear;
+  for i := 0 to Count - 1 do
+    List.Add(Items[i].Name);
 end;
 
 function TUsesList.GetItem(AIndex: Integer): TUsesItem;
