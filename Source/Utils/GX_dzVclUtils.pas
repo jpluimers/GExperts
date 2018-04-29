@@ -307,8 +307,7 @@ type
   ///    <li>roUseAllRows -> use all Grid rows to calculate the minimum width, not
   ///                        just the first 10</li>
   ///  </ul> </summary>
-  TResizeOptions = (roUseGridWidth, roRestrictToGridWidth, roIgnoreHeader,
-    roUseLastRows, roUseAllRows);
+  TResizeOptions = (roUseGridWidth, roIgnoreHeader, roUseLastRows, roUseAllRows);
   TResizeOptionSet = set of TResizeOptions;
 
 ///<summary>
@@ -330,7 +329,25 @@ procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet;
 /// @param ConstantCols is an array containg the indexes of columns that should keep their
 ///                     width. </summary>
 procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid); overload;
-procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid; _ConstantCols: array of Integer); overload
+procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid; _ConstantCols: array of Integer); overload;
+
+///<summary> sets the row count, taking the fixed rows into account
+///          @returns the new RowCount </summary>
+function TGrid_SetRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
+
+///<summary> sets the nonfixd row count
+///          @returns the new RowCount </summary>
+function TGrid_SetNonfixedRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
+///<summary> @returns RowCount - FixedRows </summary>
+function TGrid_GetNonfixedRowCount(_Grid: TCustomGrid): Integer;
+
+///<summary> sets the row count to FixedRows + 1 and clears all non-fixed cells </summary>
+procedure TStringGrid_Clear(_Grid: TStringGrid);
+
+///<summary>
+/// Sets the given column of the StringList to the given string list,
+/// adjusting the RowCount if necessary </summary>
+procedure TStringGrid_AssignCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
 
 implementation
 
@@ -1490,6 +1507,60 @@ begin
       Grid.ColWidths[Col] := ColWidths[Col];
     end;
   end;
+end;
+
+function TGrid_SetRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
+var
+  Grid: TGridHack;
+begin
+  Grid := TGridHack(_Grid);
+  if Grid.FixedRows >= _RowCount then
+    Result := Grid.FixedRows + 1
+  else
+    Result := _RowCount;
+  Grid.RowCount := Result;
+end;
+
+function TGrid_SetNonfixedRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
+var
+  Grid: TGridHack;
+begin
+  Grid := TGridHack(_Grid);
+  if _RowCount = 0 then
+    _RowCount := 1;
+  Result := Grid.FixedRows + _RowCount;
+  Grid.RowCount := Result;
+end;
+
+function TGrid_GetNonfixedRowCount(_Grid: TCustomGrid): Integer;
+var
+  Grid: TGridHack;
+begin
+  Grid := TGridHack(_Grid);
+  Result := Grid.RowCount - Grid.FixedRows;
+end;
+
+procedure TStringGrid_Clear(_Grid: TStringGrid);
+var
+  c: Integer;
+begin
+  _Grid.RowCount := _Grid.FixedRows + 1;
+  for c := _Grid.FixedCols to _Grid.ColCount - 1 do
+    _Grid.Cells[c, _Grid.FixedRows] := '';
+end;
+
+procedure TStringGrid_AssignCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
+var
+  FixedRows: Integer;
+  cnt: Integer;
+  i: Integer;
+begin
+  cnt := _sl.Count;
+  FixedRows := _Grid.FixedRows;
+  if _Grid.RowCount < cnt + FixedRows then
+    _Grid.RowCount := cnt + FixedRows;
+  for i := 0 to cnt - 1 do
+    _Grid.Cells[_Col, FixedRows + i] := _sl[i];
 end;
 
 end.
