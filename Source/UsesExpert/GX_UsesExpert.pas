@@ -1194,6 +1194,7 @@ begin
   end;
   sgIdentifiers.RowCount := FixedRows + Max(1, cnt);
   TGrid_Resize(sgIdentifiers, [roUseGridWidth, roUseAllRows]);
+  TGrid_RestrictToGridWdith(sgIdentifiers, [1]);
 end;
 
 procedure TfmUsesManager.edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1311,7 +1312,7 @@ begin
     Identifier := sl[IdentIdx];
     UniqueString(Identifier);
     UnitName := PChar(sl.Objects[IdentIdx]);
-      // make sure the string is valid and not freed in the thread
+    // make sure the string is valid and not freed in the thread
     if FFavoriteUnits.Find(UnitName, Idx) then begin
       UnitName := FFavoriteUnits[Idx];
       FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
