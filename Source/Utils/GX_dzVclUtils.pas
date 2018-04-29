@@ -297,27 +297,40 @@ procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH); o
 
 type
   ///<summary> used in ResizeStringGrid and ResizeDbGrid to specify additional options
+  ///  Note that the default is to use the first 10 rows.
   ///  <ul>
   ///    <li>roUseGridWidth -> make the columns take up the whole grid width</li>
   ///    <li>roIgnoreHeader -> do not use the column header to calculate the column
   ///                          width</li>
-  ///    <li>roUseLastRows -> use the last 10 rows to calculate the minimum width, not
-  ///                         first 10
+  ///    <li>roUseLastRows -> use the last 10 rows to calculate the minimum width,
+  ///                         not just the first 10</li>
   ///    <li>roUseAllRows -> use all Grid rows to calculate the minimum width, not
   ///                        just the first 10</li>
   ///  </ul> </summary>
-  TResizeOptions = (roUseGridWidth, roIgnoreHeader, roUseFirstRows, roUseLastRows, roUseAllRows);
+  TResizeOptions = (roUseGridWidth, roRestrictToGridWidth, roIgnoreHeader,
+    roUseLastRows, roUseAllRows);
   TResizeOptionSet = set of TResizeOptions;
 
-///<summary> Resizes the columns of a TCustomGrid to fit their contents
-///          @param Grid is the TCustomGrid to work on
-///          @param Options is a TResizeOptionSet specifying additional options,
-///                         defaults to an empty set. </summary>
+///<summary>
+/// Resizes the columns of a TCustomGrid to fit their contents
+/// @param Grid is the TCustomGrid to work on
+/// @param Options is a TResizeOptionSet specifying additional options,
+///                defaults to an empty set.
+/// @param RowOffset gives the first row to use, -1 means "start at the first non-fixed row"
+/// @param ConstantCols is an array containg the indexes of columns that should keep their
+///                     width.
+/// @note that the default is to use the first 10 rows. </summary>
 procedure TGrid_Resize(_Grid: TCustomGrid); overload;
-procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet); overload;
-procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; _RowOffset: Integer); overload;
-procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer); overload;
-procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer; _RowOffset: Integer); overload;
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; _RowOffset: Integer = -1); overload;
+procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet;
+  const _ConstantCols: array of Integer; _RowOffset: Integer = -1); overload;
+
+///<summary>
+/// Reduce the width of grid columns so there is now horizontal scroll bar.
+/// @param ConstantCols is an array containg the indexes of columns that should keep their
+///                     width. </summary>
+procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid); overload;
+procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid; _ConstantCols: array of Integer); overload
 
 implementation
 
@@ -1326,19 +1339,9 @@ begin
   TGrid_Resize(_Grid, [], [], -1);
 end;
 
-procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet);
-begin
-  TGrid_Resize(_Grid, _Options, [], -1);
-end;
-
 procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; _RowOffset: Integer);
 begin
   TGrid_Resize(_Grid, _Options, [], _RowOffset);
-end;
-
-procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer);
-begin
-  TGrid_Resize(_Grid, _Options, _ConstantCols, -1);
 end;
 
 function ArrayContains(_Element: Integer; const _Arr: array of Integer): Boolean;
@@ -1437,6 +1440,56 @@ begin
   end;
   for Col := MinCol to MaxCol do
     Grid.ColWidths[Col] := ColWidths[Col];
+end;
+
+procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid);
+begin
+  TGrid_RestrictToGridWdith(_Grid, []);
+end;
+
+procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid; _ConstantCols: array of Integer);
+var
+  Col: Integer;
+  Grid: TGridHack;
+  ColWidths: array of Integer;
+  SumWidths: Integer;
+  TotalDiff: Integer;
+  ColDiff: Integer;
+  NonConstCols: Integer;
+  FirstCol: Integer;
+  MaxCol: Integer;
+begin
+  Grid := TGridHack(_Grid);
+  MaxCol := Grid.ColCount - 1;
+  SetLength(ColWidths, MaxCol + 1);
+
+  SumWidths := MaxCol; // one spare pixel per column
+  if goVertLine in Grid.Options then
+    Inc(SumWidths, Grid.GridLineWidth);
+  for Col := 0 to MaxCol do begin
+    ColWidths[Col] := Grid.ColWidths[Col];
+    Inc(SumWidths, ColWidths[Col]);
+  end;
+  TotalDiff := SumWidths - Grid.ClientWidth;
+  if TotalDiff > 0 then begin
+    NonConstCols := Grid.ColCount - Length(_ConstantCols);
+    if NonConstCols > 0 then begin
+      ColDiff := TotalDiff div NonConstCols;
+      FirstCol := 0;
+      for Col := MaxCol downto 0 do begin
+        if not ArrayContains(Col, _ConstantCols) then begin
+          FirstCol := Col;
+          ColWidths[Col] := ColWidths[Col] - ColDiff;
+          Dec(TotalDiff, ColDiff);
+        end;
+      end;
+      if TotalDiff > 0 then
+        ColWidths[FirstCol] := ColWidths[FirstCol] + TotalDiff;
+    end;
+    for Col := 0 to MaxCol do begin
+      Grid.ColWidths[Col] := ColWidths[Col];
+    end;
+  end;
 end;
 
 end.
