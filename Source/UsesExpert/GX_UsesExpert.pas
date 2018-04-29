@@ -61,10 +61,8 @@ type
     lbxFavorite: TListBox;
     pcUses: TPageControl;
     tabInterface: TTabSheet;
-    pnlInterface: TPanel;
     lbxInterface: TListBox;
     tabImplementation: TTabSheet;
-    pnlImplementation: TPanel;
     lbxImplementation: TListBox;
     mitUsesOpenUnit: TMenuItem;
     mitUsesSep1: TMenuItem;
@@ -89,12 +87,8 @@ type
     actFavAdd: TAction;
     actAvailAddToImpl: TAction;
     actAvailAddToIntf: TAction;
-    pnlImplFooter: TPanel;
-    btnImplDelete: TButton;
-    btnImplMoveToIntf: TButton;
-    pnlIntfFooter: TPanel;
-    btnIntfDelete: TButton;
-    btnIntfMoveToImpl: TButton;
+    btnUsesDelete: TButton;
+    btnUsesMove: TButton;
     actOpenUnit: TAction;
     tabSearchPath: TTabSheet;
     pnlSearchPathFooter: TPanel;
@@ -118,6 +112,7 @@ type
     lblUses: TPanel;
     pnlButtonsRight: TPanel;
     btnCancel: TButton;
+    actOK: TAction;
     btnOK: TButton;
     btnOpen: TButton;
     pnlUsesBottom: TPanel;
@@ -153,7 +148,7 @@ type
     procedure edtIdentifierFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure edtUnitFilterChange(Sender: TObject);
     procedure edtUnitFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure btnOKClick(Sender: TObject);
+    procedure actOKExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure actUsesAddToFavoritesExecute(Sender: TObject);
     procedure btnRemoveDotsClick(Sender: TObject);
@@ -798,11 +793,13 @@ begin
   actUsesAddToFavorites.Enabled := actUsesDelete.Enabled;
   if UsesIsInterface then begin
       actUsesMove.Caption := SUsesMoveToImplementation;
+      actUsesMove.Hint := StripHotkey(SUsesMoveToImplementation);
       actUsesMove.OnExecute := actUsesMoveToImplExecute;
       actUsesMove.Enabled := HaveSelectedItem(lbxInterface);
       mitAvailAddToUses.Action := actAvailAddToIntf;
   end else begin
       actUsesMove.Caption := SUsesMoveToInterface;
+      actUsesMove.Hint := StripHotkey(SUsesMoveToInterface);
       actUsesMove.OnExecute := actUsesMoveToIntExecute;
       actUsesMove.Enabled := HaveSelectedItem(lbxImplementation);
       mitAvailAddToUses.Action := actAvailAddToImpl;
@@ -1392,7 +1389,7 @@ type
 
 function TShowAddDotsMessage.GetMessage: string;
 resourcestring
-  SConfirmRemoveDots =
+  SConfirmAddDots =
     'This will try to add namespace qualifiers to all unit names ' + sLineBreak
     + 'in both uses clauses.' + sLineBreak
     + sLineBreak
@@ -1403,7 +1400,7 @@ resourcestring
     + sLineBreak
     + 'Do you want to proceed?';
 begin
-  Result := SConfirmRemoveDots;
+  Result := SConfirmAddDots;
 end;
 
 procedure TfmUsesManager.btnAddDotsClick(Sender: TObject);
@@ -1464,7 +1461,7 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.btnOKClick(Sender: TObject);
+procedure TfmUsesManager.actOKExecute(Sender: TObject);
 var
   ListBox: TListBox;
 begin
@@ -1478,6 +1475,7 @@ begin
       AddListToImplSection(ListBox, False);
   end;
   SaveChanges;
+  ModalResult := mrOk;
 end;
 
 type

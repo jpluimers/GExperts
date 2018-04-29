@@ -402,123 +402,47 @@ object fmUsesManager: TfmUsesManager
       Left = 6
       Top = 21
       Width = 254
-      Height = 379
+      Height = 347
       ActivePage = tabInterface
       Align = alClient
       TabOrder = 1
       object tabInterface: TTabSheet
         Caption = 'I&nterface'
-        object pnlInterface: TPanel
+        object lbxInterface: TListBox
           Left = 0
           Top = 0
           Width = 246
-          Height = 316
+          Height = 318
           Align = alClient
-          BevelOuter = bvNone
-          BorderWidth = 3
-          FullRepaint = False
+          DragMode = dmAutomatic
+          ItemHeight = 14
+          MultiSelect = True
+          PopupMenu = pmuUses
+          Sorted = True
           TabOrder = 0
-          object lbxInterface: TListBox
-            Left = 3
-            Top = 3
-            Width = 240
-            Height = 310
-            Align = alClient
-            DragMode = dmAutomatic
-            ItemHeight = 14
-            MultiSelect = True
-            PopupMenu = pmuUses
-            Sorted = True
-            TabOrder = 0
-            OnDblClick = lbxInterfaceDblClick
-            OnDragDrop = lbxInterfaceDragDrop
-            OnDragOver = lbxUsedDragOver
-          end
-        end
-        object pnlIntfFooter: TPanel
-          Left = 0
-          Top = 316
-          Width = 246
-          Height = 34
-          Align = alBottom
-          BevelOuter = bvNone
-          TabOrder = 1
-          object btnIntfDelete: TButton
-            Left = 4
-            Top = 4
-            Width = 75
-            Height = 25
-            Action = actUsesDelete
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-          end
-          object btnIntfMoveToImpl: TButton
-            Left = 88
-            Top = 4
-            Width = 152
-            Height = 25
-            Action = actUsesMove
-            TabOrder = 1
-          end
+          OnDblClick = lbxInterfaceDblClick
+          OnDragDrop = lbxInterfaceDragDrop
+          OnDragOver = lbxUsedDragOver
         end
       end
       object tabImplementation: TTabSheet
         Caption = 'I&mplementation'
         ImageIndex = 1
-        object pnlImplementation: TPanel
+        object lbxImplementation: TListBox
           Left = 0
           Top = 0
           Width = 246
-          Height = 316
+          Height = 318
           Align = alClient
-          BevelOuter = bvNone
-          BorderWidth = 3
-          FullRepaint = False
+          DragMode = dmAutomatic
+          ItemHeight = 14
+          MultiSelect = True
+          PopupMenu = pmuUses
+          Sorted = True
           TabOrder = 0
-          object lbxImplementation: TListBox
-            Left = 3
-            Top = 3
-            Width = 240
-            Height = 310
-            Align = alClient
-            DragMode = dmAutomatic
-            ItemHeight = 14
-            MultiSelect = True
-            PopupMenu = pmuUses
-            Sorted = True
-            TabOrder = 0
-            OnDblClick = lbxImplementationDblClick
-            OnDragDrop = lbxImplementationDragDrop
-            OnDragOver = lbxUsedDragOver
-          end
-        end
-        object pnlImplFooter: TPanel
-          Left = 0
-          Top = 316
-          Width = 246
-          Height = 34
-          Align = alBottom
-          BevelOuter = bvNone
-          TabOrder = 1
-          object btnImplDelete: TButton
-            Left = 4
-            Top = 4
-            Width = 75
-            Height = 25
-            Action = actUsesDelete
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-          end
-          object btnImplMoveToIntf: TButton
-            Left = 88
-            Top = 4
-            Width = 152
-            Height = 25
-            Action = actUsesMove
-            TabOrder = 1
-          end
+          OnDblClick = lbxImplementationDblClick
+          OnDragDrop = lbxImplementationDragDrop
+          OnDragOver = lbxUsedDragOver
         end
       end
     end
@@ -536,14 +460,14 @@ object fmUsesManager: TfmUsesManager
     end
     object pnlUsesBottom: TPanel
       Left = 6
-      Top = 400
+      Top = 368
       Width = 254
-      Height = 35
+      Height = 67
       Align = alBottom
       TabOrder = 2
       object btnAddDots: TButton
         Left = 8
-        Top = 4
+        Top = 36
         Width = 105
         Height = 25
         Caption = 'Add Unit Prefixes'
@@ -552,12 +476,32 @@ object fmUsesManager: TfmUsesManager
       end
       object btnRemoveDots: TButton
         Left = 120
-        Top = 4
+        Top = 36
         Width = 129
         Height = 25
         Caption = 'Remove Unit Prefixes'
         TabOrder = 1
         OnClick = btnRemoveDotsClick
+      end
+      object btnUsesDelete: TButton
+        Left = 4
+        Top = 4
+        Width = 93
+        Height = 25
+        Action = actUsesDelete
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+      end
+      object btnUsesMove: TButton
+        Left = 104
+        Top = 4
+        Width = 144
+        Height = 25
+        Action = actUsesMove
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 3
       end
     end
   end
@@ -611,12 +555,11 @@ object fmUsesManager: TfmUsesManager
         Top = 4
         Width = 75
         Height = 25
-        Cancel = True
-        Caption = 'OK'
+        Action = actOK
         Default = True
-        ModalResult = 1
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 2
-        OnClick = btnOKClick
       end
       object btnOpen: TButton
         Left = 104
@@ -699,8 +642,9 @@ object fmUsesManager: TfmUsesManager
     end
     object actUsesMove: TAction
       Caption = 'M&ove to Interface'
+      Hint = 'Move to Interface'
       ImageIndex = 36
-      ShortCut = 32845
+      ShortCut = 16461
     end
     object actFavDelete: TAction
       Caption = 'D&elete from Favorites'
@@ -716,12 +660,10 @@ object fmUsesManager: TfmUsesManager
     end
     object actAvailAddToIntf: TAction
       Caption = 'Add to Interfa&ce'
-      ShortCut = 16468
       OnExecute = actAvailAddToIntfExecute
     end
     object actAvailAddToImpl: TAction
       Caption = 'Add to Imp&lementation'
-      ShortCut = 16464
       OnExecute = actAvailAddToImplExecute
     end
     object actOpenUnit: TAction
@@ -733,11 +675,18 @@ object fmUsesManager: TfmUsesManager
     end
     object actUsesAddToFavorites: TAction
       Caption = 'Add to Favorites'
+      ShortCut = 16454
       OnExecute = actUsesAddToFavoritesExecute
     end
     object actUsesUnAlias: TAction
       Caption = 'Unalias ...'
       OnExecute = actUsesUnAliasExecute
+    end
+    object actOK: TAction
+      Caption = 'OK'
+      Hint = 'OK'
+      ShortCut = 16397
+      OnExecute = actOKExecute
     end
   end
 end
