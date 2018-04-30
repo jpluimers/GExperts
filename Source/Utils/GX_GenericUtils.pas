@@ -665,6 +665,8 @@ procedure LoadFormFileToStrings(const FileName: string; Strings: TGXUnicodeStrin
 function IsBinaryForm(const FileName: string): Boolean;
 // Load a file from disk to a unicode string list
 procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
+// Search for a file in the given path, returns the first match
+function TryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;
 
 //
 // Binary module utility functions.
@@ -4007,6 +4009,44 @@ begin
     LoadFormFileToStrings(FileName, Data, WasBinary)
   else // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
     Data.LoadFromFile(FileName);
+end;
+
+function TryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;
+
+  function MakeFilename(const Path, FileName: string): string;
+  begin
+    if Path = '' then
+      Result := FileName
+    else if Path[Length(Path)] = PathDelim then
+      Result := Path + FileName
+    else
+      Result := Path + PathDelim + FileName;
+  end;
+
+var
+  i: Integer;
+  NewFileName: string;
+begin
+  Assert(Assigned(Paths));
+
+  if IsPathAbsolute(FileName) then begin
+    FullFilename := FileName;
+    Result := FileExists(FileName);
+    Exit; //==>
+  end;
+
+  for i := 0 to Paths.Count - 1 do
+  begin
+    NewFileName := MakeFilename(Paths[i], FileName);
+    if FileExists(NewFileName) then
+    begin
+      Result := True;
+      FullFilename := NewFileName;
+      Exit; //==>
+    end;
+  end;
+
+  Result := False;
 end;
 
 function ThisDllName: string;

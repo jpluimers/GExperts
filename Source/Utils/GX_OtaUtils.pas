@@ -464,10 +464,9 @@ procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
 // Retrieve a guess at all possible paths where files in the current project
 // might be located by the compiler
 procedure GxOtaGetAllPossiblePaths(Paths: TStrings);
-// Locate a base file name on a list of paths, if Paths is nil, call GxOtaGetAllPossiblePaths
-// to fill it.
-function GxOtaTryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings = nil): Boolean;
-function GxOtaFindPathToFile(const FileName: string; Paths: TStrings = nil): string;
+// Locate a base file name in all possible paths (retrieved with GxOtaGetAllPossiblePaths)
+function GxOtaTryFindPathToFile(const FileName: string; out FullFilename: string): Boolean;
+function GxOtaFindPathToFile(const FileName: string): string;
 // Try to open a file located anywhere in GxOtaGetAllPossiblePaths
 function GxOtaOpenFileFromPath(const FileName: string): Boolean;
 // Obtain a list of alias mappings in OldUnit=NewUnit format
@@ -2970,55 +2969,22 @@ begin
   AddVCLPaths;
 end;
 
-function GxOtaTryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;
-
-  function MakeFilename(const Path, FileName: string): string;
-  begin
-    if Path = '' then
-      Result := FileName
-    else if Path[Length(Path)] = PathDelim then
-      Result := Path + FileName
-    else
-      Result := Path + PathDelim + FileName;
-  end;
-
+function GxOtaTryFindPathToFile(const FileName: string; out FullFilename: string): Boolean; overload;
 var
   PathList: TStringList;
-  i: Integer;
-  NewFileName: string;
 begin
-  Result := True;
-  if IsPathAbsolute(FileName) and FileExists(FileName) then begin
-    FullFilename := FileName;
-    Exit; //==>
-  end;
-
   PathList := TStringList.Create;
   try
-    if Assigned(Paths) then
-      PathList.Assign(Paths)
-    else
-      GxOtaGetAllPossiblePaths(PathList);
-
-    for i := 0 to PathList.Count - 1 do
-    begin
-      NewFileName := MakeFilename(PathList[i], FileName);
-      if FileExists(NewFileName) then
-      begin
-        FullFilename := NewFileName;
-        Exit; //==>
-      end;
-    end;
+    GxOtaGetAllPossiblePaths(PathList);
+    Result := TryFindPathToFile(FileName, FullFilename, PathList);
   finally
     FreeAndNil(PathList);
   end;
-
-  Result := False;
 end;
 
-function GxOtaFindPathToFile(const FileName: string; Paths: TStrings): string;
+function GxOtaFindPathToFile(const FileName: string): string; overload;
 begin
-  if not GxOtaTryFindPathToFile(FileName, Result, Paths) then
+  if not GxOtaTryFindPathToFile(FileName, Result) then
     Result := FileName;
 end;
 
