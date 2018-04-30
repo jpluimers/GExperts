@@ -159,6 +159,7 @@ type
     procedure sg_MouseDownForDragging(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure pcUnitsResize(Sender: TObject);
     procedure pcUsesResize(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FAliases: TStringList;
     FFindThread: TFileFindThread;
@@ -203,8 +204,8 @@ type
     procedure lbxFavoriteFilesDropped(_Sender: TObject; _Files: TStrings);
     procedure actUsesMoveToImplExecute(Sender: TObject);
     procedure actUsesMoveToIntExecute(Sender: TObject);
-    procedure LoadSettings;
-    procedure SaveSettings;
+    procedure LoadFavorites;
+    procedure SaveFavorites;
     procedure OnExportParserFinished(_Sender: TObject);
     procedure ResizeIdentiferGrid;
     procedure SwitchUnitsTab(_Direction: Integer);
@@ -225,12 +226,16 @@ type
 
 implementation
 
-uses
-  SysUtils, Messages, Windows, Graphics, ToolsAPI,
-  GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils,
-  GX_UsesExpertOptions, GX_MessageBox, StrUtils, Math;
-
 {$R *.dfm}
+
+uses
+  SysUtils, Messages, Windows, Graphics, StrUtils, Math, ToolsAPI,
+  GX_OtaUtils, GX_IdeUtils, GX_UsesManager, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils,
+{$IFOPT D+}
+  GX_DbugIntf,
+{$ENDIF D+}
+  GX_UsesExpertOptions, GX_MessageBox;
+
 
 { TUsesExpert }
 
@@ -363,14 +368,12 @@ begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
   Form := TfmUsesManager.Create(Application, Self);
   try
-    Form.LoadSettings;
     Form.chkSingleActionMode.Checked := FSingleActionMode;
     if (FAvailTabIndex >= 0) and (FAvailTabIndex < Form.pcUnits.PageCount) then
       Form.pcUnits.ActivePageIndex := FAvailTabIndex;
 
     if Form.ShowModal = mrOk then
     begin
-      Form.SaveSettings;
       FSingleActionMode := Form.chkSingleActionMode.Checked;
       FAvailTabIndex := Form.pcUnits.ActivePageIndex;
 
@@ -405,6 +408,9 @@ constructor TfmUsesManager.Create(_Owner: TComponent; _UsesExpert: TUsesExpert);
 var
   Bitmap: TBitmap;
 begin
+{$IFOPT D+}
+  SendDebug('Creating UsesManager form');
+{$ENDIF D+}
   FUsesExpert := _UsesExpert;
   inherited Create(_Owner);
 
@@ -423,6 +429,9 @@ var
   i: Integer;
   FileName: string;
 begin
+{$IFOPT D+}
+  SendDebug('Reading project files');
+{$ENDIF D+}
   FProjectUnits.Clear;
   if not FUsesExpert.FReadMap or not TryGetMapFiles then begin
     IProject := GxOtaGetCurrentProject;
@@ -438,6 +447,9 @@ begin
         FProjectUnits.Add(ExtractPureFileName(FileName));
     end;
   end;
+{$IFOPT D+}
+  SendDebug('Done reading project files');
+{$ENDIF D+}
 end;
 
 function TfmUsesManager.TryGetMapFiles: boolean;
@@ -473,6 +485,9 @@ var
   Found: Integer;
   SearchRec: TSearchRec;
 begin
+{$IFOPT D+}
+  SendDebug('Reading common files');
+{$ENDIF D+}
   // Read all dcu files from the $(DELPHI)\lib directory (for XE+ use the Win32\Release subdir)
   Found := SysUtils.FindFirst(AddSlash(ExtractFilePath(GetIdeRootDirectory)) +
     AddSlash('lib') {$IFDEF GX_VER220_up} + AddSlash('Win32') + AddSlash('Release') {$ENDIF} + '*.dcu', $3F, SearchRec);
@@ -486,6 +501,16 @@ begin
   finally
     SysUtils.FindClose(SearchRec);
   end;
+{$IFOPT D+}
+  SendDebug('Done reading common files');
+{$ENDIF D+}
+end;
+
+procedure TfmUsesManager.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  inherited;
+  if ModalResult = mrOk then
+    SaveFavorites;
 end;
 
 procedure TfmUsesManager.FormCreate(Sender: TObject);
@@ -527,6 +552,11 @@ begin
   GxOtaGetEffectiveLibraryPath(FFindThread.SearchDirs);
   FFindThread.OnFindComplete := SearchPathReady;
   FFindThread.StartFind;
+{$IFOPT D+}
+  SendDebug('Started SearchPath FindThread');
+{$ENDIF D+}
+
+  LoadFavorites;
 
   pcUnits.ActivePage := tabSearchPath;
   pcUses.ActivePage := tabInterface;
@@ -789,6 +819,9 @@ var
   tab: TTabSheet;
   sl: TStringList;
 begin
+{$IFOPT D+}
+  SendDebug('Reading uses lists');
+{$ENDIF D+}
   TStringGrid_Clear(sg_Interface);
   TStringGrid_Clear(sg_Implementation);
 
@@ -840,6 +873,9 @@ begin
     FreeAndNil(sl);
     FreeAndNil(UsesManager);
   end;
+{$IFOPT D+}
+  SendDebug('Done reading uses lists');
+{$ENDIF D+}
 end;
 
 procedure TfmUsesManager.sg_ImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -1210,6 +1246,9 @@ begin
     // which freed the thread but a synchronise call was still waiting to be executed.
     Exit; //==>
   end;
+{$IFOPT D+}
+  SendDebug('SarchPath is ready');
+{$ENDIF D+}
   IsDotNet := GxOtaCurrentProjectIsDotNet;
   PathFiles := nil;
   PathUnits := TStringList.Create;
@@ -1223,6 +1262,9 @@ begin
     finally
       FFindThread.ReleaseResults;
     end;
+{$IFOPT D+}
+  SendDebugFmt('Found %d files in SarchPath', [PathFiles.Count]);
+{$ENDIF D+}
     for i := 0 to PathFiles.Count - 1 do
       AddPathUnit(PathFiles[i]);
     GxOtaGetProjectFileNames(GxOtaGetCurrentProject, PathFiles);
@@ -1329,6 +1371,9 @@ var
   FixedRows: Integer;
   cnt: Integer;
 begin
+{$IFOPT D+}
+  SendDebug('Filtering identifiers');
+{$ENDIF D+}
   Filter := Trim(edtIdentifierFilter.Text);
   FixedRows := sg_Identifiers.FixedRows;
   TStringGrid_Clear(sg_Identifiers);
@@ -1344,6 +1389,9 @@ begin
     end;
   end;
   TGrid_SetNonfixedRowCount(sg_Identifiers, cnt);
+{$IFOPT D+}
+  SendDebug('Done filtering identifiers');
+{$ENDIF D+}
   ResizeIdentiferGrid;
 end;
 
@@ -1405,14 +1453,14 @@ begin
   ResizeIdentiferGrid;
 end;
 
-procedure TfmUsesManager.LoadSettings;
+procedure TfmUsesManager.LoadFavorites;
 var
   Settings: TGExpertsSettings;
   Paths: TStringList;
-  sl: TStringList;
-  i: Integer;
-  fn: string;
 begin
+{$IFOPT D+}
+  SendDebug('Loading settings (including favorites)');
+{$ENDIF D+}
   // Do not localize.
   Settings := TGExpertsSettings.Create;
   try
@@ -1422,21 +1470,16 @@ begin
     FreeAndNil(Settings);
   end;
   FFavoriteUnits.Sorted := True;
+{$IFOPT D+}
+  SendDebug('Done loading settings (including favorites)');
+{$ENDIF D+}
 
-  Paths := nil;
-  sl := TStringList.Create;
+  Paths := TStringList.Create;
   try
-    Paths := TStringList.Create;
     GxOtaGetAllPossiblePaths(Paths);
-    for i := 0 to FFavoriteUnits.Count - 1 do begin
-      if GxOtaTryFindPathToFile(FFavoriteUnits[i] + '.pas', fn, Paths) then
-        sl.Add(fn);
-    end;
-    if sl.Count > 0 then
-      FUnitExportParserThread := TUnitExportParserThread.Create(sl, OnExportParserFinished);
+    FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths, OnExportParserFinished);
   finally
     FreeAndNil(Paths);
-    FreeAndNil(sl);
   end;
 end;
 
@@ -1454,6 +1497,14 @@ begin
 
   FixedRows := sg_Identifiers.FixedRows;
   sl := FUnitExportParserThread.Identifiers;
+
+{$IFOPT D+}
+  SendDebugFmt('UnitExportParser finished, found %d identifiers', [sl.Count]);
+{$ENDIF D+}
+
+{$IFOPT D+}
+  SendDebug('Preprocessing identifiers');
+{$ENDIF D+}
   sg_Identifiers.RowCount := FixedRows + 1;
   sg_Identifiers.Cells[0, FixedRows] := '';
   sg_Identifiers.Cells[1, FixedRows] := '';
@@ -1467,6 +1518,9 @@ begin
       FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
     end;
   end;
+{$IFOPT D+}
+  SendDebug('Done preprocessing identifiers');
+{$ENDIF D+}
   FilterIdentifiers;
 end;
 
@@ -1777,7 +1831,7 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.SaveSettings;
+procedure TfmUsesManager.SaveFavorites;
 var
   Settings: TGExpertsSettings;
 begin

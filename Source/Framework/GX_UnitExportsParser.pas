@@ -139,13 +139,15 @@ type
     FUnits: TStringList;
     FFiles: TStringList;
     FIdentifiers: TStrings;
+    FPaths: TStringList;
     procedure AddSymbols(_Parser: TUnitExportsParser);
   protected
     procedure Execute; override;
   public
     ///<summary>
-    /// @param Files must be a list of full file names </summary>
-    constructor Create(const _Files: TStrings; _OnTerminate: TNotifyEvent);
+    /// @param Files is a list of unit names, without path and extension
+    /// @param Paths is a list of possible search paths </summary>
+    constructor Create(const _Files: TStrings; _Paths: TStrings; _OnTerminate: TNotifyEvent);
     destructor Destroy; override;
     ///<summary>
     /// After execution Identifiers contains a sorted list of all identfiers. The
@@ -158,7 +160,9 @@ type
 implementation
 
 uses
-  StrUtils, GX_GenericUtils;
+  StrUtils,
+  GX_GenericUtils,
+  GX_OtaUtils;
 
 { TPasLexEx }
 
@@ -846,19 +850,28 @@ end;
 
 { TUnitExportParserThread }
 
-constructor TUnitExportParserThread.Create(const _Files: TStrings; _OnTerminate: TNotifyEvent);
+constructor TUnitExportParserThread.Create(const _Files: TStrings; _Paths: TStrings;
+  _OnTerminate: TNotifyEvent);
 var
   i: Integer;
-  fn: string;
+  s: string;
 begin
   OnTerminate := _OnTerminate;
   FIdentifiers := TStringList.Create;
   FUnits := TStringList.Create;
+
   FFiles := TStringList.Create;
   for i := 0 to _Files.Count - 1 do begin
-    fn := _Files[i];
-    UniqueString(fn);
-    FFiles.Add(fn);
+    s := _Files[i];
+    UniqueString(s);
+    FFiles.Add(s);
+  end;
+
+  FPaths := TStringList.Create;
+  for i := 0 to _Paths.Count - 1 do begin
+    s := _Paths[i];
+    UniqueString(s);
+    FPaths.Add(s);
   end;
   inherited Create(False);
 end;
@@ -866,6 +879,7 @@ end;
 destructor TUnitExportParserThread.Destroy;
 begin
   OnTerminate := nil;
+  FreeAndNil(FPaths);
   FreeAndNil(FFiles);
   FreeAndNil(FIdentifiers);
   FreeAndNil(FUnits);
@@ -948,6 +962,23 @@ var
   UnitName: string;
 begin
   inherited;
+
+  sl := TStringList.Create;
+  try
+    for FileIdx := 0 to FFiles.Count - 1 do begin
+      // GxOtaTryFindPathToFile works without OTA calls when Paths is passed to it
+      // todo: Split it into a function that needs OTA and one that doesn't
+      //       and call the latter from here.
+      if GxOtaTryFindPathToFile(FFiles[FileIdx] + '.pas', fn, FPaths) then
+        sl.Add(fn);
+    end;
+    if sl.Count = 0 then begin
+      Exit; //==>
+    end;
+    FFiles.Assign(sl);
+  finally
+    FreeAndNil(sl);
+  end;
 
   for FileIdx := 0 to FFiles.Count - 1 do begin
     if Terminated then
