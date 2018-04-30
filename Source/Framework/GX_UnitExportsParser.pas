@@ -878,11 +878,11 @@ end;
 destructor TUnitExportParserThread.Destroy;
 begin
   OnTerminate := nil;
+  inherited;
   FreeAndNil(FPaths);
   FreeAndNil(FFiles);
   FreeAndNil(FIdentifiers);
   FreeAndNil(FUnits);
-  inherited;
 end;
 
 procedure TUnitExportParserThread.AddSymbols(_Parser: TUnitExportsParser);
