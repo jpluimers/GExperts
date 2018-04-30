@@ -2982,7 +2982,7 @@ begin
   end;
 end;
 
-function GxOtaFindPathToFile(const FileName: string): string; overload;
+function GxOtaFindPathToFile(const FileName: string): string;
 begin
   if not GxOtaTryFindPathToFile(FileName, Result) then
     Result := FileName;
