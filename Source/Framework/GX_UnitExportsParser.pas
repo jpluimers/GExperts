@@ -161,8 +161,7 @@ implementation
 
 uses
   StrUtils,
-  GX_GenericUtils,
-  GX_OtaUtils;
+  GX_GenericUtils;
 
 { TPasLexEx }
 
@@ -966,10 +965,7 @@ begin
   sl := TStringList.Create;
   try
     for FileIdx := 0 to FFiles.Count - 1 do begin
-      // GxOtaTryFindPathToFile works without OTA calls when Paths is passed to it
-      // todo: Split it into a function that needs OTA and one that doesn't
-      //       and call the latter from here.
-      if GxOtaTryFindPathToFile(FFiles[FileIdx] + '.pas', fn, FPaths) then
+      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, FPaths) then
         sl.Add(fn);
     end;
     if sl.Count = 0 then begin
