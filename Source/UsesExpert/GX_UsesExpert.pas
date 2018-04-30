@@ -546,6 +546,8 @@ begin
   FOldToNewUnitNameMap := TStringList.Create;
   FCurrentIdentIdx := -1;
 
+  LoadFavorites;
+
   FFindThread := TFileFindThread.Create;
   FFindThread.FileMasks.Add('*.pas');
   FFindThread.FileMasks.Add('*.dcu');
@@ -555,8 +557,6 @@ begin
 {$IFOPT D+}
   SendDebug('Started SearchPath FindThread');
 {$ENDIF D+}
-
-  LoadFavorites;
 
   pcUnits.ActivePage := tabSearchPath;
   pcUses.ActivePage := tabInterface;
@@ -1459,7 +1459,7 @@ var
   Paths: TStringList;
 begin
 {$IFOPT D+}
-  SendDebug('Loading settings (including favorites)');
+  SendDebug('Loading favorites');
 {$ENDIF D+}
   // Do not localize.
   Settings := TGExpertsSettings.Create;
@@ -1471,12 +1471,15 @@ begin
   end;
   FFavoriteUnits.Sorted := True;
 {$IFOPT D+}
-  SendDebug('Done loading settings (including favorites)');
+  SendDebugFmt('Done loading %d favorites', [FFavoriteUnits.Count]);
 {$ENDIF D+}
 
   Paths := TStringList.Create;
   try
     GxOtaGetAllPossiblePaths(Paths);
+{$IFOPT D+}
+    SendDebug('Running UnitExportParser thread to get identifiers from favorites');
+{$ENDIF D+}
     FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths, OnExportParserFinished);
   finally
     FreeAndNil(Paths);
