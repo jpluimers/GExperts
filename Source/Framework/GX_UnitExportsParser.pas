@@ -426,11 +426,9 @@ end;
 
 procedure TPasLexEx.Pop;
 var
-  cnt: Integer;
+  Condition: string;
 begin
-  cnt := FIfdefStack.Count;
-  if cnt > 0 then
-    FIfdefStack.Delete(cnt - 1);
+  Pop(Condition);
 end;
 
 procedure TPasLexEx.Push(const _Condition: string);
