@@ -715,9 +715,11 @@ procedure TfmUsesManager.pcUnitsChange(Sender: TObject);
 begin
   if pcUnits.ActivePage = tabIdentifiers then begin
     edtIdentifierFilter.Visible := True;
+    TWinControl_SetFocus(edtIdentifierFilter);
     edtUnitFilter.Visible := False;
   end else begin
     edtUnitFilter.Visible := True;
+    TWinControl_SetFocus(edtUnitFilter);
     edtIdentifierFilter.Visible := False;
   end;
 end;
@@ -1301,6 +1303,10 @@ begin
   FilterIdentifiers;
 end;
 
+type
+  TCustomTabControlHack = class(TCustomTabControl)
+  end;
+
 procedure TfmUsesManager.SwitchUnitsTab(_Direction: Integer);
 var
   i: Integer;
@@ -1311,6 +1317,7 @@ begin
   else if i < 0 then
     i := pcUnits.PageCount - 1;
   pcUnits.ActivePageIndex := i;
+  TCustomTabControlHack(pcUnits).Change;
 end;
 
 procedure TfmUsesManager.edtIdentifierFilterKeyDown(Sender: TObject; var Key: Word;
