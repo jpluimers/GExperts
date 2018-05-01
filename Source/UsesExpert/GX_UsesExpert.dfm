@@ -2,11 +2,10 @@ object fmUsesManager: TfmUsesManager
   Left = 311
   Top = 202
   ActiveControl = edtUnitFilter
-  AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Uses Clause Manager'
   ClientHeight = 478
-  ClientWidth = 604
+  ClientWidth = 764
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -18,20 +17,20 @@ object fmUsesManager: TfmUsesManager
   Scaled = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 14
   object Splitter: TSplitter
-    Left = 266
+    Left = 297
     Top = 0
-    Width = 3
     Height = 441
-    Cursor = crHSplit
+    OnMoved = SplitterMoved
   end
   object pnlUnits: TPanel
-    Left = 269
+    Left = 300
     Top = 0
-    Width = 335
+    Width = 464
     Height = 441
     Align = alClient
     BevelOuter = bvNone
@@ -41,9 +40,9 @@ object fmUsesManager: TfmUsesManager
     object pcUnits: TPageControl
       Left = 6
       Top = 47
-      Width = 323
+      Width = 452
       Height = 388
-      ActivePage = tabSearchPath
+      ActivePage = tabIdentifiers
       Align = alClient
       TabOrder = 1
       OnChange = pcUnitsChange
@@ -54,7 +53,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPathFooter: TPanel
           Left = 0
           Top = 325
-          Width = 315
+          Width = 428
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -79,7 +78,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 315
+          Width = 428
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -89,7 +88,7 @@ object fmUsesManager: TfmUsesManager
           object sg_SearchPath: TStringGrid
             Left = 3
             Top = 3
-            Width = 309
+            Width = 422
             Height = 319
             Align = alClient
             Color = clBtnFace
@@ -106,6 +105,7 @@ object fmUsesManager: TfmUsesManager
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnDrawCell = sg_AvailDrawCell
             OnMouseDown = sg_MouseDownForDragging
           end
         end
@@ -115,7 +115,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 315
+          Width = 428
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -125,7 +125,7 @@ object fmUsesManager: TfmUsesManager
           object sg_Project: TStringGrid
             Left = 3
             Top = 3
-            Width = 309
+            Width = 422
             Height = 319
             Align = alClient
             ColCount = 1
@@ -140,13 +140,14 @@ object fmUsesManager: TfmUsesManager
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnDrawCell = sg_AvailDrawCell
             OnMouseDown = sg_MouseDownForDragging
           end
         end
         object pnlProjFooter: TPanel
           Left = 0
           Top = 325
-          Width = 315
+          Width = 428
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -175,7 +176,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 315
+          Width = 428
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -185,7 +186,7 @@ object fmUsesManager: TfmUsesManager
           object sg_Common: TStringGrid
             Left = 3
             Top = 3
-            Width = 309
+            Width = 422
             Height = 319
             Align = alClient
             ColCount = 1
@@ -200,13 +201,14 @@ object fmUsesManager: TfmUsesManager
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnDrawCell = sg_AvailDrawCell
             OnMouseDown = sg_MouseDownForDragging
           end
         end
         object pnlCommonFooter: TPanel
           Left = 0
           Top = 325
-          Width = 315
+          Width = 428
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -235,7 +237,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 315
+          Width = 428
           Height = 296
           Align = alClient
           BevelOuter = bvNone
@@ -245,7 +247,7 @@ object fmUsesManager: TfmUsesManager
           object sg_Favorite: TStringGrid
             Left = 3
             Top = 3
-            Width = 309
+            Width = 422
             Height = 290
             Align = alClient
             ColCount = 1
@@ -260,13 +262,14 @@ object fmUsesManager: TfmUsesManager
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
             OnDragOver = lbxAvailDragOver
+            OnDrawCell = sg_AvailDrawCell
             OnMouseDown = sg_MouseDownForDragging
           end
         end
         object pnlFavFooter: TPanel
           Left = 0
           Top = 296
-          Width = 315
+          Width = 428
           Height = 63
           Align = alBottom
           BevelOuter = bvNone
@@ -311,7 +314,7 @@ object fmUsesManager: TfmUsesManager
         object sg_Identifiers: TStringGrid
           Left = 0
           Top = 0
-          Width = 315
+          Width = 444
           Height = 325
           Align = alClient
           ColCount = 2
@@ -319,14 +322,15 @@ object fmUsesManager: TfmUsesManager
           DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 2
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goRowSelect]
           TabOrder = 0
+          OnDrawCell = sg_AvailDrawCell
           OnMouseDown = sg_MouseDownForDragging
         end
         object pnlIdentifiersFooter: TPanel
           Left = 0
           Top = 325
-          Width = 315
+          Width = 444
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -353,32 +357,34 @@ object fmUsesManager: TfmUsesManager
     object pnlAvailableHeader: TPanel
       Left = 6
       Top = 6
-      Width = 323
+      Width = 452
       Height = 41
       Align = alTop
       BevelOuter = bvNone
       FullRepaint = False
       TabOrder = 0
+      OnResize = pnlAvailableHeaderResize
       DesignSize = (
-        323
+        452
         41)
       object edtUnitFilter: TEdit
-        Left = 160
+        Left = 200
         Top = 16
-        Width = 161
+        Width = 250
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 1
         OnChange = edtUnitFilterChange
+        OnEnter = edtUnitFilterEnter
+        OnExit = edtUnitFilterExit
         OnKeyDown = edtUnitFilterKeyDown
       end
       object lblUnits: TPanel
         Left = 0
         Top = 0
-        Width = 323
+        Width = 452
         Height = 14
         Align = alTop
-        AutoSize = True
         BevelOuter = bvNone
         Caption = 'Available Units'
         ParentColor = True
@@ -395,12 +401,14 @@ object fmUsesManager: TfmUsesManager
       object edtIdentifierFilter: TEdit
         Left = 0
         Top = 16
-        Width = 153
+        Width = 209
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 2
         Visible = False
         OnChange = edtIdentifierFilterChange
+        OnEnter = edtIdentifierFilterEnter
+        OnExit = edtIdentifierFilterExit
         OnKeyDown = edtIdentifierFilterKeyDown
       end
     end
@@ -408,77 +416,108 @@ object fmUsesManager: TfmUsesManager
   object pnlUses: TPanel
     Left = 0
     Top = 0
-    Width = 266
+    Width = 297
     Height = 441
     Align = alLeft
     BevelOuter = bvNone
     BorderWidth = 6
     FullRepaint = False
     TabOrder = 0
-    object pcUses: TPageControl
+    OnResize = pnlUsesResize
+    object p_Interface: TPanel
       Left = 6
       Top = 21
-      Width = 254
+      Width = 139
       Height = 347
-      ActivePage = tabInterface
-      Align = alClient
-      TabOrder = 1
+      Align = alLeft
+      BevelOuter = bvNone
+      TabOrder = 2
       OnResize = pcUsesResize
-      object tabInterface: TTabSheet
+      object l_Interface: TLabel
+        AlignWithMargins = True
+        Left = 0
+        Top = 3
+        Width = 139
+        Height = 14
+        Margins.Left = 0
+        Margins.Right = 0
+        Align = alTop
+        Alignment = taCenter
         Caption = 'I&nterface'
-        object sg_Interface: TStringGrid
-          Left = 0
-          Top = 0
-          Width = 246
-          Height = 318
-          Align = alClient
-          ColCount = 1
-          DefaultColWidth = 100
-          DefaultRowHeight = 16
-          FixedCols = 0
-          RowCount = 1
-          FixedRows = 0
-          Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
-          PopupMenu = pmuUses
-          TabOrder = 0
-          OnDblClick = sg_InterfaceDblClick
-          OnDragDrop = sg_InterfaceDragDrop
-          OnDragOver = sg_UsedDragOver
-          OnMouseDown = sg_MouseDownForDragging
-        end
+        FocusControl = sg_Interface
       end
-      object tabImplementation: TTabSheet
+      object sg_Interface: TStringGrid
+        Left = 0
+        Top = 20
+        Width = 139
+        Height = 327
+        Align = alClient
+        ColCount = 1
+        DefaultColWidth = 100
+        DefaultRowHeight = 16
+        FixedCols = 0
+        RowCount = 1
+        FixedRows = 0
+        Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
+        PopupMenu = pm_Intf
+        TabOrder = 0
+        OnDblClick = sg_InterfaceDblClick
+        OnDragDrop = sg_InterfaceDragDrop
+        OnDragOver = sg_UsedDragOver
+        OnDrawCell = sg_UsedDrawCell
+        OnMouseDown = sg_MouseDownForDragging
+      end
+    end
+    object p_Implementation: TPanel
+      Left = 145
+      Top = 21
+      Width = 146
+      Height = 347
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 3
+      OnResize = pcUsesResize
+      object l_Implementation: TLabel
+        AlignWithMargins = True
+        Left = 0
+        Top = 3
+        Width = 146
+        Height = 14
+        Margins.Left = 0
+        Margins.Right = 0
+        Align = alTop
+        Alignment = taCenter
         Caption = 'I&mplementation'
-        ImageIndex = 1
-        object sg_Implementation: TStringGrid
-          Left = 0
-          Top = 0
-          Width = 246
-          Height = 318
-          Align = alClient
-          ColCount = 1
-          DefaultColWidth = 100
-          DefaultRowHeight = 16
-          FixedCols = 0
-          RowCount = 1
-          FixedRows = 0
-          Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
-          PopupMenu = pmuUses
-          TabOrder = 0
-          OnDblClick = sg_ImplementationDblClick
-          OnDragDrop = sg_ImplementationDragDrop
-          OnDragOver = sg_UsedDragOver
-          OnMouseDown = sg_MouseDownForDragging
-        end
+        FocusControl = sg_Implementation
+      end
+      object sg_Implementation: TStringGrid
+        Left = 0
+        Top = 20
+        Width = 146
+        Height = 327
+        Align = alClient
+        ColCount = 1
+        DefaultColWidth = 100
+        DefaultRowHeight = 16
+        FixedCols = 0
+        RowCount = 1
+        FixedRows = 0
+        Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
+        PopupMenu = pm_Impl
+        TabOrder = 0
+        OnDblClick = sg_ImplementationDblClick
+        OnDragDrop = sg_ImplementationDragDrop
+        OnDragOver = sg_UsedDragOver
+        OnDrawCell = sg_UsedDrawCell
+        OnMouseDown = sg_MouseDownForDragging
       end
     end
     object lblUses: TPanel
       Left = 6
       Top = 6
-      Width = 254
+      Width = 285
       Height = 15
       Align = alTop
-      AutoSize = True
       BevelOuter = bvNone
       Caption = 'Used Units '
       ParentColor = True
@@ -487,66 +526,92 @@ object fmUsesManager: TfmUsesManager
     object pnlUsesBottom: TPanel
       Left = 6
       Top = 368
-      Width = 254
+      Width = 285
       Height = 67
       Align = alBottom
-      TabOrder = 2
+      BevelOuter = bvNone
+      TabOrder = 1
+      OnResize = pnlUsesBottomResize
       object btnAddDots: TButton
-        Left = 8
+        Left = 0
         Top = 36
-        Width = 105
+        Width = 137
         Height = 25
         Caption = 'Add Unit Prefixes'
-        TabOrder = 2
+        ParentShowHint = False
+        ShowHint = False
+        TabOrder = 0
         OnClick = btnAddDotsClick
       end
       object btnRemoveDots: TButton
-        Left = 120
+        Left = 144
         Top = 36
-        Width = 129
+        Width = 137
         Height = 25
         Caption = 'Remove Unit Prefixes'
-        TabOrder = 3
+        ParentShowHint = False
+        ShowHint = False
+        TabOrder = 1
         OnClick = btnRemoveDotsClick
       end
-      object btnUsesDelete: TButton
-        Left = 4
-        Top = 4
-        Width = 85
+      object b_DeleteFromIntf: TButton
+        Left = 0
+        Top = 8
+        Width = 65
         Height = 25
-        Action = actUsesDelete
+        Action = actIntfDelete
         ParentShowHint = False
-        ShowHint = True
-        TabOrder = 0
+        ShowHint = False
+        TabOrder = 2
       end
-      object btnUsesMove: TButton
-        Left = 96
-        Top = 4
-        Width = 152
+      object b_DeleteFromImpl: TButton
+        Left = 216
+        Top = 8
+        Width = 65
         Height = 25
-        Action = actUsesMove
+        Action = actImplDelete
         ParentShowHint = False
-        ShowHint = True
-        TabOrder = 1
+        ShowHint = False
+        TabOrder = 3
+      end
+      object b_MoveToImpl: TButton
+        Left = 72
+        Top = 8
+        Width = 65
+        Height = 25
+        Action = actIntfMove
+        ParentShowHint = False
+        ShowHint = False
+        TabOrder = 4
+      end
+      object b_MoveToIntf: TButton
+        Left = 144
+        Top = 8
+        Width = 65
+        Height = 25
+        Action = actImplMove
+        ParentShowHint = False
+        ShowHint = False
+        TabOrder = 5
       end
     end
   end
   object pnlFooter: TPanel
     Left = 0
     Top = 441
-    Width = 604
+    Width = 764
     Height = 37
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 2
     DesignSize = (
-      604
+      764
       37)
     object chkSingleActionMode: TCheckBox
       Left = 8
       Top = 9
-      Width = 242
+      Width = 402
       Height = 17
       Hint = 
         'If enabled, OK will add the currently selected unit on the right' +
@@ -559,7 +624,7 @@ object fmUsesManager: TfmUsesManager
       TabOrder = 0
     end
     object pnlButtonsRight: TPanel
-      Left = 249
+      Left = 409
       Top = 0
       Width = 355
       Height = 37
@@ -599,30 +664,56 @@ object fmUsesManager: TfmUsesManager
       end
     end
   end
-  object pmuUses: TPopupMenu
+  object pm_Intf: TPopupMenu
     Left = 104
     Top = 56
-    object mitUsesDelete: TMenuItem
-      Action = actUsesDelete
+    object m_IntfDelete: TMenuItem
+      Action = actIntfDelete
       Default = True
     end
-    object mitUsesMove: TMenuItem
-      Action = actUsesMove
+    object m_IntfMove: TMenuItem
+      Action = actIntfMove
     end
-    object mitUsesSep1: TMenuItem
+    object m_IntfSep1: TMenuItem
       Caption = '-'
     end
-    object mitUsesOpenUnit: TMenuItem
+    object m_IntfOpenUnit: TMenuItem
       Action = actOpenUnit
     end
-    object mitUsesAddToFavorites: TMenuItem
-      Action = actUsesAddToFavorites
+    object m_IntfAddToFavorites: TMenuItem
+      Action = actIntfAddToFavorites
     end
-    object mitUsesSep2: TMenuItem
+    object m_IntfSep2: TMenuItem
       Caption = '-'
     end
-    object mitUsesUnalias: TMenuItem
-      Action = actUsesUnAlias
+    object m_IntfUnalias: TMenuItem
+      Action = actUnAlias
+    end
+  end
+  object pm_Impl: TPopupMenu
+    Left = 200
+    Top = 56
+    object m_ImplDelete: TMenuItem
+      Action = actImplDelete
+      Default = True
+    end
+    object m_ImplMove: TMenuItem
+      Action = actImplMove
+    end
+    object m_ImplSep: TMenuItem
+      Caption = '-'
+    end
+    object m_ImplOpenUnit: TMenuItem
+      Action = actOpenUnit
+    end
+    object m_ImplAddToFavorites: TMenuItem
+      Action = actImplAddToFavorites
+    end
+    object m_ImplSep2: TMenuItem
+      Caption = '-'
+    end
+    object m_ImplUnAlias: TMenuItem
+      Action = actUnAlias
     end
   end
   object pmuAvail: TPopupMenu
@@ -659,36 +750,47 @@ object fmUsesManager: TfmUsesManager
     OnUpdate = ActionListUpdate
     Left = 42
     Top = 56
-    object actUsesDelete: TAction
-      Caption = '&Delete'
-      Hint = 'Delete unit from uses list (Double Click)'
-      ImageIndex = 42
-      ShortCut = 46
-      OnExecute = acUsesDeleteExecute
+    object actIntfDelete: TAction
+      Category = 'Intf'
+      Caption = 'Delete'
+      OnExecute = actIntfDeleteExecute
     end
-    object actUsesMove: TAction
-      Caption = 'M&ove to Interface'
-      Hint = 'Move to Interface'
-      ImageIndex = 36
-      ShortCut = 16461
+    object actImplDelete: TAction
+      Category = 'Impl'
+      Caption = 'Delete'
+      OnExecute = actImplDeleteExecute
+    end
+    object actIntfMove: TAction
+      Category = 'Intf'
+      Caption = 'Move ->'
+      OnExecute = actIntfMoveExecute
+    end
+    object actImplMove: TAction
+      Category = 'Impl'
+      Caption = '<- Move'
+      OnExecute = actImplMoveExecute
     end
     object actFavDelete: TAction
+      Category = 'Fav'
       Caption = 'D&elete from Favorites'
       ImageIndex = 42
       ShortCut = 46
       OnExecute = actFavDeleteExecute
     end
     object actFavAdd: TAction
+      Category = 'Fav'
       Caption = '&Add to Favorites...'
       ImageIndex = 41
       ShortCut = 45
       OnExecute = actFavAddExecute
     end
     object actAvailAddToIntf: TAction
+      Category = 'Avail'
       Caption = 'Add to Interfa&ce'
       OnExecute = actAvailAddToIntfExecute
     end
     object actAvailAddToImpl: TAction
+      Category = 'Avail'
       Caption = 'Add to Imp&lementation'
       OnExecute = actAvailAddToImplExecute
     end
@@ -699,14 +801,19 @@ object fmUsesManager: TfmUsesManager
       ShortCut = 16463
       OnExecute = actOpenUnitExecute
     end
-    object actUsesAddToFavorites: TAction
+    object actIntfAddToFavorites: TAction
+      Category = 'Intf'
       Caption = 'Add to Favorites'
-      ShortCut = 16454
-      OnExecute = actUsesAddToFavoritesExecute
+      OnExecute = actIntfAddToFavoritesExecute
     end
-    object actUsesUnAlias: TAction
+    object actImplAddToFavorites: TAction
+      Category = 'Impl'
+      Caption = 'Add to Favorites'
+      OnExecute = actImplAddToFavoritesExecute
+    end
+    object actUnAlias: TAction
       Caption = 'Unalias ...'
-      OnExecute = actUsesUnAliasExecute
+      OnExecute = actIntfUnAliasExecute
     end
     object actOK: TAction
       Caption = 'OK'
