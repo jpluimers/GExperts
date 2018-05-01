@@ -2,7 +2,7 @@ unit GX_UsesExpert;
 
 interface
 
-{$I GX_CondDefine.Inc}
+{$I 'GX_CondDefine.inc'}
 
 uses
   Classes, Controls, Forms, Menus, ComCtrls,
@@ -77,10 +77,10 @@ type
     pnlFavorite: TPanel;
     sg_Favorite: TStringGrid;
     p_Interface: TPanel;
-    l_Interface: TLabel;
+    p_InterfaceTitle: TPanel;
     sg_Interface: TStringGrid;
     p_Implementation: TPanel;
-    l_Implementation: TLabel;
+    p_ImplementationTitle: TPanel;
     sg_Implementation: TStringGrid;
     m_IntfOpenUnit: TMenuItem;
     m_ImplOpenUnit: TMenuItem;
@@ -153,6 +153,8 @@ type
     pnlIdentifiersFooter: TPanel;
     btnIdentifiersAddToIntf: TButton;
     btnIdentifiersAddToImpl: TButton;
+    actFocusInterface: TAction;
+    actFocusImplementation: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -205,6 +207,8 @@ type
     procedure actImplMoveExecute(Sender: TObject);
     procedure actIntfMoveExecute(Sender: TObject);
     procedure pnlUsesBottomResize(Sender: TObject);
+    procedure actFocusInterfaceExecute(Sender: TObject);
+    procedure actFocusImplementationExecute(Sender: TObject);
   private
     FLeftRatio: Double;
     FAliases: TStringList;
@@ -732,6 +736,8 @@ begin
     end;
   end;
   if not found then begin
+    if (cnt = sg.FixedRows + 1) and (sg.Cells[0, sg.FixedRows] = '') then
+      cnt :=sg.FixedRows;
     sg.RowCount := cnt + 1;
     sg.Cells[0, cnt] := UnitName;
   end;
@@ -1143,6 +1149,16 @@ begin
     DeleteFromFavorites(sg_Favorite.Cells[0, i]);
 end;
 
+procedure TfmUsesManager.actFocusImplementationExecute(Sender: TObject);
+begin
+  TWinControl_SetFocus(sg_Implementation);
+end;
+
+procedure TfmUsesManager.actFocusInterfaceExecute(Sender: TObject);
+begin
+  TWinControl_SetFocus(sg_Interface);
+end;
+
 procedure TfmUsesManager.actFavAddExecute(Sender: TObject);
 var
   i: Integer;
@@ -1167,7 +1183,8 @@ begin
     for i := Src.Selection.Bottom downto Src.Selection.Top do
     begin
       FileName := Src.Cells[0, i];
-      AddToFavorites(FileName);
+      if FileName <> '' then
+        AddToFavorites(FileName);
     end;
     edtUnitFilter.Text := '';
     pcUnits.ActivePage := tabFavorite;
@@ -1604,20 +1621,17 @@ end;
 
 procedure TfmUsesManager.LoadFavorites;
 var
-  Settings: TGExpertsSettings;
+  fn: string;
   Paths: TStringList;
 begin
 {$IFOPT D+}
   SendDebug('Loading favorites');
 {$ENDIF D+}
-  // Do not localize.
-  Settings := TGExpertsSettings.Create;
-  try
-    FFavoriteUnits.Sorted := False;
-    FFavoriteUnits.CommaText := Settings.ReadString(TUsesExpert.ConfigurationKey, 'Favorites', '');
-  finally
-    FreeAndNil(Settings);
-  end;
+  FFavoriteUnits.Sorted := False;
+  FFavoriteUnits.Clear;
+  fn := ConfigInfo.ConfigPath + 'FavoriteUnits.txt'; // do not localize
+  if FileExists(fn) then
+    FFavoriteUnits.LoadFromFile(fn);
   FFavoriteUnits.Sorted := True;
 {$IFOPT D+}
   SendDebugFmt('Done loading %d favorites', [FFavoriteUnits.Count]);
@@ -1989,15 +2003,11 @@ end;
 
 procedure TfmUsesManager.SaveFavorites;
 var
-  Settings: TGExpertsSettings;
+  fn: string;
 begin
   // Do not localize.
-  Settings := TGExpertsSettings.Create;
-  try
-    Settings.WriteString(TUsesExpert.ConfigurationKey, 'Favorites', FFavoriteUnits.CommaText);
-  finally
-    FreeAndNil(Settings);
-  end;
+  fn := ConfigInfo.ConfigPath + 'FavoriteUnits.txt'; // do not localize
+  FFavoriteUnits.SaveToFile(fn);
 end;
 
 procedure TfmUsesManager.CloseIfInSingleActionMode;

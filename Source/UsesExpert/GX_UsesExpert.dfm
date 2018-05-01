@@ -15,6 +15,7 @@ object fmUsesManager: TfmUsesManager
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
@@ -53,7 +54,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPathFooter: TPanel
           Left = 0
           Top = 325
-          Width = 428
+          Width = 444
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -78,7 +79,7 @@ object fmUsesManager: TfmUsesManager
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 428
+          Width = 444
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -88,7 +89,7 @@ object fmUsesManager: TfmUsesManager
           object sg_SearchPath: TStringGrid
             Left = 3
             Top = 3
-            Width = 422
+            Width = 438
             Height = 319
             Align = alClient
             Color = clBtnFace
@@ -115,7 +116,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 428
+          Width = 444
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -125,7 +126,7 @@ object fmUsesManager: TfmUsesManager
           object sg_Project: TStringGrid
             Left = 3
             Top = 3
-            Width = 422
+            Width = 438
             Height = 319
             Align = alClient
             ColCount = 1
@@ -147,7 +148,7 @@ object fmUsesManager: TfmUsesManager
         object pnlProjFooter: TPanel
           Left = 0
           Top = 325
-          Width = 428
+          Width = 444
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -176,7 +177,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 428
+          Width = 444
           Height = 325
           Align = alClient
           BevelOuter = bvNone
@@ -186,7 +187,7 @@ object fmUsesManager: TfmUsesManager
           object sg_Common: TStringGrid
             Left = 3
             Top = 3
-            Width = 422
+            Width = 438
             Height = 319
             Align = alClient
             ColCount = 1
@@ -208,7 +209,7 @@ object fmUsesManager: TfmUsesManager
         object pnlCommonFooter: TPanel
           Left = 0
           Top = 325
-          Width = 428
+          Width = 444
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -237,7 +238,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 428
+          Width = 444
           Height = 296
           Align = alClient
           BevelOuter = bvNone
@@ -247,7 +248,7 @@ object fmUsesManager: TfmUsesManager
           object sg_Favorite: TStringGrid
             Left = 3
             Top = 3
-            Width = 422
+            Width = 438
             Height = 290
             Align = alClient
             ColCount = 1
@@ -269,7 +270,7 @@ object fmUsesManager: TfmUsesManager
         object pnlFavFooter: TPanel
           Left = 0
           Top = 296
-          Width = 428
+          Width = 444
           Height = 63
           Align = alBottom
           BevelOuter = bvNone
@@ -383,7 +384,7 @@ object fmUsesManager: TfmUsesManager
         Left = 0
         Top = 0
         Width = 452
-        Height = 14
+        Height = 15
         Align = alTop
         BevelOuter = bvNone
         Caption = 'Available Units'
@@ -433,24 +434,22 @@ object fmUsesManager: TfmUsesManager
       BevelOuter = bvNone
       TabOrder = 2
       OnResize = pcUsesResize
-      object l_Interface: TLabel
-        AlignWithMargins = True
+      object p_InterfaceTitle: TPanel
         Left = 0
-        Top = 3
+        Top = 0
         Width = 139
-        Height = 14
-        Margins.Left = 0
-        Margins.Right = 0
+        Height = 15
         Align = alTop
-        Alignment = taCenter
+        BevelOuter = bvNone
         Caption = 'I&nterface'
-        FocusControl = sg_Interface
+        ParentColor = True
+        TabOrder = 1
       end
       object sg_Interface: TStringGrid
         Left = 0
-        Top = 20
+        Top = 15
         Width = 139
-        Height = 327
+        Height = 332
         Align = alClient
         ColCount = 1
         DefaultColWidth = 100
@@ -477,24 +476,22 @@ object fmUsesManager: TfmUsesManager
       BevelOuter = bvNone
       TabOrder = 3
       OnResize = pcUsesResize
-      object l_Implementation: TLabel
-        AlignWithMargins = True
+      object p_ImplementationTitle: TPanel
         Left = 0
-        Top = 3
+        Top = 0
         Width = 146
-        Height = 14
-        Margins.Left = 0
-        Margins.Right = 0
+        Height = 15
         Align = alTop
-        Alignment = taCenter
+        BevelOuter = bvNone
         Caption = 'I&mplementation'
-        FocusControl = sg_Implementation
+        ParentColor = True
+        TabOrder = 1
       end
       object sg_Implementation: TStringGrid
         Left = 0
-        Top = 20
+        Top = 15
         Width = 146
-        Height = 327
+        Height = 332
         Align = alClient
         ColCount = 1
         DefaultColWidth = 100
@@ -820,6 +817,16 @@ object fmUsesManager: TfmUsesManager
       Hint = 'OK'
       ShortCut = 16397
       OnExecute = actOKExecute
+    end
+    object actFocusInterface: TAction
+      Caption = 'Focus Interface'
+      ShortCut = 32846
+      OnExecute = actFocusInterfaceExecute
+    end
+    object actFocusImplementation: TAction
+      Caption = 'Focus Imlementation'
+      ShortCut = 32845
+      OnExecute = actFocusImplementationExecute
     end
   end
 end
