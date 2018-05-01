@@ -2,7 +2,7 @@ unit GX_UsesExpert;
 
 interface
 
-{$I GX_CondDefine.inc}
+{$I GX_CondDefine.Inc}
 
 uses
   Classes, Controls, Forms, Menus, ComCtrls,
@@ -257,6 +257,8 @@ type
     procedure DeleteFromStringGrid(sg: TStringGrid; const UnitName: string);
     function IndexInStringGrid(sg: TStringGrid; const UnitName: string): integer;
     procedure FilterStringGrid(Filter: string; List: TStrings; sg: TStringGrid);
+    procedure DrawStringGridCell(_sg: TStringGrid; const _Text: string; const _Rect: TRect;
+      _State: TGridDrawState; _Focused: Boolean);
   protected
     FProjectUnits: TStringList;
     FCommonUnits: TStringList;
@@ -746,7 +748,10 @@ begin
     if SameText(sg.Cells[0, i], UnitName) then begin
       for j := i + 1 to cnt - 1 do
         sg.Cells[0, j - 1] := sg.Cells[0, j];
-      sg.RowCount := cnt - 1;
+      Dec(cnt);
+      TGrid_SetNonfixedRowCount(sg, cnt);
+      if cnt = 0 then
+        sg.Cells[0, sg.FixedRows] := '';
       Exit; //==>
     end;
   end;
@@ -981,22 +986,33 @@ begin
     (Source = sg_Favorite) or (Source = sg_SearchPath);
 end;
 
+procedure TfmUsesManager.DrawStringGridCell(_sg: TStringGrid; const _Text: string; const _Rect: TRect;
+  _State: TGridDrawState; _Focused: Boolean);
+var
+  cnv: TCanvas;
+begin
+  cnv := _sg.Canvas;
+  if _Text = '' then
+    cnv.Brush.Color := _sg.Color
+  else begin
+    if gdSelected in _State then begin
+      if not _Focused then begin
+        cnv.Brush.Color := clDkGray;
+        // I would have used clHighlightText but that becomes unreadable when theming is active
+        cnv.Font.Color := clWhite;
+      end;
+    end;
+  end;
+  cnv.FillRect(_Rect);
+  cnv.TextRect(_Rect, _Rect.Left + 2, _Rect.Top + 2, _Text);
+end;
+
 procedure TfmUsesManager.sg_UsedDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
   State: TGridDrawState);
 var
-  Grid: TStringGrid absolute Sender;
-  cnv: TCanvas;
+  sg: TStringGrid absolute Sender;
 begin
-  if not grid.Focused then begin
-    if gdSelected in State then begin
-      cnv := grid.Canvas;
-      cnv.Brush.Color := clDkGray;
-      // I would have used clHighlightText but that becomes unreadable when theming is active
-      cnv.Font.Color := clWhite;
-      cnv.FillRect(Rect);
-      cnv.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, grid.Cells[ACol, ARow]);
-    end;
-  end;
+  DrawStringGridCell(sg, sg.Cells[ACol, ARow], Rect, State, sg.Focused);
 end;
 
 procedure TfmUsesManager.sg_MouseDownForDragging(Sender: TObject; Button: TMouseButton;
@@ -1212,19 +1228,11 @@ end;
 procedure TfmUsesManager.sg_AvailDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
   State: TGridDrawState);
 var
-  Grid: TStringGrid absolute Sender;
-  cnv: TCanvas;
+  sg: TStringGrid absolute Sender;
+  GridFocused: Boolean;
 begin
-  if not grid.Focused and not (edtUnitFilter.Focused or edtIdentifierFilter.Focused) then begin
-    if gdSelected in State then begin
-      cnv := grid.Canvas;
-      cnv.Brush.Color := clDkGray;
-      // I would have used clHighlightText but that becomes unreadable when theming is active
-      cnv.Font.Color := clWhite;
-      cnv.FillRect(Rect);
-      cnv.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, grid.Cells[ACol, ARow]);
-    end;
-  end;
+  GridFocused := sg.Focused or edtUnitFilter.Focused or edtIdentifierFilter.Focused;
+  DrawStringGridCell(sg, sg.Cells[ACol, ARow], Rect, State, GridFocused);
 end;
 
 procedure TfmUsesManager.sg_ImplementationDblClick(Sender: TObject);
@@ -1866,107 +1874,111 @@ begin
 
     for i := sg_Interface.FixedRows to sg_Interface.RowCount - 1 do begin
       NewUnitName := sg_Interface.Cells[0, i];
-      OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
-      if OldUnitName = NewUnitName then
-        OldUnitName := '';
-      case GetUsesStatus(NewUnitName) of
-        usNonExisting: begin
-            if OldUnitName = '' then begin
-              UseUnitInInterface(NewUnitName);
-            end else begin
-              case GetUsesStatus(OldUnitName) of
-                usNonExisting: begin
-                    UseUnitInInterface(NewUnitName);
-                  end;
-                usImplementation: begin
+      if NewUnitName <> '' then begin
+        OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
+        if OldUnitName = NewUnitName then
+          OldUnitName := '';
+        case GetUsesStatus(NewUnitName) of
+          usNonExisting: begin
+              if OldUnitName = '' then begin
+                UseUnitInInterface(NewUnitName);
+              end else begin
+                case GetUsesStatus(OldUnitName) of
+                  usNonExisting: begin
+                      UseUnitInInterface(NewUnitName);
+                    end;
+                  usImplementation: begin
+                      RemoveUnitFromImplementation(OldUnitName);
+                      UseUnitInInterface(NewUnitName);
+                    end;
+                  usInterface: begin
+                      ReplaceUnitInInterface(OldUnitName, NewUnitName);
+                    end;
+                end;
+              end;
+            end;
+          usInterface: begin
+              // the new unit name is already in the interface uses
+              // there is a slim chance that the old one is also used
+              if OldUnitName <> '' then begin
+                case GetUsesStatus(OldUnitName) of
+                  usImplementation:
                     RemoveUnitFromImplementation(OldUnitName);
-                    UseUnitInInterface(NewUnitName);
-                  end;
-                usInterface: begin
-                    ReplaceUnitInInterface(OldUnitName, NewUnitName);
-                  end;
+                  usInterface:
+                    RemoveUnitFromInterface(OldUnitName);
+                end;
               end;
             end;
-          end;
-        usInterface: begin
-            // the new unit name is already in the interface uses
-            // there is a slim chance that the old one is also used
-            if OldUnitName <> '' then begin
-              case GetUsesStatus(OldUnitName) of
-                usImplementation:
-                  RemoveUnitFromImplementation(OldUnitName);
-                usInterface:
-                  RemoveUnitFromInterface(OldUnitName);
+          usImplementation: begin
+              // also removes it from the implementation uses
+              UseUnitInInterface(NewUnitName);
+              // the new unit name is now in the interface uses
+              // there is a slim chance that the old one is also used
+              if OldUnitName <> '' then begin
+                case GetUsesStatus(OldUnitName) of
+                  usImplementation:
+                    RemoveUnitFromImplementation(OldUnitName);
+                  usInterface:
+                    RemoveUnitFromInterface(OldUnitName);
+                end;
               end;
             end;
-          end;
-        usImplementation: begin
-            // also removes it from the implementation uses
-            UseUnitInInterface(NewUnitName);
-            // the new unit name is now in the interface uses
-            // there is a slim chance that the old one is also used
-            if OldUnitName <> '' then begin
-              case GetUsesStatus(OldUnitName) of
-                usImplementation:
-                  RemoveUnitFromImplementation(OldUnitName);
-                usInterface:
-                  RemoveUnitFromInterface(OldUnitName);
-              end;
-            end;
-          end;
-      end; // case New
+        end; // case New
+      end;
     end; // end for interface
 
     for i := sg_Implementation.FixedRows to sg_Implementation.RowCount - 1 do begin
       NewUnitName := sg_Implementation.Cells[0, i];
-      OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
-      if OldUnitName = NewUnitName then
-        OldUnitName := '';
-      case GetUsesStatus(NewUnitName) of
-        usNonExisting: begin
-            if OldUnitName = '' then begin
+      if NewUnitName <> '' then begin
+        OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
+        if OldUnitName = NewUnitName then
+          OldUnitName := '';
+        case GetUsesStatus(NewUnitName) of
+          usNonExisting: begin
+              if OldUnitName = '' then begin
+                UseUnitInImplementation(NewUnitName);
+              end else begin
+                case GetUsesStatus(OldUnitName) of
+                  usNonExisting: begin
+                      UseUnitInImplementation(NewUnitName);
+                    end;
+                  usInterface: begin
+                      RemoveUnitFromInterface(OldUnitName);
+                      UseUnitInImplementation(NewUnitName);
+                    end;
+                  usImplementation: begin
+                      ReplaceUnitInImplementation(OldUnitName, NewUnitName);
+                    end;
+                end;
+              end;
+            end;
+          usInterface: begin
+              // also removes it from the interface uses
               UseUnitInImplementation(NewUnitName);
-            end else begin
-              case GetUsesStatus(OldUnitName) of
-                usNonExisting: begin
-                    UseUnitInImplementation(NewUnitName);
-                  end;
-                usInterface: begin
+              // the new unit name is now in the implementation uses
+              // there is a slim chance that the old one is also used
+              if OldUnitName <> '' then begin
+                case GetUsesStatus(OldUnitName) of
+                  usImplementation:
+                    RemoveUnitFromImplementation(OldUnitName);
+                  usInterface:
                     RemoveUnitFromInterface(OldUnitName);
-                    UseUnitInImplementation(NewUnitName);
-                  end;
-                usImplementation: begin
-                    ReplaceUnitInImplementation(OldUnitName, NewUnitName);
-                  end;
+                end;
               end;
             end;
-          end;
-        usInterface: begin
-            // also removes it from the interface uses
-            UseUnitInImplementation(NewUnitName);
-            // the new unit name is now in the implementation uses
-            // there is a slim chance that the old one is also used
-            if OldUnitName <> '' then begin
-              case GetUsesStatus(OldUnitName) of
-                usImplementation:
-                  RemoveUnitFromImplementation(OldUnitName);
-                usInterface:
-                  RemoveUnitFromInterface(OldUnitName);
+          usImplementation: begin
+              // the new unit name is already in the implementation uses
+              // there is a slim chance that the old one is also used
+              if OldUnitName <> '' then begin
+                case GetUsesStatus(OldUnitName) of
+                  usImplementation:
+                    RemoveUnitFromImplementation(OldUnitName);
+                  usInterface:
+                    RemoveUnitFromInterface(OldUnitName);
+                end;
               end;
             end;
-          end;
-        usImplementation: begin
-            // the new unit name is already in the implementation uses
-            // there is a slim chance that the old one is also used
-            if OldUnitName <> '' then begin
-              case GetUsesStatus(OldUnitName) of
-                usImplementation:
-                  RemoveUnitFromImplementation(OldUnitName);
-                usInterface:
-                  RemoveUnitFromInterface(OldUnitName);
-              end;
-            end;
-          end;
+        end;
       end;
     end;
   finally
