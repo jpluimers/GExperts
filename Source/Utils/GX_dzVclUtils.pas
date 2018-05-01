@@ -1557,10 +1557,13 @@ var
 begin
   cnt := _sl.Count;
   FixedRows := _Grid.FixedRows;
-  if _Grid.RowCount < cnt + FixedRows then
-    _Grid.RowCount := cnt + FixedRows;
-  for i := 0 to cnt - 1 do
-    _Grid.Cells[_Col, FixedRows + i] := _sl[i];
+  TGrid_SetNonfixedRowCount(_Grid, cnt);
+  if cnt = 0 then begin
+    _Grid.Cells[_Col, FixedRows] := '';
+  end else begin
+    for i := 0 to cnt - 1 do
+      _Grid.Cells[_Col, FixedRows + i] := _sl[i];
+  end;
 end;
 
 end.
