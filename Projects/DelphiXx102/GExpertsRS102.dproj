@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.3</ProjectVersion>
+        <ProjectVersion>18.4</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -383,7 +383,6 @@ $(PreBuildEvent)]]></PreBuildEvent>
         </DCCReference>
         <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderCorrection.pas"/>
         <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderData.pas"/>
-        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderDefaults.pas"/>
         <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderExpert.pas"/>
         <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderKeyboard.pas"/>
         <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderUtils.pas"/>
@@ -537,7 +536,12 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
-        <DCCReference Include="..\..\Source\FMX\GXFmxUtils.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_UsageStatistics.pas">
+            <Form>fmUsageStatistics</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzDateUtils.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_UnitExportsParser.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzNamedThread.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
