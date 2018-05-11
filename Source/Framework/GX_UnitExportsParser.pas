@@ -140,14 +140,16 @@ type
     FFiles: TStringList;
     FIdentifiers: TStrings;
     FPaths: TStringList;
+    FCacheDirBS: string;
     procedure AddSymbols(_Parser: TUnitExportsParser);
   protected
     procedure Execute; override;
   public
     ///<summary>
     /// @param Files is a list of unit names, without path and extension
-    /// @param Paths is a list of possible search paths </summary>
-    constructor Create(const _Files: TStrings; _Paths: TStrings; _OnTerminate: TNotifyEvent);
+    /// @param Paths is a list of possible search paths
+    /// @param CacheDir is a directory to cache the identifier lists </summary>
+    constructor Create(const _Files: TStrings; _Paths: TStrings; const _CacheDir: string; _OnTerminate: TNotifyEvent);
     destructor Destroy; override;
     ///<summary>
     /// After execution Identifiers contains a sorted list of all identfiers. The
@@ -848,12 +850,16 @@ end;
 { TUnitExportParserThread }
 
 constructor TUnitExportParserThread.Create(const _Files: TStrings; _Paths: TStrings;
-  _OnTerminate: TNotifyEvent);
+  const _CacheDir: string; _OnTerminate: TNotifyEvent);
 var
   i: Integer;
   s: string;
 begin
   OnTerminate := _OnTerminate;
+
+  FCacheDirBS := IncludeTrailingPathDelimiter(_CacheDir);
+  UniqueString(FCacheDirBS);
+
   FIdentifiers := TStringList.Create;
   FUnits := TStringList.Create;
 
@@ -957,6 +963,7 @@ var
   IdentIdx: Integer;
   sl: TStrings;
   UnitName: string;
+  CacheFn: string;
 begin
   inherited;
 
@@ -974,26 +981,43 @@ begin
     FreeAndNil(sl);
   end;
 
+  ForceDirectories(FCacheDirBS);
+
   for FileIdx := 0 to FFiles.Count - 1 do begin
     if Terminated then
       Exit; //==>
     fn := FFiles[FileIdx];
+    UnitName := ExtractFileName(fn);
+    UnitName := ChangeFileExt(UnitName, '');
     if FileExists(fn) then begin
-      Parser := TUnitExportsParser.Create(fn);
-      try
-        AddSymbols(Parser);
-        Parser.Execute;
-        if Terminated then
-          Exit; //==>
-        UnitName := ExtractFileName(fn);
-        UnitName := ChangeFileExt(UnitName, '');
-        FUnits.Add(UnitName);
-        sl := Parser.Identifiers;
-        for IdentIdx := 0 to sl.Count - 1 do begin
-          FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+      CacheFn := MangleFilename(fn);
+      CacheFn := FCacheDirBS + CacheFn;
+      if FileExists(CacheFn) and not FileIsNewerThan(fn, CacheFn) then begin
+        sl := TStringList.Create;
+        try
+          sl.LoadFromFile(CacheFn);
+          FUnits.Add(UnitName);
+          for IdentIdx := 0 to sl.Count - 1 do
+            FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+        finally
+          FreeAndNil(sl);
         end;
-      finally
-        FreeAndNil(Parser);
+      end else begin
+        Parser := TUnitExportsParser.Create(fn);
+        try
+          AddSymbols(Parser);
+          Parser.Execute;
+          if Terminated then
+            Exit; //==>
+          FUnits.Add(UnitName);
+          sl := Parser.Identifiers;
+          sl.SaveToFile(CacheFn);
+          for IdentIdx := 0 to sl.Count - 1 do begin
+            FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+          end;
+        finally
+          FreeAndNil(Parser);
+        end;
       end;
     end;
   end;
