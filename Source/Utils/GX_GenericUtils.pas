@@ -253,6 +253,9 @@ function LeftTrimNChars(const AValue: string; const TrimChars: TSysCharSet = [#9
 {$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 function StartsText(const SubStr, Str: string): Boolean;
 function StartsStr(const SubStr, Str: string): Boolean;
+// Delphi 6 does not have the overloaded version with start only, so we implement it here
+function Copy(const _Value: string; _Start, _Len: Integer): string; overload;
+function Copy(const _Value: string; _Start: Integer): string; overload;
 {$ENDIF}
 
 // See if a string begins/ends with a specific substring
@@ -667,6 +670,15 @@ function IsBinaryForm(const FileName: string): Boolean;
 procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
 // Search for a file in the given path, returns the first match
 function TryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;
+
+///<summary>
+/// removes leading '..\', converts ':', '\' and '/' to @ </summary>
+function MangleFilename(const _fn: string): string;
+
+///<summary>
+/// @returns True, if Fn1 is newer than FN2
+/// @raises exeptions if either of the files does not exist </summary>
+function FileIsNewerThan(const _Fn1, _Fn2: string): Boolean;
 
 //
 // Binary module utility functions.
@@ -1100,7 +1112,7 @@ var
 begin
   if StartIndex > 1 then
   begin
-    S := Copy(Text, StartIndex, MaxInt);
+    S := Copy(Text, StartIndex);
     Result := CaseInsensitivePos(Pat, S);
   end else
     Result := CaseInsensitivePos(Pat, Text);
@@ -1114,7 +1126,7 @@ var
 begin
   if StartIndex > 1 then
   begin
-    S := Copy(Text, StartIndex, MaxInt);
+    S := Copy(Text, StartIndex);
     Result := Pos(Pat, S);
   end else
     Result := Pos(Pat, Text);
@@ -1566,6 +1578,16 @@ end;
 function StartsStr(const SubStr, Str: string): Boolean;
 begin
   Result := Pos(SubStr, Str) = 1;
+end;
+
+function Copy(const _Value: string; _Start, _Len: Integer): string;
+begin
+  Result := System.Copy(_Value, _Start, _Len);
+end;
+
+function Copy(const _Value: string; _Start: Integer): string;
+begin
+  Result := System.Copy(_Value, _Start, MaxInt);
 end;
 
 {$ENDIF}
@@ -3887,7 +3909,7 @@ begin
   else
   begin
     NameWild := Copy(FileWildcard, 1, DotPos - 1);
-    ExtWild := Copy(FileWildcard, DotPos + 1, MaxInt);
+    ExtWild := Copy(FileWildcard, DotPos + 1);
   end;
   // We could probably modify this to use ExtractFileExt, etc.
   DotPos := LastCharPos(FileName, '.');
@@ -3895,7 +3917,7 @@ begin
     DotPos := Length(FileName) + 1;
 
   NameFile := Copy(FileName, 1, DotPos - 1);
-  ExtFile := Copy(FileName, DotPos + 1, MaxInt);
+  ExtFile := Copy(FileName, DotPos + 1);
   // Case insensitive check
   if IgnoreCase then
   begin
@@ -4047,6 +4069,33 @@ begin
   end;
 
   Result := False;
+end;
+
+function MangleFilename(const _fn: string): string;
+var
+  i: Integer;
+begin
+  Result := _fn;
+  UniqueString(Result);
+  while StartsStr('..\', Result) do
+    Result := Copy(Result, 4);
+  for i := 1 to Length(Result) - 1 do begin
+    case Result[i] of
+      ':': Result[i] := '@';
+      '\': Result[i] := '@';
+      '/': Result[i] := '@';
+    end;
+  end;
+end;
+
+function FileIsNewerThan(const _Fn1, _Fn2: string): Boolean;
+var
+  Age1: TDateTime;
+  Age2: TDateTime;
+begin
+  Age1:=  GetFileDate(_Fn1);
+  Age2 := GetFileDate(_Fn2);
+  Result := (Age1 > Age2);
 end;
 
 function ThisDllName: string;
