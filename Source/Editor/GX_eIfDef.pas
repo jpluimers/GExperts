@@ -692,10 +692,10 @@ begin
       _Value := Copy(s, Length(Incl) + 1, p - 1 - Length(Incl));
       _Value := Trim(_Value);
       _Value := AnsiDequotedStr(_Value, '''');
-      s := Copy(s, p + 1, MaxInt);
+      s := Copy(s, p + 1);
       p := Pos('//', s);
       if p > 0 then
-        _Comment := Trim(Copy(s, p + 2, MaxInt));
+        _Comment := Trim(Copy(s, p + 2));
     end;
   end;
 end;

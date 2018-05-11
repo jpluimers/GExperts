@@ -851,7 +851,7 @@ procedure TGrepSearchRunner.FoundIt(LineNo, StartCol, EndCol: Integer; const Lin
     for I := 1 to Min(Length(AFileName), Length(FSearchRoot)) do
       if ( UpperCase(AFileName[I]) = UpperCase(FSearchRoot[I]) ) and (AFileName[I] = PathDelim) then
         ARemoveCount := I;
-    Result := Copy(AFileName, ARemoveCount+1, MaxInt);
+    Result := Copy(AFileName, ARemoveCount+1);
   end;
 
 var
@@ -1026,7 +1026,7 @@ var
   ASubKey: String;
 begin
   // INI file trims when reading back in, so a magic marker is used but we need to strip it when reading in.
-  Line := Copy(AIni.ReadString(ASection, 'Line', '#' + Line), 2, MaxInt);
+  Line := Copy(AIni.ReadString(ASection, 'Line', '#' + Line), 2);
   LineNo := AIni.ReadInteger(ASection, 'LineNo', LineNo);
 
 //MatchList
@@ -2003,7 +2003,7 @@ var
   begin
     for I := 0 to ASection.Count - 1 do
                    //order index to first                                 //keyindex
-      ASection[I] := TStrings_ValueFromIndex(ASection, I) + '=' + Copy(ASection.Names[I], 12, MaxInt);
+      ASection[I] := TStrings_ValueFromIndex(ASection, I) + '=' + Copy(ASection.Names[I], 12);
     ASection.Sort;
   end;
 

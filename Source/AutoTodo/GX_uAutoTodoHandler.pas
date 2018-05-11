@@ -219,7 +219,7 @@ var
   After: Integer;
 begin
   repeat
-    Result := Pos(Id, Copy(s, StartPos, MaxInt));
+    Result := Pos(Id, Copy(s, StartPos));
     if Result > 0 then
       Inc(Result, StartPos - 1);
     After := Result + Length(Id);

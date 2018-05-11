@@ -292,7 +292,7 @@ begin
     while FOutputMessages.Count > 0 do
     begin
       sFileName := Copy(FOutputMessages[0], 1, Pos('|', FOutputMessages[0]) - 1);
-      sMessage := Copy(FOutputMessages[0], Pos('|', FOutputMessages[0]) + 1, MaxInt);
+      sMessage := Copy(FOutputMessages[0], Pos('|', FOutputMessages[0]) + 1);
       GxOtaWriteToolMessage(sFileName, sMessage, '', 0, 0);
       FOutputMessages.Delete(0);
     end;

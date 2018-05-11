@@ -1005,7 +1005,7 @@ var
       RenamedEqualPosition := Pos('=', MInfo.RName);
       // For renamed/redirected methods, RName should jump to the renamed method
       if RenamedEqualPosition > 0 then
-        MInfo.FRName := Trim(Copy(MInfo.RName, RenamedEqualPosition + 1, 9999));
+        MInfo.FRName := Trim(Copy(MInfo.RName, RenamedEqualPosition + 1));
     end;
   end;
 

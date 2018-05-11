@@ -382,7 +382,7 @@ begin
     end;
   end;
   while StartsStr(';', cbExcludedDirs.Text) do
-    cbExcludedDirs.Text := Copy(cbExcludedDirs.Text, 2, MaxInt);
+    cbExcludedDirs.Text := Copy(cbExcludedDirs.Text, 2);
   cbExcludedDirs.Text := StringReplace(cbExcludedDirs.Text, ';;', ';', [rfReplaceAll]);
 
   SaveFormSettings;

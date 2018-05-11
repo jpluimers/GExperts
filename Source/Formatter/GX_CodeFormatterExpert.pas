@@ -297,9 +297,9 @@ begin
             Position := Pos(FormattedBlockEnd, FullTextStr);
             FullTextStr := Copy(FullTextStr, 1, Position - 1);
             Position := Pos(FormattedBlockStart, FullTextStr);
-            FullTextStr := Copy(FullTextStr, Position + Length(FormattedBlockStart), MaxInt);
+            FullTextStr := Copy(FullTextStr, Position + Length(FormattedBlockStart));
             if Copy(FullTextStr, 1, 2) = CRLF then
-              FullTextStr := Copy(FullTextStr, 3, MaxInt);
+              FullTextStr := Copy(FullTextStr, 3);
             GxOtaSelectBlock(SourceEditor, BlockStart, BlockEnd);
             GxOtaReplaceSelection(SourceEditor, 0, FullTextStr);
           end else

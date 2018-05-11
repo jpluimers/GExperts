@@ -282,7 +282,7 @@ begin
   BaseIndent := LeftStr(_sl[0], FirstCharPos - 1);
 
   for i := 0 to _sl.Count - 1 do begin
-    Line := Copy(_sl[i], FirstCharPos, MaxInt);
+    Line := Copy(_sl[i], FirstCharPos);
     if _TrimLeft then
       Line := TrimLeft(Line);
     if _TrimRight then
@@ -334,7 +334,7 @@ begin
   end;
 
   for i := 0 to _sl.Count - 1 do begin
-    ALine := Copy(_sl[i], FirstCharPos, MaxInt);
+    ALine := Copy(_sl[i], FirstCharPos);
 
     if _QuoteStrings then
       ALine := AnsiQuotedStr(ALine + IfThen(_AppendSpace, ' '), SINGLE_QUOTE);

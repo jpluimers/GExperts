@@ -274,10 +274,10 @@ procedure ScanForIncludesAndAdd(const FileName: string;
       if (ParsedLine <> '') and (ParsedLine[1] = '#') then
       begin
         // This will break filenames with more than one consecutive space
-        PragmaBackup := CompressWhiteSpace(Copy(ParsedLine, 2, MaxInt));
+        PragmaBackup := CompressWhiteSpace(Copy(ParsedLine, 2));
         if StartsStr('pragma backup ', PragmaBackup) then
         begin
-          FileSpec := Trim(Copy(ParsedLine, Pos('backup', ParsedLine) + 6, MaxInt));
+          FileSpec := Trim(Copy(ParsedLine, Pos('backup', ParsedLine) + 6));
           if FileSpec = '' then
             Continue;
 
@@ -480,7 +480,7 @@ var
     if SeparatorPos > 0 then
     begin
       Delete(IncludedFile, SeparatorPos, Length(Entry));
-      RefererFile := Copy(Entry, SeparatorPos + 1, MaxInt);
+      RefererFile := Copy(Entry, SeparatorPos + 1);
     end
     else
       RefererFile := '';

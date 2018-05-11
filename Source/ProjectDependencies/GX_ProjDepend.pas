@@ -913,7 +913,7 @@ procedure TfmProjDepend.ExportAllDependencies;
     while i >= 0 do
     begin
       Str := ExportList[i];
-      Str := Copy(Str, Pos(',', Str) + 1, MaxInt);
+      Str := Copy(Str, Pos(',', Str) + 1);
       if SameText(UsingUnit, Str) then
         Break;
       Dec(i);

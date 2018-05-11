@@ -600,7 +600,7 @@ begin
     for i := StartIdx to EndIdx do begin
       s := sl[i];
       if LeftStr(s, 3) = '..\' then begin
-        s := Copy(s, 4, MaxInt);
+        s := Copy(s, 4);
         sl[i] := s;
       end;
     end;
