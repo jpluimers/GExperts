@@ -1644,7 +1644,7 @@ begin
     SendDebug('Running UnitExportParser thread to get identifiers from favorites');
 {$ENDIF D+}
     FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
-      ConfigInfo.ConfigPath + 'Cache', OnExportParserFinished);
+      ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
   finally
     FreeAndNil(Paths);
   end;
