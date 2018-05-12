@@ -690,7 +690,16 @@ begin
           if not (FParser.Tokenid in [tkFunction, tkProcedure, tkConstructor, tkDestructor, tkOperator,
             tkVar, tkThreadvar, tkProperty]) then begin
             // nested class declaration
-            SkipClassOrRecord;
+            if FParser.Tokenid = tkRoundOpen then begin
+              // class declaration with ancestor
+              SkipToClosingDelimiter(tkRoundOpen, tkRoundClose);
+              FParser.NextNoJunkEx;
+              if FParser.Tokenid = tkSemiColon then
+                // type class bla(blub);
+              else
+                SkipClassOrRecord;
+            end else
+              SkipClassOrRecord;
           end;
         end;
       tkRecord,
