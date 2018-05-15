@@ -160,7 +160,9 @@ type
     procedure FormResize(Sender: TObject);
     procedure sg_ImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure sg_InterfaceDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure sg_UsedDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState;
+    procedure sg_InterfaceDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState;
+      var Accept: Boolean);
+    procedure sg_ImplementationDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState;
       var Accept: Boolean);
     procedure ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
     procedure actImplDeleteExecute(Sender: TObject);
@@ -975,7 +977,7 @@ end;
 
 procedure TfmUsesManager.sg_ImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
 begin
-  AddListToImplSection(Source, False);
+  AddListToImplSection(Source, Source = sg_Interface);
   CloseIfInSingleActionMode;
 end;
 
@@ -985,11 +987,18 @@ begin
   CloseIfInSingleActionMode;
 end;
 
-procedure TfmUsesManager.sg_UsedDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState;
-  var Accept: Boolean);
+procedure TfmUsesManager.sg_ImplementationDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
 begin
   Accept := (Source = sg_Project) or (Source = sg_Common) or
-    (Source = sg_Favorite) or (Source = sg_SearchPath);
+    (Source = sg_Favorite) or (Source = sg_SearchPath) or (Source = sg_Interface);
+end;
+
+procedure TfmUsesManager.sg_InterfaceDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+begin
+  Accept := (Source = sg_Project) or (Source = sg_Common) or
+    (Source = sg_Favorite) or (Source = sg_SearchPath) or (Source = sg_Implementation);
 end;
 
 procedure TfmUsesManager.DrawStringGridCell(_sg: TStringGrid; const _Text: string; const _Rect: TRect;

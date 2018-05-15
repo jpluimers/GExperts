@@ -462,7 +462,7 @@ object fmUsesManager: TfmUsesManager
         TabOrder = 0
         OnDblClick = sg_InterfaceDblClick
         OnDragDrop = sg_InterfaceDragDrop
-        OnDragOver = sg_UsedDragOver
+        OnDragOver = sg_InterfaceDragOver
         OnDrawCell = sg_UsedDrawCell
         OnMouseDown = sg_MouseDownForDragging
       end
@@ -504,7 +504,7 @@ object fmUsesManager: TfmUsesManager
         TabOrder = 0
         OnDblClick = sg_ImplementationDblClick
         OnDragDrop = sg_ImplementationDragDrop
-        OnDragOver = sg_UsedDragOver
+        OnDragOver = sg_ImplementationDragOver
         OnDrawCell = sg_UsedDrawCell
         OnMouseDown = sg_MouseDownForDragging
       end
