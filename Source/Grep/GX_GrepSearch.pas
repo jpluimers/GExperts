@@ -328,9 +328,10 @@ end;
 
 procedure TGrepDlgExpert.Execute(Sender: TObject);
 begin
-  if Assigned(fmGrepResults) then
-    fmGrepResults.Execute(gssNormal)
-  else
+  if Assigned(fmGrepResults) then begin
+    fmGrepResults.Execute(gssNormal);
+    IncCallCount;
+  end else
     raise Exception.Create(SGrepResultsNotActive);
 end;
 
