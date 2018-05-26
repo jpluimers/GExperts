@@ -180,7 +180,8 @@ uses
   GX_GxUtils, GX_EditorEnhancements, GX_Experts, GX_IdeEnhance,
   GX_ConfigurationInfo, GX_EditorExpertManager, GX_MessageBox,
   GX_GExperts, GX_EditorShortcut, GX_MenuActions, GX_GenericUtils, GX_IdeUtils,
-  GX_OtaUtils, GX_dzVclUtils, GX_KbdShortCutBroker, GX_UsageStatistics;
+  GX_OtaUtils, GX_dzVclUtils, GX_KbdShortCutBroker, GX_UsageStatistics,
+  GX_BaseExpert;
 
 type
   TShowOldComCtrlVersionMessage = class(TGxMsgBoxAdaptor)
@@ -206,6 +207,7 @@ var
   GExperts: TGExperts;
   i: Integer;
   UsageCount: Integer;
+  Expert: TGX_BaseExpert;
 
   procedure AdjustMinSize(_ctrl: TControl);
   begin
@@ -295,10 +297,14 @@ begin
   GExperts := GExpertsInst(True);
   UsageCount := 0;
   for i := 0 to GExperts.ExpertCount - 1 do begin
-    Inc(UsageCount, GExperts.ExpertList[i].CallCount);
+    Expert := GExperts.ExpertList[i];
+    if Expert.HasCallCount then
+      Inc(UsageCount, Expert.CallCount);
   end;
   for i := 0 to GExperts.EditorExpertManager.EditorExpertCount - 1 do begin
-    Inc(UsageCount, GExperts.EditorExpertManager.EditorExpertList[i].CallCount);
+    Expert := GExperts.EditorExpertManager.EditorExpertList[i];
+    if Expert.HasCallCount then
+      Inc(UsageCount, Expert.CallCount);
   end;
   btnUsage.Caption := Format('Usage (%d) ...', [UsageCount]);
 end;
