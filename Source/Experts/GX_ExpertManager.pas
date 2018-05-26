@@ -501,6 +501,9 @@ var
 begin
   {$IFOPT D+} SendDebug('Adding Expert: '+FileName); {$ENDIF}
 
+  // set Result here because otherwise Delphi 7 complains (wrongly) that it might not be set
+  Result := aerOK;
+
   // Make sure that this particular expert is not already loaded.
   ExpertList := TStringList.Create;
   try
@@ -528,8 +531,6 @@ begin
   finally
     FreeAndNil(RegIni);
   end;
-
-  Result := aerOK;
 end;
 
 // Function to move a value from one registry key to another
