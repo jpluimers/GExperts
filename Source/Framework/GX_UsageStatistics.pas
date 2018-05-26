@@ -106,59 +106,77 @@ end;
 
 procedure TfmUsageStatistics.FillStats;
 var
-  GExperts: TGExperts;
   ClassUsageCount: Integer;
   ClassTotalCount: Integer;
+
+  procedure AppendExpert(_Expert: TGX_BaseExpert; _Items: TListItems);
+  var
+    li: TListItem;
+    cnt: Integer;
+  begin
+    if _Expert.HasCallCount then begin
+      li := _Items.Add;
+      li.Caption := _Expert.GetDisplayName;
+      cnt := _Expert.CallCount;
+      li.SubItems.Add(IntToStr(cnt));
+      Inc(ClassUsageCount, cnt);
+      Inc(cnt, _Expert.TotalCallCount);
+      li.SubItems.Add(IntToStr(cnt));
+      Inc(ClassTotalCount, cnt);
+    end;
+  end;
+
+  procedure AppendTotals(_Items: TListItems);
+  var
+    li: TListItem;
+  begin
+    li := _Items.Add;
+    li.Caption := 'Total';
+    li.SubItems.Add(IntToStr(ClassUsageCount));
+    li.SubItems.Add(IntToStr(ClassTotalCount));
+  end;
+
+var
+  GExperts: TGExperts;
   AllUsageCount: Integer;
   AllTotalCount: Integer;
   cnt: Integer;
   i: Integer;
-  Expert: TGX_BaseExpert;
-  li: TListItem;
+  Items: TListItems;
 begin
-  lv_Experts.Clear;
+  Items := lv_Experts.Items;
+  Items.BeginUpdate;
+  try
+    lv_Experts.Clear;
+    GExperts := GExpertsInst(True);
 
-  GExperts := GExpertsInst(True);
-
-  ClassUsageCount := 0;
-  ClassTotalCount := 0;
-  for i := 0 to GExperts.ExpertCount - 1 do begin
-    Expert := GExperts.ExpertList[i];
-    li := lv_Experts.Items.Add;
-    li.Caption := Expert.GetDisplayName;
-    cnt := Expert.CallCount;
-    li.SubItems.Add(IntToStr(cnt));
-    Inc(ClassUsageCount, cnt);
-    Inc(cnt, Expert.TotalCallCount);
-    li.SubItems.Add(IntToStr(cnt));
-    Inc(ClassTotalCount, cnt);
+    ClassUsageCount := 0;
+    ClassTotalCount := 0;
+    for i := 0 to GExperts.ExpertCount - 1 do begin
+      AppendExpert(GExperts.ExpertList[i], Items);
+    end;
+    AppendTotals(Items);
+//    TListView_Resize(lv_Experts);
+  finally
+    Items.EndUpdate;
   end;
-  li := lv_Experts.Items.Add;
-  li.Caption := 'Total';
-  li.SubItems.Add(IntToStr(ClassUsageCount));
-  li.SubItems.Add(IntToStr(ClassTotalCount));
-  TListView_Resize(lv_Experts);
 
   AllUsageCount := ClassUsageCount;
   AllTotalCount := ClassTotalCount;
   ClassUsageCount := 0;
   ClassTotalCount := 0;
-  for i := 0 to GExperts.EditorExpertManager.EditorExpertCount - 1 do begin
-    Expert := GExperts.EditorExpertManager.EditorExpertList[i];
-    li := lv_EditorExperts.Items.Add;
-    li.Caption := Expert.GetDisplayName;
-    cnt := Expert.CallCount;
-    li.SubItems.Add(IntToStr(cnt));
-    Inc(ClassUsageCount, cnt);
-    Inc(cnt, Expert.TotalCallCount);
-    li.SubItems.Add(IntToStr(cnt));
-    Inc(ClassTotalCount, cnt);
+
+  Items := lv_EditorExperts.Items;
+  Items.BeginUpdate;
+  try
+    for i := 0 to GExperts.EditorExpertManager.EditorExpertCount - 1 do begin
+      AppendExpert(GExperts.EditorExpertManager.EditorExpertList[i], Items);
+    end;
+    AppendTotals(Items);
+//    TListView_Resize(lv_EditorExperts);
+  finally
+    Items.EndUpdate;
   end;
-  li := lv_EditorExperts.Items.Add;
-  li.Caption := 'Total';
-  li.SubItems.Add(IntToStr(ClassUsageCount));
-  li.SubItems.Add(IntToStr(ClassTotalCount));
-  TListView_Resize(lv_EditorExperts);
 
   Inc(AllUsageCount, ClassUsageCount);
   Inc(AllTotalCount, ClassTotalCount);
