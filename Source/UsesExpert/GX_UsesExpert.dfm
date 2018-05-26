@@ -319,7 +319,7 @@ object fmUsesManager: TfmUsesManager
           Height = 325
           Align = alClient
           ColCount = 2
-          DefaultColWidth = 80
+          DefaultColWidth = 150
           DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 2
@@ -828,5 +828,12 @@ object fmUsesManager: TfmUsesManager
       ShortCut = 32845
       OnExecute = actFocusImplementationExecute
     end
+  end
+  object tim_Progress: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = tim_ProgressTimer
+    Left = 376
+    Top = 248
   end
 end

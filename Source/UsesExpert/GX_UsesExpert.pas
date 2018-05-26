@@ -155,6 +155,7 @@ type
     btnIdentifiersAddToImpl: TButton;
     actFocusInterface: TAction;
     actFocusImplementation: TAction;
+    tim_Progress: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -211,6 +212,7 @@ type
     procedure pnlUsesBottomResize(Sender: TObject);
     procedure actFocusInterfaceExecute(Sender: TObject);
     procedure actFocusImplementationExecute(Sender: TObject);
+    procedure tim_ProgressTimer(Sender: TObject);
   private
     FLeftRatio: Double;
     FAliases: TStringList;
@@ -479,6 +481,7 @@ begin
 
   sg_Identifiers.Cells[0, 0] := 'Identifier';
   sg_Identifiers.Cells[1, 0] := 'Unit';
+  sg_Identifiers.Cells[0, 1] := 'searching ...';
 end;
 
 procedure TfmUsesManager.GetProjectFiles;
@@ -593,6 +596,7 @@ procedure TfmUsesManager.FormCreate(Sender: TObject);
 
 var
   Selection: string;
+  Paths: TStringList;
 begin
   TControl_SetMinConstraints(Self);
   pnlUses.Constraints.MinWidth := pnlUses.Width;
@@ -614,6 +618,19 @@ begin
   FOldToNewUnitNameMap := TStringList.Create;
 
   LoadFavorites;
+
+  Paths := TStringList.Create;
+  try
+    GxOtaGetAllPossiblePaths(Paths);
+{$IFOPT D+}
+    SendDebug('Running UnitExportParser thread to get identifiers from favorites');
+{$ENDIF D+}
+    FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
+      ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
+    tim_Progress.Enabled := True;
+  finally
+    FreeAndNil(Paths);
+  end;
 
   FFindThread := TFileFindThread.Create;
   FFindThread.FileMasks.Add('*.pas');
@@ -651,14 +668,18 @@ end;
 
 procedure TfmUsesManager.FormDestroy(Sender: TObject);
 begin
+  tim_Progress.Enabled := False;
+
   if Assigned(FFindThread) then begin
     FFindThread.OnFindComplete := nil;
     FFindThread.Terminate;
   end;
+
   if Assigned(FUnitExportParserThread) then begin
     FUnitExportParserThread.OnTerminate := nil;
     FUnitExportParserThread.Terminate;
   end;
+
   FreeAndNil(FOldToNewUnitNameMap);
   FreeAndNil(FAliases);
   FreeAndNil(FFindThread);
@@ -1602,10 +1623,16 @@ begin
   ResizeIdentiferGrid;
 end;
 
+procedure TfmUsesManager.tim_ProgressTimer(Sender: TObject);
+begin
+  if Assigned(FUnitExportParserThread) then begin
+    sg_Identifiers.Cells[1, 1] := IntToStr(FUnitExportParserThread.Identifiers.Count);
+  end;
+end;
+
 procedure TfmUsesManager.LoadFavorites;
 var
   fn: string;
-  Paths: TStringList;
 begin
 {$IFOPT D+}
   SendDebug('Loading favorites');
@@ -1619,18 +1646,6 @@ begin
 {$IFOPT D+}
   SendDebugFmt('Done loading %d favorites', [FFavoriteUnits.Count]);
 {$ENDIF D+}
-
-  Paths := TStringList.Create;
-  try
-    GxOtaGetAllPossiblePaths(Paths);
-{$IFOPT D+}
-    SendDebug('Running UnitExportParser thread to get identifiers from favorites');
-{$ENDIF D+}
-    FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
-      ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
-  finally
-    FreeAndNil(Paths);
-  end;
 end;
 
 procedure TfmUsesManager.OnExportParserFinished(_Sender: TObject);
@@ -1642,6 +1657,7 @@ var
   sl: TStrings;
   Idx: Integer;
 begin
+  tim_Progress.Enabled := False;
   if not Assigned(FUnitExportParserThread) then
     Exit; //==>
 
