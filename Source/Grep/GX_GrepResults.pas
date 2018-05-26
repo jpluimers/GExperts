@@ -497,6 +497,7 @@ begin
   if FSearchInProgress then
     raise Exception.Create(SGrepActive);
 
+  GrepExpert.IncCallCount;
   if (AState in [gssNormal, gssSearchAgain, gssModifySearchSettings]) or not FGrepSettings.CanRefresh then
     if not QueryUserForGrepOptions(AState) then
       Exit;

@@ -110,6 +110,9 @@ type
     function GetHelpString: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
+    // The call count of the Grep Search expert is included with the Grep Results expert
+    // so we return false here.
+    function HasCallCount: Boolean; override;
   end;
 
 implementation
@@ -326,11 +329,15 @@ begin
   Result := 'GrepSearch'; // Do not localize.
 end;
 
+function TGrepDlgExpert.HasCallCount: Boolean;
+begin
+  Result := False;
+end;
+
 procedure TGrepDlgExpert.Execute(Sender: TObject);
 begin
   if Assigned(fmGrepResults) then begin
     fmGrepResults.Execute(gssNormal);
-    IncCallCount;
   end else
     raise Exception.Create(SGrepResultsNotActive);
 end;
