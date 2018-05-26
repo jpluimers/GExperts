@@ -50,6 +50,10 @@ type
     // displays a dialog saying there are no configuration options
     // see also HasConfigOptions
     procedure Configure; virtual;
+    // @returns true, if the expert maintains a call count. Most experts return true, with
+    // the notable exception of the Grep Search expert because it's calls are counted
+    // by the Grep Results expert.
+    function HasCallCount: Boolean; virtual;
     procedure IncCallCount;
     procedure Execute(Sender: TObject); virtual; abstract;
     // Get a reference to the bitmap for menu items, buttons, etc.
@@ -189,6 +193,11 @@ end;
 function TGX_BaseExpert.GetOptionsBaseRegistryKey: string;
 begin
   Result := '';
+end;
+
+function TGX_BaseExpert.HasCallCount: Boolean;
+begin
+  Result := True;
 end;
 
 function TGX_BaseExpert.HasConfigOptions: Boolean;
