@@ -4428,8 +4428,13 @@ procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = 
 var
   i: Integer;
 begin
-  for i := 0 to _lv.Columns.Count - 1 do
-    TListView_ResizeColumn(_lv.Columns[i], _Options);
+  _lv.Items.BeginUpdate;
+  try
+    for i := 0 to _lv.Columns.Count - 1 do
+      TListView_ResizeColumn(_lv.Columns[i], _Options);
+  finally
+    _lv.Items.EndUpdate;
+  end;
 end;
 (*
 function TAction_SetCheckedExecute(_act: TCustomAction; _Checked: Boolean): Boolean;
@@ -5108,10 +5113,10 @@ begin
   Result.Caption := _Caption;
 end;
 
-function TActionlist_Append(_al: TActionList; const _Caption: string; _Shortcut: TShortCut): TAction;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _ShortCut: TShortCut): TAction;
 begin
   Result := TActionlist_Append(_al, _Caption);
-  Result.ShortCut := _Shortcut;
+  Result.ShortCut := _ShortCut;
 end;
 
 function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent): TAction;
@@ -5120,9 +5125,9 @@ begin
   Result.OnExecute := _OnExecute;
 end;
 
-function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent; _Shortcut: TShortCut): TAction;
+function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction;
 begin
-  Result := TActionlist_Append(_al, _Caption, _Shortcut);
+  Result := TActionlist_Append(_al, _Caption, _ShortCut);
   Result.OnExecute := _OnExecute;
 end;
 (*
