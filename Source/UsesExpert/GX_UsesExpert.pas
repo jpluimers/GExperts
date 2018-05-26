@@ -216,7 +216,6 @@ type
     FAliases: TStringList;
     FFindThread: TFileFindThread;
     FUnitExportParserThread: TUnitExportParserThread;
-    FCurrentIdentIdx: Integer;
     // maintains a list unit name mappings from "originally used" to "currently used"
     // this is necessary to put units which have been switched between using prefixes and
     // not in the correct place of the unit list.
@@ -613,7 +612,6 @@ begin
   FFavUnitsExports := TStringList.Create;
   FAliases := TStringList.Create;
   FOldToNewUnitNameMap := TStringList.Create;
-  FCurrentIdentIdx := -1;
 
   LoadFavorites;
 
@@ -640,8 +638,9 @@ begin
   Selection := RetrieveEditorBlockSelection;
   if Trim(Selection) = '' then begin
     try
-      Selection := GxOtaGetCurrentIdent; //if access violation created
+      Selection := GxOtaGetCurrentIdent;
     except
+       // if access violation created
       on E: Exception do
         Selection := '';
     end;
@@ -916,12 +915,6 @@ procedure TfmUsesManager.ReadUsesList;
 var
   i: Integer;
   UsesManager: TUsesManager;
-  Ident: string;
-  IdentOffset: Integer;
-  StartPos: TOTAEditPos;
-  CurrentPos: TOTAEditPos;
-  AfterLen: Integer;
-  sg: TStringGrid;
   sl: TStringList;
 begin
 {$IFOPT D+}
@@ -947,25 +940,6 @@ begin
       sl[i] := ApplyAlias(sl[i]);
     TStringGrid_AssignCol(sg_Implementation, 0, sl);
     TGrid_Resize(sg_Implementation, [roUseGridWidth, roUseAllRows]);
-
-    GxOtaGetCurrentIdentEx(Ident, IdentOffset, StartPos, CurrentPos, AfterLen);
-    if Ident <> '' then begin
-      sg := nil;
-      case UsesManager.isPositionInUsesList(IdentOffset) of
-        puInterface: begin
-            if UsesManager.GetUsesStatus(Ident) = usInterface then begin
-              sg := sg_Interface;
-            end;
-          end;
-        puImplementation: begin
-            if UsesManager.GetUsesStatus(Ident) = usImplementation then begin
-              sg := sg_Implementation;
-            end;
-          end;
-      end;
-      if Assigned(sg) then
-        FCurrentIdentIdx := IndexInStringGrid(sg, Ident);
-    end;
   finally
     FreeAndNil(sl);
     FreeAndNil(UsesManager);
@@ -2030,16 +2004,26 @@ begin
 end;
 
 procedure TfmUsesManager.FormShow(Sender: TObject);
+
+procedure SelectInGrid(_sg: TStringGrid; const _Unit: string);
+  var
+    Idx: Integer;
+  begin
+    Idx := IndexInStringGrid(_sg, _Unit);
+    if Idx <> -1 then
+      _sg.row := Idx
+    else
+      _sg.row := 0;
+  end;
+
 var
-  sg: TStringGrid;
+  s: string;
 begin
   FilterVisibleUnits;
-//  sg := GetUsesSourceList;
-//  if FCurrentIdentIdx <> -1 then
-//    sg.row := FCurrentIdentIdx
-//  else begin
-//    sg.Row := 0;
-//  end;
+
+  s := edtIdentifierFilter.Text;
+  SelectInGrid(sg_Interface, s);
+  SelectInGrid(sg_Implementation, s);
 end;
 
 procedure TfmUsesManager.actImplMoveExecute(Sender: TObject);
