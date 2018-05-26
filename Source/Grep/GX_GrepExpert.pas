@@ -170,7 +170,7 @@ type
     procedure SetShortCut(Value: TShortCut); override;
   public
     procedure Execute(Sender: TObject); override;
-    procedure Configure; override;
+    function HasConfigOptions: Boolean; override;
     function GetDefaultShortCut: TShortCut; override;
     function GetActionCaption: string; override;
     class function ConfigurationKey: string; override;
@@ -183,7 +183,7 @@ type
     procedure SetShortCut(Value: TShortCut); override;
   public
     procedure Execute(Sender: TObject); override;
-    procedure Configure; override;
+    function HasConfigOptions: Boolean; override;
     function GetDefaultShortCut: TShortCut; override;
     function GetActionCaption: string; override;
     class function ConfigurationKey: string; override;
@@ -956,12 +956,12 @@ end;
 
 class function TGrepNextItemExpert.ConfigurationKey: string;
 begin
-  result := TGrepExpert.ConfigurationKey;
+  Result := TGrepExpert.ConfigurationKey + 'Next';
 end;
 
-procedure TGrepNextItemExpert.Configure;
+function TGrepNextItemExpert.HasConfigOptions: Boolean;
 begin
-  inherited;
+  Result := False;
 end;
 
 procedure TGrepNextItemExpert.Execute(Sender: TObject);
@@ -1012,12 +1012,12 @@ end;
 
 class function TGrepPrevItemExpert.ConfigurationKey: string;
 begin
-  result := TGrepExpert.ConfigurationKey;
+  Result := TGrepExpert.ConfigurationKey + 'Prev';
 end;
 
-procedure TGrepPrevItemExpert.Configure;
+function TGrepPrevItemExpert.HasConfigOptions: Boolean;
 begin
-  inherited;
+  Result := False;
 end;
 
 procedure TGrepPrevItemExpert.Execute(Sender: TObject);
