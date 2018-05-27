@@ -1303,9 +1303,15 @@ procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; _frm: TForm); overload;
 function TScreen_MonitorFromPoint(_pnt: TPoint): TMonitor;
 procedure TScreen_MakeFullyVisible(_frm: TForm); overload;
 *)
+///<summary>
 /// Sets the given column of the StringList to the given string list,
 /// adjusting the RowCount if necessary </summary>
 procedure TStringGrid_AssignCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
+
+///<summary>
+/// Adds the entris of the given column to the string list
+/// NOTE: sl will not be cleared. </summary>
+procedure TStringGrid_GetCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
 
 implementation
 
@@ -1654,6 +1660,14 @@ begin
     for i := 0 to cnt - 1 do
       _Grid.Cells[_Col, FixedRows + i] := _sl[i];
   end;
+end;
+
+procedure TStringGrid_GetCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
+var
+  r: Integer;
+begin
+  for r := _Grid.FixedRows to _Grid.RowCount - 1 do
+    _sl.Add(_Grid.Cells[_Col, r]);
 end;
 (*
 procedure TStringGrid_SetNonfixedCell(_Grid: TStringGrid; _Col, _Row: Integer; const _Text: string);
