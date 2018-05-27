@@ -578,7 +578,7 @@ object fmUsesManager: TfmUsesManager
         Height = 25
         Action = actIntfMove
         ParentShowHint = False
-        ShowHint = False
+        ShowHint = True
         TabOrder = 4
       end
       object b_MoveToIntf: TButton
@@ -588,7 +588,7 @@ object fmUsesManager: TfmUsesManager
         Height = 25
         Action = actImplMove
         ParentShowHint = False
-        ShowHint = False
+        ShowHint = True
         TabOrder = 5
       end
     end
