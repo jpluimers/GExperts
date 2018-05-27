@@ -2118,15 +2118,27 @@ procedure TfmUsesManager.actIntfUnAliasExecute(Sender: TObject);
     i: Integer;
     s: string;
     p: Integer;
+    sl: TStringList;
+    FixedRows: Integer;
   begin
-    for i := sg.RowCount - 1 downto sg.FixedRows do begin
-      s := sg.Cells[0, i];
-      p := Pos(ALIAS_PREFIX, s);
-      if p > 0 then begin
-        p := p + Length(ALIAS_PREFIX);
-        s := Copy(s, p, Length(s) - p);
-        sg.Cells[0, i] := s;
+    sl := TStringList.Create;
+    try
+      for i := sg.FixedRows to sg.RowCount - 1  do begin
+        s := sg.Cells[0, i];
+        p := Pos(ALIAS_PREFIX, s);
+        if p > 0 then begin
+          p := p + Length(ALIAS_PREFIX);
+          s := Copy(s, p, Length(s) - p);
+        end;
+        if sl.IndexOf(s) = -1 then
+          sl.Add(s);
       end;
+      FixedRows := sg.FixedRows;
+      for i := 0 to sl.Count - 1 do
+        sg.Cells[0, i + FixedRows] := sl[i];
+      TGrid_SetNonfixedRowCount(sg, sl.Count);
+    finally
+      FreeAndNil(sl);
     end;
   end;
 
