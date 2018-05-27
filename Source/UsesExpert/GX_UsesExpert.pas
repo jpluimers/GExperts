@@ -225,8 +225,8 @@ type
     procedure GetCommonFiles;
     procedure GetProjectFiles;
     function TryGetMapFiles: Boolean;
-    procedure AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean);
-    procedure AddToIntfSection(const UnitName: string);
+    function AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean): Integer;
+    function AddToIntfSection(const UnitName: string): Integer;
     procedure DeleteFromIntfSection(const UnitName: string);
     procedure DeleteFromImplSection(const UnitName: string);
     procedure OpenUnit(const UnitName: string);
@@ -260,7 +260,7 @@ type
     procedure OnExportParserFinished(_Sender: TObject);
     procedure ResizeIdentiferGrid;
     procedure SwitchUnitsTab(_Direction: Integer);
-    procedure AddToStringGrid(sg: TStringGrid; const UnitName: string);
+    function AddToStringGrid(sg: TStringGrid; const UnitName: string): Integer;
     procedure DeleteFromStringGrid(sg: TStringGrid; const UnitName: string);
     function IndexInStringGrid(sg: TStringGrid; const UnitName: string): integer;
     procedure FilterStringGrid(Filter: string; List: TStrings; sg: TStringGrid);
@@ -743,16 +743,18 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.AddToStringGrid(sg: TStringGrid; const UnitName: string);
+function TfmUsesManager.AddToStringGrid(sg: TStringGrid; const UnitName: string): Integer;
 var
   i: Integer;
   cnt: Integer;
   Found: Boolean;
 begin
+  Result := -1;
   Found := False;
   cnt := sg.RowCount;
   for i := sg.FixedRows to cnt - 1 do begin
     if SameText(sg.Cells[0, i], UnitName) then begin
+      Result := i;
       Found := True;
       Break;
     end;
@@ -762,6 +764,7 @@ begin
       cnt :=sg.FixedRows;
     sg.RowCount := cnt + 1;
     sg.Cells[0, cnt] := UnitName;
+    Result := cnt;
   end;
 end;
 
@@ -785,9 +788,9 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.AddToIntfSection(const UnitName: string);
+function TfmUsesManager.AddToIntfSection(const UnitName: string): Integer;
 begin
-  AddToStringGrid(sg_Interface, UnitName);
+  Result := AddToStringGrid(sg_Interface, UnitName);
   DeleteFromStringGrid(sg_Implementation, UnitName);
 end;
 
@@ -876,11 +879,11 @@ begin
   end;
 end;
 
-procedure TfmUsesManager.AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean);
+function TfmUsesManager.AddToImplSection(const UnitName: string; RemoveFromInterface: Boolean): Integer;
 begin
   if RemoveFromInterface then
     DeleteFromStringGrid(sg_Interface, UnitName);
-  AddToStringGrid(sg_Implementation, UnitName);
+  Result := AddToStringGrid(sg_Implementation, UnitName);
 end;
 
 procedure TfmUsesManager.DeleteFromImplSection(const UnitName: string);
@@ -1201,11 +1204,15 @@ var
   Src: TStringGrid;
   i: Integer;
   Col: Integer;
+  Row: Integer;
 begin
   src := GetAvailableSourceList;
   Col := src.ColCount - 1;
+  Row := -1;
   for i := Src.Selection.Bottom downto Src.Selection.Top do
-    AddToIntfSection(Src.Cells[Col, i]);
+    Row := AddToIntfSection(Src.Cells[Col, i]);
+  if Row <> -1 then
+    sg_Interface.Row := Row;
   CloseIfInSingleActionMode;
 end;
 
@@ -1214,11 +1221,16 @@ var
   i: Integer;
   Src: TStringGrid;
   Col: Integer;
+  Row: Integer;
 begin
   src := GetAvailableSourceList;
   Col := src.ColCount - 1;
-  for i := Src.Selection.Bottom downto Src.Selection.Top do
-    AddToImplSection(Src.Cells[Col, i], False);
+  Row := -1;
+  for i := Src.Selection.Bottom downto Src.Selection.Top do begin
+    Row := AddToImplSection(Src.Cells[col, i], False);
+  end;
+  if Row <> -1 then
+    sg_Implementation.Row := Row;
   CloseIfInSingleActionMode;
 end;
 
