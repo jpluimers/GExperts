@@ -558,7 +558,7 @@ object fmUsesManager: TfmUsesManager
         Height = 25
         Action = actIntfDelete
         ParentShowHint = False
-        ShowHint = False
+        ShowHint = True
         TabOrder = 2
       end
       object b_DeleteFromImpl: TButton
@@ -568,7 +568,7 @@ object fmUsesManager: TfmUsesManager
         Height = 25
         Action = actImplDelete
         ParentShowHint = False
-        ShowHint = False
+        ShowHint = True
         TabOrder = 3
       end
       object b_MoveToImpl: TButton
@@ -750,21 +750,25 @@ object fmUsesManager: TfmUsesManager
     object actIntfDelete: TAction
       Category = 'Intf'
       Caption = 'Delete'
+      Hint = 'Delete from Interface'
       OnExecute = actIntfDeleteExecute
     end
     object actImplDelete: TAction
       Category = 'Impl'
       Caption = 'Delete'
+      Hint = 'Delete from Implementation'
       OnExecute = actImplDeleteExecute
     end
     object actIntfMove: TAction
       Category = 'Intf'
       Caption = 'Move ->'
+      Hint = 'Move to Implementation'
       OnExecute = actIntfMoveExecute
     end
     object actImplMove: TAction
       Category = 'Impl'
       Caption = '<- Move'
+      Hint = 'Move to Interface'
       OnExecute = actImplMoveExecute
     end
     object actFavDelete: TAction
