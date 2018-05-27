@@ -2113,7 +2113,7 @@ end;
 
 procedure TfmUsesManager.actIntfUnAliasExecute(Sender: TObject);
 
-  procedure ReplaceByAlias(sg: TStringGrid);
+  procedure ReplaceByAlias(sg: TStringGrid; AlsoSearch: TStringList);
   var
     i: Integer;
     s: string;
@@ -2130,24 +2130,39 @@ procedure TfmUsesManager.actIntfUnAliasExecute(Sender: TObject);
           p := p + Length(ALIAS_PREFIX);
           s := Copy(s, p, Length(s) - p);
         end;
-        if sl.IndexOf(s) = -1 then
+        // only if the unit is not already in the list or in AlsoSearch, add it
+        if (AlsoSearch.IndexOf(s) = -1) and (sl.IndexOf(s) = -1) then
           sl.Add(s);
       end;
       FixedRows := sg.FixedRows;
       for i := 0 to sl.Count - 1 do
         sg.Cells[0, i + FixedRows] := sl[i];
       TGrid_SetNonfixedRowCount(sg, sl.Count);
+      if sl.Count = 0 then
+        sg.Cells[0, FixedRows] := '';
     finally
       FreeAndNil(sl);
     end;
   end;
 
+var
+  IntSl: TStringList;
 begin
   if ShowGxMessageBox(TShowUnaliasMessage) <> mrYes then
     Exit;
 
-  ReplaceByAlias(sg_Interface);
-  ReplaceByAlias(sg_Implementation);
+  IntSl := TStringList.Create;
+  try
+    // IntSl is empty
+    ReplaceByAlias(sg_Interface, IntSl);
+
+    // fill IntSl with the units from interface list
+    TStringGrid_GetCol(sg_Interface, 0, IntSl);
+    IntSl.Sort;
+    ReplaceByAlias(sg_Implementation, IntSl);
+  finally
+    FreeAndNil(IntSl);
+  end;
 end;
 
 procedure TfmUsesManager.AddListToFavorites(sg: TStringGrid);
