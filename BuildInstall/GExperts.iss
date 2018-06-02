@@ -6,12 +6,12 @@
 #ifdef ISPPCC_INVOKED
 ; Command line compiler
   #ifndef Version
-    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.35"
+    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.3.10"
   #endif
 #else
 ; IDE compiler
   #define RS101
-  #define Version "1.38"
+  #define Version "1.3.10"
 #endif
 
 #define Product "GExperts"
