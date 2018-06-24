@@ -175,6 +175,8 @@ uses
 
 const
   ClipStorageFileName = 'ClipboardHistory.xml';
+  MAX_CLIP_MIN = 20;
+  MAX_CLIP_MAX = 1000;
 
 type
   THelperWinControl = class(TWinControl)
@@ -876,7 +878,7 @@ begin
   inherited Create;
   FStoragePath := ConfigInfo.ConfigPath;
 
-  FMaxClip := 20;
+  FMaxClip := MAX_CLIP_MIN;
 
   FreeAndNil(ClipExpert);
   ClipExpert := Self;
@@ -919,7 +921,7 @@ procedure TClipExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize.
-  FMaxClip := Min(Settings.ReadInteger('Maximum', 20), 100);
+  FMaxClip := Min(Settings.ReadInteger('Maximum', MAX_CLIP_MIN), MAX_CLIP_MAX);
   FAutoStart := Settings.ReadBool('AutoStart', False);
   FAutoClose := Settings.ReadBool('AutoClose', False);
 
@@ -954,7 +956,7 @@ begin
     begin
       FAutoStart := Dlg.chkAutoStart.Checked;
       FAutoClose := Dlg.chkAutoClose.Checked;
-      FMaxClip := Min(StrToIntDef(Dlg.edtMaxClip.Text, 20), 1000);
+      FMaxClip := Min(StrToIntDef(Dlg.edtMaxClip.Text, MAX_CLIP_MIN), MAX_CLIP_MAX);
       SaveSettings;
     end;
   finally
