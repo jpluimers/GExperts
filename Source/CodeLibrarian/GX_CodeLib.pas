@@ -1106,6 +1106,8 @@ end;
 constructor TfmCodeLib.Create(AOwner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
   SetNonModalFormPopupMode(Self);
   SetToolbarGradient(ToolBar);
   SetupSyntaxHighlightingControl;

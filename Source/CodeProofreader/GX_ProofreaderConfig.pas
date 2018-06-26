@@ -115,7 +115,7 @@ implementation
 uses
   SysUtils, Windows,
   GX_ProofreaderAutoCorrectEntry, GX_KibitzComp,
-  GX_GxUtils, GX_GenericUtils, GX_OtaUtils;
+  GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -125,6 +125,8 @@ var
   TabIndex: Integer;
 begin
   inherited Create(AOwner);
+
+  TControl_SetMinConstraints(Self);
 
   SetToolbarGradient(tbrReplacement);
   SetToolbarGradient(tbrDictionary);

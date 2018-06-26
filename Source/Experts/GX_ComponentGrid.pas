@@ -70,7 +70,8 @@ implementation
 
 uses
   SysUtils, Graphics, Printers, Windows, Dialogs, ToolsAPI,
-  GX_Consts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_SharedImages;
+  GX_Consts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_SharedImages,
+  GX_dzVclUtils;
 
 type
   TGridProperty = record
@@ -327,6 +328,8 @@ end;
 constructor TfmComponentGrid.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  TControl_SetMinConstraints(Self);
 
   FComponentList := TInterfaceList.Create;
   FModified := False;

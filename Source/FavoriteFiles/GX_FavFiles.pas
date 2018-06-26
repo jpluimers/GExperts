@@ -218,7 +218,7 @@ uses
   GX_ConfigurationInfo, GX_Experts, GX_GExperts,
   {$ENDIF STANDALONE}
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_SharedImages, OmniXML,
-  GX_XmlUtils, GX_IdeUtils, Math;
+  GX_XmlUtils, GX_IdeUtils, Math, GX_dzVclUtils;
 
 type
   EFavFiles = class(Exception);
@@ -1456,6 +1456,8 @@ resourcestring
     // Update SetFilter when you change these
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
 
   SetToolbarGradient(ToolBar);
   pnlFileView.Caption := '';

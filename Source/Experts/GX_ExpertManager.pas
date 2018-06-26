@@ -131,7 +131,7 @@ uses
   SysUtils, CommCtrl,
   GX_GExperts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
   GX_ConfigurationInfo, GX_MessageBox, GX_SharedImages, GX_IdeUtils,
-  GX_VerDepConst;
+  GX_VerDepConst, GX_dzVclUtils;
 
 type
   TGxExpertState = (gesCurrentlyEnabled, gesNextTimeEnabled,
@@ -244,6 +244,8 @@ constructor TfmExpertManager.CreateWithManager(AOwner: TComponent; Manager: TExp
 begin
   FExpertManager := Manager;
   inherited Create(AOwner);
+
+  TControl_SetMinConstraints(Self);
 
   SetToolbarGradient(ToolBar);
   SetNonModalFormPopupMode(Self);

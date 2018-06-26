@@ -204,6 +204,9 @@ end;
 constructor TfmGxBookmarksForm.Create(_Owner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
   if Assigned(BookmarksExpert) then
     BookmarksExpert.SetFormIcon(Self);
 end;

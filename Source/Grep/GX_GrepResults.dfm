@@ -3,8 +3,8 @@ inherited fmGrepResults: TfmGrepResults
   Top = 243
   ActiveControl = lbResults
   Caption = 'Grep Results'
-  ClientHeight = 689
-  ClientWidth = 623
+  ClientHeight = 337
+  ClientWidth = 396
   DefaultMonitor = dmDesktop
   KeyPreview = True
   Menu = MainMenu
@@ -18,16 +18,16 @@ inherited fmGrepResults: TfmGrepResults
   object pnlMain: TPanel
     Left = 0
     Top = 0
-    Width = 623
-    Height = 670
+    Width = 396
+    Height = 318
     Align = alClient
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 0
     object SplitterContext: TSplitter
       Left = 0
-      Top = 574
-      Width = 623
+      Top = 222
+      Width = 396
       Height = 8
       Cursor = crVSplit
       Align = alBottom
@@ -37,9 +37,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object SplitterHistoryList: TSplitter
       Left = 147
-      Top = 24
+      Top = 22
       Width = 8
-      Height = 550
+      Height = 200
       Cursor = crHSplit
       AutoSnap = False
       Beveled = True
@@ -48,9 +48,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object lbResults: TListBox
       Left = 155
-      Top = 24
-      Width = 468
-      Height = 550
+      Top = 22
+      Width = 241
+      Height = 200
       Style = lbOwnerDrawFixed
       Align = alClient
       ItemHeight = 17
@@ -67,8 +67,8 @@ inherited fmGrepResults: TfmGrepResults
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 623
-      Height = 24
+      Width = 396
+      Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
       Flat = True
@@ -213,8 +213,8 @@ inherited fmGrepResults: TfmGrepResults
     end
     object reContext: TRichEdit
       Left = 0
-      Top = 582
-      Width = 623
+      Top = 230
+      Width = 396
       Height = 88
       Align = alBottom
       Font.Charset = ANSI_CHARSET
@@ -232,9 +232,9 @@ inherited fmGrepResults: TfmGrepResults
     end
     object tcHistoryListPage: TTabControl
       Left = 0
-      Top = 24
+      Top = 22
       Width = 147
-      Height = 550
+      Height = 200
       Align = alLeft
       TabOrder = 1
       Tabs.Strings = (
@@ -248,7 +248,7 @@ inherited fmGrepResults: TfmGrepResults
         Left = 4
         Top = 25
         Width = 139
-        Height = 521
+        Height = 171
         Style = lbVirtualOwnerDraw
         Align = alClient
         Font.Charset = ANSI_CHARSET
@@ -272,8 +272,8 @@ inherited fmGrepResults: TfmGrepResults
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 670
-    Width = 623
+    Top = 318
+    Width = 396
     Height = 19
     Panels = <
       item
@@ -772,7 +772,7 @@ inherited fmGrepResults: TfmGrepResults
   end
   object pmHistoryMenu: TPopupMenu
     Images = dmSharedImages.Images
-    Left = 16
+    Left = 40
     Top = 160
     object miHistoryItemName: TMenuItem
       Caption = 'Search Text'
@@ -900,8 +900,8 @@ inherited fmGrepResults: TfmGrepResults
   end
   object pmContextMenu: TPopupMenu
     Images = dmSharedImages.Images
-    Left = 16
-    Top = 592
+    Left = 32
+    Top = 248
     object miContextSearchSelectedText: TMenuItem
       Action = actContextSelSearch
     end
