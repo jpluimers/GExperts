@@ -19,7 +19,7 @@ inherited fmGrepSelect: TfmGrepSelect
     Checkboxes = True
     Columns = <
       item
-        Caption = 'Serch Text'
+        Caption = 'Search Text'
         Tag = 2
         Width = 300
       end
@@ -73,9 +73,137 @@ inherited fmGrepSelect: TfmGrepSelect
     DesignSize = (
       790
       150)
+    object pnlSortButtons: TPanel
+      Left = 361
+      Top = 90
+      Width = 340
+      Height = 60
+      Anchors = [akRight, akBottom]
+      BevelOuter = bvNone
+      Color = clBtnShadow
+      TabOrder = 11
+      object lblQuickSortButtons: TLabel
+        Left = 7
+        Top = 10
+        Width = 41
+        Height = 43
+        Alignment = taCenter
+        AutoSize = False
+        Caption = 'Quick Sort Buttons'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindow
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object btnSortSearchTextAsc: TButton
+        Tag = 2
+        Left = 56
+        Top = 5
+        Width = 90
+        Height = 25
+        Caption = 'Search Text'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ModalResult = 6
+        ParentFont = False
+        TabOrder = 0
+        OnClick = SortButtonsClick
+      end
+      object btnSortSearchTextDesc: TButton
+        Tag = 2
+        Left = 56
+        Top = 32
+        Width = 90
+        Height = 25
+        Caption = 'Text Desc'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ModalResult = 7
+        ParentFont = False
+        TabOrder = 3
+        OnClick = SortButtonsClick
+      end
+      object btnSortTimeAsc: TButton
+        Tag = 3
+        Left = 148
+        Top = 5
+        Width = 90
+        Height = 25
+        Caption = 'Search Time'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ModalResult = 6
+        ParentFont = False
+        TabOrder = 1
+        OnClick = SortButtonsClick
+      end
+      object btnSortTimeDesc: TButton
+        Tag = 3
+        Left = 148
+        Top = 32
+        Width = 90
+        Height = 25
+        Caption = 'Time Desc'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ModalResult = 7
+        ParentFont = False
+        TabOrder = 4
+        OnClick = SortButtonsClick
+      end
+      object btnSortKeyIndexAsc: TButton
+        Tag = 1
+        Left = 240
+        Top = 5
+        Width = 90
+        Height = 25
+        Caption = 'Key Index'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ModalResult = 6
+        ParentFont = False
+        TabOrder = 2
+        OnClick = SortButtonsClick
+      end
+      object btnSortKeyIndexDesc: TButton
+        Tag = 1
+        Left = 240
+        Top = 32
+        Width = 90
+        Height = 25
+        Caption = 'Key Idx Desc'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ModalResult = 7
+        ParentFont = False
+        TabOrder = 5
+        OnClick = SortButtonsClick
+      end
+    end
     object btnOK: TButton
-      Left = 693
-      Top = 48
+      Left = 709
+      Top = 88
       Width = 75
       Height = 25
       Anchors = [akTop, akRight]
@@ -83,17 +211,6 @@ inherited fmGrepSelect: TfmGrepSelect
       Default = True
       ModalResult = 1
       TabOrder = 12
-    end
-    object btnCancel: TButton
-      Left = 693
-      Top = 93
-      Width = 75
-      Height = 25
-      Anchors = [akTop, akRight]
-      Cancel = True
-      Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 13
     end
     object btnCheckItems: TButton
       Left = 2
@@ -147,7 +264,7 @@ inherited fmGrepSelect: TfmGrepSelect
       object lblSaveOption: TLabel
         Left = 5
         Top = 8
-        Width = 204
+        Width = 205
         Height = 13
         Caption = 'Save option new value (when IDE closing):'
       end
@@ -242,7 +359,7 @@ inherited fmGrepSelect: TfmGrepSelect
       object lblSearchSaveOption: TLabel
         Left = 8
         Top = 33
-        Width = 110
+        Width = 113
         Height = 13
         Caption = 'Save option for search:'
       end
@@ -380,7 +497,7 @@ inherited fmGrepSelect: TfmGrepSelect
       object lblSaveSplitCount: TLabel
         Left = 27
         Top = 30
-        Width = 53
+        Width = 54
         Height = 13
         Caption = 'Split count:'
         Enabled = False
@@ -444,133 +561,16 @@ inherited fmGrepSelect: TfmGrepSelect
         TabOrder = 0
       end
     end
-    object pnlSortButtons: TPanel
-      Left = 361
-      Top = 82
-      Width = 340
-      Height = 60
-      Anchors = [akRight, akBottom]
-      BevelOuter = bvNone
-      Color = clBtnShadow
-      TabOrder = 11
-      object lblQuickSortButtons: TLabel
-        Left = 7
-        Top = 10
-        Width = 41
-        Height = 43
-        Alignment = taCenter
-        AutoSize = False
-        Caption = 'Quick Sort Buttons'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindow
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        WordWrap = True
-      end
-      object btnSortSearchTextAsc: TButton
-        Tag = 2
-        Left = 56
-        Top = 5
-        Width = 90
-        Height = 25
-        Caption = 'Search Text'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ModalResult = 6
-        ParentFont = False
-        TabOrder = 0
-        OnClick = SortButtonsClick
-      end
-      object btnSortSearchTextDesc: TButton
-        Tag = 2
-        Left = 56
-        Top = 32
-        Width = 90
-        Height = 25
-        Caption = 'Text Desc'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ModalResult = 7
-        ParentFont = False
-        TabOrder = 3
-        OnClick = SortButtonsClick
-      end
-      object btnSortTimeAsc: TButton
-        Tag = 3
-        Left = 148
-        Top = 5
-        Width = 90
-        Height = 25
-        Caption = 'Search Time'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ModalResult = 6
-        ParentFont = False
-        TabOrder = 1
-        OnClick = SortButtonsClick
-      end
-      object btnSortTimeDesc: TButton
-        Tag = 3
-        Left = 148
-        Top = 32
-        Width = 90
-        Height = 25
-        Caption = 'Time Desc'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ModalResult = 7
-        ParentFont = False
-        TabOrder = 4
-        OnClick = SortButtonsClick
-      end
-      object btnSortKeyIndexAsc: TButton
-        Tag = 1
-        Left = 240
-        Top = 5
-        Width = 90
-        Height = 25
-        Caption = 'Key Index'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ModalResult = 6
-        ParentFont = False
-        TabOrder = 2
-        OnClick = SortButtonsClick
-      end
-      object btnSortKeyIndexDesc: TButton
-        Tag = 1
-        Left = 240
-        Top = 32
-        Width = 90
-        Height = 25
-        Caption = 'Key Idx Desc'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ModalResult = 7
-        ParentFont = False
-        TabOrder = 5
-        OnClick = SortButtonsClick
-      end
+    object btnCancel: TButton
+      Left = 709
+      Top = 117
+      Width = 75
+      Height = 25
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 13
     end
   end
   object tmrSearchInFilter: TTimer

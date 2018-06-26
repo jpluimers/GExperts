@@ -107,7 +107,7 @@ type
 implementation
 
 uses
-  Math, DateUtils, StrUtils;
+  Math, DateUtils, StrUtils, GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -116,6 +116,7 @@ uses
 constructor TfmGrepSelect.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  TControl_SetMinConstraints(Self);
   FSortOrderList := TList.Create;
 end;
 
