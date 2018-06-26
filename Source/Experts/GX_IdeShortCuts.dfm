@@ -95,7 +95,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
     object hkShortCut: THotKey
       Left = 116
       Top = 84
-      Width = 157
+      Width = 269
       Height = 22
       Enabled = False
       HotKey = 0
