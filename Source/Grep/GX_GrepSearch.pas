@@ -51,6 +51,8 @@ type
     rgSaveOption: TRadioGroup;
     btnSearch: TButton;
     timHintTimer: TTimer;
+    btnGrepAll: TButton;
+    btnSectionAll: TButton;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -70,6 +72,8 @@ type
     procedure cbSectionInitializationClick(Sender: TObject);
     procedure cbSectionFinalizationClick(Sender: TObject);
     procedure timHintTimerTimer(Sender: TObject);
+    procedure btnGrepAllClick(Sender: TObject);
+    procedure btnSectionAllClick(Sender: TObject);
   private
     FGrepExpert: TGrepExpert;
     FEmbedded: Boolean;
@@ -133,6 +137,13 @@ const
 
 { TfmGrepSearch }
 
+procedure TfmGrepSearch.btnGrepAllClick(Sender: TObject);
+begin
+  cbGrepCode.Checked := True;
+  cbGrepStrings.Checked := True;
+  cbGrepComments.Checked := True;
+end;
+
 procedure TfmGrepSearch.btnBrowseClick(Sender: TObject);
 var
   Temp: string;
@@ -149,6 +160,14 @@ begin
   UseCurrentIdent := GrepExpert.GrepUseCurrentIdent;
   if TfmGrepOptions.Execute(UseCurrentIdent) then
     GrepExpert.GrepUseCurrentIdent := UseCurrentIdent;
+end;
+
+procedure TfmGrepSearch.btnSectionAllClick(Sender: TObject);
+begin
+  cbSectionInterface.Checked := True;
+  cbSectionImplementation.Checked := True;
+  cbSectionInitialization.Checked := True;
+  cbSectionFinalization.Checked := True;
 end;
 
 procedure TfmGrepSearch.EnableDirectoryControls(New: Boolean);
@@ -503,10 +522,9 @@ procedure TfmGrepSearch.LoadFormSettings;
     begin
       i := Min(Pos(#13, Temp), Pos(#10, Temp));
       if i > 0 then
-        Temp := Copy(Temp, 1, i - 1);
+        Result := Copy(Temp, 1, i - 1);
     end else
-      Temp := '';
-    Result := Temp;
+      Result := '';
   end;
 
   procedure SetSearchPattern(Str: string);
@@ -632,7 +650,6 @@ begin
   else // IsStandAlone
   begin
     rbDirectories.Checked := True;
-    rbAllProjFiles.Enabled := False;
     rbOpenFiles.Enabled := False;
     rbAllProjGroupFiles.Enabled := False;
     rbAllProjFiles.Enabled := False;
