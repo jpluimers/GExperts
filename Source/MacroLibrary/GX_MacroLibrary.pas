@@ -233,7 +233,7 @@ uses
   GX_GxUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
   GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math, GX_IdeUtils,
-  GX_MessageBox;
+  GX_MessageBox, GX_dzVclUtils;
 
 type
   TIDEMacroBugMessage = class(TGxMsgBoxAdaptor)
@@ -739,6 +739,8 @@ resourcestring
   SLoadingFailed = 'Loading of stored macros failed.';
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
 
   FSuspended := False;
   FDataList := TList.Create;

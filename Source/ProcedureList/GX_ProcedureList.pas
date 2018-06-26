@@ -593,6 +593,8 @@ end;
 constructor TfmProcedureList.Create(AOwner: TComponent);
 begin
   inherited;
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   lvProcs.DoubleBuffered := True;
   InitializeForm;

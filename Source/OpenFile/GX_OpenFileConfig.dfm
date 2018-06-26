@@ -4,11 +4,9 @@ object fmOpenFileConfig: TfmOpenFileConfig
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Open File Configuration'
-  ClientHeight = 452
-  ClientWidth = 605
+  ClientHeight = 369
+  ClientWidth = 475
   Color = clBtnFace
-  Constraints.MinHeight = 400
-  Constraints.MinWidth = 550
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -22,14 +20,14 @@ object fmOpenFileConfig: TfmOpenFileConfig
   TextHeight = 14
   object pnlButtons: TPanel
     Left = 0
-    Top = 419
-    Width = 605
+    Top = 336
+    Width = 475
     Height = 33
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 304
+      Left = 174
       Top = 0
       Width = 301
       Height = 33
@@ -71,8 +69,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
   object pnlConfig: TPanel
     Left = 0
     Top = 0
-    Width = 605
-    Height = 419
+    Width = 475
+    Height = 336
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -80,8 +78,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
     object pcConfigPages: TPageControl
       Left = 6
       Top = 6
-      Width = 593
-      Height = 407
+      Width = 463
+      Height = 324
       ActivePage = tsTypes
       Align = alClient
       TabIndex = 0
@@ -89,8 +87,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
       object tsTypes: TTabSheet
         Caption = 'File Groups'
         DesignSize = (
-          585
-          378)
+          455
+          295)
         object lblExtension: TLabel
           Left = 177
           Top = 13
@@ -112,17 +110,17 @@ object fmOpenFileConfig: TfmOpenFileConfig
         object gbxCustomDirectory: TGroupBox
           Left = 173
           Top = 72
-          Width = 403
-          Height = 298
+          Width = 273
+          Height = 215
           Anchors = [akLeft, akTop, akRight, akBottom]
           Caption = 'Custom Search Path'
           TabOrder = 5
           DesignSize = (
-            403
-            298)
+            273
+            215)
           object btnDirectory: TSpeedButton
-            Left = 371
-            Top = 238
+            Left = 241
+            Top = 155
             Width = 22
             Height = 20
             Anchors = [akRight, akBottom]
@@ -132,8 +130,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
           object lbxDirectoryList: TListBox
             Left = 10
             Top = 64
-            Width = 383
-            Height = 169
+            Width = 253
+            Height = 86
             Anchors = [akLeft, akTop, akRight, akBottom]
             ItemHeight = 14
             TabOrder = 2
@@ -141,7 +139,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           end
           object btnDirectoryAdd: TBitBtn
             Left = 90
-            Top = 265
+            Top = 182
             Width = 75
             Height = 25
             Anchors = [akLeft, akBottom]
@@ -151,7 +149,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           end
           object btnDirectoryDelete: TBitBtn
             Left = 170
-            Top = 265
+            Top = 182
             Width = 75
             Height = 25
             Anchors = [akLeft, akBottom]
@@ -169,7 +167,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           end
           object btnDirectoryReplace: TBitBtn
             Left = 10
-            Top = 265
+            Top = 182
             Width = 75
             Height = 25
             Anchors = [akLeft, akBottom]
@@ -179,8 +177,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
           end
           object edtDirectory: TEdit
             Left = 10
-            Top = 238
-            Width = 362
+            Top = 155
+            Width = 232
             Height = 22
             Anchors = [akLeft, akRight, akBottom]
             TabOrder = 3
@@ -199,7 +197,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
           Left = 8
           Top = 9
           Width = 153
-          Height = 329
+          Height = 246
           Anchors = [akLeft, akTop, akBottom]
           ItemHeight = 14
           Sorted = True
@@ -209,14 +207,14 @@ object fmOpenFileConfig: TfmOpenFileConfig
         object edtExtension: TEdit
           Left = 264
           Top = 9
-          Width = 311
+          Width = 181
           Height = 22
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 3
         end
         object btnTypeAdd: TBitBtn
           Left = 8
-          Top = 344
+          Top = 261
           Width = 75
           Height = 25
           Anchors = [akLeft, akBottom]
@@ -226,7 +224,7 @@ object fmOpenFileConfig: TfmOpenFileConfig
         end
         object btnTypeDelete: TBitBtn
           Left = 87
-          Top = 344
+          Top = 261
           Width = 75
           Height = 25
           Anchors = [akLeft, akBottom]
@@ -247,8 +245,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
         Caption = 'Settings'
         ImageIndex = 1
         object gbxIDEMenuItems: TGroupBox
-          Left = 16
-          Top = 161
+          Left = 8
+          Top = 145
           Width = 323
           Height = 144
           Caption = 'IDE Menu Item Overrides'
@@ -328,8 +326,8 @@ object fmOpenFileConfig: TfmOpenFileConfig
           end
         end
         object gbxGeneralSettings: TGroupBox
-          Left = 16
-          Top = 12
+          Left = 8
+          Top = 4
           Width = 323
           Height = 133
           Caption = 'General Settings'

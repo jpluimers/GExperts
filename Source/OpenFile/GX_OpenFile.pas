@@ -705,6 +705,8 @@ end;
 
 procedure TfmOpenFile.FormCreate(Sender: TObject);
 begin
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   lvSearchPath.Color := clBtnFace;
   lvSearchPath.Enabled := False;

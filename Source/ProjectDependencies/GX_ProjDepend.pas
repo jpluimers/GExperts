@@ -149,7 +149,8 @@ uses
   SysUtils, Windows, ToolsAPI,
   mPasLex, mwPasParserTypes,
   GX_EditReader, GX_ProjDependProp, GX_GExperts, GX_ProjDependFilter,
-  GX_GenericUtils, GX_GxUtils, GX_SharedImages, GX_IdeUtils, Math;
+  GX_GenericUtils, GX_GxUtils, GX_SharedImages, GX_IdeUtils, Math,
+  GX_dzVclUtils;
 
 type
   TProjectNotifier = class(TBaseIdeNotifier)
@@ -738,6 +739,9 @@ end;
 constructor TfmProjDepend.Create(AOwner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   SetNonModalFormPopupMode(Self);
   FFilterList := TStringList.Create;

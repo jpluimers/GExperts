@@ -63,7 +63,8 @@ type
 implementation
 
 uses
-  SysUtils, Clipbrd, Gx_GenericUtils, GX_ReplaceCompUtils, GX_ConfigurationInfo;
+  SysUtils, Clipbrd, Gx_GenericUtils, GX_ReplaceCompUtils, GX_ConfigurationInfo,
+  GX_dzVclUtils;
   
 {$R *.dfm}
 
@@ -74,6 +75,8 @@ constructor TfmReplaceCompLog.Create(Owner: TComponent;
   const SourceClassName, DestClassName: string; LogEvents: TCompRepEventList);
 begin
   inherited Create(Owner);
+
+  TControl_SetMinConstraints(Self);
   FConfigData := ConfigData;
   FLogEvents := LogEvents;
   edtSourceClassName.Text := SourceClassName;

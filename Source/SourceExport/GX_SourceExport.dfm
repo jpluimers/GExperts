@@ -4,11 +4,9 @@ object fmSourceExport: TfmSourceExport
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Source Export'
-  ClientHeight = 524
-  ClientWidth = 684
+  ClientHeight = 362
+  ClientWidth = 534
   Color = clBtnFace
-  Constraints.MinHeight = 400
-  Constraints.MinWidth = 550
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -23,8 +21,8 @@ object fmSourceExport: TfmSourceExport
   TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
-    Top = 450
-    Width = 684
+    Top = 288
+    Width = 534
     Height = 74
     Align = alBottom
     BevelOuter = bvNone
@@ -47,13 +45,13 @@ object fmSourceExport: TfmSourceExport
     object pnlButtons: TPanel
       Left = 0
       Top = 36
-      Width = 684
+      Width = 534
       Height = 38
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       object pnlButtonsRight: TPanel
-        Left = 217
+        Left = 67
         Top = 0
         Width = 467
         Height = 38
@@ -108,8 +106,8 @@ object fmSourceExport: TfmSourceExport
   object pnlEditor: TPanel
     Left = 0
     Top = 24
-    Width = 684
-    Height = 426
+    Width = 534
+    Height = 264
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -118,7 +116,7 @@ object fmSourceExport: TfmSourceExport
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 684
+    Width = 534
     Height = 24
     AutoSize = True
     ButtonHeight = 24
@@ -141,14 +139,14 @@ object fmSourceExport: TfmSourceExport
       ShowHint = True
     end
     object tbnSave: TToolButton
-      Left = 25
+      Left = 23
       Top = 0
       Action = actFileSave
       ParentShowHint = False
       ShowHint = True
     end
     object tbnCopy: TToolButton
-      Left = 50
+      Left = 46
       Top = 0
       Action = actCopy
       DropdownMenu = pmuCopy
@@ -157,42 +155,42 @@ object fmSourceExport: TfmSourceExport
       Style = tbsDropDown
     end
     object ToolButton3: TToolButton
-      Left = 90
+      Left = 84
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnPrint: TToolButton
-      Left = 98
+      Left = 92
       Top = 0
       Action = actFilePrint
       ParentShowHint = False
       ShowHint = True
     end
     object ToolButton2: TToolButton
-      Left = 123
+      Left = 115
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnConfigure: TToolButton
-      Left = 131
+      Left = 123
       Top = 0
       Action = actFileConfigure
       ParentShowHint = False
       ShowHint = True
     end
     object ToolButton1: TToolButton
-      Left = 156
+      Left = 146
       Top = 0
       Width = 8
       ImageIndex = 6
       Style = tbsSeparator
     end
     object tbnHelp: TToolButton
-      Left = 164
+      Left = 154
       Top = 0
       Action = actHelpHelp
       ParentShowHint = False

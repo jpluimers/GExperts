@@ -4,11 +4,9 @@ object fmCompRenameConfig: TfmCompRenameConfig
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
-  ClientHeight = 428
-  ClientWidth = 497
+  ClientHeight = 245
+  ClientWidth = 409
   Color = clBtnFace
-  Constraints.MinHeight = 285
-  Constraints.MinWidth = 425
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -25,17 +23,17 @@ object fmCompRenameConfig: TfmCompRenameConfig
   TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
-    Top = 352
-    Width = 497
+    Top = 169
+    Width = 409
     Height = 76
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      497
+      409
       76)
     object pnlButtonsRight: TPanel
-      Left = 224
+      Left = 136
       Top = 0
       Width = 273
       Height = 76
@@ -94,8 +92,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
   object pnlRules: TPanel
     Left = 0
     Top = 0
-    Width = 497
-    Height = 352
+    Width = 409
+    Height = 169
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -103,16 +101,16 @@ object fmCompRenameConfig: TfmCompRenameConfig
     object pnlNames: TGroupBox
       Left = 6
       Top = 6
-      Width = 485
-      Height = 340
+      Width = 397
+      Height = 157
       Align = alClient
       Caption = 'Rename &Rules'
       TabOrder = 0
       DesignSize = (
-        485
-        340)
+        397
+        157)
       object btnAdd: TButton
-        Left = 358
+        Left = 270
         Top = 16
         Width = 117
         Height = 26
@@ -121,7 +119,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 0
       end
       object btnDelete: TButton
-        Left = 358
+        Left = 270
         Top = 50
         Width = 117
         Height = 26
@@ -130,8 +128,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 1
       end
       object btnDefaults: TButton
-        Left = 358
-        Top = 301
+        Left = 270
+        Top = 118
         Width = 117
         Height = 26
         Anchors = [akRight, akBottom]
@@ -140,7 +138,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         OnClick = btnDefaultsClick
       end
       object btnOtherProperties: TButton
-        Left = 358
+        Left = 270
         Top = 84
         Width = 117
         Height = 26

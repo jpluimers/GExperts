@@ -104,7 +104,7 @@ implementation
 uses
   Windows, SysUtils, Math,
   GX_GenericUtils, GX_OtaUtils, GX_SharedImages, GX_GxUtils, GX_CompRenameAdvanced,
-  GX_MessageBox;
+  GX_MessageBox, GX_dzVclUtils;
 
 function CompareClassFunc(List: TStringList; Index1, Index2: Integer): Integer;
 var
@@ -144,6 +144,8 @@ resourcestring
 const
   GridPad = 8;
 begin
+  TControl_SetMinConstraints(Self);
+
   Grid := TRenameStringGrid.Create(Self);
   with Grid do
   begin

@@ -3,8 +3,8 @@ object fmProjDepend: TfmProjDepend
   Top = 149
   AutoScroll = False
   Caption = 'Project Dependencies'
-  ClientHeight = 512
-  ClientWidth = 667
+  ClientHeight = 262
+  ClientWidth = 519
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -24,13 +24,13 @@ object fmProjDepend: TfmProjDepend
     Left = 213
     Top = 22
     Width = 3
-    Height = 471
+    Height = 221
     Cursor = crHSplit
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 493
-    Width = 667
+    Top = 243
+    Width = 519
     Height = 19
     Panels = <>
     ParentFont = True
@@ -41,7 +41,7 @@ object fmProjDepend: TfmProjDepend
     Left = 0
     Top = 22
     Width = 213
-    Height = 471
+    Height = 221
     Align = alLeft
     HideSelection = False
     Images = dmSharedImages.Images
@@ -58,8 +58,8 @@ object fmProjDepend: TfmProjDepend
   object pnlPageControlHost: TPanel
     Left = 216
     Top = 22
-    Width = 451
-    Height = 471
+    Width = 303
+    Height = 221
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
@@ -67,8 +67,8 @@ object fmProjDepend: TfmProjDepend
     object pcData: TPageControl
       Left = 0
       Top = 0
-      Width = 451
-      Height = 471
+      Width = 303
+      Height = 221
       ActivePage = tshUnitUses
       Align = alClient
       TabIndex = 0
@@ -79,8 +79,8 @@ object fmProjDepend: TfmProjDepend
         object lvUnitUses: TListView
           Left = 0
           Top = 0
-          Width = 443
-          Height = 442
+          Width = 295
+          Height = 192
           Align = alClient
           Columns = <
             item
@@ -164,7 +164,7 @@ object fmProjDepend: TfmProjDepend
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 667
+    Width = 519
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
@@ -291,8 +291,8 @@ object fmProjDepend: TfmProjDepend
   object Actions: TActionList
     Images = dmSharedImages.Images
     OnUpdate = ActionsUpdate
-    Left = 48
-    Top = 40
+    Left = 16
+    Top = 96
     object actFileRefresh: TAction
       Category = 'File'
       Caption = '&Refresh'
@@ -378,7 +378,7 @@ object fmProjDepend: TfmProjDepend
     DefaultExt = 'csv'
     Filter = 'CSV Files (*.csv)|*.csv|TXT Files (*.txt)|*.txt'
     Title = 'Export Indirect Dependencies'
-    Left = 112
-    Top = 40
+    Left = 80
+    Top = 96
   end
 end

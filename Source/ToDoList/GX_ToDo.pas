@@ -180,7 +180,7 @@ uses
   SysUtils, Dialogs, Clipbrd, Windows, StrUtils,
   mPasLex, mwBCBTokenList, mwPasParserTypes,
   GX_GxUtils, GX_GenericUtils, GX_EditReader,
-  GX_ToDoOptions, GX_SharedImages, Math;
+  GX_ToDoOptions, GX_SharedImages, Math, GX_dzVclUtils;
 
 resourcestring
   SParsingError = 'A parsing error occurred in file %s.' + sLineBreak;
@@ -974,10 +974,12 @@ end;
 constructor TfmToDo.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
 
   if Assigned(ToDoExpert) then
-      ToDoExpert.SetFormIcon(Self);
+    ToDoExpert.SetFormIcon(Self);
 
   FIsFirstActivation := True;
   FColumnIndex := -1;

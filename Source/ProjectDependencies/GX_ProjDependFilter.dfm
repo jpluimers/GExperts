@@ -4,11 +4,9 @@ object fmProjDependFilter: TfmProjDependFilter
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Unit Filter'
-  ClientHeight = 398
+  ClientHeight = 262
   ClientWidth = 205
   Color = clBtnFace
-  Constraints.MinHeight = 300
-  Constraints.MinWidth = 221
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -23,7 +21,7 @@ object fmProjDependFilter: TfmProjDependFilter
   TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
-    Top = 366
+    Top = 230
     Width = 205
     Height = 32
     Align = alBottom
@@ -54,13 +52,13 @@ object fmProjDependFilter: TfmProjDependFilter
     Left = 0
     Top = 0
     Width = 205
-    Height = 366
+    Height = 230
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     object pnlListFooter: TPanel
       Left = 0
-      Top = 325
+      Top = 189
       Width = 205
       Height = 41
       Align = alBottom
@@ -88,7 +86,7 @@ object fmProjDependFilter: TfmProjDependFilter
       Left = 0
       Top = 0
       Width = 205
-      Height = 325
+      Height = 189
       Align = alClient
       BevelOuter = bvNone
       BorderWidth = 6
@@ -97,7 +95,7 @@ object fmProjDependFilter: TfmProjDependFilter
         Left = 6
         Top = 23
         Width = 193
-        Height = 296
+        Height = 160
         Align = alClient
         ItemHeight = 14
         MultiSelect = True
