@@ -450,6 +450,8 @@ resourcestring
 begin
   inherited;
 
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   {$IFOPT D+} SendDebug('Creating clipboard history data list'); {$ENDIF}
   FDataList := TList.Create;

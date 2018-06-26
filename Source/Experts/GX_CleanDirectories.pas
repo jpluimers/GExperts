@@ -300,6 +300,7 @@ begin
 
   inherited Create(nil);
 
+  TControl_SetMinConstraints(Self);
   TWinControl_ActivateDropFiles(clbDirs, clbDirsOnFilesDropped);
   TWinControl_ActivateDropFiles(clbExtensions, clbExtensionsOnFilesDropped);
 end;
