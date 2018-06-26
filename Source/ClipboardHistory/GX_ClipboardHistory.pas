@@ -110,6 +110,7 @@ type
     procedure actEditPasteAsPascalStringExecute(Sender: TObject);
     procedure actViewPasteAsOptionsExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure lvClipResize(Sender: TObject);
   private
     FHelperWindow: TWinControl;
     IgnoreClip: Boolean;
@@ -394,6 +395,7 @@ begin
         ClipItem.Data := Info;
       end;
     finally
+      TListView_Resize(lvClip);
       lvClip.Items.EndUpdate;
       FLoading := False;
     end;
@@ -590,6 +592,8 @@ begin
 
           lvClip.Selected := lvClip.Items[0];
           lvClip.ItemFocused := lvClip.Selected;
+
+          TListView_Resize(lvClip);
         finally
           IgnoreClip := False;
         end;
@@ -642,6 +646,11 @@ begin
 
   if Key = #13 then
     actEditCopy.Execute;
+end;
+
+procedure TfmClipboardHistory.lvClipResize(Sender: TObject);
+begin
+  TListView_Resize(lvClip);
 end;
 
 procedure TfmClipboardHistory.actEditPasteToIdeExecute(Sender: TObject);

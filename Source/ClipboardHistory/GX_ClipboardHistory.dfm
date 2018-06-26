@@ -43,21 +43,13 @@ inherited fmClipboardHistory: TfmClipboardHistory
     Columns = <
       item
         Caption = 'Time'
-        Width = -1
-        WidthType = (
-          -1)
       end
       item
         Caption = 'Lines'
-        Width = -1
-        WidthType = (
-          -1)
       end
       item
         Caption = 'First Line'
-        Width = -1
-        WidthType = (
-          -1)
+        Width = 100
       end>
     ColumnClick = False
     HideSelection = False
@@ -70,6 +62,7 @@ inherited fmClipboardHistory: TfmClipboardHistory
     OnChange = lvClipChange
     OnDblClick = lvClipDblClick
     OnKeyPress = lvClipKeyPress
+    OnResize = lvClipResize
   end
   object ToolBar: TToolBar
     Left = 0
