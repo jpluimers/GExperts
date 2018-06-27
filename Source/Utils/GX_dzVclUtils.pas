@@ -141,6 +141,9 @@ procedure TDbGrid_Resize(_Grid: TCustomDbGrid; _Options: TResizeOptionSet; _MinW
 ///                     width. </summary>
 procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid); overload;
 procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid; _ConstantCols: array of Integer); overload;
+
+procedure TStringGrid_AdjustRowHight(_sg: TStringGrid);
+
 (*
 ///<summary>
 /// Adds a column to the TDbGrid
@@ -2170,6 +2173,7 @@ var
   Additional: Integer;
 begin
   Grid := TGridHack(_Grid);
+
   MaxCol := Grid.ColCount - 1;
   MinCol := 0;
   SetLength(ColWidths, MaxCol + 1);
@@ -2300,6 +2304,29 @@ begin
       Grid.ColWidths[Col] := ColWidths[Col];
     end;
   end;
+end;
+
+procedure TStringGrid_AdjustRowHight(_sg: TStringGrid);
+var
+  r: Integer;
+  c: Integer;
+  rh: Integer;
+  s: string;
+  h: Integer;
+begin
+  _sg.Canvas.Font := _sg.Font;
+  rh := _sg.Canvas.TextHeight('Mg');
+  for r := 0 to _sg.RowCount - 1 do begin
+    for c := 0 to _sg.ColCount - 1 do begin
+      s := _sg.Cells[c, r];
+      if s <> '' then begin
+        h := _sg.Canvas.TextHeight(s);
+        if h > rh then
+          rh := h;
+      end;
+    end;
+  end;
+  _sg.DefaultRowHeight := rh + 4;
 end;
 (*
 function TDbGrid_CalcAdditionalWidth(_Grid: TCustomDbGrid): Integer;
