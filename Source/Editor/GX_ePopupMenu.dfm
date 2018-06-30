@@ -82,8 +82,8 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     ViewStyle = vsReport
     OnChange = lv_SelectedChange
     OnDblClick = lv_SelectedDblClick
+    OnEdited = lv_SelectedEdited
     OnEditing = lv_SelectedEditing
-    OnKeyDown = lv_SelectedKeyDown
   end
   object b_OK: TButton
     Left = 416
