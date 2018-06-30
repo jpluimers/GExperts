@@ -268,9 +268,12 @@ begin
       begin
         if ((SearchRec.Attr and faDirectory) <> 0) then
         begin
-          // Recurse into sub-directories.
-          SearchRec.Name := AddSlash(SearchRec.Name);
-          CleanDirectory(Directory + SearchRec.Name, Recursing);
+          // Skip Junctions
+          if ((SearchRec.Attr and faSymLink) = 0) then begin
+            // Recurse into sub-directories.
+            SearchRec.Name := AddSlash(SearchRec.Name);
+            CleanDirectory(Directory + SearchRec.Name, Recursing);
+          end;
         end
         else
         begin
