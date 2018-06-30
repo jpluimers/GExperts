@@ -14,6 +14,7 @@ uses
   Dialogs,
   ComCtrls,
   StdCtrls,
+  Menus,
   GX_BaseForm,
   GX_BaseExpert;
 
@@ -33,6 +34,7 @@ type
     b_Default: TButton;
     b_ClearShortcut: TButton;
     chk_FocusEditor: TCheckBox;
+    pm_Selected: TPopupMenu;
     procedure b_AddClick(Sender: TObject);
     procedure b_RemoveClick(Sender: TObject);
     procedure lb_EditorExpertsDblClick(Sender: TObject);
@@ -44,6 +46,7 @@ type
     procedure lv_SelectedChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure b_DefaultClick(Sender: TObject);
     procedure b_ClearShortcutClick(Sender: TObject);
+    procedure pm_SelectedPopup(Sender: TObject);
   private
     function GetExpertIndex(const _ListView: TListView; const _Expert: TGX_BaseExpert): Integer;
     procedure CheckForDuplicates;
@@ -54,6 +57,7 @@ type
     procedure AddSelectedExpert;
     procedure AddSelectedEditorExpert;
     procedure EnableOKCancel;
+    procedure mi_SetHotkey(_Sender: TObject);
   public
     constructor Create(_Owner: TComponent); override;
   end;
@@ -63,7 +67,6 @@ implementation
 {$R *.dfm}
 
 uses
-  Menus,
   StrUtils,
   GX_EditorExpert,
   GX_ConfigurationInfo,
@@ -281,15 +284,22 @@ begin
   _sl.Add('H=ClipboardHistory');
   _sl.Add('I=SelectIdent');
   _sl.Add('J=SortLines');
+  // K
   _sl.Add('L=CodeLibrarian');
   _sl.Add('M=MacroLibrary');
+  // N
   _sl.Add('O=OpenFile');
   _sl.Add('P=ProcedureList');
+  // Q
   _sl.Add('R=ReverseStatement');
   _sl.Add('S=MessageDialog');
   _sl.Add('T=MacroTemplates');
   _sl.Add('U=UsesClauseMgr');
+  // V
+  _sl.Add('W=WARN');
   _sl.Add('X=Configure');
+  // Y
+  // Z
 end;
 
 { TfmEditorPopupMenuExpertConfig }
@@ -528,11 +538,46 @@ var
   li: TListItem;
 begin
   if Key = VK_F2 then begin
-    li := lv_Selected.Selected;
-    if Assigned(li) then
+    if TListView_TryGetSelected(lv_Selected, li) then
       li.EditCaption;
     Key := 0;
   end;
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.pm_SelectedPopup(Sender: TObject);
+var
+  li: TListItem;
+  i: Integer;
+  UsedHotkeys: set of AnsiChar;
+  c: AnsiChar;
+begin
+  if not TListView_TryGetSelected(lv_Selected, li) then
+    Exit; //==>
+
+  pm_Selected.Items.Clear;
+
+  Include(UsedHotkeys, 'X');
+
+  for i := 0 to lv_Selected.Items.Count - 1 do begin
+    c := AnsiChar(lv_Selected.Items[i].Caption[1]);
+    Include(UsedHotkeys, c);
+  end;
+
+  for c := 'A' to 'Z' do begin
+    if not (c in UsedHotkeys) then
+      TPopupMenu_AppendMenuItem(pm_Selected, String(c), mi_SetHotkey)
+  end;
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.mi_SetHotkey(_Sender: TObject);
+var
+  mi: TMenuItem;
+  li: TListItem;
+begin
+  if not TListView_TryGetSelected(lv_Selected, li) then
+    Exit; //==>
+  mi := _Sender as TMenuItem;
+  li.Caption := mi.Caption;
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.RemoveExpert;

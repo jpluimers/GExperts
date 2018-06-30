@@ -76,6 +76,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
         Width = 175
       end>
     RowSelect = True
+    PopupMenu = pm_Selected
     SortType = stText
     TabOrder = 4
     ViewStyle = vsReport
@@ -152,5 +153,11 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Anchors = [akLeft, akBottom]
     Caption = 'Focus editor window if not focused'
     TabOrder = 5
+  end
+  object pm_Selected: TPopupMenu
+    AutoHotkeys = maManual
+    OnPopup = pm_SelectedPopup
+    Left = 376
+    Top = 168
   end
 end
