@@ -4029,8 +4029,16 @@ begin
     raise EGXFileNotFound.CreateFmt('The file %s does not exist.', [FileName]);
   if IsForm(FileName) then
     LoadFormFileToStrings(FileName, Data, WasBinary)
-  else // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
+  else begin
+    // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
     Data.LoadFromFile(FileName);
+    if Data.Count = 0 then begin
+      // TStringList and TUnicodeStringList.LoadFromFile has issues with some UnicodeCharacters
+      if GetFileSize(FileName) > 0 then begin
+        raise Exception.CreateFmt('%s.LoadFromFile failed to read %s.', [Data.ClassParent.ClassName, FileName]);
+      end;
+    end;
+  end;
 end;
 
 function TryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;

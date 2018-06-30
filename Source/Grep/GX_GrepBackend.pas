@@ -487,6 +487,7 @@ procedure TGrepSearchRunner.GrepProject(Project: IOTAProject);
 var
   i: Integer;
   Context: TGrepSearchContext;
+  fn: string;
 begin
   if Project = nil then
     Exit;
@@ -499,7 +500,8 @@ begin
 
     for i := 0 to Project.GetModuleCount - 1 do
     begin
-      GrepProjectFile(Project.GetModule(i).GetFileName, Context);
+      fn := Project.GetModule(i).GetFileName;
+      GrepProjectFile(fn, Context);
       if FAbortSignalled then
         Break;
     end;

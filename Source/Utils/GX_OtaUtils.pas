@@ -4550,6 +4550,12 @@ begin
     MemStream.Position := 0;
     {$IFDEF UNICODE}
     Data.LoadFromStream(MemStream, TEncoding.UTF8);
+    // For some Unicode characters (e.g. $E59C and $E280 SynUnicode.LoadFromStream works,
+    // but TStringList.LoadFromStream doesn't.
+    // Depending on the RTL version the latter fails silently and returns an empty string list.
+    // So we check here for that condition and raise an error
+    if (Data.Count = 0) and (MemStream.Size >0) then
+      raise Exception.CreateFmt('%s.LoadFromFile failed to read %s.', [Data.ClassParent.ClassName, SourceEditor.FileName]);
     {$ELSE}
     if RunningDelphi8OrGreater then
       SynUnicode.LoadFromStream(Data, MemStream, seUTF8)
