@@ -241,6 +241,11 @@ begin
 end;
 
 procedure TfmCleanDirectories.CleanDirectory(const Directory: string; const Recursing: Boolean);
+{$IFNDEF GX_VER150_up}
+// Delphi 6 does not have this constant
+const
+  faSymLink   = $00000040;
+{$endif}
 var
   SearchRec: TSearchRec;
   SearchAttr: Integer;
