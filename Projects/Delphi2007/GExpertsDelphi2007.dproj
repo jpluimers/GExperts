@@ -52,45 +52,167 @@
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType>VCLApplication</Borland.ProjectType>
     <BorlandProject>
-    <BorlandProject>
-    <Delphi.Personality>
-      <Parameters>
-         <Parameters Name="UseLauncher">False</Parameters>
-         <Parameters Name="LoadAllSymbols">True</Parameters>
-         <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
-         <Parameters Name="HostApplication">C:\delphi\delphi2007\bin\bds.exe</Parameters>
-      </Parameters>
-      <VersionInfo>
-        <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
-        <VersionInfo Name="AutoIncBuild">False</VersionInfo>
-        <VersionInfo Name="MajorVer">1</VersionInfo>
-        <VersionInfo Name="MinorVer">3</VersionInfo>
-        <VersionInfo Name="Release">8</VersionInfo>
-        <VersionInfo Name="Build">0</VersionInfo>
-        <VersionInfo Name="Debug">False</VersionInfo>
-        <VersionInfo Name="PreRelease">False</VersionInfo>
-        <VersionInfo Name="Special">False</VersionInfo>
-        <VersionInfo Name="Private">False</VersionInfo>
-        <VersionInfo Name="DLL">True</VersionInfo>
-        <VersionInfo Name="Locale">1033</VersionInfo>
-        <VersionInfo Name="CodePage">1252</VersionInfo>
-      </VersionInfo>
-      <VersionInfoKeys>
-        <VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
-        <VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
-        <VersionInfoKeys Name="FileVersion"></VersionInfoKeys>
-        <VersionInfoKeys Name="InternalName"></VersionInfoKeys>
-        <VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
-        <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
-        <VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
-        <VersionInfoKeys Name="ProductName"></VersionInfoKeys>
-        <VersionInfoKeys Name="ProductVersion"></VersionInfoKeys>
-        <VersionInfoKeys Name="Comments"></VersionInfoKeys>
-      </VersionInfoKeys>
-      <Source>
-        <Source Name="MainSource">GExpertsDelphi2007.dpr</Source>
-      </Source>
-      <Excluded_Packages>
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters><Parameters Name="HostApplication">C:\delphi\delphi2007\bin\bds.exe</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">False</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">3</VersionInfo><VersionInfo Name="Release">8</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">True</VersionInfo><VersionInfo Name="Locale">1033</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion"></VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion"></VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">GExpertsDelphi2007.dpr</Source></Source><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dclmid100.bpl">CodeGear MyBase DataAccess Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcldb100.bpl">CodeGear Database Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\applet100.bpl">CodeGear Control Panel Applet Package</Excluded_Packages>
@@ -416,6 +538,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
     <DCCReference Include="..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas" />
+    <DCCReference Include="..\..\Source\IDE\GX_IdeMessageAutoClose.pas" />
     <DCCReference Include="..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas" />
     <DCCReference Include="..\..\source\IDE\GX_IdePackageRenameDlg.pas">
       <Form>fmIdxPackageRenameDlg</Form>

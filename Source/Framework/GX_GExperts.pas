@@ -5,7 +5,8 @@ unit GX_GExperts;
 interface
 
 uses
-  Classes, ToolsAPI, Controls, GX_EditorExpertManager, GX_Experts;
+  Classes, ToolsAPI, Controls, ExtCtrls,
+  GX_EditorExpertManager, GX_Experts;
 
 type
   TGExperts = class(TNotifierObject, IOTANotifier, IOTAWizard)
@@ -13,10 +14,12 @@ type
     FEditorExpertsManager: TGxEditorExpertManager;
     FExpertList: TList;
     FStartingUp: Boolean;
+    FCloseMessageViewTimer: ttimer;
     procedure InstallAddIn;
     function GetExpert(const Index: Integer): TGX_Expert;
     function GetExpertCount: Integer;
     procedure InitializeGExperts;
+    procedure OnCloseMessageViewTimer(_Sender: TObject);
   protected
     // IOTAWizard
     function GetIDString: string;
@@ -44,6 +47,7 @@ type
 
     function GetSharedImages: TImageList;
     function GetExpertList: TList;
+    procedure TimedCloseMessageView;
   end;
 
 function GExpertsInst(ForceValid: Boolean = False): TGExperts;
@@ -56,7 +60,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Dialogs, ExtCtrls,
+  SysUtils, Dialogs, Forms,
   GX_GenericUtils, GX_GetIdeVersion, GX_About, GX_MenuActions, GX_MessageBox,
   GX_ConfigurationInfo, GX_Configure, GX_KbdShortCutBroker, GX_SharedImages,
   GX_IdeUtils, GX_IdeEnhance, GX_EditorChangeServices, GX_ToolbarDropDown;
@@ -377,6 +381,38 @@ begin
     GxKeyboardShortCutBroker.DoUpdateKeyBindings;
   GXMenuActionManager.ArrangeMenuItems;
   GXMenuActionManager.MoveMainMenuItems;
+end;
+
+function FindClassForm(const AClassName: string): TForm;
+var
+  i: Integer;
+begin
+  Result := nil;
+  for i := 0 to Screen.FormCount - 1 do
+    if Screen.Forms[i].ClassNameIs(AClassName) then begin
+      Result := Screen.Forms[i];
+      Break;
+    end;
+end;
+
+procedure TGExperts.TimedCloseMessageView;
+begin
+  FCloseMessageViewTimer :=  TTimer.Create(nil);
+  FCloseMessageViewTimer.OnTimer := OnCloseMessageViewTimer;
+end;
+
+procedure TGExperts.OnCloseMessageViewTimer(_Sender: TObject);
+var
+  MessageViewForm: TForm;
+begin
+  FCloseMessageViewTimer.Enabled := False;
+  FreeAndNil(FCloseMessageViewTimer);
+  MessageViewForm := FindClassForm('TMsgWindow');
+  if MessageViewForm = nil then // otherwise TMessageViewForm is used
+    MessageViewForm := FindClassForm('TMessageViewForm');
+  if MessageViewForm = nil then
+    Exit; //==>
+  MessageViewForm.Hide;
 end;
 
 { TUnsupportedIDEMessage }

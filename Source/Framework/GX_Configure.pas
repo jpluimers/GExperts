@@ -110,6 +110,7 @@ type
     lblHideNavBar: TLabel;
     tshFormEnhancements: TTabSheet;
     btnUsage: TButton;
+    chkAutoCloseMessage: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -469,6 +470,7 @@ begin
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   chkEnhanceGotoDialog.Checked := IdeEnhancements.EnhanceGotoDialog;
+  chkAutoCloseMessage.Checked := IdeEnhancements.AutoCloseMessageWindow;
   chkEnhanceBuildEventsDialog.Checked := IdeEnhancements.EnhanceBuildEventsDialog;
   chkEnhanceApplicationSettingsDialog.Checked := IdeEnhancements.EnhanceApplicationSettingsDialog;
   UpdateIdeDialogCheckboxes;
@@ -575,6 +577,7 @@ begin
   IdeEnhancements.EnhanceInstallPackages := chkEnhanceInstallPackages.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
   IdeEnhancements.EnhanceGotoDialog := chkEnhanceGotoDialog.Checked;
+  IdeEnhancements.AutoCloseMessageWindow := chkAutoCloseMessage.Checked;
   IdeEnhancements.EnhanceBuildEventsDialog := chkEnhanceBuildEventsDialog.Checked;
   IdeEnhancements.EnhanceApplicationSettingsDialog:= chkEnhanceApplicationSettingsDialog.Checked;
 

@@ -56,6 +56,7 @@ type
     FEnhanceInstallPackages: Boolean;
     FEnhanceToolProperties: Boolean;
     FEnhanceGotoDialog: Boolean;
+    FAutoCloseMessageWindow: Boolean;
 
     procedure InstallMultiLineComponentTabs;
     procedure RemoveMultiLineComponentTabs;
@@ -94,6 +95,7 @@ type
     procedure SetOIHideDescPane(const Value: boolean);
     procedure SetEnhanceBuildEventsDialog(const Value: boolean);
     procedure SetEnhanceApplicationSettingsDialog(const Value: boolean);
+    procedure SetAutoCloseMessageWindow(const Value: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -115,6 +117,8 @@ type
     property EnhanceToolProperties: Boolean read FEnhanceToolProperties write SetEnhanceToolProperties;
     // Goto dialog
     property EnhanceGotoDialog: Boolean read FEnhanceGotoDialog write SetEnhanceGotoDialog;
+    // automatically close messages window
+    property AutoCloseMessageWindow: Boolean read FAutoCloseMessageWindow write SetAutoCloseMessageWindow;
     // Build Events dialog
     property  EnhanceBuildEventsDialog: boolean read FEnhanceBuildEventsDialog write SetEnhanceBuildEventsDialog;
     // Application Settings dialog
@@ -159,7 +163,7 @@ uses
   GX_IdeSearchPathEnhancer, GX_IdeProjectOptionsEnhancer,
   GX_IdeToolPropertiesEnhancer, GX_IdeInstallPackagesEnhancer, 
   GX_IdeGotoEnhancer, GX_IdeObjectInspectorEnhancer, GX_IdeBuildEventsEnhancer, 
-  GX_IdeApplicationSettingsEnhancer;
+  GX_IdeApplicationSettingsEnhancer, GX_IdeMessageAutoClose;
 
 { TIdeEnhancements }
 
@@ -292,6 +296,7 @@ begin
     EnhanceToolProperties := ExpSettings.ReadBool('EnhanceToolProperties', False);
     EnhanceInstallPackages := ExpSettings.ReadBool('EnhanceInstallPackages', False);
     EnhanceGotoDialog := ExpSettings.ReadBool('EnhanceGotoDialog', False);
+    AutoCloseMessageWindow := ExpSettings.ReadBool('AutoCloseMessageWindow', False);
     EnhanceBuildEventsDialog := ExpSettings.ReadBool('EnhanceBuildEventsDialog', False);
     EnhanceApplicationSettingsDialog := ExpSettings.ReadBool('EnhanceApplicationSettingsDialog', False);
 
@@ -346,6 +351,7 @@ begin
     ExpSettings.WriteBool('EnhanceToolProperties', EnhanceToolProperties);
     ExpSettings.WriteBool('EnhanceInstallPackages', EnhanceInstallPackages);
     ExpSettings.WriteBool('EnhanceGotoDialog', EnhanceGotoDialog);
+    ExpSettings.WriteBool('AutoCloseMessageWindow', AutoCloseMessageWindow);
     ExpSettings.WriteBool('EnhanceBuildEventsDialog', EnhanceBuildEventsDialog);
     ExpSettings.WriteBool('EnhanceApplicationSettingsDialog', EnhanceApplicationSettingsDialog);
 
@@ -484,6 +490,12 @@ begin
         Break;
       end;
   end;
+end;
+
+procedure TIdeEnhancements.SetAutoCloseMessageWindow(const Value: Boolean);
+begin
+  FAutoCloseMessageWindow := Value;
+  TGxMessageAutoClose.SetEnabled(Value and EnhanceIDEForms);
 end;
 
 procedure TIdeEnhancements.SetAutoSave(const Value: Boolean);

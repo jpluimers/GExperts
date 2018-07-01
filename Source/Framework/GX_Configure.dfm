@@ -405,6 +405,14 @@ object fmConfiguration: TfmConfiguration
             Caption = 'Enhance Application Settings dialog with version button'
             TabOrder = 7
           end
+          object chkAutoCloseMessage: TCheckBox
+            Left = 224
+            Top = 155
+            Width = 297
+            Height = 17
+            Caption = 'Automatically close message window'
+            TabOrder = 9
+          end
         end
         object gbxObjectInspector: TGroupBox
           Left = 8

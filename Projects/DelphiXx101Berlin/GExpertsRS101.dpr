@@ -231,7 +231,9 @@ uses
   GX_UsageStatistics in '..\..\Source\Framework\GX_UsageStatistics.pas' {fmUsageStatistics},
   GX_dzDateUtils in '..\..\Source\Utils\GX_dzDateUtils.pas',
   GX_UnitExportsParser in '..\..\Source\Framework\GX_UnitExportsParser.pas',
-  GX_dzNamedThread in '..\..\Source\Utils\GX_dzNamedThread.pas';
+  GX_dzNamedThread in '..\..\Source\Utils\GX_dzNamedThread.pas',
+  GX_DummyWizard in '..\..\Source\Framework\GX_DummyWizard.pas',
+  GX_IdeMessageAutoClose in '..\..\Source\IDE\GX_IdeMessageAutoClose.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}
