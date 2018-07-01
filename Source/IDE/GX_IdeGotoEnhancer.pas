@@ -31,7 +31,8 @@ uses
   GX_dzClassUtils,
   GX_UnitPositions,
   GX_IdeFormEnhancer,
-  GX_IdeDialogEnhancer;
+  GX_IdeDialogEnhancer,
+  Graphics;
 
 type
   TWinControlHack = class(TWinControl)
@@ -91,6 +92,7 @@ var
   Items: TStrings;
   i: Integer;
   cmp: TComponent;
+  Y: Integer;
 begin
   if TComponent_FindComponent(_Form, LB_UNIT_POSITIONS, True, cmp) then
     Exit;
@@ -106,10 +108,6 @@ begin
   if not TComponent_FindComponent(_Form, 'HelpButton', True, TComponent(HelpButton), TButton) then
     Exit;
 
-  _Form.Height := 240;
-  OkButton.Top := _Form.ClientHeight - OkButton.Height - 8;
-  CancelButton.Top := _Form.ClientHeight - CancelButton.Height - 8;
-  HelpButton.Top := _Form.ClientHeight - HelpButton.Height - 8;
   lb_UnitPositions := TListBox.Create(_Form);
   lb_UnitPositions.Name := LB_UNIT_POSITIONS;
   lb_UnitPositions.Parent := _Form;
@@ -130,6 +128,12 @@ begin
   finally
     Items.EndUpdate;
   end;
+  lb_UnitPositions.ClientHeight := (FUnitPositions.Count + 1) * lb_UnitPositions.ItemHeight;
+  Y := lb_UnitPositions.Top + lb_UnitPositions.Height + 8;
+  OkButton.Top := Y;
+  CancelButton.Top := Y;
+  HelpButton.Top := Y;
+  _Form.ClientHeight := Y + OkButton.Height + 8;
 
   FLineInput.OnKeyDown := LineInputKeyDown;
 end;
