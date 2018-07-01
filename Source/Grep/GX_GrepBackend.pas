@@ -844,18 +844,6 @@ begin
 end;
 
 procedure TGrepSearchRunner.FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
-
-  function RemoveMatchingPart(AFileName: String): String;
-  var
-    I, ARemoveCount: Integer;
-  begin
-    ARemoveCount := 0;
-    for I := 1 to Min(Length(AFileName), Length(FSearchRoot)) do
-      if ( UpperCase(AFileName[I]) = UpperCase(FSearchRoot[I]) ) and (AFileName[I] = PathDelim) then
-        ARemoveCount := I;
-    Result := Copy(AFileName, ARemoveCount+1);
-  end;
-
 var
   ALineResult: TLineResult;
   AMatchResult: TMatchResult;
@@ -868,7 +856,7 @@ begin
   begin
     FFileResult := TFileResult.Create;
     FFileResult.FileName := FSearcher.FileName;
-    FFileResult.RelativeFileName := RemoveMatchingPart(FSearcher.FileName);
+    FFileResult.RelativeFileName := ExtractRelativePath(FSearchRoot, FSearcher.FileName);
     FStorageTarget.AddObject(FSearcher.FileName, FFileResult);
   end;
 
