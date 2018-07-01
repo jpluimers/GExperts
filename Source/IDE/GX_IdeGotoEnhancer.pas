@@ -44,7 +44,9 @@ type
     lb_UnitPositions: TListBox;
     FUnitPositions: TUnitPositions;
     FLineInput: TWinControlHack;
+    FOkButton: TButton;
     procedure lb_UnitPositionsClick(Sender: TObject);
+    procedure lb_UnitPositionsDblClick(Sender: TObject);
     procedure LineInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     function IsDesiredForm(_Form: TCustomForm): Boolean; override;
@@ -86,7 +88,6 @@ const
   LB_UNIT_POSITIONS = 'GxIdeGotoEnhancerUnitPositionsListbox';
 var
   Bevel1: TBevel;
-  OkButton: TButton;
   CancelButton: TButton;
   HelpButton: TButton;
   Items: TStrings;
@@ -101,7 +102,7 @@ begin
     Exit;
   if not TComponent_FindComponent(_Form, 'LineInput', True, TComponent(FLineInput), TWinControl) then
     Exit;
-  if not TComponent_FindComponent(_Form, 'OKButton', True, TComponent(OkButton), TButton) then
+  if not TComponent_FindComponent(_Form, 'OKButton', True, TComponent(FOkButton), TButton) then
     Exit;
   if not TComponent_FindComponent(_Form, 'CancelButton', True, TComponent(CancelButton), TButton) then
     Exit;
@@ -114,9 +115,10 @@ begin
   lb_UnitPositions.Top := Bevel1.Top + Bevel1.Height + 8;
   lb_UnitPositions.Left := Bevel1.Left;
   lb_UnitPositions.Width := Bevel1.Width;
-  lb_UnitPositions.Height := OkButton.Top - lb_UnitPositions.Top - 8;
+  lb_UnitPositions.Height := FOkButton.Top - lb_UnitPositions.Top - 8;
   lb_UnitPositions.OnClick := lb_UnitPositionsClick;
-  lb_UnitPositions.TabOrder := OkButton.TabOrder;
+  lb_UnitPositions.OnDblClick := lb_UnitPositionsDblClick;
+  lb_UnitPositions.TabOrder := FOkButton.TabOrder;
 
   Items := lb_UnitPositions.Items;
   Items.BeginUpdate;
@@ -130,10 +132,10 @@ begin
   end;
   lb_UnitPositions.ClientHeight := (FUnitPositions.Count + 1) * lb_UnitPositions.ItemHeight;
   Y := lb_UnitPositions.Top + lb_UnitPositions.Height + 8;
-  OkButton.Top := Y;
+  FOkButton.Top := Y;
   CancelButton.Top := Y;
   HelpButton.Top := Y;
-  _Form.ClientHeight := Y + OkButton.Height + 8;
+  _Form.ClientHeight := Y + FOkButton.Height + 8;
 
   FLineInput.OnKeyDown := LineInputKeyDown;
 end;
@@ -188,6 +190,15 @@ begin
   View.ConvertPos(False, CursorPos, CharPos);
   TCombobox_SetText(FLineInput, IntToStr(CursorPos.Line));
   TCombobox_SelectAll(FLineInput);
+end;
+
+procedure TGotoEnhancer.lb_UnitPositionsDblClick(Sender: TObject);
+begin
+  if lb_UnitPositions.ItemIndex < 0 then
+    Exit; //==>
+  lb_UnitPositionsClick(Sender);
+  if Assigned(FOkButton) then
+    FOkButton.Click;
 end;
 
 end.
