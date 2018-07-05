@@ -46,6 +46,7 @@ const
   // Invalid notifier index
   InvalidNotifierIndex = -1;
   dNFM = 'nfm';  // Not present in the Delphi 8/9/10 ToolsAPI.pas
+  // todo: These are only the English and German names, what about French and Japanese?
   FileVersionOptionNames:     array [0..1] of string = ('FileVersion', 'Dateiversion');
   ProductNameOptionNames:     array [0..1] of string = ('ProductName', 'Produktname');
   InternalNameOptionNames:    array [0..1] of string = ('InternalName', 'Interner Name');
@@ -1520,14 +1521,54 @@ end;
 function GxOtaGetActiveProjectOption(const Option: string; var Value: Variant): Boolean;
 var
   ProjectOptions: IOTAProjectOptions;
+
+{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
+  // since Delphi XE there can be multiple configuration settings, we need to get the current one
+  // because Embarcadero decided to not implement it for us.
+  function HandleDelphiXEUpVersionInfo(Option: string; var Value: Variant): boolean;
+  var
+    ProjectConfigs: IOTAProjectOptionsConfigurations;
+    cfg: IOTABuildConfiguration;
+  begin
+    Result := False;
+    if Option = 'MajorVersion' then
+      Option := 'VerInfo_MajorVer'
+    else if Option = 'MinorVersion' then
+      Option := 'VerInfo_MinorVer'
+    else if Option = 'Release' then
+      Option := 'VerInfo_Release'
+    else if Option = 'Build' then
+      Option := 'VerInfo_Build'
+    else begin
+      Exit; //==>
+    end;
+    ProjectConfigs := ProjectOptions as IOTAProjectOptionsConfigurations;
+    if Assigned(ProjectConfigs) then begin
+      cfg := ProjectConfigs.ActiveConfiguration;
+      if Assigned(cfg) then begin
+        Value := cfg.GetValue(Option, True);
+        Result := True;
+      end;
+    end;
+  end;
+{$ELSE}
+  function HandleDelphiXEUpVersionInfo: boolean;
+  begin
+    Result := False;
+  end;
+{$ENDIF}
+
 begin
   Result := False;
   Value := '';
   ProjectOptions := GxOtaGetActiveProjectOptions;
-  if Assigned(ProjectOptions) then
-  begin
-    Value := ProjectOptions.Values[Option];
-    Result := True;
+  if Assigned(ProjectOptions) then begin
+    if HandleDelphiXEUpVersionInfo(Option,Value) then begin
+      Result := True;
+    end else begin
+      Value := ProjectOptions.Values[Option];
+      Result := True;
+    end;
   end;
 end;
 
