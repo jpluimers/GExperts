@@ -542,6 +542,8 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCCReference Include="..\..\Source\Utils\GX_dzDateUtils.pas"/>
         <DCCReference Include="..\..\Source\Framework\GX_UnitExportsParser.pas"/>
         <DCCReference Include="..\..\Source\Utils\GX_dzNamedThread.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_DummyWizard.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeMessageAutoClose.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
