@@ -1552,7 +1552,7 @@ var
     end;
   end;
 {$ELSE}
-  function HandleDelphiXEUpVersionInfo: boolean;
+  function HandleDelphiXEUpVersionInfo(Option: string; var Value: Variant): boolean;
   begin
     Result := False;
   end;
@@ -1563,7 +1563,7 @@ begin
   Value := '';
   ProjectOptions := GxOtaGetActiveProjectOptions;
   if Assigned(ProjectOptions) then begin
-    if HandleDelphiXEUpVersionInfo(Option,Value) then begin
+    if HandleDelphiXEUpVersionInfo(Option, Value) then begin
       Result := True;
     end else begin
       Value := ProjectOptions.Values[Option];
