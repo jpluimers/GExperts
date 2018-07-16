@@ -3578,6 +3578,7 @@ var
   VAChar           : AnsiChar;
   VWChar           : WChar;
   VBoolean         : Boolean;
+  TempInt: Integer;
 
   function PropertyDescription: string;
   begin
@@ -3625,6 +3626,15 @@ begin
     tkInteger: begin
         VInteger := StrToInt(Value);
         Result := AComponent.SetPropByName(PropertyName, VInteger);
+        if AComponent.GetPropValueByName(PropertyName, TempInt) then begin
+          // Setting an integer property often (always?) fails, so we check the value here and if
+          // it is different, we use the native object to set the value. This works.
+          // (Example: Try to set the Interval property of a TTimer. It always gets set to 0.)
+          // This happens in Delphi 2007 and 10.2, I haven't tested other versions.)
+          // -- 2018-07-16 twm
+          if TempInt <> VInteger then
+            SetPropValue(NativeObject, PropertyName, VInteger);
+        end;
       end;
 
     tkInt64: begin
