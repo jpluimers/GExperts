@@ -496,7 +496,6 @@ var
   CompType: WideString;
   Index: Integer;
   Additional: TStringList;
-  i: Integer;
 begin
   CompType := Grid.Cells[0, Grid.Row];
 
