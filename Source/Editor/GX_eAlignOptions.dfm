@@ -39,7 +39,6 @@ object fmAlignOptions: TfmAlignOptions
       ScrollBars = ssVertical
       TabOrder = 0
       WordWrap = False
-      OnKeyDown = mmoTokensKeyDown
     end
   end
   object btnOK: TButton

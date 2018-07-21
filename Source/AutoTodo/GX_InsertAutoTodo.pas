@@ -12,7 +12,12 @@ interface
 
 uses
   SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, Menus,
-  GX_BaseForm, GX_Experts, ExtCtrls;
+  GX_BaseForm, GX_Experts, ExtCtrls,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmInsertAutoTodoForm = class(TfmBaseForm)
