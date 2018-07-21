@@ -112,9 +112,13 @@ type
     procedure HandleOnRowHeaderClick(Sender: TObject; Col: Integer);
     procedure SortByClass;
     procedure SortByRule;
+    procedure GetData(_ValueList: TStringList; out _AutoShow, _AutoAdd: Boolean;
+      out _FormWidth, _FormHeight: Integer);
+    procedure SetData(_ValueList: TStringList; _AutoShow, _AutoAdd: Boolean;
+      _FormWidth, _FormHeight: Integer; const _Selected: string);
   public
-    property ValueList: TStringList read FValueList;
-    function Execute: Boolean;
+    class function Execute(_Owner: TComponent; _ValueList: TStringList; var _AutoShow: Boolean;
+      var _AutoAdd: Boolean; var _FormWidth, _FormHeight: Integer; const _Selected: string): Boolean;
   end;
 
 implementation
@@ -124,7 +128,7 @@ implementation
 uses
   Windows, SysUtils, Math, StrUtils,
   GX_GenericUtils, GX_OtaUtils, GX_SharedImages, GX_GxUtils, GX_CompRenameAdvanced,
-  GX_MessageBox, GX_dzVclUtils;
+  GX_MessageBox, GX_dzVclUtils, GX_dzClassUtils;
 
 function CompareClassFunc(List: TStringList; Index1, Index2: Integer): Integer;
 var
@@ -148,13 +152,69 @@ end;
 
 { TfmCompRenameConfig }
 
-function TfmCompRenameConfig.Execute: Boolean;
+class function TfmCompRenameConfig.Execute(_Owner: TComponent; _ValueList: TStringList;
+  var _AutoShow: Boolean; var _AutoAdd: Boolean; var _FormWidth, _FormHeight: Integer;
+  const _Selected: string): Boolean;
+var
+  frm: TfmCompRenameConfig;
 begin
+  frm:= TfmCompRenameConfig.Create(_Owner);
+  try
+    frm.SetData(_ValueList, _Autoshow, _AutoAdd, _FormWidth, _FormHeight, _Selected);
+
+    Result := (frm.ShowModal = mrOk);
+    if Result then
+      frm.GetData(_ValueList, _Autoshow, _AutoAdd, _FormWidth, _FormHeight);
+  finally
+    FreeAndNil(frm);
+  end;
+end;
+
+procedure CopyValueList(_Src: TStringList; _Dest: TStringList);
+var
+  i: Integer;
+  Additional: TStringList;
+  sl: TStringList;
+begin
+  Assert(Assigned(_Src));
+  Assert(Assigned(_Dest));
+
+  TStrings_FreeObjects(_Dest);
+  _Dest.Clear;
+
+  for i := 0 to _Src.Count - 1 do begin
+    Additional := _Src.Objects[i] as TStringList;
+    if Assigned(Additional) then begin
+      sl := TStringList.Create;
+      sl.Assign(Additional);
+    end else
+      sl := nil;
+    _Dest.AddObject(_Src[i], sl);
+  end;
+end;
+
+procedure TfmCompRenameConfig.SetData(_ValueList: TStringList; _AutoShow, _AutoAdd: Boolean;
+      _FormWidth, _FormHeight: Integer; const _Selected: string);
+begin
+  Width := _FormWidth;
+  Height := _FormHeight;
+  chkShowDialog.Checked := _AutoShow;
+  chkAutoAdd.Checked := _AutoAdd;
+  CopyValueList(_ValueList, FValueList);
   CopyValuesToGrid(FValueList);
-  Grid.Row := Grid.FixedRows; // Go to the bottom of grid
-  Result := (ShowModal = mrOk);
-  if Result then
-    CopyGridToValues(FValueList);
+  Grid.Row := Grid.FixedRows; // Go to the top of the grid
+  edtFind.Text := _Selected;
+end;
+
+procedure TfmCompRenameConfig.GetData(_ValueList: TStringList;
+  out _AutoShow: Boolean; out _AutoAdd: Boolean; out _FormWidth, _FormHeight: Integer);
+begin
+  CopyGridToValues(FValueList);
+  _FormWidth := Width;
+  _FormHeight := Height;
+  _AutoShow := chkShowDialog.Checked;
+  _AutoAdd := chkAutoAdd.Checked;
+  CopyValueList(FValueList, _ValueList);
 end;
 
 procedure TfmCompRenameConfig.FormCreate(Sender: TObject);
@@ -203,7 +263,7 @@ end;
 
 procedure TfmCompRenameConfig.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FValueList);
+  TStrings_FreeWithObjects(FValueList);
 end;
 
 procedure TfmCompRenameConfig.HandleOnRowHeaderClick(Sender: TObject; Col: Integer);
@@ -555,6 +615,7 @@ begin
     if ShowGxMessageBox(TDefaultRenameComponentsMessage) <> mrYes then
       Exit; //==>
 
+  TStrings_FreeObjects(FValueList);
   with FValueList do begin
     Clear;
     Values['TAction']      := 'act';

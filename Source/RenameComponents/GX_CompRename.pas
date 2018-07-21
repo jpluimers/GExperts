@@ -78,12 +78,14 @@ type
     FProperties: TObjectList;
     FAnchorButtons: array[TAnchorKind] of TdzSpeedBitBtn;
     FAlignButtons: array[TAlign] of TdzSpeedBitBtn;
+    FComponentClassName: WideString;
     function GetNewName: WideString;
     function GetOldName: WideString;
     procedure SetNewName(const Value: WideString);
     procedure SetOldName(const Value: WideString);
     procedure AddComponentProperty(PropertyName, Value: WideString);
     function GetComponentProperty(Index: Integer): WideString;
+    procedure SetComponent(const _Component: IOTAComponent);
     procedure SetAlign(const _Component: IOTAComponent);
     procedure GetAlign(const _Component: IOTAComponent);
     procedure SetAnchors(const _Component: IOTAComponent);
@@ -154,7 +156,8 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure Execute(Sender: TObject); override;
-    procedure Configure; override;
+    procedure Configure; overload; override;
+    procedure Configure(const _Selected: string); reintroduce; overload; 
     function GetActionCaption: string; override;
     function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
@@ -332,6 +335,13 @@ begin
     for ak := Low(TAnchorKind) to High(TAnchorKind) do
       FAnchorButtons[ak].Down := (ak in AnchorValue);
   end;
+end;
+
+procedure TfmCompRename.SetComponent(const _Component: IOTAComponent);
+begin
+  FComponentClassName := _Component.GetComponentType;
+  SetAlign(_Component);
+  SetAnchors(_Component);
 end;
 
 procedure TfmCompRename.SetNewName(const Value: WideString);
@@ -611,31 +621,18 @@ begin
 end;
 
 procedure TCompRenameExpert.Configure;
-var
-  Dialog: TfmCompRenameConfig;
 begin
-  Dialog := TfmCompRenameConfig.Create(nil);
-  try
-    if (FFormWidth > 0) and (FFormHeight > 0) then begin
-      Dialog.Width := FFormWidth;
-      Dialog.Height := FFormHeight;
-    end;
-    Dialog.chkShowDialog.Checked := FShowDialog;
-    Dialog.chkAutoAdd.Checked := FAutoAddClasses;
-    SetFormIcon(Dialog);
-    FRenameRuleList.Sort;
-    Dialog.ValueList.Assign(FRenameRuleList);
-    if Dialog.Execute then
-    begin
-      FFormWidth := Dialog.Width;
-      FFormHeight := Dialog.Height;
-      FShowDialog := Dialog.chkShowDialog.Checked;
-      FAutoAddClasses := Dialog.chkAutoAdd.Checked;
-      FRenameRuleList.Assign(Dialog.ValueList);
-      SaveSettings;
-    end;
-  finally
-    FreeAndNil(Dialog);
+  Configure('');
+end;
+
+procedure TCompRenameExpert.Configure(const _Selected: string);
+begin
+//    SetFormIcon(Dialog);
+  FRenameRuleList.Sort;
+  if TfmCompRenameConfig.Execute(nil,
+    FRenameRuleList, FShowDialog, FAutoAddClasses,
+    FFormWidth, FFormHeight, _Selected) then begin
+    SaveSettings;
   end;
 end;
 
@@ -771,8 +768,7 @@ begin
         Dialog.OnIsValidComponentName := IsValidComponentName;
         Dialog.OldName := CompName;
 
-        Dialog.SetAlign(Component);
-        Dialog.SetAnchors(Component);
+        Dialog.SetComponent(Component);
 
         Index := FRenameRuleList.IndexOfName(Component.GetComponentType);
         if Index <> -1 then
@@ -1139,7 +1135,7 @@ end;
 procedure TfmCompRename.btnSettingsClick(Sender: TObject);
 begin
   Assert(Assigned(PrivateCompRenameExpert));
-  PrivateCompRenameExpert.Configure;
+  PrivateCompRenameExpert.Configure(FComponentClassName);
 end;
 
 procedure TfmCompRename.HandleAlignButtons(_Align: TAlign);
