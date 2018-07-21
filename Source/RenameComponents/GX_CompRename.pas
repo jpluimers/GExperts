@@ -201,7 +201,7 @@ procedure TfmCompRename.pc_AdditionalChange(Sender: TObject);
 begin
   inherited;
   if pc_Additional.ActivePage = ts_Align then
-    TWinControl_SetFocus(b_AlignLeft)
+    TWinControl_SetFocus(b_AlignClient)
   else if pc_Additional.ActivePage = ts_Anchors then
     TWinControl_SetFocus(b_AnchorTop);
 end;
