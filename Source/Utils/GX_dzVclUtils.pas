@@ -952,12 +952,12 @@ function TCheckBox_Autosize(_Chk: TCustomCheckBox; _ParentCanvas: TCanvas = nil)
 /// @returns the monitor on wich the center point of the form is located.
 ///          Warning: The result might be nil if the form is outside the visible area. </summary>
 function TForm_GetMonitor(_frm: TForm): TMonitor;
-
+*)
 ///<summary> centers a form on the given point, but makes sure the form is fully visible </summary>
 procedure TForm_CenterOn(_frm: TForm; _Center: TPoint); overload;
 ///<summary> centers a form on the given component, but makes sure the form is fully visible </summary>
 procedure TForm_CenterOn(_frm: TForm; _Center: TWinControl); overload;
-
+(*
 type
   TFormPlacementEnum = (fpePositionOnly, fpeSizeOnly, fpePosAndSize);
 
@@ -1300,10 +1300,10 @@ procedure TMonitor_MakeFullyVisible(_MonitorRect: TRect; var _Rect: TRect; out _
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect; out _Width, _Height: Integer); overload;
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRect); overload;
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH); overload;
-(*
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; _frm: TForm); overload;
 
 function TScreen_MonitorFromPoint(_pnt: TPoint): TMonitor;
+(*
 procedure TScreen_MakeFullyVisible(_frm: TForm); overload;
 *)
 ///<summary>
@@ -3513,7 +3513,7 @@ begin
   end else
     Result := -1;
 end;
-
+*)
 function TScreen_MonitorFromPoint(_pnt: TPoint): TMonitor;
 var
   i: Integer;
@@ -3528,7 +3528,7 @@ begin
   end;
   Result := nil;
 end;
-
+(*
 function TForm_GetMonitor(_frm: TForm): TMonitor;
 var
   Center: TPoint;
@@ -3537,7 +3537,7 @@ begin
   Center.Y := _frm.Top + _frm.Height div 2;
   Result := TScreen_MonitorFromPoint(Center);
 end;
-
+*)
 procedure TForm_CenterOn(_frm: TForm; _Center: TPoint);
 var
   Monitor: TMonitor;
@@ -3568,7 +3568,7 @@ begin
     TForm_CenterOn(_frm, Point(Screen.Width div 2, Screen.Height div 2));
   end;
 end;
-
+(*
 function TApplication_GetRegistryPath: string;
 var
   VerInfo: IFileInfo;
@@ -5396,7 +5396,7 @@ procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH);
 begin
   TMonitor_MakeFullyVisible(_Monitor.WorkareaRect, _Rect.Left, _Rect.Top, _Rect.Width, _Rect.Height);
 end;
-(*
+
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; _frm: TForm);
 var
   re: TRect;
@@ -5405,7 +5405,7 @@ begin
   TMonitor_MakeFullyVisible(_Monitor, re);
   _frm.BoundsRect := re;
 end;
-
+(*
 function TScreen_GetPrimaryMonitor: TMonitor;
 var
   i: Integer;
