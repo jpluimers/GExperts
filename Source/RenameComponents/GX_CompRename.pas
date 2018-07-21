@@ -13,7 +13,7 @@ interface
 uses
   Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI, ComCtrls, Buttons,
   GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs, Messages,
-  GX_BaseForm, GX_dzSpeedBitBtn;
+  Types, GX_BaseForm, GX_dzSpeedBitBtn;
 
 type
   TCompRenameExpert = class;
@@ -134,6 +134,8 @@ type
     FTimer: TTimer;
     FTimerCount: Integer;
     FFormEditor: IOTAFormEditor;
+    FFormWidth: Integer;
+    FFormHeight: Integer;
     function DoRename(const Component: IOTAComponent; UseRules: Boolean): TModalResult;
   protected
     procedure AddNewClass(const AClassName: WideString);
@@ -614,6 +616,10 @@ var
 begin
   Dialog := TfmCompRenameConfig.Create(nil);
   try
+    if (FFormWidth > 0) and (FFormHeight > 0) then begin
+      Dialog.Width := FFormWidth;
+      Dialog.Height := FFormHeight;
+    end;
     Dialog.chkShowDialog.Checked := FShowDialog;
     Dialog.chkAutoAdd.Checked := FAutoAddClasses;
     SetFormIcon(Dialog);
@@ -621,6 +627,8 @@ begin
     Dialog.ValueList.Assign(FRenameRuleList);
     if Dialog.Execute then
     begin
+      FFormWidth := Dialog.Width;
+      FFormHeight := Dialog.Height;
       FShowDialog := Dialog.chkShowDialog.Checked;
       FAutoAddClasses := Dialog.chkAutoAdd.Checked;
       FRenameRuleList.Assign(Dialog.ValueList);
@@ -988,6 +996,10 @@ begin
   Assert(Assigned(FRenameRuleList));
   FShowDialog := Settings.ReadBool('ShowDialog', False);
   FAutoAddClasses := Settings.ReadBool('AutoAdd', True);
+
+  FFormWidth := Settings.ReadInteger('Width', 0);
+  FFormHeight := Settings.ReadInteger('Height', 0);
+
   if Settings.SectionExists('Items') then
     Settings.ReadStrings('Items', FRenameRuleList)
   else
@@ -1029,6 +1041,10 @@ begin
   end;
 
   Settings.WriteStrings('Items', FRenameRuleList);
+
+  Settings.WriteInteger('Width', FFormWidth);
+  Settings.WriteInteger('Height', FFormHeight);
+
   Settings.WriteBool('ShowDialog', FShowDialog);
   Settings.WriteBool('AutoAdd', FAutoAddClasses);
 
