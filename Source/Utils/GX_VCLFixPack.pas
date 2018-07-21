@@ -38,7 +38,7 @@ unit GX_VCLFixPack;
 interface
 
 // GExperts:
-// The use of VCLFixPack is not really teted and might have undesireble side
+// The use of VCLFixPack is not really teted and might have undesirable side
 // effects. For now it's an experimental feature that must be explicitly
 // enabled by defining GX_USE_VCL_FIX_PACK
 // -- 2016-06-20 twm
