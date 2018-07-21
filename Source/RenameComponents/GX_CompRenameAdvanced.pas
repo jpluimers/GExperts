@@ -8,7 +8,12 @@ uses
   Controls,
   StdCtrls,
   Forms,
-  GX_BaseForm;
+  GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmCompRenameAdvanced = class(TfmBaseForm)
