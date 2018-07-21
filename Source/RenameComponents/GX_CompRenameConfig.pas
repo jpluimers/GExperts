@@ -17,16 +17,23 @@ resourcestring
 type
   TEditMode = (emRead, emEdit, emInsert);
 
+  TOnRowHeaderClick = procedure(Sender: TObject; Col: Integer) of object;
+
   TRenameStringGrid = class(TStringGrid)
   private
     FComponents: TStringList;
+    FOnRowHeaderClick: TOnRowHeaderClick;
   protected
     function GetEditStyle(ACol: Integer; ARow: Integer): TEditStyle; override;
     function CreateEditor: TInplaceEdit; override;
     procedure OnGetComponentList(ACol, ARow: Integer; Items: TStrings);
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure doRowHeaderClick(Col: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+  published
+    property OnRowHeaderClick: TOnRowHeaderClick read FOnRowHeaderClick write FOnRowHeaderClick;
   end;
 
   TfmCompRenameConfig = class(TfmBaseForm)
@@ -102,6 +109,9 @@ type
     procedure GridAddRow;
     function RemoveEmptyBottomRow: Boolean;
     function RowHasComponent(aGrid: TStringGrid; ARow: Integer): Boolean;
+    procedure HandleOnRowHeaderClick(Sender: TObject; Col: Integer);
+    procedure SortByClass;
+    procedure SortByRule;
   public
     property ValueList: TStringList read FValueList;
     function Execute: Boolean;
@@ -178,6 +188,7 @@ begin
     PopupMenu := pmGrid;
     ScrollBars := ssVertical;
     TabOrder := 0;
+    OnRowHeaderClick := HandleOnRowHeaderClick;
   end;
 
   l_Find.Left := GridPad;
@@ -193,6 +204,14 @@ end;
 procedure TfmCompRenameConfig.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FValueList);
+end;
+
+procedure TfmCompRenameConfig.HandleOnRowHeaderClick(Sender: TObject; Col: Integer);
+begin
+  if Col = 0 then
+    SortByClass
+  else
+    SortByRule;
 end;
 
 procedure TfmCompRenameConfig.FormResize(Sender: TObject);
@@ -341,18 +360,28 @@ begin
   ModalResult := mrOk;
 end;
 
-procedure TfmCompRenameConfig.acSortByClassExecute(Sender: TObject);
+procedure TfmCompRenameConfig.SortByClass;
 begin
   CopyGridToValues(FValueList);
   FValueList.CustomSort(CompareClassFunc);
   CopyValuesToGrid(FValueList);
 end;
 
-procedure TfmCompRenameConfig.acSortByRuleExecute(Sender: TObject);
+procedure TfmCompRenameConfig.acSortByClassExecute(Sender: TObject);
+begin
+  SortByClass;
+end;
+
+procedure TfmCompRenameConfig.SortByRule;
 begin
   CopyGridToValues(FValueList);
   FValueList.CustomSort(CompareRuleFunc);
   CopyValuesToGrid(FValueList);
+end;
+
+procedure TfmCompRenameConfig.acSortByRuleExecute(Sender: TObject);
+begin
+  SortByRule;
 end;
 
 procedure TfmCompRenameConfig.GridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -594,6 +623,22 @@ destructor TRenameStringGrid.Destroy;
 begin
   FreeAndNil(FComponents);
   inherited;
+end;
+
+procedure TRenameStringGrid.doRowHeaderClick(Col: Integer);
+begin
+  if Assigned(FOnRowHeaderClick) then
+    FOnRowHeaderClick(Self, Col);
+end;
+
+procedure TRenameStringGrid.WMLButtonUp(var msg: TWMLButtonUp);
+var
+  ACol, ARow: Integer;
+begin
+  inherited;
+  MouseToCell(Msg.XPos, Msg.YPos, ACol, ARow);
+  if ARow <= FixedRows-1 then
+    doRowHeaderClick(ACol);
 end;
 
 function TRenameStringGrid.CreateEditor: TInplaceEdit;
