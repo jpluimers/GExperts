@@ -77,15 +77,13 @@ object fmMacroSelect: TfmMacroSelect
       Caption = 'Filte&r'
       FocusControl = tbEnter
     end
-    object tbEnter: TMemo
+    object tbEnter: TEdit
       Left = 48
       Top = 4
       Width = 249
-      Height = 20
+      Height = 22
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
-      WantReturns = False
-      WordWrap = False
       OnChange = tbEnterChange
       OnKeyDown = tbEnterKeyDown
     end

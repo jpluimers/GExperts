@@ -12,7 +12,7 @@ type
     lvMacros: TListView;
     pnlHeader: TPanel;
     lblFilter: TLabel;
-    tbEnter: TMemo;
+    tbEnter: TEdit;
     pnlButtonsRight: TPanel;
     btnConfiguration: TButton;
     procedure tbEnterChange(Sender: TObject);
