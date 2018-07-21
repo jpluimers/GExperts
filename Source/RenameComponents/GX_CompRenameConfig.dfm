@@ -4,7 +4,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
-  ClientHeight = 245
+  ClientHeight = 261
   ClientWidth = 409
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -23,7 +23,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
-    Top = 169
+    Top = 185
     Width = 409
     Height = 76
     Align = alBottom
@@ -89,62 +89,128 @@ object fmCompRenameConfig: TfmCompRenameConfig
       TabOrder = 0
     end
   end
-  object pnlRules: TPanel
+  object pnlTop: TPanel
     Left = 0
     Top = 0
     Width = 409
-    Height = 169
+    Height = 185
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
     TabOrder = 0
-    object pnlNames: TGroupBox
+    object grpNames: TGroupBox
       Left = 6
       Top = 6
       Width = 397
-      Height = 157
+      Height = 173
       Align = alClient
       Caption = 'Rename &Rules'
       TabOrder = 0
-      DesignSize = (
-        397
-        157)
-      object btnAdd: TButton
-        Left = 270
+      object pnlRules: TPanel
+        Left = 2
         Top = 16
-        Width = 117
-        Height = 26
-        Action = acAdd
-        Anchors = [akTop, akRight]
+        Width = 262
+        Height = 155
+        Align = alClient
         TabOrder = 0
+        object pnlIncSearch: TPanel
+          Left = 1
+          Top = 1
+          Width = 260
+          Height = 24
+          Align = alTop
+          TabOrder = 0
+          DesignSize = (
+            260
+            24)
+          object l_Find: TLabel
+            Left = 8
+            Top = 5
+            Width = 30
+            Height = 14
+            Caption = '&Find: '
+            FocusControl = edtFind
+          end
+          object edtFind: TEdit
+            Left = 40
+            Top = 1
+            Width = 198
+            Height = 22
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 0
+            OnChange = edtFindChange
+            OnKeyDown = edtFindKeyDown
+          end
+          object btnClear: TButton
+            Left = 233
+            Top = 1
+            Width = 21
+            Height = 21
+            Anchors = [akTop, akRight]
+            Caption = 'X'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBtnText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            OnClick = btnClearClick
+          end
+        end
+        object pnlNames: TPanel
+          Left = 1
+          Top = 25
+          Width = 260
+          Height = 129
+          Align = alClient
+          TabOrder = 1
+        end
       end
-      object btnDelete: TButton
-        Left = 270
-        Top = 50
-        Width = 117
-        Height = 26
-        Action = acDelete
-        Anchors = [akTop, akRight]
+      object pnlRight: TPanel
+        Left = 264
+        Top = 16
+        Width = 131
+        Height = 155
+        Align = alRight
         TabOrder = 1
-      end
-      object btnDefaults: TButton
-        Left = 270
-        Top = 118
-        Width = 117
-        Height = 26
-        Anchors = [akRight, akBottom]
-        Caption = '&Defaults'
-        TabOrder = 3
-        OnClick = btnDefaultsClick
-      end
-      object btnOtherProperties: TButton
-        Left = 270
-        Top = 84
-        Width = 117
-        Height = 26
-        Action = acOtherProperties
-        Anchors = [akTop, akRight]
-        TabOrder = 2
+        DesignSize = (
+          131
+          155)
+        object btnAdd: TButton
+          Left = 8
+          Top = 8
+          Width = 117
+          Height = 26
+          Action = acAdd
+          TabOrder = 0
+        end
+        object btnDefaults: TButton
+          Left = 8
+          Top = 120
+          Width = 117
+          Height = 26
+          Anchors = [akLeft, akBottom]
+          Caption = '&Defaults'
+          TabOrder = 3
+          OnClick = btnDefaultsClick
+        end
+        object btnDelete: TButton
+          Left = 8
+          Top = 40
+          Width = 117
+          Height = 26
+          Action = acDelete
+          TabOrder = 1
+        end
+        object btnOtherProperties: TButton
+          Left = 8
+          Top = 80
+          Width = 117
+          Height = 26
+          Action = acOtherProperties
+          TabOrder = 2
+        end
       end
     end
   end
@@ -152,7 +218,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
     Images = dmSharedImages.Images
     OnUpdate = ActionListUpdate
     Left = 152
-    Top = 80
+    Top = 112
     object acAdd: TAction
       Caption = '&Add'
       ImageIndex = 12
@@ -195,7 +261,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   object pmGrid: TPopupMenu
     Images = dmSharedImages.Images
     Left = 108
-    Top = 80
+    Top = 112
     object mnuAdd: TMenuItem
       Action = acAdd
     end
@@ -228,6 +294,6 @@ object fmCompRenameConfig: TfmCompRenameConfig
     Options = [frDown, frDisableMatchCase, frDisableUpDown, frDisableWholeWord]
     OnFind = FindDialogFind
     Left = 64
-    Top = 80
+    Top = 112
   end
 end
