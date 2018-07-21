@@ -17,6 +17,8 @@ uses
 ///            so st[Integer(ls.Objects[i])] = sl[i] </summary>
 procedure TStrings_GetAsSortedList(_st: TStrings; _sl: TStringList; _Duplicates: TDuplicates = dupAccept);
 
+procedure TStrings_FreeWithObjects(_List: TStrings);
+
 ///<summary>
 /// assign the current index to the Objects property and then sort the list </summary>
 procedure TStringList_MakeIndex(_sl: TStringList);
@@ -50,6 +52,18 @@ begin
       TObject(_List[i]).Free;
     FreeAndNil(_List);
   end;
+end;
+
+procedure TStrings_FreeWithObjects(_List: TStrings);
+var
+  i: Integer;
+begin
+  if Assigned(_List) then
+    for i := 0 to _List.Count - 1 do begin
+      _List.Objects[i].Free;
+      _List.Objects[i] := nil;
+    end;
+  _List.Free;
 end;
 
 function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
