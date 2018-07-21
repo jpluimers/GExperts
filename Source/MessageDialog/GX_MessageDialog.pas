@@ -5,7 +5,12 @@ unit GX_MessageDialog;
 interface
 
 uses
-  Classes, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls, GX_BaseForm;
+  Classes, Graphics, Controls, Forms, StdCtrls, ExtCtrls, ComCtrls, GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TSourceType = (stPascal, stCpp);
@@ -163,7 +168,6 @@ type
     procedure btnHelpClick(Sender: TObject);
     procedure btnTestClick(Sender: TObject);
     procedure cbDialogButtonsOrIfStatementClick(Sender: TObject);
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure mmoMessageKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure pgeMessageDialogChange(Sender: TObject);
     procedure cbxTypeEmbeddedChange(Sender: TObject);
@@ -487,17 +491,6 @@ begin
     Control.Enabled := (FFunctionResultsGroupBox.Enabled and (((EnableControlIndex and Control.Tag) > 0) or (Control.Name = 'chkMrNone')));
     if CheckResults then
       (Control as TCheckBox).Checked := Control.Enabled;
-  end;
-end;
-
-procedure TfmMessageDialog.FormKeyPress(Sender: TObject; var Key: Char);
-begin
-  case Key of
-    #27:
-      begin
-        ModalResult := mrCancel;
-        Key := #0;
-      end;
   end;
 end;
 

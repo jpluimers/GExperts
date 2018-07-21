@@ -5,7 +5,12 @@ unit GX_About;
 interface
 
 uses
-  Windows, Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
+  Windows, Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmAbout = class(TfmBaseForm)

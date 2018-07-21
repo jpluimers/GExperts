@@ -5,7 +5,12 @@ unit GX_MessageBox;
 interface
 
 uses
-  Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, GX_BaseForm;
+  Classes, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TGxMsgBoxAdaptor = class(TObject)

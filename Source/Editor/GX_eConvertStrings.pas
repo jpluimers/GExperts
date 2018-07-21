@@ -14,7 +14,12 @@ uses
   Dialogs,
   StdCtrls,
   ExtCtrls,
-  GX_BaseForm;
+  GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TPasteAsType = (paRaw, paStringArray, paAdd, paSLineBreak,

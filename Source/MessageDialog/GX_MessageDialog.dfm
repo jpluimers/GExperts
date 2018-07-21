@@ -16,11 +16,9 @@ object fmMessageDialog: TfmMessageDialog
   Font.Height = -12
   Font.Name = 'Tahoma'
   Font.Style = []
-  KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
-  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 14
   object pnlMain: TPanel
