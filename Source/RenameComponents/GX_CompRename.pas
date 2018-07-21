@@ -12,7 +12,7 @@ interface
 
 uses
   Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI, ComCtrls, Buttons,
-  GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs,
+  GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs, Messages,
   GX_BaseForm, GX_dzSpeedBitBtn;
 
 type
@@ -90,6 +90,7 @@ type
     procedure GetAnchors(const _Component: IOTAComponent);
     procedure HandleAlignButtons(_Align: TAlign);
     procedure SetMargins(_Value: integer);
+    procedure DialogKey(var Msg: TWMKey); message CM_DIALOGKEY;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
@@ -448,6 +449,57 @@ destructor TfmCompRename.Destroy;
 begin
   FreeAndNil(FProperties);
   inherited;
+end;
+
+procedure TfmCompRename.DialogKey(var Msg: TWMKey);
+begin
+  // make the selection of alignment and anchors via arrow keys more intuitive
+  case Msg.CharCode of
+    VK_DOWN: begin
+        if ActiveControl = b_AlignTop then
+          b_AlignClient.SetFocus
+        else if (ActiveControl = b_AlignClient) or (ActiveControl = b_AlignLeft) or (ActiveControl = b_AlignRight) then
+          b_AlignBottom.SetFocus
+        else if (ActiveControl = b_AnchorTop) or (ActiveControl = b_AnchorLeft) or (ActiveControl = b_AnchorRight) then
+          b_AnchorBottom.SetFocus
+        else
+          inherited;
+      end;
+    VK_UP: begin
+        if ActiveControl = b_AlignBottom then
+          b_AlignClient.SetFocus
+        else if (ActiveControl = b_AlignClient) or (ActiveControl = b_AlignLeft) or (ActiveControl = b_AlignRight) then
+          b_AlignTop.SetFocus
+        else if (ActiveControl = b_AlignNone) or (ActiveControl = b_AlignCustom)then
+          b_AlignBottom.SetFocus
+        else if (ActiveControl = b_AnchorBottom) or (ActiveControl = b_AnchorLeft) or (ActiveControl = b_AnchorRight) then
+          b_AnchorTop.SetFocus
+        else
+          inherited;
+      end;
+    VK_RIGHT: begin
+        if ActiveControl = b_AlignLeft then
+          b_AlignClient.SetFocus
+        else if ActiveControl = b_AlignClient then
+          b_AlignRight.SetFocus
+        else if (ActiveControl = b_AnchorTop) or (ActiveControl = b_AnchorBottom) or (ActiveControl = b_AnchorLeft) then
+          b_AnchorRight.SetFocus
+        else
+          inherited;
+      end;
+    VK_LEFT: begin
+        if ActiveControl = b_AlignRight then
+          b_AlignClient.SetFocus
+        else if ActiveControl = b_AlignClient then
+          b_AlignLeft.SetFocus
+        else if (ActiveControl = b_AnchorTop) or (ActiveControl = b_AnchorBottom) or (ActiveControl = b_AnchorRight) then
+          b_AnchorLeft.SetFocus
+        else
+          inherited;
+      end;
+  else
+    inherited;
+  end;
 end;
 
 { TCompRenameNotifier }
