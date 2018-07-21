@@ -19,6 +19,8 @@ procedure TStrings_GetAsSortedList(_st: TStrings; _sl: TStringList; _Duplicates:
 
 procedure TStrings_FreeWithObjects(_List: TStrings);
 
+procedure TStrings_FreeObjects(_List: TStrings);
+
 ///<summary>
 /// assign the current index to the Objects property and then sort the list </summary>
 procedure TStringList_MakeIndex(_sl: TStringList);
@@ -64,6 +66,16 @@ begin
       _List.Objects[i] := nil;
     end;
   _List.Free;
+end;
+
+procedure TStrings_FreeObjects(_List: TStrings);
+var
+  i: Integer;
+begin
+  for i := 0 to _List.Count - 1 do begin
+    _List.Objects[i].Free;
+    _List.Objects[i] := nil;
+  end;
 end;
 
 function IsSameMethod(_Method1, _Method2: TNotifyEvent): Boolean;
