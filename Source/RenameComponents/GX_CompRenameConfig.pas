@@ -492,55 +492,23 @@ begin
 end;
 
 procedure TfmCompRenameConfig.acOtherPropertiesExecute(Sender: TObject);
-
-  function RemoveSpaces(const Value: string): string;
-  begin
-    Result := Value;
-    Result := StringReplace(Result, ' =', '=', []);
-    Result := StringReplace(Result, '= ', '=', []);
-  end;
-
 var
   CompType: WideString;
-  Dlg: TfmCompRenameAdvanced;
   Index: Integer;
   Additional: TStringList;
   i: Integer;
 begin
   CompType := Grid.Cells[0, Grid.Row];
-  Dlg := TfmCompRenameAdvanced.Create(Self);
-  try
-    Dlg.lblComponentClass.Caption := CompType;
-    Index := FValueList.IndexOfName(CompType);
-    if Index = -1 then
-      Index := FValueList.Add(Grid.Cells[0, Grid.Row] + '=' + Grid.Cells[1, Grid.Row]);
-    if Index <> -1 then
+
+  Index := FValueList.IndexOfName(CompType);
+  if Index = -1 then
+    Index := FValueList.Add(Grid.Cells[0, Grid.Row] + '=' + Grid.Cells[1, Grid.Row]);
+  if Index <> -1 then
     begin
       Additional := FValueList.Objects[Index] as TStringList;
-      if Assigned(Additional) then
-        Dlg.mmoPropertyNames.Lines.Assign(Additional);
-      if Dlg.ShowModal = mrOK then
-      begin
-        if Dlg.mmoPropertyNames.Lines.Count > 0 then
-        begin
-          if not Assigned(Additional) then
-            Additional := TStringList.Create;
-          Additional.Assign(Dlg.mmoPropertyNames.Lines);
-          for i := 0 to Additional.Count - 1 do
-            Additional[i] := RemoveSpaces(Additional[i]);
-
-          FValueList.Objects[Index] := Additional;
-        end
-        else if Assigned(Additional) then
-        begin
-          FValueList.Objects[Index] := nil;
-          FreeAndNil(Additional);
-        end;
-      end;
+      if TfmCompRenameAdvanced.Execute(Self, CompType, Additional) then
+        FValueList.Objects[Index] := Additional;
     end;
-  finally
-    FreeAndNil(Dlg);
-  end;
 end;
 
 { TRenameStringGrid }
