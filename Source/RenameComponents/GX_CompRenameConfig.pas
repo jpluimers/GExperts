@@ -232,24 +232,21 @@ begin
   pnlNames.BevelOuter := bvNone;
 
   Grid := TRenameStringGrid.Create(Self);
-  with Grid do
-  begin
-    Name := 'Grid';
-    Parent := pnlNames;
+  Grid.Name := 'Grid';
+  Grid.Parent := pnlNames;
     // Delphi 6 does not support Margins, so we have to do it the hard way
-    SetBounds(GridPad, GridPad, pnlNames.Width - (GridPad*2), pnlNames.Height - (GridPad * 2));
-    Anchors := [akLeft, akTop, akRight, akBottom];
-    ColCount := 2;
-    DefaultColWidth := 150;
-    DefaultRowHeight := 17;
-    FixedCols := 0;
-    RowCount := 2;
-    Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing, goTabs, goAlwaysShowEditor, goThumbTracking];
-    PopupMenu := pmGrid;
-    ScrollBars := ssVertical;
-    TabOrder := 0;
-    OnRowHeaderClick := HandleOnRowHeaderClick;
-  end;
+  Grid.SetBounds(GridPad, GridPad, pnlNames.Width - (GridPad * 2), pnlNames.Height - (GridPad * 2));
+  Grid.Anchors := [akLeft, akTop, akRight, akBottom];
+  Grid.ColCount := 2;
+  Grid.DefaultColWidth := 150;
+  Grid.DefaultRowHeight := 17;
+  Grid.FixedCols := 0;
+  Grid.RowCount := 2;
+  Grid.Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing, goTabs, goAlwaysShowEditor, goThumbTracking];
+  Grid.PopupMenu := pmGrid;
+  Grid.ScrollBars := ssVertical;
+  Grid.TabOrder := 0;
+  Grid.OnRowHeaderClick := HandleOnRowHeaderClick;
 
   l_Find.Left := GridPad;
   btnClear.Left := pnlIncSearch.Width - btnClear.Width - GridPad;
@@ -616,32 +613,31 @@ begin
       Exit; //==>
 
   TStrings_FreeObjects(FValueList);
-  with FValueList do begin
-    Clear;
-    Values['TAction']      := 'act';
-    Values['TBitBtn']      := 'btn';
-    Values['TButton']      := 'btn';
-    Values['TCheckBox']    := 'chk';
-    Values['TCheckListBox']:= 'lbx';
-    Values['TComboBox']    := 'cbx';
-    Values['TDrawGrid']    := 'grd';
-    Values['TEdit']        := 'edt';
-    Values['TGroupBox']    := 'gbx';
-    Values['TImage']       := 'img';
-    Values['TLabel']       := 'lbl';
-    Values['TListBox']     := 'lbx';
-    Values['TMaskEdit']    := 'edt';
-    Values['TMemo']        := 'mmo';
-    Values['TMenuItem']    := 'mnu';
-    Values['TPageControl'] := 'pag';
-    Values['TPanel']       := 'pnl';
-    Values['TRadioButton'] := 'rdo';
-    Values['TRadioGroup']  := 'rgp';
-    Values['TSpeedButton'] := 'btn';
-    Values['TStaticText']  := 'txt';
-    Values['TStringGrid']  := 'grd';
-    Values['TTabSheet']    := 'tab';
-  end;
+  FValueList.Clear;
+  FValueList.Values['TAction'] := 'act';
+  FValueList.Values['TBitBtn'] := 'btn';
+  FValueList.Values['TButton'] := 'btn';
+  FValueList.Values['TCheckBox'] := 'chk';
+  FValueList.Values['TCheckListBox'] := 'lbx';
+  FValueList.Values['TComboBox'] := 'cbx';
+  FValueList.Values['TDrawGrid'] := 'grd';
+  FValueList.Values['TEdit'] := 'edt';
+  FValueList.Values['TGroupBox'] := 'gbx';
+  FValueList.Values['TImage'] := 'img';
+  FValueList.Values['TLabel'] := 'lbl';
+  FValueList.Values['TListBox'] := 'lbx';
+  FValueList.Values['TMaskEdit'] := 'edt';
+  FValueList.Values['TMemo'] := 'mmo';
+  FValueList.Values['TMenuItem'] := 'mnu';
+  FValueList.Values['TPageControl'] := 'pag';
+  FValueList.Values['TPanel'] := 'pnl';
+  FValueList.Values['TRadioButton'] := 'rdo';
+  FValueList.Values['TRadioGroup'] := 'rgp';
+  FValueList.Values['TSpeedButton'] := 'btn';
+  FValueList.Values['TStaticText'] := 'txt';
+  FValueList.Values['TStringGrid'] := 'grd';
+  FValueList.Values['TTabSheet'] := 'tab';
+
   CopyValuesToGrid(FValueList);
   chkShowDialog.Checked := False;
   chkAutoAdd.Checked := True;
