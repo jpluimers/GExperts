@@ -162,7 +162,8 @@ type
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
     procedure LoadForm(Form: TCustomForm; const Section: string = '';
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
-    constructor Create(const FileName: string = '');
+    constructor Create(const FileName: string = ''); overload;
+    constructor Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean = False); overload;
     function CreateExpertSettings(const Section: string): TExpertSettings;
   end;
 
@@ -744,6 +745,11 @@ begin
     inherited Create(TRegistryIniFile.Create(ConfigInfo.GExpertsIdeRootRegistryKey), True)
   else
     inherited Create(TRegistryIniFile.Create(FileName), True);
+end;
+
+constructor TGExpertsSettings.Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean);
+begin
+  inherited Create(_IniFile, _OwnsIniFile);
 end;
 
 procedure TGExpertsSettings.SaveFont(const Section: string; const Font: TFont; Flags: TGXFontFlags);
