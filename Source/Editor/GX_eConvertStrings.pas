@@ -181,7 +181,7 @@ begin
   Settings := nil;
   GXSettings := TGExpertsSettings.Create;
   try
-    Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
+    Settings := GXSettings.CreateExpertSettings(TConvertStringsExpert.ConfigurationKey);
     Settings.SaveForm('Window', Self);
     Settings.WriteBool('ExtractRaw', chk_ExtractRaw.Checked);
     Settings.WriteBool('TrimLeft', chk_TrimLeft.Checked);
@@ -245,7 +245,7 @@ begin
   Settings := nil;
   GXSettings := TGExpertsSettings.Create;
   try
-    Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
+    Settings := GXSettings.CreateExpertSettings(TConvertStringsExpert.ConfigurationKey);
     Settings.LoadForm('Window', Self);
     chk_ExtractRaw.Checked := Settings.ReadBool('ExtractRaw', True);
     chk_TrimLeft.Checked := Settings.ReadBool('TrimLeft', True);

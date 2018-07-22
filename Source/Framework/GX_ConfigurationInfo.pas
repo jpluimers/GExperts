@@ -878,7 +878,7 @@ end;
 
 function TExpertSettings.CreateExpertSettings(const Section: string): TExpertSettings;
 begin
-  Result := TExpertSettings.Create(FGExpertsSettings, FSection + '\' + Section);
+  Result := FGExpertsSettings.CreateExpertSettings(FSection + '\' + Section);
 end;
 
 procedure TExpertSettings.DeleteKey(const Ident: String);
