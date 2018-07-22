@@ -96,7 +96,6 @@ type
     procedure WriteBinaryStream(const Section, Name: string; Value: TStream); override;
     procedure ReadSection(const Section: string; Strings: TStrings); override;
     procedure ReadSections(Strings: TStrings); overload; override;
-    procedure ReadSections(const Section: string; Strings: TStrings); overload; override;
     procedure ReadSectionValues(const Section: string; Strings: TStrings); override;
     procedure EraseSection(const Section: string); override;
     procedure DeleteKey(const Section, Ident: String); override;
@@ -1135,11 +1134,6 @@ end;
 procedure TGExpertsBaseSettings.ReadSection(const Section: string; Strings: TStrings);
 begin
   FIniFile.ReadSection(Section, Strings);
-end;
-
-procedure TGExpertsBaseSettings.ReadSections(const Section: string; Strings: TStrings);
-begin
-  FIniFile.ReadSections(Section, Strings);
 end;
 
 procedure TGExpertsBaseSettings.ReadSections(Strings: TStrings);
