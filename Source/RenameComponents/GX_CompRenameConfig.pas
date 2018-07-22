@@ -77,6 +77,8 @@ type
     btnOK: TButton;
     btnClose: TButton;
     btnHelp: TButton;
+    b_Import: TButton;
+    b_Export: TButton;
     procedure acOtherPropertiesExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -98,7 +100,11 @@ type
     procedure btnClearClick(Sender: TObject);
     procedure edtFindChange(Sender: TObject);
     procedure edtFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure b_ImportClick(Sender: TObject);
+    procedure b_ExportClick(Sender: TObject);
   private
+    FOnImport: TNotifyEvent;
+    FOnExport: TNotifyEvent;
     FValueList: TStringList;
     Grid: TRenameStringGrid;
     procedure CopyValuesToGrid(Values: TStringList);
@@ -114,11 +120,12 @@ type
     procedure SortByRule;
     procedure GetData(_ValueList: TStringList; out _AutoShow, _AutoAdd: Boolean;
       out _FormWidth, _FormHeight: Integer);
+  public
+    class function Execute(_Owner: TComponent; _OnImport, _OnExport: TNotifyEvent;
+      _ValueList: TStringList; var _AutoShow: Boolean;
+      var _AutoAdd: Boolean; var _FormWidth, _FormHeight: Integer; const _Selected: string): Boolean;
     procedure SetData(_ValueList: TStringList; _AutoShow, _AutoAdd: Boolean;
       _FormWidth, _FormHeight: Integer; const _Selected: string);
-  public
-    class function Execute(_Owner: TComponent; _ValueList: TStringList; var _AutoShow: Boolean;
-      var _AutoAdd: Boolean; var _FormWidth, _FormHeight: Integer; const _Selected: string): Boolean;
   end;
 
 implementation
@@ -152,19 +159,21 @@ end;
 
 { TfmCompRenameConfig }
 
-class function TfmCompRenameConfig.Execute(_Owner: TComponent; _ValueList: TStringList;
-  var _AutoShow: Boolean; var _AutoAdd: Boolean; var _FormWidth, _FormHeight: Integer;
-  const _Selected: string): Boolean;
+class function TfmCompRenameConfig.Execute(_Owner: TComponent; _OnImport, _OnExport: TNotifyEvent;
+  _ValueList: TStringList; var _AutoShow: Boolean;
+  var _AutoAdd: Boolean; var _FormWidth, _FormHeight: Integer; const _Selected: string): Boolean;
 var
   frm: TfmCompRenameConfig;
 begin
-  frm:= TfmCompRenameConfig.Create(_Owner);
+  frm := TfmCompRenameConfig.Create(_Owner);
   try
-    frm.SetData(_ValueList, _Autoshow, _AutoAdd, _FormWidth, _FormHeight, _Selected);
+    frm.FOnImport := _OnImport;
+    frm.FOnExport := _OnExport;
+    frm.SetData(_ValueList, _AutoShow, _AutoAdd, _FormWidth, _FormHeight, _Selected);
 
-    Result := (frm.ShowModal = mrOk);
+    Result := (frm.ShowModal = mrOK);
     if Result then
-      frm.GetData(_ValueList, _Autoshow, _AutoAdd, _FormWidth, _FormHeight);
+      frm.GetData(_ValueList, _AutoShow, _AutoAdd, _FormWidth, _FormHeight);
   finally
     FreeAndNil(frm);
   end;
@@ -660,6 +669,16 @@ end;
 procedure TfmCompRenameConfig.btnHelpClick(Sender: TObject);
 begin
   GxContextHelp(Self, 42);
+end;
+
+procedure TfmCompRenameConfig.b_ExportClick(Sender: TObject);
+begin
+  FOnExport(Self);
+end;
+
+procedure TfmCompRenameConfig.b_ImportClick(Sender: TObject);
+begin
+  FOnImport(Self);
 end;
 
 procedure TfmCompRenameConfig.acOtherPropertiesExecute(Sender: TObject);

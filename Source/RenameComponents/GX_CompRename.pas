@@ -106,8 +106,8 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Menus, StrUtils, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
-  GX_IdeUtils, Graphics, GX_GxUtils, TypInfo, GX_dzVclUtils;
+  SysUtils, Windows, Menus, StrUtils, IniFiles, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
+  GX_IdeUtils, Graphics, GX_GxUtils, TypInfo, GX_dzVclUtils, GX_dzClassUtils;
 
 type
   TCompRenameExpert = class;
@@ -148,6 +148,8 @@ type
     FFormWidth: Integer;
     FFormHeight: Integer;
     function DoRename(const Component: IOTAComponent; UseRules: Boolean): TModalResult;
+    procedure HandleOnExport(_Sender: TObject);
+    procedure HandleOnImport(_Sender: TObject);
   protected
     procedure AddNewClass(const AClassName: WideString);
     procedure DoOnTimer(Sender: TObject);
@@ -166,7 +168,7 @@ type
     destructor Destroy; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; overload; override;
-    procedure Configure(const _Selected: string); reintroduce; overload; 
+    procedure Configure(const _Selected: string); reintroduce; overload;
     function GetActionCaption: string; override;
     function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
@@ -630,10 +632,55 @@ procedure TCompRenameExpert.Configure(const _Selected: string);
 begin
 //    SetFormIcon(Dialog);
   FRenameRuleList.Sort;
-  if TfmCompRenameConfig.Execute(nil,
+  if TfmCompRenameConfig.Execute(nil, HandleOnImport, HandleOnExport,
     FRenameRuleList, FShowDialog, FAutoAddClasses,
-    FFormWidth, FFormHeight, _Selected) then begin
+    FFormWidth, FFormHeight, _Selected) then
     SaveSettings;
+end;
+
+procedure TCompRenameExpert.HandleOnImport(_Sender: TObject);
+var
+  GXSettings: TGExpertsSettings;
+  ini: TMemIniFile;
+  fn: string;
+begin
+  fn := 'GExperts_' + Self.GetName + '.ini';
+  if not ShowOpenDialog('Select file to import', 'ini', fn, 'INI files (*.ini)|*.ini') then
+    Exit; //==>
+  if not FileExists(fn) then
+    Exit; //==>
+
+  GXSettings := nil;
+  ini := TMemInifile.Create(fn);
+  try
+    GXSettings := TGExpertsSettings.Create(Ini);
+    InternalLoadSettings(GXSettings);
+  finally
+    FreeAndNil(GXSettings);
+    FreeAndNil(ini);
+  end;
+  (_Sender as TfmCompRenameConfig).SetData(FRenameRuleList, FShowDialog, FAutoAddClasses, FFormWidth, FFormHeight, '');
+end;
+
+procedure TCompRenameExpert.HandleOnExport(_Sender: TObject);
+var
+  GXSettings: TGExpertsSettings;
+  ini: TMemIniFile;
+  fn: string;
+begin
+  fn := 'GExperts_' + Self.GetName + '.ini';
+  if not ShowSaveDialog('Select file to export to', 'ini', fn, 'INI files (*.ini)|*.ini') then
+    Exit; //==>
+
+  GXSettings := nil;
+  ini := TMemIniFile.Create(fn);
+  try
+    GXSettings := TGExpertsSettings.Create(ini);
+    InternalSaveSettings(GXSettings);
+    ini.UpdateFile;
+  finally
+    FreeAndNil(GXSettings);
+    FreeAndNil(ini);
   end;
 end;
 
@@ -996,6 +1043,9 @@ begin
 
   FFormWidth := Settings.ReadInteger('Width', 0);
   FFormHeight := Settings.ReadInteger('Height', 0);
+
+  TStrings_FreeWithObjects(FRenameRuleList);
+  FRenameRuleList := TStringList.Create;
 
   if Settings.SectionExists('Items') then
     Settings.ReadStrings('Items', FRenameRuleList)

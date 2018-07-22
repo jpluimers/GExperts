@@ -32,9 +32,11 @@ type
     // Defaults to GetName.
     function GetBitmapFileName: string; virtual;
     // Overrride to load any configuration settings
-    procedure InternalLoadSettings(Settings: TExpertSettings); virtual;
+    procedure InternalLoadSettings(Settings: TExpertSettings); overload; virtual;
+    procedure InternalLoadSettings(_GxSettings: TGExpertsSettings); overload;
     // Overrride to save any configuration settings
-    procedure InternalSaveSettings(Settings: TExpertSettings); virtual;
+    procedure InternalSaveSettings(Settings: TExpertSettings); overload; virtual;
+    procedure InternalSaveSettings(_GxSettings: TGExpertsSettings); overload;
     // do nothing, overridden by TGX_Expert and TEditorExpert because
     // theses settings are "traditionally" stored differently.
     procedure LoadActiveAndShortCut(Settings: TGExpertsSettings); virtual;
@@ -217,9 +219,33 @@ begin
   // do nothing
 end;
 
+procedure TGX_BaseExpert.InternalLoadSettings(_GxSettings: TGExpertsSettings);
+var
+  ExpSettings: TExpertSettings;
+begin
+  ExpSettings := _GxSettings.CreateExpertSettings(ConfigurationKey);
+  try
+    InternalLoadSettings(ExpSettings);
+  finally
+    FreeAndNil(ExpSettings);
+  end;
+end;
+
 procedure TGX_BaseExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   // do nothing
+end;
+
+procedure TGX_BaseExpert.InternalSaveSettings(_GxSettings: TGExpertsSettings);
+var
+  ExpSettings: TExpertSettings;
+begin
+  ExpSettings := _GxSettings.CreateExpertSettings(ConfigurationKey);
+  try
+    InternalSaveSettings(ExpSettings);
+  finally
+    FreeAndNil(ExpSettings);
+  end;
 end;
 
 function TGX_BaseExpert.IsDefaultActive: Boolean;
@@ -246,16 +272,9 @@ begin
 end;
 
 procedure TGX_BaseExpert.LoadSettings(_GxSettings: TGExpertsSettings);
-var
-  ExpSettings: TExpertSettings;
 begin
   LoadActiveAndShortCut(_GxSettings);
-  ExpSettings := _GxSettings.CreateExpertSettings(ConfigurationKey);
-  try
-    InternalLoadSettings(ExpSettings);
-  finally
-    FreeAndNil(ExpSettings);
-  end;
+  InternalLoadSettings(_GxSettings);
 end;
 
 function TGX_BaseExpert.GetTotalCallCount: Integer;
@@ -295,16 +314,9 @@ begin
 end;
 
 procedure TGX_BaseExpert.SaveSettings(_GxSettings: TGExpertsSettings);
-var
-  ExpSettings: TExpertSettings;
 begin
   SaveActiveAndShortCut(_GxSettings);
-  ExpSettings := _GxSettings.CreateExpertSettings(ConfigurationKey);
-  try
-    InternalSaveSettings(ExpSettings);
-  finally
-    FreeAndNil(ExpSettings);
-  end;
+  InternalSaveSettings(_GxSettings);
 end;
 
 procedure TGX_BaseExpert.SetTotalCallCount(Value: Integer);

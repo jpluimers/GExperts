@@ -4,7 +4,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
-  ClientHeight = 261
+  ClientHeight = 264
   ClientWidth = 409
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -23,7 +23,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
-    Top = 185
+    Top = 188
     Width = 409
     Height = 76
     Align = alBottom
@@ -41,8 +41,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
       BevelOuter = bvNone
       TabOrder = 2
       object btnOK: TButton
-        Left = 18
-        Top = 43
+        Left = 32
+        Top = 48
         Width = 75
         Height = 25
         Action = acOK
@@ -51,8 +51,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 0
       end
       object btnClose: TButton
-        Left = 105
-        Top = 43
+        Left = 112
+        Top = 48
         Width = 75
         Height = 25
         Action = acCancel
@@ -60,8 +60,8 @@ object fmCompRenameConfig: TfmCompRenameConfig
         TabOrder = 1
       end
       object btnHelp: TButton
-        Left = 190
-        Top = 43
+        Left = 192
+        Top = 48
         Width = 75
         Height = 25
         Cancel = True
@@ -88,12 +88,30 @@ object fmCompRenameConfig: TfmCompRenameConfig
       Caption = 'Show rename dialog for new components'
       TabOrder = 0
     end
+    object b_Import: TButton
+      Left = 8
+      Top = 48
+      Width = 75
+      Height = 25
+      Caption = 'Import ...'
+      TabOrder = 3
+      OnClick = b_ImportClick
+    end
+    object b_Export: TButton
+      Left = 88
+      Top = 48
+      Width = 75
+      Height = 25
+      Caption = 'Export ...'
+      TabOrder = 4
+      OnClick = b_ExportClick
+    end
   end
   object pnlTop: TPanel
     Left = 0
     Top = 0
     Width = 409
-    Height = 185
+    Height = 188
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -102,7 +120,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
       Left = 6
       Top = 6
       Width = 397
-      Height = 173
+      Height = 176
       Align = alClient
       Caption = 'Rename &Rules'
       TabOrder = 0
@@ -110,7 +128,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 2
         Top = 16
         Width = 262
-        Height = 155
+        Height = 158
         Align = alClient
         TabOrder = 0
         object pnlIncSearch: TPanel
@@ -162,7 +180,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
           Left = 1
           Top = 25
           Width = 260
-          Height = 129
+          Height = 132
           Align = alClient
           TabOrder = 1
         end
@@ -171,12 +189,12 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 264
         Top = 16
         Width = 131
-        Height = 155
+        Height = 158
         Align = alRight
         TabOrder = 1
         DesignSize = (
           131
-          155)
+          158)
         object btnAdd: TButton
           Left = 8
           Top = 8
@@ -187,7 +205,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         end
         object btnDefaults: TButton
           Left = 8
-          Top = 120
+          Top = 123
           Width = 117
           Height = 26
           Anchors = [akLeft, akBottom]
