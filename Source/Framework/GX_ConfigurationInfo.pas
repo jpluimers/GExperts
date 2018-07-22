@@ -22,11 +22,8 @@ type
     procedure SetMoveComponentMenu(const Value: Boolean);
     function GetAlphabetizeMenu: Boolean;
     function GetConfigPath: string;
-    function GetGExpertsPath: string;
     function GetEditorExpertsEnabled: Boolean;
-    function GetGExpertsIdeRootRegistryKey: string;
     function GetHelpFileLocation: string;
-    function GetIdeRootRegistryKey: string;
     function GetVclPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
     function GetHideWindowMenu: Boolean;
@@ -34,17 +31,16 @@ type
     function GetEnableKeyboardShortcuts: Boolean;
     function GetEnableCustomFont: Boolean;
     procedure SetEnableCustomFont(const Value: Boolean);
-    function GetCustomFont: TFont;
     procedure UpdateScreenForms;
 
     // Return the IDE's base registry key without a
     // trailing backslash, e.g.
     //    SOFTWARE\Borland\Delphi\6.0
-    property IdeRootRegistryKey: string read GetIdeRootRegistryKey;
+    function IdeRootRegistryKey: string;
     // Return the GExperts base registry key within
     // the IDE without a trailing backslash, e.g.
     //    SOFTWARE\Borland\Delphi\6.0\GExperts
-    property GExpertsIdeRootRegistryKey: string read GetGExpertsIdeRootRegistryKey;
+    function GExpertsIdeRootRegistryKey: string;
     // Return the location of the GExperts help file.
     property HelpFile: string read GetHelpFileLocation write SetHelpFileLocation;
     // Return the location of the VCL source code.
@@ -64,10 +60,10 @@ type
     property PlaceGxMainMenuInToolsMenu: Boolean read GetPlaceGxMainMenuInToolsMenu write SetPlaceGxMainMenuInToolsMenu;
     property HideWindowMenu: Boolean read GetHideWindowMenu write SetHideWindowMenu;
     property MoveComponentMenu: Boolean read GetMoveComponentMenu write SetMoveComponentMenu;
-    property GExpertsPath: string read GetGExpertsPath;
+    function GExpertsPath: string;
     property EnableKeyboardShortcuts: Boolean read GetEnableKeyboardShortcuts;
     property EnableCustomFont: Boolean read GetEnableCustomFont write SetEnableCustomFont;
-    property CustomFont: TFont read GetCustomFont;
+    function CustomFont: TFont;
   end;
 
   TGXFontFlag = (ffColor);
@@ -206,11 +202,11 @@ type
     function GetAlphabetizeMenu: Boolean;
     function GetConfigPath: string;
     function GetEditorExpertsEnabled: Boolean;
-    function GetGExpertsIdeRootRegistryKey: string;
+    function GExpertsIdeRootRegistryKey: string;
     function GetHelpFileLocation: string;
-    function GetIdeRootRegistryKey: string;
+    function IdeRootRegistryKey: string;
     function GetVclPath: string;
-    function GetGExpertsPath: string;
+    function GExpertsPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
     function GetHideWindowMenu: Boolean;
     function GetMoveComponentMenu: Boolean;
@@ -218,7 +214,7 @@ type
     function GetEnableKeyboardShortcuts: Boolean;
     function GetEnableCustomFont: Boolean;
     procedure SetEnableCustomFont(const Value: Boolean);
-    function GetCustomFont: TFont;
+    function CustomFont: TFont;
     procedure UpdateScreenForms;
   public
     constructor Create;
@@ -530,7 +526,7 @@ begin
   FVclPath := AddSlash(Value);
 end;
 
-function TConfigInfo.GetGExpertsIdeRootRegistryKey: string;
+function TConfigInfo.GExpertsIdeRootRegistryKey: string;
 const
   SGExpertsString = 'GExperts-1.3';
 begin
@@ -566,7 +562,7 @@ begin
   Result := FHelpFileLocation;
 end;
 
-function TConfigInfo.GetIdeRootRegistryKey: string;
+function TConfigInfo.IdeRootRegistryKey: string;
 begin
   Result := FIdeRootRegistryKey;
 end;
@@ -625,7 +621,7 @@ begin
   FHideWindowMenu := Value;
 end;
 
-function TConfigInfo.GetGExpertsPath: string;
+function TConfigInfo.GExpertsPath: string;
 begin
   Result := ExtractFilePath(FGExpertsPath);
 end;
@@ -645,7 +641,7 @@ begin
   Result := FEnableKeyboardShortcuts;
 end;
 
-function TConfigInfo.GetCustomFont: TFont;
+function TConfigInfo.CustomFont: TFont;
 begin
   Result := FCustomFont;
 end;

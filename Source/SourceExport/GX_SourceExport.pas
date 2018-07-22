@@ -139,7 +139,7 @@ begin
   Assert(Assigned(SourceExportExpert));
   Assert(Assigned(FEditor));
 
-  FEditor.Highlighter.LoadFromRegistry(HKEY_CURRENT_USER, ConfigInfo.GetGExpertsIdeRootRegistryKey +
+  FEditor.Highlighter.LoadFromRegistry(HKEY_CURRENT_USER, ConfigInfo.GExpertsIdeRootRegistryKey +
         HighlighterDefaultRegKey + FEditor.Highlighter.LanguageName);
 
   case SourceExportExpert.FDefaultCopyFormat of
@@ -420,7 +420,7 @@ var
 begin
   Dlg := TfmSourceExportOptions.Create(nil);
   try
-    HighlighterRegKey := ConfigInfo.GetGExpertsIdeRootRegistryKey + HighlighterDefaultRegKey
+    HighlighterRegKey := ConfigInfo.GExpertsIdeRootRegistryKey + HighlighterDefaultRegKey
         + Dlg.SynSampleEditor.Highlighter.LanguageName;
 
     Dlg.rbxCopySettings.ItemIndex := Ord(FDefaultCopyFormat);
