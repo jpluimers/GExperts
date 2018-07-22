@@ -6,7 +6,7 @@ interface
 
 uses
   Registry,
-  Graphics, Classes, TypInfo, Forms, ComCtrls, Types;
+  Graphics, Classes, TypInfo, Forms, ComCtrls, Types, IniFiles;
 
 type
   IConfigInfo = interface(IUnknown) //FI:W523 - we don't need a GUID
@@ -72,7 +72,37 @@ type
   TFormSaveFlag = (fsSize, fsPosition);
   TFormSaveFlags = set of TFormSaveFlag;
 
-  TGExpertsBaseSettings = class(TRegistryIniFile);
+  TGExpertsBaseSettings = class(TCustomIniFile)
+  private
+    FIniFile: TCustomIniFile;
+    FOwnsIniFile: Boolean;
+  public
+    constructor Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean = False);
+    destructor Destroy; override;
+    function ReadDate(const Section, Name: string; Default: TDateTime): TDateTime; override;
+    function ReadDateTime(const Section, Name: string; Default: TDateTime): TDateTime; override;
+    function ReadInteger(const Section, Ident: string; Default: Longint): Longint; override;
+    function ReadFloat(const Section, Name: string; Default: Double): Double; override;
+    function ReadString(const Section, Ident, Default: string): string; override;
+    function ReadTime(const Section, Name: string; Default: TDateTime): TDateTime; override;
+    function ReadBinaryStream(const Section, Name: string; Value: TStream): Integer; override;
+//    procedure ReadKeys(const Section: string; Sections: TStrings);
+    procedure WriteDate(const Section, Name: string; Value: TDateTime); override;
+    procedure WriteDateTime(const Section, Name: string; Value: TDateTime); override;
+    procedure WriteFloat(const Section, Name: string; Value: Double); override;
+    procedure WriteInteger(const Section, Ident: string; Value: Longint); override;
+    procedure WriteString(const Section, Ident, Value: String); override;
+    procedure WriteTime(const Section, Name: string; Value: TDateTime); override;
+    procedure WriteBinaryStream(const Section, Name: string; Value: TStream); override;
+    procedure ReadSection(const Section: string; Strings: TStrings); override;
+    procedure ReadSections(Strings: TStrings); overload; override;
+    procedure ReadSections(const Section: string; Strings: TStrings); overload; override;
+    procedure ReadSectionValues(const Section: string; Strings: TStrings); override;
+    procedure EraseSection(const Section: string); override;
+    procedure DeleteKey(const Section, Ident: String); override;
+    procedure UpdateFile; override;
+  end;
+
   TGExpertsSettings = class;
 
   ///<summary>
@@ -712,9 +742,9 @@ const
 constructor TGExpertsSettings.Create(const FileName: string);
 begin
   if FileName = '' then
-    inherited Create(ConfigInfo.GExpertsIdeRootRegistryKey)
+    inherited Create(TRegistryIniFile.Create(ConfigInfo.GExpertsIdeRootRegistryKey), True)
   else
-    inherited Create(FileName);
+    inherited Create(TRegistryIniFile.Create(FileName), True);
 end;
 
 procedure TGExpertsSettings.SaveFont(const Section: string; const Font: TFont; Flags: TGXFontFlags);
@@ -1049,6 +1079,127 @@ begin
   if ListName <> '' then
     s := AddSlash(s) + ListName;
   FGExpertsSettings.WriteStrings(List, s, Ident);
+end;
+
+{ TGExpertsBaseSettings }
+
+constructor TGExpertsBaseSettings.Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean = False);
+begin
+  inherited Create(_IniFile.FileName);
+  FIniFile := _IniFile;
+  FOwnsIniFile:= _OwnsIniFile;
+end;
+
+destructor TGExpertsBaseSettings.Destroy;
+begin
+  if FOwnsIniFile then
+    FreeAndNil(FIniFile);
+  inherited;
+end;
+
+procedure TGExpertsBaseSettings.DeleteKey(const Section, Ident: String);
+begin
+  FIniFile.DeleteKey(Section, Ident);
+end;
+
+procedure TGExpertsBaseSettings.EraseSection(const Section: string);
+begin
+  FIniFile.EraseSection(Section);
+end;
+
+function TGExpertsBaseSettings.ReadBinaryStream(const Section, Name: string; Value: TStream): Integer;
+begin
+  Result := FIniFile.ReadBinaryStream(Section, Name, Value);
+end;
+
+function TGExpertsBaseSettings.ReadDate(const Section, Name: string; Default: TDateTime): TDateTime;
+begin
+  Result := FIniFile.ReadDate(Section, Name, Default);
+end;
+
+function TGExpertsBaseSettings.ReadDateTime(const Section, Name: string; Default: TDateTime): TDateTime;
+begin
+  Result := FIniFile.ReadDateTime(Section, Name, Default);
+end;
+
+function TGExpertsBaseSettings.ReadFloat(const Section, Name: string; Default: Double): Double;
+begin
+  Result := FIniFile.ReadFloat(section, Name, Default);
+end;
+
+function TGExpertsBaseSettings.ReadInteger(const Section, Ident: string; Default: Integer): Longint;
+begin
+  Result := FIniFile.ReadInteger(section, ident, Default);
+end;
+
+procedure TGExpertsBaseSettings.ReadSection(const Section: string; Strings: TStrings);
+begin
+  FIniFile.ReadSection(Section, Strings);
+end;
+
+procedure TGExpertsBaseSettings.ReadSections(const Section: string; Strings: TStrings);
+begin
+  FIniFile.ReadSections(Section, Strings);
+end;
+
+procedure TGExpertsBaseSettings.ReadSections(Strings: TStrings);
+begin
+  FIniFile.ReadSections(Strings);
+end;
+
+procedure TGExpertsBaseSettings.ReadSectionValues(const Section: string; Strings: TStrings);
+begin
+  FIniFile.ReadSectionValues(Section, Strings);
+end;
+
+function TGExpertsBaseSettings.ReadString(const Section, Ident, Default: string): string;
+begin
+  Result := FIniFile.ReadString(Section, Ident, default);
+end;
+
+function TGExpertsBaseSettings.ReadTime(const Section, Name: string; Default: TDateTime): TDateTime;
+begin
+  Result := FIniFile.ReadTime(Section,Name, Default);
+end;
+
+procedure TGExpertsBaseSettings.UpdateFile;
+begin
+  FIniFile.UpdateFile;
+end;
+
+procedure TGExpertsBaseSettings.WriteBinaryStream(const Section, Name: string; Value: TStream);
+begin
+  FIniFile.WriteBinaryStream(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteDate(const Section, Name: string; Value: TDateTime);
+begin
+  FIniFile.WriteDate(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteDateTime(const Section, Name: string; Value: TDateTime);
+begin
+  FIniFile.WriteDateTime(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteFloat(const Section, Name: string; Value: Double);
+begin
+  FIniFile.WriteFloat(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteInteger(const Section, Ident: string; Value: Integer);
+begin
+  FIniFile.WriteInteger(Section, Ident, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteString(const Section, Ident, Value: String);
+begin
+  FIniFile.WriteString(Section, Ident, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteTime(const Section, Name: string; Value: TDateTime);
+begin
+  FIniFile.WriteTime(Section, Name, Value);
 end;
 
 initialization
