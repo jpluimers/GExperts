@@ -607,6 +607,20 @@ begin
 end;
 
 procedure TfmCompRenameConfig.btnDefaultsClick(Sender: TObject);
+
+  function CreateStringlist(const _Entries: array of string): TStringList;
+  var
+    i: Integer;
+  begin
+    if Length(_Entries) = 0 then
+      Result := nil
+    else begin
+      Result := TStringList.Create;
+      for i := 0 to Length(_Entries) - 1 do
+        Result.Add(_Entries[i]);
+    end;
+  end;
+
 begin
   if FValueList.Count > 0 then
     if ShowGxMessageBox(TDefaultRenameComponentsMessage) <> mrYes then
@@ -614,29 +628,29 @@ begin
 
   TStrings_FreeObjects(FValueList);
   FValueList.Clear;
-  FValueList.Add('TAction=act');
-  FValueList.Add('TBitBtn=btn');
-  FValueList.Add('TButton=btn');
-  FValueList.Add('TCheckBox=chk');
+  FValueList.AddObject('TAction=act', CreateSTringlist(['Caption']));
+  FValueList.AddObject('TBitBtn=btn', CreateSTringlist(['Caption', 'Enabled']));
+  FValueList.AddObject('TButton=btn', CreateSTringlist(['Caption', 'Enabled']));
+  FValueList.AddObject('TCheckBox=chk', CreateSTringlist(['Caption']));
   FValueList.Add('TCheckListBox=lbx');
-  FValueList.Add('TComboBox=cbx');
+  FValueList.AddObject('TComboBox=cbx', CreateSTringlist(['Text=''''']));
   FValueList.Add('TDrawGrid=grd');
-  FValueList.Add('TEdit=edt');
-  FValueList.Add('TGroupBox=gbx');
+  FValueList.AddObject('TEdit=edt', CreateSTringlist(['Text=''''']));
+  FValueList.AddObject('TGroupBox=gbx', CreateSTringlist(['Caption']));
   FValueList.Add('TImage=img');
-  FValueList.Add('TLabel=lbl');
+  FValueList.AddObject('TLabel=lbl', CreateSTringlist(['Caption']));
   FValueList.Add('TListBox=lbx');
   FValueList.Add('TMaskEdit=edt');
   FValueList.Add('TMemo=mmo');
-  FValueList.Add('TMenuItem=mnu');
+  FValueList.AddObject('TMenuItem=mnu', CreateSTringlist(['Caption']));
   FValueList.Add('TPageControl=pag');
-  FValueList.Add('TPanel=pnl');
-  FValueList.Add('TRadioButton=rdo');
-  FValueList.Add('TRadioGroup=rgp');
-  FValueList.Add('TSpeedButton=btn');
+  FValueList.AddObject('TPanel=pnl', CreateSTringlist(['Caption=''''']));
+  FValueList.AddObject('TRadioButton=rdo', CreateSTringlist(['Caption=''''']));
+  FValueList.AddObject('TRadioGroup=rgp', CreateSTringlist(['Caption=''''']));
+  FValueList.AddObject('TSpeedButton=btn', CreateSTringlist(['Caption=''''']));
   FValueList.Add('TStaticText=txt');
   FValueList.Add('TStringGrid=grd');
-  FValueList.Add('TTabSheet=tab');
+  FValueList.AddObject('TTabSheet=tab', CreateSTringlist(['Caption=''''']));
 
   CopyValuesToGrid(FValueList);
   chkShowDialog.Checked := False;
