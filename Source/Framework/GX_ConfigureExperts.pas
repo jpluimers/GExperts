@@ -19,6 +19,18 @@ uses
   ExtCtrls;
 
 type
+  TScrollBox = class(Forms.TScrollBox)
+//    procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
+    procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
+  private
+    FOnScrollVert: TNotifyEvent;
+//    FOnScrollHorz: TNotifyEvent;
+  public
+    property OnScrollVert: TNotifyEvent read FOnScrollVert write FOnScrollVert;
+//    property OnScrollHorz: TNotifyEvent read FOnScrollHorz write FOnScrollHorz;
+  end;
+
+type
   TfrConfigureExperts = class(TFrame)
     pnlExpertsFilter: TPanel;
     lblFilter: TLabel;
@@ -45,6 +57,7 @@ type
       var Handled: Boolean);
     procedure btnClearAllClick(Sender: TObject);
     procedure btnSetAllDefaultClick(Sender: TObject);
+    procedure edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FThumbSize: Integer;
     FExperts: TList;
@@ -52,6 +65,8 @@ type
     procedure FilterVisibleExperts;
     procedure SetAllEnabled(_Value: Boolean);
     procedure SetDefaultShortcutClick(_Sender: TObject);
+    procedure HandleVerticalScroll(_Sender: TObject);
+    procedure SetConfigButtonHotkey;
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -70,6 +85,9 @@ uses
   GX_BaseExpert,
   GX_dzVclUtils,
   GX_DbugIntf;
+
+resourcestring
+  SConfigureButtonCaption = 'Configure...';
 
 function IsThemesEnabled: Boolean;
 begin
@@ -117,6 +135,8 @@ begin
   end;
 
   pnlExpertsFilter.FullRepaint := False;
+
+  sbxExperts.OnScrollVert := HandleVerticalScroll;
 end;
 
 destructor TfrConfigureExperts.Destroy;
@@ -128,6 +148,74 @@ end;
 procedure TfrConfigureExperts.edtFilterChange(Sender: TObject);
 begin
   FilterVisibleExperts;
+end;
+
+procedure TfrConfigureExperts.edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  DeltaY: Integer;
+begin
+  case Key of
+    VK_DOWN:
+      DeltaY := 1;
+    VK_UP:
+      DeltaY := -1;
+    VK_NEXT:
+      DeltaY := 5;
+    VK_PRIOR:
+      DeltaY := -5;
+  else
+    Exit;
+  end;
+  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + sbxExperts.VertScrollBar.Increment * DeltaY;
+  Key := 0;
+  SetConfigButtonHotkey;
+end;
+
+function TryGetConfigButton(_Pnl: TPanel; out _btn: TButton): Boolean;
+var
+  i: Integer;
+  ctrl: TControl;
+begin
+  Result := False;
+  for i := 0 to _Pnl.ComponentCount - 1 do begin
+    ctrl := _Pnl.Components[i] as TControl;
+    if ctrl is TButton then begin
+      if StripHotkey(TButton(ctrl).Caption) = SConfigureButtonCaption then begin
+        _btn := TButton(Ctrl);
+        Result := True;
+        Exit;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrConfigureExperts.SetConfigButtonHotkey;
+var
+  h: Integer;
+  PanelIdx: Integer;
+  Panel: TPanel;
+  btn: TButton;
+begin
+  h := pnlExpertLayout.Height;
+  for PanelIdx := 0 to sbxExperts.ControlCount - 1 do begin
+    Panel := sbxExperts.Controls[PanelIdx] as TPanel;
+    if Panel <> pnlExpertLayout then begin
+      if Panel.Visible then begin
+        if TryGetConfigButton(Panel, btn) then begin
+          if Panel.Top div h = 0 then begin
+            btn.Caption := '&' + SConfigureButtonCaption;
+          end else begin
+            btn.Caption := SConfigureButtonCaption;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrConfigureExperts.HandleVerticalScroll(_Sender: TObject);
+begin
+  SetConfigButtonHotkey;
 end;
 
 function TryGetControl(_Owner: TControl; _CtrlClass: TControlClass; out _ctrl: TControl): Boolean;
@@ -356,8 +444,6 @@ begin
 end;
 
 procedure TfrConfigureExperts.Init(_Experts: TList);
-resourcestring
-  SConfigureButtonCaption = 'Configure...';
 var
   i: Integer;
   AnExpert: TGX_BaseExpert;
@@ -516,6 +602,17 @@ begin
   end;
 
   sbxExperts.VertScrollBar.Range := CurrTop;
+
+  SetConfigButtonHotkey;
+end;
+
+{ TScrollBox }
+
+procedure TScrollBox.WMVScroll(var Message: TWMVScroll);
+begin
+  inherited;
+  if Assigned(FOnScrollVert) then
+    FOnScrollVert(Self);
 end;
 
 end.

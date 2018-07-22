@@ -30,6 +30,7 @@ object frConfigureExperts: TfrConfigureExperts
       Height = 21
       TabOrder = 0
       OnChange = edtFilterChange
+      OnKeyDown = edtFilterKeyDown
     end
     object btnEnableAll: TButton
       Left = 406
