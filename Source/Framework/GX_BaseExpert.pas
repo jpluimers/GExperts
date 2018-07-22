@@ -77,12 +77,14 @@ type
     // the virtual methods
     // LoadActiveAndShortCut and InternalLoadSettings
     // override InternalLoadSettings to actually load the settings.
-    procedure LoadSettings;
+    procedure LoadSettings; overload;
+    procedure LoadSettings(_GxSettings: TGExpertsSettings); overload;
     // Creates a Settings object and passes it to
     // the virtual methods
     // SaveActiveAndShortCut and InternalSaveSettings
     // override InternalSaveSettings to actually save the settings.
-    procedure SaveSettings;
+    procedure SaveSettings; overload;
+    procedure SaveSettings(_GxSettings: TGExpertsSettings); overload;
     // Returns an empty string, overridden by TGX_Expert and TEditorExpert
     // to return the correct values.
     function GetOptionsBaseRegistryKey: string; virtual;
@@ -234,19 +236,25 @@ end;
 procedure TGX_BaseExpert.LoadSettings;
 var
   Settings: TGExpertsSettings;
-  ExpSettings: TExpertSettings;
 begin
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
   try
-    LoadActiveAndShortCut(Settings);
-    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
-    try
-      InternalLoadSettings(ExpSettings);
-    finally
-      FreeAndNil(ExpSettings);
-    end;
+    LoadSettings(Settings);
   finally
     FreeAndNil(Settings);
+  end;
+end;
+
+procedure TGX_BaseExpert.LoadSettings(_GxSettings: TGExpertsSettings);
+var
+  ExpSettings: TExpertSettings;
+begin
+  LoadActiveAndShortCut(_GxSettings);
+  ExpSettings := _GxSettings.CreateExpertSettings(ConfigurationKey);
+  try
+    InternalLoadSettings(ExpSettings);
+  finally
+    FreeAndNil(ExpSettings);
   end;
 end;
 
@@ -277,19 +285,25 @@ end;
 procedure TGX_BaseExpert.SaveSettings;
 var
   Settings: TGExpertsSettings;
-  ExpSettings: TExpertSettings;
 begin
   Settings := TGExpertsSettings.Create(GetOptionsBaseRegistryKey);
   try
-    SaveActiveAndShortCut(Settings);
-    ExpSettings := Settings.CreateExpertSettings(ConfigurationKey);
-    try
-      InternalSaveSettings(ExpSettings);
-    finally
-      FreeAndNil(ExpSettings);
-    end;
+    SaveSettings(Settings);
   finally
     FreeAndNil(Settings);
+  end;
+end;
+
+procedure TGX_BaseExpert.SaveSettings(_GxSettings: TGExpertsSettings);
+var
+  ExpSettings: TExpertSettings;
+begin
+  SaveActiveAndShortCut(_GxSettings);
+  ExpSettings := _GxSettings.CreateExpertSettings(ConfigurationKey);
+  try
+    InternalSaveSettings(ExpSettings);
+  finally
+    FreeAndNil(ExpSettings);
   end;
 end;
 
