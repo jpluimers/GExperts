@@ -16,8 +16,6 @@ uses
   Types, GX_BaseForm, GX_dzSpeedBitBtn;
 
 type
-  TCompRenameExpert = class;
-
   TIsValidComponentName = function (const OldName, NewName: WideString; var Reason: WideString): Boolean of object;
 
   // Simple rename dialog that shows the old and new component name
@@ -103,6 +101,17 @@ type
     property OnIsValidComponentName: TIsValidComponentName read FIsValidComponentName write FIsValidComponentName;
   end;
 
+implementation
+
+{$R *.dfm}
+
+uses
+  SysUtils, Windows, Menus, StrUtils, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
+  GX_IdeUtils, Graphics, GX_GxUtils, TypInfo, GX_dzVclUtils;
+
+type
+  TCompRenameExpert = class;
+
   TCompRenameNotifier = class(TInterfacedObject, IGxEditorNotification)
   private
     FChangeServiceNotifierIndex: Integer;
@@ -166,14 +175,6 @@ type
     function IsDefaultActive: Boolean; override;
     function HasDesignerMenuItem: Boolean; override;
   end;
-
-implementation
-
-{$R *.dfm}
-
-uses
-  SysUtils, Windows, Menus, StrUtils, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
-  GX_IdeUtils, Graphics, GX_GxUtils, TypInfo, GX_dzVclUtils;
 
 resourcestring
   SPropertyNotFound = 'Property not found';
