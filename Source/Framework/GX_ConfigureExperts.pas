@@ -62,6 +62,7 @@ type
   private
     FThumbSize: Integer;
     FExperts: TList;
+    FVisibleExpertsCount: Integer;
     procedure ConfigureExpertClick(_Sender: TObject);
     procedure FilterVisibleExperts;
     procedure SetAllEnabled(_Value: Boolean);
@@ -226,14 +227,14 @@ begin
   SetConfigButtonHotkey;
 end;
 
-function TryGetControl(_Owner: TControl; _CtrlClass: TControlClass; out _ctrl: TControl): Boolean;
+function TryGetControl(_Owner: TControl; _CtrlClass: TControlClass; out _Ctrl: TControl): Boolean;
 var
   i: Integer;
 begin
   Result := False;
   for i := 0 to _Owner.ComponentCount - 1 do begin
-    _ctrl := _Owner.Components[i] as TControl;
-    if _ctrl is _CtrlClass then begin
+    _Ctrl := _Owner.Components[i] as TControl;
+    if _Ctrl is _CtrlClass then begin
       Result := True;
       Exit;
     end;
@@ -545,6 +546,8 @@ begin
   end;
   pnlExpertLayout.Visible := False;
 
+  FVisibleExpertsCount := FExperts.Count;
+
   AdjustScrollRange;
 end;
 
@@ -593,6 +596,8 @@ var
 begin
   sbxExperts.VertScrollBar.Position := 0;
   SubText := Trim(edtFilter.Text);
+
+  FVisibleExpertsCount := 0;
   CurrTop := 0;
   for i := 0 to sbxExperts.ControlCount - 1 do begin
     Panel := sbxExperts.Controls[i] as TPanel;
@@ -607,17 +612,18 @@ begin
     if Panel.Visible then begin
       Panel.Top := CurrTop;
       Inc(CurrTop, Panel.Height);
+      Inc(FVisibleExpertsCount);
     end;
   end;
 
-  sbxExperts.VertScrollBar.Range := CurrTop;
+  AdjustScrollRange;
 
   SetConfigButtonHotkey;
 end;
 
 procedure TfrConfigureExperts.AdjustScrollRange;
 begin
-  sbxExperts.VertScrollBar.Range := FExperts.Count * FThumbSize
+  sbxExperts.VertScrollBar.Range := (FVisibleExpertsCount) * FThumbSize
     + sbxExperts.Height - FThumbSize - 4;
 end;
 
