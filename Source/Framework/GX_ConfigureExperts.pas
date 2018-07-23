@@ -20,8 +20,8 @@ uses
 
 type
   TScrollBox = class(Forms.TScrollBox)
-//    procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
-    procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
+//    procedure WMHScroll(var _Msg: TWMHScroll); message WM_HSCROLL;
+    procedure WMVScroll(var _Msg: TWMVScroll); message WM_VSCROLL;
   private
     FOnScrollVert: TNotifyEvent;
 //    FOnScrollHorz: TNotifyEvent;
@@ -68,6 +68,7 @@ type
     procedure SetDefaultShortcutClick(_Sender: TObject);
     procedure HandleVerticalScroll(_Sender: TObject);
     procedure SetConfigButtonHotkey;
+    procedure ScrollBy(_DeltaY: Integer);
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -167,8 +168,13 @@ begin
   else
     Exit;
   end;
-  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize * DeltaY;
+  ScrollBy(DeltaY);
   Key := 0;
+end;
+
+procedure TfrConfigureExperts.ScrollBy(_DeltaY: Integer);
+begin
+  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize * _DeltaY;
   SetConfigButtonHotkey;
 end;
 
@@ -203,7 +209,7 @@ begin
     if Panel <> pnlExpertLayout then begin
       if Panel.Visible then begin
         if TryGetConfigButton(Panel, btn) then begin
-          if (Panel.Top >= 0) and (Panel.Top < h) then begin
+          if (Panel.Top >= -11) and (Panel.Top < h - 11) then begin
             btn.Caption := '&' + SConfigureButtonCaption;
           end else begin
             btn.Caption := SConfigureButtonCaption;
@@ -568,14 +574,14 @@ end;
 procedure TfrConfigureExperts.FrameMouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize;
+  ScrollBy(1);
   Handled := True;
 end;
 
 procedure TfrConfigureExperts.FrameMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position - FThumbSize;
+  ScrollBy(-1);
   Handled := True;
 end;
 
@@ -621,7 +627,7 @@ end;
 
 { TScrollBox }
 
-procedure TScrollBox.WMVScroll(var Message: TWMVScroll);
+procedure TScrollBox.WMVScroll(var _Msg: TWMVScroll);
 begin
   inherited;
   if Assigned(FOnScrollVert) then
