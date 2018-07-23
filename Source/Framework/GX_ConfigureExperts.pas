@@ -69,6 +69,7 @@ type
     procedure HandleVerticalScroll(_Sender: TObject);
     procedure SetConfigButtonHotkey;
     procedure ScrollBy(_DeltaY: Integer);
+    procedure AdjustScrollRange;
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -544,9 +545,7 @@ begin
   end;
   pnlExpertLayout.Visible := False;
 
-  RowHeight := FThumbSize + 1;
-  sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight
-    + (sbxExperts.Height div RowHeight - 2) * RowHeight + 2;
+  AdjustScrollRange;
 end;
 
 procedure TfrConfigureExperts.SaveExperts;
@@ -616,13 +615,15 @@ begin
   SetConfigButtonHotkey;
 end;
 
-procedure TfrConfigureExperts.FrameResize(Sender: TObject);
-var
-  RowHeight: Integer;
+procedure TfrConfigureExperts.AdjustScrollRange;
 begin
-  RowHeight := FThumbSize + 1;
-  sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight
-    + (sbxExperts.Height div RowHeight - 2) * RowHeight + 2;
+  sbxExperts.VertScrollBar.Range := FExperts.Count * FThumbSize
+    + sbxExperts.Height - FThumbSize - 4;
+end;
+
+procedure TfrConfigureExperts.FrameResize(Sender: TObject);
+begin
+  AdjustScrollRange;
 end;
 
 { TScrollBox }

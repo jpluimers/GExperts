@@ -6,6 +6,7 @@ object frConfigureExperts: TfrConfigureExperts
   TabOrder = 0
   OnMouseWheelDown = FrameMouseWheelDown
   OnMouseWheelUp = FrameMouseWheelUp
+  OnResize = FrameResize
   object pnlExpertsFilter: TPanel
     Left = 0
     Top = 0
