@@ -58,6 +58,7 @@ type
     procedure btnClearAllClick(Sender: TObject);
     procedure btnSetAllDefaultClick(Sender: TObject);
     procedure edtFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FrameResize(Sender: TObject);
   private
     FThumbSize: Integer;
     FExperts: TList;
@@ -166,7 +167,7 @@ begin
   else
     Exit;
   end;
-  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + sbxExperts.VertScrollBar.Increment * DeltaY;
+  sbxExperts.VertScrollBar.Position := sbxExperts.VertScrollBar.Position + FThumbSize * DeltaY;
   Key := 0;
   SetConfigButtonHotkey;
 end;
@@ -181,7 +182,7 @@ begin
     ctrl := _Pnl.Components[i] as TControl;
     if ctrl is TButton then begin
       if StripHotkey(TButton(ctrl).Caption) = SConfigureButtonCaption then begin
-        _btn := TButton(Ctrl);
+        _btn := TButton(ctrl);
         Result := True;
         Exit;
       end;
@@ -202,7 +203,7 @@ begin
     if Panel <> pnlExpertLayout then begin
       if Panel.Visible then begin
         if TryGetConfigButton(Panel, btn) then begin
-          if Panel.Top div h = 0 then begin
+          if (Panel.Top >= 0) and (Panel.Top < h) then begin
             btn.Caption := '&' + SConfigureButtonCaption;
           end else begin
             btn.Caption := SConfigureButtonCaption;
@@ -349,7 +350,7 @@ begin
 end;
 
 type
-  THotKeyHack = class(thotkey)
+  THotKeyHack = class(THotKey)
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
   end;
@@ -365,6 +366,7 @@ begin
 end;
 
 {$IFOPT D+}
+
 function ModifierStr(_Modifiers: THKModifiers): string;
 begin
   Result := '';
@@ -423,7 +425,7 @@ begin
     Include(HkMods, hkAlt)
   else
     Exclude(HkMods, hkAlt);
-  if (hkmods = []) or (HkMods = [hkShift]) then begin
+  if (HkMods = []) or (HkMods = [hkShift]) then begin
     HkMods := [hkAlt];
   end;
   Modifiers := HkMods;
@@ -454,7 +456,6 @@ var
   chk: TCheckBox;
   hk: THotKey;
   btn: TButton;
-
 begin
   FExperts.Assign(_Experts);
 
@@ -535,8 +536,11 @@ begin
       btn.Tag := i;
     end;
   end;
-  sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight;
   pnlExpertLayout.Visible := False;
+
+  RowHeight := FThumbSize + 1;
+  sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight
+    + (sbxExperts.Height div RowHeight - 2) * RowHeight + 2;
 end;
 
 procedure TfrConfigureExperts.SaveExperts;
@@ -606,6 +610,15 @@ begin
   SetConfigButtonHotkey;
 end;
 
+procedure TfrConfigureExperts.FrameResize(Sender: TObject);
+var
+  RowHeight: Integer;
+begin
+  RowHeight := FThumbSize + 1;
+  sbxExperts.VertScrollBar.Range := FExperts.Count * RowHeight
+    + (sbxExperts.Height div RowHeight - 2) * RowHeight + 2;
+end;
+
 { TScrollBox }
 
 procedure TScrollBox.WMVScroll(var Message: TWMVScroll);
@@ -616,4 +629,3 @@ begin
 end;
 
 end.
-
