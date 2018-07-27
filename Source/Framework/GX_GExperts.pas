@@ -15,7 +15,7 @@ type
     FExpertList: TList;
     FStartingUp: Boolean;
     FCloseMessageViewTimer: TTimer;
-{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
     FLastDesktopName: string;
 {$ENDIF}
     procedure InstallAddIn;
@@ -141,7 +141,7 @@ begin
   InitializeGExperts;
   InitHelper := TInitHelper.Create(DoAfterIDEInitialized);
   gblAboutFormClass.AddToAboutDialog;
-{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
   FLastDesktopName := GetIdeDesktopName;
   {$IFOPT D+} SendDebug('LastDesktopName:' + FLastDesktopName);  {$ENDIF}
 {$ENDIF}
@@ -382,7 +382,9 @@ end;
 procedure TGExperts.DoAfterIDEInitialized(Sender: TObject);
 var
   i: Integer;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
   s: string;
+{$ENDIF}
 begin
   FStartingUp := False;
   for i := 0 to FExpertList.Count - 1 do
@@ -391,9 +393,10 @@ begin
     GxKeyboardShortCutBroker.DoUpdateKeyBindings;
   GXMenuActionManager.ArrangeMenuItems;
   GXMenuActionManager.MoveMainMenuItems;
-{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  // se also GX_EditorChangeServices
   if ConfigInfo.GetForceDesktopOnStartup then begin
-    s := ConfigInfo.GetForcedStartupDestkop;
+    s := ConfigInfo.GetForcedStartupDesktop;
     if s = '' then
       s := FLastDesktopName;
     SetIdeDesktop(s);

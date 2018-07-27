@@ -23,7 +23,8 @@ implementation
 uses
   StdCtrls,
   Messages,
-  Windows;
+  Windows,
+  GX_IdeUtils;
 
 { TReslectDesktopExpert }
 
@@ -33,17 +34,11 @@ type
 
 procedure TReselectDesktopExpert.Execute(Sender: TObject);
 var
-  AppBuilder: TForm;
-  cbDesktop: TComboBoxHack;
+  cbDesktop: TComboBox;
 begin
-  AppBuilder := TForm(Application.FindComponent('AppBuilder'));
-  if not Assigned(AppBuilder) then
-    Exit;
-  cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
-  if not Assigned(cbDesktop) then
-    Exit;
-  cbDesktop.Click;
-
+  if not TryGetDesktopCombo(cbDesktop) then
+    Exit; //==>
+  TComboBoxHack(cbDesktop).Click;
   IncCallCount;
 end;
 

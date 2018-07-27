@@ -111,6 +111,9 @@ type
     tshFormEnhancements: TTabSheet;
     btnUsage: TButton;
     chkAutoCloseMessage: TCheckBox;
+    tshOldIdes: TTabSheet;
+    chkForceStartupDesktop: TCheckBox;
+    cbxDesktop: TComboBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -209,6 +212,7 @@ var
   i: Integer;
   UsageCount: Integer;
   Expert: TGX_BaseExpert;
+  Desktops: TStrings;
 
   procedure AdjustMinSize(_ctrl: TControl);
   begin
@@ -258,6 +262,12 @@ begin
   FConfigExpertsFrame.Align := alClient;
   AdjustMinSize(FConfigExpertsFrame);
   FConfigExpertsFrame.Init(GExpertsInst.GetExpertList);
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  if TryGetIdeDesktops(Desktops) then
+    cbxDesktop.Items.Assign(Desktops);
+{$ENDIF}
+
 
 {$IFOPT D+} // DebugInfo
   FConfigFormEnhancementsFrame := TfrConfigureFormEnhancements.Create(Self);
@@ -471,6 +481,12 @@ begin
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   chkEnhanceGotoDialog.Checked := IdeEnhancements.EnhanceGotoDialog;
   chkAutoCloseMessage.Checked := IdeEnhancements.AutoCloseMessageWindow;
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  chkForceStartupDesktop.Checked := ConfigInfo.GetForceDesktopOnStartup;
+  cbxDesktop.Text := ConfigInfo.GetForcedStartupDesktop;
+{$ENDIF}
+
   chkEnhanceBuildEventsDialog.Checked := IdeEnhancements.EnhanceBuildEventsDialog;
   chkEnhanceApplicationSettingsDialog.Checked := IdeEnhancements.EnhanceApplicationSettingsDialog;
   UpdateIdeDialogCheckboxes;
@@ -578,6 +594,12 @@ begin
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
   IdeEnhancements.EnhanceGotoDialog := chkEnhanceGotoDialog.Checked;
   IdeEnhancements.AutoCloseMessageWindow := chkAutoCloseMessage.Checked;
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  ConfigInfo.SetForceDesktopOnStartup(chkForceStartupDesktop.Checked);
+  ConfigInfo.SetForcedStartupDesktop(cbxDesktop.Text);
+{$ENDIF}
+
   IdeEnhancements.EnhanceBuildEventsDialog := chkEnhanceBuildEventsDialog.Checked;
   IdeEnhancements.EnhanceApplicationSettingsDialog:= chkEnhanceApplicationSettingsDialog.Checked;
 
@@ -652,8 +674,7 @@ procedure TfmConfiguration.HideUnsupportedIdeItems;
 begin
 {$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
   // Only for the old IDEs
-  gbxIDEMenu.Width := gbxTabDockHost.Left + gbxTabDockHost.Width - gbxIDEMenu.Left;
-  gbxTabDockHost.Visible := False;
+  tshOldIdes.TabVisible := False;
 {$ENDIF}
 
 {$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)
@@ -671,11 +692,12 @@ begin
   chkOIHideDescPane.Visible := False;
 {$ENDIF}
 
-{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
-  // Only the old IDEs had a component palette
-  gbxCompPalette.Visible := False;
-  gbxObjectInspector.Width := gbxCompPalette.Left + gbxCompPalette.Width - gbxObjectInspector.Left;
+{$IFNDEF STARTUP_LAYOUT_FIX_ENABLED}
+  chkForceStartupDesktop.Visible := False;
+  cbxDesktop.Visible := False;
+{$ENDIF}
 
+{$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
   // these are on the debug tab and normally not visible
   btnCPFont.Visible := False;
   chkCPFontEnabled.Visible := False;

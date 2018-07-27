@@ -17,13 +17,6 @@ interface
 
 {$I GX_CondDefine.inc}
 
-{$IFDEF GX_VER320_up}
-{$IFNDEF GX_VER330_up}
-// only for Delphi 10.2 (lets hope Embarcadero fixes the problem in later versions)
-{$DEFINE STARTUP_LAYOUT_FIX_ENABLED}
-{$ENDIF GX_VER330_up}
-{$ENDIF GX_VER320_up}
-
 {$UNDEF UseInternalTestClient}
 {.$DEFINE UseInternalTestClient}
 
@@ -670,58 +663,40 @@ procedure TGxIdeNotifier.RestoreUserDesktop;
 var
   Settings     : TGExpertsSettings;
   LDesktopName : string;
-  AppBuilder   : TForm;
-  cbDesktop    : TComboBoxHack;
-  ndx          : Integer;
 begin
-  LDesktopName := '';
-  Settings := TGExpertsSettings.Create;
-  try
-    LDesktopName := Settings.ReadString('Desktop', 'Layout', '');
-  finally
-    FreeAndNil(Settings);
+  if not ConfigInfo.GetForceDesktopOnStartup then
+    Exit; //==>
+
+  LDesktopName := ConfigInfo.GetForcedStartupDesktop;
+  if LDesktopName = '' then begin
+    Settings := TGExpertsSettings.Create;
+    try
+      LDesktopName := Settings.ReadString('Desktop', 'Layout', '');
+    finally
+      FreeAndNil(Settings);
+    end;
   end;
 
   if Length(LDesktopName) > 0 then
-  begin
-    AppBuilder := TForm(Application.FindComponent('AppBuilder'));
-    if not Assigned(AppBuilder) then
-      Exit;
-    cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
-    if not Assigned(cbDesktop) then
-      Exit;
-
-    ndx := cbDesktop.Items.IndexOf(LDesktopName);
-    if (ndx >= 0) and (cbDesktop.ItemIndex <> ndx) then
-    begin
-      cbDesktop.ItemIndex := ndx;
-      cbDesktop.Click;
-    end;
-  end;
+    SetIdeDesktop(LDesktopName);
 end;
 
 procedure TGxIdeNotifier.SaveUserDesktop;
 var
-  AppBuilder  : TForm;
-  cbDesktop   : TComboBoxHack;
+  cbDesktop   : TComboBox;
   ndx         : Integer;
   LDesktopName: string;
   LIgnoreName : string;
   Settings    : TGExpertsSettings;
 begin
-  AppBuilder := TForm(Application.FindComponent('AppBuilder'));
-  if not Assigned(AppBuilder) then
-    Exit;
-  cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
-  if not Assigned(cbDesktop) then
-    Exit;
-
+  if not TryGetDesktopCombo(cbDesktop) then
+    Exit; //==>
   ndx := cbDesktop.ItemIndex;
   if ndx > 0 then
   begin
     LDesktopName := cbDesktop.Items.Strings[ndx];
 
-    // do not store layouts with this names:
+    // do not store layouts with these names:
     LIgnoreName := AnsiUpperCase(LDesktopName);
     if (AnsiPos('DEFAULT', LIgnoreName)=1)
     or (AnsiPos('STARTUP', LIgnoreName)=1)

@@ -126,6 +126,13 @@ Kylix is no longer supported.  You can try compiling with the GExperts source fr
 // All IDEs support this feature to some degree (though Delphi 8+ do not support multiline editor tabs)
 {$DEFINE GX_EditorEnhancements}
 
+{$IFDEF GX_VER320_up}
+{$IFNDEF GX_VER330_up}
+// only for Delphi 10.2 (lets hope Embarcadero fixes the problem in later versions)
+{$DEFINE STARTUP_LAYOUT_FIX_ENABLED}
+{$ENDIF GX_VER330_up}
+{$ENDIF GX_VER320_up}
+
 // Define GX_ENHANCED_EDITOR if SynEdit is available
 {$IFDEF SYNEDIT}
   {$DEFINE UniSynEdit}

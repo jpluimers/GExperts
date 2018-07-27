@@ -15,7 +15,7 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Graphics, Forms, Menus, ComCtrls, Controls, Classes;
+  Graphics, Forms, Menus, ComCtrls, Controls, Classes, StdCtrls;
 
 const
   EditorFormClassName = 'TEditWindow';
@@ -57,6 +57,14 @@ function GetIdeDesktopName: string;
 ///<summary>
 /// Sets the IDE desktop by changing it in the Destkop toolbar </summary>
 procedure SetIdeDesktop(const _Desktop: string);
+
+///<summary>
+/// Returns a reference to the IDE desktop selection combobox's Items.
+/// Use with care!!!! </summary>
+function TryGetIdeDesktops(out _Items: TStrings): Boolean;
+
+function TryGetDesktopCombo(out _cmb: TCombobox): Boolean;
+
 
 // Return the IDE's version identifier, such as ENT, CSS, PRO, STD,
 // or the empty string if unknown
@@ -100,7 +108,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Windows, Registry, StrUtils, StdCtrls,
+  SysUtils, Windows, Registry, StrUtils,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils;
 
 function GetIdeMainForm: TCustomForm;
@@ -296,19 +304,36 @@ type
   TComboBoxHack = class(TComboBox)
   end;
 
-procedure SetIdeDesktop(const _Desktop: string);
+function TryGetDesktopCombo(out _cmb: TCombobox): Boolean;
 var
   AppBuilder: TForm;
-  cbDesktop: TComboBoxHack;
 begin
+  Result := False;
   AppBuilder := TForm(Application.FindComponent('AppBuilder'));
   if not Assigned(AppBuilder) then
     Exit;
-  cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
-  if not Assigned(cbDesktop) then
-    Exit;
+  _cmb := TComboBox(AppBuilder.FindComponent('cbDesktop'));
+  Result := Assigned(_cmb);
+end;
+
+procedure SetIdeDesktop(const _Desktop: string);
+var
+  cbDesktop: TComboBox;
+begin
+  if not TryGetDesktopCombo(cbDesktop) then
+    Exit; //==>
+
   cbDesktop.Text := _Desktop;
-  cbDesktop.Click;
+  TComboBoxHack(cbDesktop).Click;
+end;
+
+function TryGetIdeDesktops(out _Items: TStrings): Boolean;
+var
+  cbDesktop: TComboBox;
+begin
+  Result := TryGetDesktopCombo(cbDesktop);
+  if Result then
+    _Items := cbDesktop.Items;
 end;
 
 function GetIdeRootDirectory: string;
