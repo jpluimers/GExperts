@@ -1006,6 +1006,7 @@ begin
         try
           sl.LoadFromFile(CacheFn);
           FUnits.Add(UnitName);
+          FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
           for IdentIdx := 0 to sl.Count - 1 do
             FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
         finally
@@ -1021,6 +1022,7 @@ begin
           FUnits.Add(UnitName);
           sl := Parser.Identifiers;
           sl.SaveToFile(CacheFn);
+          FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
           for IdentIdx := 0 to sl.Count - 1 do begin
             FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
           end;
