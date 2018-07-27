@@ -1,14 +1,14 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{84D8A48D-40DE-46E2-B5D2-562447ADAEB5}</ProjectGuid>
-        <MainSource>GExpertsRSXE4.dpr</MainSource>
-        <Config Condition="'$(Config)'==''">Release</Config>
-        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-        <ProjectVersion>14.6</ProjectVersion>
         <Base>True</Base>
         <AppType>Library</AppType>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <FrameworkType>VCL</FrameworkType>
+        <MainSource>GExpertsRSXE4.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectGuid>{84D8A48D-40DE-46E2-B5D2-562447ADAEB5}</ProjectGuid>
+        <ProjectVersion>14.6</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -42,63 +42,60 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
-        <Manifest_File>None</Manifest_File>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE4;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE4;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE4.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_MinorVer>3</VerInfo_MinorVer>
-        <VerInfo_DLL>true</VerInfo_DLL>
-        <VerInfo_Release>8</VerInfo_Release>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
-        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
-        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
-        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE4.dll</DCC_DependencyCheckOutputName>
+        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <DCC_ImageBase>00400000</DCC_ImageBase>
-        <UsePackages>true</UsePackages>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <DCC_Platform>x86</DCC_Platform>
+        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+        <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
+        <DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
+        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_N>false</DCC_N>
-        <DCC_S>false</DCC_S>
         <GenDll>true</GenDll>
-        <DCC_E>false</DCC_E>
-        <DCC_F>false</DCC_F>
-        <DCC_K>false</DCC_K>
+        <Manifest_File>None</Manifest_File>
+        <UsePackages>true</UsePackages>
+        <VerInfo_DLL>true</VerInfo_DLL>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE4;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE4;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE4.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
+        <VerInfo_Release>8</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
-call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"
-$(PreBuildEvent)]]></PreBuildEvent>
-        <Debugger_RunParams>-ns</Debugger_RunParams>
         <Debugger_HostApplication>D:\IDE\Delphi XE4\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_RunParams>-ns</Debugger_RunParams>
+        <PreBuildEvent>
+            <![CDATA[call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
+call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"
+$(PreBuildEvent)]]>
+        </PreBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
-        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
-        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>false</DCC_DebugInformation>
-        <DCC_ObjOutput>dcu</DCC_ObjOutput>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
         <DCC_HppOutput>dcu</DCC_HppOutput>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_ObjOutput>dcu</DCC_ObjOutput>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE4;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE4;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE4.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=</VerInfo_Keys>
         <Debugger_HostApplication>D:\IDE\Delphi XE4\11.0\bin\bds.exe</Debugger_HostApplication>
+        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE4;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE4;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE4.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
         <DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE4.dll</DCC_DependencyCheckOutputName>
-        <DCC_ObjOutput>dcu</DCC_ObjOutput>
-        <DCC_HppOutput>dcu</DCC_HppOutput>
-        <DCC_UnitSearchPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_ResourcePath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_ResourcePath)</DCC_ResourcePath>
-        <DCC_ObjPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_ObjPath)</DCC_ObjPath>
-        <DCC_IncludePath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_IncludePath)</DCC_IncludePath>
-        <DCC_Optimize>False</DCC_Optimize>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_HppOutput>dcu</DCC_HppOutput>
+        <DCC_IncludePath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_IncludePath)</DCC_IncludePath>
+        <DCC_ObjOutput>dcu</DCC_ObjOutput>
+        <DCC_ObjPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_ObjPath)</DCC_ObjPath>
+        <DCC_Optimize>False</DCC_Optimize>
+        <DCC_ResourcePath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;..\..\gx\source\framework;..\..\gx\externalsource;..\..\gx\externalsource\abbrevia;..\..\..\synedit\source;$(DCC_ResourcePath)</DCC_ResourcePath>
+        <DCC_UnitSearchPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <Debugger_HostApplication>C:\Program Files (x86)\Embarcadero\RAD Studio\11.0\bin\bds.exe</Debugger_HostApplication>
@@ -551,15 +548,15 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>GXIcons.res</Form>
         </RcCompile>
-        <BuildConfiguration Include="Debug">
-            <Key>Cfg_2</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
         <BuildConfiguration Include="Release">
             <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
@@ -573,10 +570,12 @@ $(PreBuildEvent)]]></PreBuildEvent>
                 <Source>
                     <Source Name="MainSource">GExpertsRSXE4.dpr</Source>
                 </Source>
-                <Parameters>
-                    <Parameters Name="RunParams">-ns</Parameters>
-                    <Parameters Name="HostApplication">D:\IDE\Delphi XE4\bin\bds.exe</Parameters>
-                </Parameters>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k180.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp180.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k180.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp180.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
                 <VersionInfo>
                     <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
                     <VersionInfo Name="AutoIncBuild">False</VersionInfo>
@@ -604,12 +603,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
                     <VersionInfoKeys Name="ProductVersion">1.35</VersionInfoKeys>
                     <VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
                 </VersionInfoKeys>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k180.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp180.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k180.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp180.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                </Excluded_Packages>
+                <Parameters>
+                    <Parameters Name="RunParams">-ns</Parameters>
+                    <Parameters Name="HostApplication">D:\IDE\Delphi XE4\bin\bds.exe</Parameters>
+                </Parameters>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">True</Platform>

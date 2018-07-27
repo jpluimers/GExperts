@@ -1,14 +1,14 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{84D8A48D-40DE-46E2-B5D2-562447ADAEB5}</ProjectGuid>
-        <MainSource>GExpertsRSXE5.dpr</MainSource>
-        <Config Condition="'$(Config)'==''">Release</Config>
-        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-        <ProjectVersion>15.3</ProjectVersion>
         <Base>True</Base>
         <AppType>Library</AppType>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <FrameworkType>VCL</FrameworkType>
+        <MainSource>GExpertsRSXE5.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectGuid>{84D8A48D-40DE-46E2-B5D2-562447ADAEB5}</ProjectGuid>
+        <ProjectVersion>15.3</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -42,52 +42,49 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
-        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
         <DCC_DcuOutput>dcu</DCC_DcuOutput>
-        <Manifest_File>None</Manifest_File>
+        <DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE5.dll</DCC_DependencyCheckOutputName>
+        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Platform>x86</DCC_Platform>
+        <DCC_UnitAlias>ImageList=ImgList;$(DCC_UnitAlias)</DCC_UnitAlias>
+        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;$(DCC_UsePackage)</DCC_UsePackage>
+        <GenDll>true</GenDll>
+        <Manifest_File>None</Manifest_File>
+        <UsePackages>true</UsePackages>
+        <VerInfo_DLL>true</VerInfo_DLL>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE5;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE5;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE5.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=Sunday, January 16, 2011 4:39 PM</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
-        <VerInfo_DLL>true</VerInfo_DLL>
         <VerInfo_Release>8</VerInfo_Release>
-        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_DependencyCheckOutputName>..\..\Binaries\GExpertsRSXE5.dll</DCC_DependencyCheckOutputName>
-        <DCC_ImageBase>00400000</DCC_ImageBase>
-        <UsePackages>true</UsePackages>
-        <DCC_Platform>x86</DCC_Platform>
-        <DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_N>false</DCC_N>
-        <DCC_S>false</DCC_S>
-        <GenDll>true</GenDll>
-        <DCC_E>false</DCC_E>
-        <DCC_F>false</DCC_F>
-        <DCC_K>false</DCC_K>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
-call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"
-$(PreBuildEvent)]]></PreBuildEvent>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <Debugger_RunParams>-ns</Debugger_RunParams>
         <Debugger_HostApplication>D:\IDE\Delphi XE5\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_RunParams>-ns</Debugger_RunParams>
+        <PreBuildEvent>
+            <![CDATA[call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
+call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"
+$(PreBuildEvent)]]>
+        </PreBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
-        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
-        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE5;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE5;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE5.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=</VerInfo_Keys>
         <Debugger_HostApplication>D:\IDE\Delphi XE5\11.0\bin\bds.exe</Debugger_HostApplication>
+        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE5;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE5;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE5.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CompileDate=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-        <DCC_Optimize>false</DCC_Optimize>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio XE5;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio XE5;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRSXE5.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source</VerInfo_Keys>
@@ -535,15 +532,15 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>GXIcons.res</Form>
         </RcCompile>
-        <BuildConfiguration Include="Debug">
-            <Key>Cfg_2</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
         <BuildConfiguration Include="Release">
             <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
@@ -557,10 +554,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
                 <Source>
                     <Source Name="MainSource">GExpertsRSXE5.dpr</Source>
                 </Source>
-                <Parameters>
-                    <Parameters Name="RunParams">-ns</Parameters>
-                    <Parameters Name="HostApplication">D:\IDE\Delphi XE5\bin\bds.exe</Parameters>
-                </Parameters>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
                 <VersionInfo>
                     <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
                     <VersionInfo Name="AutoIncBuild">False</VersionInfo>
@@ -588,10 +585,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
                     <VersionInfoKeys Name="ProductVersion">1.37</VersionInfoKeys>
                     <VersionInfoKeys Name="Comments">Open Source</VersionInfoKeys>
                 </VersionInfoKeys>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
+                <Parameters>
+                    <Parameters Name="RunParams">-ns</Parameters>
+                    <Parameters Name="HostApplication">D:\IDE\Delphi XE5\bin\bds.exe</Parameters>
+                </Parameters>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">True</Platform>
