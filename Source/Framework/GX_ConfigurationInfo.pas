@@ -64,6 +64,12 @@ type
     property EnableKeyboardShortcuts: Boolean read GetEnableKeyboardShortcuts;
     property EnableCustomFont: Boolean read GetEnableCustomFont write SetEnableCustomFont;
     function CustomFont: TFont;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+    function GetForceDesktopOnStartup: Boolean;
+    procedure SetForceDesktopOnStartup(const _Value: Boolean);
+    function GetForcedStartupDestkop: string;
+    procedure SetForcedStartupDestkop(const _Value: string);
+{$ENDIF}
   end;
 
   TGXFontFlag = (ffColor);
@@ -215,6 +221,10 @@ type
     FCustomFont: TFont;
     FHideWindowMenu: Boolean;
     FMoveComponentMenu: Boolean;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+    FForceDesktopOnStartup: Boolean;
+    FForcedStartupDestkop: string;
+{$ENDIF}
     procedure LoadSettings;
     function DefaultConfigPath: string;
   protected
@@ -246,6 +256,12 @@ type
     procedure SetEnableCustomFont(const Value: Boolean);
     function CustomFont: TFont;
     procedure UpdateScreenForms;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+    function GetForceDesktopOnStartup: Boolean;
+    procedure SetForceDesktopOnStartup(const _Value: Boolean);
+    function GetForcedStartupDestkop: string;
+    procedure SetForcedStartupDestkop(const _Value: string);
+{$ENDIF}
   public
     constructor Create;
     destructor Destroy; override;
@@ -520,6 +536,11 @@ begin
 
     Setting := Settings.ReadBool(ConfigurationKey, 'EditorEnhancementsEnabled', False);
     EditorEnhancements.Enabled := Setting and not IsStandAlone;
+
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+    FForceDesktopOnStartup := Settings.ReadBool(ConfigurationKey, 'ForceDesktopOnStartup', False);
+    FForcedStartupDestkop := Settings.ReadString(ConfigurationKey, 'ForcedStartupDestkop', '');
+{$ENDIF}
   finally
     FreeAndNil(Settings);
   end;
@@ -546,6 +567,10 @@ begin
     Settings.WriteBool(ConfigurationKey, 'EditorEnhancementsEnabled', EditorEnhancements.Enabled);
     Settings.WriteBool(ConfigurationKey, 'EnableCustomFont', FEnableCustomFont);
     Settings.SaveFont(AddSlash(ConfigurationKey) + 'CustomFont', FCustomFont);
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+    Settings.WriteBool(ConfigurationKey, 'ForceDesktopOnStartup', FForceDesktopOnStartup);
+    Settings.WriteString(ConfigurationKey, 'ForcedStartupDestkop', FForcedStartupDestkop);
+{$ENDIF}
   finally
     FreeAndNil(Settings);
   end;
@@ -671,6 +696,18 @@ begin
   Result := FEnableKeyboardShortcuts;
 end;
 
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+function TConfigInfo.GetForceDesktopOnStartup: Boolean;
+begin
+  Result := FForceDesktopOnStartup;
+end;
+
+function TConfigInfo.GetForcedStartupDestkop: string;
+begin
+  Result := FForcedStartupDestkop;
+end;
+{$ENDIF}
+
 function TConfigInfo.CustomFont: TFont;
 begin
   Result := FCustomFont;
@@ -698,6 +735,19 @@ procedure TConfigInfo.SetEnableCustomFont(const Value: Boolean);
 begin
   FEnableCustomFont := Value;
 end;
+
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+
+procedure TConfigInfo.SetForceDesktopOnStartup(const _Value: Boolean);
+begin
+  FForceDesktopOnStartup := _Value;
+end;
+
+procedure TConfigInfo.SetForcedStartupDestkop(const _Value: string);
+begin
+  FForcedStartupDestkop := _Value;
+end;
+{$ENDIF}
 
 { TShowBadDirectoryMessage }
 

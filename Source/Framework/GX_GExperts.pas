@@ -14,7 +14,10 @@ type
     FEditorExpertsManager: TGxEditorExpertManager;
     FExpertList: TList;
     FStartingUp: Boolean;
-    FCloseMessageViewTimer: ttimer;
+    FCloseMessageViewTimer: TTimer;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+    FLastDesktopName: string;
+{$ENDIF}
     procedure InstallAddIn;
     function GetExpert(const Index: Integer): TGX_Expert;
     function GetExpertCount: Integer;
@@ -50,7 +53,9 @@ type
     procedure TimedCloseMessageView;
   end;
 
-function GExpertsInst(ForceValid: Boolean = False): TGExperts;
+///<summary>
+/// @param CheckValid, if true, raises an exceptoin if the instance is NIL </summary>
+function GExpertsInst(CheckValid: Boolean = False): TGExperts;
 procedure ShowGXAboutForm;
 procedure ShowGXConfigurationForm;
 procedure InitSharedResources;
@@ -87,9 +92,9 @@ var
   InitHelper: TInitHelper = nil;
   SharedImages: TdmSharedImages = nil;
 
-function GExpertsInst(ForceValid: Boolean): TGExperts;
+function GExpertsInst(CheckValid: Boolean): TGExperts;
 begin
-  if ForceValid and (not Assigned(FPrivateGExpertsInst)) then
+  if CheckValid and (not Assigned(FPrivateGExpertsInst)) then
     raise Exception.Create('GExpertsInst is not a valid reference');
   Result := FPrivateGExpertsInst;
 end;
@@ -136,6 +141,10 @@ begin
   InitializeGExperts;
   InitHelper := TInitHelper.Create(DoAfterIDEInitialized);
   gblAboutFormClass.AddToAboutDialog;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+  FLastDesktopName := GetIdeDesktopName;
+  {$IFOPT D+} SendDebug('LastDesktopName:' + FLastDesktopName);  {$ENDIF}
+{$ENDIF}
 end;
 
 class procedure TGExperts.DelayedRegister;
@@ -373,6 +382,7 @@ end;
 procedure TGExperts.DoAfterIDEInitialized(Sender: TObject);
 var
   i: Integer;
+  s: string;
 begin
   FStartingUp := False;
   for i := 0 to FExpertList.Count - 1 do
@@ -381,6 +391,14 @@ begin
     GxKeyboardShortCutBroker.DoUpdateKeyBindings;
   GXMenuActionManager.ArrangeMenuItems;
   GXMenuActionManager.MoveMainMenuItems;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+  if ConfigInfo.GetForceDesktopOnStartup then begin
+    s := ConfigInfo.GetForcedStartupDestkop;
+    if s = '' then
+      s := FLastDesktopName;
+    SetIdeDesktop(s);
+  end;
+{$ENDIF}
 end;
 
 function FindClassForm(const AClassName: string): TForm;
