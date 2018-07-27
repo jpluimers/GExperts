@@ -54,6 +54,10 @@ function GetIdeRootDirectory: string;
 /// Reads the current Desktop from the registry </summary>
 function GetIdeDesktopName: string;
 
+///<summary>
+/// Sets the IDE desktop by changing it in the Destkop toolbar </summary>
+procedure SetIdeDesktop(const _Desktop: string);
+
 // Return the IDE's version identifier, such as ENT, CSS, PRO, STD,
 // or the empty string if unknown
 function GetIdeEdition: string;
@@ -96,8 +100,8 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Windows, Registry,
-  GX_GenericUtils, GX_GxUtils, GX_OtaUtils, StrUtils;
+  SysUtils, Windows, Registry, StrUtils, StdCtrls,
+  GX_GenericUtils, GX_GxUtils, GX_OtaUtils;
 
 function GetIdeMainForm: TCustomForm;
 begin
@@ -286,6 +290,25 @@ begin
     on E: Exception do
       GxLogException(E, 'Error in GetIdeDesktopName');
   end;
+end;
+
+type
+  TComboBoxHack = class(TComboBox)
+  end;
+
+procedure SetIdeDesktop(const _Desktop: string);
+var
+  AppBuilder: TForm;
+  cbDesktop: TComboBoxHack;
+begin
+  AppBuilder := TForm(Application.FindComponent('AppBuilder'));
+  if not Assigned(AppBuilder) then
+    Exit;
+  cbDesktop := TComboBoxHack(AppBuilder.FindComponent('cbDesktop'));
+  if not Assigned(cbDesktop) then
+    Exit;
+  cbDesktop.Text := _Desktop;
+  cbDesktop.Click;
 end;
 
 function GetIdeRootDirectory: string;
