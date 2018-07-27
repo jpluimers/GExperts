@@ -212,7 +212,9 @@ var
   i: Integer;
   UsageCount: Integer;
   Expert: TGX_BaseExpert;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
   Desktops: TStrings;
+{$ENDIF}
 
   procedure AdjustMinSize(_ctrl: TControl);
   begin

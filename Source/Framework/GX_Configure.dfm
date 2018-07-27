@@ -299,7 +299,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceBuildEventsDialog: TCheckBox
             Left = 24
-            Top = 155
+            Top = 174
             Width = 489
             Height = 17
             Caption = 'Enhance Build Events dialog with Favourites'
@@ -315,7 +315,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkAutoCloseMessage: TCheckBox
             Left = 24
-            Top = 174
+            Top = 155
             Width = 489
             Height = 17
             Caption = 'Automatically close message window after successful compile'
