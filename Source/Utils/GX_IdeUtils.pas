@@ -50,6 +50,10 @@ function IsReplaceConfirmDialogOnScreen: Boolean;
 // Returns an empty string if the information could not be retrieved.
 function GetIdeRootDirectory: string;
 
+///<summary>
+/// Reads the current Desktop from the registry </summary>
+function GetIdeDesktopName: string;
+
 // Return the IDE's version identifier, such as ENT, CSS, PRO, STD,
 // or the empty string if unknown
 function GetIdeEdition: string;
@@ -257,6 +261,30 @@ begin
         end;
       end;
     end;
+  end;
+end;
+
+function GetIdeDesktopName: string;
+var
+  reg: TRegistry;
+begin
+  Result := '';
+
+  try
+    Reg := TRegistry.Create;
+    try
+      Reg.RootKey := HKEY_CURRENT_USER;
+      if Reg.OpenKeyReadOnly(GxOtaGetIdeBaseRegistryKey+'\Session') then
+      begin
+        Result := Reg.ReadString('DesktopName');
+        Reg.CloseKey;
+      end;
+    finally
+      Reg.Free;
+    end;
+  except
+    on E: Exception do
+      GxLogException(E, 'Error in GetIdeDesktopName');
   end;
 end;
 
