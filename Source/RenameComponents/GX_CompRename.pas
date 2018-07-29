@@ -143,7 +143,6 @@ type
     FComponentNames: TStringList;
     FFormNames: TStringList;
     FTimer: TTimer;
-    FTimerCount: Integer;
     FFormEditor: IOTAFormEditor;
     FFormWidth: Integer;
     FFormHeight: Integer;
@@ -705,7 +704,6 @@ begin
     begin
       FComponentNames.Add(NewName);
       FFormNames.Add(FormEditor.FileName);
-      FTimerCount := 0;
       FTimer.Enabled := True;
     end;
   end;
