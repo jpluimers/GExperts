@@ -210,7 +210,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
           Height = 26
           Anchors = [akLeft, akBottom]
           Caption = '&Defaults'
-          TabOrder = 3
+          TabOrder = 4
           OnClick = btnDefaultsClick
         end
         object btnDelete: TButton
@@ -236,7 +236,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
           Height = 109
           Anchors = [akLeft, akTop, akBottom]
           ItemHeight = 14
-          TabOrder = 4
+          TabOrder = 3
         end
       end
     end
