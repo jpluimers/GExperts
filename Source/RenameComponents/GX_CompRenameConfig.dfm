@@ -4,7 +4,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Rename Components Configuration'
-  ClientHeight = 264
+  ClientHeight = 368
   ClientWidth = 409
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -23,7 +23,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
   TextHeight = 14
   object pnlFooter: TPanel
     Left = 0
-    Top = 188
+    Top = 292
     Width = 409
     Height = 76
     Align = alBottom
@@ -73,18 +73,18 @@ object fmCompRenameConfig: TfmCompRenameConfig
     object chkAutoAdd: TCheckBox
       Left = 8
       Top = 21
-      Width = 350
+      Width = 393
       Height = 17
-      Anchors = [akLeft, akBottom]
+      Anchors = [akLeft, akRight, akBottom]
       Caption = 'Auto-add rules for new components'
       TabOrder = 1
     end
     object chkShowDialog: TCheckBox
       Left = 8
       Top = 2
-      Width = 350
+      Width = 393
       Height = 17
-      Anchors = [akLeft, akBottom]
+      Anchors = [akLeft, akRight, akBottom]
       Caption = 'Show rename dialog for new components'
       TabOrder = 0
     end
@@ -111,7 +111,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
     Left = 0
     Top = 0
     Width = 409
-    Height = 188
+    Height = 292
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -120,7 +120,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
       Left = 6
       Top = 6
       Width = 397
-      Height = 176
+      Height = 280
       Align = alClient
       Caption = 'Rename &Rules'
       TabOrder = 0
@@ -128,7 +128,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 2
         Top = 16
         Width = 262
-        Height = 158
+        Height = 262
         Align = alClient
         TabOrder = 0
         object pnlIncSearch: TPanel
@@ -180,7 +180,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
           Left = 1
           Top = 25
           Width = 260
-          Height = 132
+          Height = 236
           Align = alClient
           TabOrder = 1
         end
@@ -189,12 +189,12 @@ object fmCompRenameConfig: TfmCompRenameConfig
         Left = 264
         Top = 16
         Width = 131
-        Height = 158
+        Height = 262
         Align = alRight
         TabOrder = 1
         DesignSize = (
           131
-          158)
+          262)
         object btnAdd: TButton
           Left = 8
           Top = 8
@@ -205,7 +205,7 @@ object fmCompRenameConfig: TfmCompRenameConfig
         end
         object btnDefaults: TButton
           Left = 8
-          Top = 123
+          Top = 227
           Width = 117
           Height = 26
           Anchors = [akLeft, akBottom]
@@ -228,6 +228,15 @@ object fmCompRenameConfig: TfmCompRenameConfig
           Height = 26
           Action = acOtherProperties
           TabOrder = 2
+        end
+        object lbxOtherProps: TListBox
+          Left = 8
+          Top = 112
+          Width = 121
+          Height = 109
+          Anchors = [akLeft, akTop, akBottom]
+          ItemHeight = 14
+          TabOrder = 4
         end
       end
     end

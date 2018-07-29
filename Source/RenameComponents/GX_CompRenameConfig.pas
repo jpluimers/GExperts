@@ -79,6 +79,7 @@ type
     btnHelp: TButton;
     b_Import: TButton;
     b_Export: TButton;
+    lbxOtherProps: TListBox;
     procedure acOtherPropertiesExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -120,6 +121,8 @@ type
     procedure SortByRule;
     procedure GetData(_ValueList: TStringList; out _AutoShow, _AutoAdd: Boolean;
       out _FormWidth, _FormHeight: Integer);
+    procedure HandleOnGridClick(_Sender: TObject);
+    procedure UpdateOtherProps;
   public
     class function Execute(_Owner: TComponent; _OnImport, _OnExport: TNotifyEvent;
       _ValueList: TStringList; var _AutoShow: Boolean;
@@ -256,6 +259,7 @@ begin
   Grid.ScrollBars := ssVertical;
   Grid.TabOrder := 0;
   Grid.OnRowHeaderClick := HandleOnRowHeaderClick;
+  Grid.OnClick := HandleOnGridClick;
 
   l_Find.Left := GridPad;
   btnClear.Left := pnlIncSearch.Width - btnClear.Width - GridPad;
@@ -270,6 +274,31 @@ end;
 procedure TfmCompRenameConfig.FormDestroy(Sender: TObject);
 begin
   TStrings_FreeWithObjects(FValueList);
+end;
+
+procedure TfmCompRenameConfig.UpdateOtherProps;
+var
+  CompType: WideString;
+  Index: Integer;
+  Additional: TStringList;
+begin
+  CompType := Grid.Cells[0, Grid.Row];
+
+  Index := FValueList.IndexOfName(CompType);
+  if Index = -1 then begin
+    lbxOtherProps.Items.Clear;
+  end else begin
+    Additional := FValueList.Objects[Index] as TStringList;
+    if Assigned(Additional) then
+      lbxOtherProps.Items.Assign(Additional)
+    else
+      lbxOtherProps.Items.Clear;
+  end;
+end;
+
+procedure TfmCompRenameConfig.HandleOnGridClick(_Sender: TObject);
+begin
+  UpdateOtherProps;
 end;
 
 procedure TfmCompRenameConfig.HandleOnRowHeaderClick(Sender: TObject; Col: Integer);
@@ -698,6 +727,7 @@ begin
       if TfmCompRenameAdvanced.Execute(Self, CompType, Additional) then
         FValueList.Objects[Index] := Additional;
     end;
+  UpdateOtherProps;
 end;
 
 { TRenameStringGrid }
