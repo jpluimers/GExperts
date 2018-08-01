@@ -626,17 +626,21 @@ begin
 
   LoadFavorites;
 
-  Paths := TStringList.Create;
-  try
-    GxOtaGetAllPossiblePaths(Paths);
+  if FFavoriteUnits.Count = 0 then begin
+    sg_Identifiers.Cells[0, 1] := 'no favorites selected';
+  end else begin
+    Paths := TStringList.Create;
+    try
+      GxOtaGetAllPossiblePaths(Paths);
 {$IFOPT D+}
-    SendDebug('Running UnitExportParser thread to get identifiers from favorites');
+      SendDebug('Running UnitExportParser thread to get identifiers from favorites');
 {$ENDIF D+}
-    FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
-      ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
-    tim_Progress.Enabled := True;
-  finally
-    FreeAndNil(Paths);
+      FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
+        ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
+      tim_Progress.Enabled := True;
+    finally
+      FreeAndNil(Paths);
+    end;
   end;
 
   FFindThread := TFileFindThread.Create;
