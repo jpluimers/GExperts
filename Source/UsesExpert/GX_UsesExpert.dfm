@@ -5,7 +5,7 @@ object fmUsesManager: TfmUsesManager
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Uses Clause Manager'
   ClientHeight = 478
-  ClientWidth = 764
+  ClientWidth = 788
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -31,7 +31,7 @@ object fmUsesManager: TfmUsesManager
   object pnlUnits: TPanel
     Left = 300
     Top = 0
-    Width = 464
+    Width = 488
     Height = 441
     Align = alClient
     BevelOuter = bvNone
@@ -41,7 +41,7 @@ object fmUsesManager: TfmUsesManager
     object pcUnits: TPageControl
       Left = 6
       Top = 47
-      Width = 452
+      Width = 476
       Height = 388
       ActivePage = tabIdentifiers
       Align = alClient
@@ -53,34 +53,42 @@ object fmUsesManager: TfmUsesManager
         ImageIndex = 3
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 325
-          Width = 444
-          Height = 34
+          Top = 328
+          Width = 468
+          Height = 31
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           object btnSearchPathAddToIntf: TButton
-            Left = 4
-            Top = 4
-            Width = 140
+            Left = 8
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 0
           end
           object btnSearchPathAddToImpl: TButton
-            Left = 152
-            Top = 4
-            Width = 150
+            Left = 160
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
+          end
+          object btnAddSearchPathlToFavorites: TButton
+            Left = 312
+            Top = 0
+            Width = 145
+            Height = 25
+            Action = actAvailAddAllToFav
+            TabOrder = 2
           end
         end
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 444
-          Height = 325
+          Width = 468
+          Height = 328
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -89,8 +97,8 @@ object fmUsesManager: TfmUsesManager
           object sg_SearchPath: TStringGrid
             Left = 3
             Top = 3
-            Width = 438
-            Height = 319
+            Width = 462
+            Height = 322
             Align = alClient
             Color = clBtnFace
             ColCount = 1
@@ -116,8 +124,8 @@ object fmUsesManager: TfmUsesManager
         object pnlProject: TPanel
           Left = 0
           Top = 0
-          Width = 444
-          Height = 325
+          Width = 468
+          Height = 328
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -126,8 +134,8 @@ object fmUsesManager: TfmUsesManager
           object sg_Project: TStringGrid
             Left = 3
             Top = 3
-            Width = 438
-            Height = 319
+            Width = 462
+            Height = 322
             Align = alClient
             ColCount = 1
             DefaultColWidth = 100
@@ -147,27 +155,35 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlProjFooter: TPanel
           Left = 0
-          Top = 325
-          Width = 444
-          Height = 34
+          Top = 328
+          Width = 468
+          Height = 31
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           object btnProjectAddToInterface: TButton
-            Left = 4
-            Top = 4
-            Width = 140
+            Left = 8
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 0
           end
           object btnProjectAddToImplementation: TButton
-            Left = 152
-            Top = 4
-            Width = 150
+            Left = 160
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
+          end
+          object btnAddProjectToFavorites: TButton
+            Left = 312
+            Top = 0
+            Width = 145
+            Height = 25
+            Action = actAvailAddAllToFav
+            TabOrder = 2
           end
         end
       end
@@ -177,8 +193,8 @@ object fmUsesManager: TfmUsesManager
         object pnlCommon: TPanel
           Left = 0
           Top = 0
-          Width = 444
-          Height = 325
+          Width = 468
+          Height = 328
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -187,8 +203,8 @@ object fmUsesManager: TfmUsesManager
           object sg_Common: TStringGrid
             Left = 3
             Top = 3
-            Width = 438
-            Height = 319
+            Width = 462
+            Height = 322
             Align = alClient
             ColCount = 1
             DefaultColWidth = 100
@@ -208,27 +224,35 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlCommonFooter: TPanel
           Left = 0
-          Top = 325
-          Width = 444
-          Height = 34
+          Top = 328
+          Width = 468
+          Height = 31
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           object btnCommonAddToInterface: TButton
-            Left = 4
-            Top = 4
-            Width = 140
+            Left = 8
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToIntf
             TabOrder = 0
           end
           object btnCommonAddToImplementation: TButton
-            Left = 152
-            Top = 4
-            Width = 150
+            Left = 160
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToImpl
             TabOrder = 1
+          end
+          object btnAddRtlToFavorites: TButton
+            Left = 312
+            Top = 0
+            Width = 145
+            Height = 25
+            Action = actAvailAddAllToFav
+            TabOrder = 2
           end
         end
       end
@@ -238,8 +262,8 @@ object fmUsesManager: TfmUsesManager
         object pnlFavorite: TPanel
           Left = 0
           Top = 0
-          Width = 444
-          Height = 296
+          Width = 468
+          Height = 328
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -248,8 +272,8 @@ object fmUsesManager: TfmUsesManager
           object sg_Favorite: TStringGrid
             Left = 3
             Top = 3
-            Width = 438
-            Height = 290
+            Width = 462
+            Height = 322
             Align = alClient
             ColCount = 1
             DefaultColWidth = 100
@@ -258,7 +282,7 @@ object fmUsesManager: TfmUsesManager
             RowCount = 1
             FixedRows = 0
             Options = [goFixedVertLine, goFixedHorzLine, goRangeSelect, goDrawFocusSelected]
-            PopupMenu = pmuAvail
+            PopupMenu = pm_Favorite
             TabOrder = 0
             OnDblClick = lbxAvailDblClick
             OnDragDrop = lbxAvailDragDrop
@@ -269,43 +293,43 @@ object fmUsesManager: TfmUsesManager
         end
         object pnlFavFooter: TPanel
           Left = 0
-          Top = 296
-          Width = 444
-          Height = 63
+          Top = 328
+          Width = 468
+          Height = 31
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 1
           object btnFavoriteAddToInterface: TButton
-            Left = 4
-            Top = 33
-            Width = 140
+            Left = 8
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToIntf
-            TabOrder = 2
+            TabOrder = 0
           end
           object btnFavoriteAddToImplementation: TButton
-            Left = 152
-            Top = 33
-            Width = 150
+            Left = 160
+            Top = 0
+            Width = 145
             Height = 25
             Action = actAvailAddToImpl
-            TabOrder = 3
-          end
-          object btnFavoriteAddToFavorites: TButton
-            Left = 152
-            Top = 3
-            Width = 150
-            Height = 25
-            Action = actFavAdd
             TabOrder = 1
           end
-          object btnFavoriteDeleteFromFavorites: TButton
-            Left = 4
-            Top = 3
-            Width = 140
+          object btnFavoriteAddToFavorites: TButton
+            Left = 312
+            Top = 0
+            Width = 73
             Height = 25
-            Action = actFavDelete
-            TabOrder = 0
+            Action = actFavAddUnit
+            TabOrder = 2
+          end
+          object btnFavoriteDeleteFromFavorites: TButton
+            Left = 392
+            Top = 0
+            Width = 73
+            Height = 25
+            Action = actFavDelUnit
+            TabOrder = 3
           end
         end
       end
@@ -315,7 +339,7 @@ object fmUsesManager: TfmUsesManager
         object sg_Identifiers: TStringGrid
           Left = 0
           Top = 0
-          Width = 444
+          Width = 468
           Height = 325
           Align = alClient
           ColCount = 2
@@ -331,7 +355,7 @@ object fmUsesManager: TfmUsesManager
         object pnlIdentifiersFooter: TPanel
           Left = 0
           Top = 325
-          Width = 444
+          Width = 468
           Height = 34
           Align = alBottom
           BevelOuter = bvNone
@@ -358,7 +382,7 @@ object fmUsesManager: TfmUsesManager
     object pnlAvailableHeader: TPanel
       Left = 6
       Top = 6
-      Width = 452
+      Width = 476
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -366,12 +390,12 @@ object fmUsesManager: TfmUsesManager
       TabOrder = 0
       OnResize = pnlAvailableHeaderResize
       DesignSize = (
-        452
+        476
         41)
       object edtUnitFilter: TEdit
         Left = 200
         Top = 16
-        Width = 250
+        Width = 274
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 1
@@ -383,7 +407,7 @@ object fmUsesManager: TfmUsesManager
       object lblUnits: TPanel
         Left = 0
         Top = 0
-        Width = 452
+        Width = 476
         Height = 15
         Align = alTop
         BevelOuter = bvNone
@@ -402,7 +426,7 @@ object fmUsesManager: TfmUsesManager
       object edtIdentifierFilter: TEdit
         Left = 0
         Top = 16
-        Width = 209
+        Width = 233
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 2
@@ -596,38 +620,20 @@ object fmUsesManager: TfmUsesManager
   object pnlFooter: TPanel
     Left = 0
     Top = 441
-    Width = 764
+    Width = 788
     Height = 37
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 2
-    DesignSize = (
-      764
-      37)
-    object chkSingleActionMode: TCheckBox
-      Left = 8
-      Top = 9
-      Width = 402
-      Height = 17
-      Hint = 
-        'If enabled, OK will add the currently selected unit on the right' +
-        ' hand side to the uses clause shown on the left hand side and cl' +
-        'ose the dialog.'
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Single action/quic&k add mode'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 0
-    end
     object pnlButtonsRight: TPanel
-      Left = 409
+      Left = 433
       Top = 0
       Width = 355
       Height = 37
       Align = alRight
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
       object btnCancel: TButton
         Left = 273
         Top = 4
@@ -714,11 +720,14 @@ object fmUsesManager: TfmUsesManager
     end
   end
   object pmuAvail: TPopupMenu
-    Left = 296
-    Top = 80
+    Left = 456
+    Top = 112
     object mitAvailAddToUses: TMenuItem
       Action = actAvailAddToImpl
       Default = True
+    end
+    object mi_AvailAddToIntf: TMenuItem
+      Action = actAvailAddToIntf
     end
     object mitAvailSep1: TMenuItem
       Caption = '-'
@@ -730,10 +739,10 @@ object fmUsesManager: TfmUsesManager
       Caption = '-'
     end
     object mitAvailAddToFav: TMenuItem
-      Action = actFavAdd
+      Action = actAvailAddToFav
     end
     object mitAvailDelFromFav: TMenuItem
-      Action = actFavDelete
+      Action = actFavDelUnit
     end
   end
   object dlgOpen: TOpenDialog
@@ -771,19 +780,17 @@ object fmUsesManager: TfmUsesManager
       Hint = 'Move to Interface'
       OnExecute = actImplMoveExecute
     end
-    object actFavDelete: TAction
+    object actFavDelUnit: TAction
       Category = 'Fav'
-      Caption = 'D&elete from Favorites'
+      Caption = 'D&elete Unit'
       ImageIndex = 42
-      ShortCut = 46
-      OnExecute = actFavDeleteExecute
+      OnExecute = actFavDelUnitExecute
     end
-    object actFavAdd: TAction
-      Category = 'Fav'
+    object actAvailAddToFav: TAction
+      Category = 'Avail'
       Caption = '&Add to Favorites...'
       ImageIndex = 41
-      ShortCut = 45
-      OnExecute = actFavAddExecute
+      OnExecute = actAvailAddToFavExecute
     end
     object actAvailAddToIntf: TAction
       Category = 'Avail'
@@ -832,6 +839,16 @@ object fmUsesManager: TfmUsesManager
       ShortCut = 32845
       OnExecute = actFocusImplementationExecute
     end
+    object actFavAddUnit: TAction
+      Category = 'Fav'
+      Caption = 'Add Unit ...'
+      OnExecute = actFavAddUnitExecute
+    end
+    object actAvailAddAllToFav: TAction
+      Category = 'Avail'
+      Caption = 'Add all to Favorite'
+      OnExecute = actAvailAddAllToFavExecute
+    end
   end
   object tim_Progress: TTimer
     Enabled = False
@@ -839,5 +856,31 @@ object fmUsesManager: TfmUsesManager
     OnTimer = tim_ProgressTimer
     Left = 376
     Top = 248
+  end
+  object pm_Favorite: TPopupMenu
+    Left = 560
+    Top = 112
+    object mi_FavAddToImpl: TMenuItem
+      Action = actAvailAddToImpl
+      Default = True
+    end
+    object mi_FavAddtoIntf: TMenuItem
+      Action = actAvailAddToIntf
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object OpenUnit1: TMenuItem
+      Action = actOpenUnit
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object mi_FavAddUnit: TMenuItem
+      Action = actFavAddUnit
+    end
+    object mi_FavDelUnit: TMenuItem
+      Action = actFavDelUnit
+    end
   end
 end

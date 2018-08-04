@@ -27,7 +27,6 @@ type
 type
   TUsesExpert = class(TGX_Expert)
   private
-    FSingleActionMode: Boolean;
     FAvailTabIndex: Integer;
     FReplaceFileUseUnit: Boolean;
     FOrigFileAddUnitExecute: TNotifyEvent;
@@ -106,8 +105,8 @@ type
     actIntfDelete: TAction;
     actIntfMove: TAction;
     actImplMove: TAction;
-    actFavDelete: TAction;
-    actFavAdd: TAction;
+    actFavDelUnit: TAction;
+    actAvailAddToFav: TAction;
     actAvailAddToImpl: TAction;
     actAvailAddToIntf: TAction;
     b_DeleteFromIntf: TButton;
@@ -128,7 +127,6 @@ type
     mitAvailAddToFav: TMenuItem;
     mitAvailDelFromFav: TMenuItem;
     mitAvailSep1: TMenuItem;
-    chkSingleActionMode: TCheckBox;
     mitAvailSep2: TMenuItem;
     mitAvailOpenUnit: TMenuItem;
     actIntfAddToFavorites: TAction;
@@ -156,6 +154,20 @@ type
     actFocusInterface: TAction;
     actFocusImplementation: TAction;
     tim_Progress: TTimer;
+    btnAddSearchPathlToFavorites: TButton;
+    btnAddProjectToFavorites: TButton;
+    btnAddRtlToFavorites: TButton;
+    pm_Favorite: TPopupMenu;
+    mi_FavAddToImpl: TMenuItem;
+    mi_FavAddtoIntf: TMenuItem;
+    actFavAddUnit: TAction;
+    N1: TMenuItem;
+    mi_FavAddUnit: TMenuItem;
+    mi_FavDelUnit: TMenuItem;
+    N2: TMenuItem;
+    OpenUnit1: TMenuItem;
+    mi_AvailAddToIntf: TMenuItem;
+    actAvailAddAllToFav: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -168,8 +180,8 @@ type
     procedure ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
     procedure actImplDeleteExecute(Sender: TObject);
     procedure actIntfDeleteExecute(Sender: TObject);
-    procedure actFavDeleteExecute(Sender: TObject);
-    procedure actFavAddExecute(Sender: TObject);
+    procedure actFavDelUnitExecute(Sender: TObject);
+    procedure actAvailAddToFavExecute(Sender: TObject);
     procedure actAvailAddToIntfExecute(Sender: TObject);
     procedure actAvailAddToImplExecute(Sender: TObject);
     procedure sg_InterfaceDblClick(Sender: TObject);
@@ -213,6 +225,8 @@ type
     procedure actFocusInterfaceExecute(Sender: TObject);
     procedure actFocusImplementationExecute(Sender: TObject);
     procedure tim_ProgressTimer(Sender: TObject);
+    procedure actFavAddUnitExecute(Sender: TObject);
+    procedure actAvailAddAllToFavExecute(Sender: TObject);
   private
     FLeftRatio: Double;
     FAliases: TStringList;
@@ -241,7 +255,6 @@ type
     procedure DeleteSelected(sg: TStringGrid);
     procedure MoveSelected(Src, Dest: TStringGrid; ToInterface: Boolean);
     function GetAvailableSourceList: TStringGrid;
-    function GetUsesSourceList: TStringGrid;
     procedure SearchPathReady;
     procedure DeleteFromFavorites(const Item: string);
     procedure AddToFavorites(const Item: string);
@@ -249,7 +262,6 @@ type
     procedure FilterIdentifiers;
     procedure SelectFirstItemInLists;
     procedure SaveChanges;
-    procedure CloseIfInSingleActionMode;
     function GetListForOpen: TStringGrid;
     procedure OpenSelectedUnit(List: TStringGrid);
     procedure lbxInterfaceFilesDropped(_Sender: TObject; _Files: TStrings);
@@ -398,7 +410,7 @@ var
   Found: boolean;
 begin
   Found := FindAction(act);
-  if TfmUsesExpertOptions.Execute(Application, Found, FReadMap, FSingleActionMode, FReplaceFileUseUnit) then begin
+  if TfmUsesExpertOptions.Execute(Application, Found, FReadMap, FReplaceFileUseUnit) then begin
     SaveSettings;
     if Found then begin
       if FReplaceFileUseUnit then begin
@@ -421,7 +433,6 @@ begin
   AssertIsPasOrInc(GxOtaGetCurrentSourceFile);
   Form := TfmUsesManager.Create(Application, Self);
   try
-    Form.chkSingleActionMode.Checked := FSingleActionMode;
     if (FAvailTabIndex >= 0) and (FAvailTabIndex < Form.pcUnits.PageCount) then begin
       Form.pcUnits.ActivePageIndex := FAvailTabIndex;
       Form.pcUnits.Change;
@@ -429,7 +440,6 @@ begin
 
     if Form.ShowModal = mrOk then
     begin
-      FSingleActionMode := Form.chkSingleActionMode.Checked;
       FAvailTabIndex := Form.pcUnits.ActivePageIndex;
 
       IncCallCount;
@@ -442,7 +452,6 @@ end;
 procedure TUsesExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited;
-  FSingleActionMode := Settings.ReadBool('SingleActionMode', False);
   FReplaceFileUseUnit := Settings.ReadBool('ReplaceFileUseUnit', False);
   FReadMap := Settings.ReadBool('ReadMap', True);
   FAvailTabIndex := Settings.ReadInteger('AvailTabIndex', 0);
@@ -451,7 +460,6 @@ end;
 procedure TUsesExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited;
-  Settings.WriteBool('SingleActionMode', FSingleActionMode);
   Settings.WriteBool('ReplaceFileUseUnit', FReplaceFileUseUnit);
   Settings.WriteBool('ReadMap', FReadMap);
   Settings.WriteInteger('AvailTabIndex', FAvailTabIndex);
@@ -777,6 +785,7 @@ begin
     sg.Cells[0, cnt] := UnitName;
     Result := cnt;
   end;
+  sg.Row:= Result;
 end;
 
 procedure TfmUsesManager.DeleteFromStringGrid(sg: TStringGrid; const UnitName: string);
@@ -986,14 +995,12 @@ end;
 
 procedure TfmUsesManager.sg_ImplementationDragDrop(Sender, Source: TObject; X, Y: Integer);
 begin
-  AddListToImplSection(Source, Source = sg_Interface);
-  CloseIfInSingleActionMode;
+  AddListToImplSection(Source, True);
 end;
 
 procedure TfmUsesManager.sg_InterfaceDragDrop(Sender, Source: TObject; X, Y: Integer);
 begin
   AddListToIntfSection(Source);
-  CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.sg_ImplementationDragOver(Sender, Source: TObject; X, Y: Integer;
@@ -1094,26 +1101,25 @@ begin
 
   actAvailAddToImpl.Enabled := ActiveLBHasSelection;
   actAvailAddToIntf.Enabled := ActiveLBHasSelection;
-  actFavAdd.Enabled := ActiveLBHasSelection or (pcUnits.ActivePage = tabFavorite);
-  actFavDelete.Enabled := HaveSelectedItem(sg_Favorite);
-  actFavDelete.Visible := AvailableSourceList = sg_Favorite;
+  actAvailAddToFav.Enabled := ActiveLBHasSelection;
+  actFavDelUnit.Enabled := HaveSelectedItem(sg_Favorite);
 
   if ActiveControl = sg_Interface then begin
+    SetShortcut(VK_INSERT, actIntfAddToFavorites);
     SetShortcut(VK_DELETE, actIntfDelete);
     SetShortcut(ShortCut(Ord('M'), [ssCtrl]), actIntfMove);
-    SetShortcut(ShortCut(Ord('F'), [ssCtrl]), actIntfAddToFavorites)
   end else if ActiveControl = sg_Implementation then begin
+    SetShortcut(VK_INSERT, actImplAddToFavorites);
     SetShortcut(VK_DELETE, actImplDelete);
     SetShortcut(ShortCut(Ord('M'), [ssCtrl]), actImplMove);
-    SetShortcut(ShortCut(Ord('F'), [ssCtrl]), actImplAddToFavorites);
   end else if ActiveControl = sg_Favorite then begin
-    SetShortcut(VK_DELETE, actFavDelete);
+    SetShortcut(VK_INSERT, actFavAddUnit);
+    SetShortcut(VK_DELETE, actFavDelUnit);
     SetShortcut(ShortCut(Ord('M'), [ssCtrl]), nil);
-    SetShortcut(ShortCut(Ord('F'), [ssCtrl]), nil);
   end else begin
+    SetShortcut(VK_INSERT, nil);
     SetShortcut(VK_DELETE, nil);
     SetShortcut(ShortCut(Ord('M'), [ssCtrl]), nil);
-    SetShortcut(ShortCut(Ord('F'), [ssCtrl]), nil);
   end;
 
   actOpenUnit.Enabled := HaveSelectedItem(GetListForOpen);
@@ -1159,7 +1165,7 @@ begin
     end;
 end;
 
-procedure TfmUsesManager.actFavDeleteExecute(Sender: TObject);
+procedure TfmUsesManager.actFavDelUnitExecute(Sender: TObject);
 var
   i: Integer;
 begin
@@ -1177,37 +1183,54 @@ begin
   TWinControl_SetFocus(sg_Interface);
 end;
 
-procedure TfmUsesManager.actFavAddExecute(Sender: TObject);
+procedure TfmUsesManager.actFavAddUnitExecute(Sender: TObject);
+var
+  i: Integer;
+  FileName: string;
+begin
+  dlgOpen.InitialDir := ExtractFilePath(GetIdeRootDirectory);
+  if dlgOpen.Execute then begin
+    for i := 0 to dlgOpen.Files.Count - 1 do begin
+      FileName := ExtractPureFileName(dlgOpen.Files[i]);
+      AddToFavorites(FileName);
+    end;
+  end
+end;
+
+procedure TfmUsesManager.actAvailAddAllToFavExecute(Sender: TObject);
 var
   i: Integer;
   FileName: string;
   Src: TStringGrid;
 begin
-  if pcUnits.ActivePage = tabFavorite then
-  begin
-    dlgOpen.InitialDir := ExtractFilePath(GetIdeRootDirectory);
-    if dlgOpen.Execute then
-    begin
-      for i := 0 to dlgOpen.Files.Count - 1 do
-      begin
-        FileName := ExtractPureFileName(dlgOpen.Files[i]);
-        AddToFavorites(FileName);
-      end;
-    end
-  end
-  else begin
-    FileName := '';
-    src := GetAvailableSourceList;
-    for i := Src.Selection.Bottom downto Src.Selection.Top do
-    begin
-      FileName := Src.Cells[0, i];
-      if FileName <> '' then
-        AddToFavorites(FileName);
-    end;
-    edtUnitFilter.Text := '';
-    pcUnits.ActivePage := tabFavorite;
-    pcUnits.Change;
+  FileName := '';
+  Src := GetAvailableSourceList;
+  for i := Src.FixedRows to Src.RowCount - 1 do begin
+    FileName := Src.Cells[0, i];
+    if FileName <> '' then
+      AddToFavorites(FileName);
   end;
+  edtUnitFilter.Text := '';
+  pcUnits.ActivePage := tabFavorite;
+  pcUnits.Change;
+end;
+
+procedure TfmUsesManager.actAvailAddToFavExecute(Sender: TObject);
+var
+  i: Integer;
+  FileName: string;
+  Src: TStringGrid;
+begin
+  FileName := '';
+  Src := GetAvailableSourceList;
+  for i := Src.Selection.Bottom downto Src.Selection.Top do begin
+    FileName := Src.Cells[0, i];
+    if FileName <> '' then
+      AddToFavorites(FileName);
+  end;
+  edtUnitFilter.Text := '';
+  pcUnits.ActivePage := tabFavorite;
+  pcUnits.Change;
 end;
 
 procedure TfmUsesManager.actAvailAddToIntfExecute(Sender: TObject);
@@ -1224,7 +1247,6 @@ begin
     Row := AddToIntfSection(Src.Cells[Col, i]);
   if Row <> -1 then
     sg_Interface.Row := Row;
-  CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actAvailAddToImplExecute(Sender: TObject);
@@ -1238,11 +1260,10 @@ begin
   Col := src.ColCount - 1;
   Row := -1;
   for i := Src.Selection.Bottom downto Src.Selection.Top do begin
-    Row := AddToImplSection(Src.Cells[col, i], False);
+    Row := AddToImplSection(Src.Cells[col, i], True);
   end;
   if Row <> -1 then
     sg_Implementation.Row := Row;
-  CloseIfInSingleActionMode;
 end;
 
 function TfmUsesManager.GetAvailableSourceList: TStringGrid;
@@ -1349,16 +1370,6 @@ begin
   OpenSelectedUnit(GetListForOpen);
 end;
 
-function TfmUsesManager.GetUsesSourceList: TStringGrid;
-begin
-  Result := nil;
-//  if pcUses.ActivePage = tabImplementation then
-//    Result := sg_Implementation
-//  else if pcUses.ActivePage = tabInterface then
-//    Result := sg_Interface;
-//  Assert(Assigned(Result));
-end;
-
 procedure TfmUsesManager.lbxAvailDblClick(Sender: TObject);
 var
   Src: TStringGrid;
@@ -1373,10 +1384,7 @@ begin
     OpenUnit(UnitName);
     ModalResult := mrCancel;
   end else begin
-    if GetUsesSourceList = sg_Implementation then
-      AddToImplSection(UnitName, False)
-    else
-      AddToIntfSection(UnitName);
+    AddToImplSection(UnitName, True)
   end;
 end;
 
@@ -1796,18 +1804,7 @@ begin
 end;
 
 procedure TfmUsesManager.actOKExecute(Sender: TObject);
-var
-  sg: TStringGrid;
 begin
-  if chkSingleActionMode.Checked then
-  begin
-    sg := GetAvailableSourceList;
-    Assert(Assigned(sg));
-//    if pcUses.ActivePage = tabInterface then
-//      AddListToIntfSection(sg)
-//    else
-//      AddListToImplSection(sg, False);
-  end;
   SaveChanges;
   ModalResult := mrOk;
 end;
@@ -2033,15 +2030,6 @@ begin
   FFavoriteUnits.SaveToFile(fn);
 end;
 
-procedure TfmUsesManager.CloseIfInSingleActionMode;
-begin
-  if chkSingleActionMode.Checked then
-  begin
-    SaveChanges;
-    ModalResult := mrOk;
-  end;
-end;
-
 procedure TfmUsesManager.FormShow(Sender: TObject);
 
 procedure SelectInGrid(_sg: TStringGrid; const _Unit: string);
@@ -2068,7 +2056,6 @@ end;
 procedure TfmUsesManager.actImplMoveExecute(Sender: TObject);
 begin
   MoveSelected(sg_Implementation, sg_Interface, True);
-  CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actImplAddToFavoritesExecute(Sender: TObject);
@@ -2079,7 +2066,6 @@ end;
 procedure TfmUsesManager.actImplDeleteExecute(Sender: TObject);
 begin
   DeleteSelected(sg_Implementation);
-  CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actIntfAddToFavoritesExecute(Sender: TObject);
@@ -2090,13 +2076,11 @@ end;
 procedure TfmUsesManager.actIntfDeleteExecute(Sender: TObject);
 begin
   DeleteSelected(sg_Interface);
-  CloseIfInSingleActionMode;
 end;
 
 procedure TfmUsesManager.actIntfMoveExecute(Sender: TObject);
 begin
   MoveSelected(sg_Interface, sg_Implementation, False);
-  CloseIfInSingleActionMode;
 end;
 
 type

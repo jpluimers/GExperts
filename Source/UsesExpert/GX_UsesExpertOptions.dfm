@@ -28,24 +28,9 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Caption = 'Read project units from map file rather than .dpr'
     TabOrder = 0
   end
-  object chkSingleActionMode: TCheckBox
-    Left = 8
-    Top = 32
-    Width = 273
-    Height = 17
-    Hint = 
-      'If enabled, OK will add the currently selected unit on the right' +
-      ' hand side to the uses clause shown on the left hand side and cl' +
-      'ose the dialog.'
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Single action/quic&k add mode'
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 1
-  end
   object chkReplaceFileUnit: TCheckBox
     Left = 8
-    Top = 56
+    Top = 32
     Width = 273
     Height = 17
     Hint = 
@@ -55,7 +40,7 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Caption = 'Replace IDE File, Use Unit feature'
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 2
+    TabOrder = 1
   end
   object btnOK: TButton
     Left = 128
@@ -67,7 +52,7 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 3
+    TabOrder = 2
   end
   object btnCancel: TButton
     Left = 208
@@ -78,6 +63,6 @@ object fmUsesExpertOptions: TfmUsesExpertOptions
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 3
   end
 end
