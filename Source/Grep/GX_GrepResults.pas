@@ -8,8 +8,8 @@ interface
 
 uses
   Windows, Classes, Graphics, Controls, Forms, ActnList, Dialogs, StdCtrls, ExtCtrls, ToolWin,
-  ComCtrls, Menus, Actions,
-  DropSource, GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, GX_IdeDock, GX_GrepSearch;
+  ComCtrls, Menus, Actions, DropSource,
+  GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, GX_IdeDock, GX_GrepSearch, GX_SharedImages;
 
 type
   TPageIndexType = (pitClickedEntryKeyIndex, pitTopKeyIndex, pitClickedEntryItemIndex, pitTopItemIndex);
@@ -74,7 +74,7 @@ type
     actViewShowContext: TAction;
     miViewShowMatchContext: TMenuItem;
     actFileSave: TAction;
-    actFileCopy: TAction;
+    actListCopy: TAction;
     mitFileSave: TMenuItem;
     mitFileCopy: TMenuItem;
     mitView: TMenuItem;
@@ -185,6 +185,55 @@ type
     actListSelectPrevious: TAction;
     mitListSelectNext: TMenuItem;
     mitListSelectPrevious: TMenuItem;
+    tbnHamburgerMenu: TToolButton;
+    actHamburgerMenu: TAction;
+    pmHamburgerMenu: TPopupMenu;
+    miFile: TMenuItem;
+    List1: TMenuItem;
+    View1: TMenuItem;
+    Replace1: TMenuItem;
+    Help1: TMenuItem;
+    Search1: TMenuItem;
+    Refresh1: TMenuItem;
+    Abort1: TMenuItem;
+    N1: TMenuItem;
+    Print1: TMenuItem;
+    Open1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    Save1: TMenuItem;
+    PrinttoFile1: TMenuItem;
+    SavePrint1: TMenuItem;
+    N4: TMenuItem;
+    Refresh2: TMenuItem;
+    N5: TMenuItem;
+    Delete1: TMenuItem;
+    N6: TMenuItem;
+    ModifySaveOptions1: TMenuItem;
+    Search2: TMenuItem;
+    GotoSelected1: TMenuItem;
+    GotoSelectedandClose2: TMenuItem;
+    SelectNext1: TMenuItem;
+    SelectPrevious1: TMenuItem;
+    N7: TMenuItem;
+    Copy1: TMenuItem;
+    N8: TMenuItem;
+    Contract1: TMenuItem;
+    Expand1: TMenuItem;
+    Options1: TMenuItem;
+    N9: TMenuItem;
+    oolbar1: TMenuItem;
+    ShowMatchContext1: TMenuItem;
+    ShowHistoryList1: TMenuItem;
+    N10: TMenuItem;
+    ShowFullFilename1: TMenuItem;
+    ShowIndent1: TMenuItem;
+    StayonTop1: TMenuItem;
+    N11: TMenuItem;
+    ReplaceAllItems1: TMenuItem;
+    ReplaceSelectedItem1: TMenuItem;
+    Help2: TMenuItem;
+    Contents1: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);
@@ -196,7 +245,7 @@ type
     procedure actFileRefreshExecute(Sender: TObject);
     procedure actFileAbortExecute(Sender: TObject);
     procedure actFilePrintExecute(Sender: TObject);
-    procedure actFileCopyExecute(Sender: TObject);
+    procedure actListCopyExecute(Sender: TObject);
     procedure actFileSaveExecute(Sender: TObject);
     procedure actViewStayOnTopExecute(Sender: TObject);
     procedure actFileExitExecute(Sender: TObject);
@@ -244,6 +293,7 @@ type
     procedure reContextContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure actListSelectNextExecute(Sender: TObject);
     procedure actListSelectPreviousExecute(Sender: TObject);
+    procedure actHamburgerMenuExecute(Sender: TObject);
   private
     FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
@@ -354,7 +404,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF D+}
   SysUtils, Messages, ToolsAPI, Math, StrUtils, IniFiles, TypInfo, Contnrs, Clipbrd, DateUtils,
-  GX_GExperts, GX_SharedImages, GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_IdeUtils, GX_MessageBox,
+  GX_GExperts, GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_IdeUtils, GX_MessageBox,
   GX_GrepPrinting, GX_Replace, GX_GrepReplace, GX_GrepSelect,
   GX_GrepProgress, GX_dzVclUtils;
 
@@ -1405,7 +1455,7 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.actFileCopyExecute(Sender: TObject);
+procedure TfmGrepResults.actListCopyExecute(Sender: TObject);
 var
   AItem: TGrepHistoryListItem;
 begin
@@ -1531,6 +1581,15 @@ procedure TfmGrepResults.actListSelectPreviousExecute(Sender: TObject);
 begin
   if SelectPrevListItem then
     GotoHighlightedListEntry;
+end;
+
+procedure TfmGrepResults.actHamburgerMenuExecute(Sender: TObject);
+var
+  Pnt: TPoint;
+begin
+  inherited;
+  Pnt := tbnHamburgerMenu.ClientToScreen(Point(0, tbnHamburgerMenu.Height));
+  pmHamburgerMenu.Popup(Pnt.X, Pnt.Y);
 end;
 
 procedure TfmGrepResults.actListContractExecute(Sender: TObject);
@@ -1674,6 +1733,11 @@ begin
 
   SetToolbarGradient(ToolBar);
 
+  if IsStandAlone then begin
+    actHamburgerMenu.Visible := False;
+    menu := MainMenu;
+  end;
+
   FSearchInProgress := False;
   lbResults.DoubleBuffered := True;
   CenterForm(Self);
@@ -1736,7 +1800,7 @@ begin
   actViewOptions.Enabled := not Processing;
   actViewStayOnTop.Enabled := not Processing;
   actFilePrint.Enabled := not Processing and HaveItems;
-  actFileCopy.Enabled := not Processing and HaveItems;
+  actListCopy.Enabled := not Processing and HaveItems;
   actListGotoSelected.Enabled := not Processing and HaveItems;
   actListGotoSelectedAndClose.Enabled := not Processing and HaveItems;
   actListContract.Enabled := not Processing and HaveItems;

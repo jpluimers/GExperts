@@ -7,7 +7,6 @@ inherited fmGrepResults: TfmGrepResults
   ClientWidth = 396
   DefaultMonitor = dmDesktop
   KeyPreview = True
-  Menu = MainMenu
   Position = poScreenCenter
   ShowHint = True
   OnKeyPress = FormKeyPress
@@ -77,136 +76,141 @@ inherited fmGrepResults: TfmGrepResults
       ShowHint = True
       TabOrder = 0
       Wrapable = False
-      object tbnSearch: TToolButton
+      object tbnHamburgerMenu: TToolButton
         Left = 0
+        Top = 0
+        Action = actHamburgerMenu
+      end
+      object tbnSearch: TToolButton
+        Left = 23
         Top = 0
         Action = actFileSearch
       end
       object tbnRefresh: TToolButton
-        Left = 23
+        Left = 46
         Top = 0
         Action = actFileRefresh
       end
       object tbnSep1: TToolButton
-        Left = 46
+        Left = 69
         Top = 0
         Width = 8
         ImageIndex = 7
         Style = tbsSeparator
       end
       object tbnAbort: TToolButton
-        Left = 54
+        Left = 77
         Top = 0
         Action = actFileAbort
       end
       object tbnSep2: TToolButton
-        Left = 77
+        Left = 100
         Top = 0
         Width = 8
         ImageIndex = 3
         Style = tbsSeparator
       end
       object tbnSearchInHistory: TToolButton
-        Left = 85
+        Left = 108
         Top = 0
         Action = actHistorySearchInHistory
       end
       object tbnSep9: TToolButton
-        Left = 108
+        Left = 131
         Top = 0
         Width = 8
         ImageIndex = 1
         Style = tbsSeparator
       end
       object tbnGoto: TToolButton
-        Left = 116
+        Left = 139
         Top = 0
         Action = actListGotoSelected
       end
       object tbnSep3: TToolButton
-        Left = 139
+        Left = 162
         Top = 0
         Width = 8
         ImageIndex = 4
         Style = tbsSeparator
       end
       object tbnPrint: TToolButton
-        Left = 147
+        Left = 170
         Top = 0
         Action = actFilePrint
       end
       object tbnSep4: TToolButton
-        Left = 170
+        Left = 193
         Top = 0
         Width = 8
         ImageIndex = 5
         Style = tbsSeparator
       end
       object tbnContract: TToolButton
-        Left = 178
+        Left = 201
         Top = 0
         Action = actListContract
       end
       object tbnExpand: TToolButton
-        Left = 201
+        Left = 224
         Top = 0
         Action = actListExpand
       end
       object tbnSep5: TToolButton
-        Left = 224
+        Left = 247
         Top = 0
         Width = 8
         ImageIndex = 8
         Style = tbsSeparator
       end
       object tbnShowFullFilename: TToolButton
-        Left = 232
+        Left = 255
         Top = 0
         Action = actViewShowFullFilename
       end
       object tbnShowLineIndent: TToolButton
-        Left = 255
+        Left = 278
         Top = 0
         Action = actViewShowIndent
       end
       object tbnSep8: TToolButton
-        Left = 278
+        Left = 301
         Top = 0
         Width = 8
         ImageIndex = 1
         Style = tbsSeparator
       end
       object tbnReplaceSelected: TToolButton
-        Left = 286
+        Left = 309
         Top = 0
         Action = actReplaceSelected
       end
       object tbnReplaceAll: TToolButton
-        Left = 309
+        Left = 332
         Top = 0
         Action = actReplaceAll
       end
       object tbnSep6: TToolButton
-        Left = 332
+        Left = 355
         Top = 0
         Width = 8
         ImageIndex = 9
         Style = tbsSeparator
       end
       object tbnStayOnTop: TToolButton
-        Left = 340
+        Left = 363
         Top = 0
         Action = actViewStayOnTop
       end
       object tbnSep7: TToolButton
-        Left = 363
+        Left = 386
         Top = 0
         Width = 8
         ImageIndex = 2
         Style = tbsSeparator
       end
       object tbnHelp: TToolButton
-        Left = 371
+        Left = 394
         Top = 0
         Action = actHelpHelp
       end
@@ -387,7 +391,7 @@ inherited fmGrepResults: TfmGrepResults
         Caption = '-'
       end
       object mitFileCopy: TMenuItem
-        Action = actFileCopy
+        Action = actListCopy
       end
       object mitListSep2: TMenuItem
         Caption = '-'
@@ -610,13 +614,13 @@ inherited fmGrepResults: TfmGrepResults
       OnExecute = actFileSaveExecute
       OnUpdate = actHistoryUpdate
     end
-    object actFileCopy: TAction
-      Category = 'File'
+    object actListCopy: TAction
+      Category = 'List'
       Caption = '&Copy'
       Hint = 'Copy results to clipboard'
       ImageIndex = 6
       ShortCut = 16451
-      OnExecute = actFileCopyExecute
+      OnExecute = actListCopyExecute
     end
     object actViewToolBar: TAction
       Category = 'View'
@@ -769,6 +773,13 @@ inherited fmGrepResults: TfmGrepResults
         'SHIFT+ALT+F7')
       OnExecute = actListSelectPreviousExecute
     end
+    object actHamburgerMenu: TAction
+      Category = 'File'
+      Caption = 'Menu'
+      ImageIndex = 89
+      ShortCut = 121
+      OnExecute = actHamburgerMenuExecute
+    end
   end
   object pmHistoryMenu: TPopupMenu
     Images = dmSharedImages.Images
@@ -912,5 +923,148 @@ inherited fmGrepResults: TfmGrepResults
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 360
     Top = 32
+  end
+  object pmHamburgerMenu: TPopupMenu
+    Left = 248
+    Top = 88
+    object miFile: TMenuItem
+      Caption = '&File'
+      ImageIndex = 14
+      object Search1: TMenuItem
+        Action = actFileSearch
+      end
+      object Refresh1: TMenuItem
+        Action = actFileRefresh
+      end
+      object Abort1: TMenuItem
+        Action = actFileAbort
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Print1: TMenuItem
+        Action = actFilePrint
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Open1: TMenuItem
+        Action = actFileOpen
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Save1: TMenuItem
+        Action = actFileSave
+      end
+      object PrinttoFile1: TMenuItem
+        Action = actFilePrintToFile
+      end
+      object SavePrint1: TMenuItem
+        Action = actFileSavePrint
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object Refresh2: TMenuItem
+        Action = actHistoryRefreshSelected
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object Delete1: TMenuItem
+        Action = actHistoryDelete
+      end
+      object N6: TMenuItem
+        Caption = '-'
+      end
+      object ModifySaveOptions1: TMenuItem
+        Action = actHistoryModifySaveOptions
+      end
+      object Search2: TMenuItem
+        Action = actHistorySearch
+      end
+    end
+    object List1: TMenuItem
+      Caption = '&List'
+      object GotoSelected1: TMenuItem
+        Action = actListGotoSelected
+      end
+      object GotoSelectedandClose2: TMenuItem
+        Action = actListGotoSelectedAndClose
+      end
+      object SelectNext1: TMenuItem
+        Action = actListSelectNext
+      end
+      object SelectPrevious1: TMenuItem
+        Action = actListSelectPrevious
+      end
+      object N7: TMenuItem
+        Caption = '-'
+      end
+      object Copy1: TMenuItem
+        Action = actListCopy
+      end
+      object N8: TMenuItem
+        Caption = '-'
+      end
+      object Contract1: TMenuItem
+        Action = actListContract
+      end
+      object Expand1: TMenuItem
+        Action = actListExpand
+      end
+    end
+    object View1: TMenuItem
+      Caption = '&View'
+      object Options1: TMenuItem
+        Action = actViewOptions
+      end
+      object N9: TMenuItem
+        Caption = '-'
+      end
+      object oolbar1: TMenuItem
+        Action = actViewToolBar
+      end
+      object ShowMatchContext1: TMenuItem
+        Action = actViewShowContext
+      end
+      object ShowHistoryList1: TMenuItem
+        Action = actViewShowHistoryList
+      end
+      object N10: TMenuItem
+        Caption = '-'
+      end
+      object ShowFullFilename1: TMenuItem
+        Action = actViewShowFullFilename
+      end
+      object ShowIndent1: TMenuItem
+        Action = actViewShowIndent
+      end
+      object N11: TMenuItem
+        Caption = '-'
+      end
+      object StayonTop1: TMenuItem
+        Action = actViewStayOnTop
+      end
+    end
+    object Replace1: TMenuItem
+      Caption = '&Replace'
+      object ReplaceAllItems1: TMenuItem
+        Action = actReplaceAll
+      end
+      object ReplaceSelectedItem1: TMenuItem
+        Action = actReplaceSelected
+      end
+    end
+    object Help1: TMenuItem
+      Caption = '&Help'
+      object Help2: TMenuItem
+        Action = actHelpHelp
+      end
+      object Contents1: TMenuItem
+        Action = actHelpContents
+      end
+    end
   end
 end
