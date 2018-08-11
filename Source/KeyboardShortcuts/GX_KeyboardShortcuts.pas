@@ -1,0 +1,247 @@
+unit GX_KeyboardShortcuts;
+
+{$I GX_CondDefine.inc}
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+  Grids,
+  Types,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  GX_Experts,
+  GX_BaseForm;
+
+type
+  TfmGxKeyboardShortcuts = class(TfmBaseForm)
+    sg_Actions: TStringGrid;
+    procedure sg_ActionsDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
+      State: TGridDrawState);
+  private
+    function CompareShortcuts(_Idx1, _Idx2: Integer): Integer;
+    procedure SwapEntries(_Idx1, _Idx2: Integer);
+    procedure DrawStringGridCell(_sg: TStringGrid; const _Text: string;
+      const _Rect: TRect; _State: TGridDrawState; _Duplicate: Boolean);
+  public
+    constructor Create(_Owner: TComponent); override;
+  end;
+
+implementation
+
+{$R *.dfm}
+
+uses
+{$IFOPT D+}GX_DbugIntf,
+{$ENDIF}
+  Registry,
+  Menus,
+  StrUtils,
+  ActnList,
+  GX_GExperts,
+  GX_ConfigurationInfo,
+  GX_ActionBroker,
+  GX_dzVclUtils,
+  GX_dzQuicksort,
+  Graphics;
+
+type
+  TGxKeyboardShortcuts = class(TGX_Expert)
+  private
+  protected
+  public
+    function CanHaveShortCut: Boolean; override;
+    constructor Create; override;
+    destructor Destroy; override;
+    function GetActionCaption: string; override;
+    function GetHelpString: string; override;
+    function HasConfigOptions: Boolean; override;
+    procedure Execute(Sender: TObject); override;
+  end;
+
+{ TGxKeyboardShortcuts }
+
+procedure TGxKeyboardShortcuts.Execute(Sender: TObject);
+begin
+  with TfmGxKeyboardShortcuts.Create(nil) do
+    try
+      ShowModal;
+    finally
+      Free;
+    end;
+end;
+
+function TGxKeyboardShortcuts.CanHaveShortCut: Boolean;
+begin
+  Result := False;
+end;
+
+constructor TGxKeyboardShortcuts.Create;
+begin
+  inherited Create;
+end;
+
+destructor TGxKeyboardShortcuts.Destroy;
+begin
+  inherited Destroy;
+end;
+
+function TGxKeyboardShortcuts.GetActionCaption: string;
+resourcestring
+  SMenuCaption = 'Keyboard Shortcuts';
+begin
+  Result := SMenuCaption;
+end;
+
+function TGxKeyboardShortcuts.GetHelpString: string;
+resourcestring
+  SSampleExpertHelp =
+    'List all keyboard shortcuts of registered actions in the IDE';
+begin
+  Result := SSampleExpertHelp;
+end;
+
+function TGxKeyboardShortcuts.HasConfigOptions: Boolean;
+begin
+  Result := False;
+end;
+
+{ TfmGxKeyboardShortcuts }
+
+function ShortcutToSortText(_Shortcut: TShortCut): string;
+
+  function ShiftToChar(_KeyIsSet: Boolean; _c: Ansichar): Ansichar;
+  begin
+    if _KeyIsSet then
+      Result := _c
+    else
+      Result := ' ';
+  end;
+
+  function ShiftToStr(_Shift: TShiftState): string;
+  begin
+    // ssShift, ssAlt, ssCtrl,
+    Result := ShiftToChar(ssShift in _Shift, 'S')
+      + ShiftToChar(ssAlt in _Shift, 'A')
+      + ShiftToChar(ssCtrl in _Shift, 'C');
+  end;
+
+  function KeyToStr(_Key: Word): string;
+  begin
+    Result := ShortCutToText(ShortCut(_Key, []));
+    Result := RightStr(StringOfChar(' ', 20) + Result, 20);
+  end;
+
+var
+  Key: Word;
+  Shift: TShiftState;
+begin
+  ShortCutToKey(_Shortcut, Key, Shift);
+  Result := ShiftToStr(Shift) + KeyToStr(Key);
+end;
+
+constructor TfmGxKeyboardShortcuts.Create(_Owner: TComponent);
+var
+  i: Integer;
+  ContAct: TContainedAction;
+  act: TCustomAction;
+  row: Integer;
+begin
+  inherited;
+
+  TControl_SetMinConstraints(Self);
+
+  sg_Actions.Cells[0, 0] := 'Shortcut';
+  sg_Actions.Cells[1, 0] := 'Action';
+  sg_Actions.Cells[2, 0] := 'Caption';
+
+  row := sg_Actions.FixedRows;
+  for i := 0 to GxActionBroker.ActionCount - 1 do begin
+    ContAct := GxActionBroker.Actions[i];
+    if ContAct is TCustomAction then begin
+      act := TCustomAction(ContAct);
+      if act.ShortCut <> 0 then begin
+        TGrid_SetNonfixedRowCount(sg_Actions, row);
+        sg_Actions.Objects[0, row] := Pointer(act.ShortCut);
+        sg_Actions.Cells[0, row] := ShortCutToText(act.ShortCut);
+        sg_Actions.Cells[1, row] := act.Name;
+        sg_Actions.Cells[2, row] := act.Caption;
+        Inc(row);
+      end;
+    end;
+  end;
+  QuickSort(sg_Actions.FixedRows, row - 1, CompareShortcuts, SwapEntries);
+
+  for i := sg_Actions.FixedRows to row - 2 do begin
+    if SameText(sg_Actions.Cells[0, i], sg_Actions.Cells[0, i + 1]) then begin
+      sg_Actions.Objects[1, i] := Pointer(1);
+      sg_Actions.Objects[1, i + 1] := Pointer(1);
+    end;
+  end;
+
+  TStringGrid_AdjustRowHight(sg_Actions);
+  TGrid_Resize(sg_Actions, [roUseGridWidth, roUseAllRows, roReduceMinWidth]);
+end;
+
+function TfmGxKeyboardShortcuts.CompareShortcuts(_Idx1, _Idx2: Integer): Integer;
+var
+  ShortCut1: TShortCut;
+  ShortCut2: TShortCut;
+  s1: string;
+  s2: string;
+begin
+  ShortCut1 := Integer(sg_Actions.Objects[0, _Idx1]);
+  ShortCut2 := Integer(sg_Actions.Objects[0, _Idx2]);
+  s1 := ShortcutToSortText(ShortCut1);
+  s2 := ShortcutToSortText(ShortCut2);
+  Result := CompareText(s1, s2);
+end;
+
+procedure TfmGxKeyboardShortcuts.SwapEntries(_Idx1, _Idx2: Integer);
+var
+  s: string;
+  c: Integer;
+  p: Pointer;
+begin
+  for c := 0 to sg_Actions.ColCount - 1 do begin
+    s := sg_Actions.Cells[c, _Idx1];
+    sg_Actions.Cells[c, _Idx1] := sg_Actions.Cells[c, _Idx2];
+    sg_Actions.Cells[c, _Idx2] := s;
+  end;
+  p := sg_Actions.Objects[0, _Idx1];
+  sg_Actions.Objects[0, _Idx1] := sg_Actions.Objects[0, _Idx2];
+  sg_Actions.Objects[0, _Idx2] := p;
+end;
+
+procedure TfmGxKeyboardShortcuts.DrawStringGridCell(_sg: TStringGrid; const _Text: string;
+  const _Rect: TRect; _State: TGridDrawState; _Duplicate: Boolean);
+var
+  cnv: TCanvas;
+begin
+  cnv := _sg.Canvas;
+  if _Text = '' then
+    cnv.Brush.Color := _sg.Color
+  else begin
+    if _Duplicate then begin
+      cnv.Brush.Color := clYellow;
+      cnv.Font.Color := clBlack;
+    end;
+  end;
+  cnv.FillRect(_Rect);
+  cnv.TextRect(_Rect, _Rect.Left + 2, _Rect.Top + 2, _Text);
+end;
+
+procedure TfmGxKeyboardShortcuts.sg_ActionsDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  sg: TStringGrid absolute Sender;
+begin
+  DrawStringGridCell(sg, sg.Cells[ACol, ARow], Rect, State, LongBool(sg.Objects[1, ARow]));
+end;
+
+initialization
+  RegisterGX_Expert(TGxKeyboardShortcuts);
+end.

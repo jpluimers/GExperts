@@ -236,7 +236,8 @@ uses
   GX_dzNamedThread in '..\..\Source\Utils\GX_dzNamedThread.pas',
   GX_IdeMessageAutoClose in '..\..\Source\IDE\GX_IdeMessageAutoClose.pas',
   GX_DummyWizard in '..\..\Source\Framework\GX_DummyWizard.pas',
-  GX_MemoEscFix in '..\..\Source\Utils\GX_MemoEscFix.pas';
+  GX_MemoEscFix in '..\..\Source\Utils\GX_MemoEscFix.pas',
+  GX_KeyboardShortcuts in '..\..\Source\KeyboardShortcuts\GX_KeyboardShortcuts.pas' {fmGxKeyboardShortcuts};
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}

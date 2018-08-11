@@ -432,6 +432,9 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
         <DCCReference Include="..\..\source\IDE\GX_IdeToolPropertiesEnhancer.pas"/>
         <DCCReference Include="..\..\source\IDE\GX_MultilineHost.pas"/>
         <DCCReference Include="..\..\source\IDE\GX_MultiLinePalette.pas"/>
+        <DCCReference Include="..\..\Source\KeyboardShortcuts\GX_KeyboardShortcuts.pas">
+            <Form>fmGxKeyboardShortcuts</Form>
+        </DCCReference>
         <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibrary.pas">
             <Form>fmMacroLibrary</Form>
         </DCCReference>
