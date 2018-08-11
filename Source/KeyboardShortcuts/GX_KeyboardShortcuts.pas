@@ -124,7 +124,7 @@ end;
 
 function ShortcutToSortText(_Shortcut: TShortCut): string;
 
-  function ShiftToChar(_KeyIsSet: Boolean; _c: char): char;
+  function ShiftToChar(_KeyIsSet: Boolean; _c: Char): Char;
   begin
     if _KeyIsSet then
       Result := _c
@@ -132,7 +132,7 @@ function ShortcutToSortText(_Shortcut: TShortCut): string;
       Result := ' ';
   end;
 
-  function ShiftToStr(_Shift: TShiftState): String;
+  function ShiftToStr(_Shift: TShiftState): string;
   begin
     // ssShift, ssAlt, ssCtrl,
     Result := ShiftToChar(ssShift in _Shift, 'S')
@@ -160,6 +160,9 @@ var
   ContAct: TContainedAction;
   act: TCustomAction;
   row: Integer;
+  j: Integer;
+  ShortCut: TShortCut;
+  s: string;
 begin
   inherited;
 
@@ -181,6 +184,28 @@ begin
         sg_Actions.Cells[1, row] := act.Name;
         sg_Actions.Cells[2, row] := act.Caption;
         Inc(row);
+      end;
+      for j := 0 to act.SecondaryShortCuts.Count - 1 do begin
+        ShortCut := act.SecondaryShortCuts.ShortCuts[j];
+        if ShortCut = 0 then begin
+          s := act.SecondaryShortCuts.Strings[j];
+{$IFOPT D+}
+          SendDebugFmt('secondary shortcut for action %s is 0 (text: %s)', [act.Name, s]);
+{$ENDIF}
+          ShortCut := TextToShortCut(s);
+        end;
+        if ShortCut = 0 then begin
+{$IFOPT D+}
+          SendDebugFmt('secondary shortcut for action %s is still 0 after TextToShortcut', [act.Name]);
+{$ENDIF}
+        end else begin
+          TGrid_SetNonfixedRowCount(sg_Actions, row);
+          sg_Actions.Objects[0, row] := Pointer(ShortCut);
+          sg_Actions.Cells[0, row] := s + ' *';
+          sg_Actions.Cells[1, row] := act.Name;
+          sg_Actions.Cells[2, row] := act.Caption;
+          Inc(row);
+        end;
       end;
     end;
   end;
