@@ -1587,7 +1587,6 @@ procedure TfmGrepResults.actHamburgerMenuExecute(Sender: TObject);
 var
   Pnt: TPoint;
 begin
-  inherited;
   Pnt := tbnHamburgerMenu.ClientToScreen(Point(0, tbnHamburgerMenu.Height));
   pmHamburgerMenu.Popup(Pnt.X, Pnt.Y);
 end;
