@@ -42,6 +42,7 @@ uses
   Registry,
   Menus,
   StrUtils,
+  Actions,
   ActnList,
   GX_GExperts,
   GX_ConfigurationInfo,
@@ -123,7 +124,7 @@ end;
 
 function ShortcutToSortText(_Shortcut: TShortCut): string;
 
-  function ShiftToChar(_KeyIsSet: Boolean; _c: Ansichar): Ansichar;
+  function ShiftToChar(_KeyIsSet: Boolean; _c: char): char;
   begin
     if _KeyIsSet then
       Result := _c
@@ -131,7 +132,7 @@ function ShortcutToSortText(_Shortcut: TShortCut): string;
       Result := ' ';
   end;
 
-  function ShiftToStr(_Shift: TShiftState): string;
+  function ShiftToStr(_Shift: TShiftState): String;
   begin
     // ssShift, ssAlt, ssCtrl,
     Result := ShiftToChar(ssShift in _Shift, 'S')
@@ -255,3 +256,4 @@ end;
 initialization
   RegisterGX_Expert(TGxKeyboardShortcuts);
 end.
+
