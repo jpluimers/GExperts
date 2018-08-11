@@ -13,6 +13,7 @@ uses
   Forms,
   Dialogs,
   StdCtrls,
+  Graphics,
   GX_Experts,
   GX_BaseForm;
 
@@ -27,6 +28,7 @@ type
     procedure DrawStringGridCell(_sg: TStringGrid; const _Text: string;
       const _Rect: TRect; _State: TGridDrawState; _Duplicate: Boolean);
   public
+    class procedure Execute(_bmp: TBitmap);
     constructor Create(_Owner: TComponent); override;
   end;
 
@@ -46,7 +48,7 @@ uses
   GX_ActionBroker,
   GX_dzVclUtils,
   GX_dzQuicksort,
-  Graphics;
+  GX_GenericUtils;
 
 type
   TGxKeyboardShortcuts = class(TGX_Expert)
@@ -66,12 +68,7 @@ type
 
 procedure TGxKeyboardShortcuts.Execute(Sender: TObject);
 begin
-  with TfmGxKeyboardShortcuts.Create(nil) do
-    try
-      ShowModal;
-    finally
-      Free;
-    end;
+  TfmGxKeyboardShortcuts.Execute(GetBitmap);
 end;
 
 function TGxKeyboardShortcuts.CanHaveShortCut: Boolean;
@@ -110,6 +107,19 @@ begin
 end;
 
 { TfmGxKeyboardShortcuts }
+
+class procedure TfmGxKeyboardShortcuts.Execute(_bmp: TBitmap);
+var
+  frm: TfmGxKeyboardShortcuts;
+begin
+  frm := TfmGxKeyboardShortcuts.Create(nil);
+  try
+    ConvertBitmapToIcon(_bmp, frm.Icon);
+    frm.ShowModal;
+  finally
+    frm.Free;
+  end;
+end;
 
 function ShortcutToSortText(_Shortcut: TShortCut): string;
 
