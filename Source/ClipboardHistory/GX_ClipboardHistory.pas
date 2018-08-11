@@ -56,7 +56,7 @@ type
     btnOptions: TToolButton;
     actViewOptions: TAction;
     mitViewOptions: TMenuItem;
-    actRehookClipboard: TAction;
+    actFileRehookClipboard: TAction;
     mitFileRehookClipboard: TMenuItem;
     tbnDelete: TToolButton;
     actDelete: TAction;
@@ -88,6 +88,28 @@ type
     mitListSep1: TMenuItem;
     mitListCopyfromPascalstring: TMenuItem;
     mitReplaceasPascalstring: TMenuItem;
+    actHamburgerMenu: TAction;
+    tbnHamburgerMenu: TToolButton;
+    pmHamburgerMenu: TPopupMenu;
+    File1: TMenuItem;
+    Edit1: TMenuItem;
+    View1: TMenuItem;
+    Help1: TMenuItem;
+    RehookClipboard1: TMenuItem;
+    Clear1: TMenuItem;
+    Delete1: TMenuItem;
+    N1: TMenuItem;
+    Copy1: TMenuItem;
+    CopyfromPascalString1: TMenuItem;
+    PasteasPascalString1: TMenuItem;
+    N2: TMenuItem;
+    PasteasPascalString2: TMenuItem;
+    ReplaceasPascalString1: TMenuItem;
+    ShowToolbar1: TMenuItem;
+    ShowPasteAsOptions2: TMenuItem;
+    Options1: TMenuItem;
+    Help2: TMenuItem;
+    Contents1: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure SplitterMoved(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -105,12 +127,13 @@ type
     procedure actViewToolBarExecute(Sender: TObject);
     procedure actViewOptionsExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure actRehookClipboardExecute(Sender: TObject);
+    procedure actFileRehookClipboardExecute(Sender: TObject);
     procedure actDeleteExecute(Sender: TObject);
     procedure actEditPasteAsPascalStringExecute(Sender: TObject);
     procedure actViewPasteAsOptionsExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lvClipResize(Sender: TObject);
+    procedure actHamburgerMenuExecute(Sender: TObject);
   private
     FHelperWindow: TWinControl;
     IgnoreClip: Boolean;
@@ -454,6 +477,11 @@ begin
 
   TControl_SetMinConstraints(Self);
 
+  if IsStandAlone then begin
+    actHamburgerMenu.Visible := False;
+    Menu := MainMenu;
+  end;
+
   SetToolbarGradient(ToolBar);
   {$IFOPT D+} SendDebug('Creating clipboard history data list'); {$ENDIF}
   FDataList := TList.Create;
@@ -635,6 +663,15 @@ begin
   GxContextHelpContents(Self);
 end;
 
+procedure TfmClipboardHistory.actHamburgerMenuExecute(Sender: TObject);
+var
+  Pnt: TPoint;
+begin
+  inherited;
+  Pnt := tbnHamburgerMenu.ClientToScreen(Point(0, tbnHamburgerMenu.Height));
+  pmHamburgerMenu.Popup(Pnt.X, Pnt.Y);
+end;
+
 procedure TfmClipboardHistory.actHelpAboutExecute(Sender: TObject);
 begin
   ShowGXAboutForm;
@@ -665,6 +702,7 @@ procedure TfmClipboardHistory.ActionsUpdate(Action: TBasicAction; var Handled: B
 begin
   actEditCopy.Enabled := (mmoClipText.SelLength > 0) or HaveSelectedItem;
   actEditPasteToIde.Enabled := actEditCopy.Enabled;
+  actEditPasteAsPascalString.Enabled := actEditCopy.Enabled;
   actDelete.Enabled := HaveSelectedItem;
   actViewToolBar.Checked := ToolBar.Visible;
   actViewPasteAsOptions.Checked := pnlPasteAsOptions.Visible;
@@ -704,7 +742,7 @@ begin
   {$IFOPT D+} SendDebug('Clipboard history helper window created'); {$ENDIF}
 end;
 
-procedure TfmClipboardHistory.actRehookClipboardExecute(Sender: TObject);
+procedure TfmClipboardHistory.actFileRehookClipboardExecute(Sender: TObject);
 begin
   IgnoreClip := True;
   try

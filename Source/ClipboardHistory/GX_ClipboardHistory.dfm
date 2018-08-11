@@ -6,7 +6,6 @@ inherited fmClipboardHistory: TfmClipboardHistory
   ClientHeight = 428
   ClientWidth = 550
   KeyPreview = True
-  Menu = MainMenu
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
@@ -77,66 +76,71 @@ inherited fmClipboardHistory: TfmClipboardHistory
     ShowHint = True
     TabOrder = 2
     Wrapable = False
-    object tbnClear: TToolButton
+    object tbnHamburgerMenu: TToolButton
       Left = 0
+      Top = 0
+      Action = actHamburgerMenu
+    end
+    object tbnClear: TToolButton
+      Left = 23
       Top = 0
       Action = actEditClear
     end
     object tbnDelete: TToolButton
-      Left = 23
+      Left = 46
       Top = 0
       Action = actDelete
     end
     object tbnSep1: TToolButton
-      Left = 46
+      Left = 69
       Top = 0
       Width = 8
       ImageIndex = 1
       Style = tbsSeparator
     end
     object tbnCopy: TToolButton
-      Left = 54
+      Left = 77
       Top = 0
       Action = actEditCopy
     end
     object tbnPaste: TToolButton
-      Left = 77
+      Left = 100
       Top = 0
       Action = actEditPasteToIde
       ImageIndex = 7
     end
     object tbnPasteAsPascal: TToolButton
-      Left = 100
+      Left = 123
       Top = 0
       Action = actEditPasteAsPascalString
       ImageIndex = 20
     end
     object tbnSep2: TToolButton
-      Left = 123
+      Left = 146
       Top = 0
       Width = 8
       ImageIndex = 3
       Style = tbsSeparator
     end
     object tbnViewPasteAs: TToolButton
-      Left = 131
+      Left = 154
       Top = 0
       Action = actViewPasteAsOptions
     end
     object tbnSep3: TToolButton
-      Left = 154
+      Left = 177
       Top = 0
       Width = 8
       ImageIndex = 1
       Style = tbsSeparator
     end
     object btnOptions: TToolButton
-      Left = 162
+      Left = 185
       Top = 0
       Action = actViewOptions
     end
     object tbnSep4: TToolButton
-      Left = 185
+      Left = 208
       Top = 0
       Width = 8
       Caption = 'tbnSep4'
@@ -144,14 +148,14 @@ inherited fmClipboardHistory: TfmClipboardHistory
       Style = tbsSeparator
     end
     object tbnHelp: TToolButton
-      Left = 193
+      Left = 216
       Top = 0
       Action = actHelpHelp
     end
   end
   object pnlPasteAsOptions: TPanel
     Left = 0
-    Top = 24
+    Top = 22
     Width = 550
     Height = 37
     Align = alTop
@@ -198,7 +202,7 @@ inherited fmClipboardHistory: TfmClipboardHistory
     object mitFile: TMenuItem
       Caption = '&File'
       object mitFileRehookClipboard: TMenuItem
-        Action = actRehookClipboard
+        Action = actFileRehookClipboard
       end
       object mitFileExit: TMenuItem
         Action = actFileExit
@@ -264,10 +268,10 @@ inherited fmClipboardHistory: TfmClipboardHistory
     OnUpdate = ActionsUpdate
     Left = 96
     Top = 48
-    object actRehookClipboard: TAction
+    object actFileRehookClipboard: TAction
       Category = 'File'
       Caption = 'Rehook Clipboard'
-      OnExecute = actRehookClipboardExecute
+      OnExecute = actFileRehookClipboardExecute
     end
     object actFileExit: TAction
       Category = 'File'
@@ -371,6 +375,11 @@ inherited fmClipboardHistory: TfmClipboardHistory
       Hint = 'Replace as Pascal string'
       OnExecute = actEditPasteAsPascalStringExecute
     end
+    object actHamburgerMenu: TAction
+      Caption = 'Menu'
+      ImageIndex = 89
+      OnExecute = actHamburgerMenuExecute
+    end
   end
   object pmListMenu: TPopupMenu
     Left = 208
@@ -398,6 +407,67 @@ inherited fmClipboardHistory: TfmClipboardHistory
     end
     object mitListDelete: TMenuItem
       Action = actDelete
+    end
+  end
+  object pmHamburgerMenu: TPopupMenu
+    Left = 144
+    Top = 120
+    object File1: TMenuItem
+      Caption = '&File'
+      object RehookClipboard1: TMenuItem
+        Action = actFileRehookClipboard
+      end
+    end
+    object Edit1: TMenuItem
+      Caption = '&Edit'
+      object Delete1: TMenuItem
+        Action = actDelete
+      end
+      object Clear1: TMenuItem
+        Action = actEditClear
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Copy1: TMenuItem
+        Action = actEditCopy
+      end
+      object CopyfromPascalString1: TMenuItem
+        Action = actEditCopyFromPascalString
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object PasteasPascalString1: TMenuItem
+        Action = actEditPasteToIde
+      end
+      object PasteasPascalString2: TMenuItem
+        Action = actEditPasteAsPascalString
+      end
+      object ReplaceasPascalString1: TMenuItem
+        Action = actEditReplaceAsPascalString
+      end
+    end
+    object View1: TMenuItem
+      Caption = '&View'
+      object ShowToolbar1: TMenuItem
+        Action = actViewToolBar
+      end
+      object ShowPasteAsOptions2: TMenuItem
+        Action = actViewPasteAsOptions
+      end
+      object Options1: TMenuItem
+        Action = actViewOptions
+      end
+    end
+    object Help1: TMenuItem
+      Caption = '&Help'
+      object Help2: TMenuItem
+        Action = actHelpHelp
+      end
+      object Contents1: TMenuItem
+        Action = actHelpContents
+      end
     end
   end
 end
