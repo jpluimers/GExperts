@@ -1,13 +1,15 @@
-/// <summary>
-/// This is an extract from u_dzVclUtils in dzlib http://blog.dummzeuch.de/dzlib/ </summary>
+///<summary>
+/// Implements functions which work on components but are not methods.
+///  @author        twm </summary>
+{$DEFINE GExperts}
 unit GX_dzVclUtils;
-(*
+{$IFNDEF GExperts}
 {$INCLUDE jedi.inc}
 
 // If this conditional define is set, all messages received in the hooked
 // WindowProc are written to the console window -> requires a console
 {.$DEFINE dzMESSAGEDEBUG}
-*)
+{$ENDIF GExperts}
 interface
 
 {$I GX_CondDefine.inc}
@@ -25,7 +27,7 @@ uses
   SysUtils,
 //  Graphics,
   Forms,
-//  Messages,
+  Messages,
   Controls,
   ComCtrls,
   CommCtrl,
@@ -44,7 +46,7 @@ uses
 //  u_dzTranslator,
 //  u_dzTypes,
 //  u_dzInputValidator;
-(*
+{$IFNDEF GExperts}
 type
   ///<summary> Ancestor to all exceptions raised in this unit. </summary>
   EdzVclUtils = class(Exception);
@@ -73,14 +75,14 @@ type
     procedure BuildFilterStrings(GraphicClass: TGraphicClass; var Descriptions, Filters: string);
     function GetFilterString(GraphicClass: TGraphicClass = nil): string;
   end;
-*)
-function GetModifierKeyState: TShiftState;
-function IsAltDown: Boolean;
-function IsCtrlDown: Boolean;
+
+function GetModifierKeyState: TShiftState; deprecated; // use u_dzOsUtils.GetModifierKeyState
+function IsAltDown: Boolean; deprecated; // use u_dzOsUtils.IsAltDown
+function IsCtrlDown: Boolean; deprecated; // use u_dzOsUtils.IsCtrlDown
 ///<summary>
 /// @returns true, if the shift key is currently pressed </summary>
-function IsShiftDown: Boolean;
-(*
+function IsShiftDown: Boolean; deprecated; // use u_dzOsUtils.IsShiftDown
+
 ///<summary> returns the global file formats list </summary>
 function GetFileFormats: TFileFormatsList;
 
@@ -95,12 +97,13 @@ procedure TBitmap_LoadFromString(_bmp: TBitmap; const _Content: AnsiString; _Con
 ///          @param Ctrl is a TWinControl which should be locked
 ///          @returns an interface, if that interface is released, it will automatically unlock the control </summary>
 function TWinControl_Lock(_Ctrl: TWinControl): IInterface;
-*)
+{$ENDIF GExperts}
 ///<summary> checks whether the integer array contains the given element
 ///          @param Element is the integer to check for
 ///          @param Arr is the array to check
 ///          @returns true, if Arr contains Element </summary>
 function ArrayContains(_Element: Integer; const _Arr: array of Integer): Boolean;
+
 type
   ///<summary> used in TGrid_Resize and TDbGrid_Resize to specify additional options
   ///  <ul>
@@ -127,14 +130,14 @@ type
 procedure TGrid_Resize(_Grid: TCustomGrid); overload;
 procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; _RowOffset: Integer = -1); overload;
 procedure TGrid_Resize(_Grid: TCustomGrid; _Options: TResizeOptionSet; const _ConstantCols: array of Integer; _RowOffset: Integer = -1); overload;
-(*
+{$IFNDEF GExperts}
 ///<summary> Resizes the columns of a TDbGrid to fit their contents
 ///          @param Grid is the TCustomDbGrid to work on
 ///          @param Options is a TResizeOptionSet specifying additional options,
 ///                         defaults to an empty set. </summary>
 procedure TDbGrid_Resize(_Grid: TCustomDbGrid; _Options: TResizeOptionSet = []; _MinWidth: Integer = 100); overload;
 procedure TDbGrid_Resize(_Grid: TCustomDbGrid; _Options: TResizeOptionSet; _MinWidths: array of Integer); overload;
-*)
+{$ENDIF GExperts}
 ///<summary>
 /// Reduce the width of grid columns so there is now horizontal scroll bar.
 /// @param ConstantCols is an array containg the indexes of columns that should keep their
@@ -142,9 +145,9 @@ procedure TDbGrid_Resize(_Grid: TCustomDbGrid; _Options: TResizeOptionSet; _MinW
 procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid); overload;
 procedure TGrid_RestrictToGridWdith(_Grid: TCustomGrid; _ConstantCols: array of Integer); overload;
 
-procedure TStringGrid_AdjustRowHight(_sg: TStringGrid);
+procedure TStringGrid_AdjustRowHeight(_sg: TStringGrid);
 
-(*
+{$IFNDEF GExperts}
 ///<summary>
 /// Adds a column to the TDbGrid
 /// @param Field is the field name
@@ -193,7 +196,7 @@ procedure TGrid_ExportToFile(_Grid: TCustomGrid; const _Filename: string; _Inclu
 ///          @param IncludeFixed determines whether the fixed rows/columns are also exported </summary>
 procedure TGrid_ExportToStream(_Grid: TCustomGrid; _Stream: TStream; _IncludeFixed: Boolean = False); overload;
 procedure TGrid_ExportToStream(_Grid: TCustomGrid; _Stream: TStream; _Selection: TGridRect); overload;
-*)
+{$ENDIF GExperts}
 ///<summary> sets the row count, taking the fixed rows into account
 ///          @returns the new RowCount </summary>
 function TGrid_SetRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
@@ -203,7 +206,7 @@ function TGrid_SetRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
 function TGrid_SetNonfixedRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
 ///<summary> @returns RowCount - FixedRows </summary>
 function TGrid_GetNonfixedRowCount(_Grid: TCustomGrid): Integer;
-(*
+{$IFNDEF GExperts}
 ///<summary> sets the column count, taking the fixed columns into account
 ///          @returns the new ColCount </summary>
 function TGrid_SetColCount(_Grid: TCustomGrid; _ColCount: Integer): Integer;
@@ -244,10 +247,10 @@ function TGrid_SetNonfixedRow(_Grid: TCustomGrid; _Row: Integer; _MakeVisibile: 
 
 ///<summary> sets the grid's current row without triggering an OnClick event
 procedure TGrid_SetRowNoClick(_Grid: TCustomGrid; _Row: Integer);
-*)
+{$ENDIF GExperts}
 ///<summary> sets the row count to FixedRows + 1 and clears all non-fixed cells </summary>
 procedure TStringGrid_Clear(_Grid: TStringGrid);
-(*
+{$IFNDEF GExperts}
 ///<summary> adds a new column to the Grid
 ///          It first searches for an empty column (no caption) and uses that, if
 ///          found, otherwise the column count is incremented.
@@ -346,7 +349,7 @@ procedure TEdit_SetCueBanner(_ed: TCustomEdit; const _Banner: WideString);
 function TEdit_GetCueBanner(_ed: TCustomEdit): WideString;
 
 procedure TEdit_SetEnabled(_ed: TCustomEdit; _Enabled: Boolean);
-*)
+{$ENDIF GExperts}
 type
   TAutoCompleteSourceEnum = (acsFileSystem, acsUrlHistory, acsUrlMru);
   TAutoCompleteSourceEnumSet = set of TAutoCompleteSourceEnum;
@@ -357,7 +360,7 @@ type
 ///<summary>
 /// Enables autocompletion for an edit control using a call to SHAutoComplete
 /// NOTE that this will only work until the control handle is recreated which the VCL does
-///      quite often. See TEdit_AutoComplete which handles this problem.
+///      quite often. See TEdit_ActivateAutoComplete which handles this problem.
 /// @param ed is a TCustomEdit control for which autocompletion should be enabled
 /// @param Source is a set of TAutoCompleteSourceEnum that determines from which source to
 ///               autocomplate, any combination of acsFileSystem, acsUrlHistory, acsUrlMru
@@ -376,6 +379,28 @@ type
 /// </summary>
 function TEdit_SetAutocomplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): Boolean;
+
+type
+  ///<summary>
+  /// Helper class that hooks the WindowProc procedure to do something whenever the window handle
+  /// gets created or destroyed. Do not instatiate this class, it's meant to be an ancestor for
+  /// other helpers. </summary>
+  TWindowProcHook = class(TComponent)
+  protected
+    FCtrl: TWinControl;
+    FOldWindowProc: TWndMethod;
+{$IFDEF dzMESSAGEDEBUG}
+    FMsgToStr: TWmMessageToString;
+{$ENDIF dzMESSAGEDEBUG}
+  protected
+    procedure WmNcCreate; virtual;
+    procedure WmNcDestroy; virtual;
+    procedure NewWindowProc(var _Msg: TMessage); virtual;
+    function IsAutoSuggestDropdownVisible: Boolean;
+  public
+    constructor Create(_WinControl: TWinControl); reintroduce;
+    destructor Destroy; override;
+  end;
 
 ///<summary>
 /// Enables autocompletion for an edit control using a call to SHAutoComplete
@@ -399,7 +424,7 @@ function TEdit_SetAutocomplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnu
 /// </summary>
 function TEdit_ActivateAutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
-(*
+{$IFNDEF GExperts}
 function TEdit_AutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): TObject; deprecated; // use TEdit_ActivateAutoComplete instead
 
@@ -421,9 +446,6 @@ type
   TdzWindowPositions = (dwpTop, dwpBottom, dwpLeft, dwpRight, dwpTopLeft, dwpTopRight, dwpBottomLeft, dwpBottomRight);
 
 procedure TForm_MoveTo(_frm: TCustomForm; _Position: TdzWindowPositions);
-
-type
-  IdzInputValidator = u_dzInputValidator.IdzInputValidator; deprecated;
 
 ///<summary> Tries to convert the edit control text to a double, if an error occurs, it raises
 ///          an exception and optionally focuses the control.
@@ -479,6 +501,43 @@ function TEdit_TextToInt(_ed: TLabeledEdit; _FocusControl: Boolean = True): Inte
 ///          @param Default is the value to use if the edit does not contain an integer
 ///          @returns the controls content as an integer
 function TEdit_TextToIntDef(_ed: TCustomEdit; _Default: Integer): Integer;
+
+type
+  ///<summary>
+  /// Helper class to allow displaying a hint with the current value of a TTrackBar.
+  /// It is created and returned by TTrackBar_EnableOnchangeHint.
+  /// NOTE: This class will be created with the TrackBar as owner, so it will automatically
+  ///       be freed with the TrackBar.
+  /// NOTE: The OnChange event that was originally assigned to the TrackBar will be chained.
+  ///       To assign a different event later, do not assign it to the TrackBar but to the
+  ///       TrackBarHelper. </summary>
+  TTrackBarHelper = class(TComponent)
+  private
+    FOnChange: TNotifyEvent;
+    procedure doOnChange(_Sender: TObject);
+    procedure HandleOnChange(_Sender: TObject);
+  public
+    constructor Create(_Owner: TComponent); override;
+    function TrackBar: TTrackBar;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+///<summary>
+/// Initializes a TTrackBar to display the current value as a hint on every change.
+/// Note: This is similar but not the same as setting the PositionToolTip property. You should
+///       not combine these.
+/// @returns a TTrackBarHelper object which can be used to change the OnChange event
+///          later. If you don't need to do that, it is safe to simply ignore the returned
+///          object. It is freed automatically with the TrackBar. </summary>
+function TTrackBar_EnableOnchangeHint(_tb: TTrackBar): TTrackBarHelper;
+
+///<summary>
+/// Initializes a TTrackBar to display a percentage, setting ticks at every 10% </summary>
+procedure TTrackBar_InitPercent(_tb: TTrackBar);
+
+///<summary>
+/// Adds labels to a TrackBar. It uses the TrackBar's
+procedure TTrackBar_AddLabels(_trk: TTrackBar);
 
 ///<summary> returns the contents of the tree view as a string with indentations
 ///          @param Tree is the TTreeView to process
@@ -595,7 +654,7 @@ procedure TControl_SetEnabled(_Control: TControl; _Enabled: Boolean);
 
 ///<summary> Calls protected TControl.Resize (which calls TControl.OnResize if assigned) </summary>
 procedure TControl_Resize(_Control: TControl);
-*)
+{$ENDIF GExperts}
 ///<summary>
 /// This prevents the THotKey component to wrongly display Ctrl+Left as Ctrl+NUM4 </summary>
 procedure THotkey_SetHotkey(_hk: THotKey; _ShortCut: TShortCut);
@@ -606,10 +665,8 @@ function THotkey_GetHotkey(_hk: THotKey): TShortCut;
 
 ///<summary>
 /// Sets the control's Constraints.MinHeight und Constraints.MinWidth properties
-/// to the control's Width and Height.
-/// @param FixedHeight if true, the form's MaxHeight will also be set, so that the height
-///                    cannot be changed </summary>
-procedure TControl_SetMinConstraints(_Control: TControl; _FixedHeight: Boolean = False);
+///          to the control's Width and Height. </summary>
+procedure TControl_SetMinConstraints(_Control: TControl);
 
 type
   TControlConstraints = (ccMinWidth, ccMinHeight, ccMaxWidth, ccMaxHeight);
@@ -628,7 +685,9 @@ procedure TControl_SetConstraints(_Control: TControl; _Which: TControlConstraint
 
 ///<summary> Frees all objects assigned to the combobox and then clears the combobox </summary>
 procedure TComboBox_ClearWithObjects(_cmb: TCustomComboBox);
-
+{$IFNDEF GExperts}
+procedure TComboBox_SetEnabled(_cmb: TCustomComboBox; _Enabled: Boolean);
+{$ENDIF GExperts}
 ///<summary> sets the with of a ComboBox's dropdown  in pixels </summary>
 procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
 
@@ -638,14 +697,26 @@ procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
 ///          @returns true, if the value could be found, false otherwise </summary>
 function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Pointer): Boolean; overload;
 function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Integer): Boolean; overload;
-(*
+{$IFNDEF GExperts}
 ///<summary> Gets the string of a combobox entry that has an object pointer matching Obj
 ///          @param cmb is the TCustomCombobox (descendant) to select
 ///          @param Obj is the desired object value
 ///          @param s is the string of the combobox entry, only valid if the function returns true
 ///          @returns true, if the object could be found, false otherwise </summary>
 function TComboBox_GetObjectCaption(_cmb: TCustomComboBox; _Obj: Pointer; out _s: string): Boolean;
-*)
+
+///<summary> Gets the object pointer of the selected combobox item
+///          @param cmb is the TCustomCombobox (descendant) to read from
+///          @param Obj is the value of the object pointer of the selected item, only valid
+///                     if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if these out parameters are valid </summary>
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
+{$ENDIF GExperts}
+function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
+  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
 ///<summary> Gets the object pointer of the selected combobox item
 ///          @param cmb is the TCustomCombobox (descendant) to read from
 ///          @param Idx is the combobox's ItemIndex, only valid if the function returns true
@@ -655,11 +726,24 @@ function TComboBox_GetObjectCaption(_cmb: TCustomComboBox; _Obj: Pointer; out _s
 ///                              if it does not contain a valid value, default = false
 ///          @returns true, if these out parameters are valid </summary>
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
-  out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
-function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
   out _Idx: Integer; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
+///<summary> Gets the object pointer of the selected combobox item
+///          @param cmb is the TCustomCombobox (descendant) to read from
+///          @param ObjAsInt is the value of the object pointer of the selected item type casted
+///                          to integer, only valid if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if these out parameters are valid </summary>
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
   out _ObjAsInt: Integer; _FocusControl: Boolean = False): Boolean; overload;
+///<summary> Gets the object pointer of the selected combobox item
+///          @param cmb is the TCustomCombobox (descendant) to read from
+///          @param Item is the selected item, only valid if the function returns true
+///          @param Obj is the value of the object pointer of the selected item, only valid
+///                     if the function returns true
+///          @param FocusControl is a boolean which determines whether to focus the control
+///                              if it does not contain a valid value, default = false
+///          @returns true, if these out parameters are valid </summary>
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
   out _Item: string; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean; overload;
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox;
@@ -685,7 +769,7 @@ function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Item: string;
 ///          @returns true, if an item was selected </summary>
 function TComboBox_GetSelected(_cmb: TCustomComboBox; out _Idx: Integer;
   _FocusControl: Boolean = False): Boolean; overload;
-(*
+{$IFNDEF GExperts}
 ///<summary> Returns the currently selected item from the combobox.
 ///          @raises EdzComboBoxNoSelection if no item is selected </summary>
 function TComboBox_GetSelected(_cmb: TCustomComboBox): string; overload;
@@ -699,7 +783,7 @@ function TComboBox_GetSelectedDef(_cmb: TCustomComboBox; const _Default: string)
 function TComboBox_GetSelectedDef(_cmb: TCustomComboBox; const _Default: Integer = -1): Integer; overload;
 
 function TComboBox_IsSelected(_cmb: TCustomComboBox; _OkColor: TColor = clWindow; _ErrColor: TColor = clYellow): Boolean;
-*)
+{$ENDIF GExperts}
 ///<summary> Selects the item if it is in the list and returns the new ItemIndex
 ///          @param cmb is the TCustomCombobox (descendant) to use
 ///          @param Item is the item to select
@@ -707,7 +791,7 @@ function TComboBox_IsSelected(_cmb: TCustomComboBox; _OkColor: TColor = clWindow
 ///          @returns the index of the newly selected item or -1 if it doesn't exist </summary>
 function TComboBox_Select(_cmb: TCustomComboBox; const _Item: string; _DefaultIdx: Integer = -1;
   _AllowPartialMatch: Boolean = False): Integer;
-(*
+{$IFNDEF GExperts}
 ///<summary>
 /// Tries to select an item in the combobox from the given list.
 /// @returns the ItemIndex of the selected item or the DefaultIdx if no match was found. </summary>
@@ -725,11 +809,11 @@ procedure TComboBox_SelectWithoutChangeEvent(_cmb: TCustomComboBox; _Idx: Intege
 ///          @param cmb is the TCustomCombobox (descendant) to use
 ///          @param Items is the TStrings to assign
 procedure TComboBox_AssignItems(_cmb: TCustomComboBox; _Items: TStrings);
-*)
+{$ENDIF}
 ///<summary>
 /// Add a new item with Object = Pointer(Value) </summary>
 procedure TComboBox_AddIntObject(_cmb: TCustomComboBox; const _Item: string; _Value: Integer);
-(*
+{$IFNDEF GExperts}
 ///<summary> Selects an item without triggering an OnChange event
 ///          (I am not even sure whether setting the item index always triggers an OnChange event.) </summary>
 procedure TColorBox_SelectWithoutChangeEvent(_cmb: TColorBox; _Color: TColor);
@@ -738,7 +822,7 @@ procedure TColorBox_SelectWithoutChangeEvent(_cmb: TColorBox; _Color: TColor);
 ///          not grey out the control as the Enabled property would.
 ///          This is meant for controls that do not have a readonly property like TComboBox or TCheckBox. </summary>
 procedure TControl_SetReadonly(_Ctrl: TControl; _ReadOnly: Boolean);
-*)
+{$ENDIF GExperts}
 ///<summary> Gets the object pointer of the selected listbox item
 ///          @param lst is the TCustomListbox (descendant) to read from
 ///          @param Idx is the listbox's ItemIndex, only valid if the function returns true
@@ -752,7 +836,15 @@ function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Idx: Integer; out
 ///                     if the function returns true
 ///          @returns true, if out parameters are valid </summary>
 function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Obj: Pointer): Boolean; overload;
-
+{$IFNDEF GExperts}
+///<summary> Gets the object pointer of the selected listbox item
+///          @param cmb is the TCustomListbox (descendant) to read from
+///          @param ObjAsInt is the value of the object pointer of the selected item type casted
+///                          to integer, only valid if the function returns true
+///          @returns true, if these out parameters are valid </summary>
+function TListBox_GetSelectedObject(_lst: TCustomListbox;
+  out _ObjAsInt: Integer): Boolean; overload;
+{$ENDIF GExperts}
 ///<summary> Gets the caption of the selected listbox item
 ///          @param cmb is the TCustomListbox (descendant) to read from
 ///          @param Item is the selected item, only valid if the function returns true
@@ -761,7 +853,7 @@ function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Obj: Pointer): Bo
 ///          @returns true, if an item was selected </summary>
 function TListBox_GetSelected(_lb: TCustomListbox; out _Item: string;
   _FocusControl: Boolean = False): Boolean; overload;
-(*
+{$IFNDEF GExperts}
 function TListBox_GetSelected(_lb: TCustomListbox): string; overload;
 function TListBox_GetSelected(_lb: TCustomListbox; out _Idx: Integer; out _Item: string): Boolean; overload;
 
@@ -787,10 +879,10 @@ function TListBox_DeleteSelected(_lst: TCustomListbox): Boolean; overload;
 function TListBox_DeleteSelected(_lst: TCustomListbox; out _s: string): Boolean; overload;
 
 procedure TListBox_UnselectAll(_lb: TCustomListbox);
-*)
+{$ENDIF GExperts}
 ///<summary> Frees all objects assigned to the list and then clears the list </summary>
 procedure TListbox_ClearWithObjects(_lst: TCustomListbox);
-(*
+{$IFNDEF GExperts}
 ///<summary> Returns the nunber of items that are checked </summary>
 function TCheckListBox_GetCheckedCount(_clb: TCheckListBox): Integer;
 procedure TCheckListBox_DeleteDisabled(_clb: TCheckListBox);
@@ -927,7 +1019,7 @@ procedure TSpeedButton_SetDownNoClick(_sb: TSpeedButton; _Down: Boolean);
 
 ///<summary> sets the Checked property without firing an OnClick event </summary>
 procedure TCheckBox_SetCheckedNoOnClick(_Chk: TCustomCheckBox; _Checked: Boolean);
-*)
+{$ENDIF GExperts}
 ///<summary>
 /// Append a new action to the given action list, assign Caption
 /// and optionally Shortcut and OnExecute event.
@@ -936,7 +1028,7 @@ function TActionlist_Append(_al: TActionList; const _Caption: string = ''): TAct
 function TActionlist_Append(_al: TActionList; const _Caption: string; _ShortCut: TShortCut): TAction; overload;
 function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent): TAction; overload;
 function TActionlist_Append(_al: TActionList; const _Caption: string; _OnExecute: TNotifyEvent; _ShortCut: TShortCut): TAction; overload;
-(*
+{$IFNDEF GExperts}
 ///<summary> Tries to set the checkbox's width to accomodate the text, does not always
 ///          work, especially since it does not take the WordWrap parameter into account
 ///          @param chk is the checkbox to autosize
@@ -952,12 +1044,12 @@ function TCheckBox_Autosize(_Chk: TCustomCheckBox; _ParentCanvas: TCanvas = nil)
 /// @returns the monitor on wich the center point of the form is located.
 ///          Warning: The result might be nil if the form is outside the visible area. </summary>
 function TForm_GetMonitor(_frm: TForm): TMonitor;
-*)
+{$ENDIF GExperts}
 ///<summary> centers a form on the given point, but makes sure the form is fully visible </summary>
 procedure TForm_CenterOn(_frm: TForm; _Center: TPoint); overload;
 ///<summary> centers a form on the given component, but makes sure the form is fully visible </summary>
 procedure TForm_CenterOn(_frm: TForm; _Center: TWinControl); overload;
-(*
+{$IFNDEF GExperts}
 type
   TFormPlacementEnum = (fpePositionOnly, fpeSizeOnly, fpePosAndSize);
 
@@ -1033,7 +1125,7 @@ procedure TForm_AppendVersion(_frm: TForm; _Caption: string = '');
 ///          'Product version: %1:s, File version: %0:s'.
 ///          If no Mask is given, the form's caption + ' - [%s %s]' is assumed. </summary>
 procedure TForm_InsertVersion(_frm: TForm; _Mask: string = '');
-*)
+{$ENDIF GExperts}
 type
   ///<summary>
   /// Event used in TWinControl_ActivateDropFiles.
@@ -1053,7 +1145,7 @@ function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFile
 
 ///<summary> tries to focus the given control, returns false if that's not possible </summary>
 function TWinControl_SetFocus(_Ctrl: TWinControl): Boolean;
-(*
+{$IFNDEF GExperts}
 ///<summary>
 /// @returns the full path of the executable (without the filename but including a backslash) </summary>
 function TApplication_GetExePath: string;
@@ -1094,13 +1186,13 @@ procedure UnMergeForm(_Form: TCustomForm); deprecated; // use a frame instead
 ///<summary> Calls lv.Items.BeginUpdate and returns an interface which, when released calls
 ///          lv.Items.EndUpdate. </summary>
 function TListView_BeginUpdate(_lv: TListView): IInterface;
-*)
+{$ENDIF GExperts}
 ///<summary> free all lv.Items[n].Data objects and then clear the items </summary>
 procedure TListView_ClearWithObjects(_lv: TListView);
 
 ///<summary> free all li[n].Data objects and then clear the items </summary>
 procedure TListItems_ClearWithObjects(_li: TListItems);
-(*
+{$IFNDEF GExperts}
 ///<summary> Unselect all items, if WithSelectEvents is false, OnSelectItem events will be temporarily
 ///          disabled. </summary>
 procedure TListView_UnselectAll(_lv: TListView; _WithSelectEvents: Boolean = True);
@@ -1118,7 +1210,7 @@ function TListView_FindItem(_lv: TListView; const _Caption: string): Boolean; ov
 
 procedure TListView_GetItems(_lv: TListView; _sl: TStrings);
 procedure TListView_SetItems(_lv: TListView; _sl: TStrings);
-*)
+{$ENDIF GExperts}
 type
   TListViewResizeOptions = (lvrCaptions, lvrContent);
   TLIstViewResizeOptionSet = set of TListViewResizeOptions;
@@ -1151,7 +1243,7 @@ function TListView_TryGetSelected(_lv: TListView; out _Idx: Integer): Boolean; o
 /// @param li is the selected item, only valid if Result = true
 /// @returns true, if an item was selected, false otherwise </summary>
 function TListView_TryGetSelected(_lv: TListView; out _li: TListItem): Boolean; overload;
-(*
+{$IFNDEF GExperts}
 ///<summary> Returns the first item in the radio group with the caption ItemText </summary>
 function TRadioGroup_GetButton(_rg: TRadioGroup; const _ItemText: string): TRadioButton; overload;
 ///<summary> Returns the ItemIdx'th item in the radio group </summary>
@@ -1165,7 +1257,8 @@ procedure TButtonControl_SetChecked(_bctrl: TButtonControl; _Value: Boolean);
 
 ///<summary> Sets the Caption value of a TCheckbox or TRadioButton (which both descend from TButtonControl) </summary>
 procedure TButtonControl_SetCaption(_bctrl: TButtonControl; const _Value: string);
-*)
+{$ENDIF GExperts}
+// todo: we cannot use a GX_Ver conditional for shared code with dzlib
 {$IFNDEF GX_VER200_up}
 //Delphi 2009 introduced TCustomButton as the common Ancestor of TButton and TBitBtn.
 type
@@ -1180,8 +1273,8 @@ procedure TButton_AddDropdownMenu(_btn: TCustomButton; _pm: TPopupMenu);
 ///<summary>
 /// Appends a new menu item with the given Caption to the popup menu and returns it </summary>
 function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem; overload;
-(*
->
+{$IFNDEF GExperts}
+///<summary>
 /// Appends a new menu item with the given Action to the popup menu and returns it </summary>
 function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; _Action: TBasicAction): TMenuItem; overload;
 
@@ -1206,13 +1299,13 @@ function TMenuItem_AppendSubmenuItem(_mi: TMenuItem; _Action: TBasicAction): TMe
 ///<summary>
 /// Recursively appends all submen items of Src to Dest </summary>
 procedure TMenuItem_AppendSubmenuItems(_Dest, _Src: TMenuItem);
-*)
+{$ENDIF GExperts}
 function TPopupMenu_FindMenuItem(_pm: TPopupMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
 
 function TMainMenu_FindMenuItem(_mnu: TMainMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
 
 function TMenuItem_FindMenuItem(_mi: TMenuItem; const _Name: string; out _miFound: TMenuItem): Boolean;
-(*
+{$IFNDEF GExperts}
 ///<summary> sets Screen.Cursor to NewCursor and restores it automatically when the returned interface
 ///          goes out of scope </summary>
 function TCursor_TemporaryChange(_NewCursor: TCursor = crHourGlass): IInterface;
@@ -1258,22 +1351,22 @@ type
     procedure RemoveShortcuts;
     procedure AssignShortcuts;
   end;
-*)
+{$ENDIF GExperts}
 type
   TRectLTWH = record
-(*
+{$IFNDEF GExperts}
   private
     function GetTopLeft: TPoint;
     procedure SetTopLeft(_TopLeft: TPoint);
     function GetBottomLeft: TPoint;
     procedure SetBottomLeft(const _BottomLeft: TPoint);
   public
-*)
+{$ENDIF GExperts}
     Left: Integer;
     Top: Integer;
     Width: Integer;
     Height: Integer;
-(*
+{$IFNDEF GExperts}
     procedure Assign(_Left, _Top, _Width, _Height: Integer); overload;
     procedure Assign(_a: TRect); overload;
     procedure AssignTLRB(_Left, _Top, _Right, _Bottom: Integer);
@@ -1286,8 +1379,9 @@ type
     class operator Implicit(_a: TRect): TRectLTWH;
     class operator Implicit(_a: TRectLTWH): TRect;
     class function FromLTWH(_Left, _Top, _Width, _Height: Integer): TRectLTWH; static;
-*)
+{$ENDIF GExperts}
   end;
+
 procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _Left, _Top, _Width, _Height: Integer); overload;
 procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _a: TRect); overload;
 procedure TRectLTWH_AssignTLRB(var _LTWH: TRectLTWH; _Left, _Top, _Right, _Bottom: Integer);
@@ -1303,16 +1397,16 @@ procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; var _Rect: TRectLTWH); o
 procedure TMonitor_MakeFullyVisible(_Monitor: TMonitor; _frm: TForm); overload;
 
 function TScreen_MonitorFromPoint(_pnt: TPoint): TMonitor;
-(*
+{$IFNDEF GExperts}
 procedure TScreen_MakeFullyVisible(_frm: TForm); overload;
-*)
+{$ENDIF GExperts}
 ///<summary>
 /// Sets the given column of the StringList to the given string list,
 /// adjusting the RowCount if necessary </summary>
 procedure TStringGrid_AssignCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
 
 ///<summary>
-/// Adds the entris of the given column to the string list
+/// Adds the entries of the given column to the string list
 /// NOTE: sl will not be cleared. </summary>
 procedure TStringGrid_GetCol(_Grid: TStringGrid; _Col: Integer; _sl: TStrings);
 
@@ -1320,29 +1414,45 @@ implementation
 
 uses
   Consts,
-(*
+{$IFNDEF GExperts}
 {$IFDEF RTL230_UP}
   Vcl.Imaging.JPEG,
 {$ELSE}
   JPEG,
 {$ENDIF RTL230_UP}
+{$ENDIF GExperts}
   ShellApi,
+{$IFNDEF GExperts}
   StrUtils,
   Types,
   Math,
   FileCtrl,
-*)
+{$ENDIF GExperts}
+  StrUtils,
 {$IFDEF SUPPORTS_UNICODE_STRING}
   AnsiStrings,
 {$ENDIF SUPPORTS_UNICODE_STRING}
-  Messages,
-  ShellApi,
-  Types,
-  FileCtrl,
-  StrUtils,
+{$IFNDEF GExperts}
+{$IFDEF GIFByRx}
+  RxGConst,
+  rxGif,
+{$ENDIF GIFByRx}
+  u_dzConvertUtils,
+  u_dzDateUtils,
+  u_dzStringUtils,
+  u_dzFileUtils,
+  u_dzClassUtils,
+{$IFDEF dzMESSAGEDEBUG}
+  u_dzWmMessageToString,
+{$ENDIF dzMESSAGEDEBUG}
+  u_dzSortProvider,
+  u_dzLineBuilder,
+  u_dzVersionInfo,
+  u_dzGraphicsUtils,
+  u_dzOsUtils;
+{$ENDIF GExperts}
   GX_GenericUtils;
-
-(*
+{$IFNDEF GExperts}
 function _(const _s: string): string; inline;
 begin
   Result := dzDGetText(_s, 'dzlib');
@@ -1401,11 +1511,12 @@ begin
     FreeAndNil(st);
   end;
 end;
-*)
+{$ENDIF GExperts}
 // we need this to access protected methods
 type
   TGridHack = class(TCustomGrid);
-(*
+{$IFNDEF GExperts}
+type
   TDbGridHack = class(TCustomDbGrid);
 
 function TGrid_GetText(_Grid: TCustomGrid; _IncludeFixed: Boolean = False): string;
@@ -1491,7 +1602,7 @@ begin
     CloseFile(t);
   end;
 end;
-*)
+{$ENDIF GExperts}
 function TGrid_SetRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
 var
   Grid: TGridHack;
@@ -1503,7 +1614,7 @@ begin
     Result := _RowCount;
   Grid.RowCount := Result;
 end;
-(*
+{$IFNDEF GExperts}
 function TGrid_SetColCount(_Grid: TCustomGrid; _ColCount: Integer): Integer;
 var
   Grid: TGridHack;
@@ -1589,7 +1700,7 @@ begin
   Grid := TGridHack(_Grid);
   Result := Grid.ColCount - Grid.FixedCols;
 end;
-*)
+{$ENDIF GExperts}
 function TGrid_SetNonfixedRowCount(_Grid: TCustomGrid; _RowCount: Integer): Integer;
 var
   Grid: TGridHack;
@@ -1600,6 +1711,7 @@ begin
   Result := Grid.FixedRows + _RowCount;
   Grid.RowCount := Result;
 end;
+
 function TGrid_GetNonfixedRowCount(_Grid: TCustomGrid): Integer;
 var
   Grid: TGridHack;
@@ -1607,7 +1719,7 @@ begin
   Grid := TGridHack(_Grid);
   Result := Grid.RowCount - Grid.FixedRows;
 end;
-(*
+{$IFNDEF GExperts}
 procedure TStringGrid_SetRowCount(_Grid: TCustomGrid; _RowCount: Integer);
 begin
   TGrid_SetRowCount(_Grid, _RowCount);
@@ -1638,7 +1750,7 @@ procedure TStringGrid_ExportToFile(_Grid: TCustomGrid; const _Filename: string);
 begin
   TGrid_ExportToFile(_Grid, _Filename, True);
 end;
-*)
+{$ENDIF GExperts}
 procedure TStringGrid_Clear(_Grid: TStringGrid);
 var
   c: Integer;
@@ -1672,7 +1784,7 @@ begin
   for r := _Grid.FixedRows to _Grid.RowCount - 1 do
     _sl.Add(_Grid.Cells[_Col, r]);
 end;
-(*
+{$IFNDEF GExperts}
 procedure TStringGrid_SetNonfixedCell(_Grid: TStringGrid; _Col, _Row: Integer; const _Text: string);
 begin
   _Grid.Cells[_Col + _Grid.FixedCols, _Row + _Grid.FixedRows] := _Text;
@@ -1810,7 +1922,7 @@ begin
 end;
 
 type
-  THackEdit = class(TCustomEdit)
+  TEditHack = class(TCustomEdit)
   end;
 
 procedure TEdit_SetCueBanner(_ed: TCustomEdit; const _Banner: WideString);
@@ -1832,9 +1944,9 @@ end;
 
 procedure TEdit_SetEnabled(_ed: TCustomEdit; _Enabled: Boolean);
 var
-  ed: THackEdit;
+  ed: TEditHack;
 begin
-  ed := THackEdit(_ed);
+  ed := TEditHack(_ed);
   ed.Enabled := _Enabled;
   if _Enabled then
     ed.Color := clWindow
@@ -1845,9 +1957,9 @@ end;
 procedure TEdit_SetTextNoChange(_ed: TCustomEdit; const _Text: string);
 var
   Event: TNotifyEvent;
-  ed: THackEdit;
+  ed: TEditHack;
 begin
-  ed := THackEdit(_ed);
+  ed := TEditHack(_ed);
   Event := ed.OnChange;
   ed.OnChange := nil;
   try
@@ -1901,9 +2013,6 @@ var
 begin
   Result := TEdit_TryTextToDouble(_ed, Value, _OkColor, _ErrColor);
 end;
-
-type
-  TEditHack = class(TCustomEdit); deprecated; // use THackEdit (or vice versa)
 
 function TEdit_TryTextToFloat(_ed: TCustomEdit; out _Value: Extended;
   _OkColor: TColor = clWindow; _ErrColor: TColor = clYellow): Boolean;
@@ -2120,7 +2229,7 @@ begin
     Nodes.EndUpdate;
   end;
 end;
-*)
+{$ENDIF GExperts}
 function ArrayContains(_Element: Integer; const _Arr: array of Integer): Boolean;
 var
   i: Integer;
@@ -2138,11 +2247,11 @@ var
   ColWidth: Integer;
   ColText: string;
 begin
-(*
+{$IFNDEF GExperts}
   if TCustomGrid(_Grid) is TCustomDbGrid then
     if (dgIndicator in TDbGridHack(_Grid).Options) and (_Col = 0) then
       Exit;
-*)
+{$ENDIF GExperts}
   ColText := _Grid.GetEditText(_Col, _Row);
   ColWidth := _Grid.Canvas.TextWidth(ColText);
   if ColWidth > _MinWidth then
@@ -2306,7 +2415,7 @@ begin
   end;
 end;
 
-procedure TStringGrid_AdjustRowHight(_sg: TStringGrid);
+procedure TStringGrid_AdjustRowHeight(_sg: TStringGrid);
 var
   r: Integer;
   c: Integer;
@@ -2328,7 +2437,7 @@ begin
   end;
   _sg.DefaultRowHeight := rh + 4;
 end;
-(*
+{$IFNDEF GExperts}
 function TDbGrid_CalcAdditionalWidth(_Grid: TCustomDbGrid): Integer;
 var
   Grid: TDbGridHack;
@@ -2614,10 +2723,11 @@ procedure TControl_Resize(_Control: TControl);
 begin
   TControlHack(_Control).Resize;
 end;
-*)
+{$ENDIF GExperts}
 type
   TComboBoxHack = class(TCustomComboBox);
 
+// todo: This is originally from u_dzClassUtils and should be moved there again
 /// <summary>
 /// Frees all objects stored in the TStrings intance and returns the instance,
 /// meant to be called like
@@ -2640,7 +2750,7 @@ begin
   TStrings_FreeAllObjects(_cmb.Items);
   _cmb.Clear;
 end;
-(*
+{$IFNDEF GExperts}
 procedure TComboBox_SetEnabled(_cmb: TCustomComboBox; _Enabled: Boolean);
 var
   cmb: TComboBoxHack;
@@ -2652,7 +2762,7 @@ begin
   else
     cmb.Color := clBtnFace;
 end;
-*)
+{$ENDIF GExperts}
 procedure TComboBox_SetDropdownWidth(_cmb: TCustomComboBox; _Pixels: Integer);
 begin
   _cmb.HandleNeeded;
@@ -2677,7 +2787,7 @@ function TComboBox_SelectByObject(_cmb: TCustomComboBox; _Value: Integer): Boole
 begin
   Result := TComboBox_SelectByObject(_cmb, Pointer(_Value));
 end;
-(*
+{$IFNDEF GExperts}
 function TComboBox_GetObjectCaption(_cmb: TCustomComboBox; _Obj: Pointer; out _s: string): Boolean;
 var
   i: Integer;
@@ -2691,7 +2801,7 @@ begin
   end;
   Result := False;
 end;
-*)
+{$ENDIF GExperts}
 function TComboBox_GetSelectedObject(_cmb: TCustomComboBox; out _Obj: Pointer; _FocusControl: Boolean = False): Boolean;
 var
   Idx: Integer;
@@ -2770,7 +2880,7 @@ begin
   if Result then
     _Item := _cmb.Items[Idx];
 end;
-(*
+{$IFNDEF GExperts}
 function TComboBox_GetSelected(_cmb: TCustomComboBox): string; overload;
 begin
   if not TComboBox_GetSelected(_cmb, Result) then
@@ -2788,7 +2898,7 @@ begin
   if not TComboBox_GetSelected(_cmb, Result) then
     Result := _Default;
 end;
-*)
+{$ENDIF GExperts}
 function TComboBox_GetSelectedObjectDef(_cmb: TCustomComboBox; _Default: Integer;
   _FocusControl: Boolean = False): Integer;
 begin
@@ -2808,7 +2918,7 @@ begin
   else if _FocusControl then
     TWinControl_SetFocus(_lb);
 end;
-(*
+{$IFNDEF GExperts}
 function TListBox_GetSelected(_lb: TCustomListbox): string;
 begin
   if not TListBox_GetSelected(_lb, Result) then
@@ -2845,7 +2955,7 @@ begin
   else
     TComboBoxHack(_cmb).Color := _ErrColor;
 end;
-*)
+{$ENDIF GExperts}
 function TListBox_GetSelectedObject(_lst: TCustomListbox; out _Idx: Integer; out _Obj: Pointer): Boolean;
 begin
   _Idx := _lst.ItemIndex;
@@ -2860,7 +2970,13 @@ var
 begin
   Result := TListBox_GetSelectedObject(_lst, Idx, _Obj);
 end;
-(*
+{$IFNDEF GExperts}
+function TListBox_GetSelectedObject(_lst: TCustomListbox;
+  out _ObjAsInt: Integer): Boolean;
+begin
+  Result := TListBox_GetSelectedObject(_lst, Pointer(_ObjAsInt));
+end;
+
 function TListBox_DeleteSelected(_lst: TCustomListbox; out _Idx: Integer): Boolean;
 begin
   _Idx := _lst.ItemIndex;
@@ -2904,13 +3020,13 @@ begin
   for i := 0 to _lb.Items.Count - 1 do
     _lb.Selected[i] := False;
 end;
-*)
+{$ENDIF GExperts}
 procedure TListbox_ClearWithObjects(_lst: TCustomListbox);
 begin
   TStrings_FreeAllObjects(_lst.Items);
   _lst.Items.Clear;
 end;
-(*
+{$IFNDEF GExperts}
 function TCheckListBox_GetCheckedCount(_clb: TCheckListBox): Integer;
 var
   i: Integer;
@@ -3071,7 +3187,7 @@ begin
       _Objects.Add(_clb.Items.Objects[i]);
   Result := _Objects.Count;
 end;
-*)
+{$ENDIF GExperts}
 function TComboBox_Select(_cmb: TCustomComboBox; const _Item: string; _DefaultIdx: Integer = -1;
   _AllowPartialMatch: Boolean = False): Integer;
 var
@@ -3098,7 +3214,7 @@ begin
   end;
   _cmb.ItemIndex := Result;
 end;
-(*
+{$IFNDEF GExperts}
 function TCombobox_SelectAny(_cmb: TCustomComboBox; const _Items: array of string;
   _DefaultIdx: Integer = -1): Integer;
 var
@@ -3167,12 +3283,12 @@ begin
     TComboHack(_cmb).SelLength := SelLen;
   end;
 end;
-*)
+{$ENDIF GExperts}
 procedure TComboBox_AddIntObject(_cmb: TCustomComboBox; const _Item: string; _Value: Integer);
 begin
   _cmb.Items.AddObject(_Item, Pointer(_Value));
 end;
-(*
+{$IFNDEF GExperts}
 procedure TColorBox_SelectWithoutChangeEvent(_cmb: TColorBox; _Color: TColor);
 var
   Event: TNotifyEvent;
@@ -3513,7 +3629,7 @@ begin
   end else
     Result := -1;
 end;
-*)
+{$ENDIF GExperts}
 function TScreen_MonitorFromPoint(_pnt: TPoint): TMonitor;
 var
   i: Integer;
@@ -3528,7 +3644,7 @@ begin
   end;
   Result := nil;
 end;
-(*
+{$IFNDEF GExperts}
 function TForm_GetMonitor(_frm: TForm): TMonitor;
 var
   Center: TPoint;
@@ -3537,7 +3653,7 @@ begin
   Center.Y := _frm.Top + _frm.Height div 2;
   Result := TScreen_MonitorFromPoint(Center);
 end;
-*)
+{$ENDIF GExperts}
 procedure TForm_CenterOn(_frm: TForm; _Center: TPoint);
 var
   Monitor: TMonitor;
@@ -3559,7 +3675,10 @@ begin
     if Screen.FormCount > 0 then
       _Center := Screen.Forms[0];
   end;
-  if Assigned(_Center) then begin
+  // It's possible that the programmer passed the form itself or that he passed nil and it was read
+  // by one of the methods above. We cannot center a form on itself, so we center it on the
+  // screen.
+  if Assigned(_Center) and (_frm <> _Center) then begin
     if Assigned(_Center.Parent) then
       TForm_CenterOn(_frm, _Center.ClientToScreen(Point(_Center.Width div 2, _Center.Height div 2)))
     else
@@ -3568,7 +3687,7 @@ begin
     TForm_CenterOn(_frm, Point(Screen.Width div 2, Screen.Height div 2));
   end;
 end;
-(*
+{$IFNDEF GExperts}
 function TApplication_GetRegistryPath: string;
 var
   VerInfo: IFileInfo;
@@ -3748,7 +3867,7 @@ begin
   if VersionInfo.HasVersionInfo then
     Result := VersionInfo.FileVersion;
 end;
-*)
+{$ENDIF GExperts}
 procedure TControl_SetConstraints(_Control: TControl; _Which: TControlConstraintsSet);
 begin
   if ccMinWidth in _Which then
@@ -3761,11 +3880,9 @@ begin
     _Control.Constraints.MaxHeight := _Control.Height;
 end;
 
-procedure TControl_SetMinConstraints(_Control: TControl; _FixedHeight: Boolean = False);
+procedure TControl_SetMinConstraints(_Control: TControl);
 begin
   TControl_SetConstraints(_Control, ccMin);
-  if _FixedHeight then
-    _Control.Constraints.MaxHeight := _Control.Height;
 end;
 
 function TWinControl_SetFocus(_Ctrl: TWinControl): Boolean;
@@ -3789,7 +3906,7 @@ begin
     end;
   end;
 end;
-(*
+{$IFNDEF GExperts}
 procedure DisableProcessWindowsGhosting;
 var
   DisableProcessWindowsGhostingProc: procedure;
@@ -4071,7 +4188,7 @@ begin
   TControlHack(_Form).DestroyHandle;
   _Form.Parent := nil;
 end;
-*)
+{$ENDIF GExperts}
 procedure TListItems_ClearWithObjects(_li: TListItems);
 var
   i: Integer;
@@ -4093,7 +4210,7 @@ begin
   end;
   _lv.Clear;
 end;
-(*
+{$IFNDEF GExperts}
 type
   TListViewEndUpdateClass = class(TInterfacedObject, IInterface)
   private
@@ -4108,7 +4225,7 @@ begin
   _lv.Items.BeginUpdate;
   Result := TListViewEndUpdateClass.Create(_lv);
 end;
-*)
+{$ENDIF GExperts}
 function TListView_TryGetSelected(_lv: TListView; out _Idx: Integer): Boolean;
 begin
   _Idx := _lv.ItemIndex;
@@ -4123,7 +4240,7 @@ begin
   if Result then
     _li := _lv.Items[Idx];
 end;
-(*
+{$IFNDEF GExperts}
 function TRadioGroup_GetButton(_rg: TRadioGroup; _ItemIdx: Integer): TRadioButton;
 // taken from http://delphi.about.com/od/adptips2006/qt/radiogroupbtns.htm
 begin
@@ -4167,7 +4284,7 @@ procedure TButtonControl_SetCaption(_bctrl: TButtonControl; const _Value: string
 begin
   THackButtonControl(_bctrl).Caption := _Value;
 end;
-*)
+{$ENDIF GExperts}
 type
   TButtonPopupMenuLink = class(TComponent)
   private
@@ -4223,14 +4340,14 @@ begin
   Result.OnClick := _OnClick;
   _pm.Items.Add(Result);
 end;
-(*
+{$IFNDEF GExperts}
 function TPopupMenu_AppendMenuItem(_pm: TPopupMenu; _Action: TBasicAction): TMenuItem;
 begin
   Result := TMenuItem.Create(_pm);
   Result.Action := _Action;
   _pm.Items.Add(Result);
 end;
-*)
+{$ENDIF GExperts}
 function TMainMenu_FindMenuItem(_mnu: TMainMenu; const _Name: string; out _miFound: TMenuItem): Boolean;
 begin
   Result := TMenuItem_FindMenuItem(_mnu.Items, _Name, _miFound);
@@ -4255,7 +4372,7 @@ begin
   end;
   Result := False;
 end;
-(*
+{$IFNDEF GExperts}
 function TMenuItem_AppendSubmenuItem(_mi: TMenuItem; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem;
 begin
   Result := TMenuItem.Create(_mi);
@@ -4445,7 +4562,7 @@ begin
   for i := 0 to _sl.Count - 1 do
     Items.Add.Caption := _sl[i];
 end;
-*)
+{$ENDIF GExperts}
 // This code is based on an idea from
 // http://delphi-wmi-class-generator.googlecode.com/svn/trunk/units/ListView_Helper.pas
 
@@ -4477,7 +4594,7 @@ begin
     _lv.Items.EndUpdate;
   end;
 end;
-(*
+{$IFNDEF GExperts}
 function TAction_SetCheckedExecute(_act: TCustomAction; _Checked: Boolean): Boolean;
 begin
   Result := _act.Checked <> _Checked;
@@ -4706,24 +4823,7 @@ begin
     FListView.Items.EndUpdate;
   inherited;
 end;
-*)
-type
-  TWindowProcHook = class(TComponent)
-  protected
-    FCtrl: TWinControl;
-    FOldWindowProc: TWndMethod;
-{$IFDEF dzMESSAGEDEBUG}
-    FMsgToStr: TWmMessageToString;
-{$ENDIF dzMESSAGEDEBUG}
-  protected
-    procedure WmNcCreate; virtual;
-    procedure WmNcDestroy; virtual;
-    procedure NewWindowProc(var _Msg: TMessage); virtual;
-  public
-    constructor Create(_WinControl: TWinControl); reintroduce;
-    destructor Destroy; override;
-  end;
-
+{$ENDIF GExperts}
 { TWindowProcHook }
 
 constructor TWindowProcHook.Create(_WinControl: TWinControl);
@@ -4770,6 +4870,35 @@ begin
 {$ENDIF dzMESSAGEDEBUG}
   // call original WindowProc method to handle all other messages
   FOldWindowProc(_Msg);
+end;
+
+// This and the calling function IsAutoSuggstionDropdownVisible are taken from mghie's answer on
+// http://stackoverflow.com/a/9228954/49925
+
+function EnumThreadWindowsProc(AWnd: HWND; AParam: LParam): BOOL; stdcall;
+var
+  WndClassName: string;
+  FoundAndVisiblePtr: PInteger;
+begin
+  SetLength(WndClassName, 1024);
+  GetClassName(AWnd, PChar(WndClassName), Length(WndClassName));
+  WndClassName := PChar(WndClassName);
+  if WndClassName = 'Auto-Suggest Dropdown' then begin // do not translate
+    FoundAndVisiblePtr := PInteger(AParam);
+    FoundAndVisiblePtr^ := Ord(IsWindowVisible(AWnd));
+    Result := False;
+  end else
+    Result := True;
+end;
+
+function TWindowProcHook.IsAutoSuggestDropdownVisible: Boolean;
+var
+  FoundAndVisible: Integer;
+begin
+  FoundAndVisible := 0;
+  EnumThreadWindows(GetCurrentThreadId, @EnumThreadWindowsProc,
+    LParam(@FoundAndVisible));
+  Result := FoundAndVisible > 0;
 end;
 
 type
@@ -4940,12 +5069,12 @@ begin
     FreeAndNil(sl);
   end;
 end;
-(*
+{$IFNDEF GExperts}
 function TForm_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFilesDropped): TObject;
 begin
   Result := TWinControl_ActivateDropFiles(_WinCtrl, _Callback);
 end;
-*)
+{$ENDIF GExperts}
 function TWinControl_ActivateDropFiles(_WinCtrl: TWinControl; _Callback: TOnFilesDropped): TObject;
 begin
   Result := TDropFilesActivator.Create(_WinCtrl, _Callback);
@@ -5038,12 +5167,12 @@ begin
 
   Res := SHAutoComplete(_ed.Handle, Options);
   Result := (Res = S_OK);
-(*
+{$IFNDEF GExperts}
   if not Result and (_ErrorHandling = ehRaiseException) then
     raise EOleException.Create(_('Call to SHAutoComplete failed.'), Res, 'Shlwapi.dll', '', 0);
-*)
+{$ENDIF GExperts}
 end;
-(*
+{$IFNDEF GExperts}
 type
   TFormPositioningActivator = class(TWindowProcHook)
   private
@@ -5055,7 +5184,7 @@ type
   public
     constructor Create(_Form: TForm; _Modifier: TShiftState);
   end;
-*)
+{$ENDIF GExperts}
 type
   TAutoCompleteActivator = class(TWindowProcHook)
   private
@@ -5092,35 +5221,6 @@ begin
   TEdit_SetAutocomplete(FCtrl as TCustomEdit, FSource, FType);
 end;
 
-// This and the calling function IsAutoSuggstionDropdownVisible are taken from mghie's answer on
-// http://stackoverflow.com/a/9228954/49925
-
-function EnumThreadWindowsProc(AWnd: HWND; AParam: LParam): BOOL; stdcall;
-var
-  WndClassName: string;
-  FoundAndVisiblePtr: PInteger;
-begin
-  SetLength(WndClassName, 1024);
-  GetClassName(AWnd, PChar(WndClassName), Length(WndClassName));
-  WndClassName := PChar(WndClassName);
-  if WndClassName = 'Auto-Suggest Dropdown' then begin // do not translate
-    FoundAndVisiblePtr := PInteger(AParam);
-    FoundAndVisiblePtr^ := Ord(IsWindowVisible(AWnd));
-    Result := False;
-  end else
-    Result := True;
-end;
-
-function IsAutoSuggestDropdownVisible: Boolean;
-var
-  FoundAndVisible: Integer;
-begin
-  FoundAndVisible := 0;
-  EnumThreadWindows(GetCurrentThreadId, @EnumThreadWindowsProc,
-    LParam(@FoundAndVisible));
-  Result := FoundAndVisible > 0;
-end;
-
 procedure TAutoCompleteActivator.NewWindowProc(var _Msg: TMessage);
 begin
   if (_Msg.Msg = CM_WANTSPECIALKEY) then begin
@@ -5139,13 +5239,13 @@ function TEdit_ActivateAutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSour
 begin
   Result := TAutoCompleteActivator.Create(_ed, _Source, _Type);
 end;
-(*
+{$IFNDEF GExperts}
 function TEdit_AutoComplete(_ed: TCustomEdit; _Source: TAutoCompleteSourceEnumSet = [acsFileSystem];
   _Type: TAutoCompleteTypeEnumSet = []): TObject;
 begin
   Result := TEdit_ActivateAutoComplete(_ed, _Source, _Type);
 end;
-*)
+{$ENDIF GExperts}
 function TActionlist_Append(_al: TActionList; const _Caption: string = ''): TAction;
 begin
   Result := TAction.Create(_al);
@@ -5171,7 +5271,7 @@ begin
   Result := TActionlist_Append(_al, _Caption, _ShortCut);
   Result.OnExecute := _OnExecute;
 end;
-(*
+{$IFNDEF GExperts}
 { TActionListShortcutHelper }
 
 constructor TActionListShortcutHelper.Create(_al: TActionList);
@@ -5244,46 +5344,27 @@ begin
     Action.SecondaryShortcuts.Add(ShortCutToText(SecondaryShortcuts[i]));
   end;
 end;
-*)
+
 function IsShiftDown: Boolean;
-var
-  State: TKeyboardState;
 begin
-  GetKeyboardState(State);
-  Result := ((State[vk_Shift] and 128) <> 0);
+  Result := u_dzOsUtils.IsShiftDown;
 end;
 
 function IsCtrlDown: Boolean;
-var
-  State: TKeyboardState;
 begin
-  GetKeyboardState(State);
-  Result := ((State[VK_CONTROL] and 128) <> 0);
+  Result := u_dzOsUtils.IsCtrlDown;
 end;
 
 function IsAltDown: Boolean;
-var
-  State: TKeyboardState;
 begin
-  GetKeyboardState(State);
-  Result := ((State[VK_MENU] and 128) <> 0);
+  Result := u_dzOsUtils.IsAltDown;
 end;
 
 function GetModifierKeyState: TShiftState;
-var
-  State: TKeyboardState;
 begin
-  Result := [];
-  if GetKeyboardState(State) then begin
-    if ((State[vk_Shift] and 128) <> 0) then
-      Include(Result, ssShift);
-    if ((State[VK_CONTROL] and 128) <> 0) then
-      Include(Result, ssCtrl);
-    if ((State[VK_MENU] and 128) <> 0) then
-      Include(Result, ssAlt);
-  end;
+  Result := u_dzOsUtils.GetModifierKeyState;
 end;
-
+{$ENDIF GExperts}
 type
   TExtKeyArr = array[0..13] of Word;
 const
@@ -5405,7 +5486,7 @@ begin
   TMonitor_MakeFullyVisible(_Monitor, re);
   _frm.BoundsRect := re;
 end;
-(*
+{$IFNDEF GExperts}
 function TScreen_GetPrimaryMonitor: TMonitor;
 var
   i: Integer;
@@ -5490,7 +5571,7 @@ class operator TRectLTWH.Implicit(_a: TRect): TRectLTWH;
 begin
   Result.Assign(_a);
 end;
-*)
+{$ENDIF GExperts}
 procedure TRectLTWH_Assign(var _LTWH: TRectLTWH; _Left, _Top, _Width, _Height: Integer);
 begin
   _LTWH.Left := _Left;
@@ -5508,7 +5589,7 @@ procedure TRectLTWH_AssignTLRB(var _LTWH: TRectLTWH; _Left, _Top, _Right, _Botto
 begin
   TRectLTWH_Assign(_LTWH, _Left, _Top, _Right - _Left, _Bottom - _Top);
 end;
-(*
+{$IFNDEF GExperts}
 procedure TForm_MoveTo(_frm: TCustomForm; _Position: TdzWindowPositions);
 
   procedure ToTop(var _Re: TRect; _MinHeight, _MaxHeight: Integer);
@@ -5675,9 +5756,185 @@ begin
   Result := TFormPositioningActivator.Create(_Form, _Modifier);
 end;
 
+{ TTrackBarHelper }
+
+constructor TTrackBarHelper.Create(_Owner: TComponent);
+var
+  tb: TTrackBar;
+begin
+  inherited Create(_Owner);
+
+  tb := TrackBar;
+  FOnChange := tb.OnChange;
+  tb.OnChange := HandleOnChange;
+end;
+
+procedure TTrackBarHelper.doOnChange(_Sender: TObject);
+begin
+  if Assigned(FOnChange) then
+    FOnChange(_Sender);
+end;
+
+procedure TTrackBarHelper.HandleOnChange(_Sender: TObject);
+var
+  tb: TTrackBar;
+begin
+  tb := TrackBar;
+  tb.Hint := IntToStr(tb.Position);
+  Application.ActivateHint(Mouse.CursorPos);
+  doOnChange(_Sender);
+end;
+
+function TTrackBarHelper.TrackBar: TTrackBar;
+begin
+  Result := (Owner as TTrackBar);
+end;
+
+function TTrackBar_EnableOnchangeHint(_tb: TTrackBar): TTrackBarHelper;
+begin
+  Result := TTrackBarHelper.Create(_tb);
+end;
+
+procedure TTrackBar_InitPercent(_tb: TTrackBar);
+begin
+  _tb.HandleNeeded;
+  _tb.Min := 0;
+  _tb.Max := 100;
+  _tb.TickStyle := tsAuto;
+  _tb.Frequency := 10;
+  _tb.PageSize := 10;
+end;
+
+procedure TTrackBar_HorizontalAddLabels(_trk: TTrackBar);
+const
+  FIRST_TICK_POSITION = 11;
+  SUBTRACTED_FROM_WIDTH = 2 * FIRST_TICK_POSITION + 1;
+var
+  i: Integer;
+  MeasureLbl: TLabel;
+  lbl: TLabel;
+  DeltaX: Double;
+  Frequency: Integer;
+  Span: Integer;
+  NamePrefix: string;
+  DeltaValue: Integer;
+  TickCount: Integer;
+  PixelPerValue: Double;
+  ThisLeft: Integer;
+  LastRight: Integer;
+begin
+  NamePrefix := _trk.Name + 'lbl';
+
+  Frequency := _trk.Frequency;
+  if Frequency = 0 then
+    Frequency := 1;
+
+  Span := _trk.Max - _trk.Min;
+  TickCount := (Span div Frequency) + 1;
+  DeltaValue := Frequency;
+
+  PixelPerValue := (_trk.Width - SUBTRACTED_FROM_WIDTH) / Span;
+  DeltaX := PixelPerValue * Frequency;
+
+  MeasureLbl := TLabel.Create(_trk);
+  try
+    MeasureLbl.Name := '';
+    MeasureLbl.Parent := _trk;
+    LastRight := 0;
+    for i := 0 to TickCount - 1 do begin
+      MeasureLbl.Caption := IntToStr(_trk.Min + i * DeltaValue);
+      ThisLeft := 1 + FIRST_TICK_POSITION + Round(i * DeltaX) - MeasureLbl.Width div 2;
+      if ThisLeft > LastRight then begin
+        lbl := TLabel.Create(_trk);
+        lbl.Name := NamePrefix + IntToStr(i);
+        lbl.Parent := _trk;
+        lbl.Caption := IntToStr(_trk.Min + i * DeltaValue);
+        lbl.Top := _trk.Height - lbl.Height - 1;
+        lbl.Left := ThisLeft;
+        LastRight := lbl.Left + lbl.Width;
+      end;
+    end;
+  finally
+    FreeAndNil(MeasureLbl);
+  end;
+end;
+
+procedure TTrackBar_VerticalAddLabels(_trk: TTrackBar);
+const
+  FIRST_TICK_POSITION = 11;
+  SUBTRACTED_FROM_HEIGHT = 2 * FIRST_TICK_POSITION + 1;
+var
+  i: Integer;
+  MeasureLbl: TLabel;
+  lbl: TLabel;
+  DeltaX: Double;
+  Frequency: Integer;
+  Span: Integer;
+  NamePrefix: string;
+  DeltaValue: Integer;
+  TickCount: Integer;
+  PixelPerValue: Double;
+  ThisTop: Integer;
+  LastBottom: Integer;
+begin
+  NamePrefix := _trk.Name + 'lbl';
+
+  Frequency := _trk.Frequency;
+  if Frequency = 0 then
+    Frequency := 1;
+
+  Span := _trk.Max - _trk.Min;
+  TickCount := (Span div Frequency) + 1;
+  DeltaValue := Frequency;
+
+  PixelPerValue := (_trk.Height - SUBTRACTED_FROM_HEIGHT) / Span;
+  DeltaX := PixelPerValue * Frequency;
+
+  MeasureLbl := TLabel.Create(_trk);
+  try
+    MeasureLbl.Name := '';
+    MeasureLbl.Parent := _trk;
+    LastBottom := 0;
+    for i := 0 to TickCount - 1 do begin
+      MeasureLbl.Caption := IntToStr(_trk.Min + i * DeltaValue);
+      ThisTop := -1 + FIRST_TICK_POSITION + Round(i * DeltaX) - MeasureLbl.Height div 2;
+      if ThisTop > LastBottom then begin
+        lbl := TLabel.Create(_trk);
+        lbl.Name := NamePrefix + IntToStr(i);
+        lbl.Parent := _trk;
+        lbl.Caption := IntToStr(_trk.Min + i * DeltaValue);
+        lbl.Top := ThisTop;
+        lbl.Left := _trk.Width - lbl.Width - 1;
+        LastBottom := lbl.Top + lbl.Height;
+      end;
+    end;
+  finally
+    FreeAndNil(MeasureLbl);
+  end;
+end;
+
+procedure TTrackBar_AddLabels(_trk: TTrackBar);
+var
+  NamePrefix: string;
+  i: Integer;
+  cmp: TComponent;
+begin
+  NamePrefix := _trk.Name + 'lbl';
+  for i := _trk.ComponentCount - 1 downto 0 do begin
+    cmp := _trk.Components[i];
+    if (cmp is TLabel) and StartsText(NamePrefix, TLabel(cmp).Name) then
+      FreeAndNil(cmp);
+  end;
+
+  if _trk.Orientation = trHorizontal then
+    TTrackBar_HorizontalAddLabels(_trk)
+  else
+    TTrackBar_VerticalAddLabels(_trk)
+end;
+
 initialization
 finalization
   FreeAndNil(gblCheckListBoxHelper);
 end.
-*)
+{$ENDIF GExperts}
 end.
