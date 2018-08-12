@@ -141,7 +141,7 @@ constructor TfmReplaceCompMapDets.Create(Owner: TComponent; ConfigData: TReplace
   Item: TCompRepMapItem; DataAction: TDataAction);
 begin
   inherited Create(Owner);
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
   SetToolbarGradient(ToolBar);
   Assert(Assigned(ConfigData));
   Assert(Assigned(Item));

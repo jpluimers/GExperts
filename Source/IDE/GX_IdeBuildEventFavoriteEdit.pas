@@ -61,7 +61,7 @@ constructor Tf_IdeBuildEventFavoriteEdit.Create(_Owner: TComponent);
 begin
   inherited;
 
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
   TWinControl_ActivateDropFiles(ed_Command, HandleFilesDropped);
 end;
 

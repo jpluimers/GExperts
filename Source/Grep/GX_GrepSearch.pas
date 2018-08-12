@@ -126,7 +126,7 @@ implementation
 uses
   SysUtils, Windows, Messages, Graphics, StrUtils, Menus, RegExpr, Math,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions,
-  GX_GrepRegExSearch, GX_dzVclUtils;
+  GX_GrepRegExSearch, GX_dzVclUtils, GX_dzOsUtils;
 
 resourcestring
   SGrepResultsNotActive = 'The Grep Results window is not active';
@@ -741,7 +741,7 @@ end;
 
 procedure TfmGrepSearch.FormShow(Sender: TObject);
 begin
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
 end;
 
 procedure TfmGrepSearch.ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

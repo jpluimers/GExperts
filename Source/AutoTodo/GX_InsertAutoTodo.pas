@@ -339,7 +339,7 @@ begin
   TButton_AddDropdownMenu(btnInsertPlaceholder, pmuPlaceholders);
   mmoTextToInsert.Lines.Text := TAutoTodoHandler.GetDefaultTextToInsert;
 
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
 end;
 
 procedure TfmInsertAutoTodoForm.GetData(var AUsername, ATextToInsert: string;
