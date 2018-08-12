@@ -42,11 +42,34 @@ function GetFileBuildInfo(const _Filename: string;
 function GetModuleFilename: string; overload;
 function GetModuleFilename(const _Module: Cardinal): string; overload;
 
+///<summary>
+/// @returns true, if the Ctrl key is currently pressed </summary>
+function IsCtrlDown: Boolean;
+///<summary>
+/// @returns true, if the Shift key is currently pressed </summary>
+function IsShiftDown: Boolean;
+
 implementation
 
 uses
   Registry,
   ShellApi;
+
+function IsShiftDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[vk_Shift] and 128) <> 0);
+end;
+
+function IsCtrlDown: Boolean;
+var
+  State: TKeyboardState;
+begin
+  GetKeyboardState(State);
+  Result := ((State[VK_CONTROL] and 128) <> 0);
+end;
 
 function GetModuleFilename(const _Module: Cardinal): string;
 var
