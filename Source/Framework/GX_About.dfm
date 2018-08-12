@@ -79,7 +79,7 @@ object fmAbout: TfmAbout
   end
   object lblPreRelease1: TLabel
     Left = 241
-    Top = 27
+    Top = 19
     Width = 101
     Height = 19
     Alignment = taCenter
@@ -89,7 +89,7 @@ object fmAbout: TfmAbout
   end
   object lblPreRelease2: TLabel
     Left = 489
-    Top = 27
+    Top = 19
     Width = 101
     Height = 19
     Alignment = taCenter
