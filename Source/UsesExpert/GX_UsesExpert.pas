@@ -299,7 +299,7 @@ uses
 {$IFOPT D+}
   GX_DbugIntf,
 {$ENDIF D+}
-  GX_UsesExpertOptions, GX_MessageBox;
+  GX_UsesExpertOptions, GX_MessageBox, GX_dzOsUtils;
 
 
 { TUsesExpert }
@@ -491,12 +491,12 @@ begin
   sg_Identifiers.Cells[1, 0] := 'Unit';
   sg_Identifiers.Cells[0, 1] := 'searching ...';
 
-  TStringGrid_AdjustRowHight(sg_Interface);
-  TStringGrid_AdjustRowHight(sg_Implementation);
-  TStringGrid_AdjustRowHight(sg_SearchPath);
-  TStringGrid_AdjustRowHight(sg_Project);
-  TStringGrid_AdjustRowHight(sg_Favorite);
-  TStringGrid_AdjustRowHight(sg_Identifiers);
+  TStringGrid_AdjustRowHeight(sg_Interface);
+  TStringGrid_AdjustRowHeight(sg_Implementation);
+  TStringGrid_AdjustRowHeight(sg_SearchPath);
+  TStringGrid_AdjustRowHeight(sg_Project);
+  TStringGrid_AdjustRowHeight(sg_Favorite);
+  TStringGrid_AdjustRowHeight(sg_Identifiers);
 end;
 
 procedure TfmUsesManager.GetProjectFiles;

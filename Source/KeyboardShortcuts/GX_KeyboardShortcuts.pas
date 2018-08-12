@@ -218,7 +218,7 @@ begin
     end;
   end;
 
-  TStringGrid_AdjustRowHight(sg_Actions);
+  TStringGrid_AdjustRowHeight(sg_Actions);
   TGrid_Resize(sg_Actions, [roUseGridWidth, roUseAllRows, roReduceMinWidth]);
 end;
 
