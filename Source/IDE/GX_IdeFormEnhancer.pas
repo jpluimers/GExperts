@@ -24,9 +24,9 @@ type
 implementation
 
 uses Windows, Dialogs, ExtCtrls,
-  ActnList, Menus, ExtDlgs, StdCtrls, TypInfo, ComCtrls, Contnrs,
-  GX_GenericUtils, GX_ConfigurationInfo, GX_IdeUtils, GX_EventHook,
-  GX_dzVclUtils, GX_dzClassUtils, GX_IdeFormChangeManager, GX_IdeManagedFormHandler,
+  ActnList, Menus, ComCtrls, 
+  GX_GenericUtils, GX_ConfigurationInfo, 
+  GX_dzVclUtils, GX_IdeFormChangeManager, GX_IdeManagedFormHandler,
   GX_IdeManagedForm;
 
 type

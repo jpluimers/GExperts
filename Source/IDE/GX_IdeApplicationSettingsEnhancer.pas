@@ -29,9 +29,7 @@ uses
   GX_IdeProjectOptionsEnhancer,
   GX_dzVclUtils,
   GX_IdeFormEnhancer,
-  GX_IdeFavoritesList,
   GX_ConfigurationInfo,
-  GX_IdeBuildEventFavoriteEdit,
   GX_dzClassUtils,
   GX_VerDepConst,
   GX_IdeDialogEnhancer;

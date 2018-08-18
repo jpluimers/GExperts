@@ -34,11 +34,10 @@ type
 
 implementation
 
-uses
-  StrUtils,
-  GX_dzVclUtils;
-
 {$R *.dfm}
+
+uses
+  GX_dzVclUtils;
 
 { Tf_IdeBuildEventFavoriteEdit }
 

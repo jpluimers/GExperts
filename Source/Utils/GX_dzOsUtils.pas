@@ -51,10 +51,6 @@ function IsShiftDown: Boolean;
 
 implementation
 
-uses
-  Registry,
-  ShellApi;
-
 function IsShiftDown: Boolean;
 var
   State: TKeyboardState;

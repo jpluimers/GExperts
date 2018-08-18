@@ -32,18 +32,11 @@ uses Windows,
   ExtCtrls,
   ActnList,
   Menus,
-  ExtDlgs,
-  StdCtrls,
-  TypInfo,
   ComCtrls,
-  Contnrs,
   GX_GenericUtils,
   GX_ConfigurationInfo,
-  GX_IdeUtils,
   GX_EventHook,
-  GX_dzVclUtils,
-  GX_dzClassUtils,
-  GX_IdeManagedForm;
+  GX_dzVclUtils;
 
 type
   TFormChangeCallbackItem = class

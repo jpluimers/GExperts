@@ -18,7 +18,6 @@ implementation
 uses
 {$IFOPT D+}GX_DbugIntf,
 {$ENDIF}
-  ToolsAPI,
   Windows,
   Messages,
   Forms,
@@ -29,7 +28,6 @@ uses
   Graphics,
   GX_OtaUtils,
   GX_dzClassUtils,
-  GX_UnitPositions,
   GX_IdeFormEnhancer,
   GX_IdeDialogEnhancer,
   GX_GExperts;

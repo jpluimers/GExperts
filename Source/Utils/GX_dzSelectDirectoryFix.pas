@@ -9,7 +9,6 @@ interface
 uses
   Windows,
   SysUtils,
-  FileCtrl,
   Controls;
 
 ///<summary>
@@ -30,7 +29,6 @@ function dzSelectDirectory(const Caption: string; const Root: WideString;
 implementation
 
 uses
-  Consts,
   ShlObj,
   ActiveX,
   Dialogs,

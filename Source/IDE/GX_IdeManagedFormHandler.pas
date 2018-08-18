@@ -78,8 +78,6 @@ type
 
 implementation
 
-uses
-  GX_dzClassUtils;
 
 var
   gblFormHandlers: TList = nil;

@@ -30,8 +30,6 @@ type
 
 implementation
 
-uses
-  GX_dzClassUtils;
 
 { TIdeDialogEnhancer }
 
