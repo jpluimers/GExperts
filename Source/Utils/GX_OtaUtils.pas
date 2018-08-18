@@ -670,7 +670,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
-  GX_EditReader, GX_VerDepConst, SynUnicode, Math,
+  GX_EditReader, GX_VerDepConst, SynUnicode, Math, StrUtils,
   GX_GetIdeVersion, GX_dzFileUtils;
 
 const
@@ -5087,11 +5087,18 @@ begin
 end;
 
 function HackBadEditorStringToNativeString(const S: string): string;
+var
+  len: Integer;
 begin
   if IDEEditorEncodingIsUTF8 then
     Result := IDEEditorStringToString(UTF8String(Pointer(S)))
   else
     Result := S;
+  len := Length(Result);
+  while (len >0) and (Result[len] = #0) do begin
+    Dec(len);
+    Result := LeftStr(Result, len);
+  end;
 end;
 
 { TBaseIdeNotifier }
