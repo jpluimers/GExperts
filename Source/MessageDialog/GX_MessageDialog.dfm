@@ -1407,6 +1407,15 @@ object fmMessageDialog: TfmMessageDialog
         Height = 17
         Caption = '&Quote message text'
         TabOrder = 0
+        OnClick = chkQuotesClick
+      end
+      object chkGNUGettext: TCheckBox
+        Left = 295
+        Top = 2
+        Width = 186
+        Height = 17
+        Caption = 'Add _(...) for &GNU Gettext'
+        TabOrder = 1
       end
     end
   end

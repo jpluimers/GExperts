@@ -15,6 +15,7 @@ type
 type
   TSourceType = (stPascal, stCpp);
   TDialogBoxType = (dlgMessageBox, dlgMessageDlg);
+  TGnuGetTextFunction = (ggtUnderscore, ggtGetText);
 
   TAbstractMessageType = class(TObject)
   protected
@@ -28,6 +29,8 @@ type
     FButtonSeparator: string;
     FQuoteCaption: Boolean;
     FQuoteCharacter: string;
+    FGnuGetTextFunction: TGnuGetTextFunction;
+    FGnuGetTextSupport: Boolean;
   public
     procedure ShowModal; virtual; abstract;
     function GetCode: string; virtual; abstract;
@@ -41,17 +44,23 @@ type
     property ButtonSeparator: string read FButtonSeparator write FButtonSeparator;
     property QuoteCaption: Boolean read FQuoteCaption write FQuoteCaption;
     property QuoteCharacter: string read FQuoteCharacter write FQuoteCharacter;
+    property GnuGetTextFunction: TGnuGetTextFunction read FGnuGetTextFunction write FGnuGetTextFunction;
+    property GnuGetTextSupport: Boolean read FGnuGetTextSupport write FGnuGetTextSupport;
   end;
 
   TMessageDialogSettings = class(TObject)
   private
     FConcatenationString: string;
     FCppConcatenationString: string;
+    FGnuGetTextFunction: TGnuGetTextFunction;
+    FGnuGetTextIndividual: Boolean;
     FSourceType: TSourceType;
   public
     constructor Create;
     property ConcatenationString: string read FConcatenationString write FConcatenationString;
     property CppConcatenationString: string read FCppConcatenationString write FCppConcatenationString;
+    property GnuGetTextFunction: TGnuGetTextFunction read FGnuGetTextFunction write FGnuGetTextFunction;
+    property GnuGetTextIndividual: Boolean read FGnuGetTextIndividual write FGnuGetTextIndividual;
     property SourceType: TSourceType read FSourceType write FSourceType;
   end;
 
@@ -150,6 +159,7 @@ type
     mmoMessage: TMemo;
     pnlMessageTop: TPanel;
     chkQuotes: TCheckBox;
+    chkGNUGettext: TCheckBox;
     lblMessage: TLabel;
     pnlButtonsRight: TPanel;
     btnHelp: TButton;
@@ -171,6 +181,7 @@ type
     procedure mmoMessageKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure pgeMessageDialogChange(Sender: TObject);
     procedure cbxTypeEmbeddedChange(Sender: TObject);
+    procedure chkQuotesClick(Sender: TObject);
   private
     FFunctionResultsGroupBox: TGroupBox;
     FMessageType: TAbstractMessageType;
@@ -215,6 +226,8 @@ type
     function GetModality: string;
     procedure SetModality(const Value: string);
     function ModalityString: string;
+    function GetGNUGettextSupport: Boolean;
+    procedure SetGNUGettextSupport(const Value: Boolean);
 
     property AllDialogButtons: string read GetAllDialogButtons write SetAllDialogButtons;
     property AllFunctionResults: string read GetAllFunctionResults write SetAllFunctionResults;
@@ -228,6 +241,7 @@ type
     property EmbedSelection: Integer read GetEmbedSelection write SetEmbedSelection;
     property FunctionResults: string read GetFunctionResults write SetFunctionResults;
     property Quotes: Boolean read GetQuotes write SetQuotes;
+    property GNUGettextSupport: Boolean read GetGNUGettextSupport write SetGNUGettextSupport;
     property DialogBoxType: string read GetDialogBoxType write SetDialogBoxType;
   public
     constructor Create(AOwner: TComponent; Settings: TMessageDialogSettings); reintroduce;
@@ -300,6 +314,9 @@ type
     FMessageType: TAbstractMessageType;
     FUsesUnit: string;
     FUsesUnitCLX: string;
+    FGNUGettextSupport: Boolean;
+    FGnuGettextFunction: TGnuGetTextFunction;
+    FGnuGettextIndividual: Boolean;
     procedure SetDialogTypText(const Value: string);
     procedure SetText(const Value: TStrings);
     procedure SetFunctionResults(const Value: TStrings);
@@ -315,6 +332,9 @@ type
     property HelpContext: Integer read FHelpContext write FHelpContext;
     property Text: TStrings read FText write SetText;
     property Quotes: Boolean read FQuotes write FQuotes;
+    property GNUGettextSupport: Boolean read FGNUGettextSupport write FGNUGettextSupport;
+    property GnuGettextFunction: TGnuGetTextFunction read FGnuGettextFunction write FGnuGettextFunction;
+    property GnuGettextIndividual: Boolean read FGnuGettextIndividual write FGnuGettextIndividual;
     property EmbedIndex: Integer read FEmbedIndex write FEmbedIndex;
     property MessageType: TAbstractMessageType read FMessageType write FMessageType;
     property UsesUnit: string read FUsesUnit write FUsesUnit;
@@ -351,6 +371,11 @@ begin
   imgInformationMsgBox.Picture := imgInformation.Picture;
   imgConfirmationMsgBox.Picture := imgConfirmation.Picture;
   pgeMessageBoxOptions.ActivePageIndex := 0;
+
+  if FSettings.GnuGetTextFunction = ggtUnderscore then
+    chkGNUGettext.Caption := 'Add _(...) for &GNU Gettext'
+  else
+    chkGNUGettext.Caption := 'Add GetText(...) for &GNU Gettext'
 end;
 
 function TfmMessageDialog.AssembleGroupBoxCheckBoxesText(GroupBox: TGroupBox): string;
@@ -570,6 +595,9 @@ begin
     Builder.CppConcatString := FSettings.CppConcatenationString;
     Builder.Text := mmoMessage.Lines;
     Builder.Quotes := chkQuotes.Checked;
+    Builder.GNUGettextSupport := chkGNUGettext.Checked;
+    Builder.GnuGettextFunction := FSettings.GnuGetTextFunction;
+    Builder.GnuGettextIndividual := FSettings.GnuGetTextIndividual;
     Builder.EmbedIndex := cbxTypeEmbedded.ItemIndex;
     Builder.MessageType := FMessageType;
     Result := Builder.GetCode;
@@ -578,6 +606,11 @@ begin
   finally
     FreeAndNil(Builder);
   end;
+end;
+
+function TfmMessageDialog.GetGNUGettextSupport: Boolean;
+begin
+  Result := chkGNUGettext.Checked;
 end;
 
 function TfmMessageDialog.GetQuotes: Boolean;
@@ -628,7 +661,13 @@ const
   MsgExpMsgHelpContextDefault = 0;
   MsgExpMsgEmbed = 'Embed';
   MsgExpMsgQuotesIdent = 'Quotes';
+  MsgExpMsgGNUGettextSupportIdent = 'GNUGettextSupport';
+  MsgExpMsgGNUGettextFunctionIdent = 'MsgExpMsgGNUGettextFunction';
+  MsgExpMsgGNUGettextIndividualIdent = 'MsgExpMsgGNUGettextIndividual';
   MsgExpMsgQuotesDefault = True;
+  MsgExpMsgGNUGettextSupportDefault = False;
+  MsgExpMsgGNUGettextFunctionDefault = ggtUnderscore;
+  MsgExpMsgGNUGettextIndividualDefault = False;
   MsgExpMsgActivePageIdent = 'ActivePage';
   MsgExpMsgActivePageDefault = 0;
   MsgExpMsgCaptionQuotesIdent = 'TitleQuotes';
@@ -659,6 +698,7 @@ begin
     ExpSettings.WriteInteger(MsgExpMsgHelpContextIdent, DialogHelpContext);
     ExpSettings.WriteInteger(MsgExpMsgEmbed, EmbedSelection);
     ExpSettings.WriteBool(MsgExpMsgQuotesIdent, Quotes);
+    ExpSettings.WriteBool(MsgExpMsgGNUGettextSupportIdent, GNUGettextSupport);
     ExpSettings.WriteBool(MsgExpMsgCaptionQuotesIdent, CaptionQuotes);
     ExpSettings.WriteString(MsgExpMsgDefaultButtonIdent, DefaultButton);
     ExpSettings.WriteBool(MsgExpMsgEnableDefaultButtonIdent, DefaultButtonCheckbox);
@@ -692,6 +732,7 @@ begin
     AllFunctionResults := ExpSettings.ReadString(MsgExpMsgFunctionResultsIdent, MsgExpMsgFunctionResultsDefault);
     DialogHelpContext := ExpSettings.ReadInteger(MsgExpMsgHelpContextIdent, MsgExpMsgHelpContextDefault);
     Quotes := ExpSettings.ReadBool(MsgExpMsgQuotesIdent, MsgExpMsgQuotesDefault);
+    GNUGettextSupport := ExpSettings.ReadBool(MsgExpMsgGNUGettextSupportIdent, MsgExpMsgGNUGettextSupportDefault);
     CaptionQuotes := ExpSettings.ReadBool(MsgExpMsgCaptionQuotesIdent, MsgExpMsgCaptionQuotesDefault);
     DefaultButton := ExpSettings.ReadString(MsgExpMsgDefaultButtonIdent, MsgExpMsgDefaultButtonDefault);
     DefaultButtonCheckbox := ExpSettings.ReadBool(MsgExpMsgEnableDefaultButtonIdent, MsgExpMsgEnableDefaultButtonDefault);
@@ -747,6 +788,8 @@ begin
   FMessageType.QuoteCaption := CaptionQuotes;
   FMessageType.HelpContext := udHelpContext.Position;
   FMessageType.Caption := edtMsgBoxCaption.Text;
+  FMessageType.GnuGetTextSupport :=chkGNUGettext.Checked;
+  FMessageType.GnuGetTextFunction := FSettings.GnuGetTextFunction;
 end;
 
 procedure TfmMessageDialog.SetAllDialogButtons(const SelectedButtons: string);
@@ -802,6 +845,11 @@ begin
   DistributeGroupBoxCheckBoxesText(SelectedFunctionResults, FFunctionResultsGroupBox);
 end;
 
+procedure TfmMessageDialog.SetGNUGettextSupport(const Value: Boolean);
+begin
+  chkGNUGettext.Checked := Value;
+end;
+
 procedure TfmMessageDialog.SetQuotes(const Value: Boolean);
 begin
   chkQuotes.Checked := Value;
@@ -844,6 +892,11 @@ end;
 procedure TfmMessageDialog.cbxTypeEmbeddedChange(Sender: TObject);
 begin
   FixControlsEnablement(False);
+end;
+
+procedure TfmMessageDialog.chkQuotesClick(Sender: TObject);
+begin
+  chkGNUGettext.Visible := chkQuotes.Checked;
 end;
 
 destructor TfmMessageDialog.Destroy;
@@ -945,28 +998,25 @@ begin
     Settings.ReadString(MsgDlgConcateIdent, FSettings.ConcatenationString);
   FSettings.CppConcatenationString :=
     Settings.ReadString(MsgDlgCppConcateIdent, FSettings.CppConcatenationString);
+  FSettings.GnuGetTextFunction := TGnuGetTextFunction(Settings.ReadEnumerated(
+    MsgExpMsgGNUGettextFunctionIdent, TypeInfo(TGnuGetTextFunction), Ord(MsgExpMsgGNUGettextFunctionDefault)));
+  FSettings.GnuGetTextIndividual := Settings.ReadBool(MsgExpMsgGNUGettextIndividualIdent, MsgExpMsgGNUGettextIndividualDefault);
 end;
 
 procedure TMsgExpExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   Settings.WriteString(MsgDlgConcateIdent, FSettings.ConcatenationString);
   Settings.WriteString(MsgDlgCppConcateIdent, FSettings.CppConcatenationString);
+  Settings.WriteEnumerated(MsgExpMsgGNUGettextFunctionIdent,TypeInfo(TGnuGetTextFunction), Ord(FSettings.GNUGettextFunction));
+  Settings.WriteBool(MsgExpMsgGNUGettextIndividualIdent, FSettings.GNUGettextIndividual);
   inherited InternalSaveSettings(Settings);
 end;
 
 procedure TMsgExpExpert.Configure;
 begin
-  with TfmMessageOptions.Create(nil) do
-  try
-    edtMsgString.Text := FSettings.FConcatenationString;
-    edtCppMsgString.Text := FSettings.FCppConcatenationString;
-    if ShowModal = mrOk then
-    begin
-      FSettings.FConcatenationString := edtMsgString.Text;
-      FSettings.FCppConcatenationString := edtCppMsgString.Text;
-    end;
-  finally
-    Free;
+  if TfmMessageOptions.Execute(nil,
+    FSettings.FConcatenationString, FSettings.FCppConcatenationString,
+    FSettings.FGnuGetTextFunction, FSettings.FGnuGetTextIndividual) then begin
   end;
 end;
 
@@ -1034,11 +1084,26 @@ end;
 
 function TCppMessageDialogBuilder.GetCode: string;
 
+  function SurroundGnuGettext(Value: string): string;
+  begin
+    if not FGNUGettextSupport then begin
+      Result := Value;
+    end else begin
+      if FGnuGetTextFunction = ggtUnderscore then
+        Result := '_(' + Value + ')'
+      else
+        Result := 'GetText(' + Value + ')';
+    end;
+  end;
+
   function BuildString(Value: string): string;
   begin
-    if (FQuotes) then
-      Result := EscapeForCpp(Value)
-    else
+    if FQuotes then begin
+      Result := EscapeForCpp(Value);
+      if FGNUGettextSupport and FGnuGetTextIndividual then begin
+        Result := SurroundGnuGettext('"' + Result + '"');
+      end;
+    end else
       Result := Value;
   end;
 
@@ -1086,20 +1151,33 @@ function TCppMessageDialogBuilder.GetCode: string;
 
 var
   i: Integer;
+  ConcatStr: string;
 begin
+  if FQuotes and FGnuGetTextSupport and FGnuGetTextIndividual then
+    ConcatStr := '+"' + CppConcatString + '"+'
+  else
+    ConcatStr := CppConcatString;
+
   Result := '';
   if FText.Count > 0 then
   begin
     for i := 0 to FText.Count - 2 do
     begin
       Result := Result + BuildString(FText[i]);
-      Result := Result + CppConcatString;
+      Result := Result + ConcatStr;
     end;
     Result := Result + BuildString(FText[FText.Count - 1]);
   end;
 
-  if FQuotes then
-    Result := '"' + Result + '"';
+  if FQuotes then begin
+    if FGnuGetTextSupport then begin
+      if not FGnuGetTextIndividual then begin
+        Result := SurroundGnuGettext('"' + Result + '"');
+      end;
+    end else begin
+      Result := '"' + Result + '"';
+    end;
+  end;
   FMessageType.QuoteCharacter := '"';
   if FMessageType is TMessageDialogType then
   begin
@@ -1136,11 +1214,26 @@ end;
 
 function TPascalMessageDialogBuilder.GetCode: string;
 
+  function SurroundGnuGettext(Value: string): string;
+  begin
+    if not FGNUGettextSupport then begin
+      Result := Value;
+    end else begin
+      if FGnuGetTextFunction = ggtUnderscore then
+        Result := '_(' + Value + ')'
+      else
+        Result := 'GetText(' + Value + ')';
+    end;
+  end;
+
   function BuildString(Value: string): string;
   begin
-    if (FQuotes) then
-      Result := QuotedStr(Value)
-    else
+    if FQuotes then begin
+      Result := QuotedStr(Value);
+      if FGNUGettextSupport and FGnuGetTextIndividual then begin
+        Result := SurroundGnuGettext(Result);
+      end;
+    end else
       Result := Value;
   end;
 
@@ -1184,8 +1277,14 @@ begin
     Result := Result + BuildString(FText[FText.Count - 1]);
   end;
 
-  if (Result = '') and (FQuotes) then
-    Result := #39#39;
+  if Result <> '' then begin
+    if FGNUGettextSupport and not FGnuGetTextIndividual then
+      Result := SurroundGnuGettext(Result);
+  end else begin
+    if FQuotes then begin
+      Result := SurroundGnuGettext(#39#39);
+    end;
+  end;
 
   FMessageType.QuoteCharacter := #39;
 
@@ -1201,7 +1300,7 @@ begin
   else
   begin
     FMessageType.ButtonSeparator := ' or ';
-    FMessageType.ParameterFormat := '(0, %s, %s, %s)';
+    FMessageType.ParameterFormat := '(0, PChar(%s), PChar(%s), %s)';
     FUsesUnit := 'Windows';
     FUsesUnitCLX := 'Windows';
   end;
@@ -1292,13 +1391,19 @@ end;
 
 function TMessageBoxType.GetCode: string;
 var
-  Quote: string;
+  Title: string;
 begin
-  if QuoteCaption then
-    Quote := FQuoteCharacter
-  else
-    Quote := '';
-  Result := Format(FCommand + ParameterFormat, [FMessage, Quote + FCaption + Quote,
+  if QuoteCaption then begin
+    Title := FQuoteCharacter + FCaption + FQuoteCharacter;
+    if GnuGetTextSupport then begin
+      if FGnuGetTextFunction = ggtUnderscore then
+        Title := '_(' + Title + ')'
+      else
+        Title := 'GetText(' + Title + ')';
+    end;
+  end else
+    Title := FCaption;
+  Result := Format(FCommand + ParameterFormat, [FMessage, Title,
     StringReplace(AnsiUpperCase(FButtons), ',', FButtonSeparator, [rfReplaceAll, rfIgnoreCase])]);
 end;
 
