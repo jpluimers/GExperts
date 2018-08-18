@@ -12,7 +12,6 @@ uses
   Controls,
   Forms,
   Dialogs,
-  StdCtrls,
   Graphics,
   GX_Experts,
   GX_BaseForm;
@@ -39,7 +38,6 @@ implementation
 uses
 {$IFOPT D+}GX_DbugIntf,
 {$ENDIF}
-  Registry,
   Menus,
   StrUtils,
   Actions,
