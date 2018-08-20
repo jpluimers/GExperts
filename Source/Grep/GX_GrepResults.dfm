@@ -1023,9 +1023,6 @@ inherited fmGrepResults: TfmGrepResults
       object N9: TMenuItem
         Caption = '-'
       end
-      object oolbar1: TMenuItem
-        Action = actViewToolBar
-      end
       object ShowMatchContext1: TMenuItem
         Action = actViewShowContext
       end

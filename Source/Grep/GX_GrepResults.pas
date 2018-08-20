@@ -222,7 +222,6 @@ type
     Expand1: TMenuItem;
     Options1: TMenuItem;
     N9: TMenuItem;
-    oolbar1: TMenuItem;
     ShowMatchContext1: TMenuItem;
     ShowHistoryList1: TMenuItem;
     N10: TMenuItem;
@@ -853,7 +852,8 @@ begin
   WindowSettings := Settings.CreateExpertSettings('Window');
   try
     WindowSettings.WriteBool('OnTop', StayOnTop);
-    WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
+    if IsStandAlone then
+      WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
     WindowSettings.WriteBool('ShowContext', ShowContext);
     WindowSettings.WriteBool('ShowHistoryList', ShowHistoryList);
 
@@ -918,7 +918,11 @@ begin
     WindowSettings := ExpSettings.CreateExpertSettings('Window');
     EnsureFormVisible(Self);
     StayOnTop := WindowSettings.ReadBool('OnTop', True);
-    ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible);
+    if IsStandAlone then
+      ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible)
+    else
+      ToolBar.Visible := True;
+
     ShowContext := WindowSettings.ReadBool('ShowContext', True);
 
     for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
