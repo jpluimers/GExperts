@@ -28,5 +28,7 @@ object fmGxKeyboardShortcuts: TfmGxKeyboardShortcuts
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
     TabOrder = 0
     OnDrawCell = sg_ActionsDrawCell
+    OnMouseWheelDown = sg_ActionsMouseWheelDown
+    OnMouseWheelUp = sg_ActionsMouseWheelUp
   end
 end

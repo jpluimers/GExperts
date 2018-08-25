@@ -5,6 +5,7 @@ unit GX_KeyboardShortcuts;
 interface
 
 uses
+  Windows,
   SysUtils,
   Classes,
   Grids,
@@ -21,11 +22,17 @@ type
     sg_Actions: TStringGrid;
     procedure sg_ActionsDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
+    procedure sg_ActionsMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure sg_ActionsMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
   private
     function CompareShortcuts(_Idx1, _Idx2: Integer): Integer;
     procedure SwapEntries(_Idx1, _Idx2: Integer);
     procedure DrawStringGridCell(_sg: TStringGrid; const _Text: string;
       const _Rect: TRect; _State: TGridDrawState; _Duplicate: Boolean);
+    function ScrollGrid(_Grid: TStringGrid; _Direction: Integer; _Shift: TShiftState;
+      _MousePos: TPoint): Boolean;
   public
     class procedure Execute(_bmp: TBitmap);
     constructor Create(_Owner: TComponent); override;
@@ -40,6 +47,7 @@ uses
 {$ENDIF}
   Menus,
   StrUtils,
+  Math,
   Actions,
   ActnList,
   GX_GExperts,
@@ -120,6 +128,28 @@ begin
   end;
 end;
 
+function TfmGxKeyboardShortcuts.ScrollGrid(_Grid: TStringGrid; _Direction: Integer;
+  _Shift: TShiftState; _MousePos: TPoint): Boolean;
+var
+  LScrollLines: Integer;
+  NewRow: Integer;
+begin
+  if SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, @LScrollLines, 0) then begin
+    if _Shift = [ssCtrl] then
+      LScrollLines := LScrollLines * 3; // Ctrl = Speed
+    if _Shift = [ssShift] then
+      LScrollLines := 1;
+
+    NewRow := _Grid.Row + (_Direction * LScrollLines);
+    NewRow := Max(_Grid.FixedRows, NewRow); // Limit to top row
+    NewRow := Min(_Grid.RowCount - 1, NewRow); // Limit to bottom row
+
+    _Grid.Row := NewRow;
+    Result := True;
+  end else
+    Result := False;
+end;
+
 function ShortcutToSortText(_Shortcut: TShortCut): string;
 
   function ShiftToChar(_KeyIsSet: Boolean; _c: Char): Char;
@@ -157,7 +187,7 @@ var
   i: Integer;
   ContAct: TContainedAction;
   act: TCustomAction;
-  row: Integer;
+  Row: Integer;
   j: Integer;
   ShortCut: TShortCut;
   s: string;
@@ -170,18 +200,21 @@ begin
   sg_Actions.Cells[1, 0] := 'Action';
   sg_Actions.Cells[2, 0] := 'Caption';
 
-  row := sg_Actions.FixedRows;
+  sg_Actions.OnMouseWheelDown := sg_ActionsMouseWheelDown;
+  sg_Actions.OnMouseWheelUp := sg_ActionsMouseWheelUp;
+
+  Row := sg_Actions.FixedRows;
   for i := 0 to GxActionBroker.ActionCount - 1 do begin
     ContAct := GxActionBroker.Actions[i];
     if ContAct is TCustomAction then begin
       act := TCustomAction(ContAct);
       if act.ShortCut <> 0 then begin
-        TGrid_SetNonfixedRowCount(sg_Actions, row);
-        sg_Actions.Objects[0, row] := Pointer(act.ShortCut);
-        sg_Actions.Cells[0, row] := ShortCutToText(act.ShortCut);
-        sg_Actions.Cells[1, row] := act.Name;
-        sg_Actions.Cells[2, row] := act.Caption;
-        Inc(row);
+        TGrid_SetNonfixedRowCount(sg_Actions, Row);
+        sg_Actions.Objects[0, Row] := Pointer(act.ShortCut);
+        sg_Actions.Cells[0, Row] := ShortCutToText(act.ShortCut);
+        sg_Actions.Cells[1, Row] := act.Name;
+        sg_Actions.Cells[2, Row] := act.Caption;
+        Inc(Row);
       end;
       for j := 0 to act.SecondaryShortCuts.Count - 1 do begin
         ShortCut := act.SecondaryShortCuts.ShortCuts[j];
@@ -197,19 +230,19 @@ begin
           SendDebugFmt('secondary shortcut for action %s is still 0 after TextToShortcut', [act.Name]);
 {$ENDIF}
         end else begin
-          TGrid_SetNonfixedRowCount(sg_Actions, row);
-          sg_Actions.Objects[0, row] := Pointer(ShortCut);
-          sg_Actions.Cells[0, row] := s + ' *';
-          sg_Actions.Cells[1, row] := act.Name;
-          sg_Actions.Cells[2, row] := act.Caption;
-          Inc(row);
+          TGrid_SetNonfixedRowCount(sg_Actions, Row);
+          sg_Actions.Objects[0, Row] := Pointer(ShortCut);
+          sg_Actions.Cells[0, Row] := s + ' *';
+          sg_Actions.Cells[1, Row] := act.Name;
+          sg_Actions.Cells[2, Row] := act.Caption;
+          Inc(Row);
         end;
       end;
     end;
   end;
-  QuickSort(sg_Actions.FixedRows, row - 1, CompareShortcuts, SwapEntries);
+  QuickSort(sg_Actions.FixedRows, Row - 1, CompareShortcuts, SwapEntries);
 
-  for i := sg_Actions.FixedRows to row - 2 do begin
+  for i := sg_Actions.FixedRows to Row - 2 do begin
     if SameText(sg_Actions.Cells[0, i], sg_Actions.Cells[0, i + 1]) then begin
       sg_Actions.Objects[1, i] := Pointer(1);
       sg_Actions.Objects[1, i + 1] := Pointer(1);
@@ -276,7 +309,22 @@ begin
   DrawStringGridCell(sg, sg.Cells[ACol, ARow], Rect, State, LongBool(sg.Objects[1, ARow]));
 end;
 
+procedure TfmGxKeyboardShortcuts.sg_ActionsMouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if (Sender is TStringGrid) then
+    if ScrollGrid(TStringGrid(Sender), +1, Shift, MousePos) then
+      Handled := True;
+end;
+
+procedure TfmGxKeyboardShortcuts.sg_ActionsMouseWheelUp(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if Sender is TStringGrid then
+    if ScrollGrid(TStringGrid(Sender), -1, Shift, MousePos) then
+      Handled := True;
+end;
+
 initialization
   RegisterGX_Expert(TGxKeyboardShortcuts);
 end.
-
