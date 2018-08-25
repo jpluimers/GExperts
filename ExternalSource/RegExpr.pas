@@ -3647,7 +3647,7 @@ procedure TRegExpr.SetLinePairedSeparator (const AStr : RegExprString);
 --------------------------------------------------------------}
 
 function TRegExpr.GetLinePairedSeparator : RegExprString;
- begin
+begin
   if fLinePairedSeparatorAssigned then begin
      {$IFDEF UniCode}
      // Here is some UniCode 'magic'
@@ -3660,20 +3660,21 @@ function TRegExpr.GetLinePairedSeparator : RegExprString;
      {$ENDIF}
     end
    else Result := '';
- end; { of function TRegExpr.GetLinePairedSeparator
+end; { of function TRegExpr.GetLinePairedSeparator
 --------------------------------------------------------------}
 
 function TRegExpr.Substitute (const ATemplate : RegExprString) : RegExprString;
 // perform substitutions after a regexp match
 // completely rewritten in 0.929
- var
+var
   TemplateLen : integer;
   TemplateBeg, TemplateEnd : PRegExprChar;
   p, p0, ResultPtr : PRegExprChar;
   ResultLen : integer;
   n : integer;
   Ch : REChar;
- function ParseVarName (var APtr : PRegExprChar) : integer;
+
+  function ParseVarName (var APtr : PRegExprChar) : integer;
   // extract name of variable (digits, may be enclosed with
   // curly braces) from APtr^, uses TemplateEnd !!!
   const
@@ -3708,7 +3709,8 @@ function TRegExpr.Substitute (const ATemplate : RegExprString) : RegExprString;
     then Result := -1; // no valid digits found or no right curly brace
    APtr := p;
   end;
- begin
+
+begin
   // Check programm and input string
   if not IsProgrammOk
    then EXIT;
@@ -3776,7 +3778,7 @@ function TRegExpr.Substitute (const ATemplate : RegExprString) : RegExprString;
        inc (ResultPtr);
       end;
    end;
- end; { of function TRegExpr.Substitute
+end; { of function TRegExpr.Substitute
 --------------------------------------------------------------}
 
 procedure TRegExpr.Split (AInputStr : RegExprString; APieces : TStrings);
