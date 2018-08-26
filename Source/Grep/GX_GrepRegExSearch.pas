@@ -156,7 +156,7 @@ var
 begin // Execute
   if not Assigned(FData) then
     raise Exception.Create('Data to search not provided');
-  if IsEmpty(Pattern) then
+  if Pattern = '' then
     raise Exception.Create('Search pattern is empty');
 
   if RegularExpression then

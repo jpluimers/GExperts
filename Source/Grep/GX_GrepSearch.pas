@@ -385,12 +385,13 @@ var
   i: Integer;
   Dirs: TStringList;
 begin
-  if IsEmpty(cbText.Text) then
+  // we allow for ' ' (spaces)
+  if cbText.Text = '' then
     raise Exception.Create(SSearchTextEmpty);
-  
+
   if rbDirectories.Checked then
   begin
-    if Trim(cbDirectory.Text) = '' then
+    if IsEmpty(cbDirectory.Text) then
       cbDirectory.Text := GetCurrentDir;
     Dirs := TStringList.Create;
     try
