@@ -3677,7 +3677,7 @@ var
   n : integer;
   Ch : REChar;
   Mode: TSubstMode;
-  LineEnd: string;
+  EscapedCharacter: string;
 
   function ParseVarName (var APtr : PRegExprChar) : integer;
   // extract name of variable (digits, may be enclosed with
@@ -3716,7 +3716,7 @@ var
   end;
 
 begin
-  LineEnd := sLineBreak;
+  EscapedCharacter := #0;
   // Check programm and input string
   if not IsProgrammOk
    then EXIT;
@@ -3750,9 +3750,15 @@ begin
         Ch := p^;
         inc (p);
         case Ch of
-          'n' : inc(ResultLen, Length(sLineBreak));
+          't', 'r', 'n', 'f', 'a', 'e':
+            Inc(ResultLen, 1);
+          'x': begin
+            Inc(ResultLen, 1); // will be replaced by a single character
+            Inc(p, 2); // must be followed by a two digit hex number (no support for Unicode here)
+          end;
           'u', 'l', 'U', 'L': {nothing};
-          else inc(ResultLen);
+          else
+            inc(ResultLen);
         end;
       end
       else
@@ -3789,10 +3795,43 @@ begin
          Ch := p^;
          inc (p);
         case Ch of
+          't': begin
+            EscapedCharacter := #$09;
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
+          end;
+          'r': begin
+            EscapedCharacter := #$0d;
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
+          end;
+          'f': begin
+            EscapedCharacter := #$0c;
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
+          end;
+          'a': begin
+            EscapedCharacter := #$07;
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
+          end;
+          'e': begin
+            EscapedCharacter := #$1b;
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
+          end;
           'n' : begin
-              p0 := @LineEnd[1];
-              p1 := p0 + Length(sLineBreak);
+            EscapedCharacter := #$0a;
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
             end;
+          'x': begin
+            // this can raise an EConvertError exception
+            EscapedCharacter := chr(StrtoInt('$' + Copy(p, 1, 2)));
+            p0 := @EscapedCharacter[1];
+            p1 := p0 + 1;
+            Inc(p, 2);
+          end;
           'l' : begin
               Mode := smodeOneLower;
               p1 := p0;
