@@ -230,7 +230,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 115
           Width = 529
-          Height = 254
+          Height = 270
           Caption = 'IDE'
           TabOrder = 1
           object chkEnhanceDialogs: TCheckBox
@@ -303,7 +303,7 @@ object fmConfiguration: TfmConfiguration
             Width = 489
             Height = 17
             Caption = 'Enhance Build Events dialog with Favourites'
-            TabOrder = 8
+            TabOrder = 9
           end
           object chkEnhanceApplicationSettingsDialog: TCheckBox
             Left = 24
@@ -319,22 +319,31 @@ object fmConfiguration: TfmConfiguration
             Width = 489
             Height = 17
             Caption = 'Automatically close message window after successful compile'
-            TabOrder = 9
+            TabOrder = 8
           end
           object chkForceStartupDesktop: TCheckBox
+            Left = 24
+            Top = 212
+            Width = 489
+            Height = 17
+            Caption = 'Force desktop on startup (leave empty for last selected)'
+            TabOrder = 11
+          end
+          object cbxDesktop: TComboBox
+            Left = 40
+            Top = 229
+            Width = 145
+            Height = 22
+            ItemHeight = 14
+            TabOrder = 12
+          end
+          object chkEnhanceDockForms: TCheckBox
             Left = 24
             Top = 193
             Width = 489
             Height = 17
-            Caption = 'Force desktop on startup (leave empty for last selected)'
+            Caption = 'Enhance Dock Forms to allow minimize and Win+arrow positioning'
             TabOrder = 10
-          end
-          object cbxDesktop: TComboBox
-            Left = 40
-            Top = 213
-            Width = 145
-            Height = 22
-            TabOrder = 11
           end
         end
         object gbxObjectInspector: TGroupBox

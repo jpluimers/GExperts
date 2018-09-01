@@ -114,6 +114,7 @@ type
     tshOldIdes: TTabSheet;
     chkForceStartupDesktop: TCheckBox;
     cbxDesktop: TComboBox;
+    chkEnhanceDockForms: TCheckBox;
     procedure btnEnumerateModulesClick(Sender: TObject);
     procedure chkEditorKeyTracingClick(Sender: TObject);
     procedure sbVCLDirClick(Sender: TObject);
@@ -482,6 +483,7 @@ begin
   chkEnhanceToolProperties.Checked := IdeEnhancements.EnhanceToolProperties;
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   chkEnhanceGotoDialog.Checked := IdeEnhancements.EnhanceGotoDialog;
+  chkEnhanceDockForms.Checked := IdeEnhancements.EnhanceDockForms;
   chkAutoCloseMessage.Checked := IdeEnhancements.AutoCloseMessageWindow;
 
 {$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
@@ -595,6 +597,7 @@ begin
   IdeEnhancements.EnhanceInstallPackages := chkEnhanceInstallPackages.Checked;
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
   IdeEnhancements.EnhanceGotoDialog := chkEnhanceGotoDialog.Checked;
+  IdeEnhancements.EnhanceDockForms := chkEnhanceDockForms.Checked;
   IdeEnhancements.AutoCloseMessageWindow := chkAutoCloseMessage.Checked;
 
 {$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
@@ -956,6 +959,7 @@ begin
   chkEnhanceToolProperties.Enabled := EnableState;
   chkEnhanceInstallPackages.Enabled := EnableState;
   chkEnhanceGotoDialog.Enabled := EnableState;
+  chkEnhanceDockForms.Enabled := EnableState;
   chkEnhanceBuildEventsDialog.Enabled := EnableState;
   chkEnhanceApplicationSettingsDialog.Enabled := EnableState;
 end;
