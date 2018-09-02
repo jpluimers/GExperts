@@ -484,7 +484,9 @@ begin
   chkEnhanceInstallPackages.Checked := IdeEnhancements.EnhanceInstallPackages;
   chkEnhanceGotoDialog.Checked := IdeEnhancements.EnhanceGotoDialog;
   chkEnhanceDockForms.Checked := IdeEnhancements.EnhanceDockForms;
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
   chkAutoCloseMessage.Checked := IdeEnhancements.AutoCloseMessageWindow;
+{$ENDIF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 
 {$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
   chkForceStartupDesktop.Checked := ConfigInfo.GetForceDesktopOnStartup;
@@ -598,7 +600,9 @@ begin
   IdeEnhancements.EnhanceToolProperties := chkEnhanceToolProperties.Checked;
   IdeEnhancements.EnhanceGotoDialog := chkEnhanceGotoDialog.Checked;
   IdeEnhancements.EnhanceDockForms := chkEnhanceDockForms.Checked;
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
   IdeEnhancements.AutoCloseMessageWindow := chkAutoCloseMessage.Checked;
+{$ENDIF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 
 {$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
   ConfigInfo.SetForceDesktopOnStartup(chkForceStartupDesktop.Checked);
@@ -680,6 +684,10 @@ begin
 {$IFDEF GX_VER160_up} // Delphi 8 (BDS 1)
   // Only for the old IDEs
   tshOldIdes.TabVisible := False;
+{$ENDIF}
+
+{$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+  chkAutoCloseMessage.Visible := False;
 {$ENDIF}
 
 {$IFNDEF GX_VER185_up} // Delphi 2007 (11; BDS 4)

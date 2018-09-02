@@ -232,7 +232,7 @@ object fmConfiguration: TfmConfiguration
           Width = 529
           Height = 270
           Caption = 'IDE'
-          TabOrder = 1
+          TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
             Left = 8
             Top = 22
@@ -315,11 +315,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkAutoCloseMessage: TCheckBox
             Left = 24
-            Top = 155
+            Top = 193
             Width = 489
             Height = 17
             Caption = 'Automatically close message window after successful compile'
-            TabOrder = 8
+            TabOrder = 10
           end
           object chkForceStartupDesktop: TCheckBox
             Left = 24
@@ -339,11 +339,11 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceDockForms: TCheckBox
             Left = 24
-            Top = 193
+            Top = 155
             Width = 489
             Height = 17
             Caption = 'Enhance Dock Forms to allow minimize and Win+arrow positioning'
-            TabOrder = 10
+            TabOrder = 8
           end
         end
         object gbxObjectInspector: TGroupBox
@@ -352,7 +352,7 @@ object fmConfiguration: TfmConfiguration
           Width = 257
           Height = 105
           Caption = 'Object Inspector'
-          TabOrder = 2
+          TabOrder = 1
           object chkOIFontNames: TCheckBox
             Left = 8
             Top = 22
