@@ -36,6 +36,8 @@ type
   TWinControlHack = class(TWinControl)
   end;
 
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+// this expert does not work for Delphi 6 and 7, it causes access violations
 type
   TMessageAutoClose = class(TIdeDialogEnhancer)
   private
@@ -81,22 +83,30 @@ begin
     Exit; //==>
   GExpertsInst.TimedCloseMessageView;
 end;
+{$ENDIF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 
 { TGxMessageAutoClose }
 
 class function TGxMessageAutoClose.GetEnabled: Boolean;
 begin
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
   Result := Assigned(TheMessageAutoClose);
+{$ELSE}
+  Result := false;
+{$ENDIF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 end;
 
 class procedure TGxMessageAutoClose.SetEnabled(const Value: Boolean);
 begin
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
   if Value then begin
     if not Assigned(TheMessageAutoClose) then
       TheMessageAutoClose := TMessageAutoClose.Create
   end else
     FreeAndNil(TheMessageAutoClose);
+{$ENDIF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 end;
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 
 { TMessageAutoClose }
 
@@ -130,5 +140,6 @@ begin
   cmp := TMessageAutoCloseComponent.Create(_Form, HintCount, WarningCount, ErrorCount);
   cmp.Name := GxMessageAutoCloseComponent;
 end;
+{$ENDIF GX_VER170_up} // Delphi 9/2005 (BDS 2)
 
 end.
