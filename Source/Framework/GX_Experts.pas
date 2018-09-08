@@ -129,7 +129,7 @@ var
 begin
   Result := MaxInt - 10000;
   if ExpertIndexLookup.Find(ClassName, Index) then
-    Result := NativeInt(ExpertIndexLookup.Objects[Index]);
+    Result := GXNativeInt(ExpertIndexLookup.Objects[Index]);
 end;
 
 function TGX_Expert.HasMenuItem: Boolean;

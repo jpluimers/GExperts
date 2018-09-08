@@ -996,7 +996,7 @@ begin
   begin
     //FEditorHandle := EditControl.Handle;
     FNewEditControlWndProc := Classes.MakeObjectInstance(EditControlWndProc);
-    FOldEditControlWndProc := SetWindowLong(EditControl.Handle, GWL_WNDPROC, NativeInt(FNewEditControlWndProc));
+    FOldEditControlWndProc := SetWindowLong(EditControl.Handle, GWL_WNDPROC, GXNativeInt(FNewEditControlWndProc));
     if FOldEditControlWndProc = 0 then
     begin
       {$IFOPT D+} SendDebugError('Windows error hooking EditorWndProc'); {$ENDIF}
@@ -1027,7 +1027,7 @@ begin
   begin
     {$IFOPT D+} SendDebug('Starting unhook procedure'); {$ENDIF}
     EditorHandle := GetEditControl.Handle;
-    if SetWindowLong({F}EditorHandle, GWL_WNDPROC, NativeInt(FOldEditControlWndProc)) = 0 then
+    if SetWindowLong({F}EditorHandle, GWL_WNDPROC, GXNativeInt(FOldEditControlWndProc)) = 0 then
     begin
       {$IFOPT D+} SendDebugError('Windows error unhooking EditorWndProc'); {$ENDIF}
     end;

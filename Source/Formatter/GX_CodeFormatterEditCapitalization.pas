@@ -204,7 +204,7 @@ begin
     sl.Find(s, Idx);
     if Idx >= sl.Count then
       Idx := sl.Count - 1;
-    FWords.CaretXY := Point(0, NativeInt(sl.Objects[Idx]) - 1);
+    FWords.CaretXY := Point(0, GXNativeInt(sl.Objects[Idx]) - 1);
   finally
     FreeAndNil(sl);
   end;

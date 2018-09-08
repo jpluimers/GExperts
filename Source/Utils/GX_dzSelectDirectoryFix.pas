@@ -67,8 +67,6 @@ begin
 end;
 
 {$IFNDEF GX_VER160_up}
-type
-  NativeInt = integer;
 resourcestring
   SInvalidPath = '"%s" is an invalid path';
 const
@@ -80,6 +78,9 @@ const
 
 // subclass the given window by replacing its WindowProc
 
+type
+  GXNativeInt = Integer; // we are compiling for Win32 only
+
 procedure TSelectDirCallback.SubClass(_Wnd: HWND);
 begin
   if FWndProcPrevious <> nil then
@@ -87,7 +88,7 @@ begin
   FWnd := _Wnd;
   FWndProcPrevious := TFNWndProc(GetWindowLong(_Wnd, GWL_WNDPROC));
   FWndProcInstanceStub := MakeObjectInstance(WndProcSubClassed);
-  SetWindowlong(_Wnd, GWL_WNDPROC, NativeInt(FWndProcInstanceStub));
+  SetWindowlong(_Wnd, GWL_WNDPROC, GXNativeInt(FWndProcInstanceStub));
 end;
 
 // un-subclass the window by restoring the previous WindowProc
@@ -95,7 +96,7 @@ end;
 procedure TSelectDirCallback.UnsubClass;
 begin
   if FWndProcPrevious <> nil then begin
-    SetWindowlong(FWnd, GWL_WNDPROC, NativeInt(FWndProcPrevious));
+    SetWindowlong(FWnd, GWL_WNDPROC, GXNativeInt(FWndProcPrevious));
     FreeObjectInstance(FWndProcInstanceStub);
     FWndProcPrevious := nil;
     FWndProcInstanceStub := nil;

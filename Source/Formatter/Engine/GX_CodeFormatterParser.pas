@@ -169,7 +169,7 @@ end;
 
 function PCharDiff(_p, _q: PGXUnicodeChar): integer;
 begin
-  Result := (NativeInt(_p) - NativeInt(_q)) div SizeOf(_p^);
+  Result := (GXNativeInt(_p) - GXNativeInt(_q)) div SizeOf(_p^);
 end;
 
 procedure TCodeFormatterParser.ReadAsm(var _Buff: PGXUnicodeChar);

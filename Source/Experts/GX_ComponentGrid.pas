@@ -383,7 +383,7 @@ begin
 
   for Row := 1 to StringGrid.RowCount - 1 do
   begin
-    ComponentIndex := NativeInt(StringGrid.Objects[0, Row]);
+    ComponentIndex := GXNativeInt(StringGrid.Objects[0, Row]);
 
     AComponent := FComponentList.Items[ComponentIndex] as IOTAComponent;
     Assert(Assigned(AComponent));

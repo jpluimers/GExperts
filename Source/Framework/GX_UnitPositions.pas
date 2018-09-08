@@ -78,7 +78,7 @@ end;
 function TUnitPositions.GetPosition(Index: Integer): TUnitPosition;
 begin
   Result.Name := FPosList[Index];
-  Result.Position := NativeInt(FPosList.Objects[Index]);
+  Result.Position := GXNativeInt(FPosList.Objects[Index]);
 end;
 
 procedure TUnitPositions.GetPositions;

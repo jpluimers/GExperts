@@ -22,10 +22,14 @@ const
 resourcestring
   SAllAlphaNumericChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
-{$IFNDEF GX_VER160_up}
 type
-  NativeInt = integer;
-{$ENDIF ~GX_VER160_up}
+  // NativeInt and NativeUInt are wrongly declared as 8 bytes in size in Delphi 6 to 2007,
+  // so we can't use them. Instead we declare our own types which, sincd GExperts is a
+  // 32 IDE plugin are both 32 bits.
+  // Originally this simply redeclared NativeInt as Integer for older versions, but
+  // that made it hard to find accidental usages of the wrong type.
+  GXNativeInt = Integer;
+  GXNativeUInt = LongWord;
 
 type
   {$IFDEF GX_VER160_up}

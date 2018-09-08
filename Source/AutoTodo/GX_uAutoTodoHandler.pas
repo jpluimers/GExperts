@@ -272,7 +272,7 @@ begin
     Execute(Source, sl);
     Result := Source;
     for i := sl.Count - 1 downto 0 do
-      Insert(sl[i], Result, NativeInt(sl.Objects[i]) + 1);
+      Insert(sl[i], Result, GXNativeInt(sl.Objects[i]) + 1);
   finally
     sl.Free;
   end;

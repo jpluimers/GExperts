@@ -363,7 +363,7 @@ var
 begin
   r := FStringGrid.Row;
   if (r >= FStringGrid.FixedRows) and (r < FStringGrid.RowCount) then
-    Result := NativeInt(FStringGrid.Objects[0, r])
+    Result := GXNativeInt(FStringGrid.Objects[0, r])
   else
     Result := 0;
 end;
