@@ -29,7 +29,7 @@ type
     // optional, defaults to ClassName
     class function GetName: string; override;
     constructor Create; override;
-    // optional, defauls to true
+    // optional, defaults to true
     function CanHaveShortCut: boolean; override;
     // optional if HasConfigOptions returns false
     procedure Configure; override;
@@ -41,7 +41,7 @@ type
     function GetDisplayName: string; override;
     // optional, but recommended
     function GetHelpString: string; override;
-    // optional, default to true
+    // optional, defaults to true
     function HasConfigOptions: Boolean; override;
     // Overrride to load any configuration settings
     procedure InternalLoadSettings(Settings: TExpertSettings); override;
