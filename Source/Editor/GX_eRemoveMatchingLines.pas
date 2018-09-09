@@ -121,7 +121,7 @@ begin
   FMatches := TStringList.Create;
   FMatches.Sorted := True;
   FMatches.Duplicates := dupIgnore;
-  FMatches.Assign(_Matches);
+  FMatches.AddStrings(_Matches);
 end;
 
 type
