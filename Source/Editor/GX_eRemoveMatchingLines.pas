@@ -168,16 +168,28 @@ begin
   _sl.Add('{ Published declarations }');
 
   // French
-  _sl.Add('{ déclarations privées }');
-  _sl.Add('{ déclarations protégées }');
-  _sl.Add('{ déclarations publiques }');
-  _sl.Add('{ déclarations publiées }');
+  _sl.Add('{ Déclarations privées }');
+  _sl.Add('{ Déclarations protégées }');
+  _sl.Add('{ Déclarations publiques }');
+  _sl.Add('{ Déclarations publiées }');
 
   // German
   _sl.Add('{ Private-Deklarationen }');
   _sl.Add('{ Protected-Deklarationen }');
   _sl.Add('{ Public-Deklarationen }');
   _sl.Add('{ Published-Deklarationen }');
+
+  // todo: Japanese
+  // (requires Ansi CodePage 932)
+//  _sl.Add('{ Private ?? }');
+//  _sl.Add('{ Protected ?? }');
+//  _sl.Add('{ Public ?? }');
+//  _sl.Add('{ Published ?? }');
+  // The Ansi codes of the two characters are: 90 E9 8C BE
+  // The UTF-8 codes are: E5 AE A3 E8 A
+  // (from Uwe Raabe's answer to my question on Google+ )
+  // https://plus.google.com/+ThomasMueller/posts/cYvgUAhdZUS
+
 end;
 
 class function TfmRemoveMatchingLinesExpertConfig.Execute(_Owner: TComponent; _Lines: TStrings): Boolean;
