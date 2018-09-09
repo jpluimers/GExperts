@@ -32,7 +32,8 @@ type
   ///  end;
   TGxRemoveMatchingLinesEditorExpert = class(TEditorExpert)
   private
-    FLines: TStringList;
+    FMatches: TStringList;
+    FRegEx: Boolean;
   public
     constructor Create; override;
     // optional if HasConfigOptions returns false
@@ -54,14 +55,15 @@ type
     b_Cancel: TButton;
     l_Lines: TLabel;
     b_Defaults: TButton;
+    chk_RegEx: TCheckBox;
     procedure b_DefaultsClick(Sender: TObject);
   private
-    class procedure SetDefault(_sl: TStrings);
-    procedure SetData(_sl: TStrings);
-    procedure GetData(_sl: TStrings);
+    class procedure SetDefault(_Matches: TStrings; _RegEx: Boolean);
+    procedure SetData(_Matches: TStrings; _RegEx: Boolean);
+    procedure GetData(_Matches: TStrings; out _RegEx: Boolean);
   public
     constructor Create(_Owner: TComponent); override;
-    class function Execute(_Owner: TComponent; _Lines: TStrings): Boolean;
+    class function Execute(_Owner: TComponent; _Matches: TStrings; var _RegEx: Boolean): Boolean;
   end;
 
 implementation
@@ -77,13 +79,15 @@ uses
 
   GX_GExperts,
   GX_dzVclUtils,
-  GX_OtaUtils;
+  GX_OtaUtils,
+  RegExpr,
+  GX_dzClassUtils;
 
 { TGxRemoveMatchingLinesEditorExpert }
 
 procedure TGxRemoveMatchingLinesEditorExpert.Configure;
 begin
-  if TfmRemoveMatchingLinesExpertConfig.Execute(nil, FLines) then
+  if TfmRemoveMatchingLinesExpertConfig.Execute(nil, FMatches, FRegEx) then
     SaveSettings;
 end;
 
@@ -91,12 +95,109 @@ constructor TGxRemoveMatchingLinesEditorExpert.Create;
 begin
   inherited Create;
 
-  FLines := TStringList.Create;
+  FMatches := TStringList.Create;
 
-  TfmRemoveMatchingLinesExpertConfig.SetDefault(FLines);
+  FRegEx := False;
+  TfmRemoveMatchingLinesExpertConfig.SetDefault(FMatches, FRegEx);
 
   // LoadSettings is called automatically for the expert upon creation.
 end;
+
+type
+  TAbstractMatcher = class
+  protected
+    FMatches: TStringList;
+    function LineMatches(const _Line: string): Boolean; virtual; abstract;
+  public
+    constructor Create(_Matches: TStrings);
+    destructor Destroy; override;
+  end;
+
+{ TAbstractMatcher }
+
+constructor TAbstractMatcher.Create(_Matches: TStrings);
+begin
+  inherited Create;
+  FMatches := TStringList.Create;
+  FMatches.Sorted := True;
+  FMatches.Duplicates := dupIgnore;
+  FMatches.Assign(_Matches);
+end;
+
+type
+  TCompareMatcher = class(TAbstractMatcher)
+  protected
+    function LineMatches(const _Line: string): Boolean; override;
+  end;
+
+destructor TAbstractMatcher.Destroy;
+begin
+  FreeAndNil(FMatches);
+  inherited;
+end;
+
+{ TCompareMatcher }
+
+function TCompareMatcher.LineMatches(const _Line: string): Boolean;
+var
+  s: string;
+  Idx: Integer;
+begin
+  s := Trim(_Line);
+  Result := FMatches.Find(s, Idx);
+end;
+
+type
+  TRegExprMatcher = class(TAbstractMatcher)
+  protected
+    function LineMatches(const _Line: string): Boolean; override;
+  public
+    constructor Create(_Matches: TStrings);
+    destructor Destroy; override;
+  end;
+
+{ TRegExprMatcher }
+
+constructor TRegExprMatcher.Create(_Matches: TStrings);
+var
+  i: Integer;
+  re: TRegExpr;
+begin
+  inherited Create(_Matches);
+  for i := 0 to FMatches.Count - 1 do begin
+    re := TRegExpr.Create;
+    re.Expression := FMatches[i];
+    re.Compile;
+    FMatches.Objects[i] := re;
+  end;
+end;
+
+destructor TRegExprMatcher.Destroy;
+begin
+  TStrings_FreeObjects(FMatches);
+  inherited;
+end;
+
+function TRegExprMatcher.LineMatches(const _Line: string): Boolean;
+var
+  re: TRegExpr;
+  i: Integer;
+  Len: Integer;
+begin
+  Len := Length(_Line);
+  Result := False;
+  for i := 0 to FMatches.Count - 1 do begin
+    re := TRegExpr(FMatches.Objects[i]);
+    Result := re.Exec(_Line);
+    if Result then begin
+      Result := (re.MatchPos[0] = 1) and (re.MatchLen[0] = Len);
+    end;
+    if Result then
+      Exit; //==>
+  end;
+end;
+
+{ TGxRemoveMatchingLinesEditorExpert }
 
 procedure TGxRemoveMatchingLinesEditorExpert.Execute(Sender: TObject);
 var
@@ -104,20 +205,24 @@ var
   LineIdx: Integer;
   s: TGXUnicodeString;
   WasChanged: Boolean;
+  Matcher: TAbstractMatcher;
 begin
   Text := TGXUnicodeStringList.Create;
   try
     if not GxOtaGetActiveEditorText(Text, False) then
       Exit; //==>
 
+    if FRegEx then
+      Matcher := TRegExprMatcher.Create(FMatches)
+    else
+      Matcher := TCompareMatcher.Create(FMatches);
+
     WasChanged := False;
     for LineIdx := Text.Count - 1 downto 0 do begin
-      s := Trim(Text[LineIdx]);
-      if s <> '' then begin
-        if FLines.IndexOf(s) <> -1 then begin
-          Text.Delete(LineIdx);
-          WasChanged := True;
-        end;
+      s := Text[LineIdx];
+      if Matcher.LineMatches(s) then begin
+        Text.Delete(LineIdx);
+        WasChanged := True;
       end;
     end;
     if WasChanged then
@@ -147,61 +252,72 @@ procedure TGxRemoveMatchingLinesEditorExpert.InternalLoadSettings(Settings: TExp
 begin
   inherited InternalLoadSettings(Settings);
 
-  Settings.ReadStrings('Lines', FLines);
+  FMatches.Clear;
+  Settings.ReadStrings('Matches', FMatches);
+  FRegEx := Settings.ReadBool('RegEx', False);
+  if FMatches.Count = 0 then
+    TfmRemoveMatchingLinesExpertConfig.SetDefault(FMatches, FRegEx);
 end;
 
 procedure TGxRemoveMatchingLinesEditorExpert.InternalSaveSettings(Settings: TExpertSettings);
 begin
   inherited InternalSaveSettings(Settings);
 
-  Settings.WriteStrings('Lines', FLines);
+  Settings.WriteStrings('Matches', FMatches);
+  Settings.WriteBool('RegEx', FRegEx);
 end;
 
-class procedure TfmRemoveMatchingLinesExpertConfig.SetDefault(_sl: TStrings);
+class procedure TfmRemoveMatchingLinesExpertConfig.SetDefault(_Matches: TStrings; _RegEx: Boolean);
 begin
-  _sl.Clear;
+  _Matches.Clear;
 
-  // English
-  _sl.Add('{ Private declarations }');
-  _sl.Add('{ Protected declarations }');
-  _sl.Add('{ Public declarations }');
-  _sl.Add('{ Published declarations }');
+  if _RegEx then begin
+    _Matches.Add('\s*\{ (Private|Protected|Public|Published) declarations \}');
+    _Matches.Add('\s*\{ (Private|Protected|Public|Published)-Deklarationen \}');
+    _Matches.Add('\s*\{ Déclarations (privées|protégées|publiques|publiées) \}');
+  end else begin
+    // English
+    _Matches.Add('{ Private declarations }');
+    _Matches.Add('{ Protected declarations }');
+    _Matches.Add('{ Public declarations }');
+    _Matches.Add('{ Published declarations }');
 
-  // French
-  _sl.Add('{ Déclarations privées }');
-  _sl.Add('{ Déclarations protégées }');
-  _sl.Add('{ Déclarations publiques }');
-  _sl.Add('{ Déclarations publiées }');
+    // French
+    _Matches.Add('{ Déclarations privées }');
+    _Matches.Add('{ Déclarations protégées }');
+    _Matches.Add('{ Déclarations publiques }');
+    _Matches.Add('{ Déclarations publiées }');
 
-  // German
-  _sl.Add('{ Private-Deklarationen }');
-  _sl.Add('{ Protected-Deklarationen }');
-  _sl.Add('{ Public-Deklarationen }');
-  _sl.Add('{ Published-Deklarationen }');
+    // German
+    _Matches.Add('{ Private-Deklarationen }');
+    _Matches.Add('{ Protected-Deklarationen }');
+    _Matches.Add('{ Public-Deklarationen }');
+    _Matches.Add('{ Published-Deklarationen }');
 
-  // todo: Japanese
-  // (requires Ansi CodePage 932)
-//  _sl.Add('{ Private ?? }');
-//  _sl.Add('{ Protected ?? }');
-//  _sl.Add('{ Public ?? }');
-//  _sl.Add('{ Published ?? }');
-  // The Ansi codes of the two characters are: 90 E9 8C BE
-  // The UTF-8 codes are: E5 AE A3 E8 A
-  // (from Uwe Raabe's answer to my question on Google+ )
-  // https://plus.google.com/+ThomasMueller/posts/cYvgUAhdZUS
-
+    // todo: Japanese
+    // (requires Ansi CodePage 932)
+    //  _Matches.Add('{ Private ?? }');
+    //  _Matches.Add('{ Protected ?? }');
+    //  _Matches.Add('{ Public ?? }');
+    //  _Matches.Add('{ Published ?? }');
+    // The Ansi codes of the two characters are: 90 E9 8C BE
+    // The UTF-8 codes are: E5 AE A3 E8 A
+    // (from Uwe Raabe's answer to my question on Google+ )
+    // https://plus.google.com/+ThomasMueller/posts/cYvgUAhdZUS
+  end;
 end;
 
-class function TfmRemoveMatchingLinesExpertConfig.Execute(_Owner: TComponent; _Lines: TStrings): Boolean;
+class function TfmRemoveMatchingLinesExpertConfig.Execute(_Owner: TComponent; _Matches: TStrings;
+  var _RegEx: Boolean): Boolean;
 var
   frm: TfmRemoveMatchingLinesExpertConfig;
 begin
   frm := TfmRemoveMatchingLinesExpertConfig.Create(nil);
   try
-    frm.SetData(_Lines);
+    frm.SetData(_Matches, _RegEx);
     Result := (frm.ShowModal = mrOk);
     if Result then begin
-      frm.GetData(_Lines);
+      frm.GetData(_Matches, _RegEx);
     end;
   finally
     FreeAndNil(frm);
@@ -219,25 +335,28 @@ begin
   if m_Lines.Lines.Count > 0 then
     if mrYes <> MessageDlg('Do you really want to overwrite the existing lines?', mtConfirmation, [mbYes, mbCancel], 0) then
       Exit; //==>
-  SetDefault(m_Lines.Lines);
+
+  SetDefault(m_Lines.Lines, chk_RegEx.Checked);
 end;
 
-procedure TfmRemoveMatchingLinesExpertConfig.GetData(_sl: TStrings);
+procedure TfmRemoveMatchingLinesExpertConfig.GetData(_Matches: TStrings; out _RegEx: Boolean);
 var
   i: Integer;
   s: string;
 begin
-  _sl.Clear;
+  _Matches.Clear;
   for i := 0 to m_Lines.Lines.Count - 1 do begin
     s := Trim(m_Lines.Lines[i]);
     if s <> '' then
-      _sl.Add(s);
+      _Matches.Add(s);
   end;
+  _RegEx := chk_RegEx.Checked;
 end;
 
-procedure TfmRemoveMatchingLinesExpertConfig.SetData(_sl: TStrings);
+procedure TfmRemoveMatchingLinesExpertConfig.SetData(_Matches: TStrings; _RegEx: Boolean);
 begin
-  m_Lines.Lines.Assign(_sl);
+  m_Lines.Lines.Assign(_Matches);
+  chk_RegEx.Checked := _RegEx;
 end;
 
 initialization

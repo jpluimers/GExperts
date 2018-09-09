@@ -4,7 +4,7 @@ object fmRemoveMatchingLinesExpertConfig: TfmRemoveMatchingLinesExpertConfig
   BorderIcons = [biSystemMenu]
   Caption = 'Remove Matching Lines Expert Config'
   ClientHeight = 257
-  ClientWidth = 345
+  ClientWidth = 377
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -14,7 +14,7 @@ object fmRemoveMatchingLinesExpertConfig: TfmRemoveMatchingLinesExpertConfig
   OldCreateOrder = False
   Position = poOwnerFormCenter
   DesignSize = (
-    345
+    377
     257)
   PixelsPerInch = 96
   TextHeight = 14
@@ -28,30 +28,31 @@ object fmRemoveMatchingLinesExpertConfig: TfmRemoveMatchingLinesExpertConfig
   object m_Lines: TMemo
     Left = 8
     Top = 24
-    Width = 329
-    Height = 193
+    Width = 361
+    Height = 169
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    WordWrap = False
   end
   object b_OK: TButton
-    Left = 184
+    Left = 216
     Top = 224
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 3
   end
   object b_Cancel: TButton
-    Left = 264
+    Left = 296
     Top = 224
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 4
   end
   object b_Defaults: TButton
     Left = 8
@@ -60,7 +61,16 @@ object fmRemoveMatchingLinesExpertConfig: TfmRemoveMatchingLinesExpertConfig
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Defaults'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = b_DefaultsClick
+  end
+  object chk_RegEx: TCheckBox
+    Left = 8
+    Top = 200
+    Width = 361
+    Height = 17
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = 'Regular Expression'
+    TabOrder = 1
   end
 end
