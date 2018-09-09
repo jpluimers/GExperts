@@ -22,7 +22,8 @@ uses
 type
   ///<summary>
   /// This editor expert removes lines from the current editor that consist only
-  /// of the configured text, optionally padded with spaces.
+  /// of the configured text, optionally padded with spaces, or alternatively those
+  /// which match a set of regular expressions.
   /// e.g. those pesky comments the IDE adds automatically
   ///    TForm1 = class(TForm)
   ///    private
@@ -234,7 +235,7 @@ end;
 
 function TGxRemoveMatchingLinesEditorExpert.GetDisplayName: string;
 resourcestring
-  SDisplayName = 'Remove Lines';
+  SDisplayName = 'Remove Matching Lines';
 begin
   Result := SDisplayName;
 end;
@@ -242,8 +243,9 @@ end;
 function TGxRemoveMatchingLinesEditorExpert.GetHelpString: string;
 resourcestring
   SRemoveLinesEditorExpertHelp = 'Removes lines from the current editor that consist only '
-    + ' of the configured text, optionally padded with spaces.'
-    + ' e.g. those pesky comments the IDE adds automatically.';
+    + 'of the configured text, optionally padded with spaces, or those matching as set of '
+    + 'regular expressions. '
+    + 'Use case: Remove those stupid comments like { Private delcarations } the IDE adds automatically.';
 begin
   Result := SRemoveLinesEditorExpertHelp;
 end;
@@ -272,8 +274,11 @@ begin
   _Matches.Clear;
 
   if _RegEx then begin
+    // English
     _Matches.Add('\s*\{ (Private|Protected|Public|Published) declarations \}');
+    // German
     _Matches.Add('\s*\{ (Private|Protected|Public|Published)-Deklarationen \}');
+    // French
     _Matches.Add('\s*\{ Déclarations (privées|protégées|publiques|publiées) \}');
   end else begin
     // English
