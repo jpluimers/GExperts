@@ -72,6 +72,8 @@ procedure TStrings_FreeObjects(_List: TStrings);
 var
   i: Integer;
 begin
+  if not Assigned(_List) then
+    Exit; //==>
   for i := 0 to _List.Count - 1 do begin
     _List.Objects[i].Free;
     _List.Objects[i] := nil;
