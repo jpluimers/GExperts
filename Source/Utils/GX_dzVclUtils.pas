@@ -1227,7 +1227,7 @@ procedure TListView_ResizeColumn(_lc: TListColumn; _Options: TLIstViewResizeOpti
 /// @param lc is the TListColumn to resize
 /// @param Options is a set of tListViewResizeOptions
 ///                lvrCaptions means resize so the captions fit
-///                lvrContent menas resize so the contents fit
+///                lvrContent means resize so the contents fit
 ///                both can be combined. </summary>
 procedure TListView_Resize(_lv: TListView; _Options: TLIstViewResizeOptionSet = [lvrCaptions, lvrContent]);
 
