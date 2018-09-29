@@ -88,7 +88,7 @@ type
     procedure SkipFunctionDeclaration;
     procedure SkipProcedureDeclaration;
     procedure SkipToClosingDelimiter(_OpeningDel, _ClosingDel: TTokenKind);
-    procedure SkipTypeDeclaration;
+    procedure HandleTypeDeclaration;
     procedure SkipVarDeclaration;
     function GetIdentifier(_Idx: Integer): TIdentifier;
   public
@@ -575,7 +575,7 @@ begin
                 end;
               dtType: begin
                   AddToTypes(FParser.Token);
-                  SkipTypeDeclaration;
+                  HandleTypeDeclaration;
                 end;
               dtVar: begin
                   AddToVars(FParser.Token);
@@ -714,8 +714,9 @@ begin
   end;
 end;
 
-procedure TUnitExportsParser.SkipTypeDeclaration;
+procedure TUnitExportsParser.HandleTypeDeclaration;
 begin
+  // this mostly just skips the type declaration but adds enum identifiers to the identifier list
   FParser.NextNoJunkEx;
   if FParser.Tokenid = tkLower then begin
     // type bla<tresult>
@@ -727,6 +728,18 @@ begin
     Exit; //==>
   end;
   FParser.NextNoJunkEx;
+  if FParser.Tokenid = tkRoundOpen then begin
+    // enum declaration -> add the enum identifiers
+    FParser.NextNoJunkEx;
+    while FParser.Tokenid <> tkRoundClose do begin
+      if FParser.Tokenid = tkNull then
+        Exit; //==>
+      if FParser.Tokenid = tkIdentifier then begin
+        AddToIdentifiers(FParser.Token, itConst);
+      end;
+      FParser.NextNoJunkEx;
+    end;
+  end;
   if FParser.Tokenid = tkPacked then
     FParser.NextNoJunkEx;
   while FParser.Tokenid <> tkNull do begin
