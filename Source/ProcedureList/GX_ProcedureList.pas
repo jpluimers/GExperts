@@ -77,7 +77,8 @@ type
     procedure tbnShowFunctionCodeClick(Sender: TObject);
     procedure actOptionsExecute(Sender: TObject);
     procedure lvProcsCompare(Sender: TObject; Item1, Item2: TListItem; Data: Integer; var Compare: Integer);
-    procedure splSeparatorMoved(Sender: TObject);
+    procedure splSeparatorCanResize(Sender: TObject; var NewSize: Integer; var Accept: Boolean);
+    procedure lvProcsResize(Sender: TObject);
   private
     FFileScanner: TFileScanner;
     FEditReader: TEditReader;
@@ -88,6 +89,8 @@ type
     FCodeText: TGXEnhancedEditor;
     FOptions: TProcedureListOptions;
     FLastProcLineNo: Integer;
+    FMinListWidth: Integer;
+    FMinListHeight: Integer;
     function GetImageIndex(const ProcName, ProcClass: string): Integer;
     procedure LoadProcs;
     procedure FillListBox;
@@ -146,6 +149,11 @@ var
   LoadTime: DWORD;
 begin
   inherited Create(AOwner);
+  TControl_SetMinConstraints(Self);
+
+  FMinListWidth := 500;
+  FMinListHeight := 200;
+
   SetNonModalFormPopupMode(Self);
 
   FFileName := FileName;
@@ -296,16 +304,14 @@ begin
 end;
 
 procedure TfmProcedureList.FormResize(Sender: TObject);
+var
+  w: Integer;
 begin
-  with StatusBar do
-  begin
-    if Width > 80 then
-    begin
-      Panels[1].Width := 80;
-      Panels[0].Width := Width - 80;
-    end;
+  w := StatusBar.Width;
+  if w > 80 then begin
+    StatusBar.Panels[1].Width := 80;
+    StatusBar.Panels[0].Width := w - 80;
   end;
-  ResizeCols;
 end;
 
 // This is just a nasty hack to be sure the scroll bar is set right
@@ -318,7 +324,12 @@ end;
 procedure TfmProcedureList.UMResizeCols(var Msg: TMessage);
 begin
   Application.ProcessMessages;
-  lvProcs.Columns[1].Width := Max(0, lvProcs.ClientWidth - lvProcs.Columns[2].Width
+  // this might be the "correct" way to resize the list, but it flickers a lot:
+  //  TListView_Resize(lvProcs);
+  // One reason for this is that this method is called very often, e.g. about 5 times
+  // already when the dialog is opened.
+  // So until we find a way to prevent this, we keep the following code:
+  lvProcs.Columns[1].Width := Max(80, lvProcs.ClientWidth - lvProcs.Columns[2].Width
     - lvProcs.Columns[3].Width - lvProcs.Columns[0].Width);
 end;
 
@@ -607,6 +618,9 @@ begin
   inherited;
   TControl_SetMinConstraints(Self);
 
+  FMinListWidth := 500;
+  FMinListHeight := 200;
+
   SetToolbarGradient(ToolBar);
   lvProcs.DoubleBuffered := True;
   InitializeForm;
@@ -675,6 +689,19 @@ begin
   FCodeText.ReadOnly := True;
 end;
 
+procedure TfmProcedureList.splSeparatorCanResize(Sender: TObject; var NewSize: Integer;
+  var Accept: Boolean);
+begin
+  if splSeparator.Align in [alLeft, alRight] then begin
+    if ClientWidth - NewSize < FMinListWidth then
+      NewSize := ClientWidth - FMinListWidth;
+  end else begin
+    // alTop, alBottom
+    if ClientHeight - NewSize < FMinListHeight then
+      NewSize := ClientHeight - FMinListHeight;
+  end;
+end;
+
 class function TProcedureExpert.GetName: string;
 begin
   Result := 'ProcedureList'; // Do not localize.
@@ -718,7 +745,6 @@ begin
     if ShowModal = mrOK then
     begin
       ApplyOptions(False);
-      ResizeCols;
       FillListBox;
     end;
   finally
@@ -733,7 +759,6 @@ procedure TfmProcedureList.ApplyOptions(const bLoading: Boolean);
     pnlFunctionBody.Visible := bVisible;
     splSeparator.Visible := bVisible;
     tbnShowFunctionCode.Down := bVisible;
-    ResizeCols;
   end;
 
 begin
@@ -790,7 +815,7 @@ begin
   Compare := AnsiCompareText(Item1Value, Item2Value);
 end;
 
-procedure TfmProcedureList.splSeparatorMoved(Sender: TObject);
+procedure TfmProcedureList.lvProcsResize(Sender: TObject);
 begin
   ResizeCols;
 end;

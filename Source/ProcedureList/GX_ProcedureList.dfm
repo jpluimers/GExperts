@@ -6,7 +6,7 @@ object fmProcedureList: TfmProcedureList
   BorderIcons = [biSystemMenu]
   Caption = 'Procedure List'
   ClientHeight = 287
-  ClientWidth = 538
+  ClientWidth = 742
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -23,18 +23,18 @@ object fmProcedureList: TfmProcedureList
   PixelsPerInch = 96
   TextHeight = 14
   object splSeparator: TSplitter
-    Left = 523
+    Left = 517
     Top = 0
     Width = 3
     Height = 268
     Cursor = crHSplit
     Align = alRight
-    OnMoved = splSeparatorMoved
+    OnCanResize = splSeparatorCanResize
   end
   object pnlFuncHolder: TPanel
     Left = 0
     Top = 0
-    Width = 523
+    Width = 517
     Height = 268
     Align = alClient
     BevelOuter = bvNone
@@ -43,7 +43,7 @@ object fmProcedureList: TfmProcedureList
     object pnHolder: TPanel
       Left = 0
       Top = 58
-      Width = 523
+      Width = 517
       Height = 210
       Align = alClient
       BevelOuter = bvNone
@@ -52,7 +52,7 @@ object fmProcedureList: TfmProcedureList
       object lvProcs: TListView
         Left = 0
         Top = 0
-        Width = 523
+        Width = 517
         Height = 210
         Align = alClient
         Columns = <
@@ -82,12 +82,13 @@ object fmProcedureList: TfmProcedureList
         OnColumnClick = lvProcsColumnClick
         OnCompare = lvProcsCompare
         OnDblClick = actViewGotoExecute
+        OnResize = lvProcsResize
       end
     end
     object pnlHeader: TPanel
       Left = 0
       Top = 22
-      Width = 523
+      Width = 517
       Height = 36
       Align = alTop
       BevelOuter = bvNone
@@ -129,7 +130,7 @@ object fmProcedureList: TfmProcedureList
       object pnlHeaderRight: TPanel
         Left = 252
         Top = 0
-        Width = 271
+        Width = 265
         Height = 36
         Align = alClient
         BevelOuter = bvNone
@@ -162,7 +163,7 @@ object fmProcedureList: TfmProcedureList
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 523
+      Width = 517
       Height = 22
       AutoSize = True
       DisabledImages = dmSharedImages.DisabledImages
@@ -275,7 +276,7 @@ object fmProcedureList: TfmProcedureList
   object StatusBar: TStatusBar
     Left = 0
     Top = 268
-    Width = 538
+    Width = 742
     Height = 19
     Panels = <
       item
@@ -290,9 +291,9 @@ object fmProcedureList: TfmProcedureList
     UseSystemFont = False
   end
   object pnlFunctionBody: TPanel
-    Left = 526
+    Left = 520
     Top = 0
-    Width = 12
+    Width = 222
     Height = 268
     Align = alRight
     BevelOuter = bvLowered
