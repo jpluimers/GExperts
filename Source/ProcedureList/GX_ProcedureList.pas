@@ -9,6 +9,9 @@ uses
   Controls, ExtCtrls, Messages, Forms, GX_EnhancedEditor,
   GX_ProcedureListOptions, GX_FileScanner, GX_EditReader, GX_BaseForm;
 
+const
+  UM_RESIZECOLS = WM_USER + 523;
+
 type
   TfmProcedureList = class(TfmBaseForm)
     pnlFuncHolder: TPanel;
@@ -75,7 +78,6 @@ type
     procedure actOptionsExecute(Sender: TObject);
     procedure lvProcsCompare(Sender: TObject; Item1, Item2: TListItem; Data: Integer; var Compare: Integer);
     procedure splSeparatorMoved(Sender: TObject);
-    procedure lvProcsResize(Sender: TObject);
   private
     FFileScanner: TFileScanner;
     FEditReader: TEditReader;
@@ -91,6 +93,7 @@ type
     procedure FillListBox;
     procedure ResizeCols;
     procedure GotoCurrentlySelectedProcedure;
+    procedure UMResizeCols(var Msg: TMessage); message UM_RESIZECOLS;
     procedure ClearObjectStrings;
     procedure LoadObjectCombobox;
     procedure InitializeForm;
@@ -305,9 +308,18 @@ begin
   ResizeCols;
 end;
 
+// This is just a nasty hack to be sure the scroll bar is set right
+// before playing with the column widths. We should fix this somehow.
 procedure TfmProcedureList.ResizeCols;
 begin
-  TListView_Resize(lvProcs);
+  PostMessage(Self.Handle, UM_RESIZECOLS, 0, 0);
+end;
+
+procedure TfmProcedureList.UMResizeCols(var Msg: TMessage);
+begin
+  Application.ProcessMessages;
+  lvProcs.Columns[1].Width := Max(0, lvProcs.ClientWidth - lvProcs.Columns[2].Width
+    - lvProcs.Columns[3].Width - lvProcs.Columns[0].Width);
 end;
 
 procedure TfmProcedureList.SaveSettings;
@@ -776,11 +788,6 @@ begin
   end;
 
   Compare := AnsiCompareText(Item1Value, Item2Value);
-end;
-
-procedure TfmProcedureList.lvProcsResize(Sender: TObject);
-begin
-  ResizeCols;
 end;
 
 procedure TfmProcedureList.splSeparatorMoved(Sender: TObject);
