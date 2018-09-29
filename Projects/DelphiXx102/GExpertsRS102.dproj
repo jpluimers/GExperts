@@ -542,6 +542,17 @@ $(PreBuildEvent)]]>
         <DCCReference Include="..\..\Source\Framework\GX_DummyWizard.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeMessageAutoClose.pas"/>
         <DCCReference Include="..\..\Source\Utils\GX_MemoEscFix.pas"/>
+        <DCCReference Include="..\..\Source\KeyboardShortcuts\GX_KeyboardShortcuts.pas">
+            <Form>fmGxKeyboardShortcuts</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeDockFormEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Experts\GX_AddDockWindow.pas">
+            <Form>fmGxDockForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eRemoveMatchingLines.pas">
+            <Form>fmRemoveMatchingLinesExpertConfig</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
