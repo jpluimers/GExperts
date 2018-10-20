@@ -195,7 +195,8 @@ type
     property ShowPreview: Boolean read GetShowPreview write SetShowPreview;
     function CreateEmptyRootNode: TTreeNode;
     function ConfigurationKey: string;
-    function ExecuteFile(AListItem: TListItem): Boolean;
+    function ExecuteFile(AFile: TGXFile): Boolean;
+    function ExecuteFileItem(AListItem: TListItem): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -203,6 +204,7 @@ type
     procedure SetFilter;
     function MakeFileNameAbsolute(const FileName: string): string;
     function MakeFileNameRelative(const FileName: string): string;
+    function TryGetRootFolder(out _Folder: TGXFolder): Boolean;
   end;
 
 implementation
@@ -226,6 +228,14 @@ type
   TFilesExpert = class(TGX_Expert)
   private
     FFavoriteFiles: TfmFavFiles;
+    FFavMenuItem: TMenuItem;
+    function FindRecentMenuItem(out _MenuItem: TMenuItem): Boolean;
+    procedure OnFavoritesClicked(_Sender: TObject);
+    procedure OnFavFolderClicked(_Sender: TObject);
+    procedure OnFavFileClicked(_Sender: TObject);
+    procedure OnFavDummyClick(_Sender: TObject);
+    function TryGetRootFolder(out _Folder: TGXFolder): Boolean;
+    function TryGetMenuItem(_Sender: TObject; out _mi: TMenuItem): Boolean;
   protected
     procedure SetActive(New: Boolean); override;
   public
@@ -233,6 +243,8 @@ type
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
+    // Do any delayed setup after the IDE is done initializing
+    procedure AfterIDEInitialized; override;
   end;
 
 const // Do not localize any of the strings in this const section:
@@ -1362,9 +1374,9 @@ begin
   ListView.ViewStyle := vsReport;
 end;
 
-function TfmFavFiles.ExecuteFile(AListItem: TListItem): Boolean;
+
+function TfmFavFiles.ExecuteFile(AFile: TGXFile): Boolean;
 var
-  mFile: TGXFile;
   LoadFile: string;
   Ext: string;
 resourcestring
@@ -1372,18 +1384,17 @@ resourcestring
   SCouldNotOpen = 'Could not open file %s';
 begin
   Result := False;
-  mFile := GetFile(AListItem);
-  if mFile = nil then
+  if AFile = nil then
     Exit;
 
-  LoadFile := MakeFileNameAbsolute(mFile.FileName);
+  LoadFile := MakeFileNameAbsolute(AFile.FileName);
   if not (FileExists(LoadFile) or DirectoryExists(LoadFile)) then
   begin
     MessageDlg(Format(SFileDoesNotExist, [LoadFile]), mtError, [mbOK], 0);
     Exit;
   end
   else
-    case mFile.ExecType of
+    case AFile.ExecType of
       etLoadInIDE:
         begin
           if not GxOtaMakeSourceVisible(LoadFile) then
@@ -1401,7 +1412,7 @@ begin
         end;
       etCustom:
         begin
-          GXShellExecute(mFile.ExecProg, LoadFile, True);
+          GXShellExecute(AFile.ExecProg, LoadFile, True);
           Result := True;
         end;
       etProject:
@@ -1421,6 +1432,14 @@ begin
     end;
 end;
 
+function TfmFavFiles.ExecuteFileItem(AListItem: TListItem): Boolean;
+var
+  mFile: TGXFile;
+begin
+  mFile := GetFile(AListItem);
+  Result := ExecuteFile(mFile);
+end;
+
 procedure TfmFavFiles.ExecuteSelectedFiles;
 var
   i: Integer;
@@ -1433,7 +1452,7 @@ begin
     begin
       ListItem := ListView.Items[i];
       if ListItem.Selected then
-        if not ExecuteFile(ListItem) then
+        if not ExecuteFileItem(ListItem) then
           Break;
     end;
   end;
@@ -1607,6 +1626,187 @@ begin
   Result := 'FavoriteFiles'; // Do not localize.
 end;
 
+function TFilesExpert.FindRecentMenuItem(out _MenuItem: TMenuItem): Boolean;
+var
+  MainMenu: TMainMenu;
+begin
+  Result := False;
+  MainMenu := GxOtaGetIdeMainMenu;
+  if not Assigned(MainMenu) then
+    Exit;
+  Result := TMainMenu_FindMenuItem(MainMenu, 'FileClosedFilesItem', _MenuItem);
+end;
+
+function TMenuItem_InsertSubmenuItem(_mi: TMenuItem; _Idx: Integer; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem;
+begin
+  Result := TMenuItem.Create(_mi);
+  Result.Caption := _Caption;
+  Result.OnClick := _OnClick;
+  _mi.Insert(_Idx, Result);
+end;
+
+procedure TFilesExpert.AfterIDEInitialized;
+var
+  mi: TMenuItem;
+  Parent: TMenuItem;
+  Idx: Integer;
+begin
+  inherited;
+  if not FindRecentMenuItem(mi) then
+    Exit; //==>
+  Parent := mi.Parent;
+  if not Assigned(Parent)  then
+    Exit; //==>
+  Idx := Parent.IndexOf(mi);
+  if Idx = -1 then
+    Exit; //==>
+
+  FFavMenuItem :=  TMenuItem_InsertSubmenuItem(Parent, Idx, 'Favorites', OnFavoritesClicked);
+  TMenuItem_AppendSubmenuItem(FFavMenuItem, 'dummy entry', OnFavDummyClick);
+end;
+
+function TFilesExpert.TryGetRootFolder(out _Folder: TGXFolder): Boolean;
+begin
+  if FFavoriteFiles = nil then begin
+    FFavoriteFiles := TfmFavFiles.Create(nil);
+    SetFormIcon(FFavoriteFiles);
+  end;
+  Result := FFavoriteFiles.TryGetRootFolder(_Folder);
+end;
+
+type
+  // TTabMenuAction is not declared in Delphi
+  // I got it from
+  // https://stackoverflow.com/a/19060450/49925
+  // Which is apparently taken from
+  // http://codecentral.embarcadero.com/Item/19272
+  // which was posted by Steve Trefethen who used to work for Borland/Codegear/Embarcadero.
+  // That's probably why the code actually works (for Delphi 2007, have not yet checked the other
+  // versions).
+  TABMenuAction = class(TCustomAction)
+  private
+    FMenuItem: TMenuItem;
+  end;
+
+function TMenuItem_FindCaption(_mi: TMenuItem; const _Caption: string; out _miFound: TMenuItem): boolean;
+var
+  i: integer;
+  mi: TMenuItem;
+begin
+  for i := 0 to _mi.Count - 1 do begin
+    mi := _mi.Items[i];
+    if AnsiSameText(StripHotkey(mi.Caption), _Caption) then begin
+      _miFound := mi;
+      Result := True;
+      Exit; //==>
+    end;
+    if TMenuItem_FindCaption(mi, _Caption, _miFound) then begin
+      Result := True;
+      Exit; //==>
+    end;
+  end;
+  Result := False;
+end;
+
+function TFilesExpert.TryGetMenuItem(_Sender: TObject; out _mi: TMenuItem): Boolean;
+var
+  ABact: TABMenuAction;
+  s: string;
+begin
+  // in Delphi 2007, Sender for the folder menus is TMenuEntry and for the files is TABMenuAction
+  // in Delphi 10.3, Sender is always TABMenuAction
+  // I haven't checked for the intermediate versions but it seems to work for these too.
+  Result := False;
+
+  if not Assigned(_Sender) then begin
+    Exit; //
+  end;
+
+  if _Sender is TMenuItem then begin
+    _mi := _Sender as TMenuItem;
+    Result := True;
+    Exit; //==>
+  end;
+
+  if _Sender.ClassNameIs(TABMenuAction.ClassName) then begin
+    // this works in Delphi 2007 and up (haven't tested 2005 and 2006 yet
+    ABact := TABMenuAction(_Sender);
+    _mi := ABact.FMenuItem;
+    Result := Assigned(_mi);
+    Exit; //==>
+  end;
+
+  if _Sender.ClassNameIs(TCustomAction.ClassName) then begin
+    // This is for Delphi 7 (and probably 6)
+    s := StripHotkey(TCustomAction(_Sender).Caption);
+    Result :=  TMenuItem_FindCaption(FFavMenuItem, s, _mi);
+  end;
+end;
+
+procedure TFilesExpert.OnFavDummyClick(_Sender: TObject);
+begin
+  // this should never be called
+end;
+
+procedure TFilesExpert.OnFavoritesClicked(_Sender: TObject);
+var
+  FavMi: TMenuItem;
+  Folder: TGXFolder;
+begin
+  if not TryGetMenuItem(_Sender, FavMi) then
+    Exit; //==>
+  if not TryGetRootFolder(Folder) then
+    Exit; //==>
+
+  FavMi.Clear;
+
+  FavMi.Tag := GXNativeUInt(Folder);
+  OnFavFolderClicked(FavMi);
+end;
+
+procedure TFilesExpert.OnFavFolderClicked(_Sender: TObject);
+var
+  FavMi: TMenuItem;
+  mi: TMenuItem;
+  i: Integer;
+  Folder: TGXFolder;
+  FavFolder: TGXFolder;
+  Fil: TGXFile;
+begin
+  if not TryGetMenuItem(_Sender, FavMi) then
+    Exit; //==>
+
+  FavMi.Clear;
+
+  FavFolder := TGXFolder(FavMi.Tag);
+  if not Assigned(FavFolder) then
+    Exit; //==>
+
+  for i := 0 to FavFolder.FolderCount - 1 do begin
+    Folder := FavFolder.Folders[i];
+    mi := TMenuItem_AppendSubmenuItem(FavMi, Folder.FolderName, OnFavFolderClicked);
+    mi.Tag := GXNativeUInt(Folder);
+    TMenuItem_AppendSubmenuItem(mi, 'dummy entry', OnFavDummyClick);
+  end;
+  for i := 0 to FavFolder.FileCount - 1 do begin
+    fil := FavFolder.Files[i];
+    mi := TMenuItem_AppendSubmenuItem(FavMi, Fil.DName, OnFavFileClicked);
+    mi.Tag := GXNativeUInt(Fil);
+  end;
+end;
+
+procedure TFilesExpert.OnFavFileClicked(_Sender: TObject);
+var
+  FavMi: TMenuItem;
+  FavFile: TGXFile;
+begin
+  if not TryGetMenuItem(_Sender, FavMi) then
+    Exit; //==>
+
+  FavFile := TGXFile(FavMi.Tag);
+  FFavoriteFiles.ExecuteFile(FavFile);
+end;
+
 procedure TFilesExpert.Execute(Sender: TObject);
 begin
   if FFavoriteFiles = nil then
@@ -1665,6 +1865,17 @@ begin
     MenuItem.Tag := i;
     MenuItem.OnClick := mitOptionsCollectionOpenMRUExecute;
     mitOptionsCollectionReopen.Add(MenuItem);
+  end;
+end;
+
+function TfmFavFiles.TryGetRootFolder(out _Folder: TGXFolder): Boolean;
+var
+  RootNode: TTreeNode;
+begin
+  RootNode  := tvFolders.Items.GetFirstNode;
+  Result := Assigned(RootNode);
+  if Result then begin
+    _Folder := RootNode.Data;
   end;
 end;
 

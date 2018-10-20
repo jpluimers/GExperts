@@ -548,7 +548,7 @@ function TTreeView_GetAsText(_Tree: TTreeView; _Indentation: Integer = 2; _Marke
 type
   TTreeNodeArr = array of TTreeNode;
 
-///<summary>
+  ///<summary>
 /// Since accessing TTreeNodes.Items is very slow, this helper function enumerates all nodes once
 /// and returns an array that can then be used instead.
 /// NOTE: Keep in mind that any manipuplation of the TTreeNodes will result in that array to be out
@@ -1287,11 +1287,11 @@ procedure TPopupMenu_AppendAllMenuItems(_Dest: TPopupMenu; _Src: TPopupMenu; _In
 /// Appends menu items for all actions in Src to the menu items of Dest, optionally with a divider
 /// between the existing and the new items. </summary>
 procedure TPopupMenu_AppendAllActions(_Dest: TPopupMenu; _Src: TActionList; _InsertDivider: Boolean = True);
-
+{$ENDIF GExperts}
 ///<summary>
 /// Appends a new menu item with the given Caption to the given menu item and returns it </summary>
 function TMenuItem_AppendSubmenuItem(_mi: TMenuItem; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem; overload;
-
+{$IFNDEF GExperts}
 ///<summary>
 /// Appends a new sub menu item with the given Action to the given menu item and returns it </summary>
 function TMenuItem_AppendSubmenuItem(_mi: TMenuItem; _Action: TBasicAction): TMenuItem; overload;
@@ -4372,7 +4372,7 @@ begin
   end;
   Result := False;
 end;
-{$IFNDEF GExperts}
+
 function TMenuItem_AppendSubmenuItem(_mi: TMenuItem; const _Caption: string; _OnClick: TNotifyEvent): TMenuItem;
 begin
   Result := TMenuItem.Create(_mi);
@@ -4380,7 +4380,7 @@ begin
   Result.OnClick := _OnClick;
   _mi.Add(Result);
 end;
-
+{$IFNDEF GExperts}
 function TMenuItem_AppendSubmenuItem(_mi: TMenuItem; _Action: TBasicAction): TMenuItem;
 begin
   Result := TMenuItem.Create(_mi);
