@@ -1660,12 +1660,12 @@ begin
   if not FindRecentMenuItem(mi) then
     Exit; //==>
   Parent := mi.Parent;
-  if not Assigned(Parent)  then
+  if not Assigned(Parent) then
     Exit; //==>
   Idx := Parent.IndexOf(mi);
   if Idx = -1 then
     Exit; //==>
-  FFavMenuItem :=  TMenuItem_InsertSubmenuItem(Parent, Idx, 'Favorites', OnFavoritesClicked);
+  FFavMenuItem := TMenuItem_InsertSubmenuItem(Parent, Idx + 1, 'Favorites', OnFavoritesClicked);
   TMenuItem_AppendSubmenuItem(FFavMenuItem, 'dummy entry', OnFavDummyClick);
 end;
 
@@ -1692,9 +1692,9 @@ type
     FMenuItem: TMenuItem;
   end;
 
-function TMenuItem_FindCaption(_mi: TMenuItem; const _Caption: string; out _miFound: TMenuItem): boolean;
+function TMenuItem_FindCaption(_mi: TMenuItem; const _Caption: string; out _miFound: TMenuItem): Boolean;
 var
-  i: integer;
+  i: Integer;
   mi: TMenuItem;
 begin
   for i := 0 to _mi.Count - 1 do begin
@@ -1745,7 +1745,7 @@ begin
   if _Sender.ClassNameIs(TCustomAction.ClassName) then begin
     // This is for Delphi 7 (but doesn't work for Delphi 6)
     s := StripHotkey(TCustomAction(_Sender).Caption);
-    Result :=  TMenuItem_FindCaption(FFavMenuItem, s, _mi);
+    Result := TMenuItem_FindCaption(FFavMenuItem, s, _mi);
   end;
 end;
 
@@ -1820,7 +1820,7 @@ begin
     if PrefixCnt >= MaxPrefix then
       Exit; // we cannot add more than MaxPrefix entries
     s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + s;
-    mi := TMenuItem_AppendSubmenuItem(FavMi,  s, OnFavFolderClicked);
+    mi := TMenuItem_AppendSubmenuItem(FavMi, s, OnFavFolderClicked);
     mi.Tag := GXNativeUInt(Folder);
     TMenuItem_AppendSubmenuItem(mi, 'dummy entry', OnFavDummyClick);
     Inc(PrefixCnt);
@@ -1828,7 +1828,7 @@ begin
   if PrefixCnt > 0 then
     TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
   for i := 0 to FavFolder.FileCount - 1 do begin
-    fil := FavFolder.Files[i];
+    Fil := FavFolder.Files[i];
     s := Fil.DName;
     if PrefixCnt >= MaxPrefix then
       Exit; // we cannot add more than MaxPrefix entries
