@@ -228,6 +228,7 @@ type
   TFilesExpert = class(TGX_Expert)
   private
     FFavoriteFiles: TfmFavFiles;
+{$IFDEF GX_VER150_up}
     FFavMenuItem: TMenuItem;
     function FindRecentMenuItem(out _MenuItem: TMenuItem): Boolean;
     procedure OnFavoritesClicked(_Sender: TObject);
@@ -236,6 +237,7 @@ type
     procedure OnFavDummyClick(_Sender: TObject);
     function TryGetRootFolder(out _Folder: TGXFolder): Boolean;
     function TryGetMenuItem(_Sender: TObject; out _mi: TMenuItem): Boolean;
+{$ENDIF}
   protected
     procedure SetActive(New: Boolean); override;
   public
@@ -243,8 +245,10 @@ type
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
-    // Do any delayed setup after the IDE is done initializing
+{$IFDEF GX_VER150_up}
+    // add a Favorites entry to the Files menu, does not work for Delphi 6
     procedure AfterIDEInitialized; override;
+{$ENDIF}
   end;
 
 const // Do not localize any of the strings in this const section:
@@ -1626,6 +1630,7 @@ begin
   Result := 'FavoriteFiles'; // Do not localize.
 end;
 
+{$IFDEF GX_VER150_up}
 function TFilesExpert.FindRecentMenuItem(out _MenuItem: TMenuItem): Boolean;
 var
   MainMenu: TMainMenu;
@@ -1660,7 +1665,6 @@ begin
   Idx := Parent.IndexOf(mi);
   if Idx = -1 then
     Exit; //==>
-
   FFavMenuItem :=  TMenuItem_InsertSubmenuItem(Parent, Idx, 'Favorites', OnFavoritesClicked);
   TMenuItem_AppendSubmenuItem(FFavMenuItem, 'dummy entry', OnFavDummyClick);
 end;
@@ -1716,6 +1720,8 @@ begin
   // in Delphi 2007, Sender for the folder menus is TMenuEntry and for the files is TABMenuAction
   // in Delphi 10.3, Sender is always TABMenuAction
   // I haven't checked for the intermediate versions but it seems to work for these too.
+  // In Delphi 7 Sender is TCustomAction and I found no way to get the actual menu entry directly,
+  // so we search for the caption.
   Result := False;
 
   if not Assigned(_Sender) then begin
@@ -1737,7 +1743,7 @@ begin
   end;
 
   if _Sender.ClassNameIs(TCustomAction.ClassName) then begin
-    // This is for Delphi 7 (and probably 6)
+    // This is for Delphi 7 (but doesn't work for Delphi 6)
     s := StripHotkey(TCustomAction(_Sender).Caption);
     Result :=  TMenuItem_FindCaption(FFavMenuItem, s, _mi);
   end;
@@ -1758,13 +1764,36 @@ begin
   if not TryGetRootFolder(Folder) then
     Exit; //==>
 
-  FavMi.Clear;
-
   FavMi.Tag := GXNativeUInt(Folder);
   OnFavFolderClicked(FavMi);
+  if FavMi.Count > 0 then
+    TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
+  TMenuItem_AppendSubmenuItem(FavMi, 'X Configure ...', Execute);
+end;
+
+const
+  /// <summary>
+  /// String containing all characters that can be used as digits
+  /// </summary>
+  DIGIT_CHARS: string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function Long2Num(_l: ULong; _Base: Byte; _MinWidth: Integer = 1): string;
+var
+  m: Byte;
+begin
+  Result := '';
+  while _l > 0 do begin
+    m := _l mod _Base;
+    _l := _l div _Base;
+    Result := DIGIT_CHARS[m + 1] + Result;
+  end;
+  while Length(Result) < _MinWidth do
+    Result := '0' + Result;
 end;
 
 procedure TFilesExpert.OnFavFolderClicked(_Sender: TObject);
+const
+  MaxPrefix = Ord('X') - Ord('A') + 10;
 var
   FavMi: TMenuItem;
   mi: TMenuItem;
@@ -1772,6 +1801,8 @@ var
   Folder: TGXFolder;
   FavFolder: TGXFolder;
   Fil: TGXFile;
+  s: string;
+  PrefixCnt: Integer;
 begin
   if not TryGetMenuItem(_Sender, FavMi) then
     Exit; //==>
@@ -1782,16 +1813,29 @@ begin
   if not Assigned(FavFolder) then
     Exit; //==>
 
+  PrefixCnt := 0;
   for i := 0 to FavFolder.FolderCount - 1 do begin
     Folder := FavFolder.Folders[i];
-    mi := TMenuItem_AppendSubmenuItem(FavMi, Folder.FolderName, OnFavFolderClicked);
+    s := Folder.FolderName;
+    if PrefixCnt >= MaxPrefix then
+      Exit; // we cannot add more than MaxPrefix entries
+    s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + s;
+    mi := TMenuItem_AppendSubmenuItem(FavMi,  s, OnFavFolderClicked);
     mi.Tag := GXNativeUInt(Folder);
     TMenuItem_AppendSubmenuItem(mi, 'dummy entry', OnFavDummyClick);
+    Inc(PrefixCnt);
   end;
+  if PrefixCnt > 0 then
+    TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
   for i := 0 to FavFolder.FileCount - 1 do begin
     fil := FavFolder.Files[i];
-    mi := TMenuItem_AppendSubmenuItem(FavMi, Fil.DName, OnFavFileClicked);
+    s := Fil.DName;
+    if PrefixCnt >= MaxPrefix then
+      Exit; // we cannot add more than MaxPrefix entries
+    s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + s;
+    mi := TMenuItem_AppendSubmenuItem(FavMi, s, OnFavFileClicked);
     mi.Tag := GXNativeUInt(Fil);
+    Inc(PrefixCnt);
   end;
 end;
 
@@ -1806,6 +1850,7 @@ begin
   FavFile := TGXFile(FavMi.Tag);
   FFavoriteFiles.ExecuteFile(FavFile);
 end;
+{$ENDIF}
 
 procedure TFilesExpert.Execute(Sender: TObject);
 begin
