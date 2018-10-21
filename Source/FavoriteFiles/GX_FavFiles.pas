@@ -10,6 +10,17 @@ uses
   ImageList, GX_BaseForm;
 
 type
+  TFavFilesOptions = class
+  public
+    FFolderDelete: Boolean;
+    FExpandAll: Boolean;
+    FExecHide: Boolean;
+    FShowPreview: Boolean;
+    FIsFavMenuVisible: Boolean;
+    constructor Create;
+  end;
+
+type
   TfmFavFiles = class(TfmBaseForm)
     MainMenu: TMainMenu;
     mitFile: TMenuItem;
@@ -158,11 +169,10 @@ type
     FFileViewer: TFileViewer;
     FEntryFile: string;
     FMRUEntryFiles: TStrings;
-    FFolderDelete: Boolean;
-    FExpandAll: Boolean;
-    FExecHide: Boolean;
+    FOptions: TFavFilesOptions;
     FModified: Boolean;
     FFileDrop: TDropFileTarget;
+    FOnSettingsChanged: TNotifyEvent;
     function GetFolder(const FolderNode: TTreeNode): TGXFolder;
     function GetFile(const FileItem: TListItem): TGXFile;
     procedure FileToListItem(const AFile: TGXFile; const AListItem: TListItem);
@@ -188,23 +198,23 @@ type
     function GetDefaultEntryFileName: string;
     procedure SetEntryFile(const Value: string);
     procedure AddFileToCurrentFolder(const AFileName: string);
+    procedure doOnSettingsChanged;
     property EntryFile: string read FEntryFile write SetEntryFile;
     property MRUEntryFiles: TStrings read FMRUEntryFiles;
-    function GetShowPreview: Boolean;
     procedure SetShowPreview(Value: Boolean);
-    property ShowPreview: Boolean read GetShowPreview write SetShowPreview;
     function CreateEmptyRootNode: TTreeNode;
     function ConfigurationKey: string;
     function ExecuteFile(AFile: TGXFile): Boolean;
     function ExecuteFileItem(AListItem: TListItem): Boolean;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; _Options: TFavFilesOptions); reintroduce;
     destructor Destroy; override;
     procedure AssignIconImage(Image: TImage; const ContainerFileName: string);
     procedure SetFilter;
     function MakeFileNameAbsolute(const FileName: string): string;
     function MakeFileNameRelative(const FileName: string): string;
     function TryGetRootFolder(out _Folder: TGXFolder): Boolean;
+    property OnSettingsChanged: TNotifyEvent read FOnSettingsChanged write FOnSettingsChanged;
   end;
 
 implementation
@@ -228,6 +238,7 @@ type
   TFilesExpert = class(TGX_Expert)
   private
     FFavoriteFiles: TfmFavFiles;
+    FOptions: TFavFilesOptions;
 {$IFDEF GX_VER150_up}
     FFavMenuItem: TMenuItem;
     function FindRecentMenuItem(out _MenuItem: TMenuItem): Boolean;
@@ -237,12 +248,17 @@ type
     procedure OnFavDummyClick(_Sender: TObject);
     function TryGetRootFolder(out _Folder: TGXFolder): Boolean;
     function TryGetMenuItem(_Sender: TObject; out _mi: TMenuItem): Boolean;
+    procedure HandleOnSettingsChanged(_Sender: TObject);
+    procedure InsertFavMenuItem;
 {$ENDIF}
   protected
     procedure SetActive(New: Boolean); override;
   public
+    constructor Create; override;
+    destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
+    procedure Configure; override;
     procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
 {$IFDEF GX_VER150_up}
@@ -644,7 +660,7 @@ begin
   Node.ImageIndex := 0;
   Node.SelectedIndex := 1;
   CreateFolders(Root, Node);
-  Node.Expand(FExpandAll);
+  Node.Expand(FOptions.FExpandAll);
   if (tvFolders.Selected = nil) and (tvFolders.Items.Count > 0) then
     tvFolders.Selected := tvFolders.Items[0];
 end;
@@ -737,7 +753,7 @@ begin
     MessageDlg(SCannotDeleteRoot, mtError, [mbOK], 0);
     Exit;
   end;
-  if FFolderDelete then
+  if FOptions.FFolderDelete then
     if MessageDlg(Format(SConfirmDeleteFolder, [SelectedItem.Text]), mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
       Exit;
   GetFolder(SelectedItem).Free;
@@ -778,10 +794,10 @@ begin
       Settings.DeleteKey(ConfigurationKey, 'EntryFile')
     else
       Settings.WriteString(ConfigurationKey, 'EntryFile', FEntryFile);
-    Settings.WriteBool(ConfigurationKey, 'FolderDelete', FFolderDelete);
-    Settings.WriteBool(ConfigurationKey, 'ExpandAll', FExpandAll);
-    Settings.WriteBool(ConfigurationKey, 'ExecHide', FExecHide);
-    Settings.WriteBool(ConfigurationKey, 'ShowPreview', ShowPreview);
+    Settings.WriteBool(ConfigurationKey, 'FolderDelete', FOptions.FFolderDelete);
+    Settings.WriteBool(ConfigurationKey, 'ExpandAll', FOptions.FExpandAll);
+    Settings.WriteBool(ConfigurationKey, 'ExecHide', FOptions.FExecHide);
+    Settings.WriteBool(ConfigurationKey, 'ShowPreview', FOptions.FShowPreview);
     Settings.WriteInteger(ConfigurationKey + '\Window', 'ListView', Ord(ListView.ViewStyle));
     Settings.WriteStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
   finally
@@ -804,10 +820,10 @@ begin
     tvFolders.Width := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter', tvFolders.Width);
     FFileViewer.Height := Settings.ReadInteger(ConfigurationKey + '\Window', 'Splitter2', FFileViewer.Height);
     EntryFile := Settings.ReadString(ConfigurationKey, 'EntryFile', GetDefaultEntryFileName);
-    FFolderDelete := Settings.ReadBool(ConfigurationKey, 'FolderDelete', FFolderDelete);
-    FExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', FExpandAll);
-    FExecHide := Settings.ReadBool(ConfigurationKey, 'ExecHide', FExecHide);
-    ShowPreview := Settings.ReadBool(ConfigurationKey, 'ShowPreview', ShowPreview);
+    FOptions.FFolderDelete := Settings.ReadBool(ConfigurationKey, 'FolderDelete', FOptions.FFolderDelete);
+    FOptions.FExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', FOptions.FExpandAll);
+    FOptions.FExecHide := Settings.ReadBool(ConfigurationKey, 'ExecHide', FOptions.FExecHide);
+    FOptions.FShowPreview := Settings.ReadBool(ConfigurationKey, 'ShowPreview', FOptions.FShowPreview);
     ListView.ViewStyle := TViewStyle(Settings.ReadInteger(ConfigurationKey + '\Window', 'ListView', Ord(ListView.ViewStyle)));
     Assert(ListView.ViewStyle in [Low(TViewStyle)..High(TViewStyle)]);
     Settings.ReadStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
@@ -869,7 +885,7 @@ var
 begin
   if (csDestroying in ComponentState) then Exit;
 
-  if (ListView.Selected <> nil) and ShowPreview then
+  if (ListView.Selected <> nil) and FOptions.FShowPreview then
   begin
     if ListView.SelCount = 1 then
     begin
@@ -1148,11 +1164,6 @@ begin
   end;
 end;
 
-function TfmFavFiles.GetShowPreview: Boolean;
-begin
-  Result := pnlFileView.Visible;
-end;
-
 procedure TfmFavFiles.actFileNewFolderExecute(Sender: TObject);
 begin
   CreateNewFolder;
@@ -1175,25 +1186,18 @@ begin
       tvFolders.Selected := tvFolders.Selected.Parent;
 end;
 
-procedure TfmFavFiles.actOptionsOptionsExecute(Sender: TObject);
-var
-  Dlg: TfmFavOptions;
+procedure TfmFavFiles.doOnSettingsChanged;
 begin
-  Dlg := TfmFavOptions.Create(nil);
-  try
-    Dlg.chkConfirmFolderDelete.Checked := FFolderDelete;
-    Dlg.chkExpandAllOnLoad.Checked := FExpandAll;
-    Dlg.chkHideOnExecute.Checked := FExecHide;
-    Dlg.chkShowPreview.Checked := ShowPreview;
-    if Dlg.ShowModal = mrOk then
-    begin
-      FFolderDelete := Dlg.chkConfirmFolderDelete.Checked;
-      FExpandAll := Dlg.chkExpandAllOnLoad.Checked;
-      FExecHide := Dlg.chkHideOnExecute.Checked;
-      ShowPreview := Dlg.chkShowPreview.Checked;
-    end;
-  finally
-    FreeAndNil(Dlg);
+  if Assigned(FOnSettingsChanged) then
+    FOnSettingsChanged(Self);
+end;
+
+procedure TfmFavFiles.actOptionsOptionsExecute(Sender: TObject);
+begin
+  if TfmFavOptions.Execute(Self, FOptions.FFolderDelete, FOptions.FExpandAll, FOptions.FExecHide,
+    FOptions.FShowPreview, FOptions.FIsFavMenuVisible) then begin
+    SetShowPreview(FOptions.FShowPreview);
+    doOnSettingsChanged;
   end;
 end;
 
@@ -1404,7 +1408,7 @@ begin
           if not GxOtaMakeSourceVisible(LoadFile) then
             MessageDlg(Format(SCouldNotOpen, [LoadFile]), mtError, [mbOK], 0)
           else begin
-            if (not IsStandAlone) and FExecHide then
+            if (not IsStandAlone) and FOptions.FExecHide then
               Self.Hide;
             Result := True;
           end;
@@ -1429,7 +1433,7 @@ begin
               (BorlandIdeServices as IOTAActionServices).OpenFile(LoadFile)
             else
               (BorlandIdeServices as IOTAActionServices).OpenProject(LoadFile, True);
-            if (not IsStandAlone) and FExecHide then
+            if (not IsStandAlone) and FOptions.FExecHide then
               Self.Hide;
           end;
         end;
@@ -1462,7 +1466,7 @@ begin
   end;
 end;
 
-constructor TfmFavFiles.Create(AOwner: TComponent);
+constructor TfmFavFiles.Create(AOwner: TComponent; _Options: TFavFilesOptions);
 resourcestring
   SOpenFilter = // Note: Localize only the descriptive text, not the extensions
     'Source Files (*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.pas;*.cpp;*.hpp;*.c;*.h)|*.dpr;*.bpr;*.dpk;*.bpk;*.bpg;*.pas;*.cpp;*.hpp;*.c;*.h' +
@@ -1478,7 +1482,9 @@ resourcestring
     '|All Files (' + AllFilesWildCard + ')|' + AllFilesWildCard;
     // Update SetFilter when you change these
 begin
-  inherited;
+  inherited Create(AOwner);
+
+  FOptions := _Options;
 
   TControl_SetMinConstraints(Self);
 
@@ -1493,10 +1499,7 @@ begin
   FFileViewer.Parent := pnlFileView;
   FFileViewer.Align := alClient;
 
-  FExpandAll := False;
-  FFolderDelete := True;
-  FExecHide := True;
-  ShowPreview := True;
+  SetShowPreview(FOptions.FShowPreview);
   FMRUEntryFiles := TStringList.Create;
 
   SetupSystemImageLists;
@@ -1614,6 +1617,11 @@ begin
 
         FreeAndNil(FFavoriteFiles);
       end;
+      if Assigned(FFavMenuItem) then
+        FreeAndNil(FFavMenuItem);
+    end else begin
+      FFavoriteFiles := TfmFavFiles.Create(nil, FOptions);
+      FFavoriteFiles.OnSettingsChanged := HandleOnSettingsChanged;
     end;
   end;
 end;
@@ -1631,6 +1639,17 @@ begin
 end;
 
 {$IFDEF GX_VER150_up}
+procedure TFilesExpert.HandleOnSettingsChanged(_Sender: TObject);
+begin
+  if FOptions.FIsFavMenuVisible then begin
+    if not Assigned(FFavMenuItem) then
+      InsertFavMenuItem;
+  end else begin
+    if Assigned(FFavMenuItem) then
+      FreeAndNil(FFavMenuItem);
+  end;
+end;
+
 function TFilesExpert.FindRecentMenuItem(out _MenuItem: TMenuItem): Boolean;
 var
   MainMenu: TMainMenu;
@@ -1650,13 +1669,12 @@ begin
   _mi.Insert(_Idx, Result);
 end;
 
-procedure TFilesExpert.AfterIDEInitialized;
+procedure TFilesExpert.InsertFavMenuItem;
 var
   mi: TMenuItem;
   Parent: TMenuItem;
   Idx: Integer;
 begin
-  inherited;
   if not FindRecentMenuItem(mi) then
     Exit; //==>
   Parent := mi.Parent;
@@ -1666,14 +1684,22 @@ begin
   if Idx = -1 then
     Exit; //==>
   FFavMenuItem := TMenuItem_InsertSubmenuItem(Parent, Idx + 1, 'Favorites', OnFavoritesClicked);
+  FFavMenuItem.Name := 'GX_FavoritesMenu';
   TMenuItem_AppendSubmenuItem(FFavMenuItem, 'dummy entry', OnFavDummyClick);
+end;
+
+procedure TFilesExpert.AfterIDEInitialized;
+begin
+  inherited;
+  InsertFavMenuItem;
 end;
 
 function TFilesExpert.TryGetRootFolder(out _Folder: TGXFolder): Boolean;
 begin
   if FFavoriteFiles = nil then begin
-    FFavoriteFiles := TfmFavFiles.Create(nil);
+    FFavoriteFiles := TfmFavFiles.Create(nil, FOptions);
     SetFormIcon(FFavoriteFiles);
+    FFavoriteFiles.OnSettingsChanged := HandleOnSettingsChanged;
   end;
   Result := FFavoriteFiles.TryGetRootFolder(_Folder);
 end;
@@ -1852,12 +1878,32 @@ begin
 end;
 {$ENDIF}
 
+procedure TFilesExpert.Configure;
+begin
+  if TfmFavOptions.Execute(nil, FOptions.FFolderDelete, FOptions.FExpandAll, FOptions.FExecHide,
+    FOptions.FShowPreview, FOptions.FIsFavMenuVisible) then
+    HandleOnSettingsChanged(nil);
+end;
+
+constructor TFilesExpert.Create;
+begin
+  inherited;
+  FOptions := TFavFilesOptions.Create;
+end;
+
+destructor TFilesExpert.Destroy;
+begin
+  FreeAndNil(FOptions);
+  inherited;
+end;
+
 procedure TFilesExpert.Execute(Sender: TObject);
 begin
   if FFavoriteFiles = nil then
   begin
-    FFavoriteFiles := TfmFavFiles.Create(nil);
+    FFavoriteFiles := TfmFavFiles.Create(nil, FOptions);
     SetFormIcon(FFavoriteFiles);
+    FFavoriteFiles.OnSettingsChanged := HandleOnSettingsChanged;
   end;
   if FFavoriteFiles.WindowState = wsMinimized then
     FFavoriteFiles.WindowState := wsNormal;
@@ -1868,7 +1914,7 @@ end;
 
 function TFilesExpert.HasConfigOptions: Boolean;
 begin
-  Result := False;
+  Result := True;
 end;
 
 procedure TfmFavFiles.actFileSelectAllExecute(Sender: TObject);
@@ -1922,6 +1968,18 @@ begin
   if Result then begin
     _Folder := RootNode.Data;
   end;
+end;
+
+{ TFavFilesOptions }
+
+constructor TFavFilesOptions.Create;
+begin
+  inherited;
+  FExpandAll := False;
+  FFolderDelete := True;
+  FExecHide := True;
+  FShowPreview := True;
+  FIsFavMenuVisible := True;
 end;
 
 initialization
