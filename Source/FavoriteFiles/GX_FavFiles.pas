@@ -798,6 +798,7 @@ begin
     Settings.WriteBool(ConfigurationKey, 'ExpandAll', FOptions.FExpandAll);
     Settings.WriteBool(ConfigurationKey, 'ExecHide', FOptions.FExecHide);
     Settings.WriteBool(ConfigurationKey, 'ShowPreview', FOptions.FShowPreview);
+    Settings.WriteBool(ConfigurationKey, 'IsFavMenuVisible', FOptions.FIsFavMenuVisible);
     Settings.WriteInteger(ConfigurationKey + '\Window', 'ListView', Ord(ListView.ViewStyle));
     Settings.WriteStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
   finally
@@ -824,6 +825,7 @@ begin
     FOptions.FExpandAll := Settings.ReadBool(ConfigurationKey, 'ExpandAll', FOptions.FExpandAll);
     FOptions.FExecHide := Settings.ReadBool(ConfigurationKey, 'ExecHide', FOptions.FExecHide);
     FOptions.FShowPreview := Settings.ReadBool(ConfigurationKey, 'ShowPreview', FOptions.FShowPreview);
+    FOptions.FIsFavMenuVisible := Settings.ReadBool(ConfigurationKey, 'IsFavMenuVisible', FOptions.FIsFavMenuVisible);
     ListView.ViewStyle := TViewStyle(Settings.ReadInteger(ConfigurationKey + '\Window', 'ListView', Ord(ListView.ViewStyle)));
     Assert(ListView.ViewStyle in [Low(TViewStyle)..High(TViewStyle)]);
     Settings.ReadStrings(MRUEntryFiles, ConfigurationKey + PathDelim + 'MRUEntryFiles', 'EntryFile');
@@ -1691,7 +1693,16 @@ end;
 procedure TFilesExpert.AfterIDEInitialized;
 begin
   inherited;
-  InsertFavMenuItem;
+  // todo: This is far from optimal. We should not need to create the form just to load the
+  //       configuration. But since originally there was no configuration for the expert but
+  //       only for the form the code is rather messy.
+  if FFavoriteFiles = nil then begin
+    FFavoriteFiles := TfmFavFiles.Create(nil, FOptions);
+    SetFormIcon(FFavoriteFiles);
+    FFavoriteFiles.OnSettingsChanged := HandleOnSettingsChanged;
+  end;
+  if FOptions.FIsFavMenuVisible then
+    InsertFavMenuItem;
 end;
 
 function TFilesExpert.TryGetRootFolder(out _Folder: TGXFolder): Boolean;
