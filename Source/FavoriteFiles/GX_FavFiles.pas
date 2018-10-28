@@ -1840,6 +1840,7 @@ var
   Fil: TGXFile;
   s: string;
   PrefixCnt: Integer;
+  sl: TStringList;
 begin
   if not TryGetMenuItem(_Sender, FavMi) then
     Exit; //==>
@@ -1850,29 +1851,49 @@ begin
   if not Assigned(FavFolder) then
     Exit; //==>
 
-  PrefixCnt := 0;
-  for i := 0 to FavFolder.FolderCount - 1 do begin
-    Folder := FavFolder.Folders[i];
-    s := Folder.FolderName;
-    if PrefixCnt >= MaxPrefix then
-      Exit; // we cannot add more than MaxPrefix entries
-    s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + s;
-    mi := TMenuItem_AppendSubmenuItem(FavMi, s, OnFavFolderClicked);
-    mi.Tag := GXNativeUInt(Folder);
-    TMenuItem_AppendSubmenuItem(mi, 'dummy entry', OnFavDummyClick);
-    Inc(PrefixCnt);
-  end;
-  if PrefixCnt > 0 then
-    TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
-  for i := 0 to FavFolder.FileCount - 1 do begin
-    Fil := FavFolder.Files[i];
-    s := Fil.DName;
-    if PrefixCnt >= MaxPrefix then
-      Exit; // we cannot add more than MaxPrefix entries
-    s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + s;
-    mi := TMenuItem_AppendSubmenuItem(FavMi, s, OnFavFileClicked);
-    mi.Tag := GXNativeUInt(Fil);
-    Inc(PrefixCnt);
+  sl := TStringList.Create;
+  try
+    sl.Sorted := True;
+    sl.Duplicates := dupIgnore;
+    PrefixCnt := 0;
+    for i := 0 to FavFolder.FolderCount - 1 do begin
+      Folder := FavFolder.Folders[i];
+      sl.AddObject(Folder.FolderName, Folder);
+    end;
+    for i := 0 to sl.Count - 1 do begin
+      if PrefixCnt >= MaxPrefix then
+        Exit; //==> we cannot add more than MaxPrefix entries
+      s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + sl[i];
+      Folder := sl.Objects[i] as TGXFolder;
+      mi := TMenuItem_AppendSubmenuItem(FavMi, s, OnFavFolderClicked);
+      mi.Tag := GXNativeUInt(Folder);
+      TMenuItem_AppendSubmenuItem(mi, 'dummy entry', OnFavDummyClick);
+      Inc(PrefixCnt);
+    end;
+    if Prefixcnt >= MaxPrefix then
+      Exit; //==> no more prefixes left
+
+    sl.Clear;
+    for i := 0 to FavFolder.FileCount - 1 do begin
+      Fil := FavFolder.Files[i];
+      s := Fil.DName;
+      sl.AddObject(s, Fil);
+    end;
+
+    if (PrefixCnt > 0) then
+      TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
+
+    for i := 0 to sl.Count - 1 do begin
+      if PrefixCnt >= MaxPrefix then
+        Exit; //==> we cannot add more than MaxPrefix entries
+      s := Long2Num(PrefixCnt, MaxPrefix) + ' ' + sl[i];
+      Fil := sl.Objects[i] as TGXFile;
+      mi := TMenuItem_AppendSubmenuItem(FavMi, s, OnFavFileClicked);
+      mi.Tag := GXNativeUInt(Fil);
+      Inc(PrefixCnt);
+    end;
+  finally
+    FreeAndNil(sl);
   end;
 end;
 
