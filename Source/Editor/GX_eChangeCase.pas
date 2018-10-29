@@ -51,10 +51,11 @@ var
 // which is then checked in TChangeCaseExpert.Execute.
 function KeyboardHookProc(Code: Integer; WordParam: Word; LongParam: LongInt) : LongInt;  stdcall;
 begin
-  if WordParam = VK_RETURN then
-    EnterWasPressed := True;
-  // let Windows pass on the key
-  Result := 0;
+  if code >= 0 then begin
+    if WordParam = VK_RETURN then
+      EnterWasPressed := True;
+  end;
+  Result := CallNextHookEx(0, Code, WordParam, LongParam);
 end;
 
 { TChangeCaseExpert }
