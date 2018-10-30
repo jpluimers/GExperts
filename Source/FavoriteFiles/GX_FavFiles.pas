@@ -1619,11 +1619,15 @@ begin
 
         FreeAndNil(FFavoriteFiles);
       end;
+{$IFDEF GX_VER150_up}
       if Assigned(FFavMenuItem) then
         FreeAndNil(FFavMenuItem);
+{$ENDIF}
     end else begin
       FFavoriteFiles := TfmFavFiles.Create(nil, FOptions);
+{$IFDEF GX_VER150_up}
       FFavoriteFiles.OnSettingsChanged := HandleOnSettingsChanged;
+{$ENDIF}
     end;
   end;
 end;
@@ -1914,7 +1918,9 @@ procedure TFilesExpert.Configure;
 begin
   if TfmFavOptions.Execute(nil, FOptions.FFolderDelete, FOptions.FExpandAll, FOptions.FExecHide,
     FOptions.FShowPreview, FOptions.FIsFavMenuVisible) then
+{$IFDEF GX_VER150_up}
     HandleOnSettingsChanged(nil);
+{$ENDIF}
 end;
 
 constructor TFilesExpert.Create;
@@ -1935,7 +1941,9 @@ begin
   begin
     FFavoriteFiles := TfmFavFiles.Create(nil, FOptions);
     SetFormIcon(FFavoriteFiles);
+{$IFDEF GX_VER150_up}
     FFavoriteFiles.OnSettingsChanged := HandleOnSettingsChanged;
+{$ENDIF}
   end;
   if FFavoriteFiles.WindowState = wsMinimized then
     FFavoriteFiles.WindowState := wsNormal;
