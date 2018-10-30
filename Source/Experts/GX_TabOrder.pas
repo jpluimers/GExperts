@@ -5,7 +5,7 @@ unit GX_TabOrder;
 interface
 
 uses
-  Classes, Forms, Controls, ExtCtrls, ToolsAPI, ComCtrls, StdCtrls, GX_BaseForm;
+  Classes, Forms, Controls, ExtCtrls, Buttons, ActnList, ToolsAPI, ComCtrls, StdCtrls, GX_BaseForm;
 
 type
   TfmTabOrder = class(TfmBaseForm)
@@ -19,6 +19,11 @@ type
     btnResetOrder: TButton;
     pnlComponentTree: TPanel;
     tvComps: TTreeView;
+    b_MoveUp: TBitBtn;
+    b_MoveDown: TBitBtn;
+    TheActionList: TActionList;
+    act_MoveUp: TAction;
+    act_MoveDown: TAction;
     procedure btnHelpClick(Sender: TObject);
     procedure tvCompsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure tvCompsDragOver(Sender, Source: TObject; X, Y: Integer;
@@ -27,6 +32,8 @@ type
     procedure tvCompsKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnOrderByPositionClick(Sender: TObject);
     procedure btnResetOrderClick(Sender: TObject);
+    procedure act_MoveDownExecute(Sender: TObject);
+    procedure act_MoveUpExecute(Sender: TObject);
   private
     FormEditor: IOTAFormEditor;
     FBiDiMode: TBiDiMode;
@@ -36,6 +43,8 @@ type
     procedure ShowOrderButtons(Value: Boolean);
     procedure SortTreeViewComponentsByXYPosition;
     procedure SortTreeViewComponentsByOriginalTabOrder;
+  public
+    constructor Create(_Owner: TComponent); override;
   end;
 
 implementation
@@ -43,8 +52,8 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, TypInfo, ActnList,
-  GX_Experts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils;
+  SysUtils, TypInfo,
+  GX_Experts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils;
 
 const
   TabOrderPropertyName = 'TabOrder';
@@ -76,6 +85,52 @@ type
   end;
 
 { TfmTabOrder }
+
+constructor TfmTabOrder.Create(_Owner: TComponent);
+begin
+  inherited;
+  TControl_SetMinConstraints(Self);
+end;
+
+procedure TfmTabOrder.act_MoveDownExecute(Sender: TObject);
+var
+  Current: TTreeNode;
+  Next: TTreeNode;
+  Dest: TTreeNode;
+  WasExpanded: Boolean;
+begin
+  Current :=  tvComps.Selected;
+  if not Assigned(Current) then
+    Exit; //==>
+  Next := Current.getNextSibling;
+  if not Assigned(Next) then
+    Exit; //==>
+  Dest := Next.getNextSibling;
+  WasExpanded:= Current.Expanded;
+  if Assigned(Dest) then
+    Current.MoveTo(dest, naInsert)
+  else
+    Current.MoveTo(Next, naAdd);
+  Current.Expanded:= WasExpanded;
+end;
+
+procedure TfmTabOrder.act_MoveUpExecute(Sender: TObject);
+var
+  Current: TTreeNode;
+  Dest: TTreeNode;
+  WasExpanded: Boolean;
+begin
+  Current :=  tvComps.Selected;
+  if not Assigned(Current) then
+    Exit; //==>
+
+  Dest := Current.getPrevSibling;
+  if not Assigned(Dest) then
+    Exit; //==>
+  WasExpanded:= Current.Expanded;
+  Current.MoveTo(Dest, naInsert);
+  Current.Expanded:= WasExpanded;
+end;
 
 procedure TfmTabOrder.btnHelpClick(Sender: TObject);
 begin
@@ -418,7 +473,7 @@ begin
   begin
     SourceNode := TTreeView(Sender).Selected;
     SourceNode.MoveTo(TargetNode, naInsert);
-    TTreeView(Sender).Selected := TargetNode;
+    TTreeView(Sender).Selected := SourceNode;
   end;
 end;
 
