@@ -154,7 +154,7 @@ uses
   GX_SourceExport in '..\..\source\SourceExport\GX_SourceExport.pas' {fmSourceExport},
   GX_SourceExportOptions in '..\..\source\SourceExport\GX_SourceExportOptions.pas' {fmSourceExportOptions},
   GX_SynMemoUtils in '..\..\source\Framework\GX_SynMemoUtils.pas',
-  GX_TabOrder in '..\..\source\Experts\GX_TabOrder.pas' {fmTabOrder},
+  GX_TabOrder in '..\..\source\TabOrder\GX_TabOrder.pas' {fmTabOrder},
   GX_ToDo in '..\..\source\ToDoList\GX_ToDo.pas' {fmToDo},
   GX_ToDoOptions in '..\..\source\ToDoList\GX_ToDoOptions.pas' {fmToDoOptions},
   GX_Toolbar in '..\..\source\EditorToolbar\GX_Toolbar.pas',

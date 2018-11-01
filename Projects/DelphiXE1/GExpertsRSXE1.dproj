@@ -389,7 +389,7 @@
             <Form>fmSourceExportOptions</Form>
         </DCCReference>
         <DCCReference Include="..\..\source\Framework\GX_SynMemoUtils.pas"/>
-        <DCCReference Include="..\..\source\Experts\GX_TabOrder.pas">
+        <DCCReference Include="..\..\source\TabOrder\GX_TabOrder.pas">
             <Form>fmTabOrder</Form>
         </DCCReference>
         <DCCReference Include="..\..\source\ToDoList\GX_ToDo.pas">
