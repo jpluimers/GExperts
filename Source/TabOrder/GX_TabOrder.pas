@@ -286,7 +286,7 @@ begin
         raise Exception.CreateFmt(SNoComponentInterface, [i]);
 
       // All selected components need to have the same parent
-      {$IFNDEF GX_VER160_up}
+{$IFNDEF GX_VER160_up}
       NativeComponent := GxOtaGetNativeComponent(CurrentComponent);
       Assert(Assigned(NativeComponent));
       CurrentComponentParent := NativeComponent.GetParentComponent;
@@ -296,7 +296,7 @@ begin
         BaseComponentParent := CurrentComponentParent;
       if BaseComponentParent <> CurrentComponentParent then
         raise Exception.Create(SSameParentRequired);
-      {$ELSE  GX_VER160_up}
+{$ELSE  GX_VER160_up}
       CurrentComponentParent := CurrentComponent.GetParent;
       if not Assigned(CurrentComponentParent) then
         Continue // Ignore components without a parent (non-visual components)
@@ -304,7 +304,7 @@ begin
         BaseComponentParent := CurrentComponentParent;
       if not GxOtaComponentsAreEqual(BaseComponentParent, CurrentComponentParent) then
         raise Exception.Create(SSameParentRequired);
-      {$ENDIF GX_VER160_up}
+{$ENDIF GX_VER160_up}
 
       // Only use controls with a TabStop property of
       // type Boolean (which is an enumeration)
@@ -316,13 +316,13 @@ begin
         begin
           if ParentName = '' then
           begin
-            {$IFNDEF GX_VER160_up}
+{$IFNDEF GX_VER160_up}
             ParentName := BaseComponentParent.Name;
             ParentType := BaseComponentParent.ClassName;
-            {$ELSE  GX_VER160_up}
+{$ELSE  GX_VER160_up}
             ParentName := GxOtaGetComponentName(BaseComponentParent);
             ParentType := BaseComponentParent.GetComponentType;
-            {$ENDIF GX_VER160_up}
+{$ENDIF GX_VER160_up}
           end;
           Result.Add(CurrentComponent);
         end;
