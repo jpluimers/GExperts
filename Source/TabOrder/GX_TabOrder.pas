@@ -65,7 +65,7 @@ implementation
 
 uses
   SysUtils, TypInfo,
-  GX_Experts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils, 
+  GX_Experts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils,
   GX_TabOrderOptions;
 
 const
@@ -82,7 +82,7 @@ type
     TabOrder: Integer;
   end;
 
-type  
+type
   TTabExpert = class(TGX_Expert)
   private
     FAutoSort: TTabAutoSortEnum;
@@ -101,7 +101,11 @@ type
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
-    function HasDesignerMenuItem: Boolean; override;
+    // This breaks the multi-select mode, because the order of selected component
+    // is reversed when right clicking to open the context menu.
+    // (A second right click reverses it again. But that's not really a solution.)
+    // So for now, I disable the context menu entry, until somebody comes up with a fix.
+    // function HasDesignerMenuItem: Boolean; override;
   end;
 
 { TfmTabOrder }
@@ -578,10 +582,10 @@ begin
   TfmTabOrderOptions.Execute(Self, FAutoSort);
 end;
 
-function TTabExpert.HasDesignerMenuItem: Boolean;
-begin
-  Result := True;
-end;
+//function TTabExpert.HasDesignerMenuItem: Boolean;
+//begin
+//  Result := True;
+//end;
 
 procedure TTabExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
