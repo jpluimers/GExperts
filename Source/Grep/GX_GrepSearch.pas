@@ -514,18 +514,27 @@ procedure TfmGrepSearch.LoadFormSettings;
 
   function RetrieveEditorBlockSelection: string;
   var
-    Temp: string;
     i: Integer;
   begin
-    Temp := GxOtaGetCurrentSelection;
-    // Only use the currently selected text if the length is between 1 and 80
-    if (Length(Trim(Temp)) >= 1) and (Length(Trim(Temp)) <= 80) then
-    begin
-      i := Min(Pos(#13, Temp), Pos(#10, Temp));
-      if i > 0 then
-        Result := Copy(Temp, 1, i - 1);
-    end else
+    Result := GxOtaGetCurrentSelection;
+    if Trim(Result) = '' then begin
+      // we don't search for white space only
       Result := '';
+    end else begin
+      if Length(Result) > 80 then begin
+        // Allow a maximum length of 80 characters
+        // I'm not sure whether this is restriction still makes sense, since nowadays lines are
+        // usually longer than 80 characters, but I'm not going to change this unless somebody
+        // explicitly requests it. Personally I have never had a need for >80 chars for the
+        // search pattern. -- 2018-11-04 twm
+        Result := LeftStr(Result, 80)
+      end;
+      i := Min(Pos(#13, Result), Pos(#10, Result));
+      if i > 0 then begin
+        // The engine does not allow line breaks
+        Result := LeftStr(Result, i - 1);
+      end;
+    end;
   end;
 
   procedure SetSearchPattern(Str: string);
