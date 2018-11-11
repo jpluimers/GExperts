@@ -81,8 +81,10 @@ type
     FEnabled: Boolean;
     FAddDotsBtn: TButton;
     FDelDotsBtn: TButton;
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
     FTimer: TTimer;
-{$IFNDEF GX_VER300_up}
+{$ENDIF GX_VER320_up}
+{$IFNDEF GX_VER300_up} // RAD Studio 10 Seattle (24; BDS 17)
     FBrowseBtn: TCustomButton;
     FBrowseClick: TNotifyEvent;
     procedure BrowseBtnClick(_Sender: TObject);
@@ -110,7 +112,9 @@ type
     procedure DelDotsBtnClick(_Sender: TObject);
     procedure GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer; _Lines: TStrings);
     procedure SelectMemoLines(out _StartIdx, _EndIdx: Integer);
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
     procedure HandleTimer(_Sender: TObject);
+{$ENDIF GX_VER320_up}
   protected
     function IsDesiredForm(_Form: TCustomForm): Boolean; override;
     procedure EnhanceForm(_Form: TForm); override;
@@ -544,7 +548,7 @@ begin
       if cmp is TLabel then
         TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
 
-{$IFDEF GX_VER320_up}
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
       // Workaround for a problem that only exists in Delphi 10.2 if theming is enabled:
       // If the form's position is changed while it is still drawing (as is the case for all
       // forms that get manipulated by GExperts), it can no longer be moved or resized.
@@ -555,10 +559,12 @@ begin
       FTimer.OnTimer := HandleTimer;
       FTimer.Interval := 50;
       FTimer.Enabled := True;
-{$ENDIF}
+{$ENDIF GX_VER320_up}
     end;
   end;
 end;
+
+{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
 
 procedure TSearchPathEnhancer.HandleTimer(_Sender: TObject);
 begin
@@ -566,6 +572,7 @@ begin
   FForm.Left := FForm.Left - 1;
   FForm.Left := FForm.Left + 1;
 end;
+{$ENDIF GX_VER320_up}
 
 procedure TSearchPathEnhancer.GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer; _Lines: TStrings);
 var
@@ -878,7 +885,7 @@ begin
   end;
 end;
 
-{$IFNDEF GX_VER300_up}
+{$IFNDEF GX_VER300_up} // RAD Studio 10 Seattle (24; BDS 17)
 
 procedure TSearchPathEnhancer.BrowseBtnClick(_Sender: TObject);
 var
