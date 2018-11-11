@@ -895,27 +895,43 @@ end;
 procedure TGExpertsSettings.LoadForm(Form: TCustomForm; const Section: string; FormSaveFlags: TFormSaveFlags);
 var
   StorageSection: string;
+  PosChanged    : Boolean;
+  SizeChanged   : Boolean;
+  R             : TRect;
+  Rect: TRect;
 begin
   if Section = '' then
     StorageSection := Form.ClassName
   else
     StorageSection := Section;
 
-  if fsSize in FormSaveFlags then
+  R := Form.BoundsRect;
+  PosChanged := False;
+  SizeChanged := False;
+
+  if (fsPosition in FormSaveFlags) and ValueExists(StorageSection, 'Left') then
   begin
-    Form.Width := ReadInteger(StorageSection, 'Width', Form.Width);
-    Form.Height := ReadInteger(StorageSection, 'Height', Form.Height);
+    R.Left := ReadInteger(StorageSection, 'Left', Form.Left);
+    R.Top := ReadInteger(StorageSection, 'Top', Form.Top);
+    PosChanged := True;
   end;
-  if fsPosition in FormSaveFlags then
+
+  if (fsSize in FormSaveFlags) and ValueExists(StorageSection, 'Width') then
   begin
-    if ValueExists(StorageSection, 'Left') then begin
-      Form.Left := ReadInteger(StorageSection, 'Left', Form.Left);
-      Form.Top := ReadInteger(StorageSection, 'Top', Form.Top);
-    end else
-      CenterForm(Form)
-  end else begin
+    R.Width  := ReadInteger(StorageSection, 'Width', Form.Width);
+    R.Height := ReadInteger(StorageSection, 'Height', Form.Height);
+    SizeChanged := True;
+  end;
+
+  if PosChanged then
+    Form.SetBounds(R.Left, R.Top, R.Width, R.Height)
+  else if SizeChanged then begin
+    // center with the given size
+    Rect := GetScreenWorkArea(Form);
+    Form.SetBounds(Rect.Left + (Rect.Right - Rect.Left - R.Width) div 2,
+      Rect.Top + (Rect.Bottom - Rect.Top - R.Height) div 2, R.Width, R.Height);
+  end else
     CenterForm(Form);
-  end;
 end;
 
 procedure TGExpertsSettings.SaveForm(Form: TCustomForm; const Section: string;
