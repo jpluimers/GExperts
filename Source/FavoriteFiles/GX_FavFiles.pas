@@ -1795,6 +1795,13 @@ begin
   // this should never be called
 end;
 
+const
+  NilMethod: TMethod = (
+    Code: nil;
+    Data: nil;
+  );
+
+
 procedure TFilesExpert.OnFavoritesClicked(_Sender: TObject);
 var
   FavMi: TMenuItem;
@@ -1808,7 +1815,7 @@ begin
   FavMi.Tag := GXNativeUInt(Folder);
   OnFavFolderClicked(FavMi);
   if FavMi.Count > 0 then
-    TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
+    TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(NilMethod));
   TMenuItem_AppendSubmenuItem(FavMi, 'X Configure ...', Execute);
 end;
 
@@ -1885,7 +1892,7 @@ begin
     end;
 
     if (PrefixCnt > 0) then
-      TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(nil));
+      TMenuItem_AppendSubmenuItem(FavMi, '-', TNotifyEvent(NilMethod));
 
     for i := 0 to sl.Count - 1 do begin
       if PrefixCnt >= MaxPrefix then
