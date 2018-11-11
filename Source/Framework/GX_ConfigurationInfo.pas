@@ -918,18 +918,18 @@ begin
 
   if (fsSize in FormSaveFlags) and ValueExists(StorageSection, 'Width') then
   begin
-    R.Width  := ReadInteger(StorageSection, 'Width', Form.Width);
-    R.Height := ReadInteger(StorageSection, 'Height', Form.Height);
+    R.Right := R.Left + ReadInteger(StorageSection, 'Width', Form.Width);
+    R.Bottom := R.Top + ReadInteger(StorageSection, 'Height', Form.Height);
     SizeChanged := True;
   end;
 
   if PosChanged then
-    Form.SetBounds(R.Left, R.Top, R.Width, R.Height)
+    Form.BoundsRect := r
   else if SizeChanged then begin
     // center with the given size
     Rect := GetScreenWorkArea(Form);
-    Form.SetBounds(Rect.Left + (Rect.Right - Rect.Left - R.Width) div 2,
-      Rect.Top + (Rect.Bottom - Rect.Top - R.Height) div 2, R.Width, R.Height);
+    Form.SetBounds(Rect.Left + (Rect.Right - Rect.Left - (R.Right - R.Left)) div 2,
+      Rect.Top + (Rect.Bottom - Rect.Top - (R.Bottom - R.Top)) div 2, R.Right - R.Left, R.Bottom - R.Top);
   end else
     CenterForm(Form);
 end;
