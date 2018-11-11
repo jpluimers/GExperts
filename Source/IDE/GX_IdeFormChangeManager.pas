@@ -33,10 +33,13 @@ uses Windows,
   ActnList,
   Menus,
   ComCtrls,
+  Messages,
+  Registry,
   GX_GenericUtils,
   GX_ConfigurationInfo,
   GX_EventHook,
-  GX_dzVclUtils;
+  GX_dzVclUtils,
+  GX_IdeSearchPathEnhancer;
 
 type
   TFormChangeCallbackItem = class
@@ -162,9 +165,45 @@ begin
 
 end;
 
+{$IFDEF GX_VER320_up}
+
+function HasRedrawProblems(_Form: TCustomForm): Boolean;
+var
+  reg: TRegistry;
+begin
+  Result := False;
+  // is it the path editor form?
+  if not TGxIdeSearchPathEnhancer.WouldBeDesiredForm(_Form) then
+    Exit; //==>
+
+  // if yes, check if theming is enabled
+  reg := TRegistry.Create;
+  try
+    reg.RootKey := HKEY_CURRENT_USER;
+    if reg.OpenKeyReadOnly('Software\Embarcadero\BDS\19.0\Theme') then begin
+      try
+        if reg.ValueExists('Enabled') and (reg.GetDataType('Enabled') = rdInteger) then
+          Result := (reg.ReadInteger('Enabled') <> 0);
+      finally
+        reg.CloseKey;
+      end;
+    end;
+  finally
+    FreeAndNil(reg);
+  end;
+end;
+{$ELSE}
+
+function HasRedrawProblems(_Form: TCustomForm): Boolean;
+begin
+  Result := False;
+end;
+{$ENDIF}
+
 procedure TFormChangeManagerInternal.ProcessActivatedForm(Form: TCustomForm);
 var
   i: Integer;
+  NeedsWorkaround: Boolean;
 begin
   Assert(Assigned(Form));
 
@@ -174,12 +213,28 @@ begin
   // is not allowed.
   FIsInFormChangeCallback := True;
   try
-    for i := FFormChangeCallbacks.Count - 1 downto 0 do begin
-      try
-        TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
-      except
-        // just so we can have a look at any exceptions that might be raised ...
-        raise;
+    // Workaround for redraw issue in Delphi 10.2 when theming is enabled:
+    // https://sourceforge.net/p/gexperts/bugs/86/
+    // Disable redraws while we change the window
+    NeedsWorkaround := HasRedrawProblems(Form);
+    if NeedsWorkaround then
+      SendMessage(Form.Handle, WM_SETREDRAW, WParam(False), 0);
+    try
+      for i := FFormChangeCallbacks.Count - 1 downto 0 do begin
+        try
+          TFormChangeCallbackItem(FFormChangeCallbacks[i]).FCallback(Self, Form);
+        except
+          // just so we can have a look at any exceptions that might be raised ...
+          raise;
+        end;
+      end;
+    finally
+      if NeedsWorkaround then begin
+        // Allow and force a redraw of the whole window
+        SendMessage(Form.Handle, WM_SETREDRAW, WParam(True), 0);
+        RedrawWindow(Form.Handle, nil, 0, RDW_INVALIDATE or RDW_ALLCHILDREN);
+        // see Remarks on
+        // https://docs.microsoft.com/en-us/windows/desktop/gdi/wm-setredraw
       end;
     end;
   finally

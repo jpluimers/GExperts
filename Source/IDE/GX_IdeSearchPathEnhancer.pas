@@ -6,13 +6,15 @@ interface
 
 uses
   SysUtils,
-  Classes;
+  Classes,
+  Forms;
 
 type
   TGxIdeSearchPathEnhancer = class
   public
     class function GetEnabled: Boolean;
     class procedure SetEnabled(_Value: Boolean);
+    class function WouldBeDesiredForm(_Form: TCustomForm): Boolean;
   end;
 
 implementation
@@ -22,7 +24,7 @@ uses
   Messages,
   Controls,
   StdCtrls,
-  Forms,
+  ExtCtrls,
   Menus,
   Buttons,
   ActnList,
@@ -79,6 +81,7 @@ type
     FEnabled: Boolean;
     FAddDotsBtn: TButton;
     FDelDotsBtn: TButton;
+    FTimer: TTimer;
 {$IFNDEF GX_VER300_up}
     FBrowseBtn: TCustomButton;
     FBrowseClick: TNotifyEvent;
@@ -94,7 +97,6 @@ type
     procedure MakeRelativeBtnClick(_Sender: TObject);
     procedure MakeAbsoluteBtnClick(_Sender: TObject);
     procedure AddRecursiveBtnClick(_Sender: TObject);
-    function MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
     procedure FavoritesBtnClick(_Sender: TObject);
     procedure FavoritesPmConfigureClick(_Sender: TObject);
     procedure InitFavoritesMenu;
@@ -108,6 +110,7 @@ type
     procedure DelDotsBtnClick(_Sender: TObject);
     procedure GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer; _Lines: TStrings);
     procedure SelectMemoLines(out _StartIdx, _EndIdx: Integer);
+    procedure HandleTimer(_Sender: TObject);
   protected
     function IsDesiredForm(_Form: TCustomForm): Boolean; override;
     procedure EnhanceForm(_Form: TForm); override;
@@ -308,7 +311,7 @@ const
 {$ENDIF GX_VER220_up}
 {$ENDIF GX_VER300_up}
 
-function TSearchPathEnhancer.MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
+function MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
 begin
   Result := False;
   if not SameText(_Form.ClassName, _Strings.DialogClass) then
@@ -322,18 +325,24 @@ begin
   Result := True;
 end;
 
+class function TGxIdeSearchPathEnhancer.WouldBeDesiredForm(_Form: TCustomForm): Boolean;
+begin
+  if Assigned(_Form) then begin
+    Result := True;
+    if MatchesDlg(_Form, ProjectSearchPathDlg) then
+      Exit; //==>
+    if MatchesDlg(_Form, LibrarySearchPathDlg) then
+      Exit; //==>
+  end;
+  Result := False;
+end;
+
 function TSearchPathEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
   if FEnabled then begin
-    if Assigned(_Form) then begin
-      Result := True;
-      if MatchesDlg(_Form, ProjectSearchPathDlg) then
-        Exit; //==>
-      if MatchesDlg(_Form, LibrarySearchPathDlg) then
-        Exit; //==>
-    end;
-  end;
-  Result := False;
+    Result := TGxIdeSearchPathEnhancer.WouldBeDesiredForm(_Form)
+  end else
+    Result := False;
 end;
 
 type
@@ -534,8 +543,28 @@ begin
       cmp := _Form.FindComponent('InvalidPathLbl');
       if cmp is TLabel then
         TLabel(cmp).Caption := TLabel(cmp).Caption + ' Drag and drop is enabled.';
+
+{$IFDEF GX_VER320_up}
+      // Workaround for a problem that only exists in Delphi 10.2 if theming is enabled:
+      // If the form's position is changed while it is still drawing (as is the case for all
+      // forms that get manipulated by GExperts), it can no longer be moved or resized.
+      // https://sourceforge.net/p/gexperts/bugs/86/
+      // Workaround: In a timer, move the form by 1 pixel
+      FTimer := TTimer.Create(_Form);
+      FTimer.Enabled := False;
+      FTimer.OnTimer := HandleTimer;
+      FTimer.Interval := 50;
+      FTimer.Enabled := True;
+{$ENDIF}
     end;
   end;
+end;
+
+procedure TSearchPathEnhancer.HandleTimer(_Sender: TObject);
+begin
+  FTimer.Enabled := False;
+  FForm.Left := FForm.Left - 1;
+  FForm.Left := FForm.Left + 1;
 end;
 
 procedure TSearchPathEnhancer.GetSelectedMemoLines(out _StartIdx, _EndIdx: Integer; _Lines: TStrings);
@@ -878,3 +907,4 @@ initialization
 finalization
   FreeAndNil(TheSearchPathEnhancer);
 end.
+
