@@ -495,6 +495,8 @@ function GxOtaGetIdeActionList: TCustomActionList;
 // Find an action in the IDE's action list by name and return it.
 function GxOtaGetIdeActionByName(const Name: string): TContainedAction;
 
+function GxOtaGetEditorServices: IOTAEditorServices;
+
 // Return the top-most edit view/buffer (globally or for a given source editor)
 // Returns nil if none exists.
 function GxOtaGetTopMostEditView: IOTAEditView; overload;
