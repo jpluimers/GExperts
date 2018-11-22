@@ -70,6 +70,9 @@ goto DelphiEndCase
 :Delphi102
   call :ReadReg Embarcadero\BDS\19.0
   goto :DelphiEndCase
+:Delphi103
+  call :ReadReg Embarcadero\BDS\20.0
+  goto :DelphiEndCase
 :DelphiEndCase
 
 echo DelphiPath: "%DelphiPath%"
