@@ -23,6 +23,7 @@ call :doItem XE8
 call :doItem Xx10Seattle
 call :doItem Xx101Berlin
 call :doItem Xx102
+call :doItem Xx103
 
 goto :eof
 
