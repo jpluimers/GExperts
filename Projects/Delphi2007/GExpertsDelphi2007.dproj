@@ -269,9 +269,6 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
         </DCCReference>
         <DCCReference Include="..\..\Source\Experts\GX_ReselectDesktop.pas"/>
         <DCCReference Include="..\..\source\Experts\GX_SetFocusControl.pas"/>
-        <DCCReference Include="..\..\source\TabOrder\GX_TabOrder.pas">
-            <Form>fmTabOrder</Form>
-        </DCCReference>
         <DCCReference Include="..\..\source\FavoriteFiles\GX_FavFileProp.pas">
             <Form>fmFavFileProp</Form>
         </DCCReference>
@@ -542,6 +539,12 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
         </DCCReference>
         <DCCReference Include="..\..\source\SourceExport\GX_SourceExportOptions.pas">
             <Form>fmSourceExportOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\TabOrder\GX_TabOrder.pas">
+            <Form>fmTabOrder</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\TabOrder\GX_TabOrderOptions.pas">
+            <Form>fmTabOrderOptions</Form>
         </DCCReference>
         <DCCReference Include="..\..\source\ToDoList\GX_ToDo.pas">
             <Form>fmToDo</Form>

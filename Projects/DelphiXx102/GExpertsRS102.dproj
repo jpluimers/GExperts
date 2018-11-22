@@ -553,6 +553,10 @@ $(PreBuildEvent)]]>
             <Form>fmRemoveMatchingLinesExpertConfig</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\Source\TabOrder\GX_TabOrderOptions.pas">
+            <Form>fmTabOrderOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
