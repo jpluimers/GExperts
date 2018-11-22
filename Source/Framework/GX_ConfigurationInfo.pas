@@ -736,7 +736,7 @@ begin
   FEnableCustomFont := Value;
 end;
 
-{$IFDEF GX_VER320_up} // RAD Studio 10.2 Tokyo (26; BDS 19)
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
 
 procedure TConfigInfo.SetForceDesktopOnStartup(const _Value: Boolean);
 begin
@@ -747,7 +747,7 @@ procedure TConfigInfo.SetForcedStartupDesktop(const _Value: string);
 begin
   FForcedStartupDesktop := _Value;
 end;
-{$ENDIF}
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
 
 { TShowBadDirectoryMessage }
 
