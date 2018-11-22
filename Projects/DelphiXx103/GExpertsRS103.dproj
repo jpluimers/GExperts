@@ -1,0 +1,998 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Base>True</Base>
+        <AppType>Library</AppType>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>GExpertsRS103.dpr</MainSource>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectGuid>{BB29661E-3FA2-4EA6-96EB-0768940BAAB6}</ProjectGuid>
+        <ProjectVersion>18.5</ProjectVersion>
+        <TargetedPlatforms>1</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>GExpertsRS103</SanitizedProjectName>
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <DCC_ExeOutput>..\..\Binaries</DCC_ExeOutput>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;System.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UnitSearchPath>..\..\source\framework;..\..\externalsource;..\..\externalsource\mwParser;..\..\externalsource\abbrevia;..\..\externalsource\UniSynEdit;..\..\source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UsePackage>rtl;vcl;vclx;vclactnband;xmlrtl;designide;$(DCC_UsePackage)</DCC_UsePackage>
+        <GenDll>true</GenDll>
+        <Manifest_File>None</Manifest_File>
+        <UsePackages>true</UsePackages>
+        <VerInfo_DLL>true</VerInfo_DLL>
+        <VerInfo_Keys>CompanyName=Erik Berry and the GExperts Development Team;FileDescription=GExperts for RAD Studio 10;FileVersion=1.3.8.0;InternalName=GExperts for RAD Studio 10;LegalCopyright=;LegalTrademarks=;OriginalFilename=GExpertsRS10.dll;ProductName=GExperts for RAD Studio;ProductVersion=1.38;Comments=Open Source;CFBundleName=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
+        <VerInfo_Release>8</VerInfo_Release>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
+call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"
+$(PreBuildEvent)]]></PreBuildEvent>
+        <Debugger_HostApplication>C:\Delphi\Delphi_10_3\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_RunParams>-np</Debugger_RunParams>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_Optimize>False</DCC_Optimize>
+        <DCC_UnitSearchPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <Manifest_File>None</Manifest_File>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\..\source\Framework\GX_About.pas">
+            <Form>fmAbout</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_ActionBroker.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_Actions.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_AsciiChart.pas">
+            <Form>fmAsciiChart</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\BackupProject\GX_Backup.pas">
+            <Form>fmBackup</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\BackupProject\GX_BackupConfig.pas">
+            <Form>fmBackupConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\BackupProject\GX_BackupOptions.pas">
+            <Form>fmBackupOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_BaseForm.pas">
+            <Form>fmBaseForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Bookmarks\GX_Bookmarks.pas">
+            <Form>fmGxBookmarksForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ClassBrowser\GX_ClassBrowser.pas">
+            <Form>fmClassBrowser</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_ClassHacks.pas"/>
+        <DCCReference Include="..\..\source\ClassBrowser\GX_ClassIdentify.pas">
+            <Form>fmClassIdentify</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_ClassMgr.pas"/>
+        <DCCReference Include="..\..\source\ClassBrowser\GX_ClassOptions.pas">
+            <Form>fmClassOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ClassBrowser\GX_ClassParsing.pas">
+            <Form>fmClassParsing</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ClassBrowser\GX_ClassProp.pas">
+            <Form>fmClassProp</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ClassBrowser\GX_ClassReport.pas">
+            <Form>fmClassReport</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Experts\GX_CleanDirectories.pas">
+            <Form>fmCleanDirectories</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ClipboardHistory\GX_ClipboardHistory.pas">
+            <Form>fmClipboardHistory</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ClipboardHistory\GX_ClipboardOptions.pas">
+            <Form>fmClipboardOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\CodeLibrarian\GX_CodeLib.pas">
+            <Form>fmCodeLib</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\CodeLibrarian\GX_CodeOpt.pas">
+            <Form>fmCodeOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\CodeLibrarian\GX_CodeSrch.pas">
+            <Form>fmCodeSearch</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Experts\GX_ComponentGrid.pas">
+            <Form>fmComponentGrid</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\RenameComponents\GX_CompRename.pas">
+            <Form>fmCompRename</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\RenameComponents\GX_CompRenameAdvanced.pas">
+            <Form>fmCompRenameAdvanced</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\RenameComponents\GX_CompRenameConfig.pas">
+            <Form>fmCompRenameConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Experts\GX_CompsToCode.pas">
+            <Form>fmCompsToCode</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_ConfigurationInfo.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_Configure.pas">
+            <Form>fmConfiguration</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Framework\GX_ConfigureExperts.pas">
+            <Form>frConfigureExperts</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_Consts.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_CopyComponentNames.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_DbugIntf.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_DesignerMenu.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_eAlign.pas">
+            <Form>fmAlign</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Editor\GX_eAlignOptions.pas">
+            <Form>fmAlignOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Editor\GX_eChangeCase.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_eCodeFormatter.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_eComment.pas">
+            <Form>fmCommentConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Editor\GX_eDate.pas">
+            <Form>fmDateFormat</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Editor\GX_eFindDelimiter.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_ePasteAs.pas">
+            <Form>fmPasteAsConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Editor\GX_ePrevNextIdentifier.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_eReverseStatement.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_eSelectIdentifier.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_eSelectionEditorExpert.pas"/>
+        <DCCReference Include="..\..\Source\Editor\GX_eSort.pas">
+            <Form>fmeSortConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eSortOptions.pas">
+            <Form>frmSortOptions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpert.pas">
+            <Form>fmUsesManager</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\UsesExpert\GX_UsesExpertOptions.pas">
+            <Form>fmUsesExpertOptions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_ePopupMenu.pas">
+            <Form>fmEditorPopupMenuExpertConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_EditorChangeServices.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_EditorEnhancements.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_EditorExpert.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_EditorExpertManager.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_EditorFormServices.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_EditorShortcut.pas">
+            <Form>fmEditorShortcut</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_EditReader.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_ExpertManager.pas">
+            <Form>fmExpertManager</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_Experts.pas"/>
+        <DCCReference Include="..\..\source\FavoriteFiles\GX_FavFileProp.pas">
+            <Form>fmFavFileProp</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\FavoriteFiles\GX_FavFiles.pas">
+            <Form>fmFavFiles</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\FavoriteFiles\GX_FavFolderProp.pas"/>
+        <DCCReference Include="..\..\source\FavoriteFiles\GX_FavNewFolder.pas">
+            <Form>fmFavNewFolder</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\FavoriteFiles\GX_FavOptions.pas">
+            <Form>fmFavOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\FavoriteFiles\GX_FavUtil.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_FeedbackWizard.pas">
+            <Form>fmFeedbackWizard</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_FileScanner.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_FindComponentRef.pas"/>
+        <DCCReference Include="..\..\source\Utils\GX_GenericClasses.pas"/>
+        <DCCReference Include="..\..\source\Utils\GX_GenericUtils.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_GetIdeVersion.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_GExperts.pas"/>
+        <DCCReference Include="..\..\source\Grep\GX_GrepBackend.pas"/>
+        <DCCReference Include="..\..\source\Grep\GX_GrepExpert.pas"/>
+        <DCCReference Include="..\..\source\Grep\GX_GrepOptions.pas">
+            <Form>fmGrepOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Grep\GX_GrepPrinting.pas"/>
+        <DCCReference Include="..\..\source\Grep\GX_GrepRegExSearch.pas"/>
+        <DCCReference Include="..\..\source\Grep\GX_GrepReplace.pas">
+            <Form>fmGrepReplace</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Grep\GX_GrepResults.pas">
+            <Form>fmGrepResults</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Grep\GX_GrepResultsOptions.pas">
+            <Form>fmGrepResultsOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Grep\GX_GrepSearch.pas">
+            <Form>fmGrepSearch</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Grep\GX_GrepProgress.pas">
+            <Form>fmGrepProgress</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Grep\GX_GrepSelect.pas">
+            <Form>fmGrepSelect</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Utils\GX_GxUtils.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_HideNonVisualComps.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_IconMessageBox.pas"/>
+        <DCCReference Include="..\..\source\IDEDocking\GX_IdeDock.pas">
+            <Form>fmIdeDockForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\IDE\GX_IdeEnhance.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_IdeFormEnhancer.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_IdeShortCuts.pas">
+            <Form>fmIdeShortCuts</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Utils\GX_IdeUtils.pas"/>
+        <DCCReference Include="..\..\Source\AutoTodo\GX_InsertAutoTodo.pas">
+            <Form>fmInsertAutoTodoForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_KbdShortCutBroker.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_KibitzComp.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_LibrarySource.pas"/>
+        <DCCReference Include="..\..\source\MacroTemplates\GX_MacroExpandNotifier.pas"/>
+        <DCCReference Include="..\..\source\MacroTemplates\GX_MacroFile.pas"/>
+        <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibrary.pas">
+            <Form>fmMacroLibrary</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas">
+            <Form>fmEditMacroItem</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas">
+            <Form>fmMacroLibraryNamePrompt</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MacroLibrary\GX_MacroLibraryConfig.pas">
+            <Form>fmGxMacroLibraryConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_MacroParser.pas"/>
+        <DCCReference Include="..\..\source\MacroTemplates\GX_MacroSelect.pas">
+            <Form>fmMacroSelect</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MacroTemplates\GX_MacroTemplateEdit.pas">
+            <Form>fmMacroTemplateEdit</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MacroTemplates\GX_MacroTemplates.pas">
+            <Form>fmMacroTemplates</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MacroTemplates\GX_MacroTemplatesExpert.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_MenuActions.pas"/>
+        <DCCReference Include="..\..\source\Editor\GX_MenusForEditorExpert.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_MessageBox.pas">
+            <Form>fmGxMessageBox</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MessageDialog\GX_MessageDialog.pas">
+            <Form>fmMessageDialog</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\MessageDialog\GX_MessageOptions.pas">
+            <Form>fmMessageOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\IDE\GX_MultilineHost.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_MultiLinePalette.pas"/>
+        <DCCReference Include="..\..\source\OpenFile\GX_OpenFile.pas">
+            <Form>fmOpenFile</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\OpenFile\GX_OpenFileConfig.pas">
+            <Form>fmOpenFileConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Utils\GX_OtaUtils.pas"/>
+        <DCCReference Include="..\..\source\PeInfo\GX_PeInfo.pas"/>
+        <DCCReference Include="..\..\source\PeInfo\GX_PeInformation.pas">
+            <Form>fmPeInformation</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProcedureList\GX_ProcedureList.pas">
+            <Form>fmProcedureList</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProcedureList\GX_ProcedureListOptions.pas">
+            <Form>fmProcedureListOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_Progress.pas">
+            <Form>fmProgress</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProjectDependencies\GX_ProjDepend.pas">
+            <Form>fmProjDepend</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProjectDependencies\GX_ProjDependFilter.pas">
+            <Form>fmProjDependFilter</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProjectDependencies\GX_ProjDependProp.pas">
+            <Form>fmProjDependProp</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProjectOptionSets\GX_ProjOptionSets.pas">
+            <Form>fmProjOptionSets</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ProjectOptionSets\GX_ProjOptMap.pas"/>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderAutoCorrectEntry.pas">
+            <Form>fmProofreaderAutoCorrectEntry</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderConfig.pas">
+            <Form>fmProofreaderConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderCorrection.pas"/>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderData.pas"/>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderExpert.pas"/>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderKeyboard.pas"/>
+        <DCCReference Include="..\..\source\CodeProofreader\GX_ProofreaderUtils.pas"/>
+        <DCCReference Include="..\..\source\Grep\GX_Replace.pas"/>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceComp.pas">
+            <Form>fmReplaceComp</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceCompData.pas"/>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceCompLog.pas">
+            <Form>fmReplaceCompLog</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceCompMapDets.pas">
+            <Form>fmReplaceCompMapDets</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceCompMapGrpList.pas">
+            <Form>fmReplaceCompMapGrpList</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceCompMapList.pas">
+            <Form>fmReplaceCompMapList</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ReplaceComponents\GX_ReplaceCompUtils.pas"/>
+        <DCCReference Include="..\..\source\SetComponentProperties\GX_SetComponentProps.pas"/>
+        <DCCReference Include="..\..\source\SetComponentProperties\GX_SetComponentPropsConfig.pas">
+            <Form>fmSetComponentPropsConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\SetComponentProperties\GX_SetComponentPropsStatus.pas">
+            <Form>fmSetComponentPropsStatus</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Experts\GX_SetFocusControl.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_SharedImages.pas">
+            <Form>dmSharedImages</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\source\SourceExport\GX_SourceExport.pas">
+            <Form>fmSourceExport</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\SourceExport\GX_SourceExportOptions.pas">
+            <Form>fmSourceExportOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Framework\GX_SynMemoUtils.pas"/>
+        <DCCReference Include="..\..\source\TabOrder\GX_TabOrder.pas">
+            <Form>fmTabOrder</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ToDoList\GX_ToDo.pas">
+            <Form>fmToDo</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\ToDoList\GX_ToDoOptions.pas">
+            <Form>fmToDoOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\EditorToolbar\GX_Toolbar.pas"/>
+        <DCCReference Include="..\..\source\EditorToolbar\GX_ToolbarConfig.pas">
+            <Form>fmToolbarConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\EditorToolbar\GX_ToolBarDropDown.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_UnitPositions.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_UsesManager.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_VerDepConst.pas"/>
+        <DCCReference Include="..\..\source\Utils\GX_XmlUtils.pas"/>
+        <DCCReference Include="..\..\source\BackupProject\GX_Zipper.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_Formatter.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterBreakpoints.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterConfig.pas">
+            <Form>fmCodeFormatterConfig</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterConfigHandler.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterDefaultSettings.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterEditCapitalization.pas">
+            <Form>fmCodeFormatterEditCapitalization</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterExpert.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterGXConfigWrapper.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_CodeFormatterBookmarks.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterTokenList.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterTypes.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterTokens.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterFormatter.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterParser.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterSettings.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterStack.pas"/>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterEngine.pas"/>
+        <DCCReference Include="..\..\source\Formatter\GX_AboutExperimental.pas">
+            <Form>fmAboutExperimental</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Formatter\engine\GX_CodeFormatterUnicode.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_IdeSearchPathEnhancer.pas"/>
+        <DCCReference Include="..\..\source\Experts\GX_HideNavbar.pas"/>
+        <DCCReference Include="..\..\source\Utils\GX_dzVclUtils.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_IdeProjectOptionsEnhancer.pas"/>
+        <DCCReference Include="..\..\source\Framework\GX_PasteAs.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_IdeToolPropertiesEnhancer.pas"/>
+        <DCCReference Include="..\..\source\Utils\GX_NTAEditServiceNotifier.pas"/>
+        <DCCReference Include="..\..\source\Bookmarks\GX_EditBookmark.pas">
+            <Form>fmEditBookmarks</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\source\Utils\GX_BookmarkList.pas"/>
+        <DCCReference Include="..\..\source\Utils\GX_dzQuicksort.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_IdeInstallPackagesEnhancer.pas"/>
+        <DCCReference Include="..\..\source\IDE\GX_IdePackageRenameDlg.pas">
+            <Form>fmIdxPackageRenameDlg</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzClassUtils.pas"/>
+        <DCCReference Include="..\..\source\framework\GX_EventHook.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_BaseExpert.pas"/>
+        <DCCReference Include="..\..\Source\AutoTodo\GX_uAutoTodoHandler.pas"/>
+        <DCCReference Include="..\..\Source\AutoTodo\GX_AutoTodoDone.pas">
+            <Form>fmAutoTodoDone</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzFileUtils.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzSelectDirectoryFix.pas"/>
+        <DCCReference Include="..\..\Source\Formatter\GX_eAddToCaptitalization.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_VCLFixPack.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzVersionInfo.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzOsUtils.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzPackageInfo.pas"/>
+        <DCCReference Include="..\..\Source\PeInfo\GX_PeInfoPrint.pas">
+            <Form>f_PeInfoPrint</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeFavoritesList.pas">
+            <Form>f_GxIdeFavoritesList</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeSearchPathFavoriteEdit.pas">
+            <Form>f_IdeSearchPathFavoriteEdit</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Experts\GX_ReselectDesktop.pas"/>
+        <DCCReference Include="..\..\Source\Editor\GX_eWarn.pas">
+            <Form>fmConfigureWarning</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eIfDef.pas">
+            <Form>fmConfigureIfDef</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eConvertStrings.pas">
+            <Form>fmEConvertStrings</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeGotoEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzMapFileReader.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeObjectInspectorEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventFavoriteEdit.pas">
+            <Form>f_IdeBuildEventFavoriteEdit</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_ReadMapFileThread.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeApplicationSettingsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedForm.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeFormChangeManager.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeManagedFormHandler.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_ConfigureFormEnhancements.pas">
+            <Form>frConfigureFormEnhancements</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzSpeedBitBtn.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_UsageStatistics.pas">
+            <Form>fmUsageStatistics</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Utils\GX_dzDateUtils.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_UnitExportsParser.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_dzNamedThread.pas"/>
+        <DCCReference Include="..\..\Source\Framework\GX_DummyWizard.pas"/>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeMessageAutoClose.pas"/>
+        <DCCReference Include="..\..\Source\Utils\GX_MemoEscFix.pas"/>
+        <DCCReference Include="..\..\Source\KeyboardShortcuts\GX_KeyboardShortcuts.pas">
+            <Form>fmGxKeyboardShortcuts</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\IDE\GX_IdeDockFormEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\Experts\GX_AddDockWindow.pas">
+            <Form>fmGxDockForm</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eRemoveMatchingLines.pas">
+            <Form>fmRemoveMatchingLinesExpertConfig</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\TabOrder\GX_TabOrderOptions.pas">
+            <Form>fmTabOrderOptions</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
+        <RcCompile Include="..\..\images\GXIcons.rc">
+            <Form>..\..\images\GXIcons.res</Form>
+        </RcCompile>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">GExpertsRS103.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment Version="3">
+                <DeployFile LocalName="..\..\Binaries\GExpertsRS103.dll" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>GExpertsRS103.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\Binaries\GExpertsRS103.dll" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>GExpertsRS103.dll</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidFileProvider">
+                    <Platform Name="Android">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1024">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1536">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch768">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch320">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640x1136">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="ProjectiOSEntitlements"/>
+                <DeployClass Name="ProjectiOSInfoPList"/>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXDebug"/>
+                <DeployClass Name="ProjectOSXEntitlements"/>
+                <DeployClass Name="ProjectOSXInfoPList"/>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+            </Deployment>
+            <ModelSupport>False</ModelSupport>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+    <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Win32'">
+        <PreBuildEvent>call ..\..\buildtools\prebuild.cmd &quot;$(PROJECTPATH)&quot;&amp;&amp;call ..\..\buildtools\movedll.cmd &quot;$(OUTPUTPATH)&quot;</PreBuildEvent>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent/>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Win32'">
+        <PreBuildEvent>call ..\..\buildtools\prebuild.cmd &quot;$(PROJECTPATH)&quot;&amp;&amp;call ..\..\buildtools\movedll.cmd &quot;$(OUTPUTPATH)&quot;</PreBuildEvent>
+        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+        <PreLinkEvent/>
+        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+        <PostBuildEvent/>
+        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+    </PropertyGroup>
+</Project>
