@@ -107,7 +107,7 @@ end;
 function TeCodeFormatterExpert.GetDefaultShortCut: TShortCut;
 begin
   if RunningRS2010OrGreater then begin
-    // Strarting with Delphi 2010 it has a built in code formatter
+    // Starting with Delphi 2010 it has a built in code formatter
     // it doesn't work very well in the early incarnations but
     // if the user wants to replace it, he should configure it himself.
     Result := Menus.ShortCut(Word('F'), [ssCtrl, ssAlt])
