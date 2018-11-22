@@ -54,6 +54,7 @@ interface
 {$IF CompilerVersion > 15} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$IFEND} // D7
 {$IFDEF VER310} {$DEFINE D101} {$ENDIF}
 {$IFDEF VER320} {$DEFINE D101} {$DEFINE D102} {$ENDIF}
+{$IFDEF VER330} {$DEFINE D101} {$DEFINE D102} {$DEFINE D103} {$ENDIF}
 
 // ======== Define base compiler options
 {$BOOLEVAL OFF}
