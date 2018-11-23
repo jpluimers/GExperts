@@ -522,7 +522,9 @@ procedure TfmGrepSearch.LoadFormSettings;
     begin
       i := Min(Pos(#13, Temp), Pos(#10, Temp));
       if i > 0 then
-        Result := Copy(Temp, 1, i - 1);
+        Result := Copy(Temp, 1, i - 1)
+      else
+        Result := Temp;
     end else
       Result := '';
   end;
