@@ -1913,6 +1913,8 @@ var
   FavMi: TMenuItem;
   FavFile: TGXFile;
 begin
+  if not Assigned(FFavoriteFiles) then
+    Exit; //==>
   if not TryGetMenuItem(_Sender, FavMi) then
     Exit; //==>
 
@@ -1939,6 +1941,7 @@ end;
 destructor TFilesExpert.Destroy;
 begin
   FreeAndNil(FOptions);
+  FreeAndNil(FFavoriteFiles);
   inherited;
 end;
 
