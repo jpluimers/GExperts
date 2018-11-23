@@ -875,7 +875,7 @@ function GetRS103Version: TBorlandIdeVersion;
 const
   CoreIde2500: TVersionNumber = (Minor: 26; Major: 0; Build: 4364; Release: 32429);
 begin
-  Result := ideRS102;
+  Result := ideRS103;
 end;
 
 function GetBorlandIdeVersion: TBorlandIdeVersion;
