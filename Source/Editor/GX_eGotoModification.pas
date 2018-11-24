@@ -3,7 +3,7 @@ unit GX_eGotoModification;
 {$I GX_CondDefine.inc}
 
 interface
-{.$IFDEF GX_VER290_up} // RAD Studio XE 8 (23; BDS 16)
+{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
 uses
   Windows,
   SysUtils,
@@ -85,9 +85,9 @@ type
     function GetHelpString: string; override;
     function HasConfigOptions: Boolean; override;
   end;
-{.$ENDIF}
+{$ENDIF}
 implementation
-{.$IFDEF GX_VER290_up} // RAD Studio XE 8 (23; BDS 16)
+{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
 
 uses
 {$IFOPT D+}GX_DbugIntf,
@@ -322,7 +322,7 @@ end;
 initialization
   RegisterEditorExpert(TGxGotoPrevModification);
   RegisterEditorExpert(TGxGotoNextModification);
-{.$ENDIF}
+{$ENDIF}
 
 end.
 
