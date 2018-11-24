@@ -15,7 +15,7 @@ uses
 const
   AllFilesWildCard = '*.*';
   EmptyString = '';
-  GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
+  GxSentenceEndChars = ['.', '!', '?', #$bf, #$a1]; // last two are questiondown uand exclamdown
   MaxSmallInt = 32767;
   MaxEditorCol = {$IFDEF GX_VER160_up} MaxSmallInt {$ELSE} 1023 {$ENDIF};
 
@@ -1199,13 +1199,15 @@ function GetQuotedToken(const Str: string): string;
       Result := Copy(Token, 1, EndQuotePos - 1);
   end;
 
+const
+  SingleQuote = #39;
 var
   StartChar: string;
 begin
   Result := Trim(Str);
   StartChar := LeftStr(Trim(Result), 1);
-  if StartChar = '''' then
-    Result := QuotedToken(Result, '''')
+  if StartChar = SingleQuote then
+    Result := QuotedToken(Result, SingleQuote)
   else if StartChar = '"' then
     Result := QuotedToken(Result, '"');
   Result := Trim(Result);
@@ -1285,7 +1287,7 @@ end;
 
 function IsCharSymbol(C: AnsiChar): Boolean;
 begin
-  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
+  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
 end;
 
 function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
@@ -1388,6 +1390,10 @@ end;
 {$ENDIF not UNICODE}
 
 function IsCharWhiteSpace(C: Char): Boolean;
+const
+  HorizontalTab = #9;
+  VerticalTab = #11;
+  FormFeed = #12;
 begin
   {$IFDEF UNICODE}
     {$IFDEF GX_VER250_up} // XE4+
@@ -1396,7 +1402,7 @@ begin
     Result := TCharacter.IsWhiteSpace(C);
     {$ENDIF}
   {$ELSE not UNICODE}
-  Result := C in [#9, #10, #11, #12, #13, #32];
+  Result := C in [HorizontalTab, LF, VerticalTab, FormFeed, CR, #32];
   {$ENDIF}
 end;
 
@@ -1412,12 +1418,12 @@ end;
 
 function IsCharLineEnding(C: Char): Boolean;
 begin
-  Result := CharInSet(C, [#10, #13]);
+  Result := CharInSet(C, [LF, CR]);
 end;
 
 function IsCharLineEndingOrNull(C: Char): Boolean;
 begin
-  Result := CharInSet(C, [#0, #10, #13]);
+  Result := CharInSet(C, [#0, LF, CR]);
 end;
 
 function IsCharAlphaNumeric(C: Char): Boolean;
@@ -1465,7 +1471,7 @@ begin
     Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
     {$ENDIF}
   {$ELSE not UNICODE}
-  Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
+  Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
   {$ENDIF}
 end;
 
