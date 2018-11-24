@@ -253,6 +253,9 @@ type
 {$ENDIF}
   protected
     procedure SetActive(New: Boolean); override;
+    // Overrride to load any configuration settings
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -1965,6 +1968,20 @@ end;
 function TFilesExpert.HasConfigOptions: Boolean;
 begin
   Result := True;
+end;
+
+procedure TFilesExpert.InternalLoadSettings(Settings: TExpertSettings);
+begin
+  inherited;
+  if Assigned(FFavoriteFiles) then
+    FFavoriteFiles.LoadSettings;
+end;
+
+procedure TFilesExpert.InternalSaveSettings(Settings: TExpertSettings);
+begin
+  inherited;
+  if Assigned(FFavoriteFiles) then
+    FFavoriteFiles.SaveSettings;
 end;
 
 procedure TfmFavFiles.actFileSelectAllExecute(Sender: TObject);
