@@ -548,7 +548,7 @@ function TTreeView_GetAsText(_Tree: TTreeView; _Indentation: Integer = 2; _Marke
 type
   TTreeNodeArr = array of TTreeNode;
 
-  ///<summary>
+///<summary>
 /// Since accessing TTreeNodes.Items is very slow, this helper function enumerates all nodes once
 /// and returns an array that can then be used instead.
 /// NOTE: Keep in mind that any manipuplation of the TTreeNodes will result in that array to be out
