@@ -3190,10 +3190,11 @@ begin
 end;
 
 // Delphi 2005 Update 1 does not support IOTAEditorServices!
-{$IFDEF VER170}
-type
-  IOTAEditorServices = IOTAEditorServices70;
-{$ENDIF VER170}
+// (but we no longer care)
+//{$IFDEF VER170}
+//type
+//  IOTAEditorServices = IOTAEditorServices70;
+//{$ENDIF VER170}
 
 function GxOtaGetEditorServices: IOTAEditorServices;
 begin

@@ -913,6 +913,12 @@ begin
   {$IFDEF VER170}  // Delphi 9 (2005)
     Result := GetDelphi9Version;
     Assert(Result in [ideD900, ideD901, ideD902, ideD903]);
+    case Result of
+      ideD900:
+        raise Exception.Create('Your IDE version (Delphi 2005 without updades) is no longer supported, please install at least Update 2!');
+      ideD901:
+        raise Exception.Create('Your IDE version (Delphi 2005 Update 1) is no longer supported, please install at least Update 2!');
+    end;
   {$ENDIF VER170}
 
   {$IFDEF VER180}
