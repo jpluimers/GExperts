@@ -242,7 +242,8 @@ uses
   GX_IdeDockFormEnhancer in '..\..\Source\IDE\GX_IdeDockFormEnhancer.pas',
   GX_eRemoveMatchingLines in '..\..\Source\Editor\GX_eRemoveMatchingLines.pas' {fmRemoveMatchingLinesExpertConfig},
   GX_TabOrderOptions in '..\..\Source\TabOrder\GX_TabOrderOptions.pas' {fmTabOrderOptions},
-  GX_DetectIdeSearchPathForm in '..\..\Source\Framework\GX_DetectIdeSearchPathForm.pas';
+  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
+  GX_DetectIdeSearchPathForm in '..\..\Source\ide\GX_DetectIdeSearchPathForm.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}
