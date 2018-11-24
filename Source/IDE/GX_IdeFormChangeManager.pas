@@ -39,7 +39,7 @@ uses Windows,
   GX_ConfigurationInfo,
   GX_EventHook,
   GX_dzVclUtils,
-  GX_IdeSearchPathEnhancer;
+  GX_DetectIdeSearchPathForm;
 
 type
   TFormChangeCallbackItem = class
@@ -165,7 +165,7 @@ begin
 
 end;
 
-{$IFDEF GX_VER320_up}
+{$IFDEF SEARCH_PATH_REDRAW_FIX_ENABLED}
 
 function HasRedrawProblems(_Form: TCustomForm): Boolean;
 var
@@ -173,7 +173,7 @@ var
 begin
   Result := False;
   // is it the path editor form?
-  if not TGxIdeSearchPathEnhancer.WouldBeDesiredForm(_Form) then
+  if not IsSarchPathForm(_Form) then
     Exit; //==>
 
   // if yes, check if theming is enabled
@@ -192,13 +192,13 @@ begin
     FreeAndNil(reg);
   end;
 end;
-{$ELSE}
+{$ELSE ~SEARCH_PATH_REDRAW_FIX_ENABLED}
 
 function HasRedrawProblems(_Form: TCustomForm): Boolean;
 begin
   Result := False;
 end;
-{$ENDIF}
+{$ENDIF SEARCH_PATH_REDRAW_FIX_ENABLED}
 
 procedure TFormChangeManagerInternal.ProcessActivatedForm(Form: TCustomForm);
 var

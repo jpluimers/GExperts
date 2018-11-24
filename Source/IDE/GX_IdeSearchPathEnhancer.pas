@@ -14,7 +14,6 @@ type
   public
     class function GetEnabled: Boolean;
     class procedure SetEnabled(_Value: Boolean);
-    class function WouldBeDesiredForm(_Form: TCustomForm): Boolean;
   end;
 
 implementation
@@ -39,18 +38,8 @@ uses
   GX_IdeFavoritesList,
   GX_ConfigurationInfo,
   GX_IdeSearchPathFavoriteEdit,
+  GX_DetectIdeSearchPathForm,
   GX_IdeDialogEnhancer;
-
-type
-  ///<summary>
-  /// defines the strings used to identify the search path edit dialog </summary>
-  TSearchPathDlgStrings = record
-    DialogClass: string;
-    DialogName: string;
-    DialogCaptionEn: string;
-    DialogCaptionFr: string;
-    DialogCaptionDe: string;
-  end;
 
 type
   TSearchPathEnhancer = class(TIdeDialogEnhancer)
@@ -234,117 +223,10 @@ begin
   Result := True;
 end;
 
-//  SearchPathDialogClassArr: TSearchPathDialogClassArr = (
-//    'TInheritedListEditDlg', 'TInheritedListEditDlg', 'TOrderedListEditDlg'
-
-{$IFDEF GX_VER300_up}
-// Delphi 10 and up
-const
-  ProjectSearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TInheritedListEditDlg';
-    DialogName: 'InheritedListEditDlg';
-    DialogCaptionEn: 'Search Path';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-const
-  LibrarySearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TOrderedListEditDlg';
-    DialogName: 'OrderedListEditDlg';
-    DialogCaptionEn: 'Directories';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-{$ELSE GX_VER300_up}
-{$IFDEF GX_VER220_up}
-// Delphi XE and up
-const
-  ProjectSearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TInheritedListEditDlg';
-    DialogName: 'InheritedListEditDlg';
-    DialogCaptionEn: 'Search Path';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-const
-  LibrarySearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TOrderedListEditDlg';
-    DialogName: 'OrderedListEditDlg';
-    DialogCaptionEn: 'Directories';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-{$ELSE GX_VER220_up}
-{$IFDEF GX_VER200_up}
-// Delphi 2009 and up
-const
-  ProjectSearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TInheritedListEditDlg';
-    DialogName: 'InheritedListEditDlg';
-    DialogCaptionEn: 'Search Path';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-const
-  LibrarySearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TOrderedListEditDlg';
-    DialogName: 'OrderedListEditDlg';
-    DialogCaptionEn: 'Directories';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-{$ELSE GX_VER200_up}
-// Delphi 2007 and earlier
-const
-  ProjectSearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TOrderedListEditDlg';
-    DialogName: 'OrderedListEditDlg';
-    DialogCaptionEn: 'Search Path';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-const
-  LibrarySearchPathDlg: TSearchPathDlgStrings = (
-    DialogClass: 'TOrderedListEditDlg';
-    DialogName: 'OrderedListEditDlg';
-    DialogCaptionEn: 'Directories';
-    DialogCaptionFr: 'Chemin de recherche';
-    DialogCaptionDe: 'Verzeichnisse';
-    );
-{$ENDIF GX_VER200_up}
-{$ENDIF GX_VER220_up}
-{$ENDIF GX_VER300_up}
-
-function MatchesDlg(_Form: TCustomForm; _Strings: TSearchPathDlgStrings): Boolean;
-begin
-  Result := False;
-  if not SameText(_Form.ClassName, _Strings.DialogClass) then
-    Exit; //==>
-  if not SameText(_Form.Name, _Strings.DialogName) then
-    Exit; //==>
-  if not SameText(_Form.Caption, _Strings.DialogCaptionEn)
-    and not SameText(_Form.Caption, _Strings.DialogCaptionFr)
-    and not SameText(_Form.Caption, _Strings.DialogCaptionDe) then
-    Exit;
-  Result := True;
-end;
-
-class function TGxIdeSearchPathEnhancer.WouldBeDesiredForm(_Form: TCustomForm): Boolean;
-begin
-  if Assigned(_Form) then begin
-    Result := True;
-    if MatchesDlg(_Form, ProjectSearchPathDlg) then
-      Exit; //==>
-    if MatchesDlg(_Form, LibrarySearchPathDlg) then
-      Exit; //==>
-  end;
-  Result := False;
-end;
-
 function TSearchPathEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
 begin
   if FEnabled then begin
-    Result := TGxIdeSearchPathEnhancer.WouldBeDesiredForm(_Form)
+    Result := IsSarchPathForm(_Form)
   end else
     Result := False;
 end;

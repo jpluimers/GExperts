@@ -132,7 +132,8 @@ Kylix is no longer supported.  You can try compiling with the GExperts source fr
 {$IFDEF GX_VER320_up}
 {$IFNDEF GX_VER330_up}
 // only for Delphi 10.2 (lets hope Embarcadero fixes the problem in later versions)
-{$DEFINE STARTUP_LAYOUT_FIX_ENABLED}
+  {$DEFINE STARTUP_LAYOUT_FIX_ENABLED}
+  {$DEFINE SEARCH_PATH_REDRAW_FIX_ENABLED}
 {$ENDIF GX_VER330_up}
 {$ENDIF GX_VER320_up}
 
