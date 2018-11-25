@@ -42,8 +42,8 @@ begin
   if not Assigned(InternalPopupMenu) then
   begin
     InternalPopupMenu := NewPopupMenu(nil, MenuName, paCenter, False, []);
-{$IFNDEF GX_VER330_up} // RAD Studio 10.3 Rio (27; BDS 20)
-    // assigninig icons has redraw problems in themed IDEs (notably 10.3, I haven't tried 10.2 yet)
+{$IFNDEF GX_VER320_up}
+    // assigninig icons has redraw problems in themed IDEs (Delphi 10.3 and 10.2)
     // todo: Figure out the real problem and assign them again
     InternalPopupMenu.Images := GxOtaGetIdeImageList;
 {$ENDIF}
