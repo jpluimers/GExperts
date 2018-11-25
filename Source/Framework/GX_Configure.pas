@@ -970,6 +970,12 @@ begin
   chkEnhanceDockForms.Enabled := EnableState;
   chkEnhanceBuildEventsDialog.Enabled := EnableState;
   chkEnhanceApplicationSettingsDialog.Enabled := EnableState;
+{$IFDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+  chkAutoCloseMessage.Enabled := EnableState;
+{$ENDIF}
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  chkForceStartupDesktop.Enabled := EnableState;
+{$ENDIF}
 end;
 
 end.
