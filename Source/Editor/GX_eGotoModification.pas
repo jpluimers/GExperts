@@ -204,6 +204,11 @@ var
   pm: TPopupMenu;
   mi: TMenuItem;
 begin
+{$IFDEF GX_VER330_up}
+  // Adding an entry to the editor popup menu does not work with Delphi 10.3.
+  // The menu seems to be created dynamically and that fails if we add to it.
+  Exit; //==>
+{$ENDIF}
   if not Active then
     Exit; //==>
 
@@ -228,6 +233,7 @@ end;
 
 procedure TGxGotoModification.SetActive(New: Boolean);
 begin
+  inherited;
   if New then begin
     CreateMenuItem(nil);
   end else begin
@@ -235,7 +241,6 @@ begin
 //      FreeAndNil(FMenuItem);
 //    end;
   end;
-  inherited;
 end;
 
 { TGxGotoPrevModification }
