@@ -16,7 +16,7 @@ set OUTPUTDIR=%~dp1
 
 pushd %OUTPUTDIR%
 
-"%~dp0\prepbuild.exe" --readini="%PROJECTPATH%" --WriteRc="%PROJECTPATH%"
+"%~dp0\prepbuild.exe" --readini="%PROJECTPATH%" --WriteRc="%PROJECTPATH%" --incbuild
 brcc32 "%PROJECTNAMEONLY%_Version.rc"
 
 popd
