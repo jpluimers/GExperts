@@ -1,4 +1,6 @@
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 set iscc="C:\Program Files (x86)\Inno Setup 5\ISCC.exe"
 set version=1.3.12
 set instver=13C
@@ -28,7 +30,6 @@ call :makeinst RS100 RS10
 call :makeinst RS101 RS10.1
 call :makeinst RS102 RS10.2
 call :makeinst RS103 RS10.3
-pause
 goto :eof
 
 :makeinst

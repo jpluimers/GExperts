@@ -1,4 +1,6 @@
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 @rem prebuild.cmd should be called as pre-build event like this:
 @rem Path\to\buildtools\prebuild.cmd $(OUTPUTDIR)$(OUTPUTNAME)
 @echo %0

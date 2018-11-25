@@ -1,5 +1,7 @@
 @rem builds a project using dcc32
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 setlocal
 set buildtools=%~dp0%
 if exist _prebuild.cmd call _prebuild.cmd
