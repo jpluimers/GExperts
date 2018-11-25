@@ -1,5 +1,7 @@
 unit GX_ePopupMenu;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
