@@ -95,7 +95,7 @@ type
     FOkBtn: TButton;
     FConfigCombo: TCustomCombo;
     function TryFindHistoryComboBox(_SettingsControl: TWinControl; _GrpBoxIdx: Integer;
-      const _Name: string; out _cmb: TWinControl): Boolean;
+      _CmbIdx: Integer; const _Name: string; out _cmb: TWinControl): Boolean;
     function TryGetSettingsControl(_Form: TCustomForm; out _SettingsControl: TWinControl): Boolean;
     procedure ShiftCtrlO(_Sender: TObject);
     procedure ShiftCtrlT(_Sender: TObject);
@@ -162,7 +162,21 @@ var
   wctrl: TWinControl;
 begin
   Result := False;
-{$IFDEF GX_VER180_up} // Delphi 2006 (BDS 3)
+{$IFDEF GX_VER330_up} // Delphi 10.3
+  // In Delphi 10.3 there is an additional ScrollBox between the panel and the PropertySheetControl
+  if not CheckControl(_Form, 3, 'TPanel', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, 3, 'TScrollBox', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, 0, 'TPropertySheetControl', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, -1, 'TDebuggerLocalPage', wctrl) then
+    Exit;
+  if not CheckControl(wctrl, 2, 'TPanel', wctrl) then
+    Exit;
+  _SettingsControl := wctrl;
+  Result := True;
+{$ELSE}{$IFDEF GX_VER180_up} // Delphi 2006 (BDS 3)
   if not CheckControl(_Form, 3, 'TPanel', wctrl) then
     Exit;
   if not CheckControl(wctrl, 1, 'TPropertySheetControl', wctrl) then
@@ -193,20 +207,20 @@ begin
     Exit;
   _SettingsControl := wctrl;
   Result := True;
-{$ENDIF}{$ENDIF}{$ENDIF}
+{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
 end;
 
 function TProjectOptionsEnhancer.TryFindHistoryComboBox(_SettingsControl: TWinControl;
-  _GrpBoxIdx: Integer; const _Name: string; out _cmb: TWinControl): Boolean;
+  _GrpBoxIdx: Integer; _CmbIdx: Integer; const _Name: string; out _cmb: TWinControl): Boolean;
 var
   wctrl: TWinControl;
 begin
   Result := False;
-
-  if not CheckControl(_SettingsControl, _GrpBoxIdx, 'TGroupBox', wctrl) then
+  // in Delphi 10.3 the controls are on a Panel, in older versions in a GroupBox
+  if not CheckControl(_SettingsControl, _GrpBoxIdx, 'TPanel', wctrl)
+    and not CheckControl(_SettingsControl, _GrpBoxIdx, 'TGroupBox', wctrl) then
     Exit;
-  if not CheckControl(wctrl, 0, 'THistoryPropComboBox', wctrl) or (wctrl.Name <>
-    _Name) then
+  if not CheckControl(wctrl, _CmbIdx, 'THistoryPropComboBox', wctrl) or (wctrl.Name <> _Name) then
     Exit;
   _cmb := wctrl;
   Result := True;
@@ -254,15 +268,14 @@ const
 
 procedure TProjectOptionsEnhancer.EnhanceForm(_Form: TForm);
 
-  function TryHookCombo(_SettingsPanel: TWinControl; _Index: Integer; const
-    _Name: string): Boolean;
+  function TryHookCombo(_SettingsPanel: TWinControl; _PanelIdx, _CmbIdx: Integer; const _Name: string): Boolean;
   var
     cmb: TWinControl;
   begin
     Result := False;
-    if _Index < 0 then
+    if _PanelIdx < 0 then
       Exit;
-    if TryFindHistoryComboBox(_SettingsPanel, _Index, _Name, cmb) then begin
+    if TryFindHistoryComboBox(_SettingsPanel, _PanelIdx, _CmbIdx, _Name, cmb) then begin
       if not TComboboxDropHandler.IsAlreadyHooked(cmb) then begin
         TComboboxDropHandler.Create(cmb);
         Result := True;
@@ -273,7 +286,6 @@ procedure TProjectOptionsEnhancer.EnhanceForm(_Form: TForm);
 const
   GX_ACTION_LIST = 'GXProjectOptionsActionList'; // do no localize!
 var
-  i: Integer;
   SettingsControl: TWinControl;
   al: TActionList;
   lbl: TLabel;
@@ -308,8 +320,18 @@ begin
   if not TryGetSettingsControl(_Form, SettingsControl) then
     Exit;
 
-  for i := 0 to 3 do
-    TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[i], INPUT_COMBO_NAMES[i]);
+{$IFDEF GX_VER330_up}
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[0], 1, INPUT_COMBO_NAMES[0]);
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[1], 1, INPUT_COMBO_NAMES[1]);
+  // Embarcadero got the order of the controls wrong (also the tab order), index 1 is now the ... button
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[2], 2, INPUT_COMBO_NAMES[2]);
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[3], 2, INPUT_COMBO_NAMES[3]);
+{$ELSE}
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[0], 0, INPUT_COMBO_NAMES[0]);
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[1], 0, INPUT_COMBO_NAMES[1]);
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[2], 0, INPUT_COMBO_NAMES[2]);
+  TryHookCombo(SettingsControl, INPUT_COMBO_INDEXES[3], 0, INPUT_COMBO_NAMES[3]);
+{$ENDIF}
 end;
 
 procedure TProjectOptionsEnhancer.ShiftCtrlO(_Sender: TObject);
