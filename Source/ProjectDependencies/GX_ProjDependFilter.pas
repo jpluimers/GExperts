@@ -41,6 +41,7 @@ type
     procedure SetUnitList(const Value: TStrings);
     procedure UpdateButtonState;
   public
+    constructor Create(_Owner: TComponent); override;
     property UnitList: TStrings read GetUnitList write SetUnitList;
   end;
 
@@ -48,7 +49,7 @@ implementation
 
 {$R *.dfm}
 
-uses SysUtils, GX_GenericUtils;
+uses SysUtils, GX_GenericUtils, GX_dzVclUtils;
 
 procedure TfmProjDependFilter.mitAddFilesClick(Sender: TObject);
 var
@@ -121,6 +122,12 @@ end;
 procedure TfmProjDependFilter.mnuPopupPopup(Sender: TObject);
 begin
   mitDeleteFiles.Enabled := lbFilter.SelCount > 0;
+end;
+
+constructor TfmProjDependFilter.Create(_Owner: TComponent);
+begin
+  inherited;
+  TControl_SetMinConstraints(Self);
 end;
 
 procedure TfmProjDependFilter.edtUnitNameChange(Sender: TObject);

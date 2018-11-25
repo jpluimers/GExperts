@@ -83,6 +83,16 @@
                                       {$DEFINE GX_VER310_up}  // RAD Studio 10.1 Berlin (25; BDS 18)
                                       {$IF CompilerVersion >= 32}
                                         {$DEFINE GX_VER320_up}  // RAD Studio 10.2 Tokyo (26; BDS 19)
+                                        {$IF CompilerVersion >= 33}
+                                          {$DEFINE GX_VER330_up}  // RAD Studio 10.3 Rio (27; BDS 20)
+                                          {$IF CompilerVersion >= 34}
+  unsupported Delphi version
+  If you get here, you are probably trying to compile GExperts with a new Delphi release.
+  In addition to define a new GX_VERxxx_UP symbol, you should also have a look at
+  * GX_VerDepConst.pas
+  todo: List the other units that might need to be adapted.
+                                          {$IFEND}
+                                        {$IFEND}
                                       {$IFEND}
                                     {$IFEND}
                                   {$IFEND}
@@ -118,6 +128,20 @@ Kylix is no longer supported.  You can try compiling with the GExperts source fr
 
 // All IDEs support this feature to some degree (though Delphi 8+ do not support multiline editor tabs)
 {$DEFINE GX_EditorEnhancements}
+
+{$IFDEF GX_VER320_up}
+{$IFNDEF GX_VER330_up}
+// only for Delphi 10.2
+  {$DEFINE STARTUP_LAYOUT_FIX_ENABLED}
+{$ENDIF GX_VER330_up}
+{$ENDIF GX_VER320_up}
+
+{$IFDEF GX_VER320_up}
+  // That problem still exists in Delphi 10.3 Rio, but let's hope it won't in later versions
+  {$IFNDEF GX_VER340_up}
+    {$DEFINE SEARCH_PATH_REDRAW_FIX_ENABLED}
+  {$ENDIF GX_VER340_up}
+{$ENDIF GX_VER320_up}
 
 // Define GX_ENHANCED_EDITOR if SynEdit is available
 {$IFDEF SYNEDIT}

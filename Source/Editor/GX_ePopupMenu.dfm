@@ -76,13 +76,14 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
         Width = 175
       end>
     RowSelect = True
+    PopupMenu = pm_Selected
     SortType = stText
     TabOrder = 4
     ViewStyle = vsReport
     OnChange = lv_SelectedChange
     OnDblClick = lv_SelectedDblClick
+    OnEdited = lv_SelectedEdited
     OnEditing = lv_SelectedEditing
-    OnKeyDown = lv_SelectedKeyDown
   end
   object b_OK: TButton
     Left = 416
@@ -90,7 +91,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = 'OK'
+    Caption = '&OK'
     Default = True
     ModalResult = 1
     TabOrder = 7
@@ -111,7 +112,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Top = 88
     Width = 75
     Height = 25
-    Caption = '>> Add >>'
+    Caption = '>> &Add >>'
     TabOrder = 1
     OnClick = b_AddClick
   end
@@ -120,7 +121,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Top = 128
     Width = 75
     Height = 25
-    Caption = 'Remove <<'
+    Caption = '&Remove <<'
     TabOrder = 2
     OnClick = b_RemoveClick
   end
@@ -130,7 +131,7 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
-    Caption = 'Default >>'
+    Caption = '&Default >>'
     TabOrder = 3
     OnClick = b_DefaultClick
   end
@@ -152,5 +153,11 @@ inherited fmEditorPopupMenuExpertConfig: TfmEditorPopupMenuExpertConfig
     Anchors = [akLeft, akBottom]
     Caption = 'Focus editor window if not focused'
     TabOrder = 5
+  end
+  object pm_Selected: TPopupMenu
+    AutoHotkeys = maManual
+    OnPopup = pm_SelectedPopup
+    Left = 376
+    Top = 168
   end
 end

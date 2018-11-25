@@ -12,7 +12,12 @@ interface
 
 uses
   SysUtils, Classes, Controls, Forms, Dialogs, StdCtrls, Menus,
-  GX_BaseForm, GX_Experts, ExtCtrls;
+  GX_BaseForm, GX_Experts, ExtCtrls,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmInsertAutoTodoForm = class(TfmBaseForm)
@@ -43,7 +48,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Registry, Actions, ActnList, ToolsAPI, Types,
+  Actions, ActnList, ToolsAPI, Types,
   GX_GExperts, GX_ConfigurationInfo, GX_uAutoTodoHandler, GX_dzVclUtils,
   GX_OtaUtils, GX_GenericUtils, GX_AutoTodoDone;
 
@@ -163,6 +168,7 @@ begin
       if Source = '' then
         exit;
 
+      IncCallCount;
       TextLength := Length(Source);
 
       Patches := TStringList.Create;
@@ -190,7 +196,7 @@ begin
             // due to the IDE using UTF-8 we need to convert PatchPos to line and offset
             // and then convert line and offset to the Offset into the edit buffer
             for i := 0 to Patches.Count - 1 do begin
-              PatchPos := NativeInt(Patches.Objects[i]);
+              PatchPos := GXNativeInt(Patches.Objects[i]);
               cp := OffsToCP.CalcCursorPos(PatchPos);
               Offset := EditView.CharPosToPos(PointToCharPos(cp));
               Patches.Objects[i] := Pointer(Offset);
@@ -203,7 +209,7 @@ begin
           Writer := SourceEditor.CreateUndoableWriter;
           CurPos := 0;
           for i := 0 to Patches.Count - 1 do begin
-            PatchPos := NativeInt(Patches.Objects[i]);
+            PatchPos := GXNativeInt(Patches.Objects[i]);
             if PatchPos > CurPos then begin
               Writer.CopyTo(PatchPos);
               CurPos := PatchPos;
@@ -333,7 +339,7 @@ begin
   TButton_AddDropdownMenu(btnInsertPlaceholder, pmuPlaceholders);
   mmoTextToInsert.Lines.Text := TAutoTodoHandler.GetDefaultTextToInsert;
 
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
 end;
 
 procedure TfmInsertAutoTodoForm.GetData(var AUsername, ATextToInsert: string;

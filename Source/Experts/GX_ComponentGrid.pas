@@ -70,7 +70,8 @@ implementation
 
 uses
   SysUtils, Graphics, Printers, Windows, Dialogs, ToolsAPI,
-  GX_Consts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_SharedImages;
+  GX_Consts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_SharedImages,
+  GX_dzVclUtils;
 
 type
   TGridProperty = record
@@ -191,6 +192,7 @@ begin
   finally
     FreeAndNil(Dlg);
   end;
+  IncCallCount;
 end;
 
 constructor TGridExpert.Create;
@@ -327,6 +329,8 @@ constructor TfmComponentGrid.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
+  TControl_SetMinConstraints(Self);
+
   FComponentList := TInterfaceList.Create;
   FModified := False;
 
@@ -379,7 +383,7 @@ begin
 
   for Row := 1 to StringGrid.RowCount - 1 do
   begin
-    ComponentIndex := NativeInt(StringGrid.Objects[0, Row]);
+    ComponentIndex := GXNativeInt(StringGrid.Objects[0, Row]);
 
     AComponent := FComponentList.Items[ComponentIndex] as IOTAComponent;
     Assert(Assigned(AComponent));

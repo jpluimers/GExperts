@@ -7,8 +7,6 @@ object fmIdeShortCuts: TfmIdeShortCuts
   ClientHeight = 218
   ClientWidth = 650
   Color = clBtnFace
-  Constraints.MinHeight = 235
-  Constraints.MinWidth = 500
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -95,7 +93,7 @@ object fmIdeShortCuts: TfmIdeShortCuts
     object hkShortCut: THotKey
       Left = 116
       Top = 84
-      Width = 157
+      Width = 269
       Height = 22
       Enabled = False
       HotKey = 0

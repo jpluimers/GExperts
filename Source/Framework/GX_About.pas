@@ -5,7 +5,12 @@ unit GX_About;
 interface
 
 uses
-  Windows, Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm;
+  Windows, Classes, Controls, Forms, StdCtrls, ExtCtrls, GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmAbout = class(TfmBaseForm)
@@ -31,7 +36,7 @@ type
   private
     procedure InitVersionInfoControls;
   protected
-    class function GetVersionStr: string;
+    class function GetVersionStr: string; virtual;
     class function DoAddToAboutDialog: Integer; virtual;
     class function GetAboutIcon: HBITMAP; virtual;
     class function GetSplashIcon: HBITMAP; virtual;
@@ -62,7 +67,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Graphics, ToolsApi, Messages,
-  GX_GenericUtils, GX_FeedbackWizard;
+  GX_GenericUtils, GX_FeedbackWizard, GX_LibrarySource;
 
 const
   DefaultBugEmail = 'bugs@gexperts.org';  // Do not localize.
@@ -266,8 +271,13 @@ end;
 {$ENDIF GX_VER170_up}
 
 class procedure TfmAbout.AddToSplashScreen;
+var
+  VerString: string;
 begin
-  AddPluginToSplashScreen(GetSplashIcon, 'GExperts', GetVersionStr);
+  VerString := GetVersionStr;
+  if GExpertsDllMarker = nil then
+    VerString := VerString + ' (duplicate, inactive)';
+  AddPluginToSplashScreen(GetSplashIcon, 'GExperts', VerString);
 end;
 
 class function TfmAbout.DoAddToAboutDialog: Integer;

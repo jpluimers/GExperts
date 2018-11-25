@@ -5,7 +5,7 @@ unit GX_GenericClasses;
 interface
 
 uses
-  Classes, Contnrs;
+  Classes;
 
 type
   // We use the NoRefCount type to assign interface instances without invoking

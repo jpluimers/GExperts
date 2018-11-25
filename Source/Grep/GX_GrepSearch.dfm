@@ -213,6 +213,16 @@ object fmGrepSearch: TfmGrepSearch
       TabOrder = 2
       OnClick = cbGrepCommentsClick
     end
+    object btnGrepAll: TButton
+      Left = 176
+      Top = 72
+      Width = 43
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'All'
+      TabOrder = 3
+      OnClick = btnGrepAllClick
+    end
   end
   object gbxUnitSections: TGroupBox
     Left = 252
@@ -264,6 +274,16 @@ object fmGrepSearch: TfmGrepSearch
       Caption = 'Finalization'
       TabOrder = 3
       OnClick = cbSectionFinalizationClick
+    end
+    object btnSectionAll: TButton
+      Left = 176
+      Top = 72
+      Width = 43
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'All'
+      TabOrder = 4
+      OnClick = btnSectionAllClick
     end
   end
   object gbxDirectories: TGroupBox
@@ -443,7 +463,7 @@ object fmGrepSearch: TfmGrepSearch
   object timHintTimer: TTimer
     Interval = 2000
     OnTimer = timHintTimerTimer
-    Left = 160
-    Top = 232
+    Left = 176
+    Top = 136
   end
 end

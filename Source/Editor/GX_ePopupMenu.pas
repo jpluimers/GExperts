@@ -1,5 +1,7 @@
 unit GX_ePopupMenu;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
@@ -14,6 +16,7 @@ uses
   Dialogs,
   ComCtrls,
   StdCtrls,
+  Menus,
   GX_BaseForm,
   GX_BaseExpert;
 
@@ -33,6 +36,7 @@ type
     b_Default: TButton;
     b_ClearShortcut: TButton;
     chk_FocusEditor: TCheckBox;
+    pm_Selected: TPopupMenu;
     procedure b_AddClick(Sender: TObject);
     procedure b_RemoveClick(Sender: TObject);
     procedure lb_EditorExpertsDblClick(Sender: TObject);
@@ -40,11 +44,12 @@ type
     procedure lv_SelectedEditing(Sender: TObject; Item: TListItem; var AllowEdit: Boolean);
     procedure lv_SelectedEdited(Sender: TObject; Item: TListItem; var s: string);
     procedure lv_SelectedDblClick(Sender: TObject);
-    procedure lv_SelectedKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure lv_SelectedChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure b_DefaultClick(Sender: TObject);
     procedure b_ClearShortcutClick(Sender: TObject);
+    procedure pm_SelectedPopup(Sender: TObject);
   private
+    FOldlvSelectWindowProc: TWndMethod;
     function GetExpertIndex(const _ListView: TListView; const _Expert: TGX_BaseExpert): Integer;
     procedure CheckForDuplicates;
     procedure GetData(_sl: TStringList; out _ForceEdiorActive: Boolean);
@@ -54,6 +59,9 @@ type
     procedure AddSelectedExpert;
     procedure AddSelectedEditorExpert;
     procedure EnableOKCancel;
+    procedure mi_SetHotkey(_Sender: TObject);
+    procedure mi_EditHotkey(_Sender: TObject);
+    procedure ListViewWndProc(var _Message: TMessage);
   public
     constructor Create(_Owner: TComponent); override;
   end;
@@ -63,8 +71,8 @@ implementation
 {$R *.dfm}
 
 uses
-  Menus,
   StrUtils,
+  CommCtrl,
   GX_EditorExpert,
   GX_ConfigurationInfo,
   GX_dzVclUtils,
@@ -153,7 +161,8 @@ var
 begin
   if not IsEditorActive(ctl) then begin
     if not FForceEditorActive then
-      Exit;
+      Exit; //==>
+
     EditorForm := GxOtaGetTopMostEditView.GetEditWindow.Form;
     if Assigned(EditorForm) then begin
       EditorControl := EditorForm.FindComponent('Editor');
@@ -192,6 +201,8 @@ begin
     ShowConfigForm);
   pnt := ctl.ClientToScreen(Point(0, 0));
   FGExpertsShortcutMenu.Popup(pnt.X, pnt.Y);
+
+  IncCallCount;
 end;
 
 procedure TGxEditorPopupMenuExpert.ShowConfigForm(_Sender: TObject);
@@ -278,15 +289,22 @@ begin
   _sl.Add('H=ClipboardHistory');
   _sl.Add('I=SelectIdent');
   _sl.Add('J=SortLines');
+  // K
   _sl.Add('L=CodeLibrarian');
   _sl.Add('M=MacroLibrary');
+  // N
   _sl.Add('O=OpenFile');
   _sl.Add('P=ProcedureList');
+  // Q
   _sl.Add('R=ReverseStatement');
   _sl.Add('S=MessageDialog');
   _sl.Add('T=MacroTemplates');
   _sl.Add('U=UsesClauseMgr');
+  // V
+  _sl.Add('W=WARN');
   _sl.Add('X=Configure');
+  // Y
+  // Z
 end;
 
 { TfmEditorPopupMenuExpertConfig }
@@ -296,6 +314,7 @@ var
   i: Integer;
   EdExpManager: TGxEditorExpertManager;
   Expert: TGX_BaseExpert;
+  mi: TMenuItem;
 begin
   inherited;
 
@@ -313,6 +332,31 @@ begin
     if not (Expert is TGxEditorPopupMenuExpert) then
       lb_EditorExperts.Items.AddObject(Expert.GetDisplayName, Expert);
   end;
+  lb_EditorExperts.Sorted := True;
+
+  mi := TPopupMenu_AppendMenuItem(pm_Selected, 'Edit Hotkey', mi_EditHotkey);
+  mi.ShortCut := ShortCut(VK_F2, []);
+
+  FOldlvSelectWindowProc := lv_Selected.WindowProc;
+  lv_Selected.WindowProc := ListViewWndProc;
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.ListViewWndProc(var _Message: TMessage);
+var
+  LvDispInfo: PLVDispInfo;
+  Code: Integer;
+begin
+  if _Message.Msg = CN_NOTIFY then begin
+    Code := PNMHdr(_Message.lParam).Code;
+    if (Code = LVN_ENDLABELEDITA) or (Code = LVN_ENDLABELEDITW) then begin
+      LvDispInfo := PLVDispInfo(_Message.lParam);
+      if LvDispInfo.Item.pszText = nil then begin
+        EnableOKCancel;
+        Exit; //==>
+      end;
+    end;
+  end;
+  FOldlvSelectWindowProc(_Message);
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.EnableOKCancel;
@@ -518,17 +562,53 @@ begin
   b_Cancel.Enabled := False;
 end;
 
-procedure TfmEditorPopupMenuExpertConfig.lv_SelectedKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TfmEditorPopupMenuExpertConfig.mi_EditHotkey(_Sender: TObject);
 var
   li: TListItem;
 begin
-  if Key = VK_F2 then begin
-    li := lv_Selected.Selected;
-    if Assigned(li) then
-      li.EditCaption;
-    Key := 0;
+  if TListView_TryGetSelected(lv_Selected, li) then
+    li.EditCaption;
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.pm_SelectedPopup(Sender: TObject);
+var
+  li: TListItem;
+  i: Integer;
+  UsedHotkeys: set of AnsiChar;
+  c: AnsiChar;
+  mi: TMenuItem;
+begin
+  if not TListView_TryGetSelected(lv_Selected, li) then
+    Exit; //==>
+
+  pm_Selected.Items.Clear;
+
+  Include(UsedHotkeys, 'X');
+
+  for i := 0 to lv_Selected.Items.Count - 1 do begin
+    c := AnsiChar(lv_Selected.Items[i].Caption[1]);
+    Include(UsedHotkeys, c);
   end;
+
+  for c := 'A' to 'Z' do begin
+    if not (c in UsedHotkeys) then
+      TPopupMenu_AppendMenuItem(pm_Selected, string(c), mi_SetHotkey);
+  end;
+
+  mi := TPopupMenu_AppendMenuItem(pm_Selected, 'Edit Hotkey', mi_EditHotkey);
+  mi.ShortCut := ShortCut(VK_F2, []);
+end;
+
+procedure TfmEditorPopupMenuExpertConfig.mi_SetHotkey(_Sender: TObject);
+var
+  mi: TMenuItem;
+  li: TListItem;
+begin
+  if not TListView_TryGetSelected(lv_Selected, li) then
+    Exit; //==>
+  mi := _Sender as TMenuItem;
+  li.Caption := mi.Caption;
+  CheckForDuplicates;
 end;
 
 procedure TfmEditorPopupMenuExpertConfig.RemoveExpert;

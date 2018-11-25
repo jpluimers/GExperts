@@ -65,6 +65,8 @@ type
   end;
 
   TToDoScanType = (tstProject, tstOpenFiles, tstDirectory, tstProjectGroup);
+  TParsePasFileCallback = procedure(const FileName: string; const SComment, EComment: string;
+    const CommentStr: string; LineNumber: Integer) of object;
 
   TfmToDo = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
@@ -124,7 +126,7 @@ type
     procedure RefreshTodoList;
     procedure ClearDataListAndListView;
     procedure ParseComment(const FileName: string; const SComment, EComment: string;
-      const TokenString: string; LineNumber: Integer);
+      const CommentStr: string; LineNumber: Integer);
     procedure LoadFile(const FileName: string);
     procedure EnumerateFilesByDirectory;
     procedure EnumerateProjectFiles(Project: IOTAProject);
@@ -134,6 +136,8 @@ type
     function ConfigurationKey: string;
     function PriorityToImageIndex(Priority: TToDoPriority): Integer;
     function NumericPriorityToGXPriority(const PriorityStr: string): TToDoPriority;
+    procedure ParsePasFile(const _Filename: string; const _Content: string; _Callback: TParsePasFileCallback);
+    procedure ParseCFile(const _Filename, _Content: string; _Callback: TParsePasFileCallback);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -173,10 +177,10 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Dialogs, Clipbrd, Windows,
-  mPasLex, mwBCBTokenList,
+  SysUtils, Dialogs, Clipbrd, Windows, StrUtils,
+  mPasLex, mwBCBTokenList, mwPasParserTypes,
   GX_GxUtils, GX_GenericUtils, GX_EditReader,
-  GX_ToDoOptions, GX_SharedImages, Math;
+  GX_ToDoOptions, GX_SharedImages, Math, GX_dzVclUtils;
 
 resourcestring
   SParsingError = 'A parsing error occurred in file %s.' + sLineBreak;
@@ -401,7 +405,7 @@ end;
 // be passed in, clearly saying so.
 
 procedure TfmToDo.ParseComment(const FileName: string; const SComment, EComment: string;
-  const TokenString: string; LineNumber: Integer);
+  const CommentStr: string; LineNumber: Integer);
 var
   i, j, k, n, m, TokenPos, NextCharPos: Integer;
   Info: TToDoInfo;
@@ -411,7 +415,7 @@ var
 begin
   for i := 0 to ToDoExpert.FTokenList.Count - 1 do
   begin
-    n := AnsiCaseInsensitivePos(ToDoExpert.FTokenList[i], TokenString);
+    n := AnsiCaseInsensitivePos(ToDoExpert.FTokenList[i], CommentStr);
     if n > 1 then
     begin
       // We found a token that looks like a TODO comment. Now
@@ -419,7 +423,7 @@ begin
       // comment token need to be right in front of the TODO item
 
       // Remove comment characters
-      ParsingString := TokenString;
+      ParsingString := CommentStr;
       Delete(ParsingString, 1, Length(SComment));
       // Remove white-space left and right
       ParsingString := Trim(ParsingString);
@@ -451,8 +455,11 @@ begin
         Inc(j);
       end;
       if j > 0 then begin
-        if not (Info.Priority in [tpInfo, tpDone]) then
+        if not (Info.Priority in [tpInfo, tpDone]) then begin
+          // tpInfo and tpDone priority is fixed
+          // todo: shouldn't this check for tpNormal only?
           Info.Priority := NumericPriorityToGXPriority(Copy(ParsingString, 1, j));
+        end;
         Delete(ParsingString, 1, j);
         ParsingString := TrimLeft(ParsingString);
       end;
@@ -474,6 +481,22 @@ begin
       { zTODO -oTestCase -cTest -z-z-z-z -------------- -c switch: <-- try to break it }
       { zTODO -oTestCase -cTe-st : <-- hyphen test }
       //zTOdo
+
+      //zTOdo 0 <-- test case for priority 0 (maps to 5)
+      //zTOdo 1 <-- test case for priority 1 (critical)
+      //zTOdo 2 <-- test case for priority 2 (high)
+      //zTOdo 3 <-- test case for priority 3 (normal)
+      //zTOdo 4 <-- test case for priority 4 (low)
+      //zTOdo 5 <-- test case for priority 5 (lowest)
+      //zTOdo 6 <-- test case for priority 6 (maps to 5)
+      //zTOdo 7 <-- test case for priority 7 (maps to 5)
+      //zTOdo 8 <-- test case for priority 8 (maps to 5)
+      //zTOdo 9 <-- test case for priority 9 (maps to 5)
+
+      // info <-- test case for INFO
+      // done <-- test case for DONE
+      // todo <-- test case for normal todo
+
       { zTODO -oTestCase
           -cMultiline
           <-- Multiline test }
@@ -509,24 +532,21 @@ begin
         Delete(ParsingString, 1, j);
       end;
 
-      Info.Raw := TokenString;
+      Info.Raw := CommentStr;
+
+      // Handle multi-line to do comments
+      ParsingString := StringReplace(CommentStr, CRLF, ' ', [rfReplaceAll]);
 
       if not ToDoExpert.FShowTokens then
         n := n + Length(ToDoExpert.FTokenList[i]);
       if EComment <> '' then // Trim end-comment token.
-        m := AnsiCaseInsensitivePos(EComment, TokenString) - 1
+        m := AnsiCaseInsensitivePos(EComment, ParsingString) - 1
       else
-        m := Length(TokenString);
+        m := Length(ParsingString);
       if m < 1 then
-        m := Length(TokenString);
-      // Prevent multi-line to do notes
-      j := Pos(#13, TokenString);
-      k := Pos(#10, TokenString);
-      if j = 0 then j := 999999;
-      if k = 0 then k := 999999;
-      m := Min(m, Min(j, k));
+        m := Length(ParsingString);
       // The +1 is necessary to match IDE's line numbering
-      Info.Display := Copy(TokenString, n, (m - n) + 1);
+      Info.Display := Copy(ParsingString, n, (m - n) + 1);
       // Delete -C and -O options from ToDo text
       if Pos(' -C', UpperCase(Info.Display)) > 0 then
         Delete(Info.Display, Pos(' -C', UpperCase(Info.Display)), Length(Info.ToDoClass) + 3);
@@ -544,7 +564,7 @@ begin
       end;
       Delete(Info.Display, 1, j);
       Info.Display := TrimLeft(Info.Display);
-      if StrBeginsWith(':', Info.Display) then
+      if StartsStr(':', Info.Display) then
       begin
         Delete(Info.Display, 1, 1);
         Info.Display := Trim(Info.Display);
@@ -573,8 +593,6 @@ end;
 
 procedure TfmToDo.LoadFile(const FileName: string);
 var
-  Parser: TmwPasLex;
-  CParser: TBCBTokenList;
   FileContent: String;
   IsCPPModule: Boolean;
   InternalEditReader: TEditReader;
@@ -601,58 +619,90 @@ begin
       FreeAndNil(InternalEditReader);
     end;
 
-    if IsCPPModule then
-    begin
-      CParser := TBCBTokenList.Create;
-      try
-        CParser.SetOrigin(@FileContent[1], Length(FileContent));
-        while CParser.RunID <> ctknull do
-        begin
-          case CParser.RunID of
-            ctkansicomment: ParseComment(FileName, '/*', '*/', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
-            ctkslashesComment: ParseComment(FileName, '//', '', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
-          end;
-          if CParser.RunIndex = CParser.Count - 1 then
-            Break;
-          CParser.Next;
-        end;
-      finally
-        FreeAndNil(CParser);
-      end;
+    if IsCPPModule then begin
+      ParseCFile(FileName, FileContent, ParseComment);
 
-      if (ExtractUpperFileExt(FileName) = '.CPP') then
+      if IsCpp(FileName) or IsC(FileName) then
       begin
         HeaderFile := ChangeFileExt(FileName, '.h');
         if GxOtaFileOrModuleExists(HeaderFile) then
           LoadFile(HeaderFile);
       end;
-    end
-    else
-    begin
-      Parser := TmwPasLex.Create;
-      try
-        Parser.Origin := @FileContent[1];
-        while Parser.TokenID <> tkNull do
-        begin
-          { TODO 4 -oAnyone -cIssue: This needs to be fixed for multiline comments;
-            the strategy ought to be to read the complete comment and only then
-            start parsing. Also it would be better to move deleting of the comment
-            tokens out of the parser }
-          case Parser.TokenID of
-            // These only get the first line of multi-line comments.  We could concatenate multiple
-            // lines, but the go to "search" using the raw text match would need some changes.
-            tkBorComment: ParseComment(FileName, '{', '}', Parser.Token, Parser.LineNumber + 1);
-            tkAnsiComment: ParseComment(FileName, '(*', '*)', Parser.Token, Parser.LineNumber + 1);
-            tkSlashesComment: ParseComment(FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
-          end;
-          Parser.Next;
-        end;
-      finally
-        FreeAndNil(Parser);
-      end;
+    end else begin
+      ParsePasFile(FileName, FileContent, ParseComment);
     end;
   finally
     Self.Update;
+  end;
+end;
+
+procedure TfmToDo.ParseCFile(const _Filename: string; const _Content: string;
+  _Callback: TParsePasFileCallback);
+var
+  CParser: TBCBTokenList;
+begin
+  CParser := TBCBTokenList.Create;
+  try
+    CParser.SetOrigin(@_Content[1], Length(_Content));
+    while CParser.RunID <> ctknull do begin
+      case CParser.RunID of
+        ctkansicomment: begin
+            // This also supports multi line comments since the parser handles them
+            _Callback(_Filename, '/*', '*/', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
+          end;
+        ctkslashesComment: _Callback(_Filename, '//', '', CParser.RunToken, CParser.PositionAtLine(CParser.RunPosition));
+      end;
+      if CParser.RunIndex = CParser.Count - 1 then
+        Break;
+      CParser.Next;
+    end;
+  finally
+    FreeAndNil(CParser);
+  end;
+end;
+
+procedure TfmToDo.ParsePasFile(const _Filename: string; const _Content: string;
+  _Callback: TParsePasFileCallback);
+var
+  Parser: TmwPasLex;
+  CommentLineNo: Integer;
+  CommentText: string;
+begin
+  Parser := TmwPasLex.Create;
+  try
+    Parser.Origin := @_Content[1];
+    while Parser.TokenID <> tkNull do begin
+      case Parser.TokenID of
+        tkBorComment: begin
+            CommentLineNo := Parser.LineNumber + 1;
+            CommentText := '';
+            while Parser.TokenID in [tkCRLFCo, tkBorComment] do begin
+              CommentText := CommentText + Parser.Token;
+              Parser.Next;
+            end;
+            _Callback(_FileName, '{', '}', CommentText, CommentLineNo);
+          end;
+        tkAnsiComment: begin
+            CommentLineNo := Parser.LineNumber + 1;
+            CommentText := '';
+            while Parser.TokenID in [tkCRLFCo, tkAnsiComment] do begin
+              CommentText := CommentText + Parser.Token;
+              Parser.Next;
+            end;
+            _Callback(_FileName, '(*', '*)', CommentText, CommentLineNo);
+          end;
+        tkSlashesComment: begin
+            { TODO -oanyone -ccheck :
+              Do we also want to support multi line todos that start with // ?
+              The parser does not support that very well in contrast to the multi line
+              borland and ansi comments }
+            _Callback(_FileName, '//', '', Parser.Token, Parser.LineNumber + 1);
+          end;
+      end;
+      Parser.Next;
+    end;
+  finally
+    FreeAndNil(Parser);
   end;
 end;
 
@@ -723,25 +773,58 @@ begin
   (Sender as TAction).Enabled := (lvToDo.Items.Count > 0);
 end;
 
+type
+  TMatchChecker = class
+  private
+    FSelectedItem: TToDoInfo;
+    FClosestLineMatch: Integer;
+    FLineMatchDifference: integer;
+  public
+    constructor Create(_SelectedItem: TToDoInfo);
+    procedure CheckComment(const FileName: string; const SComment, EComment: string;
+      const CommentStr: string; LineNumber: Integer);
+      property ClosestLineMatch: Integer read FClosestLineMatch;
+  end;
+
+{ TMatchChecker }
+
+constructor TMatchChecker.Create(_SelectedItem: TToDoInfo);
+begin
+  inherited Create;
+  FSelectedItem := _SelectedItem;
+  FClosestLineMatch := -1;
+  FLineMatchDifference := MaxInt;
+end;
+
+procedure TMatchChecker.CheckComment(const FileName, SComment, EComment, CommentStr: string;
+  LineNumber: Integer);
+begin
+  if SameText(CommentStr, FSelectedItem.Raw) then begin
+    // Look for a matching todo comment with the smallest absolute distance
+    // from the line where we found the original comment when last scanning
+    if (FClosestLineMatch = -1) or (Abs(FSelectedItem.LineNo - LineNumber + 1) <= FLineMatchDifference) then
+    begin
+      FClosestLineMatch := LineNumber;
+      FLineMatchDifference := Abs(FSelectedItem.LineNo - FClosestLineMatch);
+    end;
+  end;
+end;
+
 procedure TfmToDo.actEditGotoExecute(Sender: TObject);
 var
-  Parser: TmwPasLex;
-  CParser: TBCBTokenList;
   FileContent: string;
   SelectedItem: TToDoInfo;
   InternalEditReader: TEditReader;
   ClosestLineMatch: Integer;
-  LineMatchDifference: Integer;
   IsCPPModule: Boolean;
   Cursor: IInterface;
+  MatchChecker: TMatchChecker;
 begin
   inherited;
 
-  ClosestLineMatch := -1;
-  LineMatchDifference := MaxInt;
-
   SelectedItem := GetSelectedItem;
-  if SelectedItem = nil then Exit;
+  if SelectedItem = nil then
+    Exit; //==>
 
   IsCPPModule := IsCppSourceModule(SelectedItem.FileName);
 
@@ -749,72 +832,32 @@ begin
     GxOtaOpenFile(SelectedItem.FileName);
 
   Cursor := TempHourGlassCursor;
-  // Since this edit reader is destroyed almost
-  // immediately, do not call FreeFileData
-  InternalEditReader := TEditReader.Create(SelectedItem.FileName);
+  InternalEditReader := nil;
+  MatchChecker := TMatchChecker.Create(SelectedItem);
   try
+    // Since this edit reader is destroyed almost
+    // immediately, do not call FreeFileData
+    InternalEditReader := TEditReader.Create(SelectedItem.FileName);
     FileContent := InternalEditReader.GetText;
-    if IsCppModule then
-    begin
-      CParser := TBCBTokenList.Create;
-      try
-        CParser.SetOrigin(@FileContent[1], Length(FileContent));
-        while CParser.RunID <> ctknull do
-        begin
-          if CParser.RunID in [ctkansicomment, ctkslashescomment] then
-            if SameText(CParser.RunToken, SelectedItem.Raw) then
-            begin
-              // Look for a matching todo comment with the smallest absolute distance
-              // from the line where we found the original comment when last scanning
-              if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - CParser.PositionAtLine(CParser.RunPosition)) <= LineMatchDifference) then
-              begin
-                ClosestLineMatch := CParser.PositionAtLine(CParser.RunPosition) - 1;
-                LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
-              end;
-            end;
-          if CParser.RunIndex = CParser.Count - 1 then
-            Break;
-          CParser.Next;
-          Application.ProcessMessages;
-        end;
-      finally
-        if LineMatchDifference > -1 then
-          InternalEditReader.GotoLine(ClosestLineMatch + 1);
-        FreeAndNil(CParser);
-      end;
-    end
-    else
-    begin
-      Parser := TmwPasLex.Create;
-      try
-        Parser.Origin := @FileContent[1];
-        while Parser.TokenID <> tkNull do
-        begin
-          if Parser.TokenID in [tkBorComment, tkAnsiComment, tkSlashesComment] then
-            if SameText(Parser.Token, SelectedItem.Raw) then
-            begin
-              // Look for a matching todo comment with the smallest absolute distance
-              // from the line where we found the original comment when last scanning
-              if (ClosestLineMatch = -1) or (Abs(SelectedItem.LineNo - Parser.LineNumber + 1) <= LineMatchDifference) then
-              begin
-                ClosestLineMatch := Parser.LineNumber;
-                LineMatchDifference := Abs(SelectedItem.LineNo - ClosestLineMatch);
-              end;
-            end;
-          Parser.Next;
-          Application.ProcessMessages;
-        end;
-      finally
-        if LineMatchDifference > -1 then
-          InternalEditReader.GotoLine(ClosestLineMatch + 1);
-        FreeAndNil(Parser);
-      end;
+    if IsCppModule then begin
+      ParseCFile(SelectedItem.FileName, FileContent, MatchChecker.CheckComment);
+    end else begin
+      ParsePasFile(SelectedItem.FileName, FileContent, MatchChecker.CheckComment);
     end;
+    ClosestLineMatch := MatchChecker.ClosestLineMatch;
+    if ClosestLineMatch = -1 then begin
+      // no match found, so we goto the line we stored originally
+      ClosestLineMatch := SelectedItem.LineNo;
+    end;
+    InternalEditReader.GotoOffsetLine(ClosestLineMatch);
   finally
+    FreeAndNil(MatchChecker);
     FreeAndNil(InternalEditReader);
   end;
   if ToDoExpert.FHideOnGoto then
     Self.Hide;
+
+  ToDoExpert.IncCallCount;
 end;
 
 procedure TfmToDo.actFilePrintExecute(Sender: TObject);
@@ -830,7 +873,7 @@ begin
 
   if lvToDo.Items.Count = 0 then
     Exit;
-  //#TODO2 make this a nicely formatted page
+  //TODO make this a nicely formatted page
   RichEdit := TRichEdit.Create(Self);
   try
     RichEdit.Visible := False;
@@ -879,6 +922,8 @@ begin
   finally
     FreeAndNil(RichEdit);
   end;
+
+  ToDoExpert.IncCallCount;
 end;
 
 procedure TfmToDo.actFileRefreshExecute(Sender: TObject);
@@ -929,10 +974,12 @@ end;
 constructor TfmToDo.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
 
   if Assigned(ToDoExpert) then
-      ToDoExpert.SetFormIcon(Self);
+    ToDoExpert.SetFormIcon(Self);
 
   FIsFirstActivation := True;
   FColumnIndex := -1;
@@ -1117,13 +1164,43 @@ end;
 
 procedure TfmToDo.lvTodoCustomDrawItem(Sender: TCustomListView; Item: TListItem;
   State: TCustomDrawState; var DefaultDraw: Boolean);
+var
+  cnv: TCanvas;
 begin
+  cnv := lvToDo.Canvas;
   if Odd(Item.Index) then
-    lvToDo.Canvas.Brush.Color := clWindow
+    cnv.Brush.Color := clWindow
   else
-    lvToDo.Canvas.Brush.Color := clWindow or ($0A0A0A);
-  if TToDoInfo(Item.Data).Priority = tpDone then
-    lvToDo.Canvas.Font.Color := clGrayText;
+    cnv.Brush.Color := clWindow or ($0A0A0A);
+
+  // todo: check for current file against TToDoInfo(Item.data).FileName and draw the filename in bold
+  // TODO: make coloring the text an option, maybe even let the user select the colours
+  // TODO: maybe only the text should be colored, not the other columns?
+  // todo: can we check the owner and draw matching entries in bold?
+
+  case TToDoInfo(Item.Data).Priority of
+    tpCritical: begin
+        cnv.Font.Color := clRed;
+      end;
+    tpHigh: begin
+        cnv.Font.Color := $0045FF; // clWebOrangeRed (Delphi 6 and 7 don't know this) 
+      end;
+    tpNormal: begin
+        cnv.Font.Color := clBlue;
+    end;
+    tpLow: begin
+        cnv.Font.Color := clBlack;
+      end;
+    tpLowest: begin
+        cnv.Font.Color := clGrayText;
+      end;
+    tpInfo: begin
+        cnv.Font.Color := clBlack;
+      end;
+    tpDone: begin
+        lvToDo.Canvas.Font.Color := clGrayText;
+      end;
+  end;
 end;
 
 procedure TfmToDo.SaveSettings;
@@ -1204,6 +1281,8 @@ begin
     fmToDo.lvToDo.Font.Assign(FFont);
   end;
   IdeDockManager.ShowForm(fmToDo);
+
+  IncCallCount;
 end;
 
 { TODO 3 -cIssue -oAnyone: This process needs to be cleaned up.  Why store the configuration
@@ -1425,11 +1504,13 @@ begin
   Result := tpNormal;
   if TryStrToInt(PriorityStr, IntPriority) then begin
     case IntPriority of
+      0: Result := tpNormal;
       1: Result := tpCritical;
       2: Result := tpHigh;
       3: Result := tpNormal;
       4: Result := tpLow;
-      5: Result := tpLowest;
+    else
+      Result := tpLowest;
     end;
   end;
 end;

@@ -51,6 +51,8 @@ type
     rgSaveOption: TRadioGroup;
     btnSearch: TButton;
     timHintTimer: TTimer;
+    btnGrepAll: TButton;
+    btnSectionAll: TButton;
     procedure btnBrowseClick(Sender: TObject);
     procedure rbDirectoriesClick(Sender: TObject);
     procedure btnHelpClick(Sender: TObject);
@@ -70,6 +72,8 @@ type
     procedure cbSectionInitializationClick(Sender: TObject);
     procedure cbSectionFinalizationClick(Sender: TObject);
     procedure timHintTimerTimer(Sender: TObject);
+    procedure btnGrepAllClick(Sender: TObject);
+    procedure btnSectionAllClick(Sender: TObject);
   private
     FGrepExpert: TGrepExpert;
     FEmbedded: Boolean;
@@ -110,6 +114,9 @@ type
     function GetHelpString: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
+    // The call count of the Grep Search expert is included with the Grep Results expert
+    // so we return false here.
+    function HasCallCount: Boolean; override;
   end;
 
 implementation
@@ -117,9 +124,9 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Windows, Messages, Graphics, Menus, RegExpr, Math,
+  SysUtils, Windows, Messages, Graphics, StrUtils, Menus, RegExpr, Math,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_GrepResults, GX_GrepOptions,
-  GX_GrepRegExSearch, GX_dzVclUtils;
+  GX_GrepRegExSearch, GX_dzVclUtils, GX_dzOsUtils;
 
 resourcestring
   SGrepResultsNotActive = 'The Grep Results window is not active';
@@ -129,6 +136,13 @@ const
   cEmbeddedTop = 55;
 
 { TfmGrepSearch }
+
+procedure TfmGrepSearch.btnGrepAllClick(Sender: TObject);
+begin
+  cbGrepCode.Checked := True;
+  cbGrepStrings.Checked := True;
+  cbGrepComments.Checked := True;
+end;
 
 procedure TfmGrepSearch.btnBrowseClick(Sender: TObject);
 var
@@ -146,6 +160,14 @@ begin
   UseCurrentIdent := GrepExpert.GrepUseCurrentIdent;
   if TfmGrepOptions.Execute(UseCurrentIdent) then
     GrepExpert.GrepUseCurrentIdent := UseCurrentIdent;
+end;
+
+procedure TfmGrepSearch.btnSectionAllClick(Sender: TObject);
+begin
+  cbSectionInterface.Checked := True;
+  cbSectionImplementation.Checked := True;
+  cbSectionInitialization.Checked := True;
+  cbSectionFinalization.Checked := True;
 end;
 
 procedure TfmGrepSearch.EnableDirectoryControls(New: Boolean);
@@ -326,11 +348,16 @@ begin
   Result := 'GrepSearch'; // Do not localize.
 end;
 
+function TGrepDlgExpert.HasCallCount: Boolean;
+begin
+  Result := False;
+end;
+
 procedure TGrepDlgExpert.Execute(Sender: TObject);
 begin
-  if Assigned(fmGrepResults) then
-    fmGrepResults.Execute(gssNormal)
-  else
+  if Assigned(fmGrepResults) then begin
+    fmGrepResults.Execute(gssNormal);
+  end else
     raise Exception.Create(SGrepResultsNotActive);
 end;
 
@@ -358,12 +385,13 @@ var
   i: Integer;
   Dirs: TStringList;
 begin
-  if IsEmpty(cbText.Text) then
+  // we allow for ' ' (spaces)
+  if cbText.Text = '' then
     raise Exception.Create(SSearchTextEmpty);
-  
+
   if rbDirectories.Checked then
   begin
-    if Trim(cbDirectory.Text) = '' then
+    if IsEmpty(cbDirectory.Text) then
       cbDirectory.Text := GetCurrentDir;
     Dirs := TStringList.Create;
     try
@@ -381,8 +409,8 @@ begin
       FreeAndNil(Dirs);
     end;
   end;
-  while StrBeginsWith(';', cbExcludedDirs.Text) do
-    cbExcludedDirs.Text := Copy(cbExcludedDirs.Text, 2, MaxInt);
+  while StartsStr(';', cbExcludedDirs.Text) do
+    cbExcludedDirs.Text := Copy(cbExcludedDirs.Text, 2);
   cbExcludedDirs.Text := StringReplace(cbExcludedDirs.Text, ';;', ';', [rfReplaceAll]);
 
   SaveFormSettings;
@@ -486,19 +514,27 @@ procedure TfmGrepSearch.LoadFormSettings;
 
   function RetrieveEditorBlockSelection: string;
   var
-    Temp: string;
     i: Integer;
   begin
-    Temp := GxOtaGetCurrentSelection;
-    // Only use the currently selected text if the length is between 1 and 80
-    if (Length(Trim(Temp)) >= 1) and (Length(Trim(Temp)) <= 80) then
-    begin
-      i := Min(Pos(#13, Temp), Pos(#10, Temp));
-      if i > 0 then
-        Temp := Copy(Temp, 1, i - 1);
-    end else
-      Temp := '';
-    Result := Temp;
+    Result := GxOtaGetCurrentSelection;
+    if Trim(Result) = '' then begin
+      // we don't search for white space only
+      Result := '';
+    end else begin
+      if Length(Result) > 80 then begin
+        // Allow a maximum length of 80 characters
+        // I'm not sure whether this is restriction still makes sense, since nowadays lines are
+        // usually longer than 80 characters, but I'm not going to change this unless somebody
+        // explicitly requests it. Personally I have never had a need for >80 chars for the
+        // search pattern. -- 2018-11-04 twm
+        Result := LeftStr(Result, 80)
+      end;
+      i := Min(Pos(#13, Result), Pos(#10, Result));
+      if i > 0 then begin
+        // The engine does not allow line breaks
+        Result := LeftStr(Result, i - 1);
+      end;
+    end;
   end;
 
   procedure SetSearchPattern(Str: string);
@@ -624,7 +660,6 @@ begin
   else // IsStandAlone
   begin
     rbDirectories.Checked := True;
-    rbAllProjFiles.Enabled := False;
     rbOpenFiles.Enabled := False;
     rbAllProjGroupFiles.Enabled := False;
     rbAllProjFiles.Enabled := False;
@@ -716,7 +751,7 @@ end;
 
 procedure TfmGrepSearch.FormShow(Sender: TObject);
 begin
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
 end;
 
 procedure TfmGrepSearch.ComboKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

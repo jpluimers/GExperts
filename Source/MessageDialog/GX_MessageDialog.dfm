@@ -16,11 +16,9 @@ object fmMessageDialog: TfmMessageDialog
   Font.Height = -12
   Font.Name = 'Tahoma'
   Font.Style = []
-  KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
-  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 14
   object pnlMain: TPanel
@@ -1409,6 +1407,15 @@ object fmMessageDialog: TfmMessageDialog
         Height = 17
         Caption = '&Quote message text'
         TabOrder = 0
+        OnClick = chkQuotesClick
+      end
+      object chkGNUGettext: TCheckBox
+        Left = 295
+        Top = 2
+        Width = 186
+        Height = 17
+        Caption = 'Add _(...) for &GNU Gettext'
+        TabOrder = 1
       end
     end
   end

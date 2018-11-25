@@ -34,11 +34,10 @@ type
 
 implementation
 
-uses
-  StrUtils,
-  GX_dzVclUtils;
-
 {$R *.dfm}
+
+uses
+  GX_dzVclUtils;
 
 { Tf_IdeBuildEventFavoriteEdit }
 
@@ -61,7 +60,7 @@ constructor Tf_IdeBuildEventFavoriteEdit.Create(_Owner: TComponent);
 begin
   inherited;
 
-  TControl_SetMinConstraints(Self, True);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
   TWinControl_ActivateDropFiles(ed_Command, HandleFilesDropped);
 end;
 

@@ -14,7 +14,12 @@ uses
   Dialogs,
   StdCtrls,
   ExtCtrls,
-  GX_BaseForm;
+  GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TPasteAsType = (paRaw, paStringArray, paAdd, paSLineBreak,
@@ -149,6 +154,7 @@ begin
   chk_ExtractRaw.Left := x;
   chk_TrimLeft.Left := x;
   chk_TrimRight.Left := x;
+  chk_Indent.Left := X;
   rg_ConvertType.Left := x;
   chk_QuoteStrings.Left := x;
   chk_AppendSpace.Left := x;
@@ -175,7 +181,7 @@ begin
   Settings := nil;
   GXSettings := TGExpertsSettings.Create;
   try
-    Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
+    Settings := GXSettings.CreateExpertSettings(TConvertStringsExpert.ConfigurationKey);
     Settings.SaveForm('Window', Self);
     Settings.WriteBool('ExtractRaw', chk_ExtractRaw.Checked);
     Settings.WriteBool('TrimLeft', chk_TrimLeft.Checked);
@@ -239,7 +245,7 @@ begin
   Settings := nil;
   GXSettings := TGExpertsSettings.Create;
   try
-    Settings := TExpertSettings.Create(GXSettings, TConvertStringsExpert.ConfigurationKey);
+    Settings := GXSettings.CreateExpertSettings(TConvertStringsExpert.ConfigurationKey);
     Settings.LoadForm('Window', Self);
     chk_ExtractRaw.Checked := Settings.ReadBool('ExtractRaw', True);
     chk_TrimLeft.Checked := Settings.ReadBool('TrimLeft', True);
@@ -281,7 +287,7 @@ begin
   BaseIndent := LeftStr(_sl[0], FirstCharPos - 1);
 
   for i := 0 to _sl.Count - 1 do begin
-    Line := Copy(_sl[i], FirstCharPos, MaxInt);
+    Line := Copy(_sl[i], FirstCharPos);
     if _TrimLeft then
       Line := TrimLeft(Line);
     if _TrimRight then
@@ -333,7 +339,7 @@ begin
   end;
 
   for i := 0 to _sl.Count - 1 do begin
-    ALine := Copy(_sl[i], FirstCharPos, MaxInt);
+    ALine := Copy(_sl[i], FirstCharPos);
 
     if _QuoteStrings then
       ALine := AnsiQuotedStr(ALine + IfThen(_AppendSpace, ' '), SINGLE_QUOTE);
@@ -511,6 +517,7 @@ begin
   finally
     FreeAndNil(sl);
   end;
+  IncCallCount;
 end;
 
 function TConvertStringsExpert.GetDisplayName: string;

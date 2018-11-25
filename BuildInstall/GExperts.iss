@@ -6,12 +6,12 @@
 #ifdef ISPPCC_INVOKED
 ; Command line compiler
   #ifndef Version
-    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.35"
+    #error Usage: "iscc.exe GExperts.iss /dDelphi7 /dVersion=1.3.10"
   #endif
 #else
 ; IDE compiler
   #define RS101
-  #define Version "1.38"
+  #define Version "1.3.10"
 #endif
 
 #define Product "GExperts"
@@ -181,6 +181,15 @@
   #define DLLSuffix    "RS102"
   #define IDERegName   "BDS"
   #define IDERegVer    "19"
+  #define RegCompany   "Embarcadero"
+#endif
+#ifdef RS103
+  #define IDEShortName "RADStudio"
+  #define IDELongName  "RAD Studio"
+  #define IDEVer       "10.3"
+  #define DLLSuffix    "RS103"
+  #define IDERegName   "BDS"
+  #define IDERegVer    "20"
   #define RegCompany   "Embarcadero"
 #endif
 

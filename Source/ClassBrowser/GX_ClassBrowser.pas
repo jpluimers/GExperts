@@ -265,7 +265,8 @@ uses
   SysUtils, Messages, Printers, CommCtrl,
   GX_VerDepConst, GX_ClassIdentify, GX_ConfigurationInfo, GX_EditReader,
   GX_ClassProp, GX_ClassOptions, GX_ClassReport, GX_GExperts,
-  GX_GxUtils, GX_GenericUtils, GX_SharedImages, GX_IdeUtils, Math;
+  GX_GxUtils, GX_GenericUtils, GX_SharedImages, GX_IdeUtils, Math,
+  GX_dzVclUtils;
 
 function ExpertClassKey: string;
 begin
@@ -1593,6 +1594,8 @@ constructor TfmClassBrowser.Create(AOwner: TComponent);
 begin
   inherited;
 
+  TControl_SetMinConstraints(Self);
+
   SetNonModalFormPopupMode(Self);
   FStartingDir := ExtractFilePath(Application.ExeName);
   FIsFirstInvocation := True;
@@ -1712,6 +1715,7 @@ begin
   if fmClassBrowser.WindowState = wsMinimized then
     fmClassBrowser.WindowState := wsNormal;
   fmClassBrowser.Show;
+  IncCallCount;
 end;
 
 function TClassExpert.HasConfigOptions: Boolean;

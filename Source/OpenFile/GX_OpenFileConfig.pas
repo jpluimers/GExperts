@@ -612,6 +612,8 @@ end;
 
 procedure TfmOpenFileConfig.FormCreate(Sender: TObject);
 begin
+  TControl_SetMinConstraints(Self);
+
   SetParentBackgroundValue(gbxCustomDirectory, True);
   SetParentBackgroundValue(gbxGeneralSettings, True);
   SetParentBackgroundValue(gbxIDEMenuItems, True);

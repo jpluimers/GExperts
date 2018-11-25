@@ -191,7 +191,8 @@ uses
   GX_ConfigurationInfo,
   GX_GenericUtils,
   GX_dzClassUtils,
-  GX_IdeUtils;
+  GX_IdeUtils,
+  GX_dzNamedThread;
 
 const
   WidthIdent = 'Width';
@@ -627,7 +628,7 @@ end;
 {$ENDIF GX_VER170_up}
 
 type
-  TMoveWindowThread = class(TThread)
+  TMoveWindowThread = class(TNamedThread)
   private
     FParentHandle: HWND;
     FParentCenterX: Integer;
@@ -672,6 +673,7 @@ var
   ThreadInfo: TGUIThreadinfo;
 begin
   inherited;
+
   GetWindowRect(FParentHandle, Rect);
   FParentCenterX := Round(Rect.Left / 2 + Rect.Right / 2);
   FParentCenterY := Round(Rect.Top / 2 + Rect.Bottom / 2);
@@ -1141,20 +1143,21 @@ begin
   Assert(Assigned(FForm));
   Assert(FForm = Sender);
 
+  // save it for later (see below)
   OrigOnDestroy := FOrigOnDestroy;
+  // It's not being called, but there might be code in other plugins
+  // (e.g. IdeFixpack or cnpack) that checks for it.
   FForm.OnDestroy := OrigOnDestroy;
+  // just in case, set FOrigOnDestroy to nil
   FOrigOnDestroy := nil;
+
   DoSaveFormState;
 
   if Assigned(OrigOnDestroy) then
   begin
-    // Restoring the FForm.OnDestroy is not enough to call OrigOnDestroy.
-    // The reason is that FormDestroy gets called from OnDestroy;
     // OnDestroy is called from TCustomForm.DoDestroy which will never call OnDestroy restored from OrigOnDestroy.
     // So manually call the old one:
     OrigOnDestroy(Sender);
-    // Note we still restore the old one, just in case there is a check
-    // for the value (some interceptors actively perform that check).
   end;
 end;
 

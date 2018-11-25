@@ -41,10 +41,10 @@ type
 type
   TFileAttributes = (
     dfaReadonly,
-    dfaHidden, // Hidden files
-    dfaSysFile, //	System files
-    dfaDirectory, //	Directory files
-    dfaArchive // Archive files
+    dfaHidden, //    Hidden files
+    dfaSysFile, //   System files
+    dfaDirectory, // Directory files
+    dfaArchive //    Archive files
     );
 
   TFileAttributeSet = set of TFileAttributes;

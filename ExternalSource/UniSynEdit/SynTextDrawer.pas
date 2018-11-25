@@ -1013,6 +1013,9 @@ end;
 initialization
 
 finalization
-  gFontsInfoManager.Free;
-
+  try
+    gFontsInfoManager.Free;
+  except
+    // ignore exceptions (especially Assertions)
+  end;
 end.

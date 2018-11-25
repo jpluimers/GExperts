@@ -102,6 +102,7 @@ begin
     Exit; //==>
   InsertString := Format('{$WARN %s %s}', [Msg, WarnStatusToStr(Status)]);
   GxOtaInsertLineIntoEditor(InsertString);
+  IncCallCount;
 end;
 
 function TWarnExpert.GetDisplayName: string;

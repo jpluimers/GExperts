@@ -5,8 +5,8 @@ object fmReplaceCompLog: TfmReplaceCompLog
   AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Replace Components - Results'
-  ClientHeight = 450
-  ClientWidth = 604
+  ClientHeight = 278
+  ClientWidth = 583
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -23,8 +23,8 @@ object fmReplaceCompLog: TfmReplaceCompLog
   TextHeight = 14
   object Splitter: TSplitter
     Left = 0
-    Top = 294
-    Width = 604
+    Top = 122
+    Width = 583
     Height = 7
     Cursor = crVSplit
     Align = alBottom
@@ -33,7 +33,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
   object pnlHeader: TPanel
     Left = 0
     Top = 0
-    Width = 604
+    Width = 583
     Height = 33
     Align = alTop
     BevelOuter = bvNone
@@ -76,8 +76,8 @@ object fmReplaceCompLog: TfmReplaceCompLog
   object pnlLog: TPanel
     Left = 0
     Top = 33
-    Width = 604
-    Height = 261
+    Width = 583
+    Height = 89
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -85,8 +85,8 @@ object fmReplaceCompLog: TfmReplaceCompLog
     object lvLogItems: TListView
       Left = 6
       Top = 6
-      Width = 592
-      Height = 249
+      Width = 571
+      Height = 77
       Align = alClient
       Columns = <
         item
@@ -117,8 +117,8 @@ object fmReplaceCompLog: TfmReplaceCompLog
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 301
-    Width = 604
+    Top = 129
+    Width = 583
     Height = 149
     Align = alBottom
     BevelOuter = bvNone
@@ -126,7 +126,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
     object pnlDetails: TPanel
       Left = 0
       Top = 0
-      Width = 604
+      Width = 583
       Height = 113
       Align = alClient
       BevelOuter = bvNone
@@ -135,7 +135,7 @@ object fmReplaceCompLog: TfmReplaceCompLog
       object lbxPreviewItems: TListBox
         Left = 6
         Top = 6
-        Width = 592
+        Width = 571
         Height = 101
         Align = alClient
         ItemHeight = 14
@@ -145,13 +145,13 @@ object fmReplaceCompLog: TfmReplaceCompLog
     object pnlButtons: TPanel
       Left = 0
       Top = 113
-      Width = 604
+      Width = 583
       Height = 36
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       object pnlButtonsRight: TPanel
-        Left = 299
+        Left = 278
         Top = 0
         Width = 305
         Height = 36

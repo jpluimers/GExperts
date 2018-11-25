@@ -74,6 +74,7 @@ begin
       InsertString := SInvalidDateTimeFormat;
   end;
   GxOtaInsertLineIntoEditor(InsertString);
+  IncCallCount;
 end;
 
 function TDateExpert.GetDefaultShortCut: TShortCut;

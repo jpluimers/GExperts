@@ -38,7 +38,7 @@ unit GX_VCLFixPack;
 interface
 
 // GExperts:
-// The use of VCLFixPack is not really teted and might have undesireble side
+// The use of VCLFixPack is not really teted and might have undesirable side
 // effects. For now it's an experimental feature that must be explicitly
 // enabled by defining GX_USE_VCL_FIX_PACK
 // -- 2016-06-20 twm
@@ -407,7 +407,7 @@ begin
   while (I < 0) or (Vmt[I] <> nil) do
   begin
     P := Vmt[I];
-    if (P <> OldProc) and (NativeInt(P) > $10000) and not IsBadReadPtr(P, 6) then
+    if (P <> OldProc) and (GXNativeInt(P) > $10000) and not IsBadReadPtr(P, 6) then
       P := GetActualAddr(P);
     if P = OldProc then
     begin

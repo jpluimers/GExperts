@@ -133,7 +133,7 @@ begin
 
   for I := 0 to ALines.Count-1 do
   begin
-    ALine := Copy(ALines[I], FirstCharPos, MaxInt);
+    ALine := Copy(ALines[I], FirstCharPos);
 
     if FCreateQuotedString then
       ALine := AnsiQuotedStr(ALine + IfThen(FAddExtraSpaceAtTheEnd, ' '), cStringSep);
@@ -165,7 +165,7 @@ begin
   try
     for i := 0 to ALines.Count-1 do
     begin
-      Line := Trim(Copy(ALines[i], FirstCharPos, MaxInt));
+      Line := Trim(Copy(ALines[i], FirstCharPos));
 
       FirstQuotePos := GetFirstCharPos(Line, [cStringSep], True);
       LastQuotePos := GetLastCharPos(Line, [cStringSep], True);

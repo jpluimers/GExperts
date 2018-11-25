@@ -19,7 +19,6 @@ implementation
 uses
   Windows,
   Classes,
-  StrUtils,
   Forms,
   ExtCtrls,
   Controls,
@@ -27,11 +26,9 @@ uses
   CheckLst,
   Dialogs,
   ShellApi,
-  Registry,
   GX_OtaUtils,
   GX_IdeFormEnhancer,
   GX_GenericUtils,
-  GX_IdeUtils,
   GX_IdeDialogEnhancer,
   GX_dzClassUtils;
 

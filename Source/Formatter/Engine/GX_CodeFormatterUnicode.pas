@@ -28,12 +28,12 @@ var
   Str2: PChar;
 begin
   Result := 0;
-	if _MaxLen = 0 then
-	  Exit;
+  if _MaxLen = 0 then
+    Exit;
   Str2 := @_Str2[1];
   Counter := 0;
-	repeat
-	  if (_Str1^ = #0) or (str2^ = #0) or  not SameText(_Str1^, str2^) then begin
+  repeat
+    if (_Str1^ = #0) or (str2^ = #0) or  not SameText(_Str1^, str2^) then begin
       Result := Ord(_Str1^) - Ord(str2^);
       exit;
     end;
@@ -49,12 +49,12 @@ var
   Str2: PChar;
 begin
   Result := 0;
-	if _MaxLen = 0 then
-	  Exit;
+  if _MaxLen = 0 then
+    Exit;
   Str2 := @_Str2[1];
   Counter := 0;
-	repeat
-	  if (_Str1^ = #0) or (str2^ = #0) or (Ord(_Str1^) <> Ord(Str2^)) then begin
+  repeat
+    if (_Str1^ = #0) or (str2^ = #0) or (Ord(_Str1^) <> Ord(Str2^)) then begin
       Result := Ord(_Str1^) - Ord(str2^);
       exit;
     end;

@@ -487,6 +487,7 @@ procedure TGrepSearchRunner.GrepProject(Project: IOTAProject);
 var
   i: Integer;
   Context: TGrepSearchContext;
+  fn: string;
 begin
   if Project = nil then
     Exit;
@@ -499,7 +500,8 @@ begin
 
     for i := 0 to Project.GetModuleCount - 1 do
     begin
-      GrepProjectFile(Project.GetModule(i).GetFileName, Context);
+      fn := Project.GetModule(i).GetFileName;
+      GrepProjectFile(fn, Context);
       if FAbortSignalled then
         Break;
     end;
@@ -842,18 +844,6 @@ begin
 end;
 
 procedure TGrepSearchRunner.FoundIt(LineNo, StartCol, EndCol: Integer; const Line: TGXUnicodeString);
-
-  function RemoveMatchingPart(AFileName: String): String;
-  var
-    I, ARemoveCount: Integer;
-  begin
-    ARemoveCount := 0;
-    for I := 1 to Min(Length(AFileName), Length(FSearchRoot)) do
-      if ( UpperCase(AFileName[I]) = UpperCase(FSearchRoot[I]) ) and (AFileName[I] = PathDelim) then
-        ARemoveCount := I;
-    Result := Copy(AFileName, ARemoveCount+1, MaxInt);
-  end;
-
 var
   ALineResult: TLineResult;
   AMatchResult: TMatchResult;
@@ -866,7 +856,7 @@ begin
   begin
     FFileResult := TFileResult.Create;
     FFileResult.FileName := FSearcher.FileName;
-    FFileResult.RelativeFileName := RemoveMatchingPart(FSearcher.FileName);
+    FFileResult.RelativeFileName := ExtractRelativePath(FSearchRoot, FSearcher.FileName);
     FStorageTarget.AddObject(FSearcher.FileName, FFileResult);
   end;
 
@@ -1026,7 +1016,7 @@ var
   ASubKey: String;
 begin
   // INI file trims when reading back in, so a magic marker is used but we need to strip it when reading in.
-  Line := Copy(AIni.ReadString(ASection, 'Line', '#' + Line), 2, MaxInt);
+  Line := Copy(AIni.ReadString(ASection, 'Line', '#' + Line), 2);
   LineNo := AIni.ReadInteger(ASection, 'LineNo', LineNo);
 
 //MatchList
@@ -1921,7 +1911,9 @@ begin
 
         if FListMode = hlmResults then
           Result := RI;
-      end;
+      end
+      else
+        Inc(FromI);
     end
     else
       Inc(FromI);
@@ -1969,6 +1961,7 @@ var
         AItem := TGrepHistoryListItem.Create(ADefGrepSettings);
         AItem.GrepSettingsSaveOption := gsoSaveSettingsAndResults;
         AItem.LoadFromIni(AIni, AIniVersion, ifmSingle, Key + PathDelim + Format('%s%d', [AItemSubKeyName, I]));
+        AItem.FKeyIndex := GetNextIndex;
         AItem.GrepSettingsSaveOption := ASaveOption;
 
         SearchHistoryItem(AItem.GrepSettings, AHistoryItem);
@@ -2000,7 +1993,7 @@ var
   begin
     for I := 0 to ASection.Count - 1 do
                    //order index to first                                 //keyindex
-      ASection[I] := TStrings_ValueFromIndex(ASection, I) + '=' + Copy(ASection.Names[I], 12, MaxInt);
+      ASection[I] := TStrings_ValueFromIndex(ASection, I) + '=' + Copy(ASection.Names[I], 12);
     ASection.Sort;
   end;
 

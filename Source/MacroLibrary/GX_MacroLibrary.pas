@@ -10,7 +10,12 @@ uses
   ComCtrls, StdCtrls, ExtCtrls, Menus,
   OmniXML,
   GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker, GX_GenericUtils,
-  GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI, ImageList, Actions;
+  GX_IdeDock, ActnList, ImgList, ToolWin, ToolsAPI, ImageList, Actions,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 const
   KeyboardMacroMagic = $524F5054;
@@ -82,8 +87,6 @@ type
     property Stream: TStream read GetStream write SetStream;
   end;
 
-  TMacroLibExpert = class;
-
   TfmMacroLibrary = class(TfmIdeDockForm)
     lvMacros: TListView;
     Toolbar: TToolBar;
@@ -103,16 +106,6 @@ type
     mitShowToolbar: TMenuItem;
     actViewDescription: TAction;
     mitShowDescription: TMenuItem;
-    actViewStyleLargeIcon: TAction;
-    actViewStyleSmallIcon: TAction;
-    actViewStyleList: TAction;
-    actViewStyleDetails: TAction;
-    mitViewStyle: TMenuItem;
-    mitLargeIcons: TMenuItem;
-    mitSmallIcons: TMenuItem;
-    mitList: TMenuItem;
-    mitDetails: TMenuItem;
-    mitSep4: TMenuItem;
     ilLarge: TImageList;
     ilSmall: TImageList;
     actFileSave: TAction;
@@ -166,7 +159,6 @@ type
     procedure lvMacrosChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure actViewDescriptionExecute(Sender: TObject);
     procedure FormResize(Sender: TObject);
-    procedure actViewStyleExecute(Sender: TObject);
     procedure actFileSaveExecute(Sender: TObject);
     procedure actFileLoadExecute(Sender: TObject);
     procedure actEditSuspendExecute(Sender: TObject);
@@ -246,7 +238,7 @@ uses
   GX_GxUtils, GX_OtaUtils,
   GX_SharedImages, GX_XmlUtils,
   GX_MacroLibraryNamePrompt, GX_MacroLibraryConfig, Math, GX_IdeUtils,
-  GX_MessageBox;
+  GX_MessageBox, GX_dzVclUtils;
 
 type
   TIDEMacroBugMessage = class(TGxMsgBoxAdaptor)
@@ -753,6 +745,8 @@ resourcestring
 begin
   inherited;
 
+  TControl_SetMinConstraints(Self);
+
   FSuspended := False;
   FDataList := TList.Create;
   LoadSettings;
@@ -822,10 +816,6 @@ begin
   actRecord.Checked      := GxOtaEditorIsRecordingMacro;
   actViewToolbar.Checked := Toolbar.Visible;
   actViewDescription.Checked    := DescriptionVisible;
-  actViewStyleLargeIcon.Checked := lvMacros.ViewStyle = vsIcon;
-  actViewStyleSmallIcon.Checked := lvMacros.ViewStyle = vsSmallIcon;
-  actViewStyleList.Checked      := lvMacros.ViewStyle = vsList;
-  actViewStyleDetails.Checked   := lvMacros.ViewStyle = vsReport;
   actPromptForName.Checked := FPromptForName;
 end;
 
@@ -952,19 +942,6 @@ begin
   lvMacros.Invalidate;
 end;
 
-procedure TfmMacroLibrary.actViewStyleExecute(Sender: TObject);
-begin
-  if Sender is TComponent then
-  begin
-    case TComponent(Sender).Tag of
-      1: lvMacros.ViewStyle := vsIcon;
-      2: lvMacros.ViewStyle := vsSmallIcon;
-      3: lvMacros.ViewStyle := vsList;
-    else lvMacros.ViewStyle := vsReport;
-    end;
-  end;
-end;
-
 procedure TfmMacroLibrary.actFileSaveExecute(Sender: TObject);
 var
   Index: Integer;
@@ -1024,7 +1001,7 @@ end;
 
 procedure TfmMacroLibrary.InstallKeyboardBindings;
 begin
-  Assert(not Assigned(FShortCut));
+  Assert(not Assigned(FShortCut), 'FShortCut is already assigend');
   FShortCut := GxKeyboardShortCutBroker.RequestOneKeyShortCut(RecordShortcutCallback, ShortCut(Ord('R'), [ssCtrl, ssShift]));
 end;
 
@@ -1108,6 +1085,8 @@ begin
   actEditCopy.Execute;
   GxOtaFocusCurrentIDEEditControl;
   GxOtaGetKeyboardServices.ResumePlayback;
+
+  MacroLibExpert.IncCallCount;
 end;
 
 procedure TfmMacroLibrary.actPromptForNameExecute(Sender: TObject);
@@ -1136,7 +1115,7 @@ begin
       sl.Clear;
     if FPromptForName then begin
       if not TfmMacroLibraryNamePrompt.Execute(Self, True, MacroName, MacroDesc, sl, FPromptForName) then
-        Exit;
+        Exit; //==>
     end;
 
     Info := TMacroInfo.Create;
@@ -1145,7 +1124,6 @@ begin
     Info.Description := MacroDesc;
     Info.TimeStamp := Now;
     Info.Stream := MemStream;
-
     InsertMacro(0, Info);
     SelectFirstMacro;
 
@@ -1154,6 +1132,8 @@ begin
     FreeAndNil(sl);
     FreeAndNil(MemStream)
   end;
+
+  MacroLibExpert.IncCallCount;
 end;
 
 procedure TfmMacroLibrary.FormCreate(Sender: TObject);

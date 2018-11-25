@@ -4,8 +4,8 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   AutoScroll = False
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Replace Components - Mapping Details'
-  ClientHeight = 338
-  ClientWidth = 394
+  ClientHeight = 330
+  ClientWidth = 364
   Color = clBtnFace
   Constraints.MinHeight = 360
   Constraints.MinWidth = 363
@@ -25,8 +25,8 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   object pnlDetails: TPanel
     Left = 0
     Top = 42
-    Width = 394
-    Height = 262
+    Width = 364
+    Height = 254
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -34,27 +34,21 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
     object gbxMappingDetails: TGroupBox
       Left = 6
       Top = 6
-      Width = 382
-      Height = 250
+      Width = 352
+      Height = 242
       Align = alClient
       Caption = 'Property Mapping Details'
       TabOrder = 0
-      DesignSize = (
-        382
-        250)
       object pnlEdits: TPanel
         Left = 7
         Top = 18
-        Width = 356
+        Width = 338
         Height = 217
         Anchors = [akLeft, akTop, akRight]
         BevelOuter = bvNone
         TabOrder = 0
-        DesignSize = (
-          356
-          217)
         object lblGroup: TLabel
-          Left = 7
+          Left = 0
           Top = 0
           Width = 33
           Height = 14
@@ -62,7 +56,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           FocusControl = cbxGroupName
         end
         object lblSourceComp: TLabel
-          Left = 7
+          Left = 0
           Top = 48
           Width = 105
           Height = 14
@@ -70,7 +64,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           FocusControl = cbxSourceClassName
         end
         object lblDestComp: TLabel
-          Left = 7
+          Left = 0
           Top = 96
           Width = 128
           Height = 14
@@ -78,7 +72,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           FocusControl = cbxDestClassName
         end
         object lblSourceProp: TLabel
-          Left = 167
+          Left = 151
           Top = 48
           Width = 89
           Height = 14
@@ -86,7 +80,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           FocusControl = cbxSourcePropName
         end
         object lblDestProp: TLabel
-          Left = 167
+          Left = 151
           Top = 96
           Width = 112
           Height = 14
@@ -94,7 +88,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           FocusControl = cbxDestPropName
         end
         object cbxGroupName: TComboBox
-          Left = 7
+          Left = 0
           Top = 16
           Width = 145
           Height = 22
@@ -104,7 +98,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           TabOrder = 0
         end
         object cbxSourceClassName: TComboBox
-          Left = 7
+          Left = 0
           Top = 64
           Width = 145
           Height = 22
@@ -115,7 +109,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           OnChange = cbxSourceClassNameChange
         end
         object cbxDestClassName: TComboBox
-          Left = 7
+          Left = 0
           Top = 112
           Width = 145
           Height = 22
@@ -126,7 +120,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           OnChange = cbxDestClassNameChange
         end
         object cbxSourcePropName: TComboBox
-          Left = 167
+          Left = 151
           Top = 64
           Width = 186
           Height = 22
@@ -137,7 +131,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           TabOrder = 2
         end
         object cbxDestPropName: TComboBox
-          Left = 167
+          Left = 151
           Top = 112
           Width = 186
           Height = 22
@@ -148,7 +142,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           TabOrder = 4
         end
         object chkBiDirEnabled: TCheckBox
-          Left = 167
+          Left = 151
           Top = 144
           Width = 150
           Height = 17
@@ -158,7 +152,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           TabOrder = 6
         end
         object chkDisabled: TCheckBox
-          Left = 7
+          Left = 0
           Top = 144
           Width = 150
           Height = 17
@@ -168,7 +162,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           TabOrder = 5
         end
         object chkUseConstValue: TCheckBox
-          Left = 7
+          Left = 0
           Top = 168
           Width = 150
           Height = 17
@@ -177,14 +171,14 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           OnClick = chkUseConstValueClick
         end
         object edtConstValue: TEdit
-          Left = 7
+          Left = 0
           Top = 192
           Width = 145
           Height = 22
           TabOrder = 9
         end
         object chkLogValues: TCheckBox
-          Left = 167
+          Left = 151
           Top = 168
           Width = 150
           Height = 17
@@ -193,7 +187,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
           OnClick = chkLogValuesClick
         end
         object chkLogNonDef: TCheckBox
-          Left = 183
+          Left = 167
           Top = 194
           Width = 150
           Height = 17
@@ -205,14 +199,14 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   end
   object pnlButtons: TPanel
     Left = 0
-    Top = 304
-    Width = 394
+    Top = 296
+    Width = 364
     Height = 34
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     object pnlButtonsRight: TPanel
-      Left = 209
+      Left = 179
       Top = 0
       Width = 185
       Height = 34
@@ -249,7 +243,7 @@ object fmReplaceCompMapDets: TfmReplaceCompMapDets
   object pnlHeader: TPanel
     Left = 0
     Top = 0
-    Width = 394
+    Width = 364
     Height = 42
     Align = alTop
     BevelOuter = bvNone

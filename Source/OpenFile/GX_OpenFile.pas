@@ -59,7 +59,7 @@ type
     property SearchPaths: TStrings read FSearchPaths write FSearchPaths;
     property RecursiveDirSearch: Boolean read FRecursiveDirSearch write FRecursiveDirSearch;
     property MapFileSearch: boolean read FMapFileSearch write FMapFileSearch;
-    procedure HaltThreads;
+    procedure FreeThreads;
   end;
 
   TfmOpenFile = class(TfmBaseForm)
@@ -204,7 +204,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Menus, Graphics, Windows, ToolsAPI,
+  SysUtils, Menus, Graphics, Windows, ToolsAPI, StrUtils,
   GX_IdeUtils, GX_SharedImages, GX_Experts, GX_ConfigurationInfo, GX_OtaUtils,
   GX_GxUtils, GX_dzVclUtils, GX_dzMapFileReader, GX_dzFileUtils;
 
@@ -276,6 +276,8 @@ begin
     if (Form.ShowModal = mrOk) or (Form.chkDefault.Checked) then begin
       SaveSettings;
       Form.SaveSettings;
+
+      IncCallCount;
     end;
   finally
     FreeAndNil(Form);
@@ -436,16 +438,13 @@ end;
 destructor TAvailableFiles.Destroy;
 begin
   OnFindComplete := nil;
-  HaltThreads;
+  FreeThreads;
   FreeAndNil(FMapFiles);
   FreeAndNil(FFileMasks);
   FreeAndNil(FCommonFiles);
   FreeAndNil(FCommonDCUFiles);
   FreeAndNil(FProjectFiles);
   FreeAndNil(FSearchPathFiles);
-  FreeAndNil(FSearchPathThread);
-  FreeAndNil(FCommonThread);
-  FreeAndNil(FMapFileThread);
   inherited;
 end;
 
@@ -454,6 +453,8 @@ var
   PathsToUse: TStringList;
   SearchPath: TStringList;
 begin
+  FreeThreads;
+
   FCommonFiles.Clear;
   FCommonDCUFiles.Clear;
   FProjectFiles.Clear;
@@ -467,7 +468,6 @@ begin
   try
     GetSearchPath(SearchPath);
 
-    FreeAndNil(FSearchPathThread);
     FSearchPathThread := TFileFindThread.Create;
 
     // This will allow semi-colon separated lists at the user GUI level
@@ -484,7 +484,6 @@ begin
     FSearchPathThread.OnFindComplete := PathSearchComplete;
     FSearchPathThread.StartFind;
 
-    FreeAndNil(FMapFileThread);
     if MapFileSearch then begin
       FMapFileThread := TReadMapFileThread.Create;
       FMapFileThread.SearchPath.Assign(SearchPath);
@@ -496,7 +495,6 @@ begin
     end else
       FMapSearchDone := True;
 
-    FreeAndNil(FCommonThread);
     FCommonThread := TFileFindThread.Create;
     FCommonThread.RecursiveSearchDirs.Add(ExtractFilePath(GetIdeRootDirectory) + AddSlash('Source'));
     FCommonThread.FileMasks.CommaText := '*.pas,*.cpp,*.cs,*.inc,*.dfm';
@@ -518,6 +516,9 @@ var
   PathUnits: TStringList;
   i: Integer;
 begin
+  if not Assigned(FSearchPathThread) then
+    Exit; //==>
+
   PathUnits := nil;
   PathFiles := TStringList.Create;
   try
@@ -545,6 +546,9 @@ end;
 
 procedure TAvailableFiles.CommonSearchComplete;
 begin
+  if not Assigned(FCommonThread) then
+    Exit; //==>
+
   FCommonThread.LockResults;
   try
     CommonFiles.Assign(FCommonThread.Results);
@@ -557,6 +561,9 @@ end;
 
 procedure TAvailableFiles.MapSearchComplete;
 begin
+  if not Assigned(FMapFileThread) then
+    Exit; //==>
+
   FMapFileThread.LockResults;
   try
      MapFiles.Assign(FMapFileThread.Results);
@@ -632,29 +639,30 @@ begin
   GxOtaGetEffectiveLibraryPath(Paths);
 end;
 
-procedure TAvailableFiles.HaltThreads;
-
-  procedure StopThread(Thread: TFileFindThread);
-  begin
-    if Assigned(Thread) then
-    begin
-      Thread.OnFindComplete := nil;
-      Thread.Terminate;
-      Thread.WaitFor;
-    end;
-  end;
-
+procedure TAvailableFiles.FreeThreads;
 var
   Cursor: IInterface;
 begin
   Cursor := TempHourGlassCursor;
-  StopThread(FSearchPathThread);
-  StopThread(FCommonThread);
+
+  if Assigned(FSearchPathThread) then begin
+    FSearchPathThread.OnFindComplete := nil;
+    FSearchPathThread.Terminate;
+  end;
+
+  if Assigned(FCommonThread) then begin
+    FCommonThread.OnFindComplete := nil;
+    FCommonThread.Terminate;
+  end;
+
   if Assigned(FMapFileThread) then begin
     FMapFileThread.OnFindComplete := nil;
     FMapFileThread.Terminate;
-    FMapFileThread.WaitFor;
   end;
+
+  FreeAndNil(FSearchPathThread);
+  FreeAndNil(FCommonThread);
+  FreeAndNil(FMapFileThread);
 end;
 
 { TOpenFileNotifier }
@@ -673,7 +681,7 @@ begin
         try
           FileExt := LowerCase(ExtractFileExt(FileName));
           FilePath := ExtractFilePath(FileName);
-          if StrBeginsWith('.', FileExt) then
+          if StartsStr('.', FileExt) then
             FileExt := Copy(FileExt, 2, Length(FileExt));
           if FileExt = '' then // Unknown files
             Exit;
@@ -697,6 +705,8 @@ end;
 
 procedure TfmOpenFile.FormCreate(Sender: TObject);
 begin
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   lvSearchPath.Color := clBtnFace;
   lvSearchPath.Enabled := False;
@@ -790,7 +800,7 @@ begin
             AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex]);
         end
         else
-          if StrBeginsWith(edtFilter.Text, SearchValue, False) then
+          if StartsText(edtFilter.Text, SearchValue) then
             AddListItem(CurrentListView, FCurrentFilePaths[FCurrentFilterIndex]);
 
       Inc(FCurrentFilterIndex);
@@ -831,7 +841,7 @@ begin
     for i := 0 to CurrentListView.Items.Count - 1 do
     begin
       ListItem := CurrentListView.Items[i];
-      if StrBeginsWith(FilterText, ListItem.Caption, False) then
+      if StartsText(FilterText, ListItem.Caption) then
       begin
         SelIndex := i;
         Break;

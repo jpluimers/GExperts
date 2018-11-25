@@ -105,7 +105,7 @@ implementation
 
 uses
   SysUtils, StrUtils, Math,
-  GX_EditorExpert, GX_OtaUtils;
+  GX_EditorExpert, GX_OtaUtils, GX_GenericUtils;
 
 var
   // This is *local* and used by both the comment
@@ -348,10 +348,10 @@ var
         if SubStringPos > 1 then
         begin
           Result := Copy(InString, 1, SubStringPos - 1) +
-            Copy(InString, SubStringPos + Length(SubString), MaxInt)
+            Copy(InString, SubStringPos + Length(SubString))
         end
         else
-          Result := Copy(InString, Length(SubString) + 1, MaxInt);
+          Result := Copy(InString, Length(SubString) + 1);
 
         Success := True;
       end
@@ -483,7 +483,7 @@ var
 begin
   AExt := ExtractFileExt(AFileName);
   if LeftStr(AExt, 1) = '.' then
-    AExt := Copy(AExt, 2, MaxInt);
+    AExt := Copy(AExt, 2);
 
   for I := 1 to Count-1 do
     if AnsiContainsText(Strings[I], AExt) then

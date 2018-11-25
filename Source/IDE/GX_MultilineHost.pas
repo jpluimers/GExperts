@@ -32,7 +32,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Windows, Forms, Menus, ComCtrls, ImgList,
+  SysUtils, Windows, Forms, Menus, ComCtrls, 
   GX_VerDepConst, GX_ClassHacks;
 
 type

@@ -20,7 +20,12 @@ uses
   SynUnicode,
   SynMemo,
   GX_BaseForm,
-  GX_GenericUtils;
+  GX_GenericUtils,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmMacroLibraryNamePrompt = class(TfmBaseForm)

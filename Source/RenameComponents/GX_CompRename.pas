@@ -11,13 +11,11 @@ unit GX_CompRename;
 interface
 
 uses
-  Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI,
-  GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs,
-  GX_BaseForm;
+  Classes, Controls, Forms, StdCtrls, ExtCtrls, ToolsAPI, ComCtrls, Buttons,
+  GX_Experts, GX_ConfigurationInfo, GX_EditorChangeServices, Contnrs, Messages,
+  Types, GX_BaseForm, GX_dzSpeedBitBtn;
 
 type
-  TCompRenameExpert = class;
-
   TIsValidComponentName = function (const OldName, NewName: WideString; var Reason: WideString): Boolean of object;
 
   // Simple rename dialog that shows the old and new component name
@@ -30,18 +28,69 @@ type
     btnOK: TButton;
     lblReason: TLabel;
     btnSettings: TButton;
+    pc_Additional: TPageControl;
+    ts_Align: TTabSheet;
+    grp_Margins: TGroupBox;
+    ed_MarginTop: TEdit;
+    l_MarginTop: TLabel;
+    ed_MarginLeft: TEdit;
+    l_MarginLeft: TLabel;
+    l_MarginRight: TLabel;
+    ed_MarginRight: TEdit;
+    ed_MarginBottom: TEdit;
+    l_MarginBottom: TLabel;
+    chk_WithMargins: TCheckBox;
+    ts_Anchors: TTabSheet;
+    b_AnchorLeft: TBitBtn;
+    b_AnchorRight: TBitBtn;
+    b_AnchorTop: TBitBtn;
+    b_AnchorBottom: TBitBtn;
+    b_AlignTop: TBitBtn;
+    b_AlignLeft: TBitBtn;
+    b_AlignRight: TBitBtn;
+    b_AlignClient: TBitBtn;
+    b_AlignBottom: TBitBtn;
+    b_AlignNone: TBitBtn;
+    b_AlignCustom: TBitBtn;
+    b_Margins0: TButton;
+    b_Margins3: TButton;
+    b_Margins6: TButton;
+    b_Margins8: TButton;
     procedure FormCreate(Sender: TObject);
     procedure edtNewNameChange(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
+    procedure pc_AdditionalChange(Sender: TObject);
+    procedure b_AlignTopClick(Sender: TObject);
+    procedure b_AlignLeftClick(Sender: TObject);
+    procedure b_AlignClientClick(Sender: TObject);
+    procedure b_AlignRightClick(Sender: TObject);
+    procedure b_AlignBottomClick(Sender: TObject);
+    procedure b_AlignNoneClick(Sender: TObject);
+    procedure b_AlignCustomClick(Sender: TObject);
+    procedure b_Margins0Click(Sender: TObject);
+    procedure b_Margins3Click(Sender: TObject);
+    procedure b_Margins6Click(Sender: TObject);
+    procedure b_Margins8Click(Sender: TObject);
   private
     FIsValidComponentName: TIsValidComponentName;
     FProperties: TObjectList;
+    FAnchorButtons: array[TAnchorKind] of TdzSpeedBitBtn;
+    FAlignButtons: array[TAlign] of TdzSpeedBitBtn;
+    FComponentClassName: WideString;
     function GetNewName: WideString;
     function GetOldName: WideString;
     procedure SetNewName(const Value: WideString);
     procedure SetOldName(const Value: WideString);
-    procedure AddComponentProperty(const PropertyName, Value: WideString);
+    procedure AddComponentProperty(PropertyName, Value: WideString);
     function GetComponentProperty(Index: Integer): WideString;
+    procedure SetComponent(const _Component: IOTAComponent);
+    procedure SetAlign(const _Component: IOTAComponent);
+    procedure GetAlign(const _Component: IOTAComponent);
+    procedure SetAnchors(const _Component: IOTAComponent);
+    procedure GetAnchors(const _Component: IOTAComponent);
+    procedure HandleAlignButtons(_Align: TAlign);
+    procedure SetMargins(_Value: integer);
+    procedure DialogKey(var Msg: TWMKey); message CM_DIALOGKEY;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
@@ -51,6 +100,17 @@ type
     procedure SetRuleSelection(SelStart, SelEnd: Integer);
     property OnIsValidComponentName: TIsValidComponentName read FIsValidComponentName write FIsValidComponentName;
   end;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  SysUtils, Windows, Menus, StrUtils, IniFiles, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
+  GX_IdeUtils, Graphics, GX_GxUtils, TypInfo, GX_dzVclUtils, GX_dzClassUtils;
+
+type
+  TCompRenameExpert = class;
 
   TCompRenameNotifier = class(TInterfacedObject, IGxEditorNotification)
   private
@@ -83,9 +143,12 @@ type
     FComponentNames: TStringList;
     FFormNames: TStringList;
     FTimer: TTimer;
-    FTimerCount: Integer;
     FFormEditor: IOTAFormEditor;
+    FFormWidth: Integer;
+    FFormHeight: Integer;
     function DoRename(const Component: IOTAComponent; UseRules: Boolean): TModalResult;
+    procedure HandleOnExport(_Sender: TObject);
+    procedure HandleOnImport(_Sender: TObject);
   protected
     procedure AddNewClass(const AClassName: WideString);
     procedure DoOnTimer(Sender: TObject);
@@ -103,7 +166,8 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure Execute(Sender: TObject); override;
-    procedure Configure; override;
+    procedure Configure; overload; override;
+    procedure Configure(const _Selected: string); reintroduce; overload;
     function GetActionCaption: string; override;
     function GetDefaultShortCut: TShortCut; override;
     class function GetName: string; override;
@@ -112,14 +176,6 @@ type
     function IsDefaultActive: Boolean; override;
     function HasDesignerMenuItem: Boolean; override;
   end;
-
-implementation
-
-{$R *.dfm}
-
-uses
-  SysUtils, Windows, Menus, GX_CompRenameConfig, GX_OtaUtils, GX_GenericUtils,
-  GX_IdeUtils, Graphics, GX_GxUtils;
 
 resourcestring
   SPropertyNotFound = 'Property not found';
@@ -132,7 +188,7 @@ var
 function TfmCompRename.Execute: TModalResult;
 begin
   ActiveControl := edtNewName;
-  lblReason.Top := btnOK.Top + Round((btnOK.Height / 2) - (lblReason.Height / 2));
+//  lblReason.Top := btnOK.Top + Round((btnOK.Height / 2) - (lblReason.Height / 2));
   Result := ShowModal;
 end;
 
@@ -144,6 +200,150 @@ end;
 function TfmCompRename.GetOldName: WideString;
 begin
   Result := Trim(edtOldName.Text);
+end;
+
+procedure TfmCompRename.pc_AdditionalChange(Sender: TObject);
+begin
+  inherited;
+  if pc_Additional.ActivePage = ts_Align then
+    TWinControl_SetFocus(b_AlignClient)
+  else if pc_Additional.ActivePage = ts_Anchors then
+    TWinControl_SetFocus(b_AnchorTop);
+end;
+
+procedure TfmCompRename.GetAlign(const _Component: IOTAComponent);
+var
+  BoolValue: LongBool;
+  CompMargins: TObject;
+  al: TAlign;
+  IntValue: Integer;
+begin
+  if not GxOtaActiveDesignerIsVCL then begin
+    // for whatever reason this currently does not work for FMX
+    Exit; //==>
+  end;
+
+  if not ts_Align.TabVisible then
+    Exit; //==>
+
+  al := Low(TAlign);
+  while al < High(TAlign) do begin
+    if FAlignButtons[al].Down then
+      Break;
+    Inc(al);
+  end;
+  IntValue := Ord(al);
+  _Component.SetPropByName('Align', IntValue);
+
+  if not grp_Margins.Visible then
+    Exit; //==>
+
+  if chk_WithMargins.Visible then begin
+    BoolValue := chk_WithMargins.Checked;
+    _Component.SetPropByName('AlignWithMargins', BoolValue);
+  end;
+  if _Component.GetPropTypeByName('Margins') = tkClass then begin
+    CompMargins := GetObjectProp((_Component as INTAComponent).GetComponent, 'Margins');
+    if TryStrToInt(ed_MarginTop.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Top', IntValue);
+    if TryStrToInt(ed_MarginLeft.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Left', IntValue);
+    if TryStrToInt(ed_MarginRight.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Right', IntValue);
+    if TryStrToInt(ed_MarginBottom.Text, IntValue) then
+      SetOrdProp(CompMargins, 'Bottom', IntValue);
+  end;
+end;
+
+procedure TfmCompRename.SetAlign(const _Component: IOTAComponent);
+var
+  BoolValue: LongBool;
+  CompMargins: TObject;
+  IntValue: Integer;
+  AlignValue: TAlign;
+  al: TAlign;
+begin
+  if not GxOtaActiveDesignerIsVCL then begin
+    ts_Align.TabVisible := False;
+    // for whatever reason this currently does not work for FMX
+    Exit; //==>
+  end;
+
+  // GetPropValueByName expects 4 byte values for enums
+  if not _Component.GetPropValueByName('Align', IntValue) then begin
+    ts_Align.TabVisible := False;
+    Exit; //==>
+  end;
+
+  if (IntValue < Ord(Low(TAlign))) or (Ord(High(TAlign)) < IntValue) then begin
+    ts_Align.TabVisible := False;
+    Exit; //==>
+  end;
+  AlignValue := TAlign(IntValue);
+
+  for al := Low(TAlign) to High(TAlign) do
+    FAlignButtons[al].Down := (al = AlignValue);
+
+  if _Component.GetPropTypeByName('Margins') <> tkClass then begin
+    grp_Margins.Visible := False;
+    chk_WithMargins.Visible := False;
+    Exit; //==>
+  end;
+
+  // GetPropValueByName expects 4 byte values for booleans too
+  if not _Component.GetPropValueByName('AlignWithMargins', BoolValue) then begin
+    chk_WithMargins.Visible := False;
+  end;
+  chk_WithMargins.Checked := BoolValue;
+  CompMargins := GetObjectProp((_Component as INTAComponent).GetComponent, 'Margins');
+  IntValue := GetOrdProp(CompMargins, 'Top');
+  ed_MarginTop.Text := IntToStr(IntValue);
+  IntValue := GetOrdProp(CompMargins, 'Left');
+  ed_MarginLeft.Text := IntToStr(IntValue);
+  IntValue := GetOrdProp(CompMargins, 'Right');
+  ed_MarginRight.Text := IntToStr(IntValue);
+  IntValue := GetOrdProp(CompMargins, 'Bottom');
+  ed_MarginBottom.Text := IntToStr(IntValue);
+end;
+
+procedure TfmCompRename.GetAnchors(const _Component: IOTAComponent);
+var
+  AnchorValue: TAnchors;
+  IntValue: Integer;
+  ak: TAnchorKind;
+begin
+  if ts_Anchors.TabVisible then begin
+    AnchorValue := [];
+    for ak  := Low(TAnchorKind) to High(TAnchorKind) do begin
+      if FAnchorButtons[ak].Down then
+        Include(AnchorValue, ak);
+    end;
+    IntValue := 0;
+    Move(AnchorValue, IntValue, SizeOf(AnchorValue));
+    _Component.SetPropByName('Anchors', AnchorValue);
+  end;
+end;
+
+procedure TfmCompRename.SetAnchors(const _Component: IOTAComponent);
+var
+  AnchorValue: TAnchors;
+  IntValue: Integer;
+  ak: TAnchorKind;
+begin
+  if not _Component.GetPropValueByName('Anchors', IntValue) then begin
+    ts_Anchors.TabVisible := False;
+  end else begin
+    Move(IntValue, AnchorValue, SizeOf(AnchorValue));
+    for ak := Low(TAnchorKind) to High(TAnchorKind) do
+      FAnchorButtons[ak].Down := (ak in AnchorValue);
+  end;
+end;
+
+procedure TfmCompRename.SetComponent(const _Component: IOTAComponent);
+begin
+  FComponentClassName := _Component.GetComponentType;
+  SetAlign(_Component);
+  SetAnchors(_Component);
 end;
 
 procedure TfmCompRename.SetNewName(const Value: WideString);
@@ -187,34 +387,49 @@ begin
     edtNewName.SelLength := SelEnd - SelStart;
 end;
 
-procedure TfmCompRename.AddComponentProperty(const PropertyName, Value: WideString);
+procedure TfmCompRename.AddComponentProperty(PropertyName, Value: WideString);
+
+  procedure VerticallyMove(_cntrl: Tcontrol; _by: Integer);
+  begin
+    _cntrl.Top := _cntrl.Top + _by;
+  end;
+
 var
   Lbl: TLabel;
   Edit: TEdit;
+  diff: Integer;
 begin
-  if Trim(PropertyName) <> '' then
-  begin
-    Lbl := TLabel.Create(Self);
-    Lbl.Parent := Self;
-    Lbl.Top := (FProperties.Count + 1) * (lblNewName.Top - lblOldName.Top) + lblNewName.Top;
-    Lbl.Left := lblNewName.Left;
-    Lbl.Caption := Trim(PropertyName);
-    Edit := TEdit.Create(Self);
-    Edit.Parent := Self;
-    Edit.Top := (FProperties.Count + 1) * (edtNewName.Top - edtOldName.Top) + edtNewName.Top;
-    Edit.Left := edtNewName.Left;
-    Edit.Width := edtNewName.Width;
-    Edit.Text := Value;
-    Edit.TabOrder := FProperties.Count + 2;
-    FProperties.Add(Edit);
-    Height := Height + 24;
-    if Edit.Text = SPropertyNotFound then begin
-      Edit.ReadOnly := True;
-      Edit.Color := clBtnFace;
-      Edit.TabStop := False;
-      Lbl.Font.Color := clGrayText;
-    end;
+  PropertyName := Trim(PropertyName);
+  if PropertyName = '' then
+    Exit; //==>
+
+  Lbl := TLabel.Create(Self);
+  Lbl.Parent := Self;
+  Lbl.Top := (FProperties.Count + 1) * (lblNewName.Top - lblOldName.Top) + lblNewName.Top;
+  Lbl.Left := lblNewName.Left;
+  Lbl.Caption := PropertyName;
+  Edit := TEdit.Create(Self);
+  Edit.Parent := Self;
+  Edit.Top := (FProperties.Count + 1) * (edtNewName.Top - edtOldName.Top) + edtNewName.Top;
+  Edit.Left := edtNewName.Left;
+  Edit.Width := edtNewName.Width;
+  Edit.Text := Value;
+  Edit.TabOrder := FProperties.Count + 2;
+  FProperties.Add(Edit);
+
+  if Edit.Text = SPropertyNotFound then begin
+    Edit.ReadOnly := True;
+    Edit.Color := clBtnFace;
+    Edit.TabStop := False;
+    Lbl.Font.Color := clGrayText;
   end;
+
+  diff := edtNewName.Top - edtOldName.Top;
+  Height := Height + diff;
+  VerticallyMove(btnOK, diff);
+  VerticallyMove(btnCancel, diff);
+  VerticallyMove(btnSettings, diff);
+  VerticallyMove(lblReason, diff);
 end;
 
 function TfmCompRename.GetComponentProperty(Index: Integer): WideString;
@@ -229,12 +444,76 @@ constructor TfmCompRename.Create(Owner: TComponent);
 begin
   inherited;
   FProperties := TObjectList.Create(False);
+
+  FAlignButtons[alTop] := TdzSpeedBitBtn.Create(b_AlignTop);
+  FAlignButtons[alLeft] := TdzSpeedBitBtn.Create(b_AlignLeft);
+  FAlignButtons[alClient] := TdzSpeedBitBtn.Create(b_AlignClient);
+  FAlignButtons[alRight] := TdzSpeedBitBtn.Create(b_AlignRight);
+  FAlignButtons[alBottom] := TdzSpeedBitBtn.Create(b_AlignBottom);
+  FAlignButtons[alNone] := TdzSpeedBitBtn.Create(b_AlignNone);
+  FAlignButtons[alCustom] := TdzSpeedBitBtn.Create(b_AlignCustom);
+
+  FAnchorButtons[akTop] := TdzSpeedBitBtn.Create(b_AnchorTop);
+  FAnchorButtons[akLeft] := TdzSpeedBitBtn.Create(b_AnchorLeft);
+  FAnchorButtons[akRight] := TdzSpeedBitBtn.Create(b_AnchorRight);
+  FAnchorButtons[akBottom] := TdzSpeedBitBtn.Create(b_AnchorBottom);
 end;
 
 destructor TfmCompRename.Destroy;
 begin
   FreeAndNil(FProperties);
   inherited;
+end;
+
+procedure TfmCompRename.DialogKey(var Msg: TWMKey);
+begin
+  // make the selection of alignment and anchors via arrow keys more intuitive
+  case Msg.CharCode of
+    VK_DOWN: begin
+        if ActiveControl = b_AlignTop then
+          b_AlignClient.SetFocus
+        else if (ActiveControl = b_AlignClient) or (ActiveControl = b_AlignLeft) or (ActiveControl = b_AlignRight) then
+          b_AlignBottom.SetFocus
+        else if (ActiveControl = b_AnchorTop) or (ActiveControl = b_AnchorLeft) or (ActiveControl = b_AnchorRight) then
+          b_AnchorBottom.SetFocus
+        else
+          inherited;
+      end;
+    VK_UP: begin
+        if ActiveControl = b_AlignBottom then
+          b_AlignClient.SetFocus
+        else if (ActiveControl = b_AlignClient) or (ActiveControl = b_AlignLeft) or (ActiveControl = b_AlignRight) then
+          b_AlignTop.SetFocus
+        else if (ActiveControl = b_AlignNone) or (ActiveControl = b_AlignCustom)then
+          b_AlignBottom.SetFocus
+        else if (ActiveControl = b_AnchorBottom) or (ActiveControl = b_AnchorLeft) or (ActiveControl = b_AnchorRight) then
+          b_AnchorTop.SetFocus
+        else
+          inherited;
+      end;
+    VK_RIGHT: begin
+        if ActiveControl = b_AlignLeft then
+          b_AlignClient.SetFocus
+        else if ActiveControl = b_AlignClient then
+          b_AlignRight.SetFocus
+        else if (ActiveControl = b_AnchorTop) or (ActiveControl = b_AnchorBottom) or (ActiveControl = b_AnchorLeft) then
+          b_AnchorRight.SetFocus
+        else
+          inherited;
+      end;
+    VK_LEFT: begin
+        if ActiveControl = b_AlignRight then
+          b_AlignClient.SetFocus
+        else if ActiveControl = b_AlignClient then
+          b_AlignLeft.SetFocus
+        else if (ActiveControl = b_AnchorTop) or (ActiveControl = b_AnchorBottom) or (ActiveControl = b_AnchorRight) then
+          b_AnchorLeft.SetFocus
+        else
+          inherited;
+      end;
+  else
+    inherited;
+  end;
 end;
 
 { TCompRenameNotifier }
@@ -339,28 +618,68 @@ begin
         Break;
     end;
   end;
+
+  IncCallCount;
 end;
 
 procedure TCompRenameExpert.Configure;
-var
-  Dialog: TfmCompRenameConfig;
 begin
-  Dialog := TfmCompRenameConfig.Create(nil);
+  Configure('');
+end;
+
+procedure TCompRenameExpert.Configure(const _Selected: string);
+begin
+//    SetFormIcon(Dialog);
+  FRenameRuleList.Sort;
+  if TfmCompRenameConfig.Execute(nil, HandleOnImport, HandleOnExport,
+    FRenameRuleList, FShowDialog, FAutoAddClasses,
+    FFormWidth, FFormHeight, _Selected) then
+    SaveSettings;
+end;
+
+procedure TCompRenameExpert.HandleOnImport(_Sender: TObject);
+var
+  GXSettings: TGExpertsSettings;
+  ini: TMemIniFile;
+  fn: string;
+begin
+  fn := 'GExperts_' + Self.GetName + '.ini';
+  if not ShowOpenDialog('Select file to import', 'ini', fn, 'INI files (*.ini)|*.ini') then
+    Exit; //==>
+  if not FileExists(fn) then
+    Exit; //==>
+
+  GXSettings := nil;
+  ini := TMemInifile.Create(fn);
   try
-    Dialog.chkShowDialog.Checked := FShowDialog;
-    Dialog.chkAutoAdd.Checked := FAutoAddClasses;
-    SetFormIcon(Dialog);
-    FRenameRuleList.Sort;
-    Dialog.ValueList.Assign(FRenameRuleList);
-    if Dialog.Execute then
-    begin
-      FShowDialog := Dialog.chkShowDialog.Checked;
-      FAutoAddClasses := Dialog.chkAutoAdd.Checked;
-      FRenameRuleList.Assign(Dialog.ValueList);
-      SaveSettings;
-    end;
+    GXSettings := TGExpertsSettings.Create(Ini);
+    InternalLoadSettings(GXSettings);
   finally
-    FreeAndNil(Dialog);
+    FreeAndNil(GXSettings);
+    FreeAndNil(ini);
+  end;
+  (_Sender as TfmCompRenameConfig).SetData(FRenameRuleList, FShowDialog, FAutoAddClasses, FFormWidth, FFormHeight, '');
+end;
+
+procedure TCompRenameExpert.HandleOnExport(_Sender: TObject);
+var
+  GXSettings: TGExpertsSettings;
+  ini: TMemIniFile;
+  fn: string;
+begin
+  fn := 'GExperts_' + Self.GetName + '.ini';
+  if not ShowSaveDialog('Select file to export to', 'ini', fn, 'INI files (*.ini)|*.ini') then
+    Exit; //==>
+
+  GXSettings := nil;
+  ini := TMemIniFile.Create(fn);
+  try
+    GXSettings := TGExpertsSettings.Create(ini);
+    InternalSaveSettings(GXSettings);
+    ini.UpdateFile;
+  finally
+    FreeAndNil(GXSettings);
+    FreeAndNil(ini);
   end;
 end;
 
@@ -385,7 +704,6 @@ begin
     begin
       FComponentNames.Add(NewName);
       FFormNames.Add(FormEditor.FileName);
-      FTimerCount := 0;
       FTimer.Enabled := True;
     end;
   end;
@@ -496,6 +814,8 @@ begin
         Dialog.OnIsValidComponentName := IsValidComponentName;
         Dialog.OldName := CompName;
 
+        Dialog.SetComponent(Component);
+
         Index := FRenameRuleList.IndexOfName(Component.GetComponentType);
         if Index <> -1 then
         begin
@@ -555,6 +875,10 @@ begin
         begin
           CompName := Dialog.NewName;
           GxOtaSetComponentName(Component, CompName);
+
+          Dialog.GetAlign(Component);
+          Dialog.GetAnchors(Component);
+
           if Assigned(OtherProps) then
           begin
             for i := 0 to OtherProps.Count - 1 do
@@ -714,6 +1038,13 @@ begin
   Assert(Assigned(FRenameRuleList));
   FShowDialog := Settings.ReadBool('ShowDialog', False);
   FAutoAddClasses := Settings.ReadBool('AutoAdd', True);
+
+  FFormWidth := Settings.ReadInteger('Width', 0);
+  FFormHeight := Settings.ReadInteger('Height', 0);
+
+  TStrings_FreeWithObjects(FRenameRuleList);
+  FRenameRuleList := TStringList.Create;
+
   if Settings.SectionExists('Items') then
     Settings.ReadStrings('Items', FRenameRuleList)
   else
@@ -755,6 +1086,10 @@ begin
   end;
 
   Settings.WriteStrings('Items', FRenameRuleList);
+
+  Settings.WriteInteger('Width', FFormWidth);
+  Settings.WriteInteger('Height', FFormHeight);
+
   Settings.WriteBool('ShowDialog', FShowDialog);
   Settings.WriteBool('AutoAdd', FAutoAddClasses);
 
@@ -827,7 +1162,7 @@ begin
   Prefix := Component.GetComponentType;
   if (Length(Prefix) > 1) and (Prefix[1] = 'T') then
     Prefix := Copy(Prefix, 2, 999);
-  if not StrBeginsWith(Prefix, NewName) then
+  if not StartsText(Prefix, NewName) then
     Exit;
   Suffix := Copy(NewName, Length(Prefix) + 1, 999);
   if StrToIntDef(Suffix, -999) <> -999 then
@@ -849,7 +1184,85 @@ end;
 procedure TfmCompRename.btnSettingsClick(Sender: TObject);
 begin
   Assert(Assigned(PrivateCompRenameExpert));
-  PrivateCompRenameExpert.Configure;
+  PrivateCompRenameExpert.Configure(FComponentClassName);
+end;
+
+procedure TfmCompRename.HandleAlignButtons(_Align: TAlign);
+var
+  al: TAlign;
+begin
+  if FAlignButtons[_Align].Down then begin
+    for al := Low(FAlignButtons) to High(FAlignButtons) do
+      if al <> _Align then
+        FAlignButtons[al].Down := False;
+  end else
+    FAlignButtons[_Align].Down := True;
+end;
+
+procedure TfmCompRename.b_AlignBottomClick(Sender: TObject);
+begin
+  HandleAlignButtons(alBottom);
+end;
+
+procedure TfmCompRename.b_AlignClientClick(Sender: TObject);
+begin
+  HandleAlignButtons(alClient);
+end;
+
+procedure TfmCompRename.b_AlignCustomClick(Sender: TObject);
+begin
+  HandleAlignButtons(alCustom);
+end;
+
+procedure TfmCompRename.b_AlignLeftClick(Sender: TObject);
+begin
+  HandleAlignButtons(alLeft);
+end;
+
+procedure TfmCompRename.b_AlignNoneClick(Sender: TObject);
+begin
+  HandleAlignButtons(alNone);
+end;
+
+procedure TfmCompRename.b_AlignRightClick(Sender: TObject);
+begin
+  HandleAlignButtons(alRight);
+end;
+
+procedure TfmCompRename.b_AlignTopClick(Sender: TObject);
+begin
+  HandleAlignButtons(alTop);
+end;
+
+procedure TfmCompRename.SetMargins(_Value: integer);
+var
+  s: string;
+begin
+  s := IntToStr(_Value);
+  ed_MarginTop.Text := s;
+  ed_MarginLeft.Text := s;
+  ed_MarginRight.Text := s;
+  ed_MarginBottom.Text := s;
+end;
+
+procedure TfmCompRename.b_Margins0Click(Sender: TObject);
+begin
+  SetMargins(0);
+end;
+
+procedure TfmCompRename.b_Margins3Click(Sender: TObject);
+begin
+  SetMargins(3);
+end;
+
+procedure TfmCompRename.b_Margins6Click(Sender: TObject);
+begin
+  SetMargins(6);
+end;
+
+procedure TfmCompRename.b_Margins8Click(Sender: TObject);
+begin
+  SetMargins(8);
 end;
 
 initialization

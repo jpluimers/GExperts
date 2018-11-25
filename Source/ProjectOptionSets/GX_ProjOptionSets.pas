@@ -171,7 +171,7 @@ uses
   {$IFOPT D+} GX_DbugIntf, Clipbrd, {$ENDIF}
   Variants, SysUtils, Messages, Dialogs,
   GX_GxUtils, GX_GenericUtils, GX_IdeUtils, GX_OtaUtils,
-  GX_VerDepConst, GX_ProjOptMap, GX_SharedImages, GX_XmlUtils;
+  GX_VerDepConst, GX_ProjOptMap, GX_SharedImages, GX_XmlUtils, GX_dzVclUtils;
 
 resourcestring
   SOptValue = '%s value';
@@ -426,6 +426,8 @@ begin
     fmProjOptionSets := TfmProjOptionSets.Create(nil);
   SetFormIcon(fmProjOptionSets);
   IdeDockManager.ShowForm(fmProjOptionSets);
+
+  IncCallCount;
 end;
 
 constructor TProjOptionSetsExpert.Create;
@@ -504,6 +506,8 @@ var
   ProjectOptions: TComponent;
 begin
   inherited Create(AOwner);
+
+  TControl_SetMinConstraints(Self);
 
   FLastLoadedSet := '';
   SetupListOptionsControls;
@@ -1407,6 +1411,9 @@ end;
 procedure TfmProjOptionSets.SetPrjOptionValue(const AOption, AValue: string);
 var
   VersionKeys: TStrings;
+  i: integer;
+  s: string;
+  c: char;
 begin
   if Assigned(FPrjOptions) then
   begin
@@ -1414,8 +1421,20 @@ begin
     try
       // BCB 5.01 AVs here on the LibDir setting every time
       if AOption = 'Keys' then begin
-        if GxOtaGetVersionInfoKeysStrings(VersionKeys) then
-          VersionKeys.Text := AValue;
+        s := '';
+        for i := 1 to Length(AValue) do begin
+          c := AValue[i];
+          if c = #$0A then
+            s := s + #$0D;
+          s := s + c;
+        end;
+        VersionKeys := TStringList.Create;
+        try
+          VersionKeys.Text := s;
+          GxOtaSetVersionInfoKeysStrings(VersionKeys);
+        finally
+          FreeAndNil(VersionKeys);
+        end;
       end else
         FPrjOptions.Values[AOption] := AValue;
     except on E: Exception do

@@ -166,6 +166,7 @@ begin
   fmBookmarks.Init;
   IdeDockManager.ShowForm(fmBookmarks);
   EnsureFormVisible(fmBookmarks);
+  IncCallCount;
 end;
 
 {$IFDEF GX_VER170_up}
@@ -203,6 +204,9 @@ end;
 constructor TfmGxBookmarksForm.Create(_Owner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
   if Assigned(BookmarksExpert) then
     BookmarksExpert.SetFormIcon(Self);
 end;

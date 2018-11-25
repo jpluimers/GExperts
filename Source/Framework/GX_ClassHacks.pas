@@ -69,8 +69,8 @@ var
   function InRangeOrNil(const APointer, PLowerBound, PUpperBound: Pointer): Boolean;
   begin
     Result := (APointer = nil) or
-                ((NativeInt(PLowerBound) <= NativeInt(APointer)) and
-                 (NativeInt(APointer) <= NativeInt(PUpperBound)));
+                ((GXNativeInt(PLowerBound) <= GXNativeInt(APointer)) and
+                 (GXNativeInt(APointer) <= GXNativeInt(PUpperBound)));
   end;
 
 var

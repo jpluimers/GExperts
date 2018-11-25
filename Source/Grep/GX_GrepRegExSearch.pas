@@ -156,7 +156,7 @@ var
 begin // Execute
   if not Assigned(FData) then
     raise Exception.Create('Data to search not provided');
-  if IsEmpty(Pattern) then
+  if Pattern = '' then
     raise Exception.Create('Search pattern is empty');
 
   if RegularExpression then
@@ -278,14 +278,14 @@ begin // Execute
         SetLength(Line, index);
       end;
     end else if IsAForm then begin
-      // todo:
-      // handle the case where long strings are split into multiple lines by the IDE, e.g.:
-      // Caption = 'abcde bcdef cdefg defgh efghi fghij ghijk hijkl ijklm jklmn klmno lmnop mnopq'
-      // split into
-      // Caption =
-      //   'abcde bcdef cdefg defgh efghi fghij ghijk hijkl ijklm jklmn klmn' +
-      //   'o lmnop mnopq'
-      // grep won't find 'bsdf' because it was split
+      { todo:
+        handle the case where long strings are split into multiple lines by the IDE, e.g.:
+        Caption = 'abcde bcdef cdefg defgh efghi fghij ghijk hijkl ijklm jklmn klmno lmnop mnopq'
+        split into
+        Caption =
+          'abcde bcdef cdefg defgh efghi fghij ghijk hijkl ijklm jklmn klmn' +
+          'o lmnop mnopq'
+        grep won't find 'bsdf' because it was split }
 
       // unfortunately this is more complex than my first take at it:
 //      Len := Length(Line);

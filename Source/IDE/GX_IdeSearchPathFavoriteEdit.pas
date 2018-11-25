@@ -36,12 +36,11 @@ type
 
 implementation
 
+{$R *.dfm}
+
 uses
-  StrUtils,
   GX_dzVclUtils,
   GX_GenericUtils;
-
-{$R *.dfm}
 
 { Tf_IdeSearchPathFavoriteEdit }
 

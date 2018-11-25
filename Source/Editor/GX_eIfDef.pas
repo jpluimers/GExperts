@@ -127,9 +127,13 @@ var
 begin
   if not TfmConfigureIfDef.Execute(GetBitmap, FAppendComment, InsertString, IncFile) then
     Exit; //==>
+
+  IncCallCount;
+
   GxOtaInsertLineIntoEditor(InsertString);
 
   if IncFile <> '' then begin
+    // if an include file is necessary for the ifdef, add the include file at the beginning
     CurPos := GxOtaGetCurrentEditPos();
     Lines := TGXUnicodeStringList.Create;
     try
@@ -359,7 +363,7 @@ var
 begin
   r := FStringGrid.Row;
   if (r >= FStringGrid.FixedRows) and (r < FStringGrid.RowCount) then
-    Result := NativeInt(FStringGrid.Objects[0, r])
+    Result := GXNativeInt(FStringGrid.Objects[0, r])
   else
     Result := 0;
 end;
@@ -681,17 +685,17 @@ begin
   _Comment := '';
   Incl := '{' + _Directive + ' ';
   s := Trim(_Line);
-  Result := StrBeginsWith(Incl, s, False);
+  Result := StartsText(Incl, s);
   if Result then begin
     p := Pos('}', s);
     if p > Length(Incl) then begin
       _Value := Copy(s, Length(Incl) + 1, p - 1 - Length(Incl));
       _Value := Trim(_Value);
       _Value := AnsiDequotedStr(_Value, '''');
-      s := Copy(s, p + 1, MaxInt);
+      s := Copy(s, p + 1);
       p := Pos('//', s);
       if p > 0 then
-        _Comment := Trim(Copy(s, p + 2, MaxInt));
+        _Comment := Trim(Copy(s, p + 2));
     end;
   end;
 end;

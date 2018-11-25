@@ -5,37 +5,58 @@ unit GX_TabOrder;
 interface
 
 uses
-  Classes, Forms, Controls, ExtCtrls, ToolsAPI, ComCtrls, StdCtrls, GX_BaseForm;
+  Classes, Forms, Controls, ExtCtrls, Buttons, ActnList, ToolsAPI, ComCtrls, StdCtrls, GX_BaseForm, 
+  GX_ConfigurationInfo;
+
+type
+  TTabAutoSortEnum = (tasYthenX, tasXthenY, tasNone);
 
 type
   TfmTabOrder = class(TfmBaseForm)
     gbxComponents: TGroupBox;
-    btnOK: TButton;
-    btnClose: TButton;
-    btnHelp: TButton;
     pnlButtons: TPanel;
     pnlComponents: TPanel;
-    btnOrderByPosition: TButton;
-    btnResetOrder: TButton;
-    pnlComponentTree: TPanel;
+    b_MoveUp: TBitBtn;
+    b_MoveDown: TBitBtn;
+    TheActionList: TActionList;
+    act_MoveUp: TAction;
+    act_MoveDown: TAction;
     tvComps: TTreeView;
+    p_Bottom: TPanel;
+    btnHelp: TButton;
+    btnClose: TButton;
+    btnOK: TButton;
+    b_Config: TButton;
+    grp_ByPosition: TGroupBox;
+    btnYthenX: TBitBtn;
+    btnXthenY: TBitBtn;
+    btnResetOrder: TButton;
     procedure btnHelpClick(Sender: TObject);
     procedure tvCompsDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure tvCompsDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure tvCompsClick(Sender: TObject);
     procedure tvCompsKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure btnOrderByPositionClick(Sender: TObject);
+    procedure btnYthenXClick(Sender: TObject);
     procedure btnResetOrderClick(Sender: TObject);
+    procedure act_MoveDownExecute(Sender: TObject);
+    procedure act_MoveUpExecute(Sender: TObject);
+    procedure b_ConfigClick(Sender: TObject);
+    procedure btnXthenYClick(Sender: TObject);
   private
     FormEditor: IOTAFormEditor;
     FBiDiMode: TBiDiMode;
+    FAutoSort: TTabAutoSortEnum;
     procedure ChildComponentCallback(Param: Pointer; Component: IOTAComponent; var Result: Boolean);
     procedure SelectCurrentComponent;
     procedure FillTreeView(FromComponent: IOTAComponent);
     procedure ShowOrderButtons(Value: Boolean);
-    procedure SortTreeViewComponentsByXYPosition;
+    procedure SortTreeViewComponentsByYThenXPosition;
+    procedure SortTreeViewComponentsByXThenYPosition;
     procedure SortTreeViewComponentsByOriginalTabOrder;
+  public
+    constructor Create(_Owner: TComponent); override;
+    property AutoSort: TTabAutoSortEnum read FAutoSort write FAutoSort;
   end;
 
 implementation
@@ -43,8 +64,9 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, TypInfo, ActnList,
-  GX_Experts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils;
+  SysUtils, TypInfo,
+  GX_Experts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_dzVclUtils,
+  GX_TabOrderOptions;
 
 const
   TabOrderPropertyName = 'TabOrder';
@@ -60,22 +82,79 @@ type
     TabOrder: Integer;
   end;
 
+type
   TTabExpert = class(TGX_Expert)
   private
+    FAutoSort: TTabAutoSortEnum;
     function GetSelectedComponentsFromCurrentForm(FormEditor: IOTAFormEditor;
       var ParentName, ParentType: WideString): TInterfaceList;
     procedure ShowTabOrderForm;
   protected
     procedure UpdateAction(Action: TCustomAction); override;
+    procedure Configure; override;
+    // Overrride to load any configuration settings
+    procedure InternalLoadSettings(Settings: TExpertSettings); override;
+    // Overrride to save any configuration settings
+    procedure InternalSaveSettings(Settings: TExpertSettings); override;
   public
     function GetActionCaption: string; override;
     class function GetName: string; override;
     procedure Execute(Sender: TObject); override;
     function HasConfigOptions: Boolean; override;
-    function HasDesignerMenuItem: Boolean; override;
+    // This breaks the multi-select mode, because the order of selected component
+    // is reversed when right clicking to open the context menu.
+    // (A second right click reverses it again. But that's not really a solution.)
+    // So for now, I disable the context menu entry, until somebody comes up with a fix.
+    // function HasDesignerMenuItem: Boolean; override;
   end;
 
 { TfmTabOrder }
+
+constructor TfmTabOrder.Create(_Owner: TComponent);
+begin
+  inherited;
+  TControl_SetMinConstraints(Self);
+end;
+
+procedure TfmTabOrder.act_MoveDownExecute(Sender: TObject);
+var
+  Current: TTreeNode;
+  Next: TTreeNode;
+  Dest: TTreeNode;
+  WasExpanded: Boolean;
+begin
+  Current :=  tvComps.Selected;
+  if not Assigned(Current) then
+    Exit; //==>
+  Next := Current.getNextSibling;
+  if not Assigned(Next) then
+    Exit; //==>
+  Dest := Next.getNextSibling;
+  WasExpanded:= Current.Expanded;
+  if Assigned(Dest) then
+    Current.MoveTo(dest, naInsert)
+  else
+    Current.MoveTo(Next, naAdd);
+  Current.Expanded:= WasExpanded;
+end;
+
+procedure TfmTabOrder.act_MoveUpExecute(Sender: TObject);
+var
+  Current: TTreeNode;
+  Dest: TTreeNode;
+  WasExpanded: Boolean;
+begin
+  Current :=  tvComps.Selected;
+  if not Assigned(Current) then
+    Exit; //==>
+
+  Dest := Current.getPrevSibling;
+  if not Assigned(Dest) then
+    Exit; //==>
+  WasExpanded:= Current.Expanded;
+  Current.MoveTo(Dest, naInsert);
+  Current.Expanded:= WasExpanded;
+end;
 
 procedure TfmTabOrder.btnHelpClick(Sender: TObject);
 begin
@@ -126,7 +205,7 @@ begin
   Result := True;
 end;
 
-function CustomSortProcByPos(Node1, Node2: TTreeNode; Data: Integer): Integer; stdcall;
+function CustomSortProcByYThenXPos(Node1, Node2: TTreeNode; BiDiMode: Integer): Integer; stdcall;
 begin
   Result := 0;
   if Assigned(Node1) and Assigned(Node2) and Assigned(Node1.Data) and Assigned(Node2.Data) then
@@ -134,7 +213,7 @@ begin
     Result := TComponentData(Node1.Data).Y - TComponentData(Node2.Data).Y;
     if Result = 0 then
     begin
-      if TBiDiMode(Data) in [bdRightToLeft, bdRightToLeftNoAlign, bdRightToLeftReadingOnly] then
+      if TBiDiMode(BiDiMode) in [bdRightToLeft, bdRightToLeftNoAlign, bdRightToLeftReadingOnly] then
         Result := TComponentData(Node2.Data).X - TComponentData(Node1.Data).X
       else
         Result := TComponentData(Node1.Data).X - TComponentData(Node2.Data).X;
@@ -149,10 +228,31 @@ begin
     Result := TComponentData(Node1.Data).TabOrder - TComponentData(Node2.Data).TabOrder;
 end;
 
-procedure TfmTabOrder.SortTreeViewComponentsByXYPosition;
+function CustomSortProcByXThenYPos(Node1, Node2: TTreeNode; BiDiMode: Integer): Integer; stdcall;
+begin
+  Result := 0;
+  if Assigned(Node1) and Assigned(Node2) and Assigned(Node1.Data) and Assigned(Node2.Data) then
+  begin
+    if TBiDiMode(BiDiMode) in [bdRightToLeft, bdRightToLeftNoAlign, bdRightToLeftReadingOnly] then
+      Result := TComponentData(Node2.Data).X - TComponentData(Node1.Data).X
+    else
+      Result := TComponentData(Node1.Data).X - TComponentData(Node2.Data).X;
+    if Result = 0 then
+      Result := TComponentData(Node1.Data).Y - TComponentData(Node2.Data).Y;
+  end;
+end;
+
+procedure TfmTabOrder.SortTreeViewComponentsByYThenXPosition;
 begin
 {$T-}
-  tvComps.CustomSort(@CustomSortProcByPos, Ord(FBiDiMode));
+  tvComps.CustomSort(@CustomSortProcByYThenXPos, Ord(FBiDiMode));
+{$T+}
+end;
+
+procedure TfmTabOrder.SortTreeViewComponentsByXThenYPosition;
+begin
+{$T-}
+  tvComps.CustomSort(@CustomSortProcByXThenYPos, Ord(FBiDiMode));
 {$T+}
 end;
 
@@ -171,7 +271,7 @@ end;
 
 procedure TfmTabOrder.ShowOrderButtons(Value: Boolean);
 begin
-  btnOrderByPosition.Visible := Value;
+  btnYthenX.Visible := Value;
   btnResetOrder.Visible := Value;
 end;
 
@@ -180,6 +280,11 @@ end;
 procedure TTabExpert.UpdateAction(Action: TCustomAction);
 begin
   Action.Enabled := GxOtaCurrentlyEditingForm;
+end;
+
+procedure TTabExpert.Configure;
+begin
+  TfmTabOrderOptions.Execute(nil, FAutoSort);
 end;
 
 procedure TTabExpert.Execute(Sender: TObject);
@@ -231,7 +336,7 @@ begin
         raise Exception.CreateFmt(SNoComponentInterface, [i]);
 
       // All selected components need to have the same parent
-      {$IFNDEF GX_VER160_up}
+{$IFNDEF GX_VER160_up}
       NativeComponent := GxOtaGetNativeComponent(CurrentComponent);
       Assert(Assigned(NativeComponent));
       CurrentComponentParent := NativeComponent.GetParentComponent;
@@ -241,7 +346,7 @@ begin
         BaseComponentParent := CurrentComponentParent;
       if BaseComponentParent <> CurrentComponentParent then
         raise Exception.Create(SSameParentRequired);
-      {$ELSE  GX_VER160_up}
+{$ELSE  GX_VER160_up}
       CurrentComponentParent := CurrentComponent.GetParent;
       if not Assigned(CurrentComponentParent) then
         Continue // Ignore components without a parent (non-visual components)
@@ -249,7 +354,7 @@ begin
         BaseComponentParent := CurrentComponentParent;
       if not GxOtaComponentsAreEqual(BaseComponentParent, CurrentComponentParent) then
         raise Exception.Create(SSameParentRequired);
-      {$ENDIF GX_VER160_up}
+{$ENDIF GX_VER160_up}
 
       // Only use controls with a TabStop property of
       // type Boolean (which is an enumeration)
@@ -261,13 +366,13 @@ begin
         begin
           if ParentName = '' then
           begin
-            {$IFNDEF GX_VER160_up}
+{$IFNDEF GX_VER160_up}
             ParentName := BaseComponentParent.Name;
             ParentType := BaseComponentParent.ClassName;
-            {$ELSE  GX_VER160_up}
+{$ELSE  GX_VER160_up}
             ParentName := GxOtaGetComponentName(BaseComponentParent);
             ParentType := BaseComponentParent.GetComponentType;
-            {$ENDIF GX_VER160_up}
+{$ENDIF GX_VER160_up}
           end;
           Result.Add(CurrentComponent);
         end;
@@ -281,7 +386,7 @@ end;
 
 function TTabExpert.HasConfigOptions: Boolean;
 begin
-  Result := False;
+  Result := True;
 end;
 
 procedure TTabExpert.ShowTabOrderForm;
@@ -342,6 +447,7 @@ begin
 
   TabOrderForm := TfmTabOrder.Create(nil);
   try
+    TabOrderForm.AutoSort := FAutoSort;
     TabOrderForm.ShowOrderButtons(False);
     TabOrderForm.FormEditor := FormEditor;
     SetFormIcon(TabOrderForm);
@@ -380,7 +486,12 @@ begin
     begin
       TabOrderForm.FBiDiMode := GxOtaGetFormBiDiMode(FormEditor);
       TabOrderForm.FillTreeView(AComponent);
-      TabOrderForm.SortTreeViewComponentsByXYPosition;
+      case FAutoSort of
+        tasYthenX:
+          TabOrderForm.SortTreeViewComponentsByYThenXPosition;
+        tasXthenY:
+          TabOrderForm.SortTreeViewComponentsByXThenYPosition;
+      end;
     end;
 
     TabOrderForm.tvComps.FullExpand;
@@ -402,7 +513,9 @@ begin
         end;
         TreeNode := TreeNode.GetNext;
       end;
+      IncCallCount;
     end;
+    FAutoSort := TabOrderForm.AutoSort;
   finally
     FreeAndNil(TabOrderForm);
   end;
@@ -417,7 +530,7 @@ begin
   begin
     SourceNode := TTreeView(Sender).Selected;
     SourceNode.MoveTo(TargetNode, naInsert);
-    TTreeView(Sender).Selected := TargetNode;
+    TTreeView(Sender).Selected := SourceNode;
   end;
 end;
 
@@ -449,9 +562,14 @@ begin
   SelectCurrentComponent;
 end;
 
-procedure TfmTabOrder.btnOrderByPositionClick(Sender: TObject);
+procedure TfmTabOrder.btnXthenYClick(Sender: TObject);
 begin
-  SortTreeViewComponentsByXYPosition;
+  SortTreeViewComponentsByXThenYPosition;
+end;
+
+procedure TfmTabOrder.btnYthenXClick(Sender: TObject);
+begin
+  SortTreeViewComponentsByYThenXPosition;
 end;
 
 procedure TfmTabOrder.btnResetOrderClick(Sender: TObject);
@@ -459,9 +577,28 @@ begin
   SortTreeViewComponentsByOriginalTabOrder;
 end;
 
-function TTabExpert.HasDesignerMenuItem: Boolean;
+procedure TfmTabOrder.b_ConfigClick(Sender: TObject);
 begin
-  Result := True;
+  TfmTabOrderOptions.Execute(Self, FAutoSort);
+end;
+
+//function TTabExpert.HasDesignerMenuItem: Boolean;
+//begin
+//  Result := True;
+//end;
+
+procedure TTabExpert.InternalLoadSettings(Settings: TExpertSettings);
+begin
+  inherited InternalLoadSettings(Settings);
+  // Do not localize.
+  FAutoSort := TTabAutoSortEnum(Settings.ReadEnumerated('AutoSort',
+    TypeInfo(TTabAutoSortEnum), Ord(tasXthenY)));
+end;
+
+procedure TTabExpert.InternalSaveSettings(Settings: TExpertSettings);
+begin
+  inherited;
+  Settings.WriteEnumerated('AutoSort', TypeInfo(TTabAutoSortEnum), Ord(FAutoSort));
 end;
 
 initialization

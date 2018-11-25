@@ -5,7 +5,7 @@ unit GX_ProofreaderCorrection;
 interface
 
 uses
-  GX_ProofreaderData, GX_EditorChangeServices;
+  GX_ProofreaderData, GX_EditorChangeServices, GX_ProofreaderExpert;
 
 type
   IAutoTypeWriterNotifier = interface(IGxEditorNotification)
@@ -261,9 +261,19 @@ begin
     Exit;
   end;
 
+// todo: Fix ':;' -> ';'
+// If I replace this ...
   PartialReplaceString := Copy(ReplaceString,
     Length(ReplaceString) - Length(ReplaceItem.Replace) + 1,
     Length(ReplaceItem.Replace));
+// ... with this ...
+//  PartialReplaceString := Copy(ReplaceString,
+//    Length(ReplaceString) - Length(ReplaceItem.Typed) + 1,
+//    Length(ReplaceItem.Typed));
+// ... it is possible to automatically replace ':;' with ';'. Otherwise it won't work.
+// But I am not sure whether this has negative side effects. In particular the part after "or"
+// in the following statement does no longer make sense then.
+ // --2018-06-03 twm
 
   Result := (AnsiCompareStr(ReplaceItem.Replace, PartialReplaceString) <> 0)
     or ((PartialReplaceString = '') and (ReplaceItem.Replace = '')); // Allow replace with nothing
@@ -761,6 +771,7 @@ begin
           ReplacementSourceTable, TrailingChars, SourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
+          CodeProofreaderExpert.IncCallCount;
           Exit;
         end;
       end;
@@ -800,6 +811,7 @@ begin
           ReplacementSourceTable, TrailingChars, SourceString, OriginalSourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
+          CodeProofreaderExpert.IncCallCount;
           Exit;
         end;
       end;
@@ -810,6 +822,7 @@ begin
           ReplacementSourceTable, TrailingChars, SourceString) then
         begin
           EditorPositionInformation.EditView.Paint;
+          CodeProofreaderExpert.IncCallCount;
           // Exit;
         end;
       end;

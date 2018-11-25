@@ -88,7 +88,7 @@ implementation
 {$R *.dfm}
 
 uses
-  SysUtils, Clipbrd, ComCtrls, ToolsAPI, TypInfo, Menus,
+  SysUtils, Clipbrd, ComCtrls, ToolsAPI, TypInfo, Menus, StrUtils,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_MessageBox, GX_IdeUtils;
 
 type
@@ -372,10 +372,13 @@ begin
   // No way to get a "native" component for VCL.NET components
   if GxOtaActiveDesignerIsNFM then
     raise Exception.Create('Components to Code does not support VCL.NET forms.');
+
   Comps := GetDesignerComps;
   if Length(Comps) > 0 then begin
     Clipboard.AsText := DoGetCreationCode(FSettings, Comps);
     ShowGxMessageBox(TShowCodeOnClipboardMessage);
+
+    IncCallCount;
   end;
 end;
 
@@ -706,8 +709,8 @@ var
       if propVal = 'True' then
         Result := 'true'
       else
-        if (Length(propVal) >= 2) or StrBeginsWith(propVal, '#39''') then
-          if StrBeginsWith(propVal, '#39''') or (propVal[1] = Chr(39)) and (propVal[Length(propVal)] = Chr(39)) then
+        if (Length(propVal) >= 2) or StartsStr(propVal, '#39''') then
+          if StartsStr(propVal, '#39''') or (propVal[1] = Chr(39)) and (propVal[Length(propVal)] = Chr(39)) then
           begin
             propVal := StringReplace(propVal, '#39''', '''', [rfReplaceAll]);
             propVal := Copy(propVal, 2, Length(propVal) - 2);
@@ -1088,7 +1091,7 @@ begin
     while not EOF do
     begin
       Readln;
-      if StrBeginsWith('object', ccULn, False) then
+      if StartsText('object', ccULn) then
         ParseComponent(Comp, decl, crea, Dele, impl, sub);
     end;
   finally

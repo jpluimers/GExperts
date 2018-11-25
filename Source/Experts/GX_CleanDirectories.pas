@@ -241,6 +241,11 @@ begin
 end;
 
 procedure TfmCleanDirectories.CleanDirectory(const Directory: string; const Recursing: Boolean);
+{$IFNDEF GX_VER150_up}
+// Delphi 6 does not have this constant
+const
+  faSymLink   = $00000040;
+{$endif}
 var
   SearchRec: TSearchRec;
   SearchAttr: Integer;
@@ -268,9 +273,12 @@ begin
       begin
         if ((SearchRec.Attr and faDirectory) <> 0) then
         begin
-          // Recurse into sub-directories.
-          SearchRec.Name := AddSlash(SearchRec.Name);
-          CleanDirectory(Directory + SearchRec.Name, Recursing);
+          // Skip Junctions
+          if ((SearchRec.Attr and faSymLink) = 0) then begin
+            // Recurse into sub-directories.
+            SearchRec.Name := AddSlash(SearchRec.Name);
+            CleanDirectory(Directory + SearchRec.Name, Recursing);
+          end;
         end
         else
         begin
@@ -300,6 +308,7 @@ begin
 
   inherited Create(nil);
 
+  TControl_SetMinConstraints(Self);
   TWinControl_ActivateDropFiles(clbDirs, clbDirsOnFilesDropped);
   TWinControl_ActivateDropFiles(clbExtensions, clbExtensionsOnFilesDropped);
 end;
@@ -667,7 +676,8 @@ begin
   try
     SetFormIcon(Dlg);
     Dlg.chkReportErrors.Checked := FReportErrors;
-    Dlg.ShowModal;
+    if Dlg.ShowModal = mrOk then
+      IncCallCount;
     FReportErrors := Dlg.chkReportErrors.Checked;
   finally
     FreeAndNil(Dlg);

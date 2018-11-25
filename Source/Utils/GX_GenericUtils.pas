@@ -9,23 +9,34 @@ interface
 uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
-  {$IFDEF GX_VER290_up} System.UITypes, {$ENDIF GX_VER290_up}
-  Types, CheckLst, TypInfo, ExtCtrls, ComCtrls;
+  UITypes,
+  Types, CheckLst, TypInfo, ExtCtrls, ComCtrls, GX_dzNamedThread;
 
 const
   AllFilesWildCard = '*.*';
   EmptyString = '';
-  GxSentenceEndChars = ['.', '!', '?', '¿', '¡'];
+  GxSentenceEndChars = ['.', '!', '?', #$bf, #$a1]; // last two are questiondown uand exclamdown
   MaxSmallInt = 32767;
   MaxEditorCol = {$IFDEF GX_VER160_up} MaxSmallInt {$ELSE} 1023 {$ENDIF};
 
 resourcestring
   SAllAlphaNumericChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
 
-{$IFNDEF GX_VER160_up}
 type
-  NativeInt = integer;
-{$ENDIF ~GX_VER160_up}
+  // NativeInt and NativeUInt are wrongly declared as 8 bytes in size in Delphi 6 to 2007,
+  // so we can't use them. Instead we declare our own types which, sincd GExperts is a
+  // 32 IDE plugin are both 32 bits.
+  // Originally this simply redeclared NativeInt as Integer for older versions, but
+  // that made it hard to find accidental usages of the wrong type.
+  GXNativeInt = Integer;
+  GXNativeUInt = LongWord;
+
+type
+  {$IFDEF GX_VER160_up}
+  IDEEditBufferString = UTF8String;
+  {$ELSE}
+  IDEEditBufferString = AnsiString;
+  {$ENDIF}
 
 type
   {$IFDEF UNICODE}
@@ -242,6 +253,14 @@ function LeftTrimChars(var Value: string; const TrimChars: TSysCharSet = [#9, #3
 // Left trim up to AMaxCount of TrimChars from Value and return the trimmed string
 function LeftTrimNChars(const AValue: string; const TrimChars: TSysCharSet = [#9, #32];
   AMaxCount: Integer = 0): string;
+
+{$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+function StartsText(const SubStr, Str: string): Boolean;
+function StartsStr(const SubStr, Str: string): Boolean;
+// Delphi 6 does not have the overloaded version with start only, so we implement it here
+function Copy(const _Value: string; _Start, _Len: Integer): string; overload;
+function Copy(const _Value: string; _Start: Integer): string; overload;
+{$ENDIF}
 
 // See if a string begins/ends with a specific substring
 function StrBeginsWith(const SubStr, Str: string; CaseSensitive: Boolean = True): Boolean;
@@ -653,6 +672,17 @@ procedure LoadFormFileToStrings(const FileName: string; Strings: TGXUnicodeStrin
 function IsBinaryForm(const FileName: string): Boolean;
 // Load a file from disk to a unicode string list
 procedure LoadDiskFileToUnicodeStrings(const FileName: string; Data: TGXUnicodeStringList; var WasBinary: Boolean);
+// Search for a file in the given path, returns the first match
+function TryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;
+
+///<summary>
+/// removes leading '..\', converts ':', '\' and '/' to @ </summary>
+function MangleFilename(const _fn: string): string;
+
+///<summary>
+/// @returns True, if Fn1 is newer than FN2
+/// @raises exeptions if either of the files does not exist </summary>
+function FileIsNewerThan(const _Fn1, _Fn2: string): Boolean;
 
 //
 // Binary module utility functions.
@@ -721,8 +751,28 @@ function IsoStringToDateTimeDef(const DateTime: string; Default: TDateTime): TDa
 function GetFirstCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 function GetLastCharPos(const AText: String; AChars: TSysCharSet; SearchThis: Boolean): Integer;
 
+{$IFNDEF GX_VER160_up}
+// Delphi 6/7: IDE is non-unicode, string is ansistring
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: IDEEditBufferString): string;
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+{$ELSE GX_VER160_up}
+// Delphi 8+
+{$IFNDEF GX_VER200_up}
+// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: IDEEditBufferString): string;
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+{$ELSE GX_VER200_up}
+// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
+function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
+function IDEEditorStringToString(const S: string): string; overload;
+function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
+{$ENDIF GX_VER200_up}
+{$ENDIF GX_VER160_up}
+
 type
-  TFileFindThread = class(TThread)
+  TFileFindThread = class(TNamedThread)
   private
     FFileMasks: TStringList;
     FResults: TStringList;
@@ -758,33 +808,17 @@ type
 
 implementation
 
-{$IFDEF GX_VER160_up}
-  {$DEFINE HAS_SHLWAPI}
-{$ELSE}
-  {$UNDEF HAS_SHLWAPI}
-{$ENDIF}
-
 uses
   Windows, Messages,
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  {$IFDEF GX_DEBUGLOG} GX_Debug, {$ENDIF}
+  GX_Debug,
   {$IFDEF UNICODE} Character, {$ENDIF}
-  {$IFDEF HAS_SHLWAPI} ShLwApi, {$ENDIF}
+  ShLwApi,
   ShellAPI, ShlObj, ActiveX, StrUtils, Math,
   GX_dzSelectDirectoryFix;
 
 const
   shlwapi32 = 'shlwapi.dll';
-
-{$IFNDEF HAS_SHLWAPI}
-// Manually import ShLwApi routines in Delphi 7 and earlier (supported in W2K or later)
-function PathCombine(szDest: PChar; lpszDir, lpszFile: PChar): PChar; stdcall;
-  external shlwapi32 name 'PathCombineA';
-
-function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
-  pszTo: PChar; dwAttrTo: DWORD): BOOL; stdcall;
-  external shlwapi32 name 'PathRelativePathToA';
-{$ENDIF}
 
 function StrCmpLogicalW(psz1, psz2: PWideChar): Integer; stdcall;
   external shlwapi32 name 'StrCmpLogicalW';
@@ -1082,7 +1116,7 @@ var
 begin
   if StartIndex > 1 then
   begin
-    S := Copy(Text, StartIndex, MaxInt);
+    S := Copy(Text, StartIndex);
     Result := CaseInsensitivePos(Pat, S);
   end else
     Result := CaseInsensitivePos(Pat, Text);
@@ -1096,7 +1130,7 @@ var
 begin
   if StartIndex > 1 then
   begin
-    S := Copy(Text, StartIndex, MaxInt);
+    S := Copy(Text, StartIndex);
     Result := Pos(Pat, S);
   end else
     Result := Pos(Pat, Text);
@@ -1165,13 +1199,15 @@ function GetQuotedToken(const Str: string): string;
       Result := Copy(Token, 1, EndQuotePos - 1);
   end;
 
+const
+  SingleQuote = #39;
 var
   StartChar: string;
 begin
   Result := Trim(Str);
   StartChar := LeftStr(Trim(Result), 1);
-  if StartChar = '''' then
-    Result := QuotedToken(Result, '''')
+  if StartChar = SingleQuote then
+    Result := QuotedToken(Result, SingleQuote)
   else if StartChar = '"' then
     Result := QuotedToken(Result, '"');
   Result := Trim(Result);
@@ -1251,7 +1287,7 @@ end;
 
 function IsCharSymbol(C: AnsiChar): Boolean;
 begin
-  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
+  Result := CharInSet(C, ['#', '$', '&', #39, '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^']);
 end;
 
 function IsCharIdentifierStart(C: AnsiChar): Boolean; overload;
@@ -1354,6 +1390,10 @@ end;
 {$ENDIF not UNICODE}
 
 function IsCharWhiteSpace(C: Char): Boolean;
+const
+  HorizontalTab = #9;
+  VerticalTab = #11;
+  FormFeed = #12;
 begin
   {$IFDEF UNICODE}
     {$IFDEF GX_VER250_up} // XE4+
@@ -1362,7 +1402,7 @@ begin
     Result := TCharacter.IsWhiteSpace(C);
     {$ENDIF}
   {$ELSE not UNICODE}
-  Result := C in [#9, #10, #11, #12, #13, #32];
+  Result := C in [HorizontalTab, LF, VerticalTab, FormFeed, CR, #32];
   {$ENDIF}
 end;
 
@@ -1378,12 +1418,12 @@ end;
 
 function IsCharLineEnding(C: Char): Boolean;
 begin
-  Result := CharInSet(C, [#10, #13]);
+  Result := CharInSet(C, [LF, CR]);
 end;
 
 function IsCharLineEndingOrNull(C: Char): Boolean;
 begin
-  Result := CharInSet(C, [#0, #10, #13]);
+  Result := CharInSet(C, [#0, LF, CR]);
 end;
 
 function IsCharAlphaNumeric(C: Char): Boolean;
@@ -1431,7 +1471,7 @@ begin
     Result := TCharacter.IsSymbol(C) or TCharacter.IsPunctuation(C);
     {$ENDIF}
   {$ELSE not UNICODE}
-  Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '–', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
+  Result := C in ['#', '$', '&', #39, '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^'];
   {$ENDIF}
 end;
 
@@ -1538,6 +1578,29 @@ begin
   if CharCnt > 0 then
     Delete(Result, 1, CharCnt);  
 end;
+
+{$IFNDEF GX_VER170_up} // Delphi 9/2005 (BDS 2)
+function StartsText(const SubStr, Str: string): Boolean;
+begin
+  Result := CaseInsensitivePos(SubStr, Str) = 1;
+end;
+
+function StartsStr(const SubStr, Str: string): Boolean;
+begin
+  Result := Pos(SubStr, Str) = 1;
+end;
+
+function Copy(const _Value: string; _Start, _Len: Integer): string;
+begin
+  Result := System.Copy(_Value, _Start, _Len);
+end;
+
+function Copy(const _Value: string; _Start: Integer): string;
+begin
+  Result := System.Copy(_Value, _Start, MaxInt);
+end;
+
+{$ENDIF}
 
 function StrBeginsWith(const SubStr, Str: string; CaseSensitive: Boolean): Boolean;
 begin
@@ -3856,7 +3919,7 @@ begin
   else
   begin
     NameWild := Copy(FileWildcard, 1, DotPos - 1);
-    ExtWild := Copy(FileWildcard, DotPos + 1, MaxInt);
+    ExtWild := Copy(FileWildcard, DotPos + 1);
   end;
   // We could probably modify this to use ExtractFileExt, etc.
   DotPos := LastCharPos(FileName, '.');
@@ -3864,7 +3927,7 @@ begin
     DotPos := Length(FileName) + 1;
 
   NameFile := Copy(FileName, 1, DotPos - 1);
-  ExtFile := Copy(FileName, DotPos + 1, MaxInt);
+  ExtFile := Copy(FileName, DotPos + 1);
   // Case insensitive check
   if IgnoreCase then
   begin
@@ -3976,8 +4039,81 @@ begin
     raise EGXFileNotFound.CreateFmt('The file %s does not exist.', [FileName]);
   if IsForm(FileName) then
     LoadFormFileToStrings(FileName, Data, WasBinary)
-  else // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
+  else begin
+    // This handles ANSI, UTF-8, and UTF-16BE/LE (but not UTF-7 or UTF-32)
     Data.LoadFromFile(FileName);
+    if Data.Count = 0 then begin
+      // TStringList and TUnicodeStringList.LoadFromFile has issues with some UnicodeCharacters
+      if GetFileSize(FileName) > 0 then begin
+        raise Exception.CreateFmt('%s.LoadFromFile failed to read %s.', [Data.ClassParent.ClassName, FileName]);
+      end;
+    end;
+  end;
+end;
+
+function TryFindPathToFile(const FileName: string; out FullFilename: string; Paths: TStrings): Boolean;
+
+  function MakeFilename(const Path, FileName: string): string;
+  begin
+    if Path = '' then
+      Result := FileName
+    else if Path[Length(Path)] = PathDelim then
+      Result := Path + FileName
+    else
+      Result := Path + PathDelim + FileName;
+  end;
+
+var
+  i: Integer;
+  NewFileName: string;
+begin
+  Assert(Assigned(Paths));
+
+  if IsPathAbsolute(FileName) then begin
+    FullFilename := FileName;
+    Result := FileExists(FileName);
+    Exit; //==>
+  end;
+
+  for i := 0 to Paths.Count - 1 do
+  begin
+    NewFileName := MakeFilename(Paths[i], FileName);
+    if FileExists(NewFileName) then
+    begin
+      Result := True;
+      FullFilename := NewFileName;
+      Exit; //==>
+    end;
+  end;
+
+  Result := False;
+end;
+
+function MangleFilename(const _fn: string): string;
+var
+  i: Integer;
+begin
+  Result := _fn;
+  UniqueString(Result);
+  while StartsStr('..\', Result) do
+    Result := Copy(Result, 4);
+  for i := 1 to Length(Result) - 1 do begin
+    case Result[i] of
+      ':': Result[i] := '@';
+      '\': Result[i] := '@';
+      '/': Result[i] := '@';
+    end;
+  end;
+end;
+
+function FileIsNewerThan(const _Fn1, _Fn2: string): Boolean;
+var
+  Age1: TDateTime;
+  Age2: TDateTime;
+begin
+  Age1:=  GetFileDate(_Fn1);
+  Age2 := GetFileDate(_Fn2);
+  Result := (Age1 > Age2);
 end;
 
 function ThisDllName: string;
@@ -4159,6 +4295,8 @@ var
   LineIdx: Integer;
   Offset: Integer;
   LineLen: Integer;
+  LeftLinePart: string;
+  ColumnError: Integer;
 begin
   Assert(CharPos > 0);
 
@@ -4172,7 +4310,10 @@ begin
       if Offset + LineLen > CharPos then begin
         Result.Y := LineIdx + 1;
         Result.X := CharPos - Offset;
-        Exit;
+        LeftLinePart := Copy(sl[LineIdx], 1, Result.X - 1);
+        ColumnError := Length(ConvertToIDEEditorString(LeftLinePart)) - Length(LeftLinePart);
+        Result.X := Result.X + ColumnError;
+        Exit; //==>
       end else begin
         Inc(LineIdx);
         Offset := Offset + LineLen;
@@ -4460,6 +4601,72 @@ begin
   Result := 0;
 end;
 
+{$IFNDEF GX_VER160_up}
+// Delphi 6/7: IDE is non-unicode, string is ansistring
+
+// no conversion necessary
+function ConvertToIDEEditorString(const S: string): string;
+begin
+  Result := S;
+end;
+
+// no conversion necessary
+function IDEEditorStringToString(const S: string): string;
+begin
+  Result := S;
+end;
+
+// converting AnsiString to WideString is done automatically on assignment
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
+{$ELSE GX_VER160_up}
+// Delphi 8+
+{$IFNDEF GX_VER200_up}
+// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
+
+function ConvertToIDEEditorString(const S: string): UTF8String;
+begin
+  Result := AnsiToUtf8(S);
+end;
+
+function IDEEditorStringToString(const S: UTF8String): string;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := UTF8Decode(S);
+end;
+
+{$ELSE GX_VER200_up}
+// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
+
+function ConvertToIDEEditorString(const S: string): UTF8String;
+begin
+  Result := UTF8Encode(s);
+end;
+
+function IDEEditorStringToString(const S: string): string;
+begin
+  Result := S;
+end;
+
+function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+
+function UTF8ToUnicodeString(S: UTF8String): WideString;
+begin
+  Result := Utf8ToAnsi(S);
+end;
+{$ENDIF GX_VER200_up}
+{$ENDIF GX_VER160_up}
+
 { TFileFindThread }
 
 procedure TFileFindThread.AddDelphiDirsToIgnore;
@@ -4504,19 +4711,21 @@ end;
 
 destructor TFileFindThread.Destroy;
 begin
+  inherited;
   FreeAndNil(FDirsToIgnore);
   FreeAndNil(FFileMasks);
   FreeAndNil(FResults);
   FreeAndNil(FResultsLock);
   FreeAndNil(FSearchDirs);
   FreeAndNil(FRecursiveSearchDirs);
-  inherited;
 end;
 
 procedure TFileFindThread.Execute;
 var
   i: Integer;
 begin
+  inherited;
+
   FComplete := False;
   try
     LockResults;

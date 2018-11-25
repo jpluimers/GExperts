@@ -1,4 +1,4 @@
-GExperts 1.38
+GExperts 1.3.10
 Open Source Programming Tools for Delphi and C++Builder
 
 Source code, the FAQ, and the latest news are available at:
@@ -28,7 +28,7 @@ GExperts contains numerous experts.  See the online help
 
 KNOWN LIMITATIONS/BUGS
 -----------------------------------------------
-- The following features are not supported under Delphi 8 - RAD Studio 10:
+- The following features are not supported under Delphi 8 - RAD Studio 10.2:
   Inner classes, class helpers, anonymous methods, and generics in the
   Class Browser, and some of the old editor tab enhancements, such as
   multiline editor tabs.  Note that the IDE converts some high ANSI and MBCS
@@ -74,6 +74,7 @@ Expert Manager tool in the GExperts start menu group.  If you prefer, you
 can also manually register the DLL with the IDE using the Windows registry
 editor (RegEdit.exe).  Create a key similar to the following (the
 version number appearing before "\Experts\" is IDE dependent):
+HKEY_CURRENT_USER\Software\Embarcadero\BDS\19.0\Experts\ (RAD Studio 10.2)
 HKEY_CURRENT_USER\Software\Embarcadero\BDS\18.0\Experts\ (RAD Studio 10.1)
 HKEY_CURRENT_USER\Software\Embarcadero\BDS\17.0\Experts\ (RAD Studio 10)
 HKEY_CURRENT_USER\Software\Embarcadero\BDS\16.0\Experts\ (RAD Studio XE8)
@@ -82,6 +83,7 @@ HKEY_CURRENT_USER\Software\Embarcadero\BDS\9.0\Experts\  (RAD Studio XE2)
 HKEY_CURRENT_USER\Software\CodeGear\BDS\6.0\Experts\     (RAD Studio 2009)
 HKEY_CURRENT_USER\Software\Borland\BDS\5.0\Experts\      (RAD Studio 2007)
 HKEY_CURRENT_USER\Software\Borland\Delphi\7.0\Experts\   (Delphi 7)
+HKEY_CURRENT_USER\Software\Borland\Delphi\6.0\Experts\   (Delphi 6)
 
 Then add a new string value that points to your GExperts DLL (X is the IDE
 version such as 6, 7, 8, 2005, 2006, 2007, 2009, 2010, XE1, XE8, 10, etc.):

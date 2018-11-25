@@ -2743,7 +2743,7 @@ begin
     raise Exception.Create('TGpStructuredStorage: Result is not assigned');
 end; { TGpStructuredStorage.DescendTree }
 
-{:Flushes cached data to the data file and destroyes the structure storate
+{:Flushes cached data to the data file and destroyes the structure storage
   object.
   @since   2003-11-10
 }

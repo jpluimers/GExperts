@@ -56,7 +56,7 @@ type
     btnOptions: TToolButton;
     actViewOptions: TAction;
     mitViewOptions: TMenuItem;
-    actRehookClipboard: TAction;
+    actFileRehookClipboard: TAction;
     mitFileRehookClipboard: TMenuItem;
     tbnDelete: TToolButton;
     actDelete: TAction;
@@ -88,6 +88,28 @@ type
     mitListSep1: TMenuItem;
     mitListCopyfromPascalstring: TMenuItem;
     mitReplaceasPascalstring: TMenuItem;
+    actHamburgerMenu: TAction;
+    tbnHamburgerMenu: TToolButton;
+    pmHamburgerMenu: TPopupMenu;
+    File1: TMenuItem;
+    Edit1: TMenuItem;
+    View1: TMenuItem;
+    Help1: TMenuItem;
+    RehookClipboard1: TMenuItem;
+    Clear1: TMenuItem;
+    Delete1: TMenuItem;
+    N1: TMenuItem;
+    Copy1: TMenuItem;
+    CopyfromPascalString1: TMenuItem;
+    PasteasPascalString1: TMenuItem;
+    N2: TMenuItem;
+    PasteasPascalString2: TMenuItem;
+    ReplaceasPascalString1: TMenuItem;
+    ShowToolbar1: TMenuItem;
+    ShowPasteAsOptions2: TMenuItem;
+    Options1: TMenuItem;
+    Help2: TMenuItem;
+    Contents1: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure SplitterMoved(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -105,11 +127,13 @@ type
     procedure actViewToolBarExecute(Sender: TObject);
     procedure actViewOptionsExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure actRehookClipboardExecute(Sender: TObject);
+    procedure actFileRehookClipboardExecute(Sender: TObject);
     procedure actDeleteExecute(Sender: TObject);
     procedure actEditPasteAsPascalStringExecute(Sender: TObject);
     procedure actViewPasteAsOptionsExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure lvClipResize(Sender: TObject);
+    procedure actHamburgerMenuExecute(Sender: TObject);
   private
     FHelperWindow: TWinControl;
     IgnoreClip: Boolean;
@@ -175,6 +199,8 @@ uses
 
 const
   ClipStorageFileName = 'ClipboardHistory.xml';
+  MAX_CLIP_MIN = 20;
+  MAX_CLIP_MAX = 1000;
 
 type
   THelperWinControl = class(TWinControl)
@@ -392,6 +418,7 @@ begin
         ClipItem.Data := Info;
       end;
     finally
+      TListView_Resize(lvClip);
       lvClip.Items.EndUpdate;
       FLoading := False;
     end;
@@ -447,6 +474,13 @@ resourcestring
   SLoadingFailed = 'Loading of stored clipboard clips failed.' + sLineBreak;
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
+  if IsStandAlone then begin
+    actHamburgerMenu.Visible := False;
+    Menu := MainMenu;
+  end;
 
   SetToolbarGradient(ToolBar);
   {$IFOPT D+} SendDebug('Creating clipboard history data list'); {$ENDIF}
@@ -586,6 +620,8 @@ begin
 
           lvClip.Selected := lvClip.Items[0];
           lvClip.ItemFocused := lvClip.Selected;
+
+          TListView_Resize(lvClip);
         finally
           IgnoreClip := False;
         end;
@@ -627,6 +663,15 @@ begin
   GxContextHelpContents(Self);
 end;
 
+procedure TfmClipboardHistory.actHamburgerMenuExecute(Sender: TObject);
+var
+  Pnt: TPoint;
+begin
+  inherited;
+  Pnt := tbnHamburgerMenu.ClientToScreen(Point(0, tbnHamburgerMenu.Height));
+  pmHamburgerMenu.Popup(Pnt.X, Pnt.Y);
+end;
+
 procedure TfmClipboardHistory.actHelpAboutExecute(Sender: TObject);
 begin
   ShowGXAboutForm;
@@ -638,6 +683,11 @@ begin
 
   if Key = #13 then
     actEditCopy.Execute;
+end;
+
+procedure TfmClipboardHistory.lvClipResize(Sender: TObject);
+begin
+  TListView_Resize(lvClip);
 end;
 
 procedure TfmClipboardHistory.actEditPasteToIdeExecute(Sender: TObject);
@@ -652,6 +702,7 @@ procedure TfmClipboardHistory.ActionsUpdate(Action: TBasicAction; var Handled: B
 begin
   actEditCopy.Enabled := (mmoClipText.SelLength > 0) or HaveSelectedItem;
   actEditPasteToIde.Enabled := actEditCopy.Enabled;
+  actEditPasteAsPascalString.Enabled := actEditCopy.Enabled;
   actDelete.Enabled := HaveSelectedItem;
   actViewToolBar.Checked := ToolBar.Visible;
   actViewPasteAsOptions.Checked := pnlPasteAsOptions.Visible;
@@ -691,7 +742,7 @@ begin
   {$IFOPT D+} SendDebug('Clipboard history helper window created'); {$ENDIF}
 end;
 
-procedure TfmClipboardHistory.actRehookClipboardExecute(Sender: TObject);
+procedure TfmClipboardHistory.actFileRehookClipboardExecute(Sender: TObject);
 begin
   IgnoreClip := True;
   try
@@ -876,7 +927,7 @@ begin
   inherited Create;
   FStoragePath := ConfigInfo.ConfigPath;
 
-  FMaxClip := 20;
+  FMaxClip := MAX_CLIP_MIN;
 
   FreeAndNil(ClipExpert);
   ClipExpert := Self;
@@ -912,13 +963,14 @@ begin
   end;
   IdeDockManager.ShowForm(fmClipboardHistory);
   fmClipboardHistory.lvClip.SetFocus;
+  IncCallCount;
 end;
 
 procedure TClipExpert.InternalLoadSettings(Settings: TExpertSettings);
 begin
   inherited InternalLoadSettings(Settings);
   // Do not localize.
-  FMaxClip := Min(Settings.ReadInteger('Maximum', 20), 100);
+  FMaxClip := Min(Settings.ReadInteger('Maximum', MAX_CLIP_MIN), MAX_CLIP_MAX);
   FAutoStart := Settings.ReadBool('AutoStart', False);
   FAutoClose := Settings.ReadBool('AutoClose', False);
 
@@ -953,7 +1005,7 @@ begin
     begin
       FAutoStart := Dlg.chkAutoStart.Checked;
       FAutoClose := Dlg.chkAutoClose.Checked;
-      FMaxClip := Min(StrToIntDef(Dlg.edtMaxClip.Text, 20), 1000);
+      FMaxClip := Min(StrToIntDef(Dlg.edtMaxClip.Text, MAX_CLIP_MIN), MAX_CLIP_MAX);
       SaveSettings;
     end;
   finally

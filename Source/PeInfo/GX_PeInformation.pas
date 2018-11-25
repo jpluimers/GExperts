@@ -256,14 +256,6 @@ begin
   end;
 end;
 
-{$IFNDEF GX_VER170_up}
-
-function StartsText(const ASubText, AText: string): Boolean;
-begin
-  Result := AnsiStartsText(ASubText, AText);
-end;
-{$ENDIF}
-
 procedure TfmPeInformation.SetPackageInfo(const AFilename: string);
 var
   sl: TStringList;
@@ -930,6 +922,8 @@ begin
     fmPeInformation := TfmPeInformation.Create(nil);
   IdeDockManager.ShowForm(fmPeInformation);
   EnsureFormVisible(fmPeInformation);
+
+  IncCallCount;
 end;
 
 function TPEExpert.HasConfigOptions: Boolean;

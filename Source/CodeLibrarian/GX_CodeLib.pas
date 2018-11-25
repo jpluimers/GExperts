@@ -547,7 +547,7 @@ procedure TfmCodeLib.DeleteExecute(Sender: TObject);
 resourcestring
   SSnippet = 'snippet';
   SFolder = 'folder';
-  SConfirmDelete = 'Delete this %s?';
+  SConfirmDelete = 'Delete %s "%s"?';
 var
   NodeType: TGXUnicodeString;
 begin
@@ -557,7 +557,7 @@ begin
     NodeType := SFolder
   else
     NodeType := SSnippet;
-  if MessageDlg(Format(SConfirmDelete, [NodeType]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  if MessageDlg(Format(SConfirmDelete, [NodeType, tvTopics.Selected.Text]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
     CodeDB.Delete(SelectedNodeFullName);
     tvTopics.Selected.Delete;
@@ -1025,8 +1025,13 @@ begin
 end;
 
 procedure TfmCodeLib.FormShow(Sender: TObject);
+var
+  Node: TTreeNode;
 begin
   CodeDB.OpenStorage(StoragePath + DefaultFileName);
+  Node := tvTopics.Selected;
+  if (Node <> nil) and (IsCodeSnippet(Node)) then
+    CodeDB.OpenFile(GetNodePath(Node));
 end;
 
 procedure TfmCodeLib.SortNodes;
@@ -1101,6 +1106,8 @@ end;
 constructor TfmCodeLib.Create(AOwner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
   SetNonModalFormPopupMode(Self);
   SetToolbarGradient(ToolBar);
   SetupSyntaxHighlightingControl;
@@ -1363,6 +1370,7 @@ begin
     FCodeLibForm.WindowState := wsNormal;
   {$IFOPT D+}SendDebug('Showing CodeLib form');{$ENDIF}
   FCodeLibForm.Show;
+  IncCallCount;
 end;
 
 function TCodeLibExpert.HasConfigOptions: Boolean;
@@ -1442,6 +1450,7 @@ end;
 
 procedure TGXStorageFile.CloseStorage;
 begin
+  CloseFile;
   FStorage := nil;
 end;
 

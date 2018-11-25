@@ -46,7 +46,8 @@ uses
 
 procedure TGxCodeFormatterExpert.Execute(Sender: TObject);
 begin
-  FExpert.Execute;
+  if FExpert.Execute then
+    IncCallCount;
 end;
 
 procedure TGxCodeFormatterExpert.Configure;

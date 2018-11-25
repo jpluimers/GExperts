@@ -15,14 +15,7 @@ interface
 {$I GX_CondDefine.inc}
 
 uses
-  Graphics, Forms, Menus, ComCtrls, Controls, Classes;
-
-type
-  {$IFDEF GX_VER160_up}
-  IDEEditBufferString = UTF8String;
-  {$ELSE}
-  IDEEditBufferString = AnsiString;
-  {$ENDIF}
+  Graphics, Forms, Menus, ComCtrls, Controls, Classes, StdCtrls;
 
 const
   EditorFormClassName = 'TEditWindow';
@@ -56,6 +49,22 @@ function IsReplaceConfirmDialogOnScreen: Boolean;
 // Return the IDE's root directory (the installation directory).
 // Returns an empty string if the information could not be retrieved.
 function GetIdeRootDirectory: string;
+
+///<summary>
+/// Reads the current Desktop from the registry </summary>
+function GetIdeDesktopName: string;
+
+///<summary>
+/// Sets the IDE desktop by changing it in the Destkop toolbar </summary>
+procedure SetIdeDesktop(const _Desktop: string);
+
+///<summary>
+/// Returns a reference to the IDE desktop selection combobox's Items.
+/// Use with care!!!! </summary>
+function TryGetIdeDesktops(out _Items: TStrings): Boolean;
+
+function TryGetDesktopCombo(out _cmb: TCombobox): Boolean;
+
 
 // Return the IDE's version identifier, such as ENT, CSS, PRO, STD,
 // or the empty string if unknown
@@ -99,8 +108,8 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Windows, Registry,
-  GX_GenericUtils, GX_GxUtils, GX_OtaUtils, StrUtils;
+  SysUtils, Windows, Registry, StrUtils,
+  GX_GenericUtils, GX_OtaUtils, GX_GxUtils;
 
 function GetIdeMainForm: TCustomForm;
 begin
@@ -190,7 +199,7 @@ end;
 function IsIdeEditorForm(AForm: TCustomForm): Boolean;
 begin
   Result := (AForm <> nil) and
-            (StrBeginsWith('EditWindow_', AForm.Name)) and
+            (StartsStr('EditWindow_', AForm.Name)) and
             (AForm.ClassName = EditorFormClassName) and
             (not (csDesigning in AForm.ComponentState));
 end;
@@ -265,6 +274,66 @@ begin
       end;
     end;
   end;
+end;
+
+function GetIdeDesktopName: string;
+var
+  reg: TRegistry;
+begin
+  Result := '';
+
+  try
+    Reg := TRegistry.Create;
+    try
+      Reg.RootKey := HKEY_CURRENT_USER;
+      if Reg.OpenKeyReadOnly(GxOtaGetIdeBaseRegistryKey+'\Session') then
+      begin
+        Result := Reg.ReadString('DesktopName');
+        Reg.CloseKey;
+      end;
+    finally
+      Reg.Free;
+    end;
+  except
+    on E: Exception do
+      GxLogException(E, 'Error in GetIdeDesktopName');
+  end;
+end;
+
+type
+  TComboBoxHack = class(TComboBox)
+  end;
+
+function TryGetDesktopCombo(out _cmb: TCombobox): Boolean;
+var
+  AppBuilder: TForm;
+begin
+  Result := False;
+  AppBuilder := TForm(Application.FindComponent('AppBuilder'));
+  if not Assigned(AppBuilder) then
+    Exit;
+  _cmb := TComboBox(AppBuilder.FindComponent('cbDesktop'));
+  Result := Assigned(_cmb);
+end;
+
+procedure SetIdeDesktop(const _Desktop: string);
+var
+  cbDesktop: TComboBox;
+begin
+  if not TryGetDesktopCombo(cbDesktop) then
+    Exit; //==>
+
+  cbDesktop.Text := _Desktop;
+  TComboBoxHack(cbDesktop).Click;
+end;
+
+function TryGetIdeDesktops(out _Items: TStrings): Boolean;
+var
+  cbDesktop: TComboBox;
+begin
+  Result := TryGetDesktopCombo(cbDesktop);
+  if Result then
+    _Items := cbDesktop.Items;
 end;
 
 function GetIdeRootDirectory: string;

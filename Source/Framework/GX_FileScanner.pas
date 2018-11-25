@@ -11,7 +11,7 @@ unit GX_FileScanner;
 interface
 
 uses
-  Classes, mPasLex, mwBCBTokenList;
+  Classes, mPasLex, mwBCBTokenList, mwPasParserTypes;
 
 type
   TSourceLanguage = (ltPas, ltCpp);
@@ -121,7 +121,7 @@ type
 
 implementation
 
-uses SysUtils, Contnrs, GX_GenericUtils, Math, GX_IdeUtils, GX_OtaUtils;
+uses SysUtils, StrUtils, Contnrs, GX_GenericUtils, Math, GX_IdeUtils, GX_OtaUtils;
 
 resourcestring
   SUnknown = 'Unknown';
@@ -161,7 +161,7 @@ var
   NestedClasses: string;
 begin
   Line := Trim(ProcLine);
-  if StrBeginsWith('class ', Line, False) then
+  if StartsText('class ', Line) then
     Line := Trim(Copy(Line, Length('class '), Length(Line)));
 
   ParamStart := Pos('(', Line);
@@ -509,7 +509,7 @@ begin
 
           while not ((FCParser.RunID in [ctkSemiColon, ctkbraceclose,
             ctkbraceopen, ctkbracepair]) or
-              (FCParser.RunID in IdentDirect) or
+              (FCParser.RunID in IdentDirectC) or
             (FCParser.RunIndex = 0)) do
           begin
             FCParser.PreviousNonJunk;
@@ -651,7 +651,7 @@ begin
             // or a destructor (depending on the presence of a ~ in the name
             if (Trim(ProcReturnType) = '') or (Trim(ProcReturnType) = 'virtual') then
             begin
-              if StrBeginsWith('~', ProcName) then
+              if StartsStr('~', ProcName) then
                 ProcedureType := 'Destructor'
               else
                 ProcedureType := 'Constructor';
@@ -688,7 +688,7 @@ begin
 
             if ProcedureType = 'Procedure' then
             begin
-              if StrBeginsWith('static ', Trim(ProcReturnType)) and
+              if StartsStr('static ', Trim(ProcReturnType)) and
                 (Length(ProcClass) > 0) then
               begin
                 if StrContains('void', ProcReturnType) then

@@ -59,7 +59,7 @@ var
 begin
   Module := GxOtaGetCurrentModule;
   if not Assigned(Module) then
-	  Exit;
+    Exit;
   CurEditor := GxOtaGetCurrentEditor;
   if Supports(CurEditor, IOTAFormEditor, FrmEditor) then
     FindSelectedComponentInSource(Module, FrmEditor)

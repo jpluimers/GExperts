@@ -424,7 +424,13 @@ begin
   ScreenHeight := ScreenRect.Bottom - ScreenRect.Top - 75;
   if RunningDelphi7OrGreater then
   begin
+//    GetMainMenuTop;
     MaxMenuItems := ScreenHeight div GetMainMenuItemHeight;
+    if PlaceGxMainMenuInToolsMenu then begin
+      // we don't known at wich position in the tools menu our entry will
+      // end up, so we assume it to be at position 5
+      Dec(MaxMenuItems, 5);
+    end;
     { TODO -oanybody -cbug : if the IDE window is not at the top of the screen,
       there is less space for the menu than the screen height. Depending on how
       far down it is, the menu will be drawn upwards, so at least half screen

@@ -542,7 +542,8 @@ begin
     raise Exception.Create(NoSupportError);
   with TfmReplaceComp.Create(nil) do
   try
-    ShowModal;
+    if ShowModal = mrOk then
+      IncCallCount;
   finally
     Free;
   end;

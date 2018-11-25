@@ -921,7 +921,7 @@ var
 {$ENDIF OWN_UnicodeString_MEMMGR}
 begin
   if NewCapacity < Count then
-    EListError.Create( SInvalidCapacity );
+    raise EListError.Create( SInvalidCapacity );
   ReallocMem(fList, NewCapacity * SynEditStringRecSize);
   {$IFDEF OWN_UnicodeString_MEMMGR}
   for I := fCount to NewCapacity - 1 do

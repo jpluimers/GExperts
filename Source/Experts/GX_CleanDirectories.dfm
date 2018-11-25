@@ -7,8 +7,6 @@ object fmCleanDirectories: TfmCleanDirectories
   ClientHeight = 512
   ClientWidth = 553
   Color = clBtnFace
-  Constraints.MinHeight = 425
-  Constraints.MinWidth = 450
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12

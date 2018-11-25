@@ -6,7 +6,7 @@ interface
 
 uses
   Registry,
-  Graphics, Classes, TypInfo, Forms, ComCtrls, Types;
+  Graphics, Classes, TypInfo, Forms, ComCtrls, Types, IniFiles;
 
 type
   IConfigInfo = interface(IUnknown) //FI:W523 - we don't need a GUID
@@ -22,11 +22,8 @@ type
     procedure SetMoveComponentMenu(const Value: Boolean);
     function GetAlphabetizeMenu: Boolean;
     function GetConfigPath: string;
-    function GetGExpertsPath: string;
     function GetEditorExpertsEnabled: Boolean;
-    function GetGExpertsIdeRootRegistryKey: string;
     function GetHelpFileLocation: string;
-    function GetIdeRootRegistryKey: string;
     function GetVclPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
     function GetHideWindowMenu: Boolean;
@@ -34,17 +31,16 @@ type
     function GetEnableKeyboardShortcuts: Boolean;
     function GetEnableCustomFont: Boolean;
     procedure SetEnableCustomFont(const Value: Boolean);
-    function GetCustomFont: TFont;
     procedure UpdateScreenForms;
 
     // Return the IDE's base registry key without a
     // trailing backslash, e.g.
     //    SOFTWARE\Borland\Delphi\6.0
-    property IdeRootRegistryKey: string read GetIdeRootRegistryKey;
+    function IdeRootRegistryKey: string;
     // Return the GExperts base registry key within
     // the IDE without a trailing backslash, e.g.
     //    SOFTWARE\Borland\Delphi\6.0\GExperts
-    property GExpertsIdeRootRegistryKey: string read GetGExpertsIdeRootRegistryKey;
+    function GExpertsIdeRootRegistryKey: string;
     // Return the location of the GExperts help file.
     property HelpFile: string read GetHelpFileLocation write SetHelpFileLocation;
     // Return the location of the VCL source code.
@@ -64,10 +60,16 @@ type
     property PlaceGxMainMenuInToolsMenu: Boolean read GetPlaceGxMainMenuInToolsMenu write SetPlaceGxMainMenuInToolsMenu;
     property HideWindowMenu: Boolean read GetHideWindowMenu write SetHideWindowMenu;
     property MoveComponentMenu: Boolean read GetMoveComponentMenu write SetMoveComponentMenu;
-    property GExpertsPath: string read GetGExpertsPath;
+    function GExpertsPath: string;
     property EnableKeyboardShortcuts: Boolean read GetEnableKeyboardShortcuts;
     property EnableCustomFont: Boolean read GetEnableCustomFont write SetEnableCustomFont;
-    property CustomFont: TFont read GetCustomFont;
+    function CustomFont: TFont;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    function GetForceDesktopOnStartup: Boolean;
+    procedure SetForceDesktopOnStartup(const _Value: Boolean);
+    function GetForcedStartupDesktop: string;
+    procedure SetForcedStartupDesktop(const _Value: string);
+{$ENDIF}
   end;
 
   TGXFontFlag = (ffColor);
@@ -76,7 +78,36 @@ type
   TFormSaveFlag = (fsSize, fsPosition);
   TFormSaveFlags = set of TFormSaveFlag;
 
-  TGExpertsBaseSettings = class(TRegistryIniFile);
+  TGExpertsBaseSettings = class(TCustomIniFile)
+  private
+    FIniFile: TCustomIniFile;
+    FOwnsIniFile: Boolean;
+  public
+    constructor Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean = False);
+    destructor Destroy; override;
+    function ReadDate(const Section, Name: string; Default: TDateTime): TDateTime; override;
+    function ReadDateTime(const Section, Name: string; Default: TDateTime): TDateTime; override;
+    function ReadInteger(const Section, Ident: string; Default: Longint): Longint; override;
+    function ReadFloat(const Section, Name: string; Default: Double): Double; override;
+    function ReadString(const Section, Ident, Default: string): string; override;
+    function ReadTime(const Section, Name: string; Default: TDateTime): TDateTime; override;
+    function ReadBinaryStream(const Section, Name: string; Value: TStream): Integer; override;
+//    procedure ReadKeys(const Section: string; Sections: TStrings);
+    procedure WriteDate(const Section, Name: string; Value: TDateTime); override;
+    procedure WriteDateTime(const Section, Name: string; Value: TDateTime); override;
+    procedure WriteFloat(const Section, Name: string; Value: Double); override;
+    procedure WriteInteger(const Section, Ident: string; Value: Longint); override;
+    procedure WriteString(const Section, Ident, Value: String); override;
+    procedure WriteTime(const Section, Name: string; Value: TDateTime); override;
+    procedure WriteBinaryStream(const Section, Name: string; Value: TStream); override;
+    procedure ReadSection(const Section: string; Strings: TStrings); override;
+    procedure ReadSections(Strings: TStrings); overload; override;
+    procedure ReadSectionValues(const Section: string; Strings: TStrings); override;
+    procedure EraseSection(const Section: string); override;
+    procedure DeleteKey(const Section, Ident: String); override;
+    procedure UpdateFile; override;
+  end;
+
   TGExpertsSettings = class;
 
   ///<summary>
@@ -137,7 +168,8 @@ type
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
     procedure LoadForm(Form: TCustomForm; const Section: string = '';
       FormSaveFlags: TFormSaveFlags = [fsSize, fsPosition]);
-    constructor Create(const FileName: string = '');
+    constructor Create(const FileName: string = ''); overload;
+    constructor Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean = False); overload;
     function CreateExpertSettings(const Section: string): TExpertSettings;
   end;
 
@@ -189,6 +221,10 @@ type
     FCustomFont: TFont;
     FHideWindowMenu: Boolean;
     FMoveComponentMenu: Boolean;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    FForceDesktopOnStartup: Boolean;
+    FForcedStartupDesktop: string;
+{$ENDIF}
     procedure LoadSettings;
     function DefaultConfigPath: string;
   protected
@@ -206,11 +242,11 @@ type
     function GetAlphabetizeMenu: Boolean;
     function GetConfigPath: string;
     function GetEditorExpertsEnabled: Boolean;
-    function GetGExpertsIdeRootRegistryKey: string;
+    function GExpertsIdeRootRegistryKey: string;
     function GetHelpFileLocation: string;
-    function GetIdeRootRegistryKey: string;
+    function IdeRootRegistryKey: string;
     function GetVclPath: string;
-    function GetGExpertsPath: string;
+    function GExpertsPath: string;
     function GetPlaceGxMainMenuInToolsMenu: Boolean;
     function GetHideWindowMenu: Boolean;
     function GetMoveComponentMenu: Boolean;
@@ -218,8 +254,14 @@ type
     function GetEnableKeyboardShortcuts: Boolean;
     function GetEnableCustomFont: Boolean;
     procedure SetEnableCustomFont(const Value: Boolean);
-    function GetCustomFont: TFont;
+    function CustomFont: TFont;
     procedure UpdateScreenForms;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    function GetForceDesktopOnStartup: Boolean;
+    procedure SetForceDesktopOnStartup(const _Value: Boolean);
+    function GetForcedStartupDesktop: string;
+    procedure SetForcedStartupDesktop(const _Value: string);
+{$ENDIF}
   public
     constructor Create;
     destructor Destroy; override;
@@ -494,6 +536,11 @@ begin
 
     Setting := Settings.ReadBool(ConfigurationKey, 'EditorEnhancementsEnabled', False);
     EditorEnhancements.Enabled := Setting and not IsStandAlone;
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    FForceDesktopOnStartup := Settings.ReadBool(ConfigurationKey, 'ForceDesktopOnStartup', False);
+    FForcedStartupDesktop := Settings.ReadString(ConfigurationKey, 'ForcedStartupDestkop', '');
+{$ENDIF}
   finally
     FreeAndNil(Settings);
   end;
@@ -520,6 +567,10 @@ begin
     Settings.WriteBool(ConfigurationKey, 'EditorEnhancementsEnabled', EditorEnhancements.Enabled);
     Settings.WriteBool(ConfigurationKey, 'EnableCustomFont', FEnableCustomFont);
     Settings.SaveFont(AddSlash(ConfigurationKey) + 'CustomFont', FCustomFont);
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    Settings.WriteBool(ConfigurationKey, 'ForceDesktopOnStartup', FForceDesktopOnStartup);
+    Settings.WriteString(ConfigurationKey, 'ForcedStartupDestkop', FForcedStartupDesktop);
+{$ENDIF}
   finally
     FreeAndNil(Settings);
   end;
@@ -530,7 +581,7 @@ begin
   FVclPath := AddSlash(Value);
 end;
 
-function TConfigInfo.GetGExpertsIdeRootRegistryKey: string;
+function TConfigInfo.GExpertsIdeRootRegistryKey: string;
 const
   SGExpertsString = 'GExperts-1.3';
 begin
@@ -566,7 +617,7 @@ begin
   Result := FHelpFileLocation;
 end;
 
-function TConfigInfo.GetIdeRootRegistryKey: string;
+function TConfigInfo.IdeRootRegistryKey: string;
 begin
   Result := FIdeRootRegistryKey;
 end;
@@ -625,7 +676,7 @@ begin
   FHideWindowMenu := Value;
 end;
 
-function TConfigInfo.GetGExpertsPath: string;
+function TConfigInfo.GExpertsPath: string;
 begin
   Result := ExtractFilePath(FGExpertsPath);
 end;
@@ -645,7 +696,19 @@ begin
   Result := FEnableKeyboardShortcuts;
 end;
 
-function TConfigInfo.GetCustomFont: TFont;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+function TConfigInfo.GetForceDesktopOnStartup: Boolean;
+begin
+  Result := FForceDesktopOnStartup;
+end;
+
+function TConfigInfo.GetForcedStartupDesktop: string;
+begin
+  Result := FForcedStartupDesktop;
+end;
+{$ENDIF}
+
+function TConfigInfo.CustomFont: TFont;
 begin
   Result := FCustomFont;
 end;
@@ -672,6 +735,19 @@ procedure TConfigInfo.SetEnableCustomFont(const Value: Boolean);
 begin
   FEnableCustomFont := Value;
 end;
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+
+procedure TConfigInfo.SetForceDesktopOnStartup(const _Value: Boolean);
+begin
+  FForceDesktopOnStartup := _Value;
+end;
+
+procedure TConfigInfo.SetForcedStartupDesktop(const _Value: string);
+begin
+  FForcedStartupDesktop := _Value;
+end;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
 
 { TShowBadDirectoryMessage }
 
@@ -716,9 +792,14 @@ const
 constructor TGExpertsSettings.Create(const FileName: string);
 begin
   if FileName = '' then
-    inherited Create(ConfigInfo.GExpertsIdeRootRegistryKey)
+    inherited Create(TRegistryIniFile.Create(ConfigInfo.GExpertsIdeRootRegistryKey), True)
   else
-    inherited Create(FileName);
+    inherited Create(TRegistryIniFile.Create(FileName), True);
+end;
+
+constructor TGExpertsSettings.Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean);
+begin
+  inherited Create(_IniFile, _OwnsIniFile);
 end;
 
 procedure TGExpertsSettings.SaveFont(const Section: string; const Font: TFont; Flags: TGXFontFlags);
@@ -814,27 +895,43 @@ end;
 procedure TGExpertsSettings.LoadForm(Form: TCustomForm; const Section: string; FormSaveFlags: TFormSaveFlags);
 var
   StorageSection: string;
+  PosChanged    : Boolean;
+  SizeChanged   : Boolean;
+  R             : TRect;
+  Rect: TRect;
 begin
   if Section = '' then
     StorageSection := Form.ClassName
   else
     StorageSection := Section;
 
-  if fsSize in FormSaveFlags then
+  R := Form.BoundsRect;
+  PosChanged := False;
+  SizeChanged := False;
+
+  if (fsPosition in FormSaveFlags) and ValueExists(StorageSection, 'Left') then
   begin
-    Form.Width := ReadInteger(StorageSection, 'Width', Form.Width);
-    Form.Height := ReadInteger(StorageSection, 'Height', Form.Height);
+    R.Left := ReadInteger(StorageSection, 'Left', Form.Left);
+    R.Top := ReadInteger(StorageSection, 'Top', Form.Top);
+    PosChanged := True;
   end;
-  if fsPosition in FormSaveFlags then
+
+  if (fsSize in FormSaveFlags) and ValueExists(StorageSection, 'Width') then
   begin
-    if ValueExists(StorageSection, 'Left') then begin
-      Form.Left := ReadInteger(StorageSection, 'Left', Form.Left);
-      Form.Top := ReadInteger(StorageSection, 'Top', Form.Top);
-    end else
-      CenterForm(Form)
-  end else begin
+    R.Right := R.Left + ReadInteger(StorageSection, 'Width', Form.Width);
+    R.Bottom := R.Top + ReadInteger(StorageSection, 'Height', Form.Height);
+    SizeChanged := True;
+  end;
+
+  if PosChanged then
+    Form.BoundsRect := r
+  else if SizeChanged then begin
+    // center with the given size
+    Rect := GetScreenWorkArea(Form);
+    Form.SetBounds(Rect.Left + (Rect.Right - Rect.Left - (R.Right - R.Left)) div 2,
+      Rect.Top + (Rect.Bottom - Rect.Top - (R.Bottom - R.Top)) div 2, R.Right - R.Left, R.Bottom - R.Top);
+  end else
     CenterForm(Form);
-  end;
 end;
 
 procedure TGExpertsSettings.SaveForm(Form: TCustomForm; const Section: string;
@@ -882,7 +979,7 @@ end;
 
 function TExpertSettings.CreateExpertSettings(const Section: string): TExpertSettings;
 begin
-  Result := TExpertSettings.Create(FGExpertsSettings, FSection + '\' + Section);
+  Result := FGExpertsSettings.CreateExpertSettings(FSection + '\' + Section);
 end;
 
 procedure TExpertSettings.DeleteKey(const Ident: String);
@@ -1053,6 +1150,122 @@ begin
   if ListName <> '' then
     s := AddSlash(s) + ListName;
   FGExpertsSettings.WriteStrings(List, s, Ident);
+end;
+
+{ TGExpertsBaseSettings }
+
+constructor TGExpertsBaseSettings.Create(_IniFile: TCustomIniFile; _OwnsIniFile: Boolean = False);
+begin
+  inherited Create(_IniFile.FileName);
+  FIniFile := _IniFile;
+  FOwnsIniFile:= _OwnsIniFile;
+end;
+
+destructor TGExpertsBaseSettings.Destroy;
+begin
+  if FOwnsIniFile then
+    FreeAndNil(FIniFile);
+  inherited;
+end;
+
+procedure TGExpertsBaseSettings.DeleteKey(const Section, Ident: String);
+begin
+  FIniFile.DeleteKey(Section, Ident);
+end;
+
+procedure TGExpertsBaseSettings.EraseSection(const Section: string);
+begin
+  FIniFile.EraseSection(Section);
+end;
+
+function TGExpertsBaseSettings.ReadBinaryStream(const Section, Name: string; Value: TStream): Integer;
+begin
+  Result := FIniFile.ReadBinaryStream(Section, Name, Value);
+end;
+
+function TGExpertsBaseSettings.ReadDate(const Section, Name: string; Default: TDateTime): TDateTime;
+begin
+  Result := FIniFile.ReadDate(Section, Name, Default);
+end;
+
+function TGExpertsBaseSettings.ReadDateTime(const Section, Name: string; Default: TDateTime): TDateTime;
+begin
+  Result := FIniFile.ReadDateTime(Section, Name, Default);
+end;
+
+function TGExpertsBaseSettings.ReadFloat(const Section, Name: string; Default: Double): Double;
+begin
+  Result := FIniFile.ReadFloat(section, Name, Default);
+end;
+
+function TGExpertsBaseSettings.ReadInteger(const Section, Ident: string; Default: Integer): Longint;
+begin
+  Result := FIniFile.ReadInteger(section, ident, Default);
+end;
+
+procedure TGExpertsBaseSettings.ReadSection(const Section: string; Strings: TStrings);
+begin
+  FIniFile.ReadSection(Section, Strings);
+end;
+
+procedure TGExpertsBaseSettings.ReadSections(Strings: TStrings);
+begin
+  FIniFile.ReadSections(Strings);
+end;
+
+procedure TGExpertsBaseSettings.ReadSectionValues(const Section: string; Strings: TStrings);
+begin
+  FIniFile.ReadSectionValues(Section, Strings);
+end;
+
+function TGExpertsBaseSettings.ReadString(const Section, Ident, Default: string): string;
+begin
+  Result := FIniFile.ReadString(Section, Ident, default);
+end;
+
+function TGExpertsBaseSettings.ReadTime(const Section, Name: string; Default: TDateTime): TDateTime;
+begin
+  Result := FIniFile.ReadTime(Section,Name, Default);
+end;
+
+procedure TGExpertsBaseSettings.UpdateFile;
+begin
+  FIniFile.UpdateFile;
+end;
+
+procedure TGExpertsBaseSettings.WriteBinaryStream(const Section, Name: string; Value: TStream);
+begin
+  FIniFile.WriteBinaryStream(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteDate(const Section, Name: string; Value: TDateTime);
+begin
+  FIniFile.WriteDate(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteDateTime(const Section, Name: string; Value: TDateTime);
+begin
+  FIniFile.WriteDateTime(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteFloat(const Section, Name: string; Value: Double);
+begin
+  FIniFile.WriteFloat(Section, Name, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteInteger(const Section, Ident: string; Value: Integer);
+begin
+  FIniFile.WriteInteger(Section, Ident, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteString(const Section, Ident, Value: String);
+begin
+  FIniFile.WriteString(Section, Ident, Value);
+end;
+
+procedure TGExpertsBaseSettings.WriteTime(const Section, Name: string; Value: TDateTime);
+begin
+  FIniFile.WriteTime(Section, Name, Value);
 end;
 
 initialization

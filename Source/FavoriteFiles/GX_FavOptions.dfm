@@ -3,8 +3,8 @@ object fmFavOptions: TfmFavOptions
   Top = 208
   BorderStyle = bsDialog
   Caption = 'Favorite Files Options'
-  ClientHeight = 151
-  ClientWidth = 289
+  ClientHeight = 194
+  ClientWidth = 425
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -20,9 +20,9 @@ object fmFavOptions: TfmFavOptions
   object gbxFavOptions: TGroupBox
     Left = 8
     Top = 8
-    Width = 273
+    Width = 409
     Height = 105
-    Caption = 'Favorite Files Options'
+    Caption = 'Favorite Files Dialog Options'
     TabOrder = 0
     object chkConfirmFolderDelete: TCheckBox
       Left = 10
@@ -58,23 +58,31 @@ object fmFavOptions: TfmFavOptions
     end
   end
   object btnOK: TButton
-    Left = 126
-    Top = 120
+    Left = 264
+    Top = 160
     Width = 74
     Height = 25
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 2
   end
   object btnCancel: TButton
-    Left = 206
-    Top = 120
+    Left = 344
+    Top = 160
     Width = 74
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 3
+  end
+  object chk_InsertFavMenu: TCheckBox
+    Left = 16
+    Top = 128
+    Width = 393
+    Height = 17
+    Caption = 'Insert a Favorites Entry in the File Menu'
+    TabOrder = 1
   end
 end

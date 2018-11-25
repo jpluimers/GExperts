@@ -8,13 +8,14 @@ interface
 
 uses
   Windows, Classes, Graphics, Controls, Forms, ActnList, Dialogs, StdCtrls, ExtCtrls, ToolWin,
-  ComCtrls, Menus, Actions,
-  DropSource, GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, GX_IdeDock, GX_GrepSearch;
+  ComCtrls, Menus, Actions, DropSource,
+  GX_GrepBackend, GX_GrepExpert, GX_ConfigurationInfo, GX_IdeDock, GX_GrepSearch, GX_SharedImages;
 
 type
   TPageIndexType = (pitClickedEntryKeyIndex, pitTopKeyIndex, pitClickedEntryItemIndex, pitTopItemIndex);
   TPageSavedIndexType = Low(TPageIndexType)..pitTopKeyIndex;
   TPageIndexes = array[TPageIndexType] of Integer;
+  TExpandMode = (emExpand, emContract, emToggle);
 
   TfmGrepResults = class(TfmIdeDockForm)
     StatusBar: TStatusBar;
@@ -73,7 +74,7 @@ type
     actViewShowContext: TAction;
     miViewShowMatchContext: TMenuItem;
     actFileSave: TAction;
-    actFileCopy: TAction;
+    actListCopy: TAction;
     mitFileSave: TMenuItem;
     mitFileCopy: TMenuItem;
     mitView: TMenuItem;
@@ -180,6 +181,58 @@ type
     miSettingsSepDir: TMenuItem;
     tbnSearchInHistory: TToolButton;
     tbnSep9: TToolButton;
+    actListSelectNext: TAction;
+    actListSelectPrevious: TAction;
+    mitListSelectNext: TMenuItem;
+    mitListSelectPrevious: TMenuItem;
+    tbnHamburgerMenu: TToolButton;
+    actHamburgerMenu: TAction;
+    pmHamburgerMenu: TPopupMenu;
+    miFile: TMenuItem;
+    List1: TMenuItem;
+    View1: TMenuItem;
+    Replace1: TMenuItem;
+    Help1: TMenuItem;
+    Search1: TMenuItem;
+    Refresh1: TMenuItem;
+    Abort1: TMenuItem;
+    N1: TMenuItem;
+    Print1: TMenuItem;
+    Open1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    Save1: TMenuItem;
+    PrinttoFile1: TMenuItem;
+    SavePrint1: TMenuItem;
+    N4: TMenuItem;
+    Refresh2: TMenuItem;
+    N5: TMenuItem;
+    Delete1: TMenuItem;
+    N6: TMenuItem;
+    ModifySaveOptions1: TMenuItem;
+    Search2: TMenuItem;
+    GotoSelected1: TMenuItem;
+    GotoSelectedandClose2: TMenuItem;
+    SelectNext1: TMenuItem;
+    SelectPrevious1: TMenuItem;
+    N7: TMenuItem;
+    Copy1: TMenuItem;
+    N8: TMenuItem;
+    Contract1: TMenuItem;
+    Expand1: TMenuItem;
+    Options1: TMenuItem;
+    N9: TMenuItem;
+    ShowMatchContext1: TMenuItem;
+    ShowHistoryList1: TMenuItem;
+    N10: TMenuItem;
+    ShowFullFilename1: TMenuItem;
+    ShowIndent1: TMenuItem;
+    StayonTop1: TMenuItem;
+    N11: TMenuItem;
+    ReplaceAllItems1: TMenuItem;
+    ReplaceSelectedItem1: TMenuItem;
+    Help2: TMenuItem;
+    Contents1: TMenuItem;
     procedure FormResize(Sender: TObject);
     procedure lbResultsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lbResultsKeyPress(Sender: TObject; var Key: Char);
@@ -191,7 +244,7 @@ type
     procedure actFileRefreshExecute(Sender: TObject);
     procedure actFileAbortExecute(Sender: TObject);
     procedure actFilePrintExecute(Sender: TObject);
-    procedure actFileCopyExecute(Sender: TObject);
+    procedure actListCopyExecute(Sender: TObject);
     procedure actFileSaveExecute(Sender: TObject);
     procedure actViewStayOnTopExecute(Sender: TObject);
     procedure actFileExitExecute(Sender: TObject);
@@ -237,6 +290,9 @@ type
     procedure actHistorySearchInHistoryExecute(Sender: TObject);
     procedure SplitterHistoryListMoved(Sender: TObject);
     procedure reContextContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure actListSelectNextExecute(Sender: TObject);
+    procedure actListSelectPreviousExecute(Sender: TObject);
+    procedure actHamburgerMenuExecute(Sender: TObject);
   private
     FLastRepaintTick: DWORD;
     FSearchInProgress: Boolean;
@@ -281,7 +337,8 @@ type
     procedure StartFileSearch(Sender: TObject; const FileName: string);
     procedure SaveSettings;
     procedure LoadSettings;
-    procedure ToggleFileResultExpanded(ListBoxIndex: Integer);
+    function ResultListItemIsFileResult(ListBoxIndex: Integer): boolean;
+    procedure ToggleFileResultExpanded(ListBoxIndex: Integer; const AExpandMode: TExpandMode = emToggle);
     procedure ExpandList(AUsedState, ASetState: Boolean; AExpandFewLines: Integer);
     procedure ContractList(ASetState: Boolean);
     procedure ResizeListBox;
@@ -299,6 +356,8 @@ type
     procedure ResizeStatusBar;
     procedure RefreshInformation(AMatchesFound: Integer; ADoExpand, AUSedExpandState, ASetExpandState: Boolean);
     procedure ViewHistoryListItems(AIndex: Integer; AUsedExpandState: Boolean);
+    function SelectNextListItem: boolean;
+    function SelectPrevListItem: boolean;
     procedure SetShowHistoryList(const Value: Boolean);
     procedure SetShowFullFilename(const Value: Boolean);
     procedure SetShowLineIndent(const Value: Boolean);
@@ -344,9 +403,9 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF D+}
   SysUtils, Messages, ToolsAPI, Math, StrUtils, IniFiles, TypInfo, Contnrs, Clipbrd, DateUtils,
-  GX_GExperts, GX_SharedImages, GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_IdeUtils, GX_MessageBox,
+  GX_GExperts, GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_IdeUtils, GX_MessageBox,
   GX_GrepPrinting, GX_Replace, GX_GrepReplace, GX_GrepSelect,
-  GX_GrepProgress;
+  GX_GrepProgress, GX_dzVclUtils;
 
 resourcestring
   SGrepReplaceStats = 'Replaced %d occurrence(s) in %.2f seconds';
@@ -487,6 +546,7 @@ begin
   if FSearchInProgress then
     raise Exception.Create(SGrepActive);
 
+  GrepExpert.IncCallCount;
   if (AState in [gssNormal, gssSearchAgain, gssModifySearchSettings]) or not FGrepSettings.CanRefresh then
     if not QueryUserForGrepOptions(AState) then
       Exit;
@@ -574,6 +634,37 @@ begin
   finally
     lbHistoryList.Items.EndUpdate;
   end;
+end;
+
+function TfmGrepResults.SelectNextListItem: boolean;
+var
+  liIx: integer;
+begin
+  result := false;
+  liIx := lbResults.ItemIndex + 1;
+  if ResultListItemIsFileResult(liIx) then
+  begin
+    ToggleFileResultExpanded(liIx, emExpand);
+    Inc(liIx);
+  end;
+  if liIx >= lbResults.Items.Count then Exit;
+  lbResults.ItemIndex := liIx;
+  result := true;
+end;
+
+function TfmGrepResults.SelectPrevListItem: boolean;
+var
+  liIx, liOrgListCnt: integer;
+begin
+  liIx := lbResults.ItemIndex - 1;
+  if ResultListItemIsFileResult(liIx) then
+  begin
+    liOrgListCnt := lbResults.Items.Count;
+    ToggleFileResultExpanded(liIx, emExpand);
+    Inc(liIx, lbResults.Items.Count - liOrgListCnt);
+  end;
+  lbResults.ItemIndex := Max(liIx, -1);
+  result := lbResults.ItemIndex >= 0;
 end;
 
 procedure TfmGrepResults.SetHistoryListMode(ANewMode: TGrepHistoryListMode;
@@ -761,7 +852,8 @@ begin
   WindowSettings := Settings.CreateExpertSettings('Window');
   try
     WindowSettings.WriteBool('OnTop', StayOnTop);
-    WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
+    if IsStandAlone then
+      WindowSettings.WriteBool('ShowToolBar', ToolBar.Visible);
     WindowSettings.WriteBool('ShowContext', ShowContext);
     WindowSettings.WriteBool('ShowHistoryList', ShowHistoryList);
 
@@ -826,7 +918,11 @@ begin
     WindowSettings := ExpSettings.CreateExpertSettings('Window');
     EnsureFormVisible(Self);
     StayOnTop := WindowSettings.ReadBool('OnTop', True);
-    ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible);
+    if IsStandAlone then
+      ToolBar.Visible := WindowSettings.ReadBool('ShowToolBar', ToolBar.Visible)
+    else
+      ToolBar.Visible := True;
+
     ShowContext := WindowSettings.ReadBool('ShowContext', True);
 
     for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
@@ -1045,7 +1141,7 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.ToggleFileResultExpanded(ListBoxIndex: Integer);
+procedure TfmGrepResults.ToggleFileResultExpanded(ListBoxIndex: Integer; const AExpandMode: TExpandMode);
 var
   AFileResult: TFileResult;
   i: Integer;
@@ -1062,7 +1158,7 @@ begin
 
     lbResults.Items.BeginUpdate;
     try
-      if AFileResult.Expanded then
+      if AFileResult.Expanded and (AExpandMode in [emToggle, emContract]) then
       begin
         while (ListBoxIndex + 1 <= lbResults.Items.Count - 1) and
               (not (lbResults.Items.Objects[ListBoxIndex + 1] is TFileResult)) do
@@ -1072,7 +1168,7 @@ begin
         AFileResult.Expanded := False;
         AFileResult.ExpandState := False;
       end
-      else
+      else if not AFileResult.Expanded and (AExpandMode in [emToggle, emExpand]) then
       begin
         for i := AFileResult.Count - 1 downto 0 do
           lbResults.Items.InsertObject(ListBoxIndex + 1, AFileResult.Items[i].Line, AFileResult.Items[i]);
@@ -1198,6 +1294,7 @@ resourcestring
     Match: TMatchResult;
     NextMatchStart: Integer;
     PrevMatchEnd: Integer;
+    LineMatches: TLineMatches;
   begin
     // Paint a search match line number and highlighted match
     ALineResult := lbResults.Items.Objects[Index] as TLineResult;
@@ -1249,13 +1346,14 @@ resourcestring
 
     if not FShowLineIndent then
     begin
-      if ALineResult.Matches.Count > 0 then
+      LineMatches := ALineResult.Matches;
+      if Assigned(LineMatches) and (LineMatches.Count > 0) then
       begin
         // Avoid trimming inside the first match :
         Trimmed := 0;
         while (Length(LineText) > Trimmed)
           and CharInSet(LineText[Trimmed + 1], [#9, #32])
-          and (Trimmed < ALineResult.Matches[0].SPos - 1) do
+          and (Trimmed < LineMatches[0].SPos - 1) do
             Inc(Trimmed);
 
         if Trimmed > 0 then
@@ -1361,7 +1459,7 @@ begin
   end;
 end;
 
-procedure TfmGrepResults.actFileCopyExecute(Sender: TObject);
+procedure TfmGrepResults.actListCopyExecute(Sender: TObject);
 var
   AItem: TGrepHistoryListItem;
 begin
@@ -1475,6 +1573,26 @@ end;
 procedure TfmGrepResults.actListGotoSelectedExecute(Sender: TObject);
 begin
   GotoHighlightedListEntry;
+end;
+
+procedure TfmGrepResults.actListSelectNextExecute(Sender: TObject);
+begin
+  if SelectNextListItem then
+    GotoHighlightedListEntry;
+end;
+
+procedure TfmGrepResults.actListSelectPreviousExecute(Sender: TObject);
+begin
+  if SelectPrevListItem then
+    GotoHighlightedListEntry;
+end;
+
+procedure TfmGrepResults.actHamburgerMenuExecute(Sender: TObject);
+var
+  Pnt: TPoint;
+begin
+  Pnt := tbnHamburgerMenu.ClientToScreen(Point(0, tbnHamburgerMenu.Height));
+  pmHamburgerMenu.Popup(Pnt.X, Pnt.Y);
 end;
 
 procedure TfmGrepResults.actListContractExecute(Sender: TObject);
@@ -1608,6 +1726,8 @@ var
 begin
   inherited;
 
+  TControl_SetMinConstraints(Self);
+
   FShowHistoryList := True;
 
   for IM := Low(TGrepHistoryListMode) to High(TGrepHistoryListMode) do
@@ -1615,6 +1735,11 @@ begin
       FPageIndexes[IM, IT] := -1;
 
   SetToolbarGradient(ToolBar);
+
+  if IsStandAlone then begin
+    actHamburgerMenu.Visible := False;
+    menu := MainMenu;
+  end;
 
   FSearchInProgress := False;
   lbResults.DoubleBuffered := True;
@@ -1678,7 +1803,7 @@ begin
   actViewOptions.Enabled := not Processing;
   actViewStayOnTop.Enabled := not Processing;
   actFilePrint.Enabled := not Processing and HaveItems;
-  actFileCopy.Enabled := not Processing and HaveItems;
+  actListCopy.Enabled := not Processing and HaveItems;
   actListGotoSelected.Enabled := not Processing and HaveItems;
   actListGotoSelectedAndClose.Enabled := not Processing and HaveItems;
   actListContract.Enabled := not Processing and HaveItems;
@@ -1922,6 +2047,11 @@ end;
 procedure TfmGrepResults.ResizeStatusBar;
 begin
   StatusBar.Panels.Items[0].Width := StatusBar.ClientWidth - StatusBar.Panels.Items[1].Width;
+end;
+
+function TfmGrepResults.ResultListItemIsFileResult(ListBoxIndex: Integer): boolean;
+begin
+  result := (ListBoxIndex >= 0) and (ListBoxIndex < lbResults.Items.Count) and (lbResults.Items.Objects[ListBoxIndex] is TFileResult);
 end;
 
 procedure TfmGrepResults.SetShowHistoryList(const Value: Boolean);
@@ -2395,15 +2525,19 @@ end;
 procedure TfmGrepResults.actHistoryDeleteExecute(Sender: TObject);
 var
   AIndex, ATopIndex: Integer;
-  IsCurrent: Boolean;
+  NewItemIndex: Integer;
 begin
   AIndex := lbHistoryListIndexForHistoryMenuActions;
   if AIndex = -1 then
-   Exit;
+   Exit; //==>
 
-  IsCurrent := AIndex = lbHistoryList.ItemIndex;
-  if IsCurrent then
+  if AIndex = lbHistoryList.ItemIndex then begin
     ClearResultsData;
+  end;
+
+  NewItemIndex := lbHistoryList.ItemIndex;
+  if NewItemIndex > AIndex then
+    Dec(NewItemIndex);  
 
   GrepExpert.HistoryListDeleteFromSettings(delOneItem, AIndex);
 
@@ -2413,14 +2547,12 @@ begin
   lbHistoryList.Count := GrepExpert.HistoryList.Count;
   if AIndex >= lbHistoryList.Count then
     Dec(AIndex);
-  if (ATopIndex < lbHistoryList.Count) and (AIndex < lbHistoryList.Count-1) then
+  if (ATopIndex < lbHistoryList.Count) and (AIndex < lbHistoryList.Count - 1) then
     lbHistoryList.TopIndex := ATopIndex;
 
-  if IsCurrent and (AIndex > -1) then
-  begin
-    lbHistoryList.ItemIndex := AIndex;
-    ViewHistoryListItems(lbHistoryList.ItemIndex, True);
-  end ;
+  if lbHistoryList.ItemIndex <> NewItemIndex then
+    lbHistoryList.ItemIndex := NewItemIndex;
+  ViewHistoryListItems(NewItemIndex, True);
 end;
 
 procedure TfmGrepResults.actHistoryDeleteSelectedExecute(Sender: TObject);

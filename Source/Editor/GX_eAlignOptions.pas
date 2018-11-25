@@ -5,7 +5,12 @@ unit GX_eAlignOptions;
 interface
 
 uses
-  Windows, Classes, Controls, StdCtrls, Forms, GX_BaseForm;
+  Windows, Classes, Controls, StdCtrls, Forms, GX_BaseForm,
+  GX_MemoEscFix;
+
+type
+  TMemo = class(TMemoEscFix)
+  end;
 
 type
   TfmAlignOptions = class(TfmBaseForm)
@@ -16,18 +21,10 @@ type
     lblWhitespace: TLabel;
     edtWhitespace: TEdit;
     mmoTokens: TMemo;
-    procedure mmoTokensKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   end;
 
 implementation
 
 {$R *.dfm}
-
-procedure TfmAlignOptions.mmoTokensKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  inherited;
-  if Key= VK_ESCAPE then
-    ModalResult := mrCancel;
-end;
 
 end.

@@ -4,8 +4,8 @@ object fmMacroLibrary: TfmMacroLibrary
   ActiveControl = lvMacros
   AutoScroll = False
   Caption = 'Keyboard Macro Library'
-  ClientHeight = 377
-  ClientWidth = 331
+  ClientHeight = 218
+  ClientWidth = 314
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -22,8 +22,8 @@ object fmMacroLibrary: TfmMacroLibrary
   TextHeight = 14
   object Splitter: TSplitter
     Left = 0
-    Top = 307
-    Width = 331
+    Top = 148
+    Width = 314
     Height = 4
     Cursor = crVSplit
     Align = alBottom
@@ -32,8 +32,8 @@ object fmMacroLibrary: TfmMacroLibrary
   object lvMacros: TListView
     Left = 0
     Top = 22
-    Width = 331
-    Height = 285
+    Width = 314
+    Height = 126
     Align = alClient
     Columns = <
       item
@@ -66,7 +66,7 @@ object fmMacroLibrary: TfmMacroLibrary
   object Toolbar: TToolBar
     Left = 0
     Top = 0
-    Width = 331
+    Width = 314
     Height = 22
     AutoSize = True
     EdgeBorders = []
@@ -173,8 +173,8 @@ object fmMacroLibrary: TfmMacroLibrary
   end
   object pnlDescription: TPanel
     Left = 0
-    Top = 311
-    Width = 331
+    Top = 152
+    Width = 314
     Height = 66
     Align = alBottom
     Alignment = taLeftJustify
@@ -184,7 +184,7 @@ object fmMacroLibrary: TfmMacroLibrary
     object lblMacroDesc: TLabel
       Left = 0
       Top = 0
-      Width = 331
+      Width = 314
       Height = 14
       Align = alTop
       Caption = '  Macro Description'
@@ -193,7 +193,7 @@ object fmMacroLibrary: TfmMacroLibrary
     object mmoMacroDescription: TMemo
       Left = 0
       Top = 14
-      Width = 331
+      Width = 314
       Height = 52
       Align = alClient
       ScrollBars = ssVertical
@@ -204,7 +204,7 @@ object fmMacroLibrary: TfmMacroLibrary
   object Actions: TActionList
     Images = dmSharedImages.Images
     OnUpdate = ActionsUpdate
-    Left = 96
+    Left = 72
     Top = 48
     object actEditCopy: TAction
       Category = 'Edit'
@@ -241,34 +241,6 @@ object fmMacroLibrary: TfmMacroLibrary
       Caption = 'Show Description'
       Hint = 'Show description'
       OnExecute = actViewDescriptionExecute
-    end
-    object actViewStyleLargeIcon: TAction
-      Tag = 1
-      Category = 'ViewStyle'
-      Caption = 'Large Icons'
-      Hint = 'View as large icons'
-      OnExecute = actViewStyleExecute
-    end
-    object actViewStyleSmallIcon: TAction
-      Tag = 2
-      Category = 'ViewStyle'
-      Caption = 'Small Icons'
-      Hint = 'View as small icons'
-      OnExecute = actViewStyleExecute
-    end
-    object actViewStyleList: TAction
-      Tag = 3
-      Category = 'ViewStyle'
-      Caption = 'List'
-      Hint = 'View as list'
-      OnExecute = actViewStyleExecute
-    end
-    object actViewStyleDetails: TAction
-      Tag = 4
-      Category = 'ViewStyle'
-      Caption = 'Details'
-      Hint = 'View as details'
-      OnExecute = actViewStyleExecute
     end
     object actFileSave: TAction
       Category = 'File'
@@ -343,7 +315,7 @@ object fmMacroLibrary: TfmMacroLibrary
     end
   end
   object mnuMacroPop: TPopupMenu
-    Left = 112
+    Left = 72
     Top = 96
     object mitClear: TMenuItem
       Action = actEditClear
@@ -379,33 +351,6 @@ object fmMacroLibrary: TfmMacroLibrary
     object mitSep3: TMenuItem
       Caption = '-'
     end
-    object mitViewStyle: TMenuItem
-      Caption = 'View Style'
-      Visible = False
-      object mitLargeIcons: TMenuItem
-        Tag = 1
-        Action = actViewStyleLargeIcon
-        RadioItem = True
-      end
-      object mitSmallIcons: TMenuItem
-        Tag = 2
-        Action = actViewStyleSmallIcon
-        RadioItem = True
-      end
-      object mitList: TMenuItem
-        Tag = 3
-        Action = actViewStyleList
-        RadioItem = True
-      end
-      object mitDetails: TMenuItem
-        Tag = 4
-        Action = actViewStyleDetails
-        RadioItem = True
-      end
-    end
-    object mitSep4: TMenuItem
-      Caption = '-'
-    end
     object mitShowToolbar: TMenuItem
       Action = actViewToolbar
     end
@@ -422,8 +367,8 @@ object fmMacroLibrary: TfmMacroLibrary
   object ilLarge: TImageList
     Height = 32
     Width = 32
-    Left = 32
-    Top = 56
+    Left = 16
+    Top = 48
     Bitmap = {
       494C010102000400040020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000002000000001002000000000000040
@@ -961,7 +906,7 @@ object fmMacroLibrary: TfmMacroLibrary
       000000000000}
   end
   object ilSmall: TImageList
-    Left = 24
+    Left = 16
     Top = 96
     Bitmap = {
       494C010101000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
@@ -1108,14 +1053,14 @@ object fmMacroLibrary: TfmMacroLibrary
     Filter = 'GExperts Editor Macros (*.gxm)|*.gxm|Any File (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Load Keyboard Macro'
-    Left = 40
-    Top = 152
+    Left = 136
+    Top = 48
   end
   object dlgSave: TSaveDialog
     DefaultExt = 'gxm'
     Filter = 'GExperts Editor Macros (*.gxm)|*.gxm|Any File (*.*)|*.*'
     Title = 'Save Keyboard Macro'
-    Left = 80
-    Top = 152
+    Left = 136
+    Top = 96
   end
 end

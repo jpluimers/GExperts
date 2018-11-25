@@ -79,35 +79,13 @@ unit mPasLex;
 interface
 
 uses
-  Classes, Contnrs;
-  
+  Classes, Contnrs, mwPasParserTypes;
+
 var
   Identifiers: array[#0..#127] of ByteBool;
   mHashTable: array[#0..#127] of Integer;
 
 type
-  TTokenKind = (tkAbsolute, tkAbstract, tkAddressOp, tkAnd, tkAnsiComment,
-    tkArray, tkAs, tkAt, tkAsciiChar, tkAsm, tkAssembler, tkAssign, tkAutomated,
-    tkBegin, tkBadString, tkBorComment, tkCase, tkCdecl, tkClass, tkColon,
-    tkComma, tkCompDirect, tkContains, tkConst, tkConstructor, tkCRLF, tkCRLFCo, tkDefault,
-    tkDestructor, tkDispid, tkDispinterface, tkDiv, tkDo, tkDoubleAddressOp,
-    tkDotDot, tkDownto, tkDynamic, tkElse, tkEnd, tkEqual, tkError, tkExcept,
-    tkExport, tkExports, tkExternal, tkFar, tkFile, tkFinalization, tkFinally,
-    tkFloat, tkFor, tkForward, tkFunction, tkGoto, tkGreater, tkGreaterEqual,
-    tkIdentifier, tkIf, tkImplementation, tkImplements, tkIn, tkIndex,
-    tkInherited, tkInitialization, tkInline, tkInteger, tkInterface, tkIs,
-    tkKeyString, tkLabel, tkLibrary, tkLower, tkLowerEqual, tkMessage, tkMinus,
-    tkMod, tkName, tkNear, tkNil, tkNodefault, tkNone, tkNot, tkNotEqual, tkNull,
-    tkNumber, tkObject, tkOf, tkOn, tkOperator, tkOr, tkOut, tkOverload, tkOverride,
-    tkPackage, tkPacked, tkPascal, tkPlus, tkPoint, tkPointerSymbol, tkPrivate, tkProcedure,
-    tkProgram, tkProperty, tkProtected, tkPublic, tkPublished, tkRaise, tkRead,
-    tkReadonly, tkRecord, tkRegister, tkReintroduce, tkRepeat, tkRequires, tkResident,
-    tkResourcestring, tkRoundClose, tkRoundOpen, tkSafecall, tkSemiColon, tkSet,
-    tkShl, tkShr, tkSlash, tkSlashesComment, tkSquareClose, tkSquareOpen,
-    tkSpace, tkStar, tkStdcall, tkStored, tkString, tkStringresource, tkSymbol,
-    tkThen, tkThreadvar, tkTo, tkTry, tkType, tkUnit, tkUnknown, tkUntil, tkUses,
-    tkVar, tkVirtual, tkWhile, tkWith, tkWrite, tkWriteonly, tkXor);
-
   TCommentState = (csAnsi, csBor, csNo);
   TLexArgList = class;
 
@@ -116,7 +94,7 @@ type
     fComment: TCommentState;
     fOrigin: PChar;
     fProcTable: array[#0..#255] of procedure of object;
-    Run: Longint;
+    Run: Integer;
     Temp: PChar;
     FRoundCount: Integer;
     FSquareCount: Integer;
@@ -253,9 +231,14 @@ type
     destructor Destroy; override;
     function CharAhead(Count: Integer): Char;
     function NextChar: Char;
-    procedure Next;
+    ///<summary>
+    /// @Returns true, if TokenId <> tkNull </summary>
+    function Next: Boolean;
     procedure NextID(ID: TTokenKind);
-    procedure NextNoJunk;
+    ///<summary>
+    /// Like Next, but skips whitespace and comments
+    /// @Returns true, if TokenId <> tkNull </summary>
+    function NextNoJunk: Boolean;
     procedure NextClass;
     property IsClass: Boolean read fIsClass;
     property IsInterface: Boolean read fIsInterface;
@@ -299,9 +282,6 @@ type
 const
   PossibleIdentifiers = [tkIdentifier, tkRegister];
 
-var // May include tkOperator after initialization
-  MethodMarkers: set of TTokenKind = [tkProcedure, tkFunction, tkConstructor, tkDestructor];
-
 implementation
 
 uses
@@ -316,7 +296,7 @@ procedure MakeIdentTable;
 var
   i, J: Char;
 begin
-  for I := #0 to #127 do
+  for i := #0 to #127 do
   begin
     case i of
       '_', '0'..'9', 'a'..'z', 'A'..'Z': Identifiers[i] := True;
@@ -1475,7 +1455,7 @@ begin
   end;
 end;
 
-procedure TmwPasLex.Next;
+function TmwPasLex.Next: Boolean;
 begin
   case fTokenID of
     tkIdentifier:
@@ -1500,6 +1480,7 @@ begin
       csAnsi: AnsiProc;
     end;
   end;
+  Result := (FTokenID <> tkNull);
 end;
 
 function TmwPasLex.GetToken: string;
@@ -1520,10 +1501,10 @@ begin
   until fTokenID = ID;
 end;
 
-procedure TmwPasLex.NextNoJunk;
+function TmwPasLex.NextNoJunk: boolean;
 begin
   repeat
-    Next;
+    Result := Next;
   until not (fTokenID in [tkSlashesComment, tkAnsiComment, tkBorComment, tkCRLF, tkCRLFCo, tkSpace]);
 end;
 
@@ -1645,8 +1626,21 @@ begin
   if TokenID in MethodMarkers then
     NextNoJunk;
 
-  while TokenID in PossibleIdentifiers + [tkPoint] do
+  while TokenID in PossibleIdentifiers + [tkPoint, tkLower] do
   begin
+    if TokenID = tkLower then begin
+      // It's a Generic, so we need to read until the closing '>'
+      CurrentIdentifier := CurrentIdentifier + Token;
+      NextNoJunk;
+      while TokenID in [tkComma, tkIdentifier] do begin
+        CurrentIdentifier := CurrentIdentifier + Token;
+        NextNoJunk;
+      end;
+      if TokenID = tkGreater then begin
+        CurrentIdentifier := CurrentIdentifier + Token;
+        NextNoJunk;
+      end;
+    end;
     if TokenID in PossibleIdentifiers then
     begin
       if PrevIdentifiers <> '' then
@@ -1770,11 +1764,6 @@ end;
 procedure Initialize;
 begin
   MakeIdentTable;
-  {$IFDEF CONDITIONALEXPRESSIONS}
-    {$IF CompilerVersion >= 16}
-    Include(MethodMarkers, tkOperator);
-    {$IFEND}
-  {$ENDIF}
 end;
 
 { TLexArgList }

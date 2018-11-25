@@ -147,9 +147,10 @@ implementation
 
 uses
   SysUtils, Windows, ToolsAPI,
-  mPasLex,
+  mPasLex, mwPasParserTypes,
   GX_EditReader, GX_ProjDependProp, GX_GExperts, GX_ProjDependFilter,
-  GX_GenericUtils, GX_GxUtils, GX_SharedImages, GX_IdeUtils, Math;
+  GX_GenericUtils, GX_GxUtils, GX_SharedImages, GX_IdeUtils, Math,
+  GX_dzVclUtils;
 
 type
   TProjectNotifier = class(TBaseIdeNotifier)
@@ -738,6 +739,9 @@ end;
 constructor TfmProjDepend.Create(AOwner: TComponent);
 begin
   inherited;
+
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   SetNonModalFormPopupMode(Self);
   FFilterList := TStringList.Create;
@@ -913,7 +917,7 @@ procedure TfmProjDepend.ExportAllDependencies;
     while i >= 0 do
     begin
       Str := ExportList[i];
-      Str := Copy(Str, Pos(',', Str) + 1, MaxInt);
+      Str := Copy(Str, Pos(',', Str) + 1);
       if SameText(UsingUnit, Str) then
         Break;
       Dec(i);
@@ -1055,6 +1059,8 @@ begin
   if fmProjDepend.WindowState = wsMinimized then
     fmProjDepend.WindowState := wsNormal;
   fmProjDepend.Show;
+
+  IncCallCount;
 end;
 
 function TDependExpert.IsDefaultActive: Boolean;

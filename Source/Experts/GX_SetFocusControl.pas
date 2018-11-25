@@ -178,6 +178,8 @@ begin
   FirstControlSelected := False;
   if not ProcessFixed then
     ProcessAutomatic;
+
+  IncCallCount;
 end;
 
 initialization

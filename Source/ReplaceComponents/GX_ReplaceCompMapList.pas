@@ -80,7 +80,7 @@ implementation
 
 uses
   SysUtils, Windows, Dialogs, Gx_GenericUtils, GX_ConfigurationInfo,
-  GX_ReplaceCompMapGrpList;
+  GX_ReplaceCompMapGrpList, GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -158,6 +158,8 @@ end;
 
 procedure TfmReplaceCompMapList.FormCreate(Sender: TObject);
 begin
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(tbrReplacement);
   SetToolbarGradient(tbrGroups);
   tbrGroups.Left := comGroupName.Left + comGroupName.Width + 4;

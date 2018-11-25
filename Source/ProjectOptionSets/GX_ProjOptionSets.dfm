@@ -2,8 +2,8 @@ inherited fmProjOptionSets: TfmProjOptionSets
   Left = 399
   Top = 185
   Caption = 'Project Option Sets'
-  ClientHeight = 465
-  ClientWidth = 260
+  ClientHeight = 285
+  ClientWidth = 190
   Position = poScreenCenter
   OnHide = FormHide
   OnKeyDown = FormKeyDown
@@ -13,8 +13,8 @@ inherited fmProjOptionSets: TfmProjOptionSets
   object pcSettings: TPageControl
     Left = 0
     Top = 43
-    Width = 260
-    Height = 422
+    Width = 190
+    Height = 242
     ActivePage = tabSets
     Align = alClient
     TabIndex = 0
@@ -25,8 +25,8 @@ inherited fmProjOptionSets: TfmProjOptionSets
       object pnlSets: TPanel
         Left = 0
         Top = 0
-        Width = 252
-        Height = 393
+        Width = 182
+        Height = 213
         Align = alClient
         BevelOuter = bvNone
         BorderWidth = 4
@@ -35,8 +35,8 @@ inherited fmProjOptionSets: TfmProjOptionSets
         object lstSets: TListBox
           Left = 4
           Top = 4
-          Width = 244
-          Height = 385
+          Width = 174
+          Height = 205
           Align = alClient
           ItemHeight = 14
           PopupMenu = pmuSets
@@ -115,7 +115,7 @@ inherited fmProjOptionSets: TfmProjOptionSets
   object pnlCurrentSet: TPanel
     Left = 0
     Top = 22
-    Width = 260
+    Width = 190
     Height = 21
     Align = alTop
     Alignment = taLeftJustify
@@ -127,7 +127,7 @@ inherited fmProjOptionSets: TfmProjOptionSets
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 260
+    Width = 190
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages

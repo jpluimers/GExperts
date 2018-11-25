@@ -4,11 +4,9 @@ object fmOpenFile: TfmOpenFile
   ActiveControl = edtFilter
   AutoScroll = False
   Caption = 'Open Unit'
-  ClientHeight = 520
-  ClientWidth = 621
+  ClientHeight = 352
+  ClientWidth = 354
   Color = clBtnFace
-  Constraints.MinHeight = 325
-  Constraints.MinWidth = 350
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -25,8 +23,8 @@ object fmOpenFile: TfmOpenFile
   object pnlUnits: TPanel
     Left = 0
     Top = 27
-    Width = 621
-    Height = 458
+    Width = 354
+    Height = 290
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -35,8 +33,8 @@ object fmOpenFile: TfmOpenFile
     object pcUnits: TPageControl
       Left = 6
       Top = 39
-      Width = 609
-      Height = 413
+      Width = 342
+      Height = 245
       ActivePage = tabSearchPath
       Align = alClient
       TabIndex = 0
@@ -49,8 +47,8 @@ object fmOpenFile: TfmOpenFile
         OnShow = tabSearchPathShow
         object pnlSearchPathFooter: TPanel
           Left = 0
-          Top = 351
-          Width = 601
+          Top = 183
+          Width = 334
           Height = 33
           Align = alBottom
           BevelOuter = bvNone
@@ -67,8 +65,8 @@ object fmOpenFile: TfmOpenFile
         object pnlSearchPath: TPanel
           Left = 0
           Top = 0
-          Width = 601
-          Height = 351
+          Width = 334
+          Height = 183
           Align = alClient
           BevelOuter = bvNone
           BorderWidth = 3
@@ -77,8 +75,8 @@ object fmOpenFile: TfmOpenFile
           object lvSearchPath: TListView
             Left = 3
             Top = 3
-            Width = 595
-            Height = 345
+            Width = 328
+            Height = 177
             Align = alClient
             Columns = <
               item
@@ -371,14 +369,14 @@ object fmOpenFile: TfmOpenFile
     object pnlAvailableHeader: TPanel
       Left = 6
       Top = 6
-      Width = 609
+      Width = 342
       Height = 33
       Align = alTop
       BevelOuter = bvNone
       FullRepaint = False
       TabOrder = 0
       DesignSize = (
-        609
+        342
         33)
       object lblFilter: TLabel
         Left = 17
@@ -390,7 +388,7 @@ object fmOpenFile: TfmOpenFile
         FocusControl = edtFilter
       end
       object lblExtension: TLabel
-        Left = 450
+        Left = 183
         Top = 10
         Width = 28
         Height = 14
@@ -402,7 +400,7 @@ object fmOpenFile: TfmOpenFile
       object edtFilter: TEdit
         Left = 50
         Top = 6
-        Width = 382
+        Width = 115
         Height = 22
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
@@ -410,7 +408,7 @@ object fmOpenFile: TfmOpenFile
         OnKeyDown = edtFilterKeyDown
       end
       object cbxType: TComboBox
-        Left = 484
+        Left = 217
         Top = 6
         Width = 113
         Height = 22
@@ -424,8 +422,8 @@ object fmOpenFile: TfmOpenFile
   end
   object pnlOKCancel: TPanel
     Left = 0
-    Top = 485
-    Width = 621
+    Top = 317
+    Width = 354
     Height = 35
     Align = alBottom
     BevelOuter = bvNone
@@ -439,7 +437,7 @@ object fmOpenFile: TfmOpenFile
       TabOrder = 0
     end
     object pnlButtonsRight: TPanel
-      Left = 420
+      Left = 153
       Top = 0
       Width = 201
       Height = 35
@@ -472,7 +470,7 @@ object fmOpenFile: TfmOpenFile
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 621
+    Width = 354
     Height = 27
     AutoSize = True
     ButtonHeight = 23
@@ -541,13 +539,13 @@ object fmOpenFile: TfmOpenFile
   object OpenDialog: TOpenDialog
     Filter = 'All Files (*.*)|*.*'
     Options = [ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 16
-    Top = 112
+    Left = 32
+    Top = 120
   end
   object ActionList: TActionList
     Images = dmSharedImages.Images
-    Left = 16
-    Top = 144
+    Left = 32
+    Top = 168
     object actAddToFavorites: TAction
       Caption = '&Add to Favorites'
       OnExecute = actAddToFavoritesExecute
@@ -602,7 +600,7 @@ object fmOpenFile: TfmOpenFile
     Enabled = False
     Interval = 10
     OnTimer = tmrFilterTimer
-    Left = 16
-    Top = 176
+    Left = 32
+    Top = 216
   end
 end

@@ -69,11 +69,13 @@ type
     procedure actCopyTextRtfHtmlExecute(Sender: TObject);
   private
     FEditor: TSynEdit;
+    FHasBeenUsed: Boolean;
     procedure LoadSettings;
     procedure CopyToClipboard(CopyFormat: TGXCopyFormat);
     function FillEditControlWithIdeData: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
+    property HasBeenUsed: Boolean read FHasBeenUsed;
   end;
 
   TSourceExportExpert = class(TGX_Expert)
@@ -104,7 +106,8 @@ uses
   SysUtils, Windows, Clipbrd,
   SynEditExport, SynExportHtml, SynExportRtf, SynEditPrint,
   GX_GenericUtils, GX_GxUtils, GX_OtaUtils, GX_IdeUtils,
-  GX_SynMemoUtils, GX_SourceExportOptions, GX_SharedImages, SynUnicode;
+  GX_SynMemoUtils, GX_SourceExportOptions, GX_SharedImages, SynUnicode,
+  GX_dzVclUtils;
 
 const
   HighlighterDefaultRegKey = '\SourceExport\Highlighters\';
@@ -136,7 +139,7 @@ begin
   Assert(Assigned(SourceExportExpert));
   Assert(Assigned(FEditor));
 
-  FEditor.Highlighter.LoadFromRegistry(HKEY_CURRENT_USER, ConfigInfo.GetGExpertsIdeRootRegistryKey +
+  FEditor.Highlighter.LoadFromRegistry(HKEY_CURRENT_USER, ConfigInfo.GExpertsIdeRootRegistryKey +
         HighlighterDefaultRegKey + FEditor.Highlighter.LanguageName);
 
   case SourceExportExpert.FDefaultCopyFormat of
@@ -210,6 +213,7 @@ begin
     finally
       FreeAndNil(Exporter);
     end;
+    FHasBeenUsed := True;
   end;
 end;
 
@@ -282,6 +286,7 @@ procedure TfmSourceExport.actCopyExecute(Sender: TObject);
 begin
   Assert(Assigned(SourceExportExpert));
   CopyToClipboard(SourceExportExpert.FDefaultCopyFormat);
+  FHasBeenUsed := True;
 end;
 
 procedure TfmSourceExport.actPrintExecute(Sender: TObject);
@@ -304,6 +309,7 @@ begin
   finally
     FreeAndNil(SynPrint);
   end;
+  FHasBeenUsed := True;
 end;
 
 procedure TfmSourceExport.actConfigureExecute(Sender: TObject);
@@ -339,6 +345,8 @@ constructor TfmSourceExport.Create(AOwner: TComponent);
 begin
   inherited;
 
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   // Destroyed with form
   FEditor := TSynEdit.Create(Self);
@@ -373,6 +381,8 @@ begin
   try
     SetFormIcon(Dlg);
     Dlg.ShowModal;
+    if Dlg.HasBeenUsed then
+      IncCallCount;
   finally
     FreeAndNil(Dlg);
   end;
@@ -410,7 +420,7 @@ var
 begin
   Dlg := TfmSourceExportOptions.Create(nil);
   try
-    HighlighterRegKey := ConfigInfo.GetGExpertsIdeRootRegistryKey + HighlighterDefaultRegKey
+    HighlighterRegKey := ConfigInfo.GExpertsIdeRootRegistryKey + HighlighterDefaultRegKey
         + Dlg.SynSampleEditor.Highlighter.LanguageName;
 
     Dlg.rbxCopySettings.ItemIndex := Ord(FDefaultCopyFormat);

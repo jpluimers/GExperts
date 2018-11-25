@@ -78,6 +78,12 @@ goto DelphiEndCase
 :Delphi102Tokyo
   call :ReadReg Embarcadero\BDS\19.0
   goto :eof
+:Delphi103
+:DelphiXX103
+:DelphiXX103Rio
+:Delphi103Rio
+  call :ReadReg Embarcadero\BDS\20.0
+  goto :eof
 :DelphiEndCase
 
 echo DelphiPath: "%DelphiPath%"

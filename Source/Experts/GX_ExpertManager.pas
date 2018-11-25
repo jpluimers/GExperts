@@ -15,6 +15,8 @@ uses
 type
   TExpertManagerExpert = class;
 
+  TAddExpertToRegistryResult = (aerOK, aerDuplicate, aerNoExpert);
+
   TfmExpertManager = class(TfmBaseForm)
     lvExperts: TListView;
     pmItems: TPopupMenu;
@@ -98,7 +100,7 @@ type
     class procedure MoveExpertRegistryKey(const ExpertName, FromBase, FromSection: string;
       const ToBase, ToSection: string);
 
-    class function AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
+    class function AddExpertToRegistry(const ExpertName, FileName: string): TAddExpertToRegistryResult;
     class procedure EnableExpertInRegistry(const ExpertName: string);
     class procedure DisableExpertInRegistry(const ExpertName: string);
     class procedure RemoveExpertFromRegistry(const ExpertName: string; IsEnabled: Boolean);
@@ -129,7 +131,7 @@ uses
   SysUtils, CommCtrl,
   GX_GExperts, GX_GxUtils, GX_GenericUtils, GX_OtaUtils,
   GX_ConfigurationInfo, GX_MessageBox, GX_SharedImages, GX_IdeUtils,
-  GX_VerDepConst;
+  GX_VerDepConst, GX_dzVclUtils;
 
 type
   TGxExpertState = (gesCurrentlyEnabled, gesNextTimeEnabled,
@@ -243,6 +245,8 @@ begin
   FExpertManager := Manager;
   inherited Create(AOwner);
 
+  TControl_SetMinConstraints(Self);
+
   SetToolbarGradient(ToolBar);
   SetNonModalFormPopupMode(Self);
 
@@ -348,10 +352,12 @@ end;
 
 procedure TfmExpertManager.AddExperts(ExpertList: TStrings);
 resourcestring
-  SCouldNotAddExpert = '%s could not be added as an expert.' + sLineBreak +
-                       sLineBreak +
-                       'The module you chose probably is not a valid expert DLL or is '+
-                       'already loaded as an expert DLL.';
+  SCouldNotAddExpertDupe = '%s could not be added as an expert.' + sLineBreak
+                          + sLineBreak
+                          + 'The module you chose is already loaded as an expert DLL.';
+  SCouldNotAddExpertInvalid = '%s could not be added as an expert.' + sLineBreak
+                            + sLineBreak
+                            + 'The module you chose probably is not a valid expert DLL.';
 var
   i: Integer;
   ExpertName: string;
@@ -365,10 +371,14 @@ begin
     ExpertEntry := ExpertList[i];
 
     ExpertName := ChangeFileExt(ExtractFileName(ExpertEntry), '');
-    if FExpertManager.AddExpertToRegistry(ExpertName, ExpertEntry) then
-      UpdateControlsState
-    else
-      MessageDlg(Format(SCouldNotAddExpert, [ExpertEntry]), mtError, [mbOK], 0);
+    case FExpertManager.AddExpertToRegistry(ExpertName, ExpertEntry) of
+      aerOK:
+        UpdateControlsState;
+      aerDuplicate:
+        MessageDlg(Format(SCouldNotAddExpertDupe, [ExpertEntry]), mtError, [mbOK], 0);
+      aerNoExpert:
+        MessageDlg(Format(SCouldNotAddExpertInvalid, [ExpertEntry]), mtError, [mbOK], 0);
+    end;
   end;
 end;
 
@@ -485,14 +495,16 @@ begin
   end;
 end;
 
-class function TExpertManagerExpert.AddExpertToRegistry(const ExpertName, FileName: string): Boolean;
+class function TExpertManagerExpert.AddExpertToRegistry(const ExpertName, FileName: string): TAddExpertToRegistryResult;
 var
   RegIni: TGExpertsSettings;
   ExpertList: TStringList;
   i: Integer;
 begin
   {$IFOPT D+} SendDebug('Adding Expert: '+FileName); {$ENDIF}
-  Result := True;
+
+  // set Result here because otherwise Delphi 7 complains (wrongly) that it might not be set
+  Result := aerOK;
 
   // Make sure that this particular expert is not already loaded.
   ExpertList := TStringList.Create;
@@ -502,20 +514,18 @@ begin
     begin
       if ExpertList.Values[ExpertList.Names[i]] = FileName then
       begin
-        Result := False;
-        Break;
+        Result := aerDuplicate;
+        Exit;
       end;
     end;
   finally
     FreeAndNil(ExpertList);
   end;
 
-  if not Result then
+  if not IsValidExpertDll(FileName) then begin
+    Result := aerNoExpert;
     Exit;
-
-  Result := IsValidExpertDll(FileName);
-  if not Result then
-    Exit;
+  end;
 
   RegIni := TGExpertsSettings.Create(ConfigInfo.IdeRootRegistryKey);
   try
@@ -615,7 +625,7 @@ var
   Succeeded: Boolean;
 begin
   try
-    Succeeded := TExpertManagerExpert.AddExpertToRegistry('GExperts', ThisDllName);
+    Succeeded := (TExpertManagerExpert.AddExpertToRegistry('GExperts', ThisDllName) = aerOK);
   except
     Succeeded := False;
   end;

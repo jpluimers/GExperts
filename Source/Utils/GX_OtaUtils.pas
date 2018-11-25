@@ -46,6 +46,7 @@ const
   // Invalid notifier index
   InvalidNotifierIndex = -1;
   dNFM = 'nfm';  // Not present in the Delphi 8/9/10 ToolsAPI.pas
+  // todo: These are only the English and German names, what about French and Japanese?
   FileVersionOptionNames:     array [0..1] of string = ('FileVersion', 'Dateiversion');
   ProductNameOptionNames:     array [0..1] of string = ('ProductName', 'Produktname');
   InternalNameOptionNames:    array [0..1] of string = ('InternalName', 'Interner Name');
@@ -66,6 +67,9 @@ const
   sVBPersonality = 'VB.Personality';
   sDesignPersonality = 'Design.Personality';
   {$ENDIF}
+
+// returns an IOTAEditReader for the given or the current IOTASourceEditor if none is specified
+function GxOtaGetEditReaderForSourceEditor(SourceEditor: IOTASourceEditor = nil): IOTAEditReader;
 
 // Save an edit reader to a stream
 procedure GxOtaSaveReaderToStream(EditReader: IOTAEditReader; Stream: TStream; TrailingNull: Boolean = True);
@@ -355,9 +359,12 @@ function GxOtaGetActiveProjectOption(const Option: string; var Value: Variant): 
 function GxOtaGetVersionInfoKeysOption(const Option: string; var Value: Variant): Boolean;
 // Get the first value of a list of version info keys strings
 function GxOtaGetVersionInfoKeysOptions(const Options: array of string; var Value: Variant): Boolean;
-// Get all of the version info keys (do not free the string list)
-function GxOtaGetVersionInfoKeysStrings(out Strings: TStrings): Boolean;
+// Get all of the version info keys
+function GxOtaGetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 function GxOtaGetVersionInfoKeysString: string;
+
+// Set all the version info keys
+function GxOtaSetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 
 // Get the selected text in the top edit view, if any
 function GxOtaGetCurrentSelection(IncludeTrailingCRLF: Boolean = True): string;
@@ -458,8 +465,9 @@ procedure GxOtaGetEffectiveLibraryPath(Paths: TStrings;
 // Retrieve a guess at all possible paths where files in the current project
 // might be located by the compiler
 procedure GxOtaGetAllPossiblePaths(Paths: TStrings);
-// Locate a base file name on a list of paths
-function GxOtaFindPathToFile(const FileName: string; Paths: TStrings = nil): string;
+// Locate a base file name in all possible paths (retrieved with GxOtaGetAllPossiblePaths)
+function GxOtaTryFindPathToFile(const FileName: string; out FullFilename: string): Boolean;
+function GxOtaFindPathToFile(const FileName: string): string;
 // Try to open a file located anywhere in GxOtaGetAllPossiblePaths
 function GxOtaOpenFileFromPath(const FileName: string): Boolean;
 // Obtain a list of alias mappings in OldUnit=NewUnit format
@@ -486,6 +494,8 @@ function GxOtaGetIdeActionList: TCustomActionList;
 
 // Find an action in the IDE's action list by name and return it.
 function GxOtaGetIdeActionByName(const Name: string): TContainedAction;
+
+function GxOtaGetEditorServices: IOTAEditorServices;
 
 // Return the top-most edit view/buffer (globally or for a given source editor)
 // Returns nil if none exists.
@@ -618,26 +628,6 @@ procedure GxOtaShowProjectModuleInformation;
 procedure GxOtaShowIDEActions;
 procedure GxOtaShowEditViewDetails;
 
-{$IFNDEF GX_VER160_up}
-// Delphi 6/7: IDE is non-unicode, string is ansistring
-function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
-function IDEEditorStringToString(const S: IDEEditBufferString): string;
-function UTF8ToUnicodeString(S: UTF8String): WideString;
-{$ELSE GX_VER160_up}
-// Delphi 8+
-{$IFNDEF GX_VER200_up}
-// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
-function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
-function IDEEditorStringToString(const S: IDEEditBufferString): string;
-function UTF8ToUnicodeString(S: UTF8String): WideString;
-{$ELSE GX_VER200_up}
-// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
-function ConvertToIDEEditorString(const S: string): IDEEditBufferString;
-function IDEEditorStringToString(const S: string): string; overload;
-function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
-{$ENDIF GX_VER200_up}
-{$ENDIF GX_VER160_up}
-
 function HackBadIDEUTF8StringToString(const S: string): string;
 // Convert an editor string (UTF-8) possibly improperly stored in an
 // AnsiString to a native string type
@@ -682,7 +672,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   Variants, Windows, ActiveX, DesignIntf, TypInfo,
-  GX_EditReader, GX_VerDepConst, SynUnicode, Math,
+  GX_EditReader, GX_VerDepConst, SynUnicode, Math, StrUtils,
   GX_GetIdeVersion, GX_dzFileUtils;
 
 const
@@ -1533,14 +1523,54 @@ end;
 function GxOtaGetActiveProjectOption(const Option: string; var Value: Variant): Boolean;
 var
   ProjectOptions: IOTAProjectOptions;
+
+{$IFDEF GX_VER220_up} // RAD Studio XE 1 (16; BDS 8)
+  // since Delphi XE there can be multiple configuration settings, we need to get the current one
+  // because Embarcadero decided to not implement it for us.
+  function HandleDelphiXEUpVersionInfo(Option: string; var Value: Variant): boolean;
+  var
+    ProjectConfigs: IOTAProjectOptionsConfigurations;
+    cfg: IOTABuildConfiguration;
+  begin
+    Result := False;
+    if Option = 'MajorVersion' then
+      Option := 'VerInfo_MajorVer'
+    else if Option = 'MinorVersion' then
+      Option := 'VerInfo_MinorVer'
+    else if Option = 'Release' then
+      Option := 'VerInfo_Release'
+    else if Option = 'Build' then
+      Option := 'VerInfo_Build'
+    else begin
+      Exit; //==>
+    end;
+    ProjectConfigs := ProjectOptions as IOTAProjectOptionsConfigurations;
+    if Assigned(ProjectConfigs) then begin
+      cfg := ProjectConfigs.ActiveConfiguration;
+      if Assigned(cfg) then begin
+        Value := cfg.GetValue(Option, True);
+        Result := True;
+      end;
+    end;
+  end;
+{$ELSE}
+  function HandleDelphiXEUpVersionInfo(Option: string; var Value: Variant): boolean;
+  begin
+    Result := False;
+  end;
+{$ENDIF}
+
 begin
   Result := False;
   Value := '';
   ProjectOptions := GxOtaGetActiveProjectOptions;
-  if Assigned(ProjectOptions) then
-  begin
-    Value := ProjectOptions.Values[Option];
-    Result := True;
+  if Assigned(ProjectOptions) then begin
+    if HandleDelphiXEUpVersionInfo(Option, Value) then begin
+      Result := True;
+    end else begin
+      Value := ProjectOptions.Values[Option];
+      Result := True;
+    end;
   end;
 end;
 
@@ -1551,14 +1581,19 @@ var
 begin
   Result := False;
   Value := Null;
-  if GxOtaGetVersionInfoKeysStrings(KeysStrings) then
-  begin
-    OptionValue := KeysStrings.Values[Option];
-    if OptionValue <> '' then
+  KeysStrings := TStringList.Create;
+  try
+    if GxOtaGetVersionInfoKeysStrings(KeysStrings) then
     begin
-      Result := True;
-      Value := OptionValue;
+      OptionValue := KeysStrings.Values[Option];
+      if OptionValue <> '' then
+      begin
+        Result := True;
+        Value := OptionValue;
+      end;
     end;
+  finally
+    FreeAndNil(KeysStrings);
   end;
 end;
 
@@ -1575,13 +1610,55 @@ begin
   end;
 end;
 
-function GxOtaGetVersionInfoKeysStrings(out Strings: TStrings): Boolean;
+function GxOtaGetVersionInfoKeysStrings(Strings: TStrings): Boolean;
 var
+  VerStrings: TStrings;
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions : IOTAProjectOptions;
+  Configurations : IOTAProjectOptionsConfigurations;
+  Configuration  : IOTABuildConfiguration;
+  PropValue      : string;
+{$ELSE}
   KeysValue: Variant;
   KeysInteger: Integer;
+{$ENDIF}
 begin
+  // This has been changed to support Delphi XE2 and up which stores
+  // version information in the configuration sets. Strings can no longer
+  // be simply assigned but needs to be passed into this function to be
+  // set.
+  Assert(Assigned(Strings));
+
   Result := False;
-  Strings := nil;
+
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions := GxOtaGetActiveProjectOptions;
+  if Assigned(ProjectOptions) then
+  begin
+    if ProjectOptions.QueryInterface(IOTAProjectOptionsConfigurations, Configurations) = S_OK then
+    begin
+      Configuration := Configurations.ActiveConfiguration;
+      if Assigned(Configuration) then
+      begin
+        if Configuration.PropertyExists('VerInfo_Keys') then
+        begin
+          PropValue := Configuration.GetValue('VerInfo_Keys', True);
+          VerStrings := TStringList.Create;
+          try
+            VerStrings.Delimiter := ';';
+            VerStrings.StrictDelimiter := True;
+            VerStrings.DelimitedText := PropValue;
+            Result := True;
+          finally
+            Strings.Clear;
+            Strings.AddStrings(VerStrings);
+            FreeAndNil(VerStrings);
+          end;
+        end;
+      end;
+    end;
+  end;
+{$ELSE}
   if GxOtaGetActiveProjectOption('Keys', KeysValue) then
   begin
     if (not VarIsNull(KeysValue)) and (VarType(KeysValue) = varInteger) then
@@ -1589,11 +1666,13 @@ begin
       KeysInteger := KeysValue;
       if TObject(KeysInteger) is TStrings then
       begin
-        Strings := TStrings(KeysInteger);
+        VerStrings := TStrings(KeysInteger);
+        Strings.Assign(VerStrings);
         Result := True;
       end;
     end;
   end;
+{$ENDIF}
 end;
 
 function GxOtaGetVersionInfoKeysString: string;
@@ -1601,8 +1680,70 @@ var
   Strings: TStrings;
 begin
   Result := '';
-  if GxOtaGetVersionInfoKeysStrings(Strings) then
-    Result := Strings.Text;
+  Strings := TStringList.Create;
+  try
+    if GxOtaGetVersionInfoKeysStrings(Strings) then
+      Result := Strings.Text;
+  finally
+    FreeAndNil(Strings);
+  end;
+end;
+
+function GxOtaSetVersionInfoKeysStrings(Strings: TStrings): Boolean;
+var
+  VerStrings: TStrings;
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions : IOTAProjectOptions;
+  Configurations : IOTAProjectOptionsConfigurations;
+  Configuration  : IOTABuildConfiguration;
+  PropValue      : string;
+{$ELSE}
+  KeysValue: Variant;
+  KeysInteger: Integer;
+{$ENDIF}
+begin
+  Assert(Assigned(Strings));
+
+  Result := False;
+
+{$IFDEF GX_VER230_up} // Delphi XE2 and up.
+  ProjectOptions := GxOtaGetActiveProjectOptions;
+  if Assigned(ProjectOptions) then
+  begin
+    if ProjectOptions.QueryInterface(IOTAProjectOptionsConfigurations, Configurations) = S_OK then
+    begin
+      Configuration := Configurations.ActiveConfiguration;
+      if Assigned(Configuration) then
+      begin
+        VerStrings := TStringList.Create;
+        try
+          VerStrings.Assign(Strings);
+          VerStrings.Delimiter := ';';
+          VerStrings.StrictDelimiter := True;
+          PropValue := VerStrings.DelimitedText;
+          Configuration.SetValue('VerInfo_Keys', PropValue);
+          Result := True;
+        finally
+          FreeAndNil(VerStrings);
+        end;
+      end;
+    end;
+  end;
+{$ELSE}
+  if GxOtaGetActiveProjectOption('Keys', KeysValue) then
+  begin
+    if (not VarIsNull(KeysValue)) and (VarType(KeysValue) = varInteger) then
+    begin
+      KeysInteger := KeysValue;
+      if TObject(KeysInteger) is TStrings then
+      begin
+        VerStrings := TStrings(KeysInteger);
+        VerStrings.Assign(Strings);
+        Result := True;
+      end;
+    end;
+  end;
+{$ENDIF}
 end;
 
 function GxOtaGetCurrentSelection(IncludeTrailingCRLF: Boolean): string;
@@ -2871,45 +3012,23 @@ begin
   AddVCLPaths;
 end;
 
-function GxOtaFindPathToFile(const FileName: string; Paths: TStrings): string;
-
-  function MakeFilename(const Path, FileName: string): string;
-  begin
-    if Path = '' then
-      Result := FileName
-    else if Path[Length(Path)] = PathDelim then
-      Result := Path + FileName
-    else
-      Result := Path + PathDelim + FileName;
-  end;
-
+function GxOtaTryFindPathToFile(const FileName: string; out FullFilename: string): Boolean; overload;
 var
   PathList: TStringList;
-  i: Integer;
-  NewFileName: string;
 begin
-  Result := FileName;
-  if not (IsPathAbsolute(Result) and FileExists(Result)) then
-  begin
-    PathList := TStringList.Create;
-    try
-      if Assigned(Paths) then
-        PathList.Assign(Paths)
-      else
-        GxOtaGetAllPossiblePaths(PathList);
-      for i := 0 to PathList.Count - 1 do
-      begin
-        NewFileName := MakeFilename(PathList[i], FileName);
-        if FileExists(NewFileName) then
-        begin
-          Result := NewFileName;
-          Break;
-        end;
-      end;
-    finally
-      FreeAndNil(PathList);
-    end;
+  PathList := TStringList.Create;
+  try
+    GxOtaGetAllPossiblePaths(PathList);
+    Result := TryFindPathToFile(FileName, FullFilename, PathList);
+  finally
+    FreeAndNil(PathList);
   end;
+end;
+
+function GxOtaFindPathToFile(const FileName: string): string;
+begin
+  if not GxOtaTryFindPathToFile(FileName, Result) then
+    Result := FileName;
 end;
 
 function GxOtaOpenFileFromPath(const FileName: string): Boolean;
@@ -3071,10 +3190,11 @@ begin
 end;
 
 // Delphi 2005 Update 1 does not support IOTAEditorServices!
-{$IFDEF VER170}
-type
-  IOTAEditorServices = IOTAEditorServices70;
-{$ENDIF VER170}
+// (but we no longer care)
+//{$IFDEF VER170}
+//type
+//  IOTAEditorServices = IOTAEditorServices70;
+//{$ENDIF VER170}
 
 function GxOtaGetEditorServices: IOTAEditorServices;
 begin
@@ -3461,6 +3581,7 @@ var
   VAChar           : AnsiChar;
   VWChar           : WChar;
   VBoolean         : Boolean;
+  TempInt: Integer;
 
   function PropertyDescription: string;
   begin
@@ -3508,6 +3629,15 @@ begin
     tkInteger: begin
         VInteger := StrToInt(Value);
         Result := AComponent.SetPropByName(PropertyName, VInteger);
+        if AComponent.GetPropValueByName(PropertyName, TempInt) then begin
+          // Setting an integer property often (always?) fails, so we check the value here and if
+          // it is different, we use the native object to set the value. This works.
+          // (Example: Try to set the Interval property of a TTimer. It always gets set to 0.)
+          // This happens in Delphi 2007 and 10.2, I haven't tested other versions.)
+          // -- 2018-07-16 twm
+          if TempInt <> VInteger then
+            SetPropValue(NativeObject, PropertyName, VInteger);
+        end;
       end;
 
     tkInt64: begin
@@ -3933,7 +4063,7 @@ var
   EditReaderPos: Integer;
   ReadDataSize: Integer;
   Buffer: array[0..EditReaderBufferSize] of AnsiChar; // Array of bytes, might be UTF-8
-  begin
+begin
   Assert(EditReader <> nil);
   Assert(Stream <> nil);
 
@@ -4044,11 +4174,11 @@ begin
   EditReader := View.Buffer.CreateReader;
   // If there are embedded tabs in the line, our offsets are off and we must
   // be sure to not request nagative indexes or return more than one line
-  LineStartPos := Position - (EditPos.Col - 1);
+  LineStartPos := Position - (CharPos.CharIndex);
   Offset := 0;
   if LineStartPos < 0 then // This happens with tabs at the beginning of the file
     Offset := Abs(LineStartPos);
-  LineLength := EditPos.Col - 1 - Offset;
+  LineLength := CharPos.CharIndex - Offset;
   Assert(LineLength >= 0);
   if LineLength = 0 then
     Exit;
@@ -4474,6 +4604,12 @@ begin
     MemStream.Position := 0;
     {$IFDEF UNICODE}
     Data.LoadFromStream(MemStream, TEncoding.UTF8);
+    // For some Unicode characters (e.g. $E59C and $E280 SynUnicode.LoadFromStream works,
+    // but TStringList.LoadFromStream doesn't.
+    // Depending on the RTL version the latter fails silently and returns an empty string list.
+    // So we check here for that condition and raise an error
+    if (Data.Count = 0) and (MemStream.Size >0) then
+      raise Exception.CreateFmt('%s.LoadFromFile failed to read %s.', [Data.ClassParent.ClassName, SourceEditor.FileName]);
     {$ELSE}
     if RunningDelphi8OrGreater then
       SynUnicode.LoadFromStream(Data, MemStream, seUTF8)
@@ -4942,72 +5078,6 @@ begin
   end;
 end;
 
-{$IFNDEF GX_VER160_up}
-// Delphi 6/7: IDE is non-unicode, string is ansistring
-
-// no conversion necessary
-function ConvertToIDEEditorString(const S: string): string;
-begin
-  Result := S;
-end;
-
-// no conversion necessary
-function IDEEditorStringToString(const S: string): string;
-begin
-  Result := S;
-end;
-
-// converting AnsiString to WideString is done automatically on assignment
-function UTF8ToUnicodeString(S: UTF8String): WideString;
-begin
-  Result := Utf8ToAnsi(S);
-end;
-
-{$ELSE GX_VER160_up}
-// Delphi 8+
-{$IFNDEF GX_VER200_up}
-// Delphi (8/)2005/2006/2007: IDE is unicode (UTF-8), string is ansistring (GX_VER160_up}
-
-function ConvertToIDEEditorString(const S: string): UTF8String;
-begin
-  Result := AnsiToUtf8(S);
-end;
-
-function IDEEditorStringToString(const S: UTF8String): string;
-begin
-  Result := Utf8ToAnsi(S);
-end;
-
-function UTF8ToUnicodeString(S: UTF8String): WideString;
-begin
-  Result := UTF8Decode(S);
-end;
-
-{$ELSE GX_VER200_up}
-// Delphi 2009+: IDE is unicode (UTF-8), string is unicodestring {GX_VER200_up}
-
-function ConvertToIDEEditorString(const S: string): UTF8String;
-begin
-  Result := UTF8Encode(s);
-end;
-
-function IDEEditorStringToString(const S: string): string;
-begin
-  Result := S;
-end;
-
-function IDEEditorStringToString(const S: IDEEditBufferString): string; overload;
-begin
-  Result := Utf8ToAnsi(S);
-end;
-
-function UTF8ToUnicodeString(S: UTF8String): WideString;
-begin
-  Result := Utf8ToAnsi(S);
-end;
-{$ENDIF GX_VER200_up}
-{$ENDIF GX_VER160_up}
-
 function HackBadIDEUTF8StringToString(const S: string): string;
 begin
   // Work around the fact that IOTAEditBlock.Text claims to return a
@@ -5020,11 +5090,18 @@ begin
 end;
 
 function HackBadEditorStringToNativeString(const S: string): string;
+var
+  len: Integer;
 begin
   if IDEEditorEncodingIsUTF8 then
     Result := IDEEditorStringToString(UTF8String(Pointer(S)))
   else
     Result := S;
+  len := Length(Result);
+  while (len >0) and (Result[len] = #0) do begin
+    Dec(len);
+    Result := LeftStr(Result, len);
+  end;
 end;
 
 { TBaseIdeNotifier }

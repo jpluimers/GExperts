@@ -51,6 +51,7 @@ uses
   GX_eSelectIdentifier in '..\..\source\Editor\GX_eSelectIdentifier.pas',
   GX_eSelectionEditorExpert in '..\..\source\Editor\GX_eSelectionEditorExpert.pas',
   GX_eSort in '..\..\Source\Editor\GX_eSort.pas' {fmeSortConfig},
+  GX_eSortOptions in '..\..\Source\Editor\GX_eSortOptions.pas' {frmSortOptions},
   GX_UsesExpert in '..\..\Source\UsesExpert\GX_UsesExpert.pas' {fmUsesManager},
   GX_UsesExpertOptions in '..\..\Source\UsesExpert\GX_UsesExpertOptions.pas' {fmUsesExpertOptions},
   GX_ePopupMenu in '..\..\Source\Editor\GX_ePopupMenu.pas' {fmEditorPopupMenuExpertConfig},
@@ -134,7 +135,6 @@ uses
   GX_ProofreaderConfig in '..\..\source\CodeProofreader\GX_ProofreaderConfig.pas' {fmProofreaderConfig},
   GX_ProofreaderCorrection in '..\..\source\CodeProofreader\GX_ProofreaderCorrection.pas',
   GX_ProofreaderData in '..\..\source\CodeProofreader\GX_ProofreaderData.pas',
-  GX_ProofreaderDefaults in '..\..\source\CodeProofreader\GX_ProofreaderDefaults.pas',
   GX_ProofreaderExpert in '..\..\source\CodeProofreader\GX_ProofreaderExpert.pas',
   GX_ProofreaderKeyboard in '..\..\source\CodeProofreader\GX_ProofreaderKeyboard.pas',
   GX_ProofreaderUtils in '..\..\source\CodeProofreader\GX_ProofreaderUtils.pas',
@@ -154,7 +154,7 @@ uses
   GX_SourceExport in '..\..\source\SourceExport\GX_SourceExport.pas' {fmSourceExport},
   GX_SourceExportOptions in '..\..\source\SourceExport\GX_SourceExportOptions.pas' {fmSourceExportOptions},
   GX_SynMemoUtils in '..\..\source\Framework\GX_SynMemoUtils.pas',
-  GX_TabOrder in '..\..\source\Experts\GX_TabOrder.pas' {fmTabOrder},
+  GX_TabOrder in '..\..\source\TabOrder\GX_TabOrder.pas' {fmTabOrder},
   GX_ToDo in '..\..\source\ToDoList\GX_ToDo.pas' {fmToDo},
   GX_ToDoOptions in '..\..\source\ToDoList\GX_ToDoOptions.pas' {fmToDoOptions},
   GX_Toolbar in '..\..\source\EditorToolbar\GX_Toolbar.pas',
@@ -226,9 +226,25 @@ uses
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
   GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas',
   GX_IdeManagedFormHandler in '..\..\source\IDE\GX_IdeManagedFormHandler.pas',
-  GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame};
+  GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame},
+  GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas',
+  GX_UsageStatistics in '..\..\Source\Framework\GX_UsageStatistics.pas' {fmUsageStatistics},
+  GX_dzDateUtils in '..\..\Source\Utils\GX_dzDateUtils.pas',
+  GX_UnitExportsParser in '..\..\Source\Framework\GX_UnitExportsParser.pas',
+  GX_dzNamedThread in '..\..\Source\Utils\GX_dzNamedThread.pas',
+  GX_DummyWizard in '..\..\Source\Framework\GX_DummyWizard.pas',
+  GX_IdeMessageAutoClose in '..\..\Source\IDE\GX_IdeMessageAutoClose.pas',
+  GX_MemoEscFix in '..\..\Source\Utils\GX_MemoEscFix.pas',
+  GX_KeyboardShortcuts in '..\..\Source\KeyboardShortcuts\GX_KeyboardShortcuts.pas' {fmGxKeyboardShortcuts},
+  GX_IdeDockFormEnhancer in '..\..\Source\IDE\GX_IdeDockFormEnhancer.pas',
+  GX_AddDockWindow in '..\..\Source\Experts\GX_AddDockWindow.pas' {fmGxDockForm},
+  GX_eRemoveMatchingLines in '..\..\Source\Editor\GX_eRemoveMatchingLines.pas' {fmRemoveMatchingLinesExpertConfig},
+  GX_TabOrderOptions in '..\..\Source\TabOrder\GX_TabOrderOptions.pas' {fmTabOrderOptions},
+  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
+  GX_IdeDetectForms in '..\..\Source\ide\GX_IdeDetectForms.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
+{$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}
 {$R *_version.res}
 
 begin

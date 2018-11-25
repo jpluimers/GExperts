@@ -4,11 +4,9 @@ object fmProjDependProp: TfmProjDependProp
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Dependency Properties'
-  ClientHeight = 420
-  ClientWidth = 363
+  ClientHeight = 267
+  ClientWidth = 304
   Color = clBtnFace
-  Constraints.MinHeight = 260
-  Constraints.MinWidth = 215
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -22,14 +20,14 @@ object fmProjDependProp: TfmProjDependProp
   TextHeight = 14
   object pnlButtons: TPanel
     Left = 0
-    Top = 388
-    Width = 363
+    Top = 235
+    Width = 304
     Height = 32
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     object pnlButtonsRight: TPanel
-      Left = 178
+      Left = 119
       Top = 0
       Width = 185
       Height = 32
@@ -52,8 +50,8 @@ object fmProjDependProp: TfmProjDependProp
   object pnlContent: TPanel
     Left = 0
     Top = 0
-    Width = 363
-    Height = 388
+    Width = 304
+    Height = 235
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 6
@@ -61,8 +59,8 @@ object fmProjDependProp: TfmProjDependProp
     object pgeProperties: TPageControl
       Left = 6
       Top = 6
-      Width = 351
-      Height = 376
+      Width = 292
+      Height = 223
       ActivePage = tabProperties
       Align = alClient
       TabIndex = 0
@@ -70,8 +68,8 @@ object fmProjDependProp: TfmProjDependProp
       object tabProperties: TTabSheet
         Caption = 'Properties'
         DesignSize = (
-          343
-          347)
+          284
+          194)
         object lblFileName: TLabel
           Left = 7
           Top = 20
@@ -91,7 +89,7 @@ object fmProjDependProp: TfmProjDependProp
         object laFileName: TStaticText
           Left = 64
           Top = 18
-          Width = 263
+          Width = 204
           Height = 18
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
@@ -101,8 +99,8 @@ object fmProjDependProp: TfmProjDependProp
         object lbxSource: TListBox
           Left = 64
           Top = 48
-          Width = 263
-          Height = 287
+          Width = 204
+          Height = 134
           Anchors = [akLeft, akTop, akRight, akBottom]
           ItemHeight = 14
           Sorted = True

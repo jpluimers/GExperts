@@ -5,7 +5,8 @@ unit GX_GExperts;
 interface
 
 uses
-  Classes, ToolsAPI, Controls, GX_EditorExpertManager, GX_Experts;
+  Classes, ToolsAPI, Controls, ExtCtrls,
+  GX_EditorExpertManager, GX_Experts;
 
 type
   TGExperts = class(TNotifierObject, IOTANotifier, IOTAWizard)
@@ -13,10 +14,15 @@ type
     FEditorExpertsManager: TGxEditorExpertManager;
     FExpertList: TList;
     FStartingUp: Boolean;
+    FCloseMessageViewTimer: TTimer;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    FLastDesktopName: string;
+{$ENDIF}
     procedure InstallAddIn;
     function GetExpert(const Index: Integer): TGX_Expert;
     function GetExpertCount: Integer;
     procedure InitializeGExperts;
+    procedure OnCloseMessageViewTimer(_Sender: TObject);
   protected
     // IOTAWizard
     function GetIDString: string;
@@ -44,9 +50,12 @@ type
 
     function GetSharedImages: TImageList;
     function GetExpertList: TList;
+    procedure TimedCloseMessageView;
   end;
 
-function GExpertsInst(ForceValid: Boolean = False): TGExperts;
+///<summary>
+/// @param CheckValid, if true, raises an exceptoin if the instance is NIL </summary>
+function GExpertsInst(CheckValid: Boolean = False): TGExperts;
 procedure ShowGXAboutForm;
 procedure ShowGXConfigurationForm;
 procedure InitSharedResources;
@@ -56,7 +65,7 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  SysUtils, Dialogs, ExtCtrls,
+  SysUtils, Dialogs, Forms,
   GX_GenericUtils, GX_GetIdeVersion, GX_About, GX_MenuActions, GX_MessageBox,
   GX_ConfigurationInfo, GX_Configure, GX_KbdShortCutBroker, GX_SharedImages,
   GX_IdeUtils, GX_IdeEnhance, GX_EditorChangeServices, GX_ToolbarDropDown;
@@ -83,9 +92,9 @@ var
   InitHelper: TInitHelper = nil;
   SharedImages: TdmSharedImages = nil;
 
-function GExpertsInst(ForceValid: Boolean): TGExperts;
+function GExpertsInst(CheckValid: Boolean): TGExperts;
 begin
-  if ForceValid and (not Assigned(FPrivateGExpertsInst)) then
+  if CheckValid and (not Assigned(FPrivateGExpertsInst)) then
     raise Exception.Create('GExpertsInst is not a valid reference');
   Result := FPrivateGExpertsInst;
 end;
@@ -132,6 +141,10 @@ begin
   InitializeGExperts;
   InitHelper := TInitHelper.Create(DoAfterIDEInitialized);
   gblAboutFormClass.AddToAboutDialog;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  FLastDesktopName := GetIdeDesktopName;
+  {$IFOPT D+} SendDebug('LastDesktopName:' + FLastDesktopName);  {$ENDIF}
+{$ENDIF}
 end;
 
 class procedure TGExperts.DelayedRegister;
@@ -369,6 +382,9 @@ end;
 procedure TGExperts.DoAfterIDEInitialized(Sender: TObject);
 var
   i: Integer;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  s: string;
+{$ENDIF}
 begin
   FStartingUp := False;
   for i := 0 to FExpertList.Count - 1 do
@@ -377,6 +393,47 @@ begin
     GxKeyboardShortCutBroker.DoUpdateKeyBindings;
   GXMenuActionManager.ArrangeMenuItems;
   GXMenuActionManager.MoveMainMenuItems;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+  // se also GX_EditorChangeServices
+  if ConfigInfo.GetForceDesktopOnStartup then begin
+    s := ConfigInfo.GetForcedStartupDesktop;
+    if s = '' then
+      s := FLastDesktopName;
+    SetIdeDesktop(s);
+  end;
+{$ENDIF}
+end;
+
+function FindClassForm(const AClassName: string): TForm;
+var
+  i: Integer;
+begin
+  Result := nil;
+  for i := 0 to Screen.FormCount - 1 do
+    if Screen.Forms[i].ClassNameIs(AClassName) then begin
+      Result := Screen.Forms[i];
+      Break;
+    end;
+end;
+
+procedure TGExperts.TimedCloseMessageView;
+begin
+  FCloseMessageViewTimer :=  TTimer.Create(nil);
+  FCloseMessageViewTimer.OnTimer := OnCloseMessageViewTimer;
+end;
+
+procedure TGExperts.OnCloseMessageViewTimer(_Sender: TObject);
+var
+  MessageViewForm: TForm;
+begin
+  FCloseMessageViewTimer.Enabled := False;
+  FreeAndNil(FCloseMessageViewTimer);
+  MessageViewForm := FindClassForm('TMsgWindow');
+  if MessageViewForm = nil then // otherwise TMessageViewForm is used
+    MessageViewForm := FindClassForm('TMessageViewForm');
+  if MessageViewForm = nil then
+    Exit; //==>
+  MessageViewForm.Hide;
 end;
 
 { TUnsupportedIDEMessage }

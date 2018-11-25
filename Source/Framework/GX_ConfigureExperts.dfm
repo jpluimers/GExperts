@@ -6,6 +6,7 @@ object frConfigureExperts: TfrConfigureExperts
   TabOrder = 0
   OnMouseWheelDown = FrameMouseWheelDown
   OnMouseWheelUp = FrameMouseWheelUp
+  OnResize = FrameResize
   object pnlExpertsFilter: TPanel
     Left = 0
     Top = 0
@@ -30,6 +31,7 @@ object frConfigureExperts: TfrConfigureExperts
       Height = 21
       TabOrder = 0
       OnChange = edtFilterChange
+      OnKeyDown = edtFilterKeyDown
     end
     object btnEnableAll: TButton
       Left = 406

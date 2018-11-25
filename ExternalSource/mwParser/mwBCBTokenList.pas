@@ -61,7 +61,7 @@ type
     ctktypename, ctkunion, ctkUnknown, ctkunsigned, ctkusing, ctkvirtual,
     ctkvoid, ctkvolatile, ctkwchar_t, ctkwhile, ctknextline);
 
-  TIdentDirect = set of TCTokenKind;
+  TCTokenKindSet = set of TCTokenKind;
 
   TCommentState = (csAnsi, csNo, csSlashes);
 
@@ -197,13 +197,13 @@ type
   end; { TBCBTokenList }
 
 const
-  IdentDirect: TIdentDirect = [ctkdirdefine, ctkdirelif, ctkdirelse,
-  ctkdirendif, ctkdirerror, ctkdirif, ctkdirifdef, ctkdirifndef,
+  IdentDirectC: TCTokenKindSet = [ctkdirdefine, ctkdirelif, ctkdirelse,
+    ctkdirendif, ctkdirerror, ctkdirif, ctkdirifdef, ctkdirifndef,
     ctkdirinclude, ctkdirline, ctkdirnull, ctkdirpragma, ctkdirundef];
 
 implementation
 
-uses SysUtils, GX_GenericUtils, GX_OtaUtils; //TODO: Remove dependency
+uses SysUtils, GX_GenericUtils;
 
 constructor TmsSearcher.Create(Value: TBCBTokenList);
 begin

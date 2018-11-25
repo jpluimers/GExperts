@@ -8,10 +8,11 @@ uses
   Windows,
   SysUtils,
   Classes,
-  SyncObjs;
+  SyncObjs,
+  GX_dzNamedThread;
 
 type
-  TReadMapFileThread = class(TThread)
+  TReadMapFileThread = class(TNamedThread)
   private
     FSearchPath: TStringList;
     FMapFile: string;
@@ -55,11 +56,11 @@ end;
 
 destructor TReadMapFileThread.Destroy;
 begin
+  inherited;
   FreeAndNil(FFileExtensions);
   FreeAndNil(FResults);
   FreeAndNil(FSearchPath);
   FreeAndNil(FResultsLock);
-  inherited;
 end;
 
 procedure TReadMapFileThread.Execute;
@@ -72,6 +73,8 @@ var
   PathIdx: Integer;
   ExtensionIndex: Integer;
 begin
+  inherited;
+
   FComplete := False;
   try
     LockResults;
@@ -80,7 +83,7 @@ begin
     finally
       ReleaseResults;
     end;
-    inherited;
+
     Reader := TMapFileReader.Create(FMapFile);
     try
       if Terminated then

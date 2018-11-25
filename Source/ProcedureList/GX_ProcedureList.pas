@@ -77,7 +77,8 @@ type
     procedure tbnShowFunctionCodeClick(Sender: TObject);
     procedure actOptionsExecute(Sender: TObject);
     procedure lvProcsCompare(Sender: TObject; Item1, Item2: TListItem; Data: Integer; var Compare: Integer);
-    procedure splSeparatorMoved(Sender: TObject);
+    procedure splSeparatorCanResize(Sender: TObject; var NewSize: Integer; var Accept: Boolean);
+    procedure lvProcsResize(Sender: TObject);
   private
     FFileScanner: TFileScanner;
     FEditReader: TEditReader;
@@ -88,6 +89,8 @@ type
     FCodeText: TGXEnhancedEditor;
     FOptions: TProcedureListOptions;
     FLastProcLineNo: Integer;
+    FMinListWidth: Integer;
+    FMinListHeight: Integer;
     function GetImageIndex(const ProcName, ProcClass: string): Integer;
     procedure LoadProcs;
     procedure FillListBox;
@@ -117,9 +120,9 @@ implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
-  Windows, Clipbrd, Menus,
+  Windows, Clipbrd, Menus, StrUtils,
   GX_GxUtils, GX_GenericUtils, GX_OtaUtils, GX_IdeUtils,
-  GX_SharedImages, GX_Experts, Math;
+  GX_SharedImages, GX_Experts, Math, GX_dzVclUtils;
 
 resourcestring
   SAllString = '<All>';
@@ -146,6 +149,11 @@ var
   LoadTime: DWORD;
 begin
   inherited Create(AOwner);
+  TControl_SetMinConstraints(Self);
+
+  FMinListWidth := 500;
+  FMinListHeight := 200;
+
   SetNonModalFormPopupMode(Self);
 
   FFileName := FileName;
@@ -188,7 +196,7 @@ begin
     Result := ImageIndexNew
   else if StrContains('destructor', ProcName, False) then // Do not localize.
     Result := ImageIndexTrash
-  else if StrBeginsWith('class proc', ProcName, False) or StrContains('class func', ProcName, False) or (ProcClass <> '') then // Do not localize
+  else if StartsText('class proc', ProcName) or StrContains('class func', ProcName, False) or (ProcClass <> '') then // Do not localize
     Result := ImageIndexGear
   else
     Result := ImageIndexFunction;
@@ -275,9 +283,9 @@ begin
 
       if Length(edtMethods.Text) = 0 then
         AddListItem(ProcInfo)
-      else if not FOptions.SearchAll and StrBeginsWith(edtMethods.Text, ProcInfo.ProcName, False) then
+      else if not FOptions.SearchAll and StartsText(edtMethods.Text, ProcInfo.ProcName) then
         AddListItem(ProcInfo)
-      else if not FOptions.SearchAll and FOptions.SearchClassName and StrBeginsWith(edtMethods.Text, ProcInfo.ProcClass, False) then
+      else if not FOptions.SearchAll and FOptions.SearchClassName and StartsText(edtMethods.Text, ProcInfo.ProcClass) then
         AddListItem(ProcInfo)
       else if FOptions.SearchAll and StrContains(edtMethods.Text, ProcInfo.ProcName, False) then
         AddListItem(ProcInfo)
@@ -296,16 +304,14 @@ begin
 end;
 
 procedure TfmProcedureList.FormResize(Sender: TObject);
+var
+  w: Integer;
 begin
-  with StatusBar do
-  begin
-    if Width > 80 then
-    begin
-      Panels[1].Width := 80;
-      Panels[0].Width := Width - 80;
-    end;
+  w := StatusBar.Width;
+  if w > 80 then begin
+    StatusBar.Panels[1].Width := 80;
+    StatusBar.Panels[0].Width := w - 80;
   end;
-  ResizeCols;
 end;
 
 // This is just a nasty hack to be sure the scroll bar is set right
@@ -318,7 +324,12 @@ end;
 procedure TfmProcedureList.UMResizeCols(var Msg: TMessage);
 begin
   Application.ProcessMessages;
-  lvProcs.Columns[1].Width := Max(0, lvProcs.ClientWidth - lvProcs.Columns[2].Width
+  // this might be the "correct" way to resize the list, but it flickers a lot:
+  //  TListView_Resize(lvProcs);
+  // One reason for this is that this method is called very often, e.g. about 5 times
+  // already when the dialog is opened.
+  // So until we find a way to prevent this, we keep the following code:
+  lvProcs.Columns[1].Width := Max(80, lvProcs.ClientWidth - lvProcs.Columns[2].Width
     - lvProcs.Columns[3].Width - lvProcs.Columns[0].Width);
 end;
 
@@ -481,20 +492,22 @@ begin
   end;
 
   if not (IsDprOrPas(FileName) or IsTypeLibrary(FileName) or IsInc(FileName) or
-    IsCpp(FileName) or IsC(FileName) or IsH(FileName)) then
-    MessageDlg(SPasOrDprOrCPPOnly, mtError, [mbOK], 0)
-  else
-  begin
-    {$IFOPT D+} SendDebug('Procedure List: Expert activated'); {$ENDIF}
-    Dlg := TfmProcedureList.CreateWithFileName(nil, FileName);
-    try
-      SetFormIcon(Dlg);
-      if Dlg.ShowModal <> mrCancel then
-        GxOtaMakeSourceVisible(FileName);
-    finally
-      FreeAndNil(Dlg);
-    end;
+    IsCpp(FileName) or IsC(FileName) or IsH(FileName)) then begin
+    MessageDlg(SPasOrDprOrCPPOnly, mtError, [mbOK], 0);
+    Exit; //==>
   end;
+
+  {$IFOPT D+} SendDebug('Procedure List: Expert activated'); {$ENDIF}
+  Dlg := TfmProcedureList.CreateWithFileName(nil, FileName);
+  try
+    SetFormIcon(Dlg);
+    if Dlg.ShowModal <> mrCancel then
+      GxOtaMakeSourceVisible(FileName);
+  finally
+    FreeAndNil(Dlg);
+  end;
+
+  IncCallCount;
 end;
 
 function TProcedureExpert.HasConfigOptions: Boolean;
@@ -603,6 +616,11 @@ end;
 constructor TfmProcedureList.Create(AOwner: TComponent);
 begin
   inherited;
+  TControl_SetMinConstraints(Self);
+
+  FMinListWidth := 500;
+  FMinListHeight := 200;
+
   SetToolbarGradient(ToolBar);
   lvProcs.DoubleBuffered := True;
   InitializeForm;
@@ -671,6 +689,19 @@ begin
   FCodeText.ReadOnly := True;
 end;
 
+procedure TfmProcedureList.splSeparatorCanResize(Sender: TObject; var NewSize: Integer;
+  var Accept: Boolean);
+begin
+  if splSeparator.Align in [alLeft, alRight] then begin
+    if ClientWidth - NewSize < FMinListWidth then
+      NewSize := ClientWidth - FMinListWidth;
+  end else begin
+    // alTop, alBottom
+    if ClientHeight - NewSize < FMinListHeight then
+      NewSize := ClientHeight - FMinListHeight;
+  end;
+end;
+
 class function TProcedureExpert.GetName: string;
 begin
   Result := 'ProcedureList'; // Do not localize.
@@ -714,7 +745,6 @@ begin
     if ShowModal = mrOK then
     begin
       ApplyOptions(False);
-      ResizeCols;
       FillListBox;
     end;
   finally
@@ -729,7 +759,6 @@ procedure TfmProcedureList.ApplyOptions(const bLoading: Boolean);
     pnlFunctionBody.Visible := bVisible;
     splSeparator.Visible := bVisible;
     tbnShowFunctionCode.Down := bVisible;
-    ResizeCols;
   end;
 
 begin
@@ -786,7 +815,7 @@ begin
   Compare := AnsiCompareText(Item1Value, Item2Value);
 end;
 
-procedure TfmProcedureList.splSeparatorMoved(Sender: TObject);
+procedure TfmProcedureList.lvProcsResize(Sender: TObject);
 begin
   ResizeCols;
 end;

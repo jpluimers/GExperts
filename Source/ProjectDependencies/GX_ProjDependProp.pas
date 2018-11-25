@@ -17,10 +17,23 @@ type
     lblSource: TLabel;
     laFileName: TStaticText;
     lbxSource: TListBox;
+  public
+    constructor Create(_Owner: TComponent); override;
   end;
 
 implementation
 
+uses
+  GX_dzVclUtils;
+
 {$R *.dfm}
+
+{ TfmProjDependProp }
+
+constructor TfmProjDependProp.Create(_Owner: TComponent);
+begin
+  inherited;
+  TControl_SetMinConstraints(Self);
+end;
 
 end.

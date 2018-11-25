@@ -19,19 +19,21 @@ implementation
 uses
 {$IFOPT D+}GX_DbugIntf,
 {$ENDIF}
-  ToolsAPI,
   Windows,
+  Classes,
   Messages,
   Forms,
   Controls,
   StdCtrls,
   ExtCtrls,
-  Classes,
+  Graphics,
+  ToolsAPI,
   GX_OtaUtils,
   GX_dzClassUtils,
   GX_UnitPositions,
   GX_IdeFormEnhancer,
-  GX_IdeDialogEnhancer;
+  GX_IdeDialogEnhancer,
+  GX_IdeDetectForms;
 
 type
   TWinControlHack = class(TWinControl)
@@ -43,7 +45,9 @@ type
     lb_UnitPositions: TListBox;
     FUnitPositions: TUnitPositions;
     FLineInput: TWinControlHack;
+    FOkButton: TButton;
     procedure lb_UnitPositionsClick(Sender: TObject);
+    procedure lb_UnitPositionsDblClick(Sender: TObject);
     procedure LineInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     function IsDesiredForm(_Form: TCustomForm): Boolean; override;
@@ -73,11 +77,8 @@ end;
 { TGotoEnhancer }
 
 function TGotoEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
-const
-  DIALOG_CLASS = 'TGotoLineDialog';
-  DIALOG_NAME = 'GotoLineDialog';
 begin
-  Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
+  Result := IsGotoForm(_Form);
 end;
 
 procedure TGotoEnhancer.EnhanceForm(_Form: TForm);
@@ -85,12 +86,12 @@ const
   LB_UNIT_POSITIONS = 'GxIdeGotoEnhancerUnitPositionsListbox';
 var
   Bevel1: TBevel;
-  OkButton: TButton;
   CancelButton: TButton;
   HelpButton: TButton;
   Items: TStrings;
   i: Integer;
   cmp: TComponent;
+  Y: Integer;
 begin
   if TComponent_FindComponent(_Form, LB_UNIT_POSITIONS, True, cmp) then
     Exit;
@@ -99,26 +100,23 @@ begin
     Exit;
   if not TComponent_FindComponent(_Form, 'LineInput', True, TComponent(FLineInput), TWinControl) then
     Exit;
-  if not TComponent_FindComponent(_Form, 'OKButton', True, TComponent(OkButton), TButton) then
+  if not TComponent_FindComponent(_Form, 'OKButton', True, TComponent(FOkButton), TButton) then
     Exit;
   if not TComponent_FindComponent(_Form, 'CancelButton', True, TComponent(CancelButton), TButton) then
     Exit;
   if not TComponent_FindComponent(_Form, 'HelpButton', True, TComponent(HelpButton), TButton) then
     Exit;
 
-  _Form.Height := 240;
-  OkButton.Top := _Form.ClientHeight - OkButton.Height - 8;
-  CancelButton.Top := _Form.ClientHeight - CancelButton.Height - 8;
-  HelpButton.Top := _Form.ClientHeight - HelpButton.Height - 8;
   lb_UnitPositions := TListBox.Create(_Form);
   lb_UnitPositions.Name := LB_UNIT_POSITIONS;
   lb_UnitPositions.Parent := _Form;
   lb_UnitPositions.Top := Bevel1.Top + Bevel1.Height + 8;
   lb_UnitPositions.Left := Bevel1.Left;
   lb_UnitPositions.Width := Bevel1.Width;
-  lb_UnitPositions.Height := OkButton.Top - lb_UnitPositions.Top - 8;
+  lb_UnitPositions.Height := FOkButton.Top - lb_UnitPositions.Top - 8;
   lb_UnitPositions.OnClick := lb_UnitPositionsClick;
-  lb_UnitPositions.TabOrder := OkButton.TabOrder;
+  lb_UnitPositions.OnDblClick := lb_UnitPositionsDblClick;
+  lb_UnitPositions.TabOrder := FOkButton.TabOrder;
 
   Items := lb_UnitPositions.Items;
   Items.BeginUpdate;
@@ -130,6 +128,12 @@ begin
   finally
     Items.EndUpdate;
   end;
+  lb_UnitPositions.ClientHeight := (FUnitPositions.Count + 1) * lb_UnitPositions.ItemHeight;
+  Y := lb_UnitPositions.Top + lb_UnitPositions.Height + 8;
+  FOkButton.Top := Y;
+  CancelButton.Top := Y;
+  HelpButton.Top := Y;
+  _Form.ClientHeight := Y + FOkButton.Height + 8;
 
   FLineInput.OnKeyDown := LineInputKeyDown;
 end;
@@ -184,6 +188,15 @@ begin
   View.ConvertPos(False, CursorPos, CharPos);
   TCombobox_SetText(FLineInput, IntToStr(CursorPos.Line));
   TCombobox_SelectAll(FLineInput);
+end;
+
+procedure TGotoEnhancer.lb_UnitPositionsDblClick(Sender: TObject);
+begin
+  if lb_UnitPositions.ItemIndex < 0 then
+    Exit; //==>
+  lb_UnitPositionsClick(Sender);
+  if Assigned(FOkButton) then
+    FOkButton.Click;
 end;
 
 end.

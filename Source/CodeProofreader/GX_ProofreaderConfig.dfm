@@ -7,8 +7,6 @@ object fmProofreaderConfig: TfmProofreaderConfig
   ClientHeight = 490
   ClientWidth = 523
   Color = clBtnFace
-  Constraints.MinHeight = 400
-  Constraints.MinWidth = 460
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -12

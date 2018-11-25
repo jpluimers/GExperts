@@ -62,6 +62,8 @@ begin
   if not GxOtaGetCurrentIdentData(Identifier, Position) then
     Exit;
   gblCodeFormatter.AddToCapitalization(Identifier);
+
+  IncCallCount;
 end;
 
 initialization

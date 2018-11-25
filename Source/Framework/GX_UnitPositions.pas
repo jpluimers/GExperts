@@ -29,9 +29,10 @@ type
 implementation
 
 uses
-  SysUtils, GX_OtaUtils, GX_GenericUtils;
+  SysUtils, GX_OtaUtils, GX_GenericUtils, mwPasParserTypes;
 
 resourcestring
+  // todo: Why are these ResourceStrings? They will never get translated.
   SUnitName = 'unit';
   SProgramName = 'program';
   SLibraryName = 'library';
@@ -77,7 +78,7 @@ end;
 function TUnitPositions.GetPosition(Index: Integer): TUnitPosition;
 begin
   Result.Name := FPosList[Index];
-  Result.Position := NativeInt(FPosList.Objects[Index]);
+  Result.Position := GXNativeInt(FPosList.Objects[Index]);
 end;
 
 procedure TUnitPositions.GetPositions;

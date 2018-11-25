@@ -21,7 +21,8 @@ interface
 {.$DEFINE UseInternalTestClient}
 
 uses
-  ToolsAPI;
+  ToolsAPI,
+  GX_ConfigurationInfo; // needed only for STARTUP_LAYOUT_FIX_ENABLED
 
 type
   { Implement the IGxEditorNotification interface to learn of
@@ -63,6 +64,7 @@ implementation
 uses
   {$IFOPT D+} GX_DbugIntf, TypInfo, {$ENDIF}
   SysUtils, Windows, Classes, Messages, Controls, Forms,
+  StdCtrls, // needed only for STARTUP_LAYOUT_FIX_ENABLED
   GX_GenericUtils, GX_GenericClasses, GX_IdeUtils, GX_OtaUtils;
 
 type
@@ -113,6 +115,11 @@ type
     function HasNotifierBeenInstalled(const FileName: string): Boolean;
     procedure NotifyClientNewModule(const Module: IOTAModule);
     function ValidModuleFileName(const FileName: string): Boolean;
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    // Fix for the IDE always switching to the Startup Layout
+    procedure SaveUserDesktop;
+    procedure RestoreUserDesktop;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
   protected
     // IOTAIdeNotifier
     procedure FileNotification(NotifyCode: TOTAFileNotification;
@@ -531,6 +538,13 @@ begin
   case NotifyCode of
     ofnFileOpened:
       InstallModuleNotifier(FileName);
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+    ofnProjectDesktopSave:
+      SaveUserDesktop;
+
+    ofnActiveProjectChanged:
+      RestoreUserDesktop;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
   else // case  // FI:W506
     // Do nothing
   end;
@@ -640,6 +654,64 @@ begin
     // FInstalledEditorNotifiers.Count down to zero.
   end;
 end;
+
+{$IFDEF STARTUP_LAYOUT_FIX_ENABLED}
+type
+  TComboBoxHack = class(TComboBox);
+
+procedure TGxIdeNotifier.RestoreUserDesktop;
+var
+  Settings     : TGExpertsSettings;
+  LDesktopName : string;
+begin
+  if not ConfigInfo.GetForceDesktopOnStartup then
+    Exit; //==>
+
+  LDesktopName := ConfigInfo.GetForcedStartupDesktop;
+  if LDesktopName = '' then begin
+    Settings := TGExpertsSettings.Create;
+    try
+      LDesktopName := Settings.ReadString('Desktop', 'Layout', '');
+    finally
+      FreeAndNil(Settings);
+    end;
+  end;
+
+  if Length(LDesktopName) > 0 then
+    SetIdeDesktop(LDesktopName);
+end;
+
+procedure TGxIdeNotifier.SaveUserDesktop;
+var
+  cbDesktop   : TComboBox;
+  ndx         : Integer;
+  LDesktopName: string;
+  LIgnoreName : string;
+  Settings    : TGExpertsSettings;
+begin
+  if not TryGetDesktopCombo(cbDesktop) then
+    Exit; //==>
+  ndx := cbDesktop.ItemIndex;
+  if ndx > 0 then
+  begin
+    LDesktopName := cbDesktop.Items.Strings[ndx];
+
+    // do not store layouts with these names:
+    LIgnoreName := AnsiUpperCase(LDesktopName);
+    if (AnsiPos('DEFAULT', LIgnoreName)=1)
+    or (AnsiPos('STARTUP', LIgnoreName)=1)
+    or (AnsiPos('DEBUG', LIgnoreName) > 0)
+    then Exit;
+
+    Settings := TGExpertsSettings.Create;
+    try
+      Settings.WriteString('Desktop', 'Layout', LDesktopName);
+    finally
+      FreeAndNil(Settings);
+    end;
+  end;
+end;
+{$ENDIF STARTUP_LAYOUT_FIX_ENABLED}
 
 function TGxIdeNotifier.ValidModuleFileName(const FileName: string): Boolean;
 begin
@@ -924,7 +996,7 @@ begin
   begin
     //FEditorHandle := EditControl.Handle;
     FNewEditControlWndProc := Classes.MakeObjectInstance(EditControlWndProc);
-    FOldEditControlWndProc := SetWindowLong(EditControl.Handle, GWL_WNDPROC, NativeInt(FNewEditControlWndProc));
+    FOldEditControlWndProc := SetWindowLong(EditControl.Handle, GWL_WNDPROC, GXNativeInt(FNewEditControlWndProc));
     if FOldEditControlWndProc = 0 then
     begin
       {$IFOPT D+} SendDebugError('Windows error hooking EditorWndProc'); {$ENDIF}
@@ -955,7 +1027,7 @@ begin
   begin
     {$IFOPT D+} SendDebug('Starting unhook procedure'); {$ENDIF}
     EditorHandle := GetEditControl.Handle;
-    if SetWindowLong({F}EditorHandle, GWL_WNDPROC, NativeInt(FOldEditControlWndProc)) = 0 then
+    if SetWindowLong({F}EditorHandle, GWL_WNDPROC, GXNativeInt(FOldEditControlWndProc)) = 0 then
     begin
       {$IFOPT D+} SendDebugError('Windows error unhooking EditorWndProc'); {$ENDIF}
     end;

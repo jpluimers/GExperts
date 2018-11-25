@@ -122,7 +122,8 @@ implementation
 
 uses
   SysUtils, Dialogs,
-  GX_OtaUtils, GX_GenericUtils, GX_ReplaceCompUtils, GX_ConfigurationInfo;
+  GX_OtaUtils, GX_GenericUtils, GX_ReplaceCompUtils, GX_ConfigurationInfo,
+  GX_dzVclUtils;
 
 {$R *.dfm}
 
@@ -140,6 +141,7 @@ constructor TfmReplaceCompMapDets.Create(Owner: TComponent; ConfigData: TReplace
   Item: TCompRepMapItem; DataAction: TDataAction);
 begin
   inherited Create(Owner);
+  TControl_SetConstraints(Self, [ccMinWidth, ccMinHeight, ccMaxHeight]);
   SetToolbarGradient(ToolBar);
   Assert(Assigned(ConfigData));
   Assert(Assigned(Item));

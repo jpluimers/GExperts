@@ -4,8 +4,8 @@ object fmToDo: TfmToDo
   ActiveControl = lvTodo
   AutoScroll = False
   Caption = 'To Do List'
-  ClientHeight = 320
-  ClientWidth = 675
+  ClientHeight = 229
+  ClientWidth = 665
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -23,8 +23,8 @@ object fmToDo: TfmToDo
   TextHeight = 14
   object StatusBar: TStatusBar
     Left = 0
-    Top = 301
-    Width = 675
+    Top = 210
+    Width = 665
     Height = 19
     Panels = <>
     ParentFont = True
@@ -34,8 +34,8 @@ object fmToDo: TfmToDo
   object lvTodo: TListView
     Left = 0
     Top = 22
-    Width = 675
-    Height = 279
+    Width = 665
+    Height = 188
     Align = alClient
     Columns = <
       item
@@ -79,7 +79,7 @@ object fmToDo: TfmToDo
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 675
+    Width = 665
     Height = 22
     AutoSize = True
     DisabledImages = dmSharedImages.DisabledImages
