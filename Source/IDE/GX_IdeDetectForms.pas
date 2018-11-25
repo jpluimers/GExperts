@@ -1,5 +1,7 @@
 unit GX_IdeDetectForms;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
