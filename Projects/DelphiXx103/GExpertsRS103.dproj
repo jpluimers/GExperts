@@ -28,6 +28,12 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>GExpertsRS103</SanitizedProjectName>
         <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
@@ -50,8 +56,6 @@
         <PreBuildEvent><![CDATA[call ..\..\buildtools\prebuild.cmd "$(PROJECTPATH)"
 call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"
 $(PreBuildEvent)]]></PreBuildEvent>
-        <Debugger_HostApplication>C:\Delphi\Delphi_10_3\bin\bds.exe</Debugger_HostApplication>
-        <Debugger_RunParams>-np</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_DebugInformation>0</DCC_DebugInformation>
@@ -65,6 +69,10 @@ $(PreBuildEvent)]]></PreBuildEvent>
         <DCC_Optimize>False</DCC_Optimize>
         <DCC_UnitSearchPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Manifest_File>None</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <Debugger_HostApplication>C:\Delphi\Delphi_10_3\bin\bds.exe</Debugger_HostApplication>
+        <Debugger_RunParams>-np</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -535,6 +543,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <Form>fmTabOrderOptions</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
+        <DCCReference Include="..\..\Source\ide\GX_DetectIdeSearchPathForm.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
