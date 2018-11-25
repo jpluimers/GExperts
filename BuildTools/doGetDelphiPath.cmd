@@ -6,8 +6,10 @@ set DelphiVersion=%1
 
 rem Support for Windows 7/8, 64 Bit
 set ProgFiles=%ProgramFiles(x86)%
+set gx_windows_type=win64
 if not "%ProgFiles%"=="" goto Win64Bit
 set ProgFiles=%ProgramFiles%
+set gx_windows_type=win32
 :Win64Bit
 
 set DelphiPath=
@@ -88,7 +90,7 @@ goto DelphiEndCase
 
 echo DelphiPath: "%DelphiPath%"
 if exist "%DelphiPath%" goto allok
-echo *** Error: Directory "%DelphiPath%" does not exist. ***
+echo *** Error: Directory "%DelphiPath%" does not exist. Variable DelphiPath in %~df0 ***
 pause
 goto :eof
 
@@ -100,9 +102,18 @@ goto :eof
 :ReadReg
 rem read the registry entry
 set DelphiPath=
-FOR /F "usebackq skip=2 tokens=3,*" %%A IN (`REG QUERY HKCU\Software\%1 /v RootDir 2^>nul`) DO (
+FOR /F "usebackq skip=2 tokens=3,*" %%A IN (`REG QUERY "HKLM\SOFTWARE\%~1" /v RootDir 2^>nul`) DO (
   set DelphiPath=%%A %%B
+  goto :HaveReg
 )
+:: we do not have a registry variable yet
+if "%gx_windows_type%" == "win64" (
+  FOR /F "usebackq skip=2 tokens=3,*" %%A IN (`REG QUERY "HKLM\SOFTWARE\Wow6432Node\%~1" /v RootDir 2^>nul`) DO (
+    set DelphiPath=%%A %%B
+    goto :HaveReg
+  )
+)
+:HaveReg
 rem remove one trailing space which might have been added because %%B was empty
 rem remove any quotes
 set DelphiPath=%DelphiPath:"=%
