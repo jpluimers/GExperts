@@ -1,5 +1,7 @@
 unit GX_MenusForEditorExpert;
 
+{$I GX_CondDefine.inc}
+
 interface
 
 uses
@@ -40,7 +42,11 @@ begin
   if not Assigned(InternalPopupMenu) then
   begin
     InternalPopupMenu := NewPopupMenu(nil, MenuName, paCenter, False, []);
+{$IFNDEF GX_VER330_up} // RAD Studio 10.3 Rio (27; BDS 20)
+    // assigninig icons has redraw problems in themed IDEs (notably 10.3, I haven't tried 10.2 yet)
+    // todo: Figure out the real problem and assign them again
     InternalPopupMenu.Images := GxOtaGetIdeImageList;
+{$ENDIF}
   end;
 
   Result := InternalPopupMenu;
@@ -76,9 +82,15 @@ begin
   APopupMenu := GetInternalPopupMenu;
   Assert(Assigned(APopupMenu));
   PopulatePopupMenu(APopupMenu);
+
+// this seems to work for theming the menu, but I won't bother right now
+//  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then begin
+//    If ITS.IDEThemingEnabled Then
+//    ITS.ApplyTheme(APopupMenu);
+//  end;
+
   APopupMenu.Popup(MousePosition.x, MousePosition.y);
 end;
-
 
 // Note: Partially duplicated below
 procedure TGxMenusForEditorExperts.CreateSubMenuItems(MenuItem: TMenuItem);
