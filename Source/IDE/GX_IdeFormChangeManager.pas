@@ -39,7 +39,7 @@ uses Windows,
   GX_ConfigurationInfo,
   GX_EventHook,
   GX_dzVclUtils,
-  GX_DetectIdeSearchPathForm;
+  GX_IdeDetectForms;
 
 type
   TFormChangeCallbackItem = class
@@ -172,8 +172,8 @@ var
   reg: TRegistry;
 begin
   Result := False;
-  // is it the path editor form?
-  if not IsSarchPathForm(_Form) then
+  // is it the Search Path editor form or the Goto form?
+  if not IsSarchPathForm(_Form) and not IsGotoForm(_Form) then
     Exit; //==>
 
   // if yes, check if theming is enabled
@@ -216,6 +216,7 @@ begin
     // Workaround for redraw issue in Delphi 10.2 when theming is enabled:
     // https://sourceforge.net/p/gexperts/bugs/86/
     // Disable redraws while we change the window
+    // Unfortunately this seems to work only for the Search Path dialog, but not for the Goto dialog.
     NeedsWorkaround := HasRedrawProblems(Form);
     if NeedsWorkaround then
       SendMessage(Form.Handle, WM_SETREDRAW, WParam(False), 0);

@@ -38,7 +38,7 @@ uses
   GX_IdeFavoritesList,
   GX_ConfigurationInfo,
   GX_IdeSearchPathFavoriteEdit,
-  GX_DetectIdeSearchPathForm,
+  GX_IdeDetectForms,
   GX_IdeDialogEnhancer;
 
 type

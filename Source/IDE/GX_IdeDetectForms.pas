@@ -1,4 +1,4 @@
-unit GX_DetectIdeSearchPathForm;
+unit GX_IdeDetectForms;
 
 interface
 
@@ -12,7 +12,17 @@ uses
 // https://blog.dummzeuch.de/2018/11/24/found-the-cause-of-the-av-on-exiting-the-delphi-ide/
 function IsSarchPathForm(_Form: TCustomForm): Boolean;
 
+function IsGotoForm(_Form: TCustomForm): Boolean;
+
 implementation
+
+function IsGotoForm(_Form: TCustomForm): Boolean;
+const
+  DIALOG_CLASS = 'TGotoLineDialog';
+  DIALOG_NAME = 'GotoLineDialog';
+begin
+  Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
+end;
 
 
 type

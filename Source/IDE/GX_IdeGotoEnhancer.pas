@@ -19,20 +19,21 @@ implementation
 uses
 {$IFOPT D+}GX_DbugIntf,
 {$ENDIF}
-  ToolsAPI,
   Windows,
+  Classes,
   Messages,
   Forms,
   Controls,
   StdCtrls,
   ExtCtrls,
-  Classes,
+  Graphics,
+  ToolsAPI,
   GX_OtaUtils,
   GX_dzClassUtils,
   GX_UnitPositions,
   GX_IdeFormEnhancer,
   GX_IdeDialogEnhancer,
-  Graphics;
+  GX_IdeDetectForms;
 
 type
   TWinControlHack = class(TWinControl)
@@ -76,11 +77,8 @@ end;
 { TGotoEnhancer }
 
 function TGotoEnhancer.IsDesiredForm(_Form: TCustomForm): Boolean;
-const
-  DIALOG_CLASS = 'TGotoLineDialog';
-  DIALOG_NAME = 'GotoLineDialog';
 begin
-  Result := (_Form.ClassName = DIALOG_CLASS) and (_Form.Name = DIALOG_NAME);
+  Result := IsGotoForm(_Form);
 end;
 
 procedure TGotoEnhancer.EnhanceForm(_Form: TForm);

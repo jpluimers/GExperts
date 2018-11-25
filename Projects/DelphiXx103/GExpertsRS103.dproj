@@ -543,7 +543,7 @@ $(PreBuildEvent)]]></PreBuildEvent>
             <Form>fmTabOrderOptions</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
-        <DCCReference Include="..\..\Source\ide\GX_DetectIdeSearchPathForm.pas"/>
+        <DCCReference Include="..\..\Source\ide\GX_IdeDetectForms.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
