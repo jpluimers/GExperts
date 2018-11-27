@@ -141,6 +141,15 @@ type
     FIdentifiers: TStrings;
     FPaths: TStringList;
     FCacheDirBS: string;
+    FLoadingTimeMS: Int64;
+    FInsertingTimeMS: Int64;
+    FSortingTimeMS: Int64;
+    FParsedUnitsCount: Integer;
+    FLoadedUnitsCount: Integer;
+    FProcessingTimeMS: Int64;
+    FTotalTimeMS: Int64;
+    FSearchingTimeMS: Int64;
+    FParsingTimeMS: Int64;
     procedure AddSymbols(_Parser: TUnitExportsParser);
   protected
     procedure Execute; override;
@@ -157,11 +166,23 @@ type
     /// @NOTE: Make a copy of these PChars (e.g. assign them to a string because they point
     ///        to entries in FUnits that are freed in the destructor! </summary>
     property Identifiers: TStrings read FIdentifiers;
+    property ParsedUnitsCount: Integer read FParsedUnitsCount;
+    property LoadedUnitsCount: Integer read FLoadedUnitsCount;
+    property LoadingTimeMS: Int64 read FLoadingTimeMS;
+    property InsertingTimeMS: Int64 read FInsertingTimeMS;
+    property ParsingTimeMS: Int64 read FParsingTimeMS;
+    property ProcessingTimeMS: Int64 read FProcessingTimeMS;
+    property SortingTimeMS: Int64 read FSortingTimeMS;
+    property TotalTimeMS: Int64 read FTotalTimeMS;
+    property SearchingTimeMS: Int64 read FSearchingTimeMS;
   end;
 
 implementation
 
 uses
+{$IFDEF GX_VER330_up}
+  System.Diagnostics,
+{$ENDIF}
   StrUtils,
   GX_GenericUtils;
 
@@ -176,7 +197,7 @@ begin
   FSymbols.CaseSensitive := False;
   FIfdefStack := TStringList.Create;
 
-   // call the following functions so they don't get elimiated by the linker
+  // call the following functions so they don't get elimiated by the linker
   TopOfStack;
   Content;
 end;
@@ -967,14 +988,14 @@ begin
 {$IFDEF VER320} // Delphi 10.2 Tokyo / BDS 19
   _Parser.Symbols.Add('VER320');
 {$ENDIF}
-// todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
+  // todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
 {$IFDEF UNICODE}
   _Parser.Symbols.Add('UNICODE');
 {$ENDIF}
-// todo: Handle the symbols defined by the target somehow
-// {$ifdef WINDOWS}
-//  _Parser.Symbols.Add('WINDOWS');
-// {$ENDIF}
+  // todo: Handle the symbols defined by the target somehow
+  // {$ifdef WINDOWS}
+  //  _Parser.Symbols.Add('WINDOWS');
+  // {$ENDIF}
 end;
 
 procedure TUnitExportParserThread.Execute;
@@ -986,8 +1007,30 @@ var
   sl: TStrings;
   UnitName: string;
   CacheFn: string;
+{$IFDEF GX_VER330_up}
+  Loading: TStopwatch;
+  Inserting: TStopwatch;
+  Sorting: TStopwatch;
+  Processing: TStopwatch;
+  Total: TStopwatch;
+  Searching: TStopwatch;
+  Parsing: TStopwatch;
+{$ENDIF}
 begin
   inherited;
+
+{$IFDEF GX_VER330_up}
+  Loading := TStopwatch.Create;
+  Inserting := TStopwatch.Create;
+  Sorting := TStopwatch.Create;
+  Processing := TStopwatch.Create;
+  Total := TStopwatch.Create;
+  Searching := TStopwatch.Create;
+  Parsing := TStopwatch.Create;
+
+  Total.Start;
+  Searching.Start;
+{$ENDIF}
 
   sl := TStringList.Create;
   try
@@ -1002,9 +1045,15 @@ begin
   finally
     FreeAndNil(sl);
   end;
+{$IFDEF GX_VER330_up}
+  Searching.Stop;
+{$ENDIF}
 
   ForceDirectories(FCacheDirBS);
 
+{$IFDEF GX_VER330_up}
+  Processing.Start;
+{$ENDIF}
   for FileIdx := 0 to FFiles.Count - 1 do begin
     if Terminated then
       Exit; //==>
@@ -1015,17 +1064,36 @@ begin
       CacheFn := MangleFilename(fn);
       CacheFn := FCacheDirBS + CacheFn;
       if FileExists(CacheFn) and not FileIsNewerThan(fn, CacheFn) then begin
+        Inc(FLoadedUnitsCount);
         sl := TStringList.Create;
         try
+{$IFDEF GX_VER330_up}
+          Loading.Start;
+{$ENDIF}
           sl.LoadFromFile(CacheFn);
+{$IFDEF GX_VER330_up}
+          Loading.Stop;
+{$ENDIF}
+
           FUnits.Add(UnitName);
           FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
+
+{$IFDEF GX_VER330_up}
+          Inserting.Start;
+{$ENDIF}
           for IdentIdx := 0 to sl.Count - 1 do
             FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+{$IFDEF GX_VER330_up}
+          Inserting.Stop;
+{$ENDIF}
         finally
           FreeAndNil(sl);
         end;
       end else begin
+        Inc(FParsedUnitsCount);
+{$IFDEF GX_VER330_up}
+        Parsing.Start;
+{$ENDIF}
         Parser := TUnitExportsParser.Create(fn);
         try
           AddSymbols(Parser);
@@ -1042,12 +1110,33 @@ begin
         finally
           FreeAndNil(Parser);
         end;
+{$IFDEF GX_VER330_up}
+        Parsing.Stop;
+{$ENDIF}
       end;
     end;
   end;
   if Terminated then
     Exit; //==>
+
+{$IFDEF GX_VER330_up}
+  Processing.Stop;
+
+  Sorting.Start;
   TStringList(FIdentifiers).Sort;
+  Sorting.Stop;
+
+  Total.Stop;
+
+  FSearchingTimeMS := Searching.ElapsedMilliseconds;
+  FSortingTimeMS := Sorting.ElapsedMilliseconds;
+  FLoadingTimeMS := Loading.ElapsedMilliseconds;
+  FInsertingTimeMS := Inserting.ElapsedMilliseconds;
+  FParsingTimeMS:= Parsing.ElapsedMilliseconds;
+  FProcessingTimeMS := Processing.ElapsedMilliseconds;
+  FTotalTimeMS := Total.ElapsedMilliseconds;
+{$ENDIF}
 end;
 
 end.
+

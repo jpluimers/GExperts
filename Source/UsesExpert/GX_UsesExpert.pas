@@ -1697,6 +1697,15 @@ begin
 
 {$IFOPT D+}
   SendDebugFmt('UnitExportParser finished, found %d identifiers', [sl.Count]);
+  SendDebugFmt('UnitExportParser loaded %d units', [FUnitExportParserThread.LoadedUnitsCount]);
+  SendDebugFmt('UnitExportParser parsed %d units', [FUnitExportParserThread.ParsedUnitsCount]);
+  SendDebugFmt('UnitExportParser searching time %d ms', [FUnitExportParserThread.SearchingTimeMS]);
+  SendDebugFmt('UnitExportParser loading time %d ms', [FUnitExportParserThread.LoadingTimeMS]);
+  SendDebugFmt('UnitExportParser inserting time %d ms', [FUnitExportParserThread.InsertingTimeMS]);
+  SendDebugFmt('UnitExportParser parsing time %d ms', [FUnitExportParserThread.ParsingTimeMS]);
+  SendDebugFmt('UnitExportParser processing time %d ms', [FUnitExportParserThread.ProcessingTimeMS]);
+  SendDebugFmt('UnitExportParser sorting time %d ms', [FUnitExportParserThread.SortingTimeMS]);
+  SendDebugFmt('UnitExportParser total time %d ms', [FUnitExportParserThread.TotalTimeMS]);
 {$ENDIF D+}
 
 {$IFOPT D+}
