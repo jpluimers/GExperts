@@ -26,6 +26,7 @@
     <DCC_HppOutput>.\dcu</DCC_HppOutput>
     <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
     <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
+    <DCC_UnitAlias>UITypes=Types</DCC_UnitAlias>
     <DCC_UnitSearchPath>..\..\..\Source\Include</DCC_UnitSearchPath>
     <DCC_ResourcePath>..\..\..\Source\Include</DCC_ResourcePath>
     <DCC_ObjPath>..\..\..\Source\Include</DCC_ObjPath>
@@ -45,6 +46,7 @@
     <DCC_HppOutput>.\dcu</DCC_HppOutput>
     <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
     <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
+    <DCC_UnitAlias>UITypes=Types</DCC_UnitAlias>
     <DCC_Optimize>False</DCC_Optimize>
     <DCC_GenerateStackFrames>True</DCC_GenerateStackFrames>
     <DCC_UnitSearchPath>$(BDS)\lib\Debug</DCC_UnitSearchPath>
@@ -57,27 +59,6 @@
     <Borland.ProjectType>VCLApplication</Borland.ProjectType>
     <BorlandProject>
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">False</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">2</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">True</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1033</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.2.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.2.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys><VersionInfoKeys Name="Author"></VersionInfoKeys><VersionInfoKeys Name="Email"></VersionInfoKeys><VersionInfoKeys Name="URL"></VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">ExpertManager.dpr</Source></Source>  <Excluded_Packages>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcltee7100.bpl">TeeChart Components</Excluded_Packages>
