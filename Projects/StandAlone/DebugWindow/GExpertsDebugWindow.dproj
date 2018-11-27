@@ -18,10 +18,10 @@
     <DCC_TypedAtParameter>True</DCC_TypedAtParameter>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_ImageBase>500000</DCC_ImageBase>
-    <DCC_UnitSearchPath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_UnitSearchPath>
-    <DCC_ResourcePath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ResourcePath>
-    <DCC_ObjPath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ObjPath>
-    <DCC_IncludePath>..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_IncludePath>
+    <DCC_UnitSearchPath>..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_IncludePath>
     <DCC_Define>RELEASE</DCC_Define>
     <DCC_Description>GExperts Debug Window</DCC_Description>
     <DCC_ExeOutput>..\..\..\binaries</DCC_ExeOutput>
@@ -38,10 +38,10 @@
     <DCC_RangeChecking>True</DCC_RangeChecking>
     <DCC_TypedAtParameter>True</DCC_TypedAtParameter>
     <DCC_ImageBase>500000</DCC_ImageBase>
-    <DCC_UnitSearchPath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_UnitSearchPath>
-    <DCC_ResourcePath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_ResourcePath>
-    <DCC_ObjPath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_ObjPath>
-    <DCC_IncludePath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_IncludePath>
+    <DCC_UnitSearchPath>$(BDS)\lib\Debug;..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>$(BDS)\lib\Debug;..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ResourcePath>
+    <DCC_ObjPath>$(BDS)\lib\Debug;..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_ObjPath>
+    <DCC_IncludePath>$(BDS)\lib\Debug;..\..\..\Source\Framework;..\..\..\Source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include</DCC_IncludePath>
     <DCC_Define>DEBUG</DCC_Define>
     <DCC_Description>GExperts Debug Window</DCC_Description>
     <DCC_ExeOutput>..\..\..\binaries</DCC_ExeOutput>
