@@ -5,6 +5,7 @@ unit GX_UnitExportsParser;
 interface
 
 uses
+  Windows,
   SysUtils,
   Classes,
   GX_dzNamedThread,
@@ -999,6 +1000,61 @@ begin
 end;
 
 procedure TUnitExportParserThread.Execute;
+
+  function MakeFilename(const Path, FileName: string): string;
+  begin
+    if Path = '' then
+      Result := FileName
+    else if Path[Length(Path)] = PathDelim then
+      Result := Path + FileName
+    else
+      Result := Path + PathDelim + FileName;
+  end;
+
+  function GxTryGetFileAge(const _fn: string; out _DosTime: UInt32): Boolean;
+  var
+    FileInformation: TWin32FileAttributeData;
+    FatDate: Word;
+    FatTime: Word;
+    Attrs: DWORD;
+    LastError: DWORD;
+  begin
+//    Attrs := GetFileAttributes(PChar(_fn));
+//    if Attrs = INVALID_FILE_ATTRIBUTES then begin
+//      LastError := GetLastError;
+//      Result := (LastError = ERROR_FILE_NOT_FOUND) or
+//        (LastError = ERROR_PATH_NOT_FOUND) or
+//        (LastError = ERROR_INVALID_NAME);
+//      if not Result then
+//        Exit;
+//    end;
+
+    Result := GetFileAttributesEx(PChar(_fn), GetFileExInfoStandard, @FileInformation);
+    if Result then begin
+      Result := FileTimeToDosDateTime(FileInformation.ftLastWriteTime, FatDate, FatTime);
+      if Result then begin
+        _DosTime := FatDate shl 16 or FatTime;
+        Exit;
+      end;
+    end;
+  end;
+
+  function TryFindPathToFile(const _fn: string; out _FoundFn: string; out _FileAge: UInt32; _Paths: TStrings): Boolean;
+  var
+    i: Integer;
+    s: string;
+  begin
+    for i := 0 to _Paths.Count - 1 do begin
+      s := MakeFilename(_Paths[i], _fn);
+      Result := GxTryGetFileAge(s, _FileAge);
+      if Result then begin
+        _FoundFn := s;
+        Exit;
+      end;
+    end;
+    Result := False;
+  end;
+
 var
   FileIdx: Integer;
   fn: string;
@@ -1007,6 +1063,8 @@ var
   sl: TStrings;
   UnitName: string;
   CacheFn: string;
+  UnitTime: UInt32;
+  CacheTime: UInt32;
 {$IFDEF GX_VER330_up}
   Loading: TStopwatch;
   Inserting: TStopwatch;
@@ -1035,8 +1093,8 @@ begin
   sl := TStringList.Create;
   try
     for FileIdx := 0 to FFiles.Count - 1 do begin
-      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, FPaths) then
-        sl.Add(fn);
+      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, UnitTime, FPaths) then
+        sl.AddObject(fn, Pointer(UnitTime));
     end;
     if sl.Count = 0 then begin
       Exit; //==>
@@ -1058,12 +1116,13 @@ begin
     if Terminated then
       Exit; //==>
     fn := FFiles[FileIdx];
+    UnitTime := UInt32(FFiles.Objects[FileIdx]);
     UnitName := ExtractFileName(fn);
     UnitName := ChangeFileExt(UnitName, '');
     if FileExists(fn) then begin
       CacheFn := MangleFilename(fn);
       CacheFn := FCacheDirBS + CacheFn;
-      if FileExists(CacheFn) and not FileIsNewerThan(fn, CacheFn) then begin
+      if GxTryGetFileAge(CacheFn, CacheTime) or (UnitTime > CacheTime) then begin
         Inc(FLoadedUnitsCount);
         sl := TStringList.Create;
         try
@@ -1132,7 +1191,7 @@ begin
   FSortingTimeMS := Sorting.ElapsedMilliseconds;
   FLoadingTimeMS := Loading.ElapsedMilliseconds;
   FInsertingTimeMS := Inserting.ElapsedMilliseconds;
-  FParsingTimeMS:= Parsing.ElapsedMilliseconds;
+  FParsingTimeMS := Parsing.ElapsedMilliseconds;
   FProcessingTimeMS := Processing.ElapsedMilliseconds;
   FTotalTimeMS := Total.ElapsedMilliseconds;
 {$ENDIF}
