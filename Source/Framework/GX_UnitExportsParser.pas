@@ -1016,8 +1016,8 @@ procedure TUnitExportParserThread.Execute;
     FileInformation: TWin32FileAttributeData;
     FatDate: Word;
     FatTime: Word;
-    Attrs: DWORD;
-    LastError: DWORD;
+//    Attrs: DWORD;
+//    LastError: DWORD;
   begin
 //    Attrs := GetFileAttributes(PChar(_fn));
 //    if Attrs = INVALID_FILE_ATTRIBUTES then begin
