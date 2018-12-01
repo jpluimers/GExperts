@@ -111,6 +111,11 @@
   If you get here, you are probably trying to compile GExperts with a new Delphi release.
   In addition to define a new GX_VERxxx_UP symbol, you should also have a look at
   * GX_VerDepConst.pas
+  * GX_StandAloneLoadDLL.pas
+  and also the include files for the 3rd party libraries used:
+  * AbDefine.inc
+  * SynEdit.inc
+  * SynEditJedi.inc (That's a copy of jedi.inc from Project JEDI)  
   todo: List the other units that might need to be adapted.
                                           {$IFEND}
                                         {$IFEND}
