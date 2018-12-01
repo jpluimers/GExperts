@@ -1,8 +1,8 @@
-@rem Searches the parent dirctories for the buildtools and calls the doBuildProject.cmd there
+@rem Searches the parent directories for the buildtools and calls the doBuildProject.cmd there
 @echo off
 setlocal
 call :FindInParents %0% buildtools
-call %result%\doBuildProject.cmd 2007
+call "%result%\doBuildProject.cmd" 2007
 pause
 goto :eof
 
@@ -13,9 +13,9 @@ setlocal
 set parentdir=%1%
 set subdir=%2%
 :loop
-call :GetDir %parentdir%
+call :GetDir "%parentdir%"
 set parentdir=%result%
-if exist %parentdir%\%subdir% goto found
+if exist "%parentdir%\%subdir%" goto found
 goto loop
 :found
 endlocal & set result=%parentdir%\%subdir%

@@ -1,4 +1,4 @@
-@rem Searches the parent dirctories for the buildtools and calls the doBuildProject.cmd there
+@rem Searches the parent directories for the buildtools and calls the doBuildProject.cmd there
 @echo off
 setlocal
 call :FindInParents %0% buildtools
