@@ -1,5 +1,7 @@
 @rem Searches the parent directories for the buildtools and calls the doBuildProject.cmd there
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 setlocal
 call :FindInParents %0% buildtools
 call "%result%\doBuildProject.cmd"
