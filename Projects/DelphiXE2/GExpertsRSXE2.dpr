@@ -38,6 +38,7 @@ uses
   GX_CopyComponentNames in '..\..\source\Experts\GX_CopyComponentNames.pas',
   GX_DbugIntf in '..\..\source\Framework\GX_DbugIntf.pas',
   GX_DesignerMenu in '..\..\source\Framework\GX_DesignerMenu.pas',
+  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
   GX_eAlign in '..\..\source\Editor\GX_eAlign.pas' {fmAlign},
   GX_eAlignOptions in '..\..\source\Editor\GX_eAlignOptions.pas' {fmAlignOptions},
   GX_eChangeCase in '..\..\source\Editor\GX_eChangeCase.pas',
@@ -240,7 +241,6 @@ uses
   GX_AddDockWindow in '..\..\Source\Experts\GX_AddDockWindow.pas' {fmGxDockForm},
   GX_eRemoveMatchingLines in '..\..\Source\Editor\GX_eRemoveMatchingLines.pas' {fmRemoveMatchingLinesExpertConfig},
   GX_TabOrderOptions in '..\..\Source\TabOrder\GX_TabOrderOptions.pas' {fmTabOrderOptions},
-  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
   GX_IdeDetectForms in '..\..\Source\ide\GX_IdeDetectForms.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}

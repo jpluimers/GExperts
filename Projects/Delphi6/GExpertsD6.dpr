@@ -38,6 +38,7 @@ uses
   GX_CopyComponentNames in '..\..\source\Experts\GX_CopyComponentNames.pas',
   GX_DbugIntf in '..\..\source\Framework\GX_DbugIntf.pas',
   GX_DesignerMenu in '..\..\source\Framework\GX_DesignerMenu.pas',
+  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
   GX_eAlign in '..\..\source\Editor\GX_eAlign.pas' {fmAlign},
   GX_eAlignOptions in '..\..\source\Editor\GX_eAlignOptions.pas' {fmAlignOptions},
   GX_eChangeCase in '..\..\source\Editor\GX_eChangeCase.pas',
@@ -234,15 +235,14 @@ uses
   GX_ShLwApi in '..\..\Source\Utils\GX_ShLwApi.pas',
   GX_UnitExportsParser in '..\..\Source\Framework\GX_UnitExportsParser.pas',
   GX_dzNamedThread in '..\..\Source\Utils\GX_dzNamedThread.pas',
-  GX_IdeMessageAutoClose in '..\..\Source\IDE\GX_IdeMessageAutoClose.pas',
   GX_DummyWizard in '..\..\Source\Framework\GX_DummyWizard.pas',
+  GX_IdeMessageAutoClose in '..\..\Source\IDE\GX_IdeMessageAutoClose.pas',
   GX_MemoEscFix in '..\..\Source\Utils\GX_MemoEscFix.pas',
   GX_KeyboardShortcuts in '..\..\Source\KeyboardShortcuts\GX_KeyboardShortcuts.pas' {fmGxKeyboardShortcuts},
-  GX_AddDockWindow in '..\..\Source\Experts\GX_AddDockWindow.pas' {fmGxDockForm},
   GX_IdeDockFormEnhancer in '..\..\Source\IDE\GX_IdeDockFormEnhancer.pas',
+  GX_AddDockWindow in '..\..\Source\Experts\GX_AddDockWindow.pas' {fmGxDockForm},
   GX_eRemoveMatchingLines in '..\..\Source\Editor\GX_eRemoveMatchingLines.pas' {fmRemoveMatchingLinesExpertConfig},
   GX_TabOrderOptions in '..\..\Source\TabOrder\GX_TabOrderOptions.pas' {fmTabOrderOptions},
-  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
   GX_IdeDetectForms in '..\..\Source\ide\GX_IdeDetectForms.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}

@@ -38,6 +38,7 @@ uses
   GX_CopyComponentNames in '..\..\source\Experts\GX_CopyComponentNames.pas',
   GX_DbugIntf in '..\..\source\Framework\GX_DbugIntf.pas',
   GX_DesignerMenu in '..\..\source\Framework\GX_DesignerMenu.pas',
+  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
   GX_eAlign in '..\..\source\Editor\GX_eAlign.pas' {fmAlign},
   GX_eAlignOptions in '..\..\source\Editor\GX_eAlignOptions.pas' {fmAlignOptions},
   GX_eChangeCase in '..\..\source\Editor\GX_eChangeCase.pas',
@@ -103,10 +104,10 @@ uses
   GX_MacroExpandNotifier in '..\..\source\MacroTemplates\GX_MacroExpandNotifier.pas',
   GX_MacroFile in '..\..\source\MacroTemplates\GX_MacroFile.pas',
   GX_MacroLibrary in '..\..\source\MacroLibrary\GX_MacroLibrary.pas' {fmMacroLibrary},
+  GX_MacroLibraryEditEntry in '..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas' {fmEditMacroItem},
   GX_MacroLibraryNamePrompt in '..\..\source\MacroLibrary\GX_MacroLibraryNamePrompt.pas' {fmMacroLibraryNamePrompt},
   GX_MacroLibraryConfig in '..\..\source\MacroLibrary\GX_MacroLibraryConfig.pas' {fmGxMacroLibraryConfig},
   GX_MacroParser in '..\..\source\Framework\GX_MacroParser.pas',
-  GX_MacroLibraryEditEntry in '..\..\Source\MacroLibrary\GX_MacroLibraryEditEntry.pas' {fmEditMacroItem},
   GX_MacroSelect in '..\..\source\MacroTemplates\GX_MacroSelect.pas' {fmMacroSelect},
   GX_MacroTemplateEdit in '..\..\source\MacroTemplates\GX_MacroTemplateEdit.pas' {fmMacroTemplateEdit},
   GX_MacroTemplates in '..\..\source\MacroTemplates\GX_MacroTemplates.pas' {fmMacroTemplates},
@@ -225,7 +226,7 @@ uses
   GX_IdeDialogEnhancer in '..\..\Source\IDE\GX_IdeDialogEnhancer.pas',
   GX_IdeManagedForm in '..\..\Source\IDE\GX_IdeManagedForm.pas',
   GX_IdeFormChangeManager in '..\..\Source\IDE\GX_IdeFormChangeManager.pas',
-  GX_IdeManagedFormHandler in '..\..\source\IDE\GX_IdeManagedFormHandler.pas',
+  GX_IdeManagedFormHandler in '..\..\Source\IDE\GX_IdeManagedFormHandler.pas',
   GX_ConfigureFormEnhancements in '..\..\Source\Framework\GX_ConfigureFormEnhancements.pas' {frConfigureFormEnhancements: TFrame},
   GX_dzSpeedBitBtn in '..\..\Source\Utils\GX_dzSpeedBitBtn.pas',
   GX_UsageStatistics in '..\..\Source\Framework\GX_UsageStatistics.pas' {fmUsageStatistics},
@@ -240,7 +241,6 @@ uses
   GX_AddDockWindow in '..\..\Source\Experts\GX_AddDockWindow.pas' {fmGxDockForm},
   GX_eRemoveMatchingLines in '..\..\Source\Editor\GX_eRemoveMatchingLines.pas' {fmRemoveMatchingLinesExpertConfig},
   GX_TabOrderOptions in '..\..\Source\TabOrder\GX_TabOrderOptions.pas' {fmTabOrderOptions},
-  GX_eGotoModification in '..\..\Source\Editor\GX_eGotoModification.pas',
   GX_IdeDetectForms in '..\..\Source\ide\GX_IdeDetectForms.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
