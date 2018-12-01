@@ -575,6 +575,7 @@ var
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&VERxxx', 4, 1, '{$IFNDEF %s}');
   FTabDefinitions.Add(def);
+  def.AddGridRow('VER330', 'Delphi 10.3 Rio / BDS 20');
   def.AddGridRow('VER320', 'Delphi 10.2 Tokyo / BDS 19');
   def.AddGridRow('VER310', 'Delphi 10.1 Berlin / BDS 18');
   def.AddGridRow('VER300', 'Delphi 10.0 Seattle / BDS 17');
@@ -610,6 +611,7 @@ var
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&RtlVersion', 16, 2, '{$IF RtlVersion >= %s}');
   FTabDefinitions.Add(def);
+  def.AddGridRow('33', 'Delphi 10.3 Rio / BDS 20');
   def.AddGridRow('32', 'Delphi 10.2 Tokyo / BDS 19');
   def.AddGridRow('31', 'Delphi 10.1 Berlin / BDS 18');
   def.AddGridRow('30', 'Delphi 10.0 Seattle / BDS 17');
@@ -640,6 +642,7 @@ var
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&CompilerVersion', 21, 2, '{$IF CompilerVersion >= %s}');
   FTabDefinitions.Add(def);
+  def.AddGridRow('33', 'Delphi 10.3 Rio / BDS 20');
   def.AddGridRow('32', 'Delphi 10.2 Tokyo / BDS 19');
   def.AddGridRow('31', 'Delphi 10.1 Berlin / BDS 18');
   def.AddGridRow('30', 'Delphi 10.0 Seattle / BDS 17');
