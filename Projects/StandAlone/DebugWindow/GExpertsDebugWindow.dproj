@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <DCC_DependencyCheckOutputName>..\..\..\binaries\GExpertsDebugWindow.exe</DCC_DependencyCheckOutputName>
         <DCC_UsePackage>vcl;vclx</DCC_UsePackage>
@@ -39,17 +39,17 @@
         <DCC_GenerateStackFrames>True</DCC_GenerateStackFrames>
         <DCC_HppOutput>.\dcu</DCC_HppOutput>
         <DCC_ImageBase>500000</DCC_ImageBase>
-        <DCC_IncludePath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_IncludePath>
+        <DCC_IncludePath>$(BDS)\lib\Debug;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include;..\..\..\source\framework</DCC_IncludePath>
         <DCC_IntegerOverflowCheck>True</DCC_IntegerOverflowCheck>
         <DCC_ObjOutput>.\dcu</DCC_ObjOutput>
-        <DCC_ObjPath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_ObjPath>
+        <DCC_ObjPath>$(BDS)\lib\Debug;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include;..\..\..\source\framework</DCC_ObjPath>
         <DCC_Optimize>False</DCC_Optimize>
         <DCC_RangeChecking>True</DCC_RangeChecking>
-        <DCC_ResourcePath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_ResourcePath>
+        <DCC_ResourcePath>$(BDS)\lib\Debug;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include;..\..\..\source\framework</DCC_ResourcePath>
         <DCC_SYMBOL_PLATFORM>False</DCC_SYMBOL_PLATFORM>
         <DCC_TypedAtParameter>True</DCC_TypedAtParameter>
         <DCC_UNIT_PLATFORM>False</DCC_UNIT_PLATFORM>
-        <DCC_UnitSearchPath>$(BDS)\lib\Debug;..\..\..\source\Framework\;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(BDS)\lib\Debug;..\..\..\source\Utils;..\..\..\ExternalSource\UniSynEdit;..\..\..\Source\Include;..\..\..\source\framework</DCC_UnitSearchPath>
         <Version>7.0</Version>
     </PropertyGroup>
     <ProjectExtensions>
