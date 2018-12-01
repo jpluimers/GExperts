@@ -112,6 +112,7 @@
   In addition to define a new GX_VERxxx_UP symbol, you should also have a look at
   * GX_VerDepConst.pas
   * GX_StandAloneLoadDLL.pas
+  * GX_eIfDef.pas
   and also the include files for the 3rd party libraries used:
   * AbDefine.inc
   * SynEdit.inc
