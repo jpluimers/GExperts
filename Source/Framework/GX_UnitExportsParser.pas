@@ -187,6 +187,7 @@ uses
   System.Diagnostics,
 {$ENDIF}
   StrUtils,
+  gx_dzCompilerAndRtlVersions,
   GX_GenericUtils;
 
 { TPasLexEx }
@@ -937,63 +938,7 @@ end;
 
 procedure TUnitExportParserThread.AddSymbols(_Parser: TUnitExportsParser);
 begin
-{$IFDEF VER140} // Delphi 6
-  _Parser.Symbols.Add('VER140');
-{$ENDIF}
-{$IFDEF VER150} // Delphi 7
-  _Parser.Symbols.Add('VER150');
-{$ENDIF}
-{$IFDEF VER170} // Delphi 2005 / BDS 2
-  _Parser.Symbols.Add('VER170');
-{$ENDIF}
-{$IFDEF VER180} // Delphi 2006/2007 / BDS 3
-  _Parser.Symbols.Add('VER180');
-{$ENDIF}
-{$IFDEF VER185} // Delphi 2007 / BDS 4
-  _Parser.Symbols.Add('VER185');
-{$ENDIF}
-{$IFDEF VER200} // Delphi 2009 / BDS 6
-  _Parser.Symbols.Add('VER200');
-{$ENDIF}
-{$IFDEF VER210} // Delphi 2010 / BDS 7
-  _Parser.Symbols.Add('VER210');
-{$ENDIF}
-{$IFDEF VER220} // Delphi XE1 / BDS 8
-  _Parser.Symbols.Add('VER220');
-{$ENDIF}
-{$IFDEF VER230} // Delphi XE2 / BDS 9
-  _Parser.Symbols.Add('VER230');
-{$ENDIF}
-{$IFDEF VER240} // Delphi XE3 / BDS 10
-  _Parser.Symbols.Add('VER240');
-{$ENDIF}
-{$IFDEF VER250} // Delphi XE4 / BDS 11
-  _Parser.Symbols.Add('VER250');
-{$ENDIF}
-{$IFDEF VER260} // Delphi XE5 / BDS 12
-  _Parser.Symbols.Add('VER260');
-{$ENDIF}
-{$IFDEF VER270} // Delphi XE6 / BDS 14
-  _Parser.Symbols.Add('VER270');
-{$ENDIF}
-{$IFDEF VER280} // Delphi XE7 / BDS 15
-  _Parser.Symbols.Add('VER280');
-{$ENDIF}
-{$IFDEF VER290} // Delphi XE8 / BDS 16
-  _Parser.Symbols.Add('VER290');
-{$ENDIF}
-{$IFDEF VER300} // Delphi 10.0 Seattle / BDS 17
-  _Parser.Symbols.Add('VER300');
-{$ENDIF}
-{$IFDEF VER310} // Delphi 10.1 Berlin / BDS 18
-  _Parser.Symbols.Add('VER310');
-{$ENDIF}
-{$IFDEF VER320} // Delphi 10.2 Tokyo / BDS 19
-  _Parser.Symbols.Add('VER320');
-{$ENDIF}
-{$IFDEF VER330} // Delphi 10.3 Rio/ BDS 20
-  _Parser.Symbols.Add('VER330');
-{$ENDIF}
+  _Parser.Symbols.Add(Format('VER%d', [CompilerVersion * 10]));
   // todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
 {$IFDEF UNICODE}
   _Parser.Symbols.Add('UNICODE');
@@ -1019,12 +964,11 @@ begin
   end;
 end;
 
-{$IFNDEF GX_DELPHI2009_UP}
-{$WARN SYMBOL_PLATFORM OFF}
+{$IF not declared(faTemporary)}
 const
   faTemporary = $00000100;
-  faSymLink = $00000400; // Available on POSIX and Vista and above
-{$ENDIF}
+  faSymLink = $00000400;
+{$IFEND}
 
 procedure TUnitExportParserThread.GetAllFilesInDir(_dir: string; _sl: TStringList);
 var
@@ -1106,7 +1050,7 @@ var
   CacheFn: string;
   UnitTime: UInt32;
   CacheTime: UInt32;
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
   Loading: TStopwatch;
   Inserting: TStopwatch;
   Sorting: TStopwatch;
@@ -1114,11 +1058,11 @@ var
   Total: TStopwatch;
   Searching: TStopwatch;
   Parsing: TStopwatch;
-{$ENDIF}
+{$IFEND}
 begin
   inherited;
 
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
   Loading := TStopwatch.Create;
   Inserting := TStopwatch.Create;
   Sorting := TStopwatch.Create;
@@ -1129,7 +1073,7 @@ begin
 
   Total.Start;
   Searching.Start;
-{$ENDIF}
+{$IFEND}
 
   sl := nil;
   FilesInPath := TStringList.Create;
@@ -1149,15 +1093,15 @@ begin
     FreeAndNil(sl);
     FreeAndNil(FilesInPath);
   end;
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
   Searching.Stop;
-{$ENDIF}
+{$IFEND}
 
   ForceDirectories(FCacheDirBS);
 
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
   Processing.Start;
-{$ENDIF}
+{$IFEND}
   for FileIdx := 0 to FFiles.Count - 1 do begin
     if Terminated then
       Exit; //==>
@@ -1172,33 +1116,33 @@ begin
         Inc(FLoadedUnitsCount);
         sl := TStringList.Create;
         try
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
           Loading.Start;
-{$ENDIF}
+{$IFEND}
           sl.LoadFromFile(CacheFn);
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
           Loading.Stop;
-{$ENDIF}
+{$IFEND}
 
           FUnits.Add(UnitName);
           FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
 
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
           Inserting.Start;
-{$ENDIF}
+{$IFEND}
           for IdentIdx := 0 to sl.Count - 1 do
             FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
           Inserting.Stop;
-{$ENDIF}
+{$IFEND}
         finally
           FreeAndNil(sl);
         end;
       end else begin
         Inc(FParsedUnitsCount);
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
         Parsing.Start;
-{$ENDIF}
+{$IFEND}
         Parser := TUnitExportsParser.Create(fn);
         try
           AddSymbols(Parser);
@@ -1215,16 +1159,16 @@ begin
         finally
           FreeAndNil(Parser);
         end;
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
         Parsing.Stop;
-{$ENDIF}
+{$IFEND}
       end;
     end;
   end;
   if Terminated then
     Exit; //==>
 
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
   Processing.Stop;
 
   Sorting.Start;
@@ -1240,7 +1184,7 @@ begin
   FParsingTimeMS := Parsing.ElapsedMilliseconds;
   FProcessingTimeMS := Processing.ElapsedMilliseconds;
   FTotalTimeMS := Total.ElapsedMilliseconds;
-{$ENDIF}
+{$IFEND}
 end;
 
 end.
