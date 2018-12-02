@@ -152,6 +152,8 @@ type
     FSearchingTimeMS: Int64;
     FParsingTimeMS: Int64;
     procedure AddSymbols(_Parser: TUnitExportsParser);
+    procedure GetAllFilesInPath(_sl: TStringList);
+    procedure GetAllFilesInDir(_dir: string; _sl: TStringList);
   protected
     procedure Execute; override;
   public
@@ -989,6 +991,9 @@ begin
 {$IFDEF VER320} // Delphi 10.2 Tokyo / BDS 19
   _Parser.Symbols.Add('VER320');
 {$ENDIF}
+{$IFDEF VER330} // Delphi 10.3 Rio/ BDS 20
+  _Parser.Symbols.Add('VER330');
+{$ENDIF}
   // todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
 {$IFDEF UNICODE}
   _Parser.Symbols.Add('UNICODE');
@@ -999,7 +1004,58 @@ begin
   // {$ENDIF}
 end;
 
+function FileTimeToDosTime(_ft: _FILETIME): GXNativeUInt;
+var
+  DosDate: Word;
+  DosTime: Word;
+begin
+  if FileTimeToDosDateTime(_ft, DosDate, DosTime) then begin
+    Result := DosDate shl 16 + DosTime;
+  end else begin
+    // If converting the file date/time to DOS date/time fails, we don't really care, since the
+    // worst thing that can happen is that we continue using an outdated cache file
+    // (if it fails for a unit in the sarch path) or reparse a unit (if it fails for a cache file).
+    Result := 0;
+  end;
+end;
+
+{$IFNDEF GX_DELPHI2009_UP}
+{$WARN SYMBOL_PLATFORM OFF}
+const
+  faTemporary = $00000100;
+  faSymLink = $00000400; // Available on POSIX and Vista and above
+{$ENDIF}
+
+procedure TUnitExportParserThread.GetAllFilesInDir(_dir: string; _sl: TStringList);
+var
+  sr: TSearchRec;
+begin
+  _dir := IncludeTrailingPathDelimiter(_dir);
+  if SysUtils.FindFirst(_dir + '*.pas', faAnyFile, sr) = 0 then begin
+    try
+      repeat
+        if (sr.Attr and (faDirectory or faHidden or faSysFile or faTemporary or faSymLink)) = 0 then begin
+          _sl.AddObject(_dir + sr.Name, Pointer(FileTimeToDosTime(sr.FindData.ftLastWriteTime)));
+        end;
+      until SysUtils.FindNext(sr) <> 0;
+    finally
+      SysUtils.FindClose(sr);
+    end;
+  end;
+end;
+
+procedure TUnitExportParserThread.GetAllFilesInPath(_sl: TStringList);
+var
+  i: Integer;
+begin
+  for i := 0 to FPaths.Count - 1 do begin
+    GetAllFilesInDir(FPaths[i], _sl);
+  end;
+end;
+
 procedure TUnitExportParserThread.Execute;
+var
+  FilesInPath: TStringList;
 
   function MakeFilename(const Path, FileName: string): string;
   begin
@@ -1011,44 +1067,29 @@ procedure TUnitExportParserThread.Execute;
       Result := Path + PathDelim + FileName;
   end;
 
-  function GxTryGetFileAge(const _fn: string; out _DosTime: UInt32): Boolean;
+  function GxTryGetFileAge(const _fn: string; out _DosTime: GXNativeUInt): Boolean;
   var
     FileInformation: TWin32FileAttributeData;
-    FatDate: Word;
-    FatTime: Word;
-//    Attrs: DWORD;
-//    LastError: DWORD;
   begin
-//    Attrs := GetFileAttributes(PChar(_fn));
-//    if Attrs = INVALID_FILE_ATTRIBUTES then begin
-//      LastError := GetLastError;
-//      Result := (LastError = ERROR_FILE_NOT_FOUND) or
-//        (LastError = ERROR_PATH_NOT_FOUND) or
-//        (LastError = ERROR_INVALID_NAME);
-//      if not Result then
-//        Exit;
-//    end;
-
     Result := GetFileAttributesEx(PChar(_fn), GetFileExInfoStandard, @FileInformation);
     if Result then begin
-      Result := FileTimeToDosDateTime(FileInformation.ftLastWriteTime, FatDate, FatTime);
-      if Result then begin
-        _DosTime := FatDate shl 16 or FatTime;
-        Exit;
-      end;
+      _DosTime := FileTimeToDosTime(FileInformation.ftLastWriteTime);
     end;
   end;
 
-  function TryFindPathToFile(const _fn: string; out _FoundFn: string; out _FileAge: UInt32; _Paths: TStrings): Boolean;
+  function TryFindPathToFile(const _fn: string; out _FoundFn: string; out _FileAge: GXNativeUInt): Boolean;
   var
     i: Integer;
-    s: string;
+    fno: string;
+    fn: string;
   begin
-    for i := 0 to _Paths.Count - 1 do begin
-      s := MakeFilename(_Paths[i], _fn);
-      Result := GxTryGetFileAge(s, _FileAge);
-      if Result then begin
-        _FoundFn := s;
+    for i := 0 to FilesInPath.Count - 1 do begin
+      fn := FilesInPath[i];
+      fno := ExtractFileName(fn);
+      if SameText(fno, _fn) then begin
+        Result := True;
+        _FoundFn := fn;
+        _FileAge := GXNativeUInt(FilesInPath.Objects[i]);
         Exit;
       end;
     end;
@@ -1090,10 +1131,14 @@ begin
   Searching.Start;
 {$ENDIF}
 
-  sl := TStringList.Create;
+  sl := nil;
+  FilesInPath := TStringList.Create;
   try
+    sl := TStringList.Create;
+    GetAllFilesInPath(FilesInPath);
+
     for FileIdx := 0 to FFiles.Count - 1 do begin
-      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, UnitTime, FPaths) then
+      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, UnitTime) then
         sl.AddObject(fn, Pointer(UnitTime));
     end;
     if sl.Count = 0 then begin
@@ -1102,6 +1147,7 @@ begin
     FFiles.Assign(sl);
   finally
     FreeAndNil(sl);
+    FreeAndNil(FilesInPath);
   end;
 {$IFDEF GX_VER330_up}
   Searching.Stop;
