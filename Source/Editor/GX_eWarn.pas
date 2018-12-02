@@ -14,6 +14,7 @@ uses
   StdCtrls,
   GX_EditorExpert,
   GX_ConfigurationInfo,
+  GX_dzCompilerAndRtlVersions,
   GX_BaseForm,
   GX_BaseExpert;
 
@@ -31,7 +32,10 @@ type
 
 type
   TWarnStatusEnum = (wseON, wseOFF, wseDEFAULT
-{$IFDEF GX_VER200_up}, wseERROR{$ENDIF});
+{$IF CompilerVersion >= CompilerVersionDelphi2009}
+    , wseERROR
+{$IFEND}
+    );
 
 type
   TfmConfigureWarning = class(TfmBaseForm)
@@ -65,13 +69,13 @@ type
 
 implementation
 
+{$R *.dfm}
+
 uses
   Messages,
   GX_OtaUtils,
   GX_dzVclUtils,
   GX_GenericUtils;
-
-{$R *.dfm}
 
 { TWarnExpert }
 
@@ -83,8 +87,9 @@ end;
 function WarnStatusToStr(_Status: TWarnStatusEnum): string;
 begin
   case _Status of
-{$IFDEF GX_VER200_up}wseERROR: Result := 'ERROR';
-{$ENDIF}
+{$IF CompilerVersion >= CompilerVersionDelphi2009}
+    wseERROR: Result := 'ERROR';
+{$IFEND}
     wseOFF: Result := 'OFF';
     wseDEFAULT: Result := 'DEFAULT';
   else // wseON:
@@ -150,7 +155,7 @@ begin
   end;
 end;
 
-{$IFDEF GX_DELPHI_RIO_UP}
+{$IF CompilerVersion >= CompilerVersionDelphiX103}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -238,7 +243,7 @@ begin
 end;
 
 {$ELSE}
-{$IFDEF GX_VER240_up} // Delphi XE3
+{$IF CompilerVersion >= CompilerVersionDelphiXE3}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -323,7 +328,7 @@ begin
   FAvailable.Add('XML_NO_MATCHING_PARM');
 end;
 {$ELSE}
-{$IFDEF GX_VER230_up} // Delphi XE2
+{$IF CompilerVersion >= CompilerVersionDelphiXE2}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -405,7 +410,7 @@ begin
   FAvailable.Add('XML_NO_MATCHING_PARM');
 end;
 {$ELSE}
-{$IFDEF GX_VER220_up} // Delphi XE
+{$IF CompilerVersion >= CompilerVersionDelphiXE}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -484,7 +489,7 @@ begin
   FAvailable.Add('XML_NO_MATCHING_PARM');
 end;
 {$ELSE}
-{$IFDEF GX_VER210_up} // Delphi 2010
+{$IF CompilerVersion >= CompilerVersionDelphi2010}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -563,7 +568,7 @@ begin
   FAvailable.Add('XML_NO_MATCHING_PARM');
 end;
 {$ELSE}
-{$IFDEF GX_VER200_up} // Delphi 2009
+{$IF CompilerVersion >= CompilerVersionDelphi2009}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -642,7 +647,7 @@ begin
   FAvailable.Add('XML_NO_MATCHING_PARM');
 end;
 {$ELSE}
-{$IFDEF GX_VER185_up} // Delphi 2007
+{$IF CompilerVersion >= CompilerVersionDelphi2007}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -712,7 +717,7 @@ begin
   FAvailable.Add('XML_NO_MATCHING_PARM');
 end;
 {$ELSE}
-{$IFDEF GX_VER180_up} // Delphi 2006
+{$IF CompilerVersion >= CompilerVersionDelphi2006}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -773,7 +778,7 @@ begin
   FAvailable.Add('MESSAGE_DIRECTIVE');
 end;
 {$ELSE}
-{$IFDEF GX_VER170_up} // Delphi 2005
+{$IF CompilerVersion >= CompilerVersionDelphi2005}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -832,7 +837,7 @@ begin
   FAvailable.Add('MESSAGE_DIRECTIVE');
 end;
 {$ELSE}
-{$IFDEF GX_VER150_up} // Delphi 7
+{$IF CompilerVersion >= CompilerVersionDelphi7}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -886,7 +891,7 @@ begin
   FAvailable.Add('MESSAGE_DIRECTIVE');
 end;
 {$ELSE}
-{$IFDEF GX_VER140_up} // Delphi 6
+{$IF CompilerVersion >= CompilerVersionDelphi6}
 
 procedure TfmConfigureWarning.InitWarnings;
 begin
@@ -897,25 +902,25 @@ begin
   FAvailable.Add('UNIT_PLATFORM');
   FAvailable.Add('UNIT_DEPRECATED');
 end;
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
+{$IFEND}
 
 constructor TfmConfigureWarning.Create(_Owner: TComponent);
 begin
   inherited;
 
-{$IFNDEF GX_VER200_up}
+{$IF CompilerVersion >= CompilerVersionDelphi2009}
   b_ERROR.Visible := False;
-{$ENDIF}
+{$IFEND}
 
   TControl_SetMinConstraints(Self);
 
@@ -979,8 +984,9 @@ end;
 
 procedure TfmConfigureWarning.b_ERRORClick(Sender: TObject);
 begin
-{$IFDEF GX_VER200_up}FStatus := wseERROR;
-{$ENDIF}
+{$IF CompilerVersion >= CompilerVersionDelphi2009}
+  FStatus := wseERROR;
+{$IFEND}
 end;
 
 procedure TfmConfigureWarning.b_OFFClick(Sender: TObject);
@@ -996,3 +1002,4 @@ end;
 initialization
   RegisterEditorExpert(TWarnExpert);
 end.
+
