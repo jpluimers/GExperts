@@ -9,7 +9,7 @@ uses
   SysUtils,
   Classes,
   GX_dzNamedThread,
-  gx_dzCompilerAndRtlVersions,
+  GX_dzCompilerAndRtlVersions,
   mwPasParserTypes,
   mPasLex;
 
@@ -95,7 +95,7 @@ type
     function GetIdentifier(_Idx: Integer): TIdentifier;
   public
     ///<summary>
-    /// @returns the namve of the given identifier type </summary>
+    /// @returns the name of the given identifier type </summary>
     class function IdentfierTypeNames(_IdType: TIdentifierTypes): string;
     ///<summary>
     /// constructs a TUnitExportsParser instance for the given file </summary>
@@ -159,7 +159,8 @@ type
     procedure Execute; override;
   public
     ///<summary>
-    /// @param Files is a list of unit names, without path and extension
+    /// @param Files is a list of unit names, without path and extension, which are to be parsed.
+    ///              Can be NIL, in which case all files in the search path will be parsed
     /// @param Paths is a list of possible search paths
     /// @param CacheDir is a directory to cache the identifier lists </summary>
     constructor Create(const _Files: TStrings; _Paths: TStrings; const _CacheDir: string; _OnTerminate: TNotifyEvent);
@@ -910,12 +911,15 @@ begin
   FIdentifiers := TStringList.Create;
   FUnits := TStringList.Create;
 
-  FFiles := TStringList.Create;
-  for i := 0 to _Files.Count - 1 do begin
-    s := _Files[i];
-    UniqueString(s);
-    FFiles.Add(s);
-  end;
+  if Assigned(_Files) then begin
+    FFiles := TStringList.Create;
+    for i := 0 to _Files.Count - 1 do begin
+      s := _Files[i];
+      UniqueString(s);
+      FFiles.Add(s);
+    end;
+  end else
+    FFiles := nil;
 
   FPaths := TStringList.Create;
   for i := 0 to _Paths.Count - 1 do begin
@@ -1081,14 +1085,18 @@ begin
     sl := TStringList.Create;
     GetAllFilesInPath(FilesInPath);
 
-    for FileIdx := 0 to FFiles.Count - 1 do begin
-      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, UnitTime) then
-        sl.AddObject(fn, Pointer(UnitTime));
+    if Assigned(FFiles) then begin
+      for FileIdx := 0 to FFiles.Count - 1 do begin
+        if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, UnitTime) then
+          sl.AddObject(fn, Pointer(UnitTime));
+      end;
+      if sl.Count = 0 then
+        Exit; //==>
+      FFiles.Assign(sl);
+    end else begin
+      FFiles := FilesInPath;
+      FilesInPath := nil;
     end;
-    if sl.Count = 0 then begin
-      Exit; //==>
-    end;
-    FFiles.Assign(sl);
   finally
     FreeAndNil(sl);
     FreeAndNil(FilesInPath);
@@ -1109,60 +1117,58 @@ begin
     UnitTime := UInt32(FFiles.Objects[FileIdx]);
     UnitName := ExtractFileName(fn);
     UnitName := ChangeFileExt(UnitName, '');
-    if FileExists(fn) then begin
-      CacheFn := MangleFilename(fn);
-      CacheFn := FCacheDirBS + CacheFn;
-      if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime < CacheTime) then begin
-        Inc(FLoadedUnitsCount);
-        sl := TStringList.Create;
-        try
+    CacheFn := MangleFilename(fn);
+    CacheFn := FCacheDirBS + CacheFn;
+    if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime < CacheTime) then begin
+      Inc(FLoadedUnitsCount);
+      sl := TStringList.Create;
+      try
 {$IF RtlVersion >= RtlVersionDelphiX103}
-          Loading.Start;
+        Loading.Start;
 {$IFEND}
-          sl.LoadFromFile(CacheFn);
+        sl.LoadFromFile(CacheFn);
 {$IF RtlVersion >= RtlVersionDelphiX103}
-          Loading.Stop;
+        Loading.Stop;
 {$IFEND}
 
-          FUnits.Add(UnitName);
-          FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
+        FUnits.Add(UnitName);
+        FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
 
 {$IF RtlVersion >= RtlVersionDelphiX103}
-          Inserting.Start;
+        Inserting.Start;
 {$IFEND}
-          for IdentIdx := 0 to sl.Count - 1 do
-            FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+        for IdentIdx := 0 to sl.Count - 1 do
+          FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
 {$IF RtlVersion >= RtlVersionDelphiX103}
-          Inserting.Stop;
+        Inserting.Stop;
 {$IFEND}
-        finally
-          FreeAndNil(sl);
-        end;
-      end else begin
-        Inc(FParsedUnitsCount);
-{$IF RtlVersion >= RtlVersionDelphiX103}
-        Parsing.Start;
-{$IFEND}
-        Parser := TUnitExportsParser.Create(fn);
-        try
-          AddSymbols(Parser);
-          Parser.Execute;
-          if Terminated then
-            Exit; //==>
-          FUnits.Add(UnitName);
-          sl := Parser.Identifiers;
-          sl.SaveToFile(CacheFn);
-          FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
-          for IdentIdx := 0 to sl.Count - 1 do begin
-            FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
-          end;
-        finally
-          FreeAndNil(Parser);
-        end;
-{$IF RtlVersion >= RtlVersionDelphiX103}
-        Parsing.Stop;
-{$IFEND}
+      finally
+        FreeAndNil(sl);
       end;
+    end else begin
+      Inc(FParsedUnitsCount);
+{$IF RtlVersion >= RtlVersionDelphiX103}
+      Parsing.Start;
+{$IFEND}
+      Parser := TUnitExportsParser.Create(fn);
+      try
+        AddSymbols(Parser);
+        Parser.Execute;
+        if Terminated then
+          Exit; //==>
+        FUnits.Add(UnitName);
+        sl := Parser.Identifiers;
+        sl.SaveToFile(CacheFn);
+        FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
+        for IdentIdx := 0 to sl.Count - 1 do begin
+          FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+        end;
+      finally
+        FreeAndNil(Parser);
+      end;
+{$IF RtlVersion >= RtlVersionDelphiX103}
+      Parsing.Stop;
+{$IFEND}
     end;
   end;
   if Terminated then

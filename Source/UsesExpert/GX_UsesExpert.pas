@@ -29,6 +29,7 @@ type
   private
     FAvailTabIndex: Integer;
     FReplaceFileUseUnit: Boolean;
+    FParseAll: Boolean;
     FOrigFileAddUnitExecute: TNotifyEvent;
     FReadMap: Boolean;
     procedure InternalExecute;
@@ -410,7 +411,7 @@ var
   Found: boolean;
 begin
   Found := FindAction(act);
-  if TfmUsesExpertOptions.Execute(Application, Found, FReadMap, FReplaceFileUseUnit) then begin
+  if TfmUsesExpertOptions.Execute(Application, Found, FReadMap, FReplaceFileUseUnit, FParseAll) then begin
     SaveSettings;
     if Found then begin
       if FReplaceFileUseUnit then begin
@@ -455,6 +456,7 @@ begin
   FReplaceFileUseUnit := Settings.ReadBool('ReplaceFileUseUnit', False);
   FReadMap := Settings.ReadBool('ReadMap', True);
   FAvailTabIndex := Settings.ReadInteger('AvailTabIndex', 0);
+  FParseAll := Settings.ReadBool('ParseAll', True);
 end;
 
 procedure TUsesExpert.InternalSaveSettings(Settings: TExpertSettings);
@@ -463,6 +465,7 @@ begin
   Settings.WriteBool('ReplaceFileUseUnit', FReplaceFileUseUnit);
   Settings.WriteBool('ReadMap', FReadMap);
   Settings.WriteInteger('AvailTabIndex', FAvailTabIndex);
+  Settings.WriteBool('ParseAll', FParseAll);
 end;
 
 { TfmUsesManager }
@@ -632,23 +635,32 @@ begin
   FAliases := TStringList.Create;
   FOldToNewUnitNameMap := TStringList.Create;
 
-  LoadFavorites;
-
-  if FFavoriteUnits.Count = 0 then begin
-    sg_Identifiers.Cells[0, 1] := 'no favorites selected';
-  end else begin
-    Paths := TStringList.Create;
-    try
-      GxOtaGetAllPossiblePaths(Paths);
+  Paths := TStringList.Create;
+  try
+    GxOtaGetAllPossiblePaths(Paths);
+    if FUsesExpert.FParseAll then begin
 {$IFOPT D+}
-      SendDebug('Running UnitExportParser thread to get identifiers from favorites');
+        SendDebug('Running UnitExportParser thread to get identifiers from all units in search path');
 {$ENDIF D+}
-      FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
-        ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
-      tim_Progress.Enabled := True;
-    finally
-      FreeAndNil(Paths);
+        FUnitExportParserThread := TUnitExportParserThread.Create(nil, Paths,
+          ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
+        tim_Progress.Enabled := True;
+    end else begin
+      LoadFavorites;
+
+      if FFavoriteUnits.Count = 0 then begin
+        sg_Identifiers.Cells[0, 1] := 'no favorites selected';
+      end else begin
+{$IFOPT D+}
+        SendDebug('Running UnitExportParser thread to get identifiers from favorites');
+{$ENDIF D+}
+        FUnitExportParserThread := TUnitExportParserThread.Create(FFavoriteUnits, Paths,
+          ConfigInfo.ConfigPath + 'UsesExpertCache', OnExportParserFinished);
+        tim_Progress.Enabled := True;
+      end;
     end;
+  finally
+    FreeAndNil(Paths);
   end;
 
   FFindThread := TFileFindThread.Create;
@@ -1719,8 +1731,8 @@ begin
     UniqueString(Identifier);
     UnitName := PChar(sl.Objects[IdentIdx]);
     // make sure the string is valid and not freed in the thread
-    if FFavoriteUnits.Find(UnitName, Idx) then begin
-      UnitName := FFavoriteUnits[Idx];
+    if FSearchPathUnits.Find(UnitName, Idx) then begin
+      UnitName := FSearchPathUnits[Idx];
       FFavUnitsExports.AddObject(Identifier, Pointer(PChar(UnitName)));
     end;
   end;
