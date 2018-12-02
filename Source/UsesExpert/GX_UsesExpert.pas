@@ -1917,7 +1917,7 @@ begin
 
     for i := sg_Interface.FixedRows to sg_Interface.RowCount - 1 do begin
       NewUnitName := sg_Interface.Cells[0, i];
-      if NewUnitName <> '' then begin
+      if (NewUnitName <> '') and not SameText(NewUnitName, 'System') then begin
         OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
         if OldUnitName = NewUnitName then
           OldUnitName := '';
@@ -1972,7 +1972,7 @@ begin
 
     for i := sg_Implementation.FixedRows to sg_Implementation.RowCount - 1 do begin
       NewUnitName := sg_Implementation.Cells[0, i];
-      if NewUnitName <> '' then begin
+      if (NewUnitName <> '') and not SameText(NewUnitName, 'System') then begin
         OldUnitName := NewToOldUnitNameMap.Values[NewUnitName];
         if OldUnitName = NewUnitName then
           OldUnitName := '';
