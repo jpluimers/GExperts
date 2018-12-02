@@ -1112,7 +1112,7 @@ begin
     if FileExists(fn) then begin
       CacheFn := MangleFilename(fn);
       CacheFn := FCacheDirBS + CacheFn;
-      if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime > CacheTime) then begin
+      if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime < CacheTime) then begin
         Inc(FLoadedUnitsCount);
         sl := TStringList.Create;
         try
