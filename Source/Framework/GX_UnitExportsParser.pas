@@ -938,7 +938,7 @@ end;
 
 procedure TUnitExportParserThread.AddSymbols(_Parser: TUnitExportsParser);
 begin
-  _Parser.Symbols.Add(Format('VER%d', [CompilerVersion * 10]));
+  _Parser.Symbols.Add(Format('VER%.0f', [CompilerVersion * 10]));
   // todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
 {$IFDEF UNICODE}
   _Parser.Symbols.Add('UNICODE');
@@ -1112,7 +1112,7 @@ begin
     if FileExists(fn) then begin
       CacheFn := MangleFilename(fn);
       CacheFn := FCacheDirBS + CacheFn;
-      if GxTryGetFileAge(CacheFn, CacheTime) or (UnitTime > CacheTime) then begin
+      if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime > CacheTime) then begin
         Inc(FLoadedUnitsCount);
         sl := TStringList.Create;
         try
