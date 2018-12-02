@@ -9,6 +9,7 @@ uses
   SysUtils,
   Classes,
   GX_dzNamedThread,
+  gx_dzCompilerAndRtlVersions,
   mwPasParserTypes,
   mPasLex;
 
@@ -183,11 +184,10 @@ type
 implementation
 
 uses
-{$IFDEF GX_VER330_up}
+{$IF RtlVersion >= RtlVersionDelphiX103}
   System.Diagnostics,
-{$ENDIF}
+{$IFEND}
   StrUtils,
-  gx_dzCompilerAndRtlVersions,
   GX_GenericUtils;
 
 { TPasLexEx }
