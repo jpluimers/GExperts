@@ -2,8 +2,6 @@ unit GX_eWarn;
 
 interface
 
-{$I GX_CondDefine.inc}
-
 uses
   Windows,
   SysUtils,
