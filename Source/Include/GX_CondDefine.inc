@@ -113,6 +113,7 @@
   * GX_VerDepConst.pas
   * GX_StandAloneLoadDLL.pas
   * GX_eIfDef.pas
+  * GX_UnitExportParser.pas
   and also the include files for the 3rd party libraries used:
   * AbDefine.inc
   * SynEdit.inc
