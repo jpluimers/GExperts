@@ -34,7 +34,8 @@ uses
   GX_UnitPositions,
   GX_IdeFormEnhancer,
   GX_IdeDialogEnhancer,
-  GX_IdeDetectForms;
+  GX_IdeDetectForms,
+  GX_IdeUtils;
 
 type
   TWinControlHack = class(TWinControl)
@@ -145,11 +146,13 @@ begin
   FLineInput.OnKeyDown := LineInputKeyDown;
 
 {$IF CompilerVersion = CompilerVersionDelphiX103}
-  FForm := _Form;
-  tim_Update := TTimer.Create(_Form);
-  tim_Update.OnTimer := tim_UpdateTimer;
-  tim_Update.Interval := 100;
-  tim_Update.Enabled := True;
+  if IsThemingEnabled then begin
+    FForm := _Form;
+    tim_Update := TTimer.Create(_Form);
+    tim_Update.OnTimer := tim_UpdateTimer;
+    tim_Update.Interval := 100;
+    tim_Update.Enabled := True;
+  end;
 {$IFEND}
 end;
 
