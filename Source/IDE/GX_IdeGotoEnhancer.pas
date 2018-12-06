@@ -5,7 +5,8 @@ unit GX_IdeGotoEnhancer;
 interface
 
 uses
-  SysUtils;
+  SysUtils,
+  GX_dzCompilerAndRtlVersions;
 
 type
   TGxIdeGotoEnhancer = class
@@ -46,6 +47,12 @@ type
     FUnitPositions: TUnitPositions;
     FLineInput: TWinControlHack;
     FOkButton: TButton;
+{$IF CompilerVersion = CompilerVersionDelphiX103}
+    // Let's hope this gets fixed by Embarcadero, but I wouldn't hold my breath
+    tim_Update: TTimer;
+    FForm: TForm;
+    procedure tim_UpdateTimer(_Sender: TObject);
+{$IFEND}
     procedure lb_UnitPositionsClick(Sender: TObject);
     procedure lb_UnitPositionsDblClick(Sender: TObject);
     procedure LineInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -136,7 +143,31 @@ begin
   _Form.ClientHeight := Y + FOkButton.Height + 8;
 
   FLineInput.OnKeyDown := LineInputKeyDown;
+
+{$IF CompilerVersion = CompilerVersionDelphiX103}
+  FForm := _Form;
+  tim_Update := TTimer.Create(_Form);
+  tim_Update.OnTimer := tim_UpdateTimer;
+  tim_Update.Interval := 100;
+  tim_Update.Enabled := True;
+{$IFEND}
 end;
+
+{$IF CompilerVersion = CompilerVersionDelphiX103}
+
+procedure TGotoEnhancer.tim_UpdateTimer(_Sender: TObject);
+begin
+  // This is a workaround for the drawing problem of the enhanced Goto dialog in
+  // Delphi 10.3 Rio. The same workaround as for the Search Path dialog
+  // (see TFormChangeManagerInternal.ProcessActivatedForm) did not work here, possibly
+  // because the GotoDialog gets resized while the Search Path dialog doesn't.
+  // So we move it one pixel to the left and then to the right.
+  tim_Update.Enabled := False;
+  FForm.Left := FForm.Left - 1;
+  FForm.Left := FForm.Left + 1;
+  FreeAndNil(tim_Update);
+end;
+{$IFEND}
 
 type
 {$IFDEF GX_VER160_up}
@@ -200,3 +231,4 @@ begin
 end;
 
 end.
+
