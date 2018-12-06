@@ -27,19 +27,20 @@ type
 
 implementation
 
-uses Windows,
+uses
+  Windows,
   Dialogs,
   ExtCtrls,
   ActnList,
   Menus,
   ComCtrls,
   Messages,
-  Registry,
   GX_GenericUtils,
   GX_ConfigurationInfo,
   GX_EventHook,
   GX_dzVclUtils,
-  GX_IdeDetectForms;
+  GX_IdeDetectForms,
+  GX_IdeUtils;
 
 type
   TFormChangeCallbackItem = class
@@ -168,29 +169,8 @@ end;
 {$IFDEF SEARCH_PATH_REDRAW_FIX_ENABLED}
 
 function HasRedrawProblems(_Form: TCustomForm): Boolean;
-var
-  reg: TRegistry;
 begin
-  Result := False;
-  // is it the Search Path editor form or the Goto form?
-  if not IsSarchPathForm(_Form) and not IsGotoForm(_Form) then
-    Exit; //==>
-
-  // if yes, check if theming is enabled
-  reg := TRegistry.Create;
-  try
-    reg.RootKey := HKEY_CURRENT_USER;
-    if reg.OpenKeyReadOnly('Software\Embarcadero\BDS\19.0\Theme') then begin
-      try
-        if reg.ValueExists('Enabled') and (reg.GetDataType('Enabled') = rdInteger) then
-          Result := (reg.ReadInteger('Enabled') <> 0);
-      finally
-        reg.CloseKey;
-      end;
-    end;
-  finally
-    FreeAndNil(reg);
-  end;
+  Result := IsSarchPathForm(_Form) and IsThemingEnabled;
 end;
 {$ELSE ~SEARCH_PATH_REDRAW_FIX_ENABLED}
 
