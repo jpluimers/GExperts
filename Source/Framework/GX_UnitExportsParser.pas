@@ -974,6 +974,8 @@ const
   faSymLink = $00000400;
 {$IFEND}
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 procedure TUnitExportParserThread.GetAllFilesInDir(_dir: string; _sl: TStringList);
 var
   sr: TSearchRec;
