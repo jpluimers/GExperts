@@ -25,8 +25,8 @@ uses
   GX_BaseExpert,
   GX_GenericUtils;
 
-{$IF RTLVersion <= RtlVersionDelphi7}
-// Delphi 6/7 does not have the MouseLeave event so we implement it via
+{$IF RTLVersion <= RtlVersionDelphi2005}
+// Delphi < 2006 does not have the MouseLeave event so we implement it via
 // an interposer class using http://stackoverflow.com/a/3182185/49925
 type
   TPageControl = class(ComCtrls.TPageControl)
@@ -863,7 +863,7 @@ begin
   FComment := _Comment;
 end;
 
-{$IF RTLVersion <= RtlVersionDelphi7}
+{$IF RTLVersion <= RtlVersionDelphi2005}
 
 { TPageControl }
 
