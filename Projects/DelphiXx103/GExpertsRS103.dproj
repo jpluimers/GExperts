@@ -169,6 +169,7 @@ $(PreBuildEvent)]]>
         <DCCReference Include="..\..\source\Experts\GX_CopyComponentNames.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_DbugIntf.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_DesignerMenu.pas"/>
+        <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
         <DCCReference Include="..\..\source\Editor\GX_eAlign.pas">
             <Form>fmAlign</Form>
         </DCCReference>
@@ -543,8 +544,8 @@ $(PreBuildEvent)]]>
         <DCCReference Include="..\..\Source\TabOrder\GX_TabOrderOptions.pas">
             <Form>fmTabOrderOptions</Form>
         </DCCReference>
-        <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
         <DCCReference Include="..\..\Source\ide\GX_IdeDetectForms.pas"/>
+        <DCCReference Include="..\..\source\framework\GX_dzCompilerAndRtlVersions.pas"/>
         <RcCompile Include="..\..\images\GXIcons.rc">
             <Form>..\..\images\GXIcons.res</Form>
         </RcCompile>
