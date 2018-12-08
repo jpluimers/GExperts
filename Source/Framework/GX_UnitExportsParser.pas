@@ -968,13 +968,13 @@ begin
   end;
 end;
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 {$IF not declared(faTemporary)}
 const
   faTemporary = $00000100;
   faSymLink = $00000400;
 {$IFEND}
-
-{$WARN SYMBOL_PLATFORM OFF}
 
 procedure TUnitExportParserThread.GetAllFilesInDir(_dir: string; _sl: TStringList);
 var
