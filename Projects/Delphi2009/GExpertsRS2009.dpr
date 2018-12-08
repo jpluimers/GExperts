@@ -241,7 +241,8 @@ uses
   GX_AddDockWindow in '..\..\Source\Experts\GX_AddDockWindow.pas' {fmGxDockForm},
   GX_eRemoveMatchingLines in '..\..\Source\Editor\GX_eRemoveMatchingLines.pas' {fmRemoveMatchingLinesExpertConfig},
   GX_TabOrderOptions in '..\..\Source\TabOrder\GX_TabOrderOptions.pas' {fmTabOrderOptions},
-  GX_IdeDetectForms in '..\..\Source\ide\GX_IdeDetectForms.pas';
+  GX_IdeDetectForms in '..\..\Source\ide\GX_IdeDetectForms.pas',
+  GX_dzCompilerAndRtlVersions in '..\..\source\framework\GX_dzCompilerAndRtlVersions.pas';
 
 {$R '..\..\images\GXIcons.res' '..\..\images\GXIcons.rc'}
 {$R '..\..\Binaries\CodeProofreaderDefault.res' '..\..\Binaries\CodeProofreaderDefault.rc'}
