@@ -19,7 +19,7 @@
 			<Compiler Name="A" Type="Integer">8</Compiler>
 			<Compiler Name="B" Type="Integer">0</Compiler>
 			<Compiler Name="C" Type="Integer">1</Compiler>
-			<Compiler Name="D" Type="Integer">1</Compiler>
+			<Compiler Name="D" Type="Integer">0</Compiler>
 			<Compiler Name="E" Type="Integer">0</Compiler>
 			<Compiler Name="F" Type="Integer">0</Compiler>
 			<Compiler Name="G" Type="Integer">1</Compiler>
@@ -27,20 +27,20 @@
 			<Compiler Name="I" Type="Integer">1</Compiler>
 			<Compiler Name="J" Type="Integer">0</Compiler>
 			<Compiler Name="K" Type="Integer">0</Compiler>
-			<Compiler Name="L" Type="Integer">1</Compiler>
+			<Compiler Name="L" Type="Integer">0</Compiler>
 			<Compiler Name="M" Type="Integer">0</Compiler>
 			<Compiler Name="N" Type="Integer">1</Compiler>
-			<Compiler Name="O" Type="Integer">0</Compiler>
+			<Compiler Name="O" Type="Integer">1</Compiler>
 			<Compiler Name="P" Type="Integer">1</Compiler>
-			<Compiler Name="Q" Type="Integer">1</Compiler>
-			<Compiler Name="R" Type="Integer">1</Compiler>
+			<Compiler Name="Q" Type="Integer">0</Compiler>
+			<Compiler Name="R" Type="Integer">0</Compiler>
 			<Compiler Name="S" Type="Integer">0</Compiler>
 			<Compiler Name="T" Type="Integer">0</Compiler>
 			<Compiler Name="U" Type="Integer">0</Compiler>
 			<Compiler Name="V" Type="Integer">1</Compiler>
-			<Compiler Name="W" Type="Integer">1</Compiler>
+			<Compiler Name="W" Type="Integer">0</Compiler>
 			<Compiler Name="X" Type="Integer">1</Compiler>
-			<Compiler Name="Y" Type="Integer">2</Compiler>
+			<Compiler Name="Y" Type="Integer">0</Compiler>
 			<Compiler Name="Z" Type="Integer">1</Compiler>
 			<Compiler Name="ShowHints" Type="Boolean">True</Compiler>
 			<Compiler Name="ShowWarnings" Type="Boolean">True</Compiler>
@@ -177,8 +177,7 @@
 			<Language Name="ActiveLang" Type="String"></Language>
 			<Language Name="ProjectLang" Type="String">$00000000</Language>
 			<Language Name="RootDir" Type="String"></Language>
-		</Language>
-    <Excluded_Packages>
+		</Language>  <Excluded_Packages>
       <Excluded_Packages Name="d:\borland\dexter\bin\dclado100.bpl">Borland ADO DB Components</Excluded_Packages>
       <Excluded_Packages Name="d:\borland\dexter\Bin\dclsmp100.bpl">Borland Sample Components</Excluded_Packages>
       <Excluded_Packages Name="d:\borland\dexter\Bin\dclIndyProtocols100.bpl">Indy 10 Protocols Design Time</Excluded_Packages>
