@@ -40,7 +40,7 @@ const
   // naming scheme changed to year numbers (curse you Microsoft!)
   RtlVersionDelphi2005 = 17;
   RtlVersionDelphi2006 = 18;
-  RtlVersionDelphi2007 = 18.5;
+  RtlVersionDelphi2007 = 18;
   RtlVersionDelphi2007Net = 19;
   RtlVersionDelphi2009 = 20;
   RtlVersionDelphi2010 = 21;
