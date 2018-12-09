@@ -8,7 +8,14 @@ uses
   Classes, Controls, Forms, Menus, ComCtrls,
   ExtCtrls, ActnList, Actions, Dialogs, StdCtrls, Grids, Types,
   GX_ConfigurationInfo, GX_Experts, GX_GenericUtils, GX_BaseForm,
-  GX_KbdShortCutBroker, GX_UnitExportsParser;
+  GX_KbdShortCutBroker, GX_UnitExportsParser, GX_dzCompilerAndRtlVersions;
+
+{$IFOPT D+}
+{$IF RTLVersion > RtlVersionDelphiXE}
+// System.Diagnostics, which exports TStopWatch, was added to the RTL in DelphiXE2
+{$DEFINE DO_TIMING}
+{$IFEND}
+{$ENDIF}
 
 type
   TPageControl = class(ComCtrls.TPageControl)
@@ -1709,6 +1716,7 @@ begin
 
 {$IFOPT D+}
   SendDebugFmt('UnitExportParser finished, found %d identifiers', [sl.Count]);
+{$IFDEF DO_TIMING}
   SendDebugFmt('UnitExportParser loaded %d units', [FUnitExportParserThread.LoadedUnitsCount]);
   SendDebugFmt('UnitExportParser parsed %d units', [FUnitExportParserThread.ParsedUnitsCount]);
   SendDebugFmt('UnitExportParser searching time %d ms', [FUnitExportParserThread.SearchingTimeMS]);
@@ -1718,6 +1726,7 @@ begin
   SendDebugFmt('UnitExportParser processing time %d ms', [FUnitExportParserThread.ProcessingTimeMS]);
   SendDebugFmt('UnitExportParser sorting time %d ms', [FUnitExportParserThread.SortingTimeMS]);
   SendDebugFmt('UnitExportParser total time %d ms', [FUnitExportParserThread.TotalTimeMS]);
+{$ENDIF}
 {$ENDIF D+}
 
 {$IFOPT D+}

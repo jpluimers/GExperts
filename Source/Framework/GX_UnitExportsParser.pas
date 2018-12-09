@@ -1,7 +1,5 @@
 unit GX_UnitExportsParser;
 
-{$I 'GX_CondDefine.inc'}
-
 interface
 
 uses
@@ -12,6 +10,13 @@ uses
   GX_dzCompilerAndRtlVersions,
   mwPasParserTypes,
   mPasLex;
+
+{$IFOPT D+}
+{$IF RTLVersion > RtlVersionDelphiXE}
+// System.Diagnostics, which exports TStopWatch, was added to the RTL in DelphiXE2
+{$DEFINE DO_TIMING}
+{$IFEND}
+{$ENDIF}
 
 type
   // itUnknown is only there so Delphi 6 does not bomb out because of NIL objects in FIdentifiers
@@ -143,6 +148,7 @@ type
     FIdentifiers: TStrings;
     FPaths: TStringList;
     FCacheDirBS: string;
+{$IFDEF DO_TIMING}
     FLoadingTimeMS: Int64;
     FInsertingTimeMS: Int64;
     FSortingTimeMS: Int64;
@@ -152,6 +158,7 @@ type
     FTotalTimeMS: Int64;
     FSearchingTimeMS: Int64;
     FParsingTimeMS: Int64;
+{$ENDIF}
     procedure AddSymbols(_Parser: TUnitExportsParser);
     procedure GetAllFilesInPath(_sl: TStringList);
     procedure GetAllFilesInDir(_dir: string; _sl: TStringList);
@@ -171,6 +178,7 @@ type
     /// @NOTE: Make a copy of these PChars (e.g. assign them to a string because they point
     ///        to entries in FUnits that are freed in the destructor! </summary>
     property Identifiers: TStrings read FIdentifiers;
+{$IFDEF DO_TIMING}
     property ParsedUnitsCount: Integer read FParsedUnitsCount;
     property LoadedUnitsCount: Integer read FLoadedUnitsCount;
     property LoadingTimeMS: Int64 read FLoadingTimeMS;
@@ -180,14 +188,15 @@ type
     property SortingTimeMS: Int64 read FSortingTimeMS;
     property TotalTimeMS: Int64 read FTotalTimeMS;
     property SearchingTimeMS: Int64 read FSearchingTimeMS;
+{$ENDIF}
   end;
 
 implementation
 
 uses
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF DO_TIMING}
   System.Diagnostics,
-{$IFEND}
+{$ENDIF}
   StrUtils,
   GX_GenericUtils;
 
@@ -1056,7 +1065,7 @@ var
   CacheFn: string;
   UnitTime: UInt32;
   CacheTime: UInt32;
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
   Loading: TStopwatch;
   Inserting: TStopwatch;
   Sorting: TStopwatch;
@@ -1064,11 +1073,11 @@ var
   Total: TStopwatch;
   Searching: TStopwatch;
   Parsing: TStopwatch;
-{$IFEND}
+{$ENDIF}
 begin
   inherited;
 
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
   Loading := TStopwatch.Create;
   Inserting := TStopwatch.Create;
   Sorting := TStopwatch.Create;
@@ -1079,7 +1088,7 @@ begin
 
   Total.Start;
   Searching.Start;
-{$IFEND}
+{$ENDIF}
 
   sl := nil;
   FilesInPath := TStringList.Create;
@@ -1103,15 +1112,15 @@ begin
     FreeAndNil(sl);
     FreeAndNil(FilesInPath);
   end;
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
   Searching.Stop;
-{$IFEND}
+{$ENDIF}
 
   ForceDirectories(FCacheDirBS);
 
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
   Processing.Start;
-{$IFEND}
+{$ENDIF}
   for FileIdx := 0 to FFiles.Count - 1 do begin
     if Terminated then
       Exit; //==>
@@ -1122,36 +1131,38 @@ begin
     CacheFn := MangleFilename(fn);
     CacheFn := FCacheDirBS + CacheFn;
     if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime < CacheTime) then begin
+{$IFDEF  DO_TIMING}
       Inc(FLoadedUnitsCount);
+{$ENDIF}
       sl := TStringList.Create;
       try
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
         Loading.Start;
-{$IFEND}
+{$ENDIF}
         sl.LoadFromFile(CacheFn);
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
         Loading.Stop;
-{$IFEND}
+{$ENDIF}
 
         FUnits.Add(UnitName);
         FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
 
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
         Inserting.Start;
-{$IFEND}
+{$ENDIF}
         for IdentIdx := 0 to sl.Count - 1 do
           FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
         Inserting.Stop;
-{$IFEND}
+{$ENDIF}
       finally
         FreeAndNil(sl);
       end;
     end else begin
+{$IFDEF  DO_TIMING}
       Inc(FParsedUnitsCount);
-{$IF RtlVersion >= RtlVersionDelphiX103}
       Parsing.Start;
-{$IFEND}
+{$ENDIF}
       Parser := TUnitExportsParser.Create(fn);
       try
         AddSymbols(Parser);
@@ -1168,19 +1179,21 @@ begin
       finally
         FreeAndNil(Parser);
       end;
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
       Parsing.Stop;
-{$IFEND}
+{$ENDIF}
     end;
   end;
   if Terminated then
     Exit; //==>
 
-{$IF RtlVersion >= RtlVersionDelphiX103}
+{$IFDEF  DO_TIMING}
   Processing.Stop;
 
   Sorting.Start;
+{$ENDIF}
   TStringList(FIdentifiers).Sort;
+{$IFDEF  DO_TIMING}
   Sorting.Stop;
 
   Total.Stop;
@@ -1192,7 +1205,7 @@ begin
   FParsingTimeMS := Parsing.ElapsedMilliseconds;
   FProcessingTimeMS := Processing.ElapsedMilliseconds;
   FTotalTimeMS := Total.ElapsedMilliseconds;
-{$IFEND}
+{$ENDIF}
 end;
 
 end.
