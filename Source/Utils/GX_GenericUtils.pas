@@ -2,6 +2,10 @@ unit GX_GenericUtils;
 
 {$I GX_CondDefine.inc}
 
+{$IFOPT D+}
+{$MESSAGE WARN 'Compiling with Debug information turned on'}
+{$ENDIF}
+
 {$WARN SYMBOL_PLATFORM OFF}
 
 interface
