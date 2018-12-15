@@ -8,11 +8,11 @@ uses
 type
   TGX_BaseExpert = class(TObject)
   private
-    FBitmap: TBitmap;
     FCallCount: Integer;
     function GetTotalCallCount: Integer;
     procedure SetTotalCallCount(Value: Integer);
   protected
+    FBitmap: TBitmap;
     FActive: Boolean;
     function GetShortCut: TShortCut; virtual; abstract;
     procedure SetActive(New: Boolean); virtual;
