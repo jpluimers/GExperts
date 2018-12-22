@@ -1,6 +1,7 @@
 object fmIdxPackageRenameDlg: TfmIdxPackageRenameDlg
   Left = 333
   Top = 237
+  ActiveControl = ed_Description
   Width = 417
   Height = 151
   BorderIcons = [biSystemMenu]
