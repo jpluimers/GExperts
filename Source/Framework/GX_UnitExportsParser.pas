@@ -72,7 +72,7 @@ type
 
 type
   ///<summary>
-  /// Simple parser that collects all identifiers declared in the interface of a unit.
+  /// Simple parser that collects all identifiers declared in the interface of a unit. </summary>
   TUnitExportsParser = class
   private
     FFilename: string;
