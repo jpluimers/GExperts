@@ -32,6 +32,9 @@ type
     ComboDropDownCount: Integer;
   end;
 
+  // to support the GX_IdeFormEnhancer and GX_IdeDialogEnhancer units that enhance/fix IDE forms and dialogs
+  // like allowing the forms to resize, saving/loading form state, collapse treenodes, etc.
+  // usage roots are InitializeFormHandlers, TIdeDialogEnhancer.Create, TIDEFormEnhancer.Create
   TManagedForm = class(TComponent)
   private
     FForm: TForm;
@@ -188,7 +191,8 @@ uses
   GX_ConfigurationInfo,
   GX_GenericUtils,
   GX_dzClassUtils,
-  GX_IdeUtils, GX_dzNamedThread;
+  GX_IdeUtils,
+  GX_dzNamedThread;
 
 const
   WidthIdent = 'Width';
@@ -1150,9 +1154,15 @@ begin
 
   DoSaveFormState;
 
-  // if it was assigned, call the original OnDestroy event
-  if Assigned(OrigOnDestroy) then
+  if Assigned(OrigOnDestroy) then begin
+    // Restoring the FForm.OnDestroy to its original value does not call OrigOnDestroy.
+    // The reason is that FormDestroy gets called from OnDestroy;
+    // OnDestroy is called from TCustomForm.DoDestroy which will never call OnDestroy restored from OrigOnDestroy.
+    // So we need to explicitly call the old one:
     OrigOnDestroy(Sender);
+    // Note we still restore the old OnDestroy value, just in case there is a check
+    // for the value (some interceptors actively perform that check).
+  end;
 end;
 
 procedure TManagedForm.MakeComponentsResizable;

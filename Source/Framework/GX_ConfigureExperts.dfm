@@ -1,7 +1,7 @@
 object frConfigureExperts: TfrConfigureExperts
   Left = 0
   Top = 0
-  Width = 599
+  Width = 640
   Height = 223
   TabOrder = 0
   OnMouseWheelDown = FrameMouseWheelDown
@@ -10,7 +10,7 @@ object frConfigureExperts: TfrConfigureExperts
   object pnlExpertsFilter: TPanel
     Left = 0
     Top = 0
-    Width = 599
+    Width = 640
     Height = 41
     Align = alTop
     BevelOuter = bvNone
@@ -88,7 +88,7 @@ object frConfigureExperts: TfrConfigureExperts
   object sbxExperts: TScrollBox
     Left = 0
     Top = 41
-    Width = 599
+    Width = 640
     Height = 182
     VertScrollBar.Increment = 40
     VertScrollBar.Range = 920
@@ -96,19 +96,12 @@ object frConfigureExperts: TfrConfigureExperts
     Align = alClient
     AutoScroll = False
     TabOrder = 1
-    DesignSize = (
-      578
-      178)
     object pnlExpertLayout: TPanel
       Left = 0
       Top = 0
-      Width = 572
+      Width = 613
       Height = 40
-      Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
-      DesignSize = (
-        572
-        40)
       object imgExpert: TImage
         Left = 4
         Top = 4
@@ -129,29 +122,26 @@ object frConfigureExperts: TfrConfigureExperts
       object edtExpert: THotKey
         Left = 267
         Top = 10
-        Width = 142
+        Width = 190
         Height = 22
-        Anchors = [akLeft, akTop, akRight]
         HotKey = 32833
         InvalidKeys = [hcNone, hcShift]
         Modifiers = [hkAlt]
         TabOrder = 1
       end
       object btnExpert: TButton
-        Left = 478
+        Left = 519
         Top = 8
         Width = 84
         Height = 25
-        Anchors = [akTop, akRight]
         Caption = 'Configure...'
         TabOrder = 3
       end
       object btnDefault: TButton
-        Left = 408
+        Left = 457
         Top = 8
         Width = 55
         Height = 25
-        Anchors = [akTop, akRight]
         Caption = 'Default'
         TabOrder = 2
       end

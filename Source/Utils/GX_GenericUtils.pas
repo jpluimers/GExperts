@@ -2,6 +2,10 @@ unit GX_GenericUtils;
 
 {$I GX_CondDefine.inc}
 
+{$IFOPT D+}
+{$MESSAGE WARN 'Compiling with Debug information turned on'}
+{$ENDIF}
+
 {$WARN SYMBOL_PLATFORM OFF}
 
 interface
@@ -9,7 +13,6 @@ interface
 uses
   SysUtils, Classes, Dialogs, SyncObjs, Graphics, Controls, Forms, StdCtrls,
   {$IFNDEF UNICODE} SynUnicode, {$ENDIF UNICODE} // UniSynEdit is required for TWideStringList in Delphi 2007 and earlier
-  UITypes,
   Types, CheckLst, TypInfo, ExtCtrls, ComCtrls, GX_dzNamedThread;
 
 const
@@ -24,12 +27,15 @@ resourcestring
 
 type
   // NativeInt and NativeUInt are wrongly declared as 8 bytes in size in Delphi 6 to 2007,
-  // so we can't use them. Instead we declare our own types which, sincd GExperts is a
+  // so we can't use them. Instead we declare our own types which, since GExperts is a
   // 32 IDE plugin are both 32 bits.
   // Originally this simply redeclared NativeInt as Integer for older versions, but
   // that made it hard to find accidental usages of the wrong type.
   GXNativeInt = Integer;
   GXNativeUInt = LongWord;
+{$IFNDEF GX_DELPHI2009_UP}
+  UInt32 = Cardinal;
+{$ENDIF}
 
 type
   {$IFDEF GX_VER160_up}

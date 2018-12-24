@@ -146,7 +146,6 @@ type
     chkQuoteCaption: TCheckBox;
     edtMsgBoxCaption: TEdit;
     pnlMessageDlg: TPanel;
-    pnlMessageBox: TPanel;
     cbxModality: TComboBox;
     chkNoFocus: TCheckBox;
     pnlButtons: TPanel;

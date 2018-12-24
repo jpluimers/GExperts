@@ -7,7 +7,7 @@ object fmMessageDialog: TfmMessageDialog
   BorderIcons = [biSystemMenu]
   Caption = 'Message Dialog'
   ClientHeight = 514
-  ClientWidth = 514
+  ClientWidth = 552
   Color = clBtnFace
   Constraints.MinHeight = 550
   Constraints.MinWidth = 530
@@ -24,7 +24,7 @@ object fmMessageDialog: TfmMessageDialog
   object pnlMain: TPanel
     Left = 0
     Top = 113
-    Width = 514
+    Width = 552
     Height = 365
     Align = alBottom
     BevelOuter = bvNone
@@ -34,20 +34,19 @@ object fmMessageDialog: TfmMessageDialog
     object pgeMessageDialog: TPageControl
       Left = 6
       Top = 47
-      Width = 502
+      Width = 540
       Height = 312
       ActivePage = tabMessageDlg
       Align = alClient
-      TabIndex = 0
       TabOrder = 1
       OnChange = pgeMessageDialogChange
       object tabMessageDlg: TTabSheet
         Caption = 'MessageDlg'
         DesignSize = (
-          494
+          532
           283)
         object pnlMessageDlg: TPanel
-          Left = 32
+          Left = 51
           Top = 23
           Width = 425
           Height = 233
@@ -781,451 +780,437 @@ object fmMessageDialog: TfmMessageDialog
       object tabMessageBox: TTabSheet
         Caption = 'MessageBox'
         ImageIndex = 1
-        DesignSize = (
-          494
-          283)
-        object pnlMessageBox: TPanel
-          Left = 5
-          Top = 1
-          Width = 484
-          Height = 278
-          Anchors = []
-          BevelOuter = bvNone
-          FullRepaint = False
+        object gbxMsgBoxTypes: TGroupBox
+          Left = 8
+          Top = 8
+          Width = 217
+          Height = 272
+          Caption = 'Dialog T&ype'
           TabOrder = 0
-          object gbxMsgBoxTypes: TGroupBox
-            Left = 3
-            Top = 5
-            Width = 192
-            Height = 272
-            Caption = 'Dialog T&ype'
-            TabOrder = 0
-            object imgMsgBoxWarning: TImage
-              Left = 8
-              Top = 24
-              Width = 32
-              Height = 32
-              AutoSize = True
-              Center = True
-              Transparent = True
-            end
-            object imgInformationMsgBox: TImage
-              Left = 8
-              Top = 145
-              Width = 32
-              Height = 32
-              AutoSize = True
-              Center = True
-              Transparent = True
-            end
-            object imgErrorMsgBox: TImage
-              Left = 8
-              Top = 88
-              Width = 32
-              Height = 32
-              AutoSize = True
-              Center = True
-              Transparent = True
-            end
-            object imgConfirmationMsgBox: TImage
-              Left = 8
-              Top = 199
-              Width = 32
-              Height = 32
-              AutoSize = True
-              Center = True
-              Transparent = True
-            end
-            object rbnIconWarning: TRadioButton
-              Left = 48
-              Top = 24
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconWarning'
-              TabOrder = 0
-            end
-            object rbnIconInformation: TRadioButton
-              Left = 48
-              Top = 144
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconInformation'
-              TabOrder = 5
-            end
-            object rbnIconQuestion: TRadioButton
-              Left = 48
-              Top = 207
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconQuestion'
-              TabOrder = 7
-            end
-            object rbnIconStop: TRadioButton
-              Left = 48
-              Top = 80
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconStop'
-              TabOrder = 2
-            end
-            object rbnIconExclamation: TRadioButton
-              Left = 48
-              Top = 40
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconExclamation'
-              Checked = True
-              TabOrder = 1
-              TabStop = True
-            end
-            object rbnIconAsterisk: TRadioButton
-              Left = 48
-              Top = 160
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconAsterisk'
-              TabOrder = 6
-            end
-            object rbnIconError: TRadioButton
-              Left = 48
-              Top = 96
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconError'
-              TabOrder = 3
-            end
-            object rbnIconHand: TRadioButton
-              Left = 48
-              Top = 112
-              Width = 141
-              Height = 17
-              Caption = 'mb_IconHand'
-              TabOrder = 4
-            end
+          object imgMsgBoxWarning: TImage
+            Left = 8
+            Top = 24
+            Width = 32
+            Height = 32
+            AutoSize = True
+            Center = True
+            Transparent = True
           end
-          object pgeMessageBoxOptions: TPageControl
-            Left = 201
-            Top = 5
-            Width = 283
-            Height = 272
-            ActivePage = tabOptions
-            TabIndex = 0
+          object imgInformationMsgBox: TImage
+            Left = 8
+            Top = 145
+            Width = 32
+            Height = 32
+            AutoSize = True
+            Center = True
+            Transparent = True
+          end
+          object imgErrorMsgBox: TImage
+            Left = 8
+            Top = 88
+            Width = 32
+            Height = 32
+            AutoSize = True
+            Center = True
+            Transparent = True
+          end
+          object imgConfirmationMsgBox: TImage
+            Left = 8
+            Top = 199
+            Width = 32
+            Height = 32
+            AutoSize = True
+            Center = True
+            Transparent = True
+          end
+          object rbnIconWarning: TRadioButton
+            Left = 48
+            Top = 24
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconWarning'
+            TabOrder = 0
+          end
+          object rbnIconInformation: TRadioButton
+            Left = 48
+            Top = 144
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconInformation'
+            TabOrder = 5
+          end
+          object rbnIconQuestion: TRadioButton
+            Left = 48
+            Top = 207
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconQuestion'
+            TabOrder = 7
+          end
+          object rbnIconStop: TRadioButton
+            Left = 48
+            Top = 80
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconStop'
+            TabOrder = 2
+          end
+          object rbnIconExclamation: TRadioButton
+            Left = 48
+            Top = 40
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconExclamation'
+            Checked = True
             TabOrder = 1
-            object tabOptions: TTabSheet
-              Caption = 'Options'
-              object gbxMsgBoxFunctionResults: TGroupBox
-                Left = 164
-                Top = 75
-                Width = 106
-                Height = 135
-                Caption = '&Function Results'
-                TabOrder = 2
-                object chkYes: TCheckBox
-                  Tag = 1
-                  Left = 8
-                  Top = 17
-                  Width = 92
-                  Height = 17
-                  Caption = 'idYes'
-                  Enabled = False
-                  TabOrder = 0
-                end
-                object chkNo: TCheckBox
-                  Tag = 2
-                  Left = 8
-                  Top = 33
-                  Width = 92
-                  Height = 17
-                  Caption = 'idNo'
-                  Enabled = False
-                  TabOrder = 1
-                end
-                object chkOk: TCheckBox
-                  Tag = 4
-                  Left = 8
-                  Top = 49
-                  Width = 92
-                  Height = 17
-                  Caption = 'idOk'
-                  Enabled = False
-                  TabOrder = 2
-                end
-                object chkCancel: TCheckBox
-                  Tag = 8
-                  Left = 8
-                  Top = 65
-                  Width = 92
-                  Height = 17
-                  Caption = 'idCancel'
-                  Enabled = False
-                  TabOrder = 3
-                end
-                object chkAbort: TCheckBox
-                  Tag = 16
-                  Left = 8
-                  Top = 81
-                  Width = 92
-                  Height = 17
-                  Caption = 'idAbort'
-                  Enabled = False
-                  TabOrder = 4
-                end
-                object chkRetry: TCheckBox
-                  Tag = 32
-                  Left = 8
-                  Top = 97
-                  Width = 92
-                  Height = 17
-                  Caption = 'idRetry'
-                  Enabled = False
-                  TabOrder = 5
-                end
-                object chkIgnore: TCheckBox
-                  Tag = 64
-                  Left = 8
-                  Top = 113
-                  Width = 92
-                  Height = 17
-                  Caption = 'idIgnore'
-                  Enabled = False
-                  TabOrder = 6
-                end
+            TabStop = True
+          end
+          object rbnIconAsterisk: TRadioButton
+            Left = 48
+            Top = 160
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconAsterisk'
+            TabOrder = 6
+          end
+          object rbnIconError: TRadioButton
+            Left = 48
+            Top = 96
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconError'
+            TabOrder = 3
+          end
+          object rbnIconHand: TRadioButton
+            Left = 48
+            Top = 112
+            Width = 161
+            Height = 17
+            Caption = 'mb_IconHand'
+            TabOrder = 4
+          end
+        end
+        object pgeMessageBoxOptions: TPageControl
+          Left = 232
+          Top = 8
+          Width = 297
+          Height = 272
+          ActivePage = tabOptions
+          TabOrder = 1
+          object tabOptions: TTabSheet
+            Caption = 'Options'
+            object gbxMsgBoxFunctionResults: TGroupBox
+              Left = 164
+              Top = 75
+              Width = 117
+              Height = 135
+              Caption = '&Function Results'
+              TabOrder = 2
+              object chkYes: TCheckBox
+                Tag = 1
+                Left = 8
+                Top = 17
+                Width = 105
+                Height = 17
+                Caption = 'idYes'
+                Enabled = False
+                TabOrder = 0
               end
-              object gbxMsgBoxDialogButtons: TGroupBox
-                Left = 6
-                Top = 75
-                Width = 154
-                Height = 135
-                Caption = '&Buttons'
+              object chkNo: TCheckBox
+                Tag = 2
+                Left = 8
+                Top = 33
+                Width = 105
+                Height = 17
+                Caption = 'idNo'
+                Enabled = False
                 TabOrder = 1
-                object rbnAbortRetryIgnore: TRadioButton
-                  Tag = 112
-                  Left = 8
-                  Top = 17
-                  Width = 140
-                  Height = 17
-                  Caption = 'mb_AbortRetryIgnore'
-                  TabOrder = 0
-                  TabStop = True
-                  OnClick = cbDialogButtonsOrIfStatementClick
-                end
-                object rbnOk: TRadioButton
-                  Tag = 4
-                  Left = 8
-                  Top = 36
-                  Width = 140
-                  Height = 17
-                  Caption = 'mb_OK'
-                  Checked = True
-                  TabOrder = 1
-                  TabStop = True
-                  OnClick = cbDialogButtonsOrIfStatementClick
-                end
-                object rbnOkCancel: TRadioButton
-                  Tag = 12
-                  Left = 8
-                  Top = 55
-                  Width = 140
-                  Height = 17
-                  Caption = 'mb_OkCancel'
-                  TabOrder = 2
-                  TabStop = True
-                  OnClick = cbDialogButtonsOrIfStatementClick
-                end
-                object rbnRetryCancel: TRadioButton
-                  Tag = 40
-                  Left = 8
-                  Top = 74
-                  Width = 140
-                  Height = 17
-                  Caption = 'mb_RetryCancel'
-                  TabOrder = 3
-                  TabStop = True
-                  OnClick = cbDialogButtonsOrIfStatementClick
-                end
-                object rbnYesNo: TRadioButton
-                  Tag = 3
-                  Left = 8
-                  Top = 93
-                  Width = 140
-                  Height = 17
-                  Caption = 'mb_YesNo'
-                  TabOrder = 4
-                  TabStop = True
-                  OnClick = cbDialogButtonsOrIfStatementClick
-                end
-                object rbnYesNoCancel: TRadioButton
-                  Tag = 11
-                  Left = 8
-                  Top = 113
-                  Width = 140
-                  Height = 17
-                  Caption = 'mb_YesNoCancel'
-                  TabOrder = 5
-                  TabStop = True
-                  OnClick = cbDialogButtonsOrIfStatementClick
-                end
               end
-              object chkDefaultButton: TCheckBox
-                Left = 6
-                Top = 220
-                Width = 104
-                Height = 13
-                Caption = 'Default button:'
+              object chkOk: TCheckBox
+                Tag = 4
+                Left = 8
+                Top = 49
+                Width = 105
+                Height = 17
+                Caption = 'idOk'
+                Enabled = False
+                TabOrder = 2
+              end
+              object chkCancel: TCheckBox
+                Tag = 8
+                Left = 8
+                Top = 65
+                Width = 105
+                Height = 17
+                Caption = 'idCancel'
+                Enabled = False
                 TabOrder = 3
               end
-              object gbxCaption: TGroupBox
-                Left = 6
-                Top = 3
-                Width = 264
-                Height = 65
-                Caption = 'Ca&ption'
-                TabOrder = 0
-                DesignSize = (
-                  264
-                  65)
-                object chkQuoteCaption: TCheckBox
-                  Left = 8
-                  Top = 42
-                  Width = 229
-                  Height = 18
-                  Caption = 'Quote caption t&ext'
-                  TabOrder = 1
-                end
-                object edtMsgBoxCaption: TEdit
-                  Left = 8
-                  Top = 18
-                  Width = 249
-                  Height = 22
-                  Anchors = [akLeft, akTop, akRight]
-                  TabOrder = 0
-                end
-              end
-              object edtDefaultButton: TEdit
-                Left = 117
-                Top = 216
-                Width = 32
-                Height = 22
+              object chkAbort: TCheckBox
+                Tag = 16
+                Left = 8
+                Top = 81
+                Width = 105
+                Height = 17
+                Caption = 'idAbort'
+                Enabled = False
                 TabOrder = 4
-                Text = '1'
               end
-              object udDefaultButton: TUpDown
-                Left = 149
-                Top = 216
-                Width = 12
-                Height = 21
-                Associate = edtDefaultButton
-                Min = 1
-                Max = 4
-                Position = 1
+              object chkRetry: TCheckBox
+                Tag = 32
+                Left = 8
+                Top = 97
+                Width = 105
+                Height = 17
+                Caption = 'idRetry'
+                Enabled = False
                 TabOrder = 5
-                Wrap = False
+              end
+              object chkIgnore: TCheckBox
+                Tag = 64
+                Left = 8
+                Top = 113
+                Width = 105
+                Height = 17
+                Caption = 'idIgnore'
+                Enabled = False
+                TabOrder = 6
               end
             end
-            object tabAdvanced: TTabSheet
-              Caption = 'Advanced'
-              ImageIndex = 1
-              object gbxMsgBoxModality: TGroupBox
-                Left = 6
-                Top = 184
-                Width = 262
-                Height = 49
-                Caption = 'Mod&ality'
-                TabOrder = 1
-                object cbxModality: TComboBox
-                  Left = 8
-                  Top = 19
-                  Width = 209
-                  Height = 22
-                  Style = csDropDownList
-                  ItemHeight = 14
-                  TabOrder = 0
-                  Items.Strings = (
-                    ''
-                    'MB_APPLMODAL'
-                    'MB_SYSTEMMODAL'
-                    'MB_TASKMODAL')
-                end
-              end
-              object gbxMsgBoxMisc: TGroupBox
-                Left = 6
-                Top = 3
-                Width = 262
-                Height = 180
-                Caption = 'M&iscellaneous Flags'
+            object gbxMsgBoxDialogButtons: TGroupBox
+              Left = 6
+              Top = 75
+              Width = 154
+              Height = 135
+              Caption = '&Buttons'
+              TabOrder = 1
+              object rbnAbortRetryIgnore: TRadioButton
+                Tag = 112
+                Left = 8
+                Top = 17
+                Width = 140
+                Height = 17
+                Caption = 'mb_AbortRetryIgnore'
                 TabOrder = 0
-                object chkDefaultDesktopOnly: TCheckBox
-                  Left = 8
-                  Top = 20
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_DEFAULT_DESKTOP_ONLY'
-                  TabOrder = 0
-                end
-                object chkHelp: TCheckBox
-                  Left = 8
-                  Top = 36
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_HELP'
-                  TabOrder = 1
-                end
-                object chkRight: TCheckBox
-                  Left = 8
-                  Top = 70
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_RIGHT'
-                  TabOrder = 3
-                end
-                object chkRtlReading: TCheckBox
-                  Left = 8
-                  Top = 87
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_RTLREADING'
-                  TabOrder = 4
-                end
-                object chkSetForeground: TCheckBox
-                  Left = 8
-                  Top = 137
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_SETFOREGROUND'
-                  TabOrder = 7
-                end
-                object chkTopMost: TCheckBox
-                  Left = 8
-                  Top = 154
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_TOPMOST'
-                  TabOrder = 8
-                end
-                object chkServiceNotification: TCheckBox
-                  Left = 8
-                  Top = 103
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_SERVICE_NOTIFICATION'
-                  TabOrder = 5
-                end
-                object chkServiceNotificationNt3x: TCheckBox
-                  Left = 8
-                  Top = 120
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_SERVICE_NOTIFICATION_NT3X'
-                  TabOrder = 6
-                end
-                object chkNoFocus: TCheckBox
-                  Left = 8
-                  Top = 53
-                  Width = 250
-                  Height = 17
-                  Caption = 'MB_NOFOCUS'
-                  TabOrder = 2
-                end
+                TabStop = True
+                OnClick = cbDialogButtonsOrIfStatementClick
+              end
+              object rbnOk: TRadioButton
+                Tag = 4
+                Left = 8
+                Top = 36
+                Width = 140
+                Height = 17
+                Caption = 'mb_OK'
+                Checked = True
+                TabOrder = 1
+                TabStop = True
+                OnClick = cbDialogButtonsOrIfStatementClick
+              end
+              object rbnOkCancel: TRadioButton
+                Tag = 12
+                Left = 8
+                Top = 55
+                Width = 140
+                Height = 17
+                Caption = 'mb_OkCancel'
+                TabOrder = 2
+                TabStop = True
+                OnClick = cbDialogButtonsOrIfStatementClick
+              end
+              object rbnRetryCancel: TRadioButton
+                Tag = 40
+                Left = 8
+                Top = 74
+                Width = 140
+                Height = 17
+                Caption = 'mb_RetryCancel'
+                TabOrder = 3
+                TabStop = True
+                OnClick = cbDialogButtonsOrIfStatementClick
+              end
+              object rbnYesNo: TRadioButton
+                Tag = 3
+                Left = 8
+                Top = 93
+                Width = 140
+                Height = 17
+                Caption = 'mb_YesNo'
+                TabOrder = 4
+                TabStop = True
+                OnClick = cbDialogButtonsOrIfStatementClick
+              end
+              object rbnYesNoCancel: TRadioButton
+                Tag = 11
+                Left = 8
+                Top = 113
+                Width = 140
+                Height = 17
+                Caption = 'mb_YesNoCancel'
+                TabOrder = 5
+                TabStop = True
+                OnClick = cbDialogButtonsOrIfStatementClick
+              end
+            end
+            object chkDefaultButton: TCheckBox
+              Left = 6
+              Top = 220
+              Width = 104
+              Height = 13
+              Caption = 'Default button:'
+              TabOrder = 3
+            end
+            object gbxCaption: TGroupBox
+              Left = 6
+              Top = 3
+              Width = 275
+              Height = 65
+              Caption = 'Ca&ption'
+              TabOrder = 0
+              DesignSize = (
+                275
+                65)
+              object chkQuoteCaption: TCheckBox
+                Left = 8
+                Top = 42
+                Width = 257
+                Height = 18
+                Caption = 'Quote caption t&ext'
+                TabOrder = 1
+              end
+              object edtMsgBoxCaption: TEdit
+                Left = 8
+                Top = 18
+                Width = 260
+                Height = 22
+                Anchors = [akLeft, akTop, akRight]
+                TabOrder = 0
+              end
+            end
+            object edtDefaultButton: TEdit
+              Left = 117
+              Top = 216
+              Width = 32
+              Height = 22
+              TabOrder = 4
+              Text = '1'
+            end
+            object udDefaultButton: TUpDown
+              Left = 149
+              Top = 216
+              Width = 12
+              Height = 22
+              Associate = edtDefaultButton
+              Min = 1
+              Max = 4
+              Position = 1
+              TabOrder = 5
+              Wrap = False
+            end
+          end
+          object tabAdvanced: TTabSheet
+            Caption = 'Advanced'
+            ImageIndex = 1
+            object gbxMsgBoxModality: TGroupBox
+              Left = 6
+              Top = 184
+              Width = 262
+              Height = 49
+              Caption = 'Mod&ality'
+              TabOrder = 1
+              object cbxModality: TComboBox
+                Left = 8
+                Top = 19
+                Width = 209
+                Height = 22
+                Style = csDropDownList
+                ItemHeight = 14
+                TabOrder = 0
+                Items.Strings = (
+                  ''
+                  'MB_APPLMODAL'
+                  'MB_SYSTEMMODAL'
+                  'MB_TASKMODAL')
+              end
+            end
+            object gbxMsgBoxMisc: TGroupBox
+              Left = 6
+              Top = 3
+              Width = 262
+              Height = 180
+              Caption = 'M&iscellaneous Flags'
+              TabOrder = 0
+              object chkDefaultDesktopOnly: TCheckBox
+                Left = 8
+                Top = 20
+                Width = 250
+                Height = 17
+                Caption = 'MB_DEFAULT_DESKTOP_ONLY'
+                TabOrder = 0
+              end
+              object chkHelp: TCheckBox
+                Left = 8
+                Top = 36
+                Width = 250
+                Height = 17
+                Caption = 'MB_HELP'
+                TabOrder = 1
+              end
+              object chkRight: TCheckBox
+                Left = 8
+                Top = 70
+                Width = 250
+                Height = 17
+                Caption = 'MB_RIGHT'
+                TabOrder = 3
+              end
+              object chkRtlReading: TCheckBox
+                Left = 8
+                Top = 87
+                Width = 250
+                Height = 17
+                Caption = 'MB_RTLREADING'
+                TabOrder = 4
+              end
+              object chkSetForeground: TCheckBox
+                Left = 8
+                Top = 137
+                Width = 250
+                Height = 17
+                Caption = 'MB_SETFOREGROUND'
+                TabOrder = 7
+              end
+              object chkTopMost: TCheckBox
+                Left = 8
+                Top = 154
+                Width = 250
+                Height = 17
+                Caption = 'MB_TOPMOST'
+                TabOrder = 8
+              end
+              object chkServiceNotification: TCheckBox
+                Left = 8
+                Top = 103
+                Width = 250
+                Height = 17
+                Caption = 'MB_SERVICE_NOTIFICATION'
+                TabOrder = 5
+              end
+              object chkServiceNotificationNt3x: TCheckBox
+                Left = 8
+                Top = 120
+                Width = 250
+                Height = 17
+                Caption = 'MB_SERVICE_NOTIFICATION_NT3X'
+                TabOrder = 6
+              end
+              object chkNoFocus: TCheckBox
+                Left = 8
+                Top = 53
+                Width = 250
+                Height = 17
+                Caption = 'MB_NOFOCUS'
+                TabOrder = 2
               end
             end
           end
@@ -1235,7 +1220,7 @@ object fmMessageDialog: TfmMessageDialog
     object pnlSettings: TPanel
       Left = 6
       Top = 6
-      Width = 502
+      Width = 540
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -1301,14 +1286,14 @@ object fmMessageDialog: TfmMessageDialog
   object pnlButtons: TPanel
     Left = 0
     Top = 478
-    Width = 514
+    Width = 552
     Height = 36
     Align = alBottom
     BevelOuter = bvNone
     FullRepaint = False
     TabOrder = 2
     object pnlButtonsRight: TPanel
-      Left = 64
+      Left = 102
       Top = 0
       Width = 450
       Height = 36
@@ -1367,7 +1352,7 @@ object fmMessageDialog: TfmMessageDialog
   object pnlMessage: TPanel
     Left = 0
     Top = 0
-    Width = 514
+    Width = 552
     Height = 113
     Align = alClient
     BevelOuter = bvNone
@@ -1376,7 +1361,7 @@ object fmMessageDialog: TfmMessageDialog
     object mmoMessage: TMemo
       Left = 6
       Top = 28
-      Width = 502
+      Width = 540
       Height = 79
       Align = alClient
       ScrollBars = ssBoth
@@ -1387,7 +1372,7 @@ object fmMessageDialog: TfmMessageDialog
     object pnlMessageTop: TPanel
       Left = 6
       Top = 6
-      Width = 502
+      Width = 540
       Height = 22
       Align = alTop
       BevelOuter = bvNone

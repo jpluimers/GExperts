@@ -216,6 +216,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
         <DCCReference Include="..\..\source\Editor\GX_EditorExpert.pas"/>
         <DCCReference Include="..\..\source\Editor\GX_EditorExpertManager.pas"/>
         <DCCReference Include="..\..\source\Editor\GX_eFindDelimiter.pas"/>
+        <DCCReference Include="..\..\Source\Editor\GX_eGotoModification.pas"/>
         <DCCReference Include="..\..\Source\Editor\GX_eIfDef.pas">
             <Form>fmConfigureIfDef</Form>
         </DCCReference>
@@ -337,6 +338,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
         <DCCReference Include="..\..\source\Framework\GX_DbugIntf.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_DesignerMenu.pas"/>
         <DCCReference Include="..\..\Source\Framework\GX_DummyWizard.pas"/>
+        <DCCReference Include="..\..\source\framework\GX_dzCompilerAndRtlVersions.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_EditorChangeServices.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_EditorEnhancements.pas"/>
         <DCCReference Include="..\..\source\Framework\GX_EditorFormServices.pas"/>
@@ -411,6 +413,7 @@ call ..\..\buildtools\movedll.cmd "$(OUTPUTPATH)"</PreBuildEvent>
             <Form>f_IdeBuildEventFavoriteEdit</Form>
         </DCCReference>
         <DCCReference Include="..\..\Source\IDE\GX_IdeBuildEventsEnhancer.pas"/>
+        <DCCReference Include="..\..\Source\ide\GX_IdeDetectForms.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeDialogEnhancer.pas"/>
         <DCCReference Include="..\..\Source\IDE\GX_IdeDockFormEnhancer.pas"/>
         <DCCReference Include="..\..\source\IDE\GX_IdeEnhance.pas"/>

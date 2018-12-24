@@ -66,11 +66,7 @@ call "%DelphiPath%\bin\rsvars.bat"
 SET FrameworkDir=%SystemRoot%\Microsoft.NET\Framework\
 SET PATH=%FrameworkDir%%FrameworkVersion%;%FrameworkSDKDir%;%OldPath%
 set BDS=%DelphiPath:~0,-1%
-rem EnvOptions.proj is inly present if the IDE has been ran at least once, which is not the case for non-interactive users.
-rem Default EnvOptions.proj settings (note $(BDSUSERDIR) is not needed, as the build does not depend on user paths.)
 rem set Win32LibraryPath=$(BDS)\lib;$(BDSUSERDIR)\Imports;$(BDS)\Imports;$(BDS)\Lib\Indy10;$(BDSCOMMONDIR)\Dcp;$(BDS)\RaveReports\Lib
-rem Adopted Win32LibraryPath because the Delphi 2007 msbuild DCC task does something odd: the first "$(BDS)\lib" is search/replaced wrongly into "$C:\Program Files....\lib"; quick fix is to add it twice
-set Win32LibraryPath=$(BDS)\lib;$(BDS)\lib;$(BDS)\Imports;$(BDS)\Lib\Indy10;$(BDSCOMMONDIR)\Dcp;$(BDS)\RaveReports\Lib
 @rem determine the .dproj file
 for %%a in (GExperts*.dproj) do set dprname=%%a
 @rem build it

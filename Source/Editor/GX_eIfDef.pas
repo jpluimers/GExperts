@@ -2,8 +2,6 @@ unit GX_eIfDef;
 
 interface
 
-{$I GX_CondDefine.inc}
-
 uses
   Windows,
   SysUtils,
@@ -22,12 +20,13 @@ uses
   Contnrs,
   GX_EditorExpert,
   GX_ConfigurationInfo,
+  GX_dzCompilerAndRtlVersions,
   GX_BaseForm,
   GX_BaseExpert,
   GX_GenericUtils;
 
-{$IFNDEF GX_VER160}
-// Delphi 6/7 does not have the MouseLeave event so we implement it via
+{$IF RTLVersion <= RtlVersionDelphi2005}
+// Delphi < 2006 does not have the MouseLeave event so we implement it via
 // an interposer class using http://stackoverflow.com/a/3182185/49925
 type
   TPageControl = class(ComCtrls.TPageControl)
@@ -40,7 +39,7 @@ type
   published
     property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
   end;
-{$ENDIF}
+{$IFEND}
 
 type
   TIfDefExpert = class(TEditorExpert)
@@ -100,13 +99,13 @@ type
 
 implementation
 
+{$R *.dfm}
+
 uses
   ToolsAPI,
   StrUtils,
   GX_OtaUtils,
   GX_dzVclUtils;
-
-{$R *.dfm}
 
 { TIfDefExpert }
 
@@ -476,16 +475,16 @@ procedure TfmConfigureIfDef.pc_IfClassesMouseMove(Sender: TObject; Shift: TShift
   X, Y: Integer);
 var
   hintPause: Integer;
-  tabindex: Integer;
+  TabIndex: Integer;
 begin
-  tabindex := pc_IfClasses.IndexOfTabAt(X, Y);
-  if (tabindex >= 0) and (pc_IfClasses.Hint <> pc_IfClasses.Pages[tabindex].Hint) then begin
+  TabIndex := pc_IfClasses.IndexOfTabAt(X, Y);
+  if (TabIndex >= 0) and (pc_IfClasses.Hint <> pc_IfClasses.Pages[TabIndex].Hint) then begin
     hintPause := Application.hintPause;
     try
       if pc_IfClasses.Hint <> '' then
         Application.hintPause := 0;
       Application.CancelHint;
-      pc_IfClasses.Hint := pc_IfClasses.Pages[tabindex].Hint;
+      pc_IfClasses.Hint := pc_IfClasses.Pages[TabIndex].Hint;
       pc_IfClasses.ShowHint := True;
       Application.ProcessMessages; // force hint to appear
     finally
@@ -575,6 +574,7 @@ var
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&VERxxx', 4, 1, '{$IFNDEF %s}');
   FTabDefinitions.Add(def);
+  def.AddGridRow('VER330', 'Delphi 10.3 Rio / BDS 20');
   def.AddGridRow('VER320', 'Delphi 10.2 Tokyo / BDS 19');
   def.AddGridRow('VER310', 'Delphi 10.1 Berlin / BDS 18');
   def.AddGridRow('VER300', 'Delphi 10.0 Seattle / BDS 17');
@@ -610,6 +610,7 @@ var
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&RtlVersion', 16, 2, '{$IF RtlVersion >= %s}');
   FTabDefinitions.Add(def);
+  def.AddGridRow('33', 'Delphi 10.3 Rio / BDS 20');
   def.AddGridRow('32', 'Delphi 10.2 Tokyo / BDS 19');
   def.AddGridRow('31', 'Delphi 10.1 Berlin / BDS 18');
   def.AddGridRow('30', 'Delphi 10.0 Seattle / BDS 17');
@@ -627,10 +628,10 @@ begin
 //  def.AddGridRow('19', 'Delphi 2007 .NET'); ???
   def.AddGridRow('18', 'Delphi 2007 / BDS 4');
   def.AddGridRow('18', 'Delphi 2006 / BDS 3');
-//  def.AddGridRow('17', 'Delphi 2005 / BDS 2');
-//  def.AddGridRow('16', 'Delphi 8 .NET / BDS 1');
-//  def.AddGridRow('15', 'Delphi 7');
-//  def.AddGridRow('14', 'Delphi 6');
+  def.AddGridRow('17', 'Delphi 2005 / BDS 2');
+  def.AddGridRow('16', 'Delphi 8 .NET / BDS 1');
+  def.AddGridRow('15', 'Delphi 7');
+  def.AddGridRow('14', 'Delphi 6');
   def.InitEvents;
 end;
 
@@ -640,6 +641,7 @@ var
 begin
   def := TIfdefTabDefinition.Create(Self, pc_IfClasses, '&CompilerVersion', 21, 2, '{$IF CompilerVersion >= %s}');
   FTabDefinitions.Add(def);
+  def.AddGridRow('33', 'Delphi 10.3 Rio / BDS 20');
   def.AddGridRow('32', 'Delphi 10.2 Tokyo / BDS 19');
   def.AddGridRow('31', 'Delphi 10.1 Berlin / BDS 18');
   def.AddGridRow('30', 'Delphi 10.0 Seattle / BDS 17');
@@ -861,6 +863,8 @@ begin
   FComment := _Comment;
 end;
 
+{$IF RTLVersion <= RtlVersionDelphi2005}
+
 { TPageControl }
 
 procedure TPageControl.MouseMove(Shift: TShiftState; X, Y: Integer);
@@ -884,7 +888,9 @@ begin
   if Assigned(FOnMouseLeave) then
     FOnMouseLeave(Self);
 end;
+{$IFEND}
 
 initialization
   RegisterEditorExpert(TIfDefExpert);
 end.
+

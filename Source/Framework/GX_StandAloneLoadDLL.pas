@@ -61,7 +61,8 @@ end;
 
 function LoadAnyGExpertsDLL: IGExpertsDll;
 begin
-  if TryLoad('GExpertsRS102.dll', Result)
+  if TryLoad('GExpertsRS103.dll', Result)
+    or TryLoad('GExpertsRS102.dll', Result)
     or TryLoad('GExpertsRS101.dll', Result)
     or TryLoad('GExpertsRS10.dll', Result)
     or TryLoad('GExpertsRSXE8.dll', Result)

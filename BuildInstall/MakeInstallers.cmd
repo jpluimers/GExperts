@@ -7,9 +7,9 @@ set instver=13C
 call :getdate
 set special=-experimental-twm-%dateYYYYMMDD%
 
-call :makeinst RS103 RS10.3
-pause
-goto :eof
+rem call :makeinst RS103 RS10.3
+rem pause
+rem goto :eof
 
 call :makeinst Delphi6 D6
 call :makeinst Delphi7 D7
