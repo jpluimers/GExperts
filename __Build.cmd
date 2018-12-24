@@ -1,4 +1,9 @@
-@echo off
+:: defining an environment variable gx_cmd_debug will disable setting echo off
+:: defining an environment variable gx_no_error_pause will disable pause on success
+:: defining an environment variable gx_no_success_pause will disable pause on success
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 buildtools\prepbuild.exe --incbuild --readini=projects\GExperts --updateini=projects\GExperts
 if "%1"=="" goto :list
 call :doItem %1

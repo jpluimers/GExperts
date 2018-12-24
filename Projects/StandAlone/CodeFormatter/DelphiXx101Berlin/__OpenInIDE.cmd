@@ -1,8 +1,10 @@
-@rem Searches the parent dirctories for the buildtools and calls the doOpenInIde.cmd there
-@echo off
+@rem Searches the parent directories for the buildtools and calls the doOpenInIde.cmd there
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 setlocal
 call :FindInParents %0% buildtools
-call %result%\doOpenInIde.cmd
+call "%result%\doOpenInIde.cmd"
 goto :eof
 
 :FindInParents
@@ -12,9 +14,9 @@ setlocal
 set parentdir=%1%
 set subdir=%2%
 :loop
-call :GetDir %parentdir%
+call :GetDir "%parentdir%"
 set parentdir=%result%
-if exist %parentdir%\%subdir% goto found
+if exist "%parentdir%\%subdir%" goto found
 goto loop
 :found
 endlocal & set result=%parentdir%\%subdir%

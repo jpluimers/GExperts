@@ -2941,7 +2941,7 @@ procedure GxOtaGetAllPossiblePaths(Paths: TStrings);
 
   function GetPath(const FileName: string): string;
   begin
-    Result := RemoveSlash(ExtractFilePath(FileName));
+    Result := AddSlash(ExtractFilePath(FileName));
   end;
 
   procedure AddAPath(const APath: string);

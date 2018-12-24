@@ -71,6 +71,7 @@ type
     procedure SetConfigButtonHotkey;
     procedure ScrollBy(_DeltaY: Integer);
     procedure AdjustScrollRange;
+    procedure PositionControls;
   public
     constructor Create(_Owner: TComponent); override;
     destructor Destroy; override;
@@ -92,6 +93,7 @@ uses
 
 resourcestring
   SConfigureButtonCaption = 'Configure...';
+  SDefaultButtonCaption = 'Default';
 
 function IsThemesEnabled: Boolean;
 begin
@@ -180,7 +182,7 @@ begin
   SetConfigButtonHotkey;
 end;
 
-function TryGetConfigButton(_Pnl: TPanel; out _btn: TButton): Boolean;
+function TryGetButton(_pnl: TPanel; const _Caption: string; out _btn: TButton): Boolean;
 var
   i: Integer;
   ctrl: TControl;
@@ -189,11 +191,37 @@ begin
   for i := 0 to _Pnl.ComponentCount - 1 do begin
     ctrl := _Pnl.Components[i] as TControl;
     if ctrl is TButton then begin
-      if StripHotkey(TButton(ctrl).Caption) = SConfigureButtonCaption then begin
+      if StripHotkey(TButton(ctrl).Caption) = _Caption then begin
         _btn := TButton(ctrl);
         Result := True;
         Exit;
       end;
+    end;
+  end;
+end;
+
+function TryGetConfigButton(_Pnl: TPanel; out _btn: TButton): Boolean;
+begin
+  Result := TryGetButton(_Pnl, SConfigureButtonCaption, _btn);
+end;
+
+function TryGetDefaultButton(_Pnl: TPanel; out _btn: TButton): Boolean;
+begin
+  Result := TryGetButton(_Pnl, SDefaultButtonCaption, _btn);
+end;
+
+function TryGetHotkeyEdit(_pnl: TPanel; out _edt: THotKey): Boolean;
+var
+  i: Integer;
+  ctrl: TControl;
+begin
+  Result := False;
+  for i := 0 to _Pnl.ComponentCount - 1 do begin
+    ctrl := _Pnl.Components[i] as TControl;
+    if ctrl is THotKey then begin
+      _edt := THotKey(ctrl);
+      Result := True;
+      Exit; //==>
     end;
   end;
 end;
@@ -523,7 +551,7 @@ begin
     btn.Parent := pnl;
     btn.BoundsRect := btnDefault.BoundsRect;
     btn.Anchors := btnDefault.Anchors;
-    btn.Caption := 'Default';
+    btn.Caption := SDefaultButtonCaption;
     if AnExpert.GetDefaultShortCut <> 0 then begin
       btn.Hint := ShortCutToText(AnExpert.GetDefaultShortCut);
       btn.ShowHint := True;
@@ -548,6 +576,7 @@ begin
 
   FVisibleExpertsCount := FExperts.Count;
 
+  PositionControls;
   AdjustScrollRange;
 end;
 
@@ -627,8 +656,34 @@ begin
     + sbxExperts.Height - FThumbSize - 4;
 end;
 
+procedure TfrConfigureExperts.PositionControls;
+const
+  GAP_WIDTH = 8;
+var
+  w: Integer;
+  i: Integer;
+  Panel: TPanel;
+  btn: TButton;
+  ed: THotKey;
+begin
+  // For whatever reason the automatic alignment via anchors does not work correctly
+  // so we just do it in code.
+  w := sbxExperts.ClientWidth;
+  for i := 0 to sbxExperts.ControlCount - 1 do begin
+    Panel := sbxExperts.Controls[i] as TPanel;
+    Panel.Width := w - Panel.Left;
+    if TryGetConfigButton(Panel, btn) then
+      btn.Left := w - btnExpert.Width - GAP_WIDTH;
+    if TryGetDefaultButton(Panel, btn) then
+      btn.Left := w - btnExpert.Width - btnDefault.Width - 2 * GAP_WIDTH;
+    if TryGetHotkeyEdit(Panel, ed) then
+      ed.Width := w - ed.Left - btnExpert.Width - btnDefault.Width - 2 * GAP_WIDTH;
+  end;
+end;
+
 procedure TfrConfigureExperts.FrameResize(Sender: TObject);
 begin
+  PositionControls;
   AdjustScrollRange;
 end;
 

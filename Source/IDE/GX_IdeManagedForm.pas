@@ -33,7 +33,7 @@ type
   end;
 
   // to support the GX_IdeFormEnhancer and GX_IdeDialogEnhancer units that enhance/fix IDE forms and dialogs
-  // like allowing the forms to resize, saving/loading form state, collapse treenodes, etc
+  // like allowing the forms to resize, saving/loading form state, collapse treenodes, etc.
   // usage roots are InitializeFormHandlers, TIdeDialogEnhancer.Create, TIDEFormEnhancer.Create
   TManagedForm = class(TComponent)
   private
@@ -1143,21 +1143,25 @@ begin
   Assert(Assigned(FForm));
   Assert(FForm = Sender);
 
-  // save it for later (see below)
-  OrigOnDestroy := FOrigOnDestroy;
+  // restore the original OnDestroy event
   // It's not being called, but there might be code in other plugins
   // (e.g. IdeFixpack or cnpack) that checks for it.
-  FForm.OnDestroy := OrigOnDestroy;
+  FForm.OnDestroy := FOrigOnDestroy;
+  // save it for later (see below)
+  OrigOnDestroy := FOrigOnDestroy;
   // just in case, set FOrigOnDestroy to nil
   FOrigOnDestroy := nil;
 
   DoSaveFormState;
 
-  if Assigned(OrigOnDestroy) then
-  begin
+  if Assigned(OrigOnDestroy) then begin
+    // Restoring the FForm.OnDestroy to its original value does not call OrigOnDestroy.
+    // The reason is that FormDestroy gets called from OnDestroy;
     // OnDestroy is called from TCustomForm.DoDestroy which will never call OnDestroy restored from OrigOnDestroy.
-    // So manually call the old one:
+    // So we need to explicitly call the old one:
     OrigOnDestroy(Sender);
+    // Note we still restore the old OnDestroy value, just in case there is a check
+    // for the value (some interceptors actively perform that check).
   end;
 end;
 

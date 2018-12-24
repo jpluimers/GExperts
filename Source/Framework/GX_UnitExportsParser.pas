@@ -1,15 +1,22 @@
 unit GX_UnitExportsParser;
 
-{$I 'GX_CondDefine.inc'}
-
 interface
 
 uses
+  Windows,
   SysUtils,
   Classes,
   GX_dzNamedThread,
+  GX_dzCompilerAndRtlVersions,
   mwPasParserTypes,
   mPasLex;
+
+{$IFOPT D+}
+{$IF RTLVersion > RtlVersionDelphiXE}
+// System.Diagnostics, which exports TStopWatch, was added to the RTL in DelphiXE2
+{$DEFINE DO_TIMING}
+{$IFEND}
+{$ENDIF}
 
 type
   // itUnknown is only there so Delphi 6 does not bomb out because of NIL objects in FIdentifiers
@@ -65,7 +72,7 @@ type
 
 type
   ///<summary>
-  /// Simple parser that collects all identifiers declared in the interface of a unit.
+  /// Simple parser that collects all identifiers declared in the interface of a unit. </summary>
   TUnitExportsParser = class
   private
     FFilename: string;
@@ -93,7 +100,7 @@ type
     function GetIdentifier(_Idx: Integer): TIdentifier;
   public
     ///<summary>
-    /// @returns the namve of the given identifier type </summary>
+    /// @returns the name of the given identifier type </summary>
     class function IdentfierTypeNames(_IdType: TIdentifierTypes): string;
     ///<summary>
     /// constructs a TUnitExportsParser instance for the given file </summary>
@@ -141,12 +148,26 @@ type
     FIdentifiers: TStrings;
     FPaths: TStringList;
     FCacheDirBS: string;
+{$IFDEF DO_TIMING}
+    FLoadingTimeMS: Int64;
+    FInsertingTimeMS: Int64;
+    FSortingTimeMS: Int64;
+    FParsedUnitsCount: Integer;
+    FLoadedUnitsCount: Integer;
+    FProcessingTimeMS: Int64;
+    FTotalTimeMS: Int64;
+    FSearchingTimeMS: Int64;
+    FParsingTimeMS: Int64;
+{$ENDIF}
     procedure AddSymbols(_Parser: TUnitExportsParser);
+    procedure GetAllFilesInPath(_sl: TStringList);
+    procedure GetAllFilesInDir(_dir: string; _sl: TStringList);
   protected
     procedure Execute; override;
   public
     ///<summary>
-    /// @param Files is a list of unit names, without path and extension
+    /// @param Files is a list of unit names, without path and extension, which are to be parsed.
+    ///              Can be NIL, in which case all files in the search path will be parsed
     /// @param Paths is a list of possible search paths
     /// @param CacheDir is a directory to cache the identifier lists </summary>
     constructor Create(const _Files: TStrings; _Paths: TStrings; const _CacheDir: string; _OnTerminate: TNotifyEvent);
@@ -157,11 +178,25 @@ type
     /// @NOTE: Make a copy of these PChars (e.g. assign them to a string because they point
     ///        to entries in FUnits that are freed in the destructor! </summary>
     property Identifiers: TStrings read FIdentifiers;
+{$IFDEF DO_TIMING}
+    property ParsedUnitsCount: Integer read FParsedUnitsCount;
+    property LoadedUnitsCount: Integer read FLoadedUnitsCount;
+    property LoadingTimeMS: Int64 read FLoadingTimeMS;
+    property InsertingTimeMS: Int64 read FInsertingTimeMS;
+    property ParsingTimeMS: Int64 read FParsingTimeMS;
+    property ProcessingTimeMS: Int64 read FProcessingTimeMS;
+    property SortingTimeMS: Int64 read FSortingTimeMS;
+    property TotalTimeMS: Int64 read FTotalTimeMS;
+    property SearchingTimeMS: Int64 read FSearchingTimeMS;
+{$ENDIF}
   end;
 
 implementation
 
 uses
+{$IFDEF DO_TIMING}
+  System.Diagnostics,
+{$ENDIF}
   StrUtils,
   GX_GenericUtils;
 
@@ -176,7 +211,7 @@ begin
   FSymbols.CaseSensitive := False;
   FIfdefStack := TStringList.Create;
 
-   // call the following functions so they don't get elimiated by the linker
+  // call the following functions so they don't get elimiated by the linker
   TopOfStack;
   Content;
 end;
@@ -885,12 +920,15 @@ begin
   FIdentifiers := TStringList.Create;
   FUnits := TStringList.Create;
 
-  FFiles := TStringList.Create;
-  for i := 0 to _Files.Count - 1 do begin
-    s := _Files[i];
-    UniqueString(s);
-    FFiles.Add(s);
-  end;
+  if Assigned(_Files) then begin
+    FFiles := TStringList.Create;
+    for i := 0 to _Files.Count - 1 do begin
+      s := _Files[i];
+      UniqueString(s);
+      FFiles.Add(s);
+    end;
+  end else
+    FFiles := nil;
 
   FPaths := TStringList.Create;
   for i := 0 to _Paths.Count - 1 do begin
@@ -913,71 +951,110 @@ end;
 
 procedure TUnitExportParserThread.AddSymbols(_Parser: TUnitExportsParser);
 begin
-{$IFDEF VER140} // Delphi 6
-  _Parser.Symbols.Add('VER140');
-{$ENDIF}
-{$IFDEF VER150} // Delphi 7
-  _Parser.Symbols.Add('VER150');
-{$ENDIF}
-{$IFDEF VER170} // Delphi 2005 / BDS 2
-  _Parser.Symbols.Add('VER170');
-{$ENDIF}
-{$IFDEF VER180} // Delphi 2006/2007 / BDS 3
-  _Parser.Symbols.Add('VER180');
-{$ENDIF}
-{$IFDEF VER185} // Delphi 2007 / BDS 4
-  _Parser.Symbols.Add('VER185');
-{$ENDIF}
-{$IFDEF VER200} // Delphi 2009 / BDS 6
-  _Parser.Symbols.Add('VER200');
-{$ENDIF}
-{$IFDEF VER210} // Delphi 2010 / BDS 7
-  _Parser.Symbols.Add('VER210');
-{$ENDIF}
-{$IFDEF VER220} // Delphi XE1 / BDS 8
-  _Parser.Symbols.Add('VER220');
-{$ENDIF}
-{$IFDEF VER230} // Delphi XE2 / BDS 9
-  _Parser.Symbols.Add('VER230');
-{$ENDIF}
-{$IFDEF VER240} // Delphi XE3 / BDS 10
-  _Parser.Symbols.Add('VER240');
-{$ENDIF}
-{$IFDEF VER250} // Delphi XE4 / BDS 11
-  _Parser.Symbols.Add('VER250');
-{$ENDIF}
-{$IFDEF VER260} // Delphi XE5 / BDS 12
-  _Parser.Symbols.Add('VER260');
-{$ENDIF}
-{$IFDEF VER270} // Delphi XE6 / BDS 14
-  _Parser.Symbols.Add('VER270');
-{$ENDIF}
-{$IFDEF VER280} // Delphi XE7 / BDS 15
-  _Parser.Symbols.Add('VER280');
-{$ENDIF}
-{$IFDEF VER290} // Delphi XE8 / BDS 16
-  _Parser.Symbols.Add('VER290');
-{$ENDIF}
-{$IFDEF VER300} // Delphi 10.0 Seattle / BDS 17
-  _Parser.Symbols.Add('VER300');
-{$ENDIF}
-{$IFDEF VER310} // Delphi 10.1 Berlin / BDS 18
-  _Parser.Symbols.Add('VER310');
-{$ENDIF}
-{$IFDEF VER320} // Delphi 10.2 Tokyo / BDS 19
-  _Parser.Symbols.Add('VER320');
-{$ENDIF}
-// todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
+  _Parser.Symbols.Add(Format('VER%.0f', [CompilerVersion * 10]));
+  // todo: This might not be correct: Are all targets of Unicode aware Delphi versions also Unicode aware?
 {$IFDEF UNICODE}
   _Parser.Symbols.Add('UNICODE');
 {$ENDIF}
-// todo: Handle the symbols defined by the target somehow
-// {$ifdef WINDOWS}
-//  _Parser.Symbols.Add('WINDOWS');
-// {$ENDIF}
+  // todo: Handle the symbols defined by the target somehow
+  // {$ifdef WINDOWS}
+  //  _Parser.Symbols.Add('WINDOWS');
+  // {$ENDIF}
+end;
+
+function FileTimeToDosTime(_ft: _FILETIME): GXNativeUInt;
+var
+  DosDate: Word;
+  DosTime: Word;
+begin
+  if FileTimeToDosDateTime(_ft, DosDate, DosTime) then begin
+    Result := DosDate shl 16 + DosTime;
+  end else begin
+    // If converting the file date/time to DOS date/time fails, we don't really care, since the
+    // worst thing that can happen is that we continue using an outdated cache file
+    // (if it fails for a unit in the sarch path) or reparse a unit (if it fails for a cache file).
+    Result := 0;
+  end;
+end;
+
+{$WARN SYMBOL_PLATFORM OFF}
+
+{$IF not declared(faTemporary)}
+const
+  faTemporary = $00000100;
+  faSymLink = $00000400;
+{$IFEND}
+
+procedure TUnitExportParserThread.GetAllFilesInDir(_dir: string; _sl: TStringList);
+var
+  sr: TSearchRec;
+begin
+  _dir := IncludeTrailingPathDelimiter(_dir);
+  if SysUtils.FindFirst(_dir + '*.pas', faAnyFile, sr) = 0 then begin
+    try
+      repeat
+        if (sr.Attr and (faDirectory or faHidden or faSysFile or faTemporary or faSymLink)) = 0 then begin
+          _sl.AddObject(_dir + sr.Name, Pointer(FileTimeToDosTime(sr.FindData.ftLastWriteTime)));
+        end;
+      until SysUtils.FindNext(sr) <> 0;
+    finally
+      SysUtils.FindClose(sr);
+    end;
+  end;
+end;
+
+procedure TUnitExportParserThread.GetAllFilesInPath(_sl: TStringList);
+var
+  i: Integer;
+begin
+  for i := 0 to FPaths.Count - 1 do begin
+    GetAllFilesInDir(FPaths[i], _sl);
+  end;
 end;
 
 procedure TUnitExportParserThread.Execute;
+var
+  FilesInPath: TStringList;
+
+  function MakeFilename(const Path, FileName: string): string;
+  begin
+    if Path = '' then
+      Result := FileName
+    else if Path[Length(Path)] = PathDelim then
+      Result := Path + FileName
+    else
+      Result := Path + PathDelim + FileName;
+  end;
+
+  function GxTryGetFileAge(const _fn: string; out _DosTime: GXNativeUInt): Boolean;
+  var
+    FileInformation: TWin32FileAttributeData;
+  begin
+    Result := GetFileAttributesEx(PChar(_fn), GetFileExInfoStandard, @FileInformation);
+    if Result then begin
+      _DosTime := FileTimeToDosTime(FileInformation.ftLastWriteTime);
+    end;
+  end;
+
+  function TryFindPathToFile(const _fn: string; out _FoundFn: string; out _FileAge: GXNativeUInt): Boolean;
+  var
+    i: Integer;
+    fno: string;
+    fn: string;
+  begin
+    for i := 0 to FilesInPath.Count - 1 do begin
+      fn := FilesInPath[i];
+      fno := ExtractFileName(fn);
+      if SameText(fno, _fn) then begin
+        Result := True;
+        _FoundFn := fn;
+        _FileAge := GXNativeUInt(FilesInPath.Objects[i]);
+        Exit;
+      end;
+    end;
+    Result := False;
+  end;
+
 var
   FileIdx: Integer;
   fn: string;
@@ -986,68 +1063,150 @@ var
   sl: TStrings;
   UnitName: string;
   CacheFn: string;
+  UnitTime: UInt32;
+  CacheTime: UInt32;
+{$IFDEF  DO_TIMING}
+  Loading: TStopwatch;
+  Inserting: TStopwatch;
+  Sorting: TStopwatch;
+  Processing: TStopwatch;
+  Total: TStopwatch;
+  Searching: TStopwatch;
+  Parsing: TStopwatch;
+{$ENDIF}
 begin
   inherited;
 
-  sl := TStringList.Create;
+{$IFDEF  DO_TIMING}
+  Loading := TStopwatch.Create;
+  Inserting := TStopwatch.Create;
+  Sorting := TStopwatch.Create;
+  Processing := TStopwatch.Create;
+  Total := TStopwatch.Create;
+  Searching := TStopwatch.Create;
+  Parsing := TStopwatch.Create;
+
+  Total.Start;
+  Searching.Start;
+{$ENDIF}
+
+  sl := nil;
+  FilesInPath := TStringList.Create;
   try
-    for FileIdx := 0 to FFiles.Count - 1 do begin
-      if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, FPaths) then
-        sl.Add(fn);
+    sl := TStringList.Create;
+    GetAllFilesInPath(FilesInPath);
+
+    if Assigned(FFiles) then begin
+      for FileIdx := 0 to FFiles.Count - 1 do begin
+        if TryFindPathToFile(FFiles[FileIdx] + '.pas', fn, UnitTime) then
+          sl.AddObject(fn, Pointer(UnitTime));
+      end;
+      if sl.Count = 0 then
+        Exit; //==>
+      FFiles.Assign(sl);
+    end else begin
+      FFiles := FilesInPath;
+      FilesInPath := nil;
     end;
-    if sl.Count = 0 then begin
-      Exit; //==>
-    end;
-    FFiles.Assign(sl);
   finally
     FreeAndNil(sl);
+    FreeAndNil(FilesInPath);
   end;
+{$IFDEF  DO_TIMING}
+  Searching.Stop;
+{$ENDIF}
 
   ForceDirectories(FCacheDirBS);
 
+{$IFDEF  DO_TIMING}
+  Processing.Start;
+{$ENDIF}
   for FileIdx := 0 to FFiles.Count - 1 do begin
     if Terminated then
       Exit; //==>
     fn := FFiles[FileIdx];
+    UnitTime := UInt32(FFiles.Objects[FileIdx]);
     UnitName := ExtractFileName(fn);
     UnitName := ChangeFileExt(UnitName, '');
-    if FileExists(fn) then begin
-      CacheFn := MangleFilename(fn);
-      CacheFn := FCacheDirBS + CacheFn;
-      if FileExists(CacheFn) and not FileIsNewerThan(fn, CacheFn) then begin
-        sl := TStringList.Create;
-        try
-          sl.LoadFromFile(CacheFn);
-          FUnits.Add(UnitName);
-          FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
-          for IdentIdx := 0 to sl.Count - 1 do
-            FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
-        finally
-          FreeAndNil(sl);
-        end;
-      end else begin
-        Parser := TUnitExportsParser.Create(fn);
-        try
-          AddSymbols(Parser);
-          Parser.Execute;
-          if Terminated then
-            Exit; //==>
-          FUnits.Add(UnitName);
-          sl := Parser.Identifiers;
-          sl.SaveToFile(CacheFn);
-          FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
-          for IdentIdx := 0 to sl.Count - 1 do begin
-            FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
-          end;
-        finally
-          FreeAndNil(Parser);
-        end;
+    CacheFn := MangleFilename(fn);
+    CacheFn := FCacheDirBS + CacheFn;
+    if GxTryGetFileAge(CacheFn, CacheTime) and (UnitTime < CacheTime) then begin
+{$IFDEF  DO_TIMING}
+      Inc(FLoadedUnitsCount);
+{$ENDIF}
+      sl := TStringList.Create;
+      try
+{$IFDEF  DO_TIMING}
+        Loading.Start;
+{$ENDIF}
+        sl.LoadFromFile(CacheFn);
+{$IFDEF  DO_TIMING}
+        Loading.Stop;
+{$ENDIF}
+
+        FUnits.Add(UnitName);
+        FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
+
+{$IFDEF  DO_TIMING}
+        Inserting.Start;
+{$ENDIF}
+        for IdentIdx := 0 to sl.Count - 1 do
+          FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+{$IFDEF  DO_TIMING}
+        Inserting.Stop;
+{$ENDIF}
+      finally
+        FreeAndNil(sl);
       end;
+    end else begin
+{$IFDEF  DO_TIMING}
+      Inc(FParsedUnitsCount);
+      Parsing.Start;
+{$ENDIF}
+      Parser := TUnitExportsParser.Create(fn);
+      try
+        AddSymbols(Parser);
+        Parser.Execute;
+        if Terminated then
+          Exit; //==>
+        FUnits.Add(UnitName);
+        sl := Parser.Identifiers;
+        sl.SaveToFile(CacheFn);
+        FIdentifiers.AddObject(UnitName, Pointer(PChar(UnitName)));
+        for IdentIdx := 0 to sl.Count - 1 do begin
+          FIdentifiers.AddObject(sl[IdentIdx], Pointer(PChar(UnitName)));
+        end;
+      finally
+        FreeAndNil(Parser);
+      end;
+{$IFDEF  DO_TIMING}
+      Parsing.Stop;
+{$ENDIF}
     end;
   end;
   if Terminated then
     Exit; //==>
+
+{$IFDEF  DO_TIMING}
+  Processing.Stop;
+
+  Sorting.Start;
+{$ENDIF}
   TStringList(FIdentifiers).Sort;
+{$IFDEF  DO_TIMING}
+  Sorting.Stop;
+
+  Total.Stop;
+
+  FSearchingTimeMS := Searching.ElapsedMilliseconds;
+  FSortingTimeMS := Sorting.ElapsedMilliseconds;
+  FLoadingTimeMS := Loading.ElapsedMilliseconds;
+  FInsertingTimeMS := Inserting.ElapsedMilliseconds;
+  FParsingTimeMS := Parsing.ElapsedMilliseconds;
+  FProcessingTimeMS := Processing.ElapsedMilliseconds;
+  FTotalTimeMS := Total.ElapsedMilliseconds;
+{$ENDIF}
 end;
 
 end.
+

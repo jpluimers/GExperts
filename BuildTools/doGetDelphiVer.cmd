@@ -1,6 +1,8 @@
 @rem determine the Delphi version from the current directory name,
 @rem assuming that it is of the form \Delphi%delphiver%\
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 setlocal
 call :GetLastDir "%CD%"
 set thisdir=%result%

@@ -230,7 +230,7 @@ object fmConfiguration: TfmConfiguration
           Left = 8
           Top = 115
           Width = 529
-          Height = 270
+          Height = 326
           Caption = 'IDE'
           TabOrder = 2
           object chkEnhanceDialogs: TCheckBox
@@ -251,7 +251,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceSearchPaths: TCheckBox
             Left = 24
-            Top = 60
+            Top = 76
             Width = 489
             Height = 17
             Caption = 'Enable drag && drop and autocomplete for search paths'
@@ -259,7 +259,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceToolProperties: TCheckBox
             Left = 24
-            Top = 79
+            Top = 95
             Width = 489
             Height = 17
             Caption = 'Enhance Tools menu Tool Properties dialog'
@@ -268,22 +268,22 @@ object fmConfiguration: TfmConfiguration
           object chkAllowResize: TCheckBox
             Left = 24
             Top = 41
-            Width = 209
+            Width = 489
             Height = 17
             Caption = 'Allow resize and remember size'
             TabOrder = 1
           end
           object chkRememberPosition: TCheckBox
-            Left = 248
-            Top = 41
-            Width = 265
+            Left = 48
+            Top = 57
+            Width = 465
             Height = 17
             Caption = 'Also remember position'
             TabOrder = 2
           end
           object chkEnhanceInstallPackages: TCheckBox
             Left = 24
-            Top = 98
+            Top = 114
             Width = 489
             Height = 17
             Caption = 'Enhance Install Packages dialog with ... Explorer button'
@@ -291,7 +291,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceGotoDialog: TCheckBox
             Left = 24
-            Top = 117
+            Top = 133
             Width = 489
             Height = 17
             Caption = 'Enhance Goto dialog with list of source locations'
@@ -299,7 +299,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceBuildEventsDialog: TCheckBox
             Left = 24
-            Top = 174
+            Top = 190
             Width = 489
             Height = 17
             Caption = 'Enhance Build Events dialog with Favourites'
@@ -307,7 +307,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceApplicationSettingsDialog: TCheckBox
             Left = 24
-            Top = 136
+            Top = 152
             Width = 489
             Height = 17
             Caption = 'Enhance Application Settings dialog with version button'
@@ -315,7 +315,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkAutoCloseMessage: TCheckBox
             Left = 24
-            Top = 193
+            Top = 209
             Width = 489
             Height = 17
             Caption = 'Automatically close message window after successful compile'
@@ -323,7 +323,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkForceStartupDesktop: TCheckBox
             Left = 24
-            Top = 212
+            Top = 228
             Width = 489
             Height = 17
             Caption = 'Force desktop on startup (leave empty for last selected)'
@@ -331,7 +331,7 @@ object fmConfiguration: TfmConfiguration
           end
           object cbxDesktop: TComboBox
             Left = 40
-            Top = 229
+            Top = 245
             Width = 145
             Height = 22
             ItemHeight = 14
@@ -339,7 +339,7 @@ object fmConfiguration: TfmConfiguration
           end
           object chkEnhanceDockForms: TCheckBox
             Left = 24
-            Top = 155
+            Top = 171
             Width = 489
             Height = 17
             Caption = 'Enhance Dock Forms to allow minimize and Win+arrow positioning'

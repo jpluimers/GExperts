@@ -6,7 +6,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, Consts,
-  Controls, Forms, Dialogs,
+  Controls, Forms, Dialogs, Graphics,
   ComCtrls, StdCtrls, ExtCtrls, Menus,
   OmniXML,
   GX_Experts, GX_ConfigurationInfo, GX_KbdShortCutBroker, GX_GenericUtils,
@@ -197,6 +197,8 @@ type
     function GetDescriptionVisible: Boolean;
     property DescriptionVisible: Boolean read GetDescriptionVisible write SetDescriptionVisible;
     procedure RecordShortcutCallback(Sender: TObject);
+    procedure GetRecordBitmap(_bmp: TBitmap);
+    procedure GetPlayBitmap(_bmp: TBitmap);
   protected
     procedure AddToMacroLibrary(CR: IOTARecord);
   public
@@ -217,12 +219,41 @@ type
     destructor Destroy; override;
     function GetActionCaption: string; override;
     class function GetName: string; override;
+    function GetHelpString: string; override;
     function GetBitmapFileName: string; override;
     procedure Execute(Sender: TObject); override;
     procedure Configure; override;
     function HasConfigOptions: Boolean; override;
     property StorageFile: string read GetStorageFile;
     function IsDefaultActive: Boolean; override;
+  end;
+
+  TMacroLibRecordExpert = class(TGX_Expert)
+  protected
+    procedure SetShortCut(Value: TShortCut); override;
+  public
+    procedure Execute(Sender: TObject); override;
+    function HasConfigOptions: Boolean; override;
+    function GetDefaultShortCut: TShortCut; override;
+    function GetActionCaption: string; override;
+    class function ConfigurationKey: string; override;
+    class function GetName: string; override;
+    function GetHelpString: string; override;
+    function GetBitmap: Graphics.TBitmap; override;
+  end;
+
+  TMacroLibPlaybackExpert = class(TGX_Expert)
+  protected
+    procedure SetShortCut(Value: TShortCut); override;
+  public
+    procedure Execute(Sender: TObject); override;
+    function HasConfigOptions: Boolean; override;
+    function GetDefaultShortCut: TShortCut; override;
+    function GetActionCaption: string; override;
+    class function ConfigurationKey: string; override;
+    class function GetName: string; override;
+    function GetHelpString: string; override;
+    function GetBitmap: Graphics.TBitmap; override;
   end;
 
 var
@@ -264,6 +295,14 @@ const
   NameColMinMidth = 100;
 
 { Utility functions }
+
+function GetMacroLibraryForm: TfmMacroLibrary;
+begin
+  if fmMacroLibrary = nil then
+    fmMacroLibrary := TfmMacroLibrary.Create(nil);
+  Result := fmMacroLibrary;
+  Result.SelectFirstMacro;
+end;
 
 procedure EncodeStream(Stream: TStream; var Str: string);
 var
@@ -1181,6 +1220,16 @@ begin
   Result := pnlDescription.Visible;
 end;
 
+procedure TfmMacroLibrary.GetPlayBitmap(_bmp: TBitmap);
+begin
+  Toolbar.Images.GetBitmap(actPlayback.ImageIndex, _bmp);
+end;
+
+procedure TfmMacroLibrary.GetRecordBitmap(_bmp: TBitmap);
+begin
+  Toolbar.Images.GetBitmap(actRecord.ImageIndex, _bmp);
+end;
+
 { TMacroLibExpert }
 
 constructor TMacroLibExpert.Create;
@@ -1237,6 +1286,14 @@ begin
   Result := 'MacroLibrary'; // Do not localize.
 end;
 
+function TMacroLibExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  Manage keyboard macros.';
+begin
+  Result := SHelpString;
+end;
+
 function TMacroLibExpert.GetStorageFile: string;
 begin
   Result := FStoragePath + MacroLibraryStorageFileName;
@@ -1258,6 +1315,124 @@ begin
   Result := not RunningRS2009;
 end;
 
+{ TMacroLibRecordExpert }
+
+class function TMacroLibRecordExpert.ConfigurationKey: string;
+begin
+  Result := 'MacroLibRecord';
+end;
+
+function TMacroLibRecordExpert.HasConfigOptions: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TMacroLibRecordExpert.Execute(Sender: TObject);
+begin
+  GetMacroLibraryForm.actRecord.Execute;
+end;
+
+function TMacroLibRecordExpert.GetActionCaption: string;
+resourcestring
+  SMenuCaption = 'Keyboard Macro Record Start/Stop';
+begin
+  Result := SMenuCaption;
+end;
+
+function TMacroLibRecordExpert.GetBitmap: Graphics.TBitmap;
+begin
+  if not Assigned(FBitmap) then begin
+    FBitmap := Graphics.TBitmap.Create;
+    GetMacroLibraryForm.GetRecordBitmap(FBitmap);
+  end;
+  result := FBitmap;
+end;
+
+function TMacroLibRecordExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Ord('R'), [ssCtrl, ssShift]);
+end;
+
+function TMacroLibRecordExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  Start or stop keyboard macro recording.';
+begin
+  Result := SHelpString;
+end;
+
+class function TMacroLibRecordExpert.GetName: string;
+begin
+  Result := 'MacroLibRecord';
+end;
+
+procedure TMacroLibRecordExpert.SetShortCut(Value: TShortCut);
+begin
+  inherited;
+  if (GetMacroLibraryForm = nil) then
+    Exit; //==>
+  GetMacroLibraryForm.actRecord.ShortCut := Value;
+end;
+
+{ TMacroLibPlaybackExpert }
+
+class function TMacroLibPlaybackExpert.ConfigurationKey: string;
+begin
+  Result := 'MacroLibPlayback';
+end;
+
+function TMacroLibPlaybackExpert.HasConfigOptions: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TMacroLibPlaybackExpert.Execute(Sender: TObject);
+begin
+  GetMacroLibraryForm.actPlayback.Execute;
+end;
+
+function TMacroLibPlaybackExpert.GetActionCaption: string;
+resourcestring
+  SMenuCaption = 'Keyboard Macro Playback';
+begin
+  Result := SMenuCaption;
+end;
+
+function TMacroLibPlaybackExpert.GetBitmap: Graphics.TBitmap;
+begin
+  if not Assigned(FBitmap) then begin
+    FBitmap := Graphics.TBitmap.Create;
+    GetMacroLibraryForm.GetPlayBitmap(FBitmap);
+  end;
+  result := FBitmap;
+end;
+
+function TMacroLibPlaybackExpert.GetDefaultShortCut: TShortCut;
+begin
+  Result := Menus.ShortCut(Ord('P'), [ssCtrl, ssShift]);
+end;
+
+function TMacroLibPlaybackExpert.GetHelpString: string;
+resourcestring
+  SHelpString =
+  '  Playback recorded keyboard macro.';
+begin
+  Result := SHelpString;
+end;
+
+class function TMacroLibPlaybackExpert.GetName: string;
+begin
+  Result := 'MacroLibPlayback';
+end;
+
+procedure TMacroLibPlaybackExpert.SetShortCut(Value: TShortCut);
+begin
+  inherited;
+  if (GetMacroLibraryForm = nil) then
+    Exit; //==>
+  GetMacroLibraryForm.actPlayback.ShortCut := Value;
+end;
+
 { TIDEMacroBugMessage }
 
 function TIDEMacroBugMessage.GetMessage: string;
@@ -1269,6 +1444,8 @@ end;
 
 initialization
   RegisterGX_Expert(TMacroLibExpert);
+  RegisterGX_Expert(TMacroLibRecordExpert);
+  RegisterGX_Expert(TMacroLibPlaybackExpert);
 
 end.
 

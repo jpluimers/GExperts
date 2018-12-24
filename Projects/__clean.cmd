@@ -1,4 +1,6 @@
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 if "%1"=="" goto :list
 call :doItem %1
 goto :eof

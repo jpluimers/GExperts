@@ -104,12 +104,14 @@ function IDEHasWelcomePage: Boolean;
 function FileIsWelcomePage(const FileName: string): Boolean;
 function IDEEditorEncodingIsUTF8: Boolean;
 
+function IsThemingEnabled: Boolean;
+
 implementation
 
 uses
   {$IFOPT D+} GX_DbugIntf, {$ENDIF}
   SysUtils, Windows, Registry, StrUtils,
-  GX_GenericUtils, GX_OtaUtils, GX_GxUtils;
+  GX_GenericUtils, GX_OtaUtils, GX_GxUtils, GX_dzCompilerAndRtlVersions;
 
 function GetIdeMainForm: TCustomForm;
 begin
@@ -655,6 +657,31 @@ end;
 function IDEEditorEncodingIsUTF8: Boolean;
 begin
   Result := RunningDelphi8OrGreater;
+end;
+
+function IsThemingEnabled: Boolean;
+var
+  reg: TRegistry;
+begin
+  Result := False;
+  if CompilerVersion < CompilerVersionDelphiX103 then
+    Exit; //==>
+
+  // if yes, check if theming is enabled
+  reg := TRegistry.Create;
+  try
+    reg.RootKey := HKEY_CURRENT_USER;
+    if reg.OpenKeyReadOnly(GxOtaGetIdeBaseRegistryKey + '\Theme') then begin
+      try
+        if reg.ValueExists('Enabled') and (reg.GetDataType('Enabled') = rdInteger) then
+          Result := (reg.ReadInteger('Enabled') <> 0);
+      finally
+        reg.CloseKey;
+      end;
+    end;
+  finally
+    FreeAndNil(reg);
+  end;
 end;
 
 end.

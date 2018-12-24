@@ -1,5 +1,7 @@
 @rem Open project in Delphi IDE
-@echo off
+@setlocal enableextensions
+@if not defined gx_cmd_debug (echo off)
+@endlocal
 setlocal
 set buildtools=%~dp0%
 if "%1" == "" goto detectver
